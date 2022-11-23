@@ -1,0 +1,26 @@
+
+RELEASE
+
+upload to testpypi/pypi
+$ twine upload -r testpypi dist/*
+$ twine upload dist/*
+
+NEXT: install from testypi/pypi
+$ python3 -m pip install -i https://test.pypi.org/simple/ project_name
+$ python3 -m pip install project_name
+
+NEXT: install from github
+https://packaging.python.org/en/latest/tutorials/installing-packages/#id23
+python3 -m pip git+https://github.com/cyclopticnerve/project_name/
+requirements? pip install -r requirements.txt
+
+python3 -m pip install -e git+https://github.com/cyclopticnerve/<project_name>.git#egg=<project_name>       # from default branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/<project_name>.git@maine#egg=<project_name> # from specific branch
+
+NEXT: Meta:
+Project name (upper-cased)
+Package/module name (lower-cased)
+Version number
+Copyright
+Short desc (for git and setup)
+Tags (for git and setup)

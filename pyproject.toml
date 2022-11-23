@@ -1,0 +1,41 @@
+# ------------------------------------------------------------------------------
+# Project :                                                        /          \
+# Filename: pyproject.toml                                        |     ()     |
+# Date    :                                                       |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+[build-system]
+requires = [
+    "setuptools>=59.6.0",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "<package-name>" # package/module name, small letters
+version = "0.0.0"
+description = "A short description"
+readme = "README.md"
+authors = [
+    {name = "cyclopticnerve", email = "cyclopticnerve@gmail.com"}
+]
+license = {file = "LICENSE"}
+classifiers = [
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = [
+    "key", 
+    "words"
+]
+dependencies = []
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/cyclopticnerve/<package_name>"
+
+# -)

@@ -1,0 +1,67 @@
+Project setup
+
+Nautilus
+    [X] Copy Template as new project folder
+
+VSCodium
+    [] get github token from ~/.git-credentials (from : to @)
+    [] git remote set-url origin https://<githubtoken>@github.com/<username>/<repositoryname>.git
+    [] Create venv - $ python -m venv venv; $ source venv/bin/activate
+    [] Install pylama in venv (popup in cottom right)
+    [] Install build - $ python -m pip install build
+    [] Create new repo in github tab
+    [] Publish "main" branch
+    [] Stage all changes
+    [] Commit “first commit”
+    [] Checkout new branch “dev” from “main”
+    [] Sync changes
+
+GitHub
+    [] Make “dev” default branch
+    [] Add description and search tags
+
+================================================================================
+
+Work
+    --- Do all work on dev
+    [] Headers/footers
+    [] Docstrings
+
+--------------------------------------------------------------------------------
+
+Test
+    --- Unit tests
+    Packages/Modules
+        [] Internal test (sys.path)
+        [] Install/test in venv (this project)$ (venv) python -m pip install -e .
+    Applications
+        [] Test in VM
+
+--------------------------------------------------------------------------------
+
+Release - VSCodium
+    [] $ python -m pip freeze > requirements.txt
+    [] remove '-e' from requirements
+    [] Change version number in __init__.py and pyproject.toml
+    [] changelog - $ git log --pretty="- %s" > CHANGELOG.md
+    --- generate docs
+    [] Build - $ python -m build
+    [] Push "dev"
+    [] Checkout new branch “release” from “dev”
+    [] Publish branch
+    --- Modify files as necessary (delete .gitignore, etc.)
+    [] Change any DEBUG to 0
+    [] Merge from “release” to “main“ (git checkout “main”; git merge “release”)
+    [] Delete release branch
+    [] tag with version number "vX.X.X"
+    [] Push “main”    
+    [] checkout "dev"
+
+Release - GitHub
+    [] Draft release
+    [] Tag with version number (v0.1.0)
+    [] Make sure target is main
+
+Reset all checks below "work"
+    [] Ctrl-H, replace [X] with []
+    

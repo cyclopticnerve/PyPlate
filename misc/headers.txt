@@ -1,0 +1,39 @@
+# ------------------------------------------------------------------------------
+# Project :                                                        /          \
+# Filename:                                                       |     ()     |
+# Date    :                                                       |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Project :                                                       /          \   
+// Filename:                                                      |     ()     |  
+// Date    :                                                      |            |  
+// Author  : cyclopticnerve                                       |   \____/   |  
+// License : WTFPLv2                                               \          /   
+//------------------------------------------------------------------------------
+
+<!----------------------------------------------------------------------------->
+<!-- Project :                                                 /          \  -->
+<!-- Filename:                                                |     ()     | -->
+<!-- Date    :                                                |            | -->
+<!-- Author  : cyclopticnerve                                 |   \____/   | -->
+<!-- License : WTFPLv2                                         \          /  -->
+<!----------------------------------------------------------------------------->
+
+    """
+        Short description
+
+        Paramaters:
+            dict_defsvar_name [type]: description
+                second line
+
+        Returns:
+            [type]: description
+
+        Rasies:
+            exception_type(vars): description
+
+        Long description
+    """
