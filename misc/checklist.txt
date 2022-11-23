@@ -4,21 +4,21 @@ Nautilus
     [X] Copy Template as new project folder
 
 VSCodium
-    [] get github token from ~/.git-credentials (from : to @)
-    [] git remote set-url origin https://<githubtoken>@github.com/<username>/<repositoryname>.git
-    [] Create venv - $ python -m venv venv; $ source venv/bin/activate
-    [] Install pylama in venv (popup in cottom right)
-    [] Install build - $ python -m pip install build
-    [] Create new repo in github tab
-    [] Publish "main" branch
-    [] Stage all changes
-    [] Commit “first commit”
-    [] Checkout new branch “dev” from “main”
-    [] Sync changes
+    [X] get github token from ~/.git-credentials (from : to @)
+    [X] git remote set-url origin https://<githubtoken>@github.com/<username>/<repositoryname>.git
+    [X] Create venv - $ python -m venv venv; $ source venv/bin/activate
+    [X] Install pylama in venv (popup in cottom right)
+    [X] Install build - $ python -m pip install build
+    [X] Create new repo in github tab
+    [X] Publish "main" branch
+    [X] Stage all changes
+    [X] Commit “first commit”
+    [X] Checkout new branch “dev” from “main”
+    [X] Sync changes
 
 GitHub
-    [] Make “dev” default branch
-    [] Add description and search tags
+    [X] Make “dev” default branch
+    [-] Add description and search tags
 
 ================================================================================
 
