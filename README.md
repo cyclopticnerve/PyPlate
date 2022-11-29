@@ -12,13 +12,13 @@
 
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
-<Description>
-
 __CN_SHORT_DESC__
 
-![](readme/readme_ss.jpg)
+<!-- ![](readme/screenshot.jpg) -->
 
 ## Requirements
+
+blah blah blah
 
 ## Installing
 
@@ -34,7 +34,7 @@ to make sure you have the lastest software installed.
 You can download the (hopefully stable) 
 [latest release](https://github.com/cyclopticnerve/__CN_PROJECT_NAME__/releases/latest) 
 from the main branch. <br>
-Download the Source Code (tar.gz) file. <br>
+Download the 'Source Code (tar.gz)' file. <br>
 Then install it using:
 
 ```bash
@@ -49,14 +49,16 @@ from the dev branch:
 foo@bar:~$ python -m pip install build
 foo@bar:~$ cd Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_PROJECT_NAME__
-foo@bar:~/Downloads/<Project_Name>$ python -m build
-foo@bar:~/Downloads/<Project_Name>$ python -m pip install ./dist/__CN_PROJECT_NAME__-X.X.X.tar.gz -r ./requirements.txt
+foo@bar:~/Downloads/__CN_PROJECT_NAME__$ python -m build
+foo@bar:~/Downloads/__CN_PROJECT_NAME_$ python -m pip install ./dist/__CN_PROJECT_NAME__-X.X.X.tar.gz -r ./requirements.txt
 ```
 
 <!-- application -->
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/__CN_PROJECT_NAME__/releases/latest) 
-from the main branch, unzip it, and run the *install.py* file from there:
+from the main branch.<br>
+Download either the 'tar.gz' or '.zip' file and extract it.<br>
+Then run the 'install.py' file from there:
 
 ```bash
 foo@bar:~$ cd Downloads/__CN_PROJECT_NAME__-X.X.X
@@ -76,8 +78,8 @@ foo@bar:~/Downloads/__CN_PROJECT_NAME__$ ./install.py
 ## Uninstalling
 
 <!-- package/module -->
-```python
-python -m pip uninstall __CN_PACKAGE_NAME__
+```bash
+foo@bar:~$ python -m pip uninstall __CN_PACKAGE_NAME__
 ```
 
 <!-- application -->
@@ -88,7 +90,11 @@ foo@bar:~/.__CN_PROGRAM_NAME__$ ./uninstall.py
 
 ## Usage
 
+blah blah blah
+
 ## Notes
+
+blah blah blah
 
 ## -)
 
