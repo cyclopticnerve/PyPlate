@@ -12,11 +12,4 @@ __version__ = '__CN_VERSION__'
 __CN_SHORT_DESC__
 """
 
-# import all modules in package to get full dot notation from package import
-# from <package> imoport <module>
-from __CN_PACKAGE_NAME__ import module_name # noqa W0611 (unused import)
-
-# from <package_name> import *
-__all__ = ["module_name"]  # ["module_name", ...]
-
 # -)

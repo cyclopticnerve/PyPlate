@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project :                                                        /          \
+# Project : __CN_PROJECT_NAME__                                    /          \
 # Filename: pyproject.toml                                        |     ()     |
-# Date    :                                                       |            |
+# Date    : __CN_DATE__                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -14,9 +14,9 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "<package-name>" # package/module name, small letters
-version = "0.0.0"
-description = "A short description"
+name = "__CN_PROGRAM_NAME__" # package/app name, small letters
+version = "__CN_VERSION__"
+description = "__CN_SHORT_DESC__"
 readme = "README.md"
 authors = [
     {name = "cyclopticnerve", email = "cyclopticnerve@gmail.com"}
@@ -29,13 +29,12 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = [
-    "key", 
-    "words"
+    "__CN_KEYWORDS__"
 ]
 dependencies = []
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/<package_name>"
+Homepage = "https://github.com/cyclopticnerve/__CN_PROJECT_NAME__"
 
 # -)

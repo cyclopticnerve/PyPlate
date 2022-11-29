@@ -1,12 +1,13 @@
 # ------------------------------------------------------------------------------
-# Project :                                                        /          \
+# Project : __CN_PROJECT_NAME__                                    /          \
 # Filename:                                                       |     ()     |
-# Date    :                                                       |            |
+# Date    : __CN_DATE__                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-def joke():
-    return ('A horse walks into a girl, and the bartender says...')
+# code to run when called from command line
+if __name__ == '__main__':
+    pass
 
 # -)

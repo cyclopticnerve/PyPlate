@@ -1,43 +1,49 @@
-Project setup
 
 Nautilus
-    [X] Copy Template as new project folder
+    [] Copy Template as new project folder and rename
 
 VSCodium
-    [X] get github token from ~/.git-credentials (from : to @)
-    [X] git remote set-url origin https://<githubtoken>@github.com/<username>/<repositoryname>.git
-    [X] Create venv - $ python -m venv venv; $ source venv/bin/activate
-    [X] Install pylama in venv (popup in cottom right)
-    [X] Install build - $ python -m pip install build
-    [X] Create new repo in github tab
-    [X] Publish "main" branch
-    [X] Stage all changes
-    [X] Commit “first commit”
-    [X] Checkout new branch “dev” from “main”
-    [X] Sync changes
+    [] Change all metadata (project name, etc.)
+    [] Create new repo in github tab
+    [] get github token from ~/.git-credentials (from : to @)
+    [] git remote set-url origin 
+        https://<githubtoken>@github.com/<username>/<repositoryname>.git
+    [] Create venv - $ python -m venv venv
+    [] Activate venv - $ source venv/bin/activate
+    [] Install pylama in venv (popup in bottom right)
+    [] Install build - $ python -m pip install build
+    [] Publish "main" branch
+    [] Stage all changes
+    [] Commit “first commit”
+    [] Checkout new branch “dev” from “main”
+    [] Sync changes
 
 GitHub
-    [X] Make “dev” default branch
-    [-] Add description and search tags
+    [] Make “dev” default branch
+    [] Add description and search tags
 
 ================================================================================
 
-Work
+LABEL WORK:
+
     --- Do all work on dev
     [] Headers/footers
     [] Docstrings
 
 --------------------------------------------------------------------------------
 
-Test
+LABEL TEST:
+
     --- Unit tests
     Packages/Modules
         [] Internal test (sys.path)
-        [] Install/test in venv (this project)$ (venv) python -m pip install -e .
-    Applications
-        [] Test in VM
+        [] Install/test in venv (this project)
+            $ (venv) python -m pip install -e .
+        [] Test in VM using GitHub/README
 
---------------------------------------------------------------------------------
+GOTO WORK AD NAUSEUM
+
+================================================================================
 
 Release - VSCodium
     [] $ python -m pip freeze > requirements.txt
@@ -64,4 +70,3 @@ Release - GitHub
 
 Reset all checks below "work"
     [] Ctrl-H, replace [X] with []
-    

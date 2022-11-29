@@ -1,0 +1,63 @@
+
+# defaults
+{
+    "__CN_PROJECT_NAME__": "",      1
+    "__CN_DATE__": "",              1
+    "__CN_PROGRAM_NAME__": "",      1
+    "__CN_PACKAGE_NAME__": "",      1
+    "__CN_VERSION__": "",           1
+    "__CN_SHORT_DESC__": "",        1
+    "__CN_KEYWORDS__": [            1
+    ]
+}
+
+# sample
+{
+    "__CN_PROJECT_NAME__": "SpaceOddity",
+    "__CN_DATE__": "01/01/2022",
+    "__CN_PROGRAM_NAME__": "spaceoddity",
+    "__CN_PACKAGE_NAME__": "installerator",
+    "__CN_VERSION__": "0.1.0",              # done in __init__.py, pyproject.toml, github, ???
+    "__CN_SHORT_DESC__": "Short desc"       # only done once for pyproject.toml, __init.py__, github
+    "__CN_KEYWORDS__": [                    # for pyproject.toml and github
+        "foo",
+        "bar"
+    ]
+}
+
+make a script that replaces all occurrences of certain variables
+(e.g. "__CN_PROGRAM_NAME__") with metadata
+scan whole template folder AFTER copying to new project location
+don't care about github, can do manually once at init of repo
+
+also update create date for each file in template when above script is run
+for all other files containing header
+this could be combined into a "make project from template" script
+
+module names skipped because there will only be one module in the template
+
+can we combine app and package?
+what would layouts look like?
+
+# package
+project_name
+    src
+        package_name
+            __init__.py
+            module_name_1.py
+            module_name_2.py
+
+# module
+project_name
+    src
+        __init__.py
+        module_name.py
+
+# app
+project name
+    src
+        __init__.py
+        app.py
+
+Single module packages are easy
+How to make app have same structure???
