@@ -1,24 +1,24 @@
 
 # defaults
 {
-    "__CN_PROJECT_NAME__": "",      1
-    "__CN_DATE__": "",              1
-    "__CN_PROGRAM_NAME__": "",      1
-    "__CN_PACKAGE_NAME__": "",      1
-    "__CN_VERSION__": "",           1
-    "__CN_SHORT_DESC__": "",        1
-    "__CN_KEYWORDS__": [            1
+    "__CN_PROJECT_NAME__":  "",
+    "__CN_DATE__":          "",
+    "__CN_PROGRAM_NAME__":  "",
+    "__CN_PACKAGE_NAME__":  "",
+    "__CN_VERSION__":       "",
+    "__CN_SHORT_DESC__":    "",
+    "__CN_KEYWORDS__": [
     ]
 }
 
 # sample
 {
-    "__CN_PROJECT_NAME__": "SpaceOddity",
-    "__CN_DATE__": "01/01/2022",
-    "__CN_PROGRAM_NAME__": "spaceoddity",
-    "__CN_PACKAGE_NAME__": "installerator",
-    "__CN_VERSION__": "0.1.0",              # done in __init__.py, pyproject.toml, github, ???
-    "__CN_SHORT_DESC__": "Short desc"       # only done once for pyproject.toml, __init.py__, github
+    "__CN_PROJECT_NAME__":  "SpaceOddity",
+    "__CN_DATE__":          "01/01/2022",
+    "__CN_PROGRAM_NAME__":  "spaceoddity",
+    "__CN_PACKAGE_NAME__":  "installerator",
+    "__CN_VERSION__":       "0.1.0",        # done in __init__.py, pyproject.toml, github, ???
+    "__CN_SHORT_DESC__":    "Short desc"    # only done once for pyproject.toml, __init.py__, github
     "__CN_KEYWORDS__": [                    # for pyproject.toml and github
         "foo",
         "bar"
