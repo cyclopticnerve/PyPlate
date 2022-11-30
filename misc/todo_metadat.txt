@@ -1,38 +1,36 @@
 
 # defaults
 {
-    "__CN_PROJECT_NAME__":  "",
-    "__CN_DATE__":          "",
-    "__CN_PROGRAM_NAME__":  "",
-    "__CN_PACKAGE_NAME__":  "",
-    "__CN_VERSION__":       "",
-    "__CN_SHORT_DESC__":    "",
-    "__CN_KEYWORDS__": [
+    '__CN_BIG_NAME__':      '',
+    '__CN_SMALL_NAME__':    '',
+    '__CN_DATE__':          '',
+    '__CN_VERSION__':       '',
+    '__CN_SHORT_DESC__':    '',
+    '__CN_KEYWORDS__': [
     ]
 }
 
 # sample
 {
-    "__CN_PROJECT_NAME__":  "SpaceOddity",
-    "__CN_DATE__":          "01/01/2022",
-    "__CN_PROGRAM_NAME__":  "spaceoddity",
-    "__CN_PACKAGE_NAME__":  "installerator",
-    "__CN_VERSION__":       "0.1.0",        # done in __init__.py, pyproject.toml, github, ???
-    "__CN_SHORT_DESC__":    "Short desc"    # only done once for pyproject.toml, __init.py__, github
-    "__CN_KEYWORDS__": [                    # for pyproject.toml and github
-        "foo",
-        "bar"
+    '__CN_BIG_NAME__':      'SpaceOddity',
+    '__CN_SMALL_NAME__':    'spaceoddity',
+    '__CN_DATE__':          '01/01/2022',
+    '__CN_VERSION__':       '0.1.0',        # done in __init__.py, pyproject.toml, github, ???
+    '__CN_SHORT_DESC__':    'Short desc'    # only done once for pyproject.toml, __init.py__, github
+    '__CN_KEYWORDS__': [                    # for pyproject.toml and github
+        'foo',
+        'bar'
     ]
 }
 
 make a script that replaces all occurrences of certain variables
-(e.g. "__CN_PROGRAM_NAME__") with metadata
+(e.g. '__CN_BIG_NAME__') with metadata
 scan whole template folder AFTER copying to new project location
 don't care about github, can do manually once at init of repo
 
 also update create date for each file in template when above script is run
 for all other files containing header
-this could be combined into a "make project from template" script
+this could be combined into a 'make project from template' script
 
 module names skipped because there will only be one module in the template
 
@@ -40,24 +38,25 @@ can we combine app and package?
 what would layouts look like?
 
 # package
-project_name
+__CN_BIG_NAME__
     src
-        package_name
+        __CN_SMALL_NAME__
             __init__.py
             module_name_1.py
             module_name_2.py
 
 # module
-project_name
+__CN_BIG_NAME__
     src
         __init__.py
-        module_name.py
+        __CN_SMALL_NAME__.py
 
 # app
-project name
+__CN_BIG_NAME__
     src
         __init__.py
-        app.py
+        __CN_SMALL_NAME__.py
+        uninstall.py
 
 Single module packages are easy
 How to make app have same structure???

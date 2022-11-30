@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_PROJECT_NAME__                                    /          \
+# Project : __CN_BIG_NAME__                                        /          \
 # Filename: __init__.py                                           |     ()     |
 # Date    : __CN_DATE__                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |

@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_PROJECT_NAME__                                    /          \
+# Project : __CN_BIG_NAME__                                        /          \
 # Filename: __init__.py                                           |     ()     |
 # Date    : __CN_DATE__                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -14,9 +14,9 @@ __CN_SHORT_DESC__
 
 # import all modules in package to get full dot notation from package import
 # from <package> imoport <module>
-from __CN_PACKAGE_NAME__ import module_name # noqa W0611 (unused import)
+from __CN_SMALL_NAME__ import module_name # noqa W0611 (unused import)
 
 # from <package_name> import *
-__all__ = ["module_name"]  # ["module_name", ...]
+__all__ = ['module_name']  # ['module_name', ...]
 
 # -)

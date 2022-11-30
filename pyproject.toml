@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_PROJECT_NAME__                                    /          \
+# Project : __CN_BIG_NAME__                                        /          \
 # Filename: pyproject.toml                                        |     ()     |
 # Date    : __CN_DATE__                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -14,7 +14,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__CN_PROGRAM_NAME__" # package/app name, small letters
+name = "__CN_SMALL_NAME__"
 version = "__CN_VERSION__"
 description = "__CN_SHORT_DESC__"
 readme = "README.md"
@@ -31,10 +31,11 @@ classifiers = [
 keywords = [
     "__CN_KEYWORDS__"
 ]
-dependencies = []
+dependencies = [
+]
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/__CN_PROJECT_NAME__"
+Homepage = "https://github.com/cyclopticnerve/__CN_BIG_NAME__"
 
 # -)

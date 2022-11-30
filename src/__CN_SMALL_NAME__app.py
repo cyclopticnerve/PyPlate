@@ -1,12 +1,13 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_PROJECT_NAME__                                    /          \
+# Project : __CN_BIG_NAME__                                        /          \
 # Filename:                                                       |     ()     |
 # Date    : __CN_DATE__                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-def func():
-    return ('this is a test')
+# code to run when called from command line
+if __name__ == '__main__':
+    pass
 
 # -)

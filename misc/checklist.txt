@@ -3,16 +3,20 @@ Nautilus
     [] Copy Template as new project folder and rename
 
 VSCodium
-    [] Change all metadata (project name, etc.)
+    [] Remove files not applicable to project type
+    [] Remove README.md sections not applicable to project type
+    [] Change filenames using misc/todo_metadata.txt
+    [] Change all metadata (project name, etc.) using misc/todo_metadata.txt
+        exclude misc folder from find/replace
     [] Create new repo in github tab
-    [] get github token from ~/.git-credentials (from : to @)
-    [] git remote set-url origin 
+    --- get github token from ~/.git-credentials (from : to @)
+    --- git remote set-url origin 
         https://<githubtoken>@github.com/<username>/<repositoryname>.git
     [] Create venv - $ python -m venv venv
     [] Activate venv - $ source venv/bin/activate
     [] Install pylama in venv (popup in bottom right)
     [] Install build - $ python -m pip install build
-    [] Publish "main" branch
+    [] Publish 'main' branch
     [] Stage all changes
     [] Commit “first commit”
     [] Checkout new branch “dev” from “main”
@@ -49,24 +53,24 @@ Release - VSCodium
     [] $ python -m pip freeze > requirements.txt
     [] remove '-e' from requirements
     [] Change version number in __init__.py and pyproject.toml
-    [] changelog - $ git log --pretty="- %s" > CHANGELOG.md
+    [] changelog - $ git log --pretty='- %s' > CHANGELOG.md
     --- generate docs
     [] Build - $ python -m build
-    [] Push "dev"
+    [] Push 'dev'
     [] Checkout new branch “release” from “dev”
     [] Publish branch
     --- Modify files as necessary (delete .gitignore, etc.)
     [] Change any DEBUG to 0
     [] Merge from “release” to “main“ (git checkout “main”; git merge “release”)
     [] Delete release branch
-    [] tag with version number "vX.X.X"
+    [] tag with version number 'vX.X.X'
     [] Push “main”    
-    [] checkout "dev"
+    [] checkout 'dev'
 
 Release - GitHub
     [] Draft release
     [] Tag with version number (v0.1.0)
     [] Make sure target is main
 
-Reset all checks below "work"
+Reset all checks below 'work'
     [] Ctrl-H, replace [X] with []
