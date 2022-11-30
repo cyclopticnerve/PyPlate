@@ -1,2 +1,19 @@
-# TODO: fill in w/ default desktop stuff
-# also header and footer, this is a text file
+# ------------------------------------------------------------------------------
+# Project : __CN_BIG_NAME__                                        /          \
+# Filename: __CN_SMALL_NAME__.desktop                             |     ()     |
+# Date    : __CN_DATE__                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Exec=__CN_GUI_EXEC__
+Name=__CN_BIG_NAME__
+Icon=__CN_GUI_ICON__
+X-Desktop-File-Install-Version=0.26
+
+# -)
