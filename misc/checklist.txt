@@ -50,6 +50,8 @@ GOTO WORK AD NAUSEUM
 ================================================================================
 
 Release - VSCodium
+    [] check dependencies in pyproject.toml and install.py
+    [] what files in MANIFEST.in?
     [] $ python -m pip freeze > requirements.txt
     [] remove '-e' from requirements
     [] Change version number in __init__.py and pyproject.toml
