@@ -14,8 +14,8 @@ VSCodium
     [] Install pylama in venv (popup in bottom right)
     [] Install build - $ python -m pip install build
     [] Create new repo in github tab
-    --- Get github token from ~/.git-credentials (from : to @)
-    --- $ git remote set-url origin 
+    ??? Get github token from ~/.git-credentials (from : to @)
+    ??? $ git remote set-url origin 
         https://<githubtoken>@github.com/<username>/<repositoryname>.git
     [] Stage all changes
     [] Commit 'first commit'
@@ -31,7 +31,7 @@ GitHub
 
 LABEL WORK:
 
-    --- Do all work on dev
+    !!! Do all work on dev
     [] Headers/footers
     [] Docstrings
 
@@ -51,19 +51,32 @@ GOTO WORK AD NAUSEUM
 ================================================================================
 
 Release - VSCodium
-    [] Check dependencies in pyproject.toml and install.py
-    [] What files in MANIFEST.in?
-    [] $ python -m pip freeze > requirements.txt
-    [] Remove '-e' from requirements
-    [] Change version number in __init__.py and pyproject.toml
-    [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
+
+    on 'dev':
+
+    [X] Check dependencies in pyproject.toml and install.py
+    [X] Update extra files in MANIFEST.in
+    [X] $ python -m pip freeze > requirements.txt
+    [X] Remove '-e' from requirements
+    [X] Change version number in __init__.py/__main__.py and pyproject.toml
+    [X] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
     --- Generate docs
-    [] Build - $ python -m build
-    [] Push 'dev'
-    [] Checkout new branch 'release' from 'dev'
-    [] Publish branch
-    --- Modify files as necessary (delete .gitignore, etc.)
-    [] Change any DEBUG to 0
+    [X] Commit/push 'dev' for 'next release'
+
+    [X] Checkout new branch 'release' from 'dev'
+    [X] Publish branch
+
+    on 'release':
+
+    ??? Modify files as necessary (delete .gitignore, etc.)
+    [X] Change any DEBUG to 0
+    [X] Build - $ python -m build
+    --- Upload to TestPyPI/PyPI
+    [] Commit/push 'release'
+
+    on 'main':
+    
+    [] Checkout 'main'
     [] Merge from 'release' to 'main' (git checkout 'main'; git merge 'release')
     [] Delete release branch
     [] Tag with version number 'vX.X.X'
