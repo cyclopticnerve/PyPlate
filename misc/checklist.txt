@@ -8,23 +8,23 @@ VSCodium
     [] Change filenames using misc/todo_metadata.txt
     [] Change all metadata (project name, etc.) using misc/todo_metadata.txt
         exclude misc folder from find/replace
-    [] Create new repo in github tab
-    --- get github token from ~/.git-credentials (from : to @)
-    --- git remote set-url origin 
-        https://<githubtoken>@github.com/<username>/<repositoryname>.git
     [] Create venv - $ python -m venv venv
     [] Activate venv - $ source venv/bin/activate
     [] Switch to venv interpreter - bottom right of status bar
     [] Install pylama in venv (popup in bottom right)
     [] Install build - $ python -m pip install build
-    [] Publish 'main' branch
+    [] Create new repo in github tab
+    --- Get github token from ~/.git-credentials (from : to @)
+    --- $ git remote set-url origin 
+        https://<githubtoken>@github.com/<username>/<repositoryname>.git
     [] Stage all changes
-    [] Commit “first commit”
-    [] Checkout new branch “dev” from “main”
-    [] Sync changes
+    [] Commit 'first commit'
+    [] Publish 'main' branch
+    [] Checkout new branch 'dev' from 'main'
+    [] Publish 'dev' branch
 
 GitHub
-    [] Make “dev” default branch
+    [] Make 'dev' default branch
     [] Add description and search tags
 
 ================================================================================
@@ -43,7 +43,7 @@ LABEL TEST:
     Packages/Modules
         [] Internal test (sys.path)
         [] Install/test in venv (this project)
-            $ (venv) python -m pip install -e .
+            $ python -m pip install -e .
         [] Test in VM using GitHub/README
 
 GOTO WORK AD NAUSEUM
@@ -51,24 +51,24 @@ GOTO WORK AD NAUSEUM
 ================================================================================
 
 Release - VSCodium
-    [] check dependencies in pyproject.toml and install.py
-    [] what files in MANIFEST.in?
+    [] Check dependencies in pyproject.toml and install.py
+    [] What files in MANIFEST.in?
     [] $ python -m pip freeze > requirements.txt
-    [] remove '-e' from requirements
+    [] Remove '-e' from requirements
     [] Change version number in __init__.py and pyproject.toml
-    [] changelog - $ git log --pretty='- %s' > CHANGELOG.md
-    --- generate docs
+    [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
+    --- Generate docs
     [] Build - $ python -m build
     [] Push 'dev'
-    [] Checkout new branch “release” from “dev”
+    [] Checkout new branch 'release' from 'dev'
     [] Publish branch
     --- Modify files as necessary (delete .gitignore, etc.)
     [] Change any DEBUG to 0
-    [] Merge from “release” to “main“ (git checkout “main”; git merge “release”)
+    [] Merge from 'release' to 'main' (git checkout 'main'; git merge 'release')
     [] Delete release branch
-    [] tag with version number 'vX.X.X'
-    [] Push “main”    
-    [] checkout 'dev'
+    [] Tag with version number 'vX.X.X'
+    [] Push 'main'    
+    [] Checkout 'dev'
 
 Release - GitHub
     [] Draft release
