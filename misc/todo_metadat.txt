@@ -60,7 +60,7 @@ __CN_BIG_NAME__
 # app
 __CN_BIG_NAME__
     src
-        __init__.py
+        __main__.py
         __CN_SMALL_NAME__.py
         uninstall.py
 

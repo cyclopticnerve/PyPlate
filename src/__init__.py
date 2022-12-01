@@ -6,6 +6,8 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# this file is only for single module projects
+
 __version__ = '__CN_VERSION__'
 
 """

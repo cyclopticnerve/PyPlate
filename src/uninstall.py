@@ -12,18 +12,17 @@
 
 import installerator
 
-# NB: requires:
-# installerator
-
-# the user dict
-dict_user = {
+# ------------------------------------------------------------------------------
+# Define the uninstall settings
+# ------------------------------------------------------------------------------
+dict_uninstall = {
     "general": {
         "name": "__CN_BIG_NAME__"
     },
     "preflight": [
     ],
     "dirs": [
-        "${HOME}/.s__CN_SMALL_NAME"
+        "${HOME}/.__CN_SMALL_NAME"
     ],
     "files": {
     },
@@ -38,9 +37,9 @@ dict_user = {
 if __name__ == '__main__':
 
     # instantiate uninstallerator class
-    uninst = installerator.uninstallerator.Uninstallerator()
+    uninstaller = installerator.uninstallerator.Uninstallerator()
 
     # # run the instance
-    uninst.run(dict_user)
+    uninstaller.run(dict_uninstall)
 
 # -)

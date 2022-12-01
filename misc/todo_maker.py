@@ -4,5 +4,4 @@
 
 # 3. rename folders/files
 
-# 4. search/replace tokens (excluding misc/)
-
+# 4. search/replace tokens in text (excluding misc/)

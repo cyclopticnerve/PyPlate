@@ -12,13 +12,12 @@
 
 import installerator
 
-# NB: requires:
-# installerator
-
-# the user dict
-dict_user = {
+# ------------------------------------------------------------------------------
+# Define the install settings
+# ------------------------------------------------------------------------------
+dict_install = {
     "general": {
-        "name":                         "__CN_BIG_NAME__"
+        "name": "__CN_BIG_NAME__"
     },
     "preflight": [
     ],
@@ -30,24 +29,23 @@ dict_user = {
         "${HOME}/.__CN_SMALL_NAME__"
     ],
     "files": {
-        "${SRC}/LICENSE":               "${HOME}/.__CN_SMALL_NAME__",
-        "${SRC}/uninstall.py":          "${HOME}/.__CN_SMALL_NAME__",
-        "${SRC}/__CN_SMALL_NAME__.py":  "${HOME}/.__CN_SMALL_NAME__"
+        "${SRC}/LICENSE": "${HOME}/.__CN_SMALL_NAME__",
+        "${SRC}/uninstall.py": "${HOME}/.__CN_SMALL_NAME__",
+        "${SRC}/__CN_SMALL_NAME__.py": "${HOME}/.__CN_SMALL_NAME__"
     },
     "postflight": [
     ]
 }
 
 # ------------------------------------------------------------------------------
-# Run the main class if we are not an import
-# This happens when we run script from command line
+# Run the main class if we are called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
 
     # instantiate installerator class
-    inst = installerator.installerator.Installerator()
+    installer = installerator.installerator.Installerator()
 
     # # run the instance
-    inst.run(dict_user)
+    installer.run(dict_install)
 
 # -)
