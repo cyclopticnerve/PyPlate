@@ -54,23 +54,23 @@ Release - VSCodium
 
     on 'dev':
 
-    [X] Check dependencies in pyproject.toml and install.py
-    [X] Update extra files in MANIFEST.in
-    [X] $ python -m pip freeze > requirements.txt
-    [X] Remove '-e' from requirements
-    [X] Change version number in __init__.py/__main__.py and pyproject.toml
-    [X] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
+    [] Check dependencies in pyproject.toml and install.py
+    [] Update extra files in MANIFEST.in
+    [] $ python -m pip freeze > requirements.txt
+    [] Remove '-e' from requirements
+    [] Change version number in __init__.py/__main__.py and pyproject.toml
+    [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
     --- Generate docs
-    [X] Commit/push 'dev' for 'next release'
+    [] Commit/push 'dev' for 'next release'
 
-    [X] Checkout new branch 'release' from 'dev'
-    [X] Publish branch
+    [] Checkout new branch 'release' from 'dev'
+    [] Publish branch
 
     on 'release':
 
     ??? Modify files as necessary (delete .gitignore, etc.)
-    [X] Change any DEBUG to 0
-    [X] Build - $ python -m build
+    [] Change any DEBUG to 0
+    [] Build - $ python -m build
     --- Upload to TestPyPI/PyPI
     [] Commit/push 'release'
 
