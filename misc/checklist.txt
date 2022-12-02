@@ -87,6 +87,7 @@ Release - GitHub
     [] Draft release
     [] Tag with version number (v0.1.0)
     [] Make sure target is main
+    [] Add CHANGELOG.md
 
 Reset all checks below 'work'
     [] Ctrl-H, replace [X] with []
