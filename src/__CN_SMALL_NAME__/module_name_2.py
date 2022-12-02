@@ -6,7 +6,7 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-def func():
-    return ('this is a test')
+def func_2():
+    return ('this is a test 2')
 
 # -)
