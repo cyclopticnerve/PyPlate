@@ -74,7 +74,8 @@ Release - VSCodium
     [] Build - $ python -m build
     --- Upload to TestPyPI/PyPI
     [] Commit/push 'release'
-
+    [] Publish branch
+    
     on 'main':
     
     [] Checkout 'main'
