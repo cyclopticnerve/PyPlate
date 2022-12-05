@@ -1,6 +1,7 @@
 
 Nautilus
     [] Copy Template as new project folder and rename
+    [] remove .git/.venv
 
 VSCodium
     [] Remove files not applicable to project type
