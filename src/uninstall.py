@@ -22,7 +22,7 @@ dict_uninstall = {
     "preflight": [
     ],
     "dirs": [
-        "${HOME}/.__CN_SMALL_NAME"
+        "${HOME}/.__CN_SMALL_NAME__"
     ],
     "files": {
     },
