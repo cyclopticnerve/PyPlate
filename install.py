@@ -26,12 +26,12 @@ dict_install = {
     "py_reqs": [
     ],
     "dirs": [
-        "${HOME}/.__CN_SMALL_NAME__"
+        "${HOME}/.cyclopticnerve/__CN_SMALL_NAME__"
     ],
     "files": {
-        "${SRC}/LICENSE": "${HOME}/.__CN_SMALL_NAME__",
-        "${SRC}/uninstall.py": "${HOME}/.__CN_SMALL_NAME__",
-        "${SRC}/__CN_SMALL_NAME__.py": "${HOME}/.__CN_SMALL_NAME__"
+        "${SRC}/LICENSE": "${HOME}/.cyclopticnerve/__CN_SMALL_NAME__",
+        "${SRC}/uninstall.py": "${HOME}/cyclopticnerve/.__CN_SMALL_NAME__",
+        "${SRC}/__CN_SMALL_NAME__.py": "${HOME}/.cyclopticnerve/__CN_SMALL_NAME__"
     },
     "postflight": [
     ]
