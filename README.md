@@ -18,6 +18,11 @@ __CN_SHORT_DESC__
 
 ## Requirements
 
+<!-- application -->
+This application requires:<br>
+[Configurator](https://github.com/cyclopticnerve/Configurator)<br>
+[Installerator](https://github.com/cyclopticnerve/Installerator)
+
 blah blah blah
 
 ## Installing
@@ -55,6 +60,10 @@ foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m pip install ./dist/__CN_SMALL_NAM
 ```
 
 <!-- application -->
+Make sure you've installed 
+[Configurator](https://github.com/cyclopticnerve/Configurator)
+and 
+[Installerator](https://github.com/cyclopticnerve/Installerator).<br>
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/__CN_BIG_NAME__/releases/latest) 
 from the main branch.<br>
