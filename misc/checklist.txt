@@ -1,7 +1,7 @@
 
 Nautilus
     [] Copy Template as new project folder and rename
-    [] remove .git/.venv
+    [] Remove .git/.venv
 
 VSCodium
     [] Remove files not applicable to project type
@@ -9,8 +9,11 @@ VSCodium
     [] Change filenames using misc/todo_metadata.txt
     [] Change all metadata (project name, etc.) using misc/todo_metadata.txt
         exclude misc folder from find/replace
+    [] Remove all refs to real name
+    [] Make sure you are in project dir in terminal
     [] Create venv - $ python -m venv venv
     [] Activate venv - $ source venv/bin/activate
+    [] Restart VSCodium
     [] Switch to venv interpreter - bottom right of status bar
     [] Install pylama in venv (popup in bottom right)
     [] Install build - $ python -m pip install build
@@ -43,11 +46,12 @@ LABEL TEST:
     --- Unit tests
     Packages/Modules
         [] Internal test (sys.path)
+        [] Test build - $ python -m build
         [] Install/test in venv (this project)
             $ python -m pip install -e .
         [] Test in VM using GitHub/README
 
-GOTO WORK AD NAUSEUM
+GOTO WORK ; AD NAUSEUM
 
 ================================================================================
 
@@ -59,22 +63,20 @@ Release - VSCodium
     [] Update extra files in MANIFEST.in
     [] $ python -m pip freeze > requirements.txt
     [] Remove '-e' from requirements
-    [] Change version number in __init__.py/__main__.py and pyproject.toml
+    [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
     [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
     --- Generate docs
     [] Commit/push 'dev' for 'next release'
-
     [] Checkout new branch 'release' from 'dev'
-    [] Publish branch
 
     on 'release':
 
+    [] Publish branch
     ??? Modify files as necessary (delete .gitignore, etc.)
     [] Change any DEBUG to 0
     [] Build - $ python -m build
     --- Upload to TestPyPI/PyPI
     [] Commit/push 'release'
-    [] Publish branch
     
     on 'main':
     
@@ -87,7 +89,6 @@ Release - VSCodium
 
 Release - GitHub
     [] Draft release
-    [] Tag with version number (v0.1.0)
     [] Make sure target is main
     [] Add CHANGELOG.md
 

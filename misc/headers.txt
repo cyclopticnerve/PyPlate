@@ -2,41 +2,33 @@
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename:                                                       |     ()     |
-# Date    : __CN_DATE__                                            |            |
+# Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Project : __CN_BIG_NAME__                                       /          \   
-// Filename:                                                      |     ()     |  
-// Date    : __CN_DATE__                                           |            |  
-// Author  : cyclopticnerve                                       |   \____/   |  
-// License : WTFPLv2                                               \          /   
-//------------------------------------------------------------------------------
-
 <!----------------------------------------------------------------------------->
 <!-- Project : __CN_BIG_NAME__                                 /          \  -->
 <!-- Filename:                                                |     ()     | -->
-<!-- Date    : __CN_DATE__                                     |            | -->
+<!-- Date    : __CN_DATE__                                    |            | -->
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-"""
-    Short description
+    """
+        Short description
 
-    Paramaters:
-        var_name [type]: description
-            second line
+        Paramaters:
+            var_name [type]: description
+                second line
 
-    Returns:
-        [type]: description
+        Returns:
+            [type]: description
 
-    Rasies:
-        exception_type(vars): description
+        Raises:
+            exception_type(vars): description
 
-    Long description
-"""
+        Long description
+    """
 
 # -)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
-# Filename: uninstall.py                                          |     ()     |
+# Filename: __CN_SMALL_NAME___gui.py                              |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -10,28 +10,18 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
+import os
+import sys
 
-import installerator
+curr_dir = os.path.abspath(os.path.dirname(__file__))
+up_one = os.path.abspath(os.path.join(curr_dir, '../src'))
+sys.path.insert(1, up_one)
+
+import __CN_SMALL_NAME__ # noqa E402 (import not at top)
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
-
-# define the uninstall settings
-dict_uninstall = {
-    'general': {
-        'name': '__CN_BIG_NAME__'
-    },
-    'preflight': [
-    ],
-    'dirs': [
-        '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
-    ],
-    'files': {
-    },
-    'postflight': [
-    ]
-}
 
 
 # ------------------------------------------------------------------------------
@@ -44,24 +34,22 @@ dict_uninstall = {
 def main():
 
     """
-        Run the Uninstaller module
+        Short description
 
-        Paramaters: none
+        Paramaters:
+            var_name [type]: description
+                second line
 
-        Returns: none
+        Returns:
+            [type]: description
 
-        Raises: none
+        Raises:
+            exception_type(vars): description
 
-        This is the main uninstaller function, which creates an instance of the
-        Uninstaller class and runs it's main function, with the global
-        dictionary created above.
+        Long description
     """
 
-    # instantiate uninstallerator class
-    uninstaller = installerator.uninstallerator.Uninstallerator()
-
-    # # run the instance
-    uninstaller.run(dict_uninstall)
+    pass
 
 
 # ------------------------------------------------------------------------------

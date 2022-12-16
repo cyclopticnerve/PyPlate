@@ -12,8 +12,8 @@
 
 # without __init__.py imports, #1 and #2 don't work
 
-# import package_name                                   # 1 one
-# print(package_name.module_name.func())
+import package_name                                   # 1 one
+print(package_name.module_name.func())
 
 # import package_name as pack                           # 2 one as
 # print(pack.module_name.func())
