@@ -1,23 +1,15 @@
 
-Nautilus
-    [] Copy Template as new project folder and rename
-    [] Remove .git/.venv
+Terminal
+    [] Run ./pymaker.py
 
 VSCodium
-    [] Remove files not applicable to project type
-    [] Remove README.md sections not applicable to project type
-    [] Change filenames using misc/todo_metadata.txt
-    [] Change all metadata (project name, etc.) using misc/todo_metadata.txt
-        exclude misc folder from find/replace
-    [] Remove all refs to real name
-    [] Make sure you are in project dir in terminal
-    [] Create venv - $ python -m venv venv
-    [] Activate venv - $ source venv/bin/activate
-    [] Restart VSCodium
+    [] Open/restart VSCodium
     [] Switch to venv interpreter - bottom right of status bar
-    [] Install pylama in venv (popup in bottom right)
-    [] Install build - $ python -m pip install build
-    [] Create new repo in github tab
+    --- Install pylama in venv (popup in bottom right)
+    --- Install build - $ python -m pip install build
+    --- Make sure you are in project dir (terminal at bottom)
+    --- Run 'source venv/bin/activate'
+    --- Create new repo in github tab
     ??? Get github token from ~/.git-credentials (from : to @)
     ??? $ git remote set-url origin 
         https://<githubtoken>@github.com/<username>/<repositoryname>.git

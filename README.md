@@ -1,29 +1,28 @@
 <!----------------------------------------------------------------------------->
-<!-- Project : __CN_BIG_NAME__                                 /          \  -->
+<!-- Project : PyPlate                                         /          \  -->
 <!-- Filename: README.md                                      |     ()     | -->
-<!-- Date    : __CN_DATE__                                    |            | -->
+<!-- Date    : 12/19/2022                                     |            | -->
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-# __CN_BIG_NAME__
+<!-- This file is only used for the PyPlate project on GitHub                -->
+<!-- It should be removed when using the template for a new project          -->
+<!-- Note that this file will be removed automatically by PyMaker            -->
+
+# PyPlate
 
 ## "It mostly works™"
 
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
-__CN_SHORT_DESC__
+A template for creating packages/modules/apps in Python
 
 <!-- ![Screenshot](readme/screenshot.jpg) -->
 
 ## Requirements
 
-<!-- __CN_APP_START__ -->
-This application requires:<br>
-[Configurator](https://github.com/cyclopticnerve/Configurator)<br>
-[Installerator](https://github.com/cyclopticnerve/Installerator)
-<!-- __CN_APP_END__ -->
-blah blah blah
+None
 
 ## Installing
 
@@ -35,77 +34,39 @@ foo@bar:~$ sudo apt update && sudo apt upgrade
 
 to make sure you have the lastest software installed.
 
-<!-- __CN_MOD_START__ -->
-You can download the (hopefully stable) 
-[latest release](https://github.com/cyclopticnerve/__CN_BIG_NAME__/releases/latest) 
-from the main branch. <br>
-Download the 'Source Code (tar.gz)' file. <br>
-Then install it using:
-
-```bash
-foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ python -m pip install __CN_BIG_NAME__-__CN_VERSION__.tar.gz
-```
-
-Or you can clone the git repo to get the latest (and often broken) code 
-from the dev branch:
-
-```bash
-foo@bar:~$ python -m pip install build
-foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_BIG_NAME__
-foo@bar:~/Downloads$ cd __CN_BIG_NAME__
-foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m build
-foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m pip install ./dist/__CN_SMALL_NAME__-__CN_VERSION__.tar.gz -r ./requirements.txt
-```
-<!-- __CN_MOD_END__ -->
-<!-- __CN_APP_START__ -->
-Make sure you've installed 
-[Configurator](https://github.com/cyclopticnerve/Configurator)
-and 
-[Installerator](https://github.com/cyclopticnerve/Installerator).<br>
 You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/__CN_BIG_NAME__/releases/latest) 
+[latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.<br>
-Then run the 'install.py' file from there:
-
-```bash
-foo@bar:~$ cd Downloads/__CN_BIG_NAME__-__CN_VERSION__
-foo@bar:~/Downloads/__CN_BIG_NAME__-__CN_VERSION__$ ./install.py
-```
 
 Or you can clone the git repo to get the latest (and often broken) code 
 from the dev branch:
 
 ```bash
 foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_BIG_NAME__
-foo@bar:~/Downloads$ cd __CN_BIG_NAME__
-foo@bar:~/Downloads/__CN_BIG_NAME__$ ./install.py
+foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
-<!-- __CN_APP_END__ -->
+and put it wherever you want it. A good suggestion is ~/Documents/Projects/Python.
 
 ## Uninstalling
 
-<!-- __CN_MOD_START__ -->
-```bash
-foo@bar:~$ python -m pip uninstall __CN_SMALL_NAME__
-```
-<!-- __CN_MOD_END__ -->
-<!-- __CN_APP_START__ -->
-```bash
-foo@bar:~$ cd .cyclopticnerve/__CN_SMALL_NAME__
-foo@bar:~/.cyclopticnerve/__CN_SMALL_NAME__$ ./uninstall.py
-```
-<!-- __CN_APP_END__ -->
+Just delete the PyPlate folder.
 
 ## Usage
 
-blah blah blah
+First, cd into the PyPlate folder, then run pymaker.py:
+``` bash
+foo@bar:~$ cd Documents/Projects/Python/PyPlate
+foo@bar:~/Documents/Projects/Python/PyPlate$ ./pymaker.py
+```
+Enter the required information, and PyMaker will create the required files and 
+folders in a subdirectory of ~/Documents/Projects/Python based on your entries.<br>
+Modules and packages will be placed in a 'Libs' folder, and CLI/GUI projects 
+will be placed in an 'Apps' folder.<br>
+From there you are free to modify the projects in your favorite IDE.
 
 ## Notes
 
-blah blah blah
+None
 
 ## -)

@@ -19,14 +19,14 @@
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Functions
+# Class
 # ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
-def func():
+class Main:
 
     """
         Short description
@@ -44,6 +44,56 @@ def func():
         Long description
     """
 
-    return ('this is a test')
+    # --------------------------------------------------------------------------
+    # Methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the class
+    # --------------------------------------------------------------------------
+    def __init__(self):
+
+        """
+            Short description
+
+            Paramaters:
+                var_name [type]: description
+                    second line
+
+            Returns:
+                [type]: description
+
+            Raises:
+                exception_type(vars): description
+
+            Long description
+        """
+
+        self.foo = 'foo'
+
+        pass
+
+    # --------------------------------------------------------------------------
+    # Do something with foo
+    # --------------------------------------------------------------------------
+    def do_foo(self):
+
+        """
+            Short description
+
+            Paramaters:
+                var_name [type]: description
+                    second line
+
+            Returns:
+                [type]: description
+
+            Raises:
+                exception_type(vars): description
+
+            Long description
+        """
+
+        print(self.foo)
 
 # -)

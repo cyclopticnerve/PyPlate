@@ -32,7 +32,8 @@ keywords = [
     "__CN_KEYWORDS__"
 ]
 dependencies = [
-]
+    "__CN_PY_DEPS__"
+] 
 requires-python = ">=3.10"
 
 [project.urls]
