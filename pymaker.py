@@ -138,6 +138,19 @@ def copy_and_prune():
     shutil.rmtree('.git', ignore_errors=True)
     shutil.rmtree('venv', ignore_errors=True)
 
+    # delete/remane dups
+    os.remove('gitignore')
+    os.rename('.gitignore_template', '.gitignore')
+
+    os.remove('CHNAGELOG.md')
+    os.rename('CHANGELOG_template.md', 'CHANGELOG.md')
+
+    os.remove('README.md')
+    os.rename('README_template.md', 'README.md')
+
+    os.remove('VERSION.md')
+    os.rename('VERSION_template.md', 'VERSIO .md')
+
     # remove unneccesary files
 
     # remove for module
