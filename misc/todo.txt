@@ -1,0 +1,4 @@
+python requirements
+    toml dependencies should be entered in pymaker
+    these should automatically add configurator and installerator for cli/gui apps
+     

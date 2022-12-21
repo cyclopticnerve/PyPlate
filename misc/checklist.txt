@@ -37,6 +37,7 @@ LABEL TEST:
 
     --- Unit tests
     Packages/Modules
+        [] Run tests/import_test_xxx.py
         [] Internal test (sys.path)
         [] Test build - $ python -m build
         [] Install/test in venv (this project)

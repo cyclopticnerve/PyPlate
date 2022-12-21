@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
-# Filename: uninstall.py                                          |     ()     |
+# Filename: __CN_SMALL_NAME__.py                                  |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -11,8 +11,6 @@
 # Imports
 # ------------------------------------------------------------------------------
 
-import installerator
-
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
@@ -21,45 +19,57 @@ import installerator
 # Globals
 # ------------------------------------------------------------------------------
 
-# define the uninstall settings
-dict_uninstall = {
-    'general': {
-        'name': '__CN_BIG_NAME__'
-    },
-    'preflight': [
-    ],
-    'dirs': [
-        '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
-    ],
-    'files': {
-    },
-    'postflight': [
-    ]
-}
-
 # ------------------------------------------------------------------------------
 # Functions
 # ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
-# Run the Uninstaller module
+# Short description
 # ------------------------------------------------------------------------------
 def main():
 
     """
-        Run the Uninstaller module
+        Short description
 
-        This is the main uninstaller function, which creates an instance of the
-        Uninstaller class and runs it's main function, with the global
-        dictionary created above.
+        Paramaters:
+            var_name [type]: description
+                second line
+
+        Returns:
+            [type]: description
+
+        Raises:
+            exception_type(vars): description
+
+        Long description
     """
 
-    # instantiate uninstallerator class
-    uninstaller = installerator.uninstallerator.Uninstallerator()
+    func()
 
-    # # run the instance
-    uninstaller.run(dict_uninstall)
+
+# ------------------------------------------------------------------------------
+# Short description
+# ------------------------------------------------------------------------------
+def func():
+
+    """
+        Short description
+
+        Paramaters:
+            var_name [type]: description
+                second line
+
+        Returns:
+            [type]: description
+
+        Raises:
+            exception_type(vars): description
+
+        Long description
+    """
+
+    return ('this is a test')
 
 
 # ------------------------------------------------------------------------------

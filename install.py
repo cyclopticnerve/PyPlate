@@ -37,8 +37,7 @@ dict_install = {
     ],
     'files': {
         'LICENSE.txt': '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__',
-        'uninstall.py': '${HOME}/cyclopticnerve/__CN_SMALL_NAME__',
-        '__CN_SMALL_NAME__.py': '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
+        'uninstall.py': '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
     },
     'postflight': [
     ]
@@ -50,18 +49,12 @@ dict_install = {
 
 
 # ------------------------------------------------------------------------------
-# Main function
+# Run the Installer module
 # ------------------------------------------------------------------------------
 def main():
 
     """
         Run the Installer module
-
-        Paramaters: none
-
-        Returns: none
-
-        Raises: none
 
         This is the main installer function, which creates an instance of the
         Installer class and runs it's main function, with the global

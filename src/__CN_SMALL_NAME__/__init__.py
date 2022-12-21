@@ -6,12 +6,12 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# this file is only for multiple module projects (packages)
+# this file is only for package projects (multiple modules)
 
 __version__ = '__CN_VERSION__'
 
 """
-__CN_SHORT_DESC__
+    __CN_SHORT_DESC__
 """
 
 # import all modules in package to get full dot notation from package import

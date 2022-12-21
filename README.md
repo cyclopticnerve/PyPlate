@@ -46,7 +46,7 @@ from the dev branch:
 foo@bar:~$ cd Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
-and put it wherever you want it. A good suggestion is ~/Documents/Projects/Python.
+and put it wherever you want it. A good suggestion is ~/Documents/Projects/Python/Tools.
 
 ## Uninstalling
 
@@ -55,12 +55,15 @@ Just delete the PyPlate folder.
 ## Usage
 
 First, cd into the PyPlate folder, then run pymaker.py:
+
 ``` bash
-foo@bar:~$ cd Documents/Projects/Python/PyPlate
-foo@bar:~/Documents/Projects/Python/PyPlate$ ./pymaker.py
+foo@bar:~$ cd Documents/Projects/Python/Tools/PyPlate
+foo@bar:~/Documents/Projects/Python/Tools/PyPlate$ ./pymaker.py
 ```
+
 Enter the required information, and PyMaker will create the required files and 
 folders in a subdirectory of ~/Documents/Projects/Python based on your entries.<br>
+
 Modules and packages will be placed in a 'Libs' folder, and CLI/GUI projects 
 will be placed in an 'Apps' folder.<br>
 From there you are free to modify the projects in your favorite IDE.

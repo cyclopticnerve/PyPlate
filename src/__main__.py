@@ -11,7 +11,7 @@
 __version__ = '__CN_VERSION__'
 
 """
-__CN_SHORT_DESC__
+    __CN_SHORT_DESC__
 """
 
 # -)

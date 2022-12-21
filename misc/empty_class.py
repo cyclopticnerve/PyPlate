@@ -31,16 +31,6 @@ class Main:
     """
         Short description
 
-        Paramaters:
-            var_name [type]: description
-                second line
-
-        Returns:
-            [type]: description
-
-        Raises:
-            exception_type(vars): description
-
         Long description
     """
 
@@ -49,7 +39,7 @@ class Main:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Initialize the class
+    # Short description
     # --------------------------------------------------------------------------
     def __init__(self):
 
@@ -74,7 +64,7 @@ class Main:
         pass
 
     # --------------------------------------------------------------------------
-    # Do something with foo
+    # Short description
     # --------------------------------------------------------------------------
     def do_foo(self):
 

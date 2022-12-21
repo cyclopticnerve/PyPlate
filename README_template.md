@@ -14,7 +14,7 @@
 
 __CN_SHORT_DESC__
 
-<!-- ![Screenshot](readme/screenshot.jpg) -->
+<!-- ![Screenshot](misc/screenshot.jpg) -->
 
 ## Requirements
 

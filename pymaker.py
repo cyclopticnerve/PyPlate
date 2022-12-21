@@ -7,8 +7,11 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# TODO: get dpath to template
+# TODO: get path to base python dir
+
 # TODO: waht files to add to install files when copying
-# (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and 
+# (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and
 # !/.cyclopticnerve/proj/app/gui)
 # ------------------------------------------------------------------------------
 # Imports
@@ -35,7 +38,7 @@ settings = {
         '__CN_SHORT_DESC__':    '',
         '__CN_KEYWORDS__':      [
         ],
-        '__CN_PY_REQS':         [
+        '__CN_PY_REQS__':         [
         ],
         '__CN_GUI_EXEC__':      '',
         '__CN_GUI_ICON__':      ''
