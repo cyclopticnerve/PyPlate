@@ -8,10 +8,10 @@
 
 # this file is only for app projects
 
-__version__ = '__CN_VERSION__'
-
 """
     __CN_SHORT_DESC__
 """
+
+__version__ = '__CN_VERSION__'
 
 # -)

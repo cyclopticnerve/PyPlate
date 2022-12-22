@@ -8,11 +8,11 @@
 
 # this file is only for package projects (multiple modules)
 
-__version__ = '__CN_VERSION__'
-
 """
     __CN_SHORT_DESC__
 """
+
+__version__ = '__CN_VERSION__'
 
 # import all modules in package to get full dot notation from package import
 # from <package> imoport <module>

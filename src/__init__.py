@@ -8,11 +8,11 @@
 
 # this file is only for single module projects
 
-__version__ = '__CN_VERSION__'
-
 """
     __CN_SHORT_DESC__
 """
+
+__version__ = '__CN_VERSION__'
 
 # from <module_name> import *
 __all__ = [__CN_SMALL_NAME__]
