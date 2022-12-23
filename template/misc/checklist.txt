@@ -1,0 +1,86 @@
+
+VSCodium
+    [] Open/restart VSCodium
+    [] Switch to venv interpreter - bottom right of status bar
+    --- Install pylama in venv (popup in bottom right)
+    --- Install build - $ python -m pip install build
+    --- Make sure you are in project dir (terminal at bottom)
+    --- Run 'source venv/bin/activate'
+    --- Create new repo in github tab
+    ??? Get github token from ~/.git-credentials (from : to @)
+    ??? $ git remote set-url origin 
+        https://<githubtoken>@github.com/<username>/<repositoryname>.git
+    [] Stage all changes
+    [] Commit 'first commit'
+    [] Publish 'main' branch
+    [] Checkout new branch 'dev' from 'main'
+    [] Publish 'dev' branch
+
+GitHub
+    [] Make 'dev' default branch
+    [] Add description and search tags
+
+================================================================================
+
+LABEL WORK:
+
+    !!! Do all work on dev
+    [] Headers/footers
+    [] Docstrings
+
+--------------------------------------------------------------------------------
+
+LABEL TEST:
+
+    --- Unit tests
+    Packages/Modules
+        [] Run tests/import_test_xxx.py
+        [] Internal test (sys.path)
+        [] Test build - $ python -m build
+        [] Install/test in venv (this project)
+            $ python -m pip install -e .
+        [] Test in VM using GitHub/README
+
+GOTO WORK ; AD NAUSEUM
+
+================================================================================
+
+Release - VSCodium
+
+    on 'dev':
+
+    [] Check dependencies in pyproject.toml and install.py
+    [] Update extra files in MANIFEST.in
+    [] $ python -m pip freeze > requirements.txt
+    [] Remove '-e' from requirements
+    [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
+    [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
+    --- Generate docs
+    [] Commit/push 'dev' for 'next release'
+    [] Checkout new branch 'release' from 'dev'
+
+    on 'release':
+
+    [] Publish branch
+    ??? Modify files as necessary (delete .gitignore, etc.)
+    [] Change any DEBUG to 0
+    [] Build - $ python -m build
+    --- Upload to TestPyPI/PyPI
+    [] Commit/push 'release'
+    
+    on 'main':
+    
+    [] Checkout 'main'
+    [] Merge from 'release' to 'main' (git checkout 'main'; git merge 'release')
+    [] Delete release branch
+    [] Tag with version number 'vX.X.X'
+    [] Push 'main'    
+    [] Checkout 'dev'
+
+Release - GitHub
+    [] Draft release
+    [] Make sure target is main
+    [] Add CHANGELOG.md
+
+Reset all checks below 'work'
+    [] Ctrl-H, replace [X] with []
