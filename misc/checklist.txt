@@ -1,27 +1,24 @@
 
-Terminal
-    [] Run ./pymaker.py
-
 VSCodium
-    [] Open/restart VSCodium
-    [] Switch to venv interpreter - bottom right of status bar
-    --- Install pylama in venv (popup in bottom right)
-    --- Install build - $ python -m pip install build
-    --- Make sure you are in project dir (terminal at bottom)
-    --- Run 'source venv/bin/activate'
-    --- Create new repo in github tab
+    [X] Open/restart VSCodium
+    [X] Switch to venv interpreter - bottom right of status bar
+    [X] Install pylama in venv (popup in bottom right)
+    [X] Install build - $ python -m pip install build
+    [X] Make sure you are in project dir (terminal at bottom)
+    [X] Run 'source venv/bin/activate'
+    [X] Create new repo in github tab
     ??? Get github token from ~/.git-credentials (from : to @)
     ??? $ git remote set-url origin 
         https://<githubtoken>@github.com/<username>/<repositoryname>.git
-    [] Stage all changes
-    [] Commit 'first commit'
-    [] Publish 'main' branch
-    [] Checkout new branch 'dev' from 'main'
-    [] Publish 'dev' branch
+    [X][ Stage all changes
+    [X] Commit 'first commit'
+    [X] Publish 'main' branch
+    [X] Checkout new branch 'dev' from 'main'
+    [X] Publish 'dev' branch
 
 GitHub
-    [] Make 'dev' default branch
-    [] Add description and search tags
+    [X] Make 'dev' default branch
+    [X] Add description and search tags
 
 ================================================================================
 

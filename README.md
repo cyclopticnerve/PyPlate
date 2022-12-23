@@ -28,12 +28,12 @@ foo@bar:~$ sudo apt update && sudo apt upgrade
 
 to make sure you have the lastest software installed.
 
-1. You can download the (hopefully stable)
+You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.<br>
 
-2. Or you can clone the git repo to get the latest (and often broken) code 
+Or you can clone the git repo to get the latest (and often broken) code 
 from the dev branch:
 
 ```bash
@@ -41,35 +41,42 @@ foo@bar:~$ cd Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
 
+Next, cut or copy and paste the PyPlate directory wherever you want. For the 
+example below, we will use "~/Documents/Projects/Python/".
+```bash
+foo@bar:~/Downloads$ cp PyPlate ~/Documents/Projects/Python
+```
 
-3. Then copy/paste the PyPlate directory wherever you want it. A good suggestion is 
-~/Documents/Projects/Python/Tools.
-
-Then you can delete the downloaded folder.
+Lastly, you can delete the downloaded folder.
 
 ## Uninstalling
 
-Just delete the PyPlate folder from wherever you put it in install.
+Just delete the PyPlate folder from wherever you put it in the install step.
 
 ## Usage
 
 First, cd into the PyPlate folder, then run pymaker.py:
 
 ``` bash
-foo@bar:~$ cd Documents/Projects/Python/Tools/PyPlate
-foo@bar:~/Documents/Projects/Python/Tools/PyPlate$ ./pymaker.py
+foo@bar:~$ cd Documents/Projects/Python/PyPlate
+foo@bar:~/Documents/Projects/Python/PyPlate$ ./pymaker.py
 ```
 
 Enter the required information, and PyMaker will create the required files and 
-folders in a subdirectory of ~/Documents/Projects/Python based on your entries.<br>
-
-Note that this path is one above the install dir, and one down based on the type
-of template you create.
-Modules and packages will be placed in a 'Libs' folder, and CLI/GUI projects 
-will be placed in an 'Apps' folder, RELATIVE to the PyPlate folder.<br>
-From there you are free to modify the projects in your favorite IDE.
+folders in a subdirectory of "~/Documents/Projects/Python/" based on your 
+entries.
 
 ## Notes
+
+Note that the project path is one above the PyPlate dir, and one down based on 
+the type of template you create.<br>
+So, using the install path above, modules and packages will be placed in 
+"~/Documents/Projects/Python/Libs/", and CLI/GUI projects will be placed 
+in "~/Documents/Projects/Python/Libs/Apps".<br>
+From there you are free to modify the projects in your favorite IDE.
+
+In a future release, the base path will be configurable, so that it is 
+independent of where the PyPlate directory is located.
 
 ## -)
 <!-- -) -->
