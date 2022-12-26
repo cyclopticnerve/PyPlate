@@ -1,12 +1,14 @@
 
+Initialize
+
 VSCodium
     [] Open/restart VSCodium
     [] Switch to venv interpreter - bottom right of status bar
-    --- Install pylama in venv (popup in bottom right)
-    --- Install build - $ python -m pip install build
-    --- Make sure you are in project dir (terminal at bottom)
-    --- Run 'source venv/bin/activate'
-    --- Create new repo in github tab
+    [] Make sure you are in project dir (terminal at bottom)
+    [] Run 'source venv/bin/activate'
+    [] Install pylama in venv (popup in bottom right)
+    [] Install build - $ python -m pip install build
+    [] Create new repo in github tab
     ??? Get github token from ~/.git-credentials (from : to @)
     ??? $ git remote set-url origin 
         https://<githubtoken>@github.com/<username>/<repositoryname>.git
@@ -22,15 +24,9 @@ GitHub
 
 ================================================================================
 
-LABEL WORK:
+Release - VSCodium
 
-    !!! Do all work on dev
-    [] Headers/footers
-    [] Docstrings
-
---------------------------------------------------------------------------------
-
-LABEL TEST:
+    on 'dev':
 
     --- Unit tests
     Packages/Modules
@@ -41,14 +37,8 @@ LABEL TEST:
             $ python -m pip install -e .
         [] Test in VM using GitHub/README
 
-GOTO WORK ; AD NAUSEUM
-
-================================================================================
-
-Release - VSCodium
-
-    on 'dev':
-
+    [] Headers/footers
+    [] Docstrings
     [] Check dependencies in pyproject.toml and install.py
     [] Update extra files in MANIFEST.in
     [] $ python -m pip freeze > requirements.txt

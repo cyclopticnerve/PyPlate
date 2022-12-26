@@ -14,6 +14,8 @@
 
 __version__ = '__CN_VERSION__'
 
+print('this is the (mod) __CN_SMALL_NAME__/__init__.py file')
+
 # from <module_name> import *
 __all__ = [__CN_SMALL_NAME__]
 

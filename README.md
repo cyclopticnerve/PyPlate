@@ -72,7 +72,7 @@ Note that the project path is one above the PyPlate dir, and one down based on
 the type of template you create.<br>
 So, using the install path above, modules and packages will be placed in 
 "~/Documents/Projects/Python/Libs/", and CLI/GUI projects will be placed 
-in "~/Documents/Projects/Python/Libs/Apps".<br>
+in "~/Documents/Projects/Python/Apps".<br>
 From there you are free to modify the projects in your favorite IDE.
 
 In a future release, the base path will be configurable, so that it is 

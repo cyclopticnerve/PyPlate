@@ -12,6 +12,8 @@
     __CN_SHORT_DESC__
 """
 
+print('this is the (cli/app) __CN_SMALL_NAME__/__main__.py file')
+
 __version__ = '__CN_VERSION__'
 
 # -)

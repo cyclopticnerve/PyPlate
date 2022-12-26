@@ -10,7 +10,12 @@
 
 """
     __CN_SHORT_DESC__
+
+    Modules:
+        ...
 """
+
+print('this is the (pkg) __CN_SMALL_NAME__/__init__.py file')
 
 __version__ = '__CN_VERSION__'
 

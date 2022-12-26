@@ -31,6 +31,12 @@ class Main:
     """
         Short description
 
+        Objects
+            ...
+
+        Methods
+            ...
+
         Long description
     """
 
@@ -60,8 +66,6 @@ class Main:
         """
 
         self.foo = 'foo'
-
-        pass
 
     # --------------------------------------------------------------------------
     # Short description

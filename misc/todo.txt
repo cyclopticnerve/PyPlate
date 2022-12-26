@@ -2,3 +2,32 @@ TODO: python requirements
     toml dependencies should be entered in pymaker
     these should automatically add configurator and installerator for cli/gui apps
      
+
+top level OK
+misc OK
+template
+    gui
+    misc
+    src
+    tests
+    top_level
+
+X Rename to PyPlate
+X Empty files except for header and dividers in misc folder
+X modify pymaker to copy all /template files/folders as top level
+
+3 when creating a CLI or GUI app, after creating venv, download and install installerator and configurator and build and pylama
+4 default install script should be modified by pymaker to download and install installator and configurator in the prerequisites
+5 Change log should be cumulative with an entry for each version number and date of release
+6 Add pip install from GitHub instructions to readme
+7 How to know if we are using the latest version of template pymaker installer and configurator
+8 single canonical version?
+9 first run specify base dir for libs/apps
+store that and use for future runs
+10 pyproject reqs should include inst/cfg for gui/cli but they need to be in pyPI
+
+add argparse to empty_exe.py
+  or make argparse_helper module that can be added if necessary
+  
+when/where are __init__.py/__main__.py files used? very confusing...
+this will be key in calling from command line vs. importing

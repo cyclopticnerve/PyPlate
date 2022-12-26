@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : Template                                                  /          \
+# Project : PyPlate                                                /          \
 # Filename: pymaker.py                                            |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# TODO: get dpath to template
-# TODO: get path to base python dir
+# TODO: get path to template
+# TODO: get path to base python projects dir
 
-# TODO: waht files to add to install files when copying
+# TODO: what files to add to install.py when copying
 # (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and
 # !/.cyclopticnerve/proj/app/gui)
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -25,11 +26,28 @@ import subprocess
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
+
+# get the current user name
 user = os.path.expanduser('~')
-template_path = f'{user}/Documents/Projects/Python/Tools/Template'
+
+# this is the dir where the script is being run from
+# (~/Documents/Projects/Python/PyPlate)
+curr_dir = os.path.dirname(os.path.abspath(__file__))
+print('curr_dir:', curr_dir)
+# this is the dir where the template files are located rel to the script
+# (~/Documents/Projects/Python/PyPlate/template)
+template_dir = os.path.abspath(f'{curr_dir}/template')
+print('template_dir:', template_dir)
+# this is the user entered base dir for python stuff
+# TODO: this may change on user input
+base_dir = os.path.abspath(f'{curr_dir}/../')
+print('base_dir:', base_dir)
+
+# the settings to use to create the project
 settings = {
     'project_type':             '',
-    'project_path':             '',
+    'project_type_dir':         '',
+    'project_dir':              '',
     'project_reps': {
         '__CN_BIG_NAME__':      '',
         '__CN_SMALL_NAME__':    '',
@@ -38,7 +56,7 @@ settings = {
         '__CN_SHORT_DESC__':    '',
         '__CN_KEYWORDS__':      [
         ],
-        '__CN_PY_REQS__':         [
+        '__CN_PY_DEPS__':       [
         ],
         '__CN_GUI_EXEC__':      '',
         '__CN_GUI_ICON__':      ''
@@ -54,10 +72,19 @@ settings = {
 # Main function
 # ------------------------------------------------------------------------------
 def main():
+
+    """
+        Main function
+
+        This is the main function, which calls each step in the process of
+        creating a project.
+    """
+
+    # call each step
     get_info()
     copy_and_prune()
-    rename()
-    replace_text()
+    recurse_rename(settings['project_dir'])
+    recurse_replace(settings['project_dir'])
     fix_readme()
     fix_toml()
     add_in()
@@ -67,6 +94,12 @@ def main():
 # Get project info
 # ------------------------------------------------------------------------------
 def get_info():
+
+    """
+        Get project info
+
+        Asks the user for project info, such as type, name, keywords, etc.
+    """
 
     global settings
 
@@ -87,14 +120,14 @@ def get_info():
 
     # calculate project path
     if settings['project_type'] in 'mp':
-        settings['project_path'] = \
-            f'{user}/Documents/Projects/Python/Libs/{prj_name}'
+        settings['project_type_dir'] = os.path.join(base_dir, 'Libs')
     else:
-        settings['project_path'] = \
-            f'{user}/Documents/Projects/Python/Apps/{prj_name}'
+        settings['project_type_dir'] = os.path.join(base_dir, 'Apps')
 
     # check if project folder exists
-    if os.path.exists(settings['project_path']):
+    settings['project_dir'] = \
+        os.path.join(settings['project_type_dir'], prj_name)
+    if os.path.exists(settings['project_dir']):
         print('Project already exists')
         exit()
 
@@ -110,16 +143,14 @@ def get_info():
     prj_desc = input('Short description of project: ')
     settings['project_reps']['__CN_SHORT_DESC__'] = prj_desc
 
-    # get keywords
-    prj_keys = input('Keywords (semicolon seperated): ')
-    if prj_keys != '':
-        prj_keys_list = prj_keys.split(';')
-        for item in prj_keys_list:
-            settings['project_reps']['__CN_KEYWORDS__'].append(item)
+    # get keywords/dependencies
+    if settings['project_type'] in 'mp':
+        get_info_keys()
+        get_info_deps()
 
     # calculate gui location
     settings['project_reps']['__CN_GUI_EXEC__'] = \
-        f'{user}/.cyclopticnerve/{lower}/{lower}_gui.py'
+        f'{user}/.cyclopticnerve/{lower}/gui/{lower}_gui.py'
 
     # calculuate icon location
     settings['project_reps']['__CN_GUI_ICON__'] = \
@@ -127,61 +158,89 @@ def get_info():
 
 
 # ------------------------------------------------------------------------------
+# Get project keywords
+# ------------------------------------------------------------------------------
+def get_info_keys():
+
+    """
+        Get project keywords
+
+        Asks the user for project keywords.
+    """
+
+    global settings
+
+    prj_keys = input('Keywords (semicolon seperated, optional): ')
+    if prj_keys != '':
+        prj_keys_list = prj_keys.split(';')
+        for item in prj_keys_list:
+            settings['project_reps']['__CN_KEYWORDS__'].append(item)
+
+
+# ------------------------------------------------------------------------------
+# Get project dependencies
+# ------------------------------------------------------------------------------
+def get_info_deps():
+
+    """
+        Get project dependencies
+
+        Asks the user for project dependencies.
+    """
+
+    global settings
+
+    prj_deps = input('Dependencies (semicolon seperated, optional): ')
+    if prj_deps != '':
+        prj_deps_list = prj_deps.split(';')
+        for item in prj_deps_list:
+            settings['project_reps']['__CN_PY_DEPS__'].append(item)
+
+
+# ------------------------------------------------------------------------------
 # Copy new project and remove unneccesary files
 # ------------------------------------------------------------------------------
 def copy_and_prune():
 
+    """
+        Copy new project and remove unneccesary files
+
+        Copy all template files/folders to the new location, then remove the
+        files/folders not used for the type of project we are creating.
+    """
+
     # copy template to new project
-    shutil.copytree(template_path, settings['project_path'])
+    shutil.copytree(template_dir, settings['project_dir'])
 
     # switch to project path
-    os.chdir(settings['project_path'])
-
-    # remove ancillaries
-    shutil.rmtree('.git', ignore_errors=True)
-    shutil.rmtree('venv', ignore_errors=True)
-
-    # delete/remane dups
-    os.remove('gitignore')
-    os.rename('.gitignore_template', '.gitignore')
-
-    os.remove('CHNAGELOG.md')
-    os.rename('CHANGELOG_template.md', 'CHANGELOG.md')
-
-    os.remove('README.md')
-    os.rename('README_template.md', 'README.md')
-
-    os.remove('VERSION.md')
-    os.rename('VERSION_template.md', 'VERSIO .md')
-
-    # remove unneccesary files
+    os.chdir(settings['project_dir'])
 
     # remove for module
     if (settings['project_type'] == 'm'):
         shutil.rmtree('gui', ignore_errors=True)
 
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
-        os.remove('src/__CN_SMALL_NAME__app.py')
+        os.remove('src/__CN_SMALL_NAME___app.py')
         os.remove('src/__main__.py')
-        os.remove('src/uninstall.py')
 
         os.remove('tests/import_test_pkg.py')
 
         os.remove('install.py')
+        os.remove('uninstall.py')
 
     # remove for package
     elif (settings['project_type'] == 'p'):
         shutil.rmtree('gui', ignore_errors=True)
 
-        os.remove('src/__CN_SMALL_NAME__app.py')
-        os.remove('src/__CN_SMALL_NAME__mod.py')
+        os.remove('src/__CN_SMALL_NAME___app.py')
+        os.remove('src/__CN_SMALL_NAME___mod.py')
         os.remove('src/__init__.py')
         os.remove('src/__main__.py')
-        os.remove('src/uninstall.py')
 
         os.remove('tests/import_test_mod.py')
 
         os.remove('install.py')
+        os.remove('uninstall.py')
 
     # remove for CLI
     elif (settings['project_type'] == 'c'):
@@ -189,7 +248,7 @@ def copy_and_prune():
 
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
 
-        os.remove('src/__CN_SMALL_NAME__mod.py')
+        os.remove('src/__CN_SMALL_NAME___mod.py')
         os.remove('src/__init__.py')
 
         os.remove('tests/import_test_mod.py')
@@ -204,7 +263,7 @@ def copy_and_prune():
 
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
 
-        os.remove('src/__CN_SMALL_NAME__mod.py')
+        os.remove('src/__CN_SMALL_NAME___mod.py')
         os.remove('src/__init__.py')
 
         os.remove('tests/import_test_mod.py')
@@ -216,144 +275,108 @@ def copy_and_prune():
 
 
 # ------------------------------------------------------------------------------
-# Rename files/folders
-# ------------------------------------------------------------------------------
-def rename():
-
-    # recursively rename folders/files
-    dir = settings['project_path']
-    recurse_rename(dir)
-
-
-# ------------------------------------------------------------------------------
 # Recursive function for renaming files/folders
 # ------------------------------------------------------------------------------
-def recurse_rename(dir):
+def recurse_rename(path):
 
-    # returns only final path part
-    lst = os.listdir(dir)
+    """
+        Recursive function for renaming files/folders
+
+        Paramaters:
+            path [string]: the folder to start recursively renaming from
+
+        This is a recursive function to rename files under a given folder. It
+        iterates over the contents of the folder, renaming files as it goes. If
+        it encounters a folder, it calls itself recursively, passing that folder
+        as the parameter. Once all files are renamed, it will then bubble up to
+        rename all folders.
+    """
+
+    # the replacement dict
+    reps = settings['project_reps']
+
+    # returns only final path part for each entry
+    lst = os.listdir(path)
 
     # for each file/folder
     for item in lst:
 
         # put path back together
-        old_path = os.path.join(dir, item)
+        old_path = os.path.join(path, item)
 
         # if it's a dir
         if os.path.isdir(old_path):
-            recurse_rename_dir(old_path, item)
 
-        # it's a file
-        else:
-            recurse_rename_file(dir, old_path, item)
+            # always skip misc folder (never replace/rename)
+            if not item == 'misc':
 
+                # recurse itself to find more files
+                recurse_rename(old_path)
 
-# ------------------------------------------------------------------------------
-# Recursive function for renaming folders
-# ------------------------------------------------------------------------------
-def recurse_rename_dir(old_path, item):
+        # for each replacement key
+        for key in reps.keys():
 
-    # the replacement dict
-    reps = settings['project_reps']
+            # skip keywords list
+            if not isinstance(reps[key], list):
 
-    # keep going (skip misc dir)
-    if not old_path.endswith('misc'):
-        recurse_rename(old_path)
+                # if file/folder name contains replaceable item
+                if key in item:
 
-    # do folders after files (when we come back from recurse)
-    for key in reps.keys():
+                    # do the string replace
+                    new_name = item.replace(key, reps[key])
 
-        # skip keywords list
-        if not isinstance(reps[key], list):
+                    # remove trailing identifiers
+                    new_name = new_name.replace('_app', '')
+                    new_name = new_name.replace('_mod', '')
 
-            # if folder name contains replaceable item
-            if key in item:
+                    # create new path
+                    new_path = os.path.join(path, new_name)
 
-                # do the string replace
-                new_name = item
-                new_name = new_name.replace(key, reps[key])
-                new_path = os.path.join(dir, new_name)
-
-                # do the actual rename
-                os.rename(old_path, new_path)
-
-
-# ------------------------------------------------------------------------------
-# Recursive function for renaming files
-# ------------------------------------------------------------------------------
-def recurse_rename_file(dir, old_path, item):
-
-    # the replacement dict
-    reps = settings['project_reps']
-
-    # do files first
-    for key in reps.keys():
-
-        # skip keyword list
-        if not isinstance(reps[key], list):
-
-            # if file name contains replaceable item
-            if key in item:
-
-                # do the steing replace
-                new_name = item
-
-                # split file name/ext
-                file_parts = item.split('.')
-                file_name = file_parts[0]
-                file_ext = file_parts[1]
-
-                # split replaceable from our forced underscore
-                old_name = file_name.split('__')
-
-                # remove anything without our forced underscore
-                if old_name[2] != '_gui':
-                    new_name = f'__{old_name[1]}__.{file_ext}'
-
-                # replace the underscored name with its final name
-                new_name = new_name.replace(key, reps[key])
-                new_path = os.path.join(dir, new_name)
-
-                # do the actual rename
-                os.rename(old_path, new_path)
-
-
-# ------------------------------------------------------------------------------
-# Replcace text inside files
-# ------------------------------------------------------------------------------
-def replace_text():
-
-    # recursively replace folders/files
-    dir = settings['project_path']
-    recurse_replace_text(dir)
+                    # do the actual rename
+                    os.rename(old_path, new_path)
 
 
 # ------------------------------------------------------------------------------
 # Recursive function for replacing text inside files
 # ------------------------------------------------------------------------------
-def recurse_replace_text(dir):
+def recurse_replace(path):
+
+    """
+        Recursive function for replacing text inside files
+
+        Paramaters:
+            path [string]: the file to replace text in
+
+        This is a recursive function to replace text inside a file. Given a
+        specific file, it iterates the file line by line, replacing test as it
+        goes. When it is done, it saves the file to disk.
+    """
 
     # the replacement dict
     reps = settings['project_reps']
 
-    # returns only final path part
-    lst = os.listdir(dir)
+    # returns only final path part for each entry
+    lst = os.listdir(path)
 
     # for each file/folder
     for item in lst:
 
         # put path back together
-        old_path = os.path.join(dir, item)
+        old_path = os.path.join(path, item)
 
         # if it's a dir
         if os.path.isdir(old_path):
 
-            # keep going (skip misc folder)
-            if not old_path.endswith('misc'):
-                recurse_replace_text(old_path)
+            # always skip misc folder (never replace/rename)
+            if not item == 'misc':
+
+                # recurse itself to find more files
+                recurse_replace(old_path)
 
         # it's a file
         else:
+
+            # do header replacement
 
             # do some fancy header replacement bullshit
             line_start = {
@@ -388,18 +411,20 @@ def recurse_replace_text(dir):
                         spaces_str = ' ' * spaces
                         data[i] = f'{key}{rep}{spaces_str}{line_end[key]}\n'
 
-            # save file with replacements
+            # save file with header replacements
             with open(old_path, 'w') as file:
                 file.writelines(data)
 
             # do regular text replacement
+
+            # open file as text lines
             with open(old_path) as file:
                 data = file.read()
 
             # for each key, do replace
             for key in reps.keys():
 
-                # skip keyword list
+                # skip keywords list
                 if not isinstance(reps[key], list):
                     data = data.replace(key, reps[key])
 
@@ -409,22 +434,30 @@ def recurse_replace_text(dir):
 
 
 # ------------------------------------------------------------------------------
-# This function cleans out the unneccessry parts of the README file
+# Cleans out the unneccessry parts of the README file
 # ------------------------------------------------------------------------------
 def fix_readme():
 
-    # path to project
-    dir = settings['project_path']
-    path = os.path.join(dir, 'README.md')
+    """
+        Cleans out the unneccessry parts of the README file
 
-    # where to put the needed lines
-    new_data = []
+        This function removes sections of the README file that are not
+        appropriate to the specified type of project, such as module/package or
+        CLI/GUI.
+    """
+
+    # path to project
+    dir = settings['project_dir']
+    path = os.path.join(dir, 'README.md')
 
     # what type of project are we creating?
     project_type = settings['project_type']
 
     # just a boolean flag to say if we are kajiggering
     in_it = False
+
+    # where to put the needed lines
+    new_data = []
 
     # what to look for in the text
     start_str = '<!-- __CN_'
@@ -462,26 +495,52 @@ def fix_readme():
 # ------------------------------------------------------------------------------
 def fix_toml():
 
-    # path to project
-    dir = settings['project_path']
-    path = os.path.join(dir, 'pyproject.toml')
+    """
+        Replace keywords in toml file
 
+        This function replaces the 'keywords' array in pyproject.toml with the
+        keywords that were entered in the startup section of the program.
+    """
+
+    # path to project/toml (exit if no file)
+    dir = settings['project_dir']
+    path = os.path.join(dir, 'pyproject.toml')
     if not os.path.exists(path):
         return
+
+    # build a keyword string
+    new_str = ''
+    for item in settings['project_reps']['__CN_KEYWORDS__']:
+        new_str += '\"' + item + '\",\n\t'
+
+    # chop off last comma/newline
+    new_str = new_str[:-3]
 
     # get the file data
     with open(path) as file:
         data = file.read()
 
-    # build a new string
+    # replace the string in the file
+    data = data.replace('\"__CN_KEYWORDS__\"', new_str)
+
+    # save the file
+    with open(path, 'w') as file:
+        file.write(data)
+
+    # build a deps string
     new_str = ''
-    for item in settings['project_reps']['__CN_KEYWORDS__']:
+    for item in settings['project_reps']['__CN_PY_DEPS__']:
         new_str += '\"' + item + '\",\n\t'
+
     # chop off last comma/newline
     new_str = new_str[:-3]
 
+    # get the file data
+    with open(path) as file:
+        data = file.read()
+
     # replace the string in the file
-    data = data.replace('\"__CN_KEYWORDS__\"', new_str)
+    data = data.replace('\"__CN_PY_DEPS__\"', new_str)
 
     # save the file
     with open(path, 'w') as file:
@@ -493,8 +552,17 @@ def fix_toml():
 # ------------------------------------------------------------------------------
 def add_in():
 
-    # TODO: make sure we are in current proj path w/chdir
-    
+    """
+        Add venv and .git folders to new project
+
+        Adds a .git folder (repository) and a venv (virtual environment) folder
+        to the project, and sets them up as necessary.
+    """
+
+    # make sure we are in current proj path w/chdir
+    dir = settings['project_dir']
+    os.chdir(dir)
+
     # add git folder
     cmd = 'git init'
     cmd_array = shlex.split(cmd)
@@ -505,14 +573,19 @@ def add_in():
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array)
 
-    # FIXME: can't source venv dir (working on it)
-    # TODO: install pylama/build in venv
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
+
+    """
+        Code to run when called from command line
+
+        This is the top level code of the program, called when the Python file
+        is invoked from the command line, e.g. "python pymaker.py".
+    """
+
     main()
 
 # -)
