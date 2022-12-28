@@ -15,9 +15,9 @@
         ...
 """
 
-print('this is the (pkg) __CN_SMALL_NAME__/__init__.py file')
-
 __version__ = '__CN_VERSION__'
+
+print('this is the (pkg) __CN_SMALL_NAME__/__init__.py file')
 
 # import all modules in package to get full dot notation from package import
 # from <package> imoport <module>
