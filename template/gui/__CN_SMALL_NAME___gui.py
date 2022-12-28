@@ -35,24 +35,15 @@ import __CN_SMALL_NAME__.py # noqa E402 (import not at top of file)
 
 
 # ------------------------------------------------------------------------------
-# Short description
+# The main function of the program
 # ------------------------------------------------------------------------------
 def main():
 
     """
-        Short description
+        The main function of the program
 
-        Paramaters:
-            var_name [type]: description
-                second line
-
-        Returns:
-            [type]: description
-
-        Raises:
-            exception_type(vars): description
-
-        Long description
+        This function is the main entry point for the program, initializing the
+        GUI and attaching it to the underlying Python program.
     """
 
     pass
@@ -62,6 +53,14 @@ def main():
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
+
+    """
+        Code to run when called from command line
+
+        This is the top level code of the program, called when the Python file
+        is invoked from the command line, e.g. "python __CN_SMALL_NAME___gui.py".
+    """
+
     main()
 
 # -)
