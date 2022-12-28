@@ -62,9 +62,11 @@ def main():
     """
 
     # instantiate installerator class
+    # package.module.class
     installer = installerator.installerator.Installerator()
 
     # # run the instance
+    # class.method
     installer.run(dict_install)
 
 
@@ -72,6 +74,14 @@ def main():
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
+
+    """
+        Code to run when called from command line
+
+        This is the top level code of the program, called when the Python file
+        is invoked from the command line, e.g. "python install.py".
+    """
+
     main()
 
 # -)
