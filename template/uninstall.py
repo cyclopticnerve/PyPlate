@@ -56,9 +56,11 @@ def main():
     """
 
     # instantiate uninstallerator class
+    # package.module.class
     uninstaller = installerator.uninstallerator.Uninstallerator()
 
     # # run the instance
+    # class.method
     uninstaller.run(dict_uninstall)
 
 
@@ -66,6 +68,14 @@ def main():
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
+
+    """
+        Code to run when called from command line
+
+        This is the top level code of the program, called when the Python file
+        is invoked from the command line, e.g. "python uninstall.py".
+    """
+
     main()
 
 # -)
