@@ -31,11 +31,11 @@ class Main:
     """
         Short description
 
-        Objects
-            ...
+        Properties:
+            prop_name [type]: description
 
-        Methods
-            ...
+        Methods:
+            method_name: description
 
         Long description
     """
