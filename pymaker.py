@@ -24,24 +24,27 @@ import shutil
 import subprocess
 
 # ------------------------------------------------------------------------------
-# Globals
+# Constants
 # ------------------------------------------------------------------------------
 
 # get the current user name
-user = os.path.expanduser('~')
+USER = os.path.expanduser('~')
 
 # this is the dir where the script is being run from
 # (~/Documents/Projects/Python/PyPlate)
-curr_dir = os.path.dirname(os.path.abspath(__file__))
-print('curr_dir:', curr_dir)
+CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # this is the dir where the template files are located rel to the script
 # (~/Documents/Projects/Python/PyPlate/template)
-template_dir = os.path.abspath(f'{curr_dir}/template')
-print('template_dir:', template_dir)
+TEMPLATE_DIR = os.path.abspath(f'{CURR_DIR}/template')
+
 # this is the user entered base dir for python stuff
 # TODO: this may change on user input
-base_dir = os.path.abspath(f'{curr_dir}/../')
-print('base_dir:', base_dir)
+BASE_DIR = os.path.abspath(f'{CURR_DIR}/../')
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
 
 # the settings to use to create the project
 settings = {
@@ -63,10 +66,10 @@ settings = {
     },
 }
 
-
 # ------------------------------------------------------------------------------
 # Functions
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # Main function
@@ -120,9 +123,9 @@ def get_info():
 
     # calculate project path
     if settings['project_type'] in 'mp':
-        settings['project_type_dir'] = os.path.join(base_dir, 'Libs')
+        settings['project_type_dir'] = os.path.join(BASE_DIR, 'Libs')
     else:
-        settings['project_type_dir'] = os.path.join(base_dir, 'Apps')
+        settings['project_type_dir'] = os.path.join(BASE_DIR, 'Apps')
 
     # check if project folder exists
     settings['project_dir'] = \
@@ -150,11 +153,11 @@ def get_info():
 
     # calculate gui location
     settings['project_reps']['__CN_GUI_EXEC__'] = \
-        f'{user}/.cyclopticnerve/{lower}/gui/{lower}_gui.py'
+        f'{USER}/.cyclopticnerve/{lower}/gui/{lower}_gui.py'
 
     # calculuate icon location
     settings['project_reps']['__CN_GUI_ICON__'] = \
-        f'{user}/.local/share/icons/cyclopticnerve/{lower}.png'
+        f'{USER}/.local/share/icons/cyclopticnerve/{lower}.png'
 
 
 # ------------------------------------------------------------------------------
@@ -210,7 +213,7 @@ def copy_and_prune():
     """
 
     # copy template to new project
-    shutil.copytree(template_dir, settings['project_dir'])
+    shutil.copytree(TEMPLATE_DIR, settings['project_dir'])
 
     # switch to project path
     os.chdir(settings['project_dir'])
