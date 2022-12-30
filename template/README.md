@@ -18,12 +18,14 @@ __CN_SHORT_DESC__
 
 ## Requirements
 
+<!-- __CN_MOD_START__ -->
+None
+<!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
 This application requires:<br>
 [Configurator](https://github.com/cyclopticnerve/Configurator)<br>
 [Installerator](https://github.com/cyclopticnerve/Installerator)
 <!-- __CN_APP_END__ -->
-blah blah blah
 
 ## Installing
 
