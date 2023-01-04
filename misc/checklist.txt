@@ -1,41 +1,9 @@
 
-Initialize
-
-VSCodium
-    [] Open/restart VSCodium
-    [] Switch to venv interpreter - bottom right of status bar
-    [] Make sure you are in project dir (terminal at bottom)
-    [] Run 'source venv/bin/activate'
-    [] Install pylama in venv (popup in bottom right)
-    [] Install build - $ python -m pip install build
-    [] Create new repo in github tab
-    ??? Get github token from ~/.git-credentials (from : to @)
-    ??? $ git remote set-url origin 
-        https://<githubtoken>@github.com/<username>/<repositoryname>.git
-    [][ Stage all changes
-    [] Commit 'first commit'
-    [] Publish 'main' branch
-    [] Checkout new branch 'dev' from 'main'
-    [] Publish 'dev' branch
-
-GitHub
-    [] Make 'dev' default branch
-    [] Add description and search tags
-
 ================================================================================
 
 Release - VSCodium
 
     on 'dev':
-
-    --- Unit tests
-    Packages/Modules
-        [] Run tests/import_test_xxx.py
-        [] Internal test (sys.path)
-        [] Test build - $ python -m build
-        [] Install/test in venv (this project)
-            $ python -m pip install -e .
-        [] Test in VM using GitHub/README
 
     [] Headers/footers
     [] Docstrings
