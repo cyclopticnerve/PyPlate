@@ -36,11 +36,11 @@ CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # this is the dir where the template files are located rel to the script
 # (~/Documents/Projects/Python/PyPlate/template)
-TEMPLATE_DIR = os.path.abspath(f'{CURR_DIR}/template')
+TEMPLATE_DIR = os.path.abspath(f'{CURR_DIR}/../template')
 
 # this is the user entered base dir for python stuff
 # TODO: this may change on user input
-BASE_DIR = os.path.abspath(f'{CURR_DIR}/../')
+BASE_DIR = os.path.abspath(f'{CURR_DIR}/../../')
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -224,7 +224,6 @@ def copy_and_prune():
 
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
         os.remove('src/__CN_SMALL_NAME___app.py')
-        os.remove('src/__main__.py')
 
         os.remove('tests/import_test_pkg.py')
 
@@ -237,8 +236,6 @@ def copy_and_prune():
 
         os.remove('src/__CN_SMALL_NAME___app.py')
         os.remove('src/__CN_SMALL_NAME___mod.py')
-        os.remove('src/__init__.py')
-        os.remove('src/__main__.py')
 
         os.remove('tests/import_test_mod.py')
 
@@ -252,7 +249,6 @@ def copy_and_prune():
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
 
         os.remove('src/__CN_SMALL_NAME___mod.py')
-        os.remove('src/__init__.py')
 
         os.remove('tests/import_test_mod.py')
         os.remove('tests/import_test_pkg.py')
@@ -267,7 +263,6 @@ def copy_and_prune():
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
 
         os.remove('src/__CN_SMALL_NAME___mod.py')
-        os.remove('src/__init__.py')
 
         os.remove('tests/import_test_mod.py')
         os.remove('tests/import_test_pkg.py')
@@ -319,7 +314,7 @@ def recurse_rename(path):
         # for each replacement key
         for key in reps.keys():
 
-            # skip keywords list
+            # skip keywords/deps lists
             if not isinstance(reps[key], list):
 
                 # if file/folder name contains replaceable item
@@ -427,7 +422,7 @@ def recurse_replace(path):
             # for each key, do replace
             for key in reps.keys():
 
-                # skip keywords list
+                # skip keywords/deps lists
                 if not isinstance(reps[key], list):
                     data = data.replace(key, reps[key])
 
@@ -501,9 +496,26 @@ def fix_toml():
     """
         Replace keywords in toml file
 
-        This function replaces the 'keywords' array in pyproject.toml with the
-        keywords that were entered in the startup section of the program.
+        This function replaces the 'keywords' and 'deps' array in pyproject.toml
+        with the keywords/deps that were entered in the startup section of the
+        program.
     """
+
+    # build a keyword string
+    key_str = ''
+    for item in settings['project_reps']['__CN_KEYWORDS__']:
+        key_str += '\"' + item + '\",\n\t'
+
+    # chop off last comma/newline
+    key_str = key_str[:-3]
+
+    # build a deps string
+    dep_str = ''
+    for item in settings['project_reps']['__CN_PY_DEPS__']:
+        dep_str += '\"' + item + '\",\n\t'
+
+    # chop off last comma/newline
+    dep_str = dep_str[:-3]
 
     # path to project/toml (exit if no file)
     dir = settings['project_dir']
@@ -511,39 +523,14 @@ def fix_toml():
     if not os.path.exists(path):
         return
 
-    # build a keyword string
-    new_str = ''
-    for item in settings['project_reps']['__CN_KEYWORDS__']:
-        new_str += '\"' + item + '\",\n\t'
-
-    # chop off last comma/newline
-    new_str = new_str[:-3]
-
     # get the file data
     with open(path) as file:
         data = file.read()
 
     # replace the string in the file
-    data = data.replace('\"__CN_KEYWORDS__\"', new_str)
-
-    # save the file
-    with open(path, 'w') as file:
-        file.write(data)
-
-    # build a deps string
-    new_str = ''
-    for item in settings['project_reps']['__CN_PY_DEPS__']:
-        new_str += '\"' + item + '\",\n\t'
-
-    # chop off last comma/newline
-    new_str = new_str[:-3]
-
-    # get the file data
-    with open(path) as file:
-        data = file.read()
-
+    data = data.replace('\"__CN_KEYWORDS__\"', key_str)
     # replace the string in the file
-    data = data.replace('\"__CN_PY_DEPS__\"', new_str)
+    data = data.replace('\"__CN_PY_DEPS__\"', dep_str)
 
     # save the file
     with open(path, 'w') as file:
