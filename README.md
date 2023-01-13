@@ -62,8 +62,8 @@ foo@bar:~$ cd Documents/Projects/Python/PyPlate
 foo@bar:~/Documents/Projects/Python/PyPlate$ ./pymaker.py
 ```
 
-Enter the required information, and PyMaker will create the required files and 
-folders in a subdirectory of "~/Documents/Projects/Python/" based on your 
+Enter the required information, and pymaker.py will create the required files 
+and folders in a subdirectory of "~/Documents/Projects/Python/" based on your 
 entries.
 
 ## Notes

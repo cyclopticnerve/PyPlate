@@ -17,7 +17,7 @@
 # import all modules in package to get full dot notation from package import
 # from <package> imoport <module>
 # TODO: fix these names
-from __CN_SMALL_NAME__ import * # noqa W0611 (unused import)
+from .__CN_SMALL_NAME__ import * # noqa W0611 (unused import)
 # from __CN_SMALL_NAME__ import mod_name_1 # noqa W0611 (unused import)
 # from __CN_SMALL_NAME__ import mod_name_2 # noqa W0611 (unused import)
 

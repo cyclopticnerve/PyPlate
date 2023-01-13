@@ -7,6 +7,7 @@ Release - VSCodium
 
     [] Headers/footers
     [] Docstrings
+    [] Check all noqa for good use
     [] Check dependencies in pyproject.toml and install.py
     [] Update extra files in MANIFEST.in
     [] $ python -m pip freeze > requirements.txt

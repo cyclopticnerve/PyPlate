@@ -15,7 +15,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "__CN_SMALL_NAME__"
-version = "__CN_VERSION__"
+version = "0.1.0"
 description = "__CN_SHORT_DESC__"
 readme = "README.md"
 authors = [
@@ -29,10 +29,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = [
-    "__CN_KEYWORDS__"
+    __CN_KEYWORDS__
 ]
 dependencies = [
-    "__CN_PY_DEPS__"
+    __CN_PY_DEPS__
 ] 
 requires-python = ">=3.10"
 

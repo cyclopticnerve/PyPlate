@@ -31,6 +31,7 @@ dict_install = {
     'sys_reqs': [
     ],
     'py_reqs': [
+        '__CN_PY_DEPS__'
     ],
     'dirs': [
         '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
