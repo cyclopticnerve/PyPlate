@@ -9,7 +9,7 @@ template
 top-level
   .gitignore - OK
   licence - OK
-  readme - compare to template
+  readme - reqs
   version - OK
 
 track version/keywords/deps and add to checklist

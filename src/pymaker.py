@@ -89,7 +89,7 @@ def main():
     copy_and_prune()
     recurse_rename(settings['project_dir'])
     recurse_replace(settings['project_dir'])
-    add_git_venv()
+    # add_git_venv()
 
 
 # ------------------------------------------------------------------------------
@@ -107,20 +107,20 @@ def get_info():
 
     # ask what type of project
     prj_type = input('Type of project: [M]odule | [P]ackage | [C]LI | [G]UI: ')
+    prj_type = prj_type.strip()
     if prj_type == '':
         exit()
-    prj_type = prj_type.strip().lower()[0]
+    prj_type = prj_type.lower()[0]
     if prj_type not in 'mpcg':
         exit()
     settings['project_type'] = prj_type
 
     # ask for project name
     prj_name_big = input('Project name: ')
+    prj_name_big = prj_name_big.strip()
     if prj_name_big == '':
         exit()
-    # NB: check for special chars in name
-    prj_name_big = prj_name_big.decode('utf-8', 'ignore').encode('utf-8')
-    prj_name_big = prj_name_big.strip().capitalize()
+    prj_name_big = prj_name_big.capitalize()
     settings['project_reps']['__CN_BIG_NAME__'] = prj_name_big
 
     # calculate project path
@@ -145,8 +145,9 @@ def get_info():
 
     # get short description
     prj_desc = input('Short description of project (Optional): ')
+    prj_desc = prj_desc.strip()
     settings['project_reps']['__CN_SHORT_DESC__'] = \
-        prj_desc.strip().capitalize()
+        prj_desc.capitalize()
 
     # calculate gui location
     settings['project_reps']['__CN_GUI_EXEC__'] = \
@@ -411,18 +412,21 @@ def recurse_replace_headers(path):
             # build start str
             key = item[0] + item[1]
 
-            # replace the dunder
-            rep = reps[item[1]]
+            # if the key is in the line
+            if key in data[i]:
 
-            # calculate spaces
-            spaces = 80 - (len(item[0]) + len(rep) + len(item[2]))
-            spaces_str = ' ' * spaces
+                # replace the dunder
+                rep = reps[item[1]]
 
-            # create replacement string
-            rep_str = f'{item[0]}{rep}{spaces_str}{item[2]}'
+                # calculate spaces
+                spaces = 80 - (len(item[0]) + len(rep) + len(item[2]))
+                spaces_str = ' ' * spaces
 
-            # replace text in line
-            data[i] = data[i].replace(key, rep_str)
+                # create replacement string (with newline!!!)
+                rep_str = f'{item[0]}{rep}{spaces_str}{item[2]}\n'
+
+                # replace text in line
+                data[i] = rep_str
 
     # save file with header replacements
     with open(path, 'w') as file:
@@ -454,19 +458,23 @@ def fix_readme(path):
     # if True, we are in a block we don't want to copy
     in_it = False
 
+    # NB: we use a new array vs. in-situ replacement here b/c we are removing
+    # A LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
+    # while that would look *ok* in the reulting README, looks UGLY in the
+    # source code. so we opt for not copying those lines.
+
     # where to put the needed lines
     new_data = []
 
     # what to look for in the text
-    a_str = '<!-- __CN_'
-
     if prj_type in 'mp':
-        b_str = a_str + 'APP'
+        start_str = '<!-- __CN_APP_START__ -->'
+        end_str = '<!-- __CN_APP_END__ -->'
+        ignore_str = '<!-- __CN_MOD_'
     else:
-        b_str = a_str + 'MOD'
-
-    start_str = b_str + '_START__ -->'
-    end_str = b_str + '_END__ -->'
+        start_str = '<!-- __CN_MOD_START__ -->'
+        end_str = '<!-- __CN_MOD_END__ -->'
+        ignore_str = '<!-- __CN_APP_'
 
     # get the file data
     with open(path) as file:
@@ -476,18 +484,18 @@ def fix_readme(path):
     for line in data:
 
         # check if we are in a block
-        if line.strip().startswith(start_str):
+        if start_str in line:
             in_it = True
 
         # it's a valid data block, just copy it
         if not in_it:
 
-            # it's not a comment line, copy it
-            if not line.strip().startswith(a_str):
+            # ignore block wrapper lines
+            if ignore_str not in line:
                 new_data.append(line)
 
         # check if we have left the block
-        if line.strip().startswith(end_str):
+        if end_str in line:
             in_it = False
 
     # save the kajiggered data line
@@ -501,7 +509,7 @@ def fix_readme(path):
 def add_git_venv():
 
     """
-        Add venv and .git folders to new project
+        Add .git and venv folders to new project
 
         Adds a .git folder (repository) and a venv (virtual environment) folder
         to the project, and sets them up as necessary.

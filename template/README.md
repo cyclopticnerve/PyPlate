@@ -12,20 +12,22 @@
 
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
+<!-- __CN_SHORT_DESC_START__ -->
 __CN_SHORT_DESC__
+<!-- __CN_SHORT_DESC_END__ -->
 
 <!-- ![Screenshot](misc/screenshot.jpg) -->
 
 ## Requirements
 
 <!-- __CN_MOD_START__ -->
-__CN_PY_DEPS__
+<!-- __CN_PY_DEPS__ -->
 <!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
 This application requires:<br>
 [Configurator](https://github.com/cyclopticnerve/Configurator)<br>
 [Installerator](https://github.com/cyclopticnerve/Installerator)<br>
-__CN_PY_DEPS__
+<!-- __CN_PY_DEPS__ -->
 <!-- __CN_APP_END__ -->
 
 ## Installing
@@ -47,7 +49,7 @@ Then install it using:
 
 ```bash
 foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ python -m pip install __CN_BIG_NAME__-[version].tar.gz
+foo@bar:~/Downloads$ python -m pip install __CN_BIG_NAME__-[__CN_VERSION__].tar.gz
 ```
 
 Or you can clone the git repo to get the latest (and often broken) code 
@@ -59,7 +61,7 @@ foo@bar:~$ cd Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_BIG_NAME__
 foo@bar:~/Downloads$ cd __CN_BIG_NAME__
 foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m build
-foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m pip install ./dist/__CN_SMALL_NAME__-[version].tar.gz -r ./requirements.txt
+foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m pip install ./dist/__CN_SMALL_NAME__-[__CN_VERSION__].tar.gz -r ./requirements.txt
 ```
 <!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
@@ -74,8 +76,8 @@ Download either the 'tar.gz' or '.zip' file and extract it.<br>
 Then run the 'install.py' file from there:
 
 ```bash
-foo@bar:~$ cd Downloads/__CN_BIG_NAME__-[version]
-foo@bar:~/Downloads/__CN_BIG_NAME__-[version]$ ./install.py
+foo@bar:~$ cd Downloads/__CN_BIG_NAME__-[__CN_VERSION__]
+foo@bar:~/Downloads/__CN_BIG_NAME__-[__CN_VERSION__]$ ./install.py
 ```
 
 Or you can clone the git repo to get the latest (and often broken) code 

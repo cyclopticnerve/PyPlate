@@ -29,10 +29,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = [
-    __CN_KEYWORDS__
+    # __CN_KEYWORDS__
 ]
 dependencies = [
-    __CN_PY_DEPS__
+    # __CN_PY_DEPS__
 ] 
 requires-python = ">=3.10"
 

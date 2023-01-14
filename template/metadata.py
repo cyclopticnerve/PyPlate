@@ -1,27 +1,29 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __CN_BIG_NAME__                                        /          \
 # Filename: version.py                                            |     ()     |
-# Date    : 12/22/2022                                            |            |
+# Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
+
+# TODO: have versionator script replace version num in README
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-# these are the short description, keywords, and dependencies for the project
+# these are the short description, keywords, and dependencies from pymaker
 # they are stored here for projects that don't use pyproject.toml
 # these will be used in the GitHub repo
-short_desc = 'A template for creating packages/modules/CLI apps/GTK3 apps in Python'
-keywords = 'python;template;package;module;cli;app;gui;gtk3'
-depends = ''
+CN_SHORT_DESC = '__CN_SHORT_DESC__'
+CN_KEYWORDS = '__CN_KEYWORDS__'
+CN_DEPENDS = '__CN_PY_DEPS__'
 
 # this is the canonical (only and absolute) version number string for this
 # project
 # this should provide the absolute version number string (in semantic notation)
 # of this project, and all other version numbers should be superceded by this
 # string
-__version__ = '0.1.0'
+CN_VERSION = '0.1.0'
 
 # -)

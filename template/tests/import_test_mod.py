@@ -5,8 +5,8 @@
 # import sys
 
 # curr_dir = os.path.abspath(os.path.dirname(__file__))
-# up_one = os.path.abspath(os.path.join(curr_dir, '../src'))
-# sys.path.insert(1, up_one)
+# src_dir = os.path.abspath(os.path.join(curr_dir, '../src'))
+# sys.path.insert(1, src_dir)
 
 # ------------------------------------------------------------------------------
 

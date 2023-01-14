@@ -50,7 +50,6 @@ def func():
 
         Paramaters:
             var_name [type]: description
-                second line
 
         Returns:
             [type]: description
