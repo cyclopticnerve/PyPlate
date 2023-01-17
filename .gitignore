@@ -6,6 +6,9 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# don't include *MY* pymaker.json
+src/pymaker.json
+
 # shamelessly stolen from 
 # https://github.com/github/gitignore/blob/main/Python.gitignore
 # (and reformatted)

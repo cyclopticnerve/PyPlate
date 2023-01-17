@@ -3,8 +3,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: __CN_SMALL_NAME___gui.py                              |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __CN_AUTHOR__                                         |   \____/   |
+# License : __CN_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # TODO: flesh this out more once we use it for a gui app

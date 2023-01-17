@@ -9,22 +9,22 @@ template
 top-level
   .gitignore - OK
   licence - OK
-  readme - reqs
+  readme - OK
   version - OK
 
 track version/keywords/deps and add to checklist
 put short desc/version/keywords/deps in a metadata.json file and make a script that can update them in other files
 maybe surround with quoted special tags?
 
-files with replacements missing last blank line after # -)
+# DONE: files with replacements missing last blank line after # -)
 
 # DONE: In package init do from .module import *
 
-Loop over files/dirs using for f in os.listdir()
+# DONE: Loop over files/dirs using for f in os.listdir()
 
 # DONE: Where do we keep short description and keywords when making an app, we need those for GitHub repository
 
-pymaker - first run specify base dir for libs/apps
+# DONE: pymaker - first run specify base dir for libs/apps
 store that and use for future runs
 
 add argparse to empty_exe.py

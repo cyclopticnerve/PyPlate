@@ -3,8 +3,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: install.py                                            |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __CN_AUTHOR__                                         |   \____/   |
+# License : __CN_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -34,11 +34,11 @@ dict_install = {
         '__CN_PY_DEPS__'
     ],
     'dirs': [
-        '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
+        '${HOME}/.__CN_AUTHOR__ /__CN_SMALL_NAME__'
     ],
     'files': {
-        'LICENSE.txt': '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__',
-        'uninstall.py': '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
+        'LICENSE.txt': '${HOME}/.__CN_AUTHOR__ /__CN_SMALL_NAME__',
+        'uninstall.py': '${HOME}/.__CN_AUTHOR__ /__CN_SMALL_NAME__'
     },
     'postflight': [
     ]

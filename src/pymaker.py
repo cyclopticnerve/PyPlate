@@ -7,19 +7,17 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# TODO: get path to template
-# TODO: get path to base python projects dir
-
-# TODO: what files to add to install.py when copying
+# TODO: Module/Package: get rid of import tests after ensuring __init__.py works
+# as expected
+# TODO: CLI/GUI: what files to add to install.py when copying
 # (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and
 # !/.cyclopticnerve/proj/app/gui)
-
-# TODO: get rid of import tests after ensuring __init__.py works as expected
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 from datetime import datetime
+import json
 import os
 import shlex
 import shutil
@@ -29,41 +27,55 @@ import subprocess
 # Constants
 # ------------------------------------------------------------------------------
 
-# get the current user name
-USER = os.path.expanduser('~')
-
 # this is the dir where the script is being run from
 # (~/Documents/Projects/Python/PyPlate/src/)
 CURR_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# this is the dir where the template files are located rel to the script
+# these are the default dirs for project location
+# (~/Documents/Projects/Python/) (above PyPlate)
+BASE_DIR = os.path.abspath(f'{CURR_DIR}/../../')
+
+# the default date format to use in headers
+DATE_FMT = '%Y-%m-%d'
+
+# this is the default dir where the template files are located rel to the script
 # (~/Documents/Projects/Python/PyPlate/template/)
 TEMPLATE_DIR = os.path.abspath(f'{CURR_DIR}/../template')
 
-# this is the user entered base dir for python stuff
-# (~/Documents/Projects/Python/)
-# TODO: this may change on user input
-BASE_DIR = os.path.abspath(f'{CURR_DIR}/../../')
+# default autthor is user's login name
+AUTHOR = os.getlogin()
 
-# subdirs for different types of projects
-APPS_DIR = os.path.join(BASE_DIR, 'Apps')
-LIBS_DIR = os.path.join(BASE_DIR, 'Libs')
+# get the current user home dir
+USER_DIR = os.path.expanduser('~')
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-# the settings to use to create the project
-settings = {
-    'project_type':             '',  # m (Module), p (Package), c (CLI), g (GUI)
-    'project_dir':              '',  # /Libs/Test/ or /Apps/Test/
-    'project_reps': {
-        '__CN_BIG_NAME__':      '',  # Test
-        '__CN_SMALL_NAME__':    '',  # test
-        '__CN_DATE__':          '',  # MM/DD/YYYY
-        '__CN_SHORT_DESC__':    '',  # 'A simple program to foo your bar'
-        '__CN_GUI_EXEC__':      '',  # foo_gui.py
-        '__CN_GUI_ICON__':      ''   # foo_gui.png
+# the default conf settings for project paths
+dict_conf = {
+    'conf_base': BASE_DIR,
+    'conf_libs': '',
+    'conf_apps': '',
+    'conf_date': DATE_FMT,
+    'conf_auth': AUTHOR,
+    'conf_mail': '',
+    'conf_lcns': ''
+}
+
+# the default settings to use to create the project
+dict_proj = {
+    'proj_type':             '',  # m (Module), p (Package), c (CLI), g (GUI)
+    'proj_dir':              '',  # conf_base/conf_libs/Foo or \
+                                  # conf_base/conf_apps/Foo
+    'proj_reps': {
+        '__CN_BIG_NAME__':   '',  # Foo
+        '__CN_SMALL_NAME__': '',  # foo
+        '__CN_DATE__':       '',  # conf_date (2022-12-08)
+        '__CN_AUTHOR__':     '',  # conf_auth
+        '__CN_LICENSE__':    '',  # conf_lcns
+        '__CN_GUI_EXEC__':   '',  # foo_gui.py
+        '__CN_GUI_ICON__':   ''   # foo.png
     }
 }
 
@@ -85,17 +97,54 @@ def main():
     """
 
     # call each step
-    get_info()
+    get_dict_conf()
+    get_dict_proj()
     copy_and_prune()
-    recurse_rename(settings['project_dir'])
-    recurse_replace(settings['project_dir'])
-    # add_git_venv()
+    recurse_rename(dict_proj['proj_dir'])
+    recurse_replace(dict_proj['proj_dir'])
+    add_git_venv()
+
+
+# ------------------------------------------------------------------------------
+# Get conf settings
+# ------------------------------------------------------------------------------
+def get_dict_conf():
+
+    """
+        Get conf settings
+
+        Get already saved settings from user (or create defaults if not exists)
+    """
+
+    global dict_conf
+
+    # get conf path
+    conf_path = os.path.join(CURR_DIR, 'pymaker.json')
+
+    # create file if necessary
+    if not os.path.exists(conf_path):
+        with open(conf_path, 'w') as file:
+            file.write(json.dumps(dict_conf, indent=4))
+            print('Edit the pymaker.json file before running. See README.md')
+            exit()
+
+    # read conf dir
+    with open(conf_path) as file:
+        dict_conf = json.load(file)
+
+    # apply default value if key is empty
+    if dict_conf['conf_base'] == '':
+        dict_conf['conf_base'] = BASE_DIR
+    if dict_conf['conf_date'] == '':
+        dict_conf['conf_date'] = DATE_FMT
+    if dict_conf['conf_auth'] == '':
+        dict_conf['conf_auth'] = AUTHOR
 
 
 # ------------------------------------------------------------------------------
 # Get project info
 # ------------------------------------------------------------------------------
-def get_info():
+def get_dict_proj():
 
     """
         Get project info
@@ -103,17 +152,23 @@ def get_info():
         Asks the user for project info, such as type, name, etc.
     """
 
-    global settings
+    global dict_proj
 
     # ask what type of project
-    prj_type = input('Type of project: [M]odule | [P]ackage | [C]LI | [G]UI: ')
-    prj_type = prj_type.strip()
-    if prj_type == '':
+    proj_type = input('Type of project: [M]odule | [P]ackage | [C]LI | [G]UI: ')
+    proj_type = proj_type.strip()
+    if proj_type == '':
         exit()
-    prj_type = prj_type.lower()[0]
-    if prj_type not in 'mpcg':
+    proj_type = proj_type.lower()[0]
+    if proj_type not in 'mpcg':
         exit()
-    settings['project_type'] = prj_type
+    dict_proj['proj_type'] = proj_type
+
+    # calculate project subdir
+    if dict_proj['proj_type'] in 'mp':
+        prj_sub_dir = dict_conf['conf_libs']
+    else:
+        prj_sub_dir = dict_conf['conf_apps']
 
     # ask for project name
     prj_name_big = input('Project name: ')
@@ -121,41 +176,41 @@ def get_info():
     if prj_name_big == '':
         exit()
     prj_name_big = prj_name_big.capitalize()
-    settings['project_reps']['__CN_BIG_NAME__'] = prj_name_big
+    dict_proj['proj_reps']['__CN_BIG_NAME__'] = prj_name_big
 
-    # calculate project path
-    if settings['project_type'] in 'mp':
-        type_dir = LIBS_DIR
-    else:
-        type_dir = APPS_DIR
+    # calculate final proj location
+    conf_base = dict_conf['conf_base']
+    dict_proj['proj_dir'] = os.path.join(conf_base, prj_sub_dir, prj_name_big)
 
     # check if project folder exists
-    settings['project_dir'] = os.path.join(type_dir, prj_name_big)
-    if os.path.exists(settings['project_dir']):
-        print(f'Project {settings["project_dir"]} already exists')
+    tmp_path = dict_proj['proj_dir']
+    if os.path.exists(tmp_path):
+        print(f'Project {tmp_path} already exists')
         exit()
 
     # calculate small name
     prj_name_small = prj_name_big.lower()
-    settings['project_reps']['__CN_SMALL_NAME__'] = prj_name_small
+    dict_proj['proj_reps']['__CN_SMALL_NAME__'] = prj_name_small
 
     # calculate current date
-    prj_date = datetime.now().strftime('%m/%d/%Y')
-    settings['project_reps']['__CN_DATE__'] = prj_date
+    prj_date = datetime.now().strftime(dict_conf['conf_date'])
+    dict_proj['proj_reps']['__CN_DATE__'] = prj_date
 
-    # get short description
-    prj_desc = input('Short description of project (Optional): ')
-    prj_desc = prj_desc.strip()
-    settings['project_reps']['__CN_SHORT_DESC__'] = \
-        prj_desc.capitalize()
+    # get author
+    conf_auth = dict_conf['conf_auth']
+    dict_proj['proj_reps']['__CN_AUTHOR__'] = conf_auth
+
+    # get license
+    conf_lcns = dict_conf['conf_lcns']
+    dict_proj['proj_reps']['__CONF_LICENSE__'] = conf_lcns
 
     # calculate gui location
-    settings['project_reps']['__CN_GUI_EXEC__'] = \
-        f'{USER}/.cyclopticnerve/{prj_name_small}/gui/{prj_name_small}_gui.py'
+    dict_proj['proj_reps']['__CN_GUI_EXEC__'] = \
+        f'{USER_DIR}/.{conf_auth}/{prj_name_small}/gui/{prj_name_small}_gui.py'
 
     # calculuate icon location
-    settings['project_reps']['__CN_GUI_ICON__'] = \
-        f'{USER}/.local/share/icons/cyclopticnerve/{prj_name_small}.png'
+    dict_proj['proj_reps']['__CN_GUI_ICON__'] = \
+        f'{USER_DIR}/.local/share/icons/{conf_auth}/{prj_name_small}.png'
 
 
 # ------------------------------------------------------------------------------
@@ -172,13 +227,13 @@ def copy_and_prune():
     """
 
     # copy template to new project
-    shutil.copytree(TEMPLATE_DIR, settings['project_dir'])
+    shutil.copytree(TEMPLATE_DIR, dict_proj['proj_dir'])
 
     # switch to project path
-    os.chdir(settings['project_dir'])
+    os.chdir(dict_proj['proj_dir'])
 
     # remove for module
-    if (settings['project_type'] == 'm'):
+    if (dict_proj['proj_type'] == 'm'):
 
         shutil.rmtree('gui', ignore_errors=True)
 
@@ -191,7 +246,7 @@ def copy_and_prune():
         os.remove('uninstall.py')
 
     # remove for package
-    elif (settings['project_type'] == 'p'):
+    elif (dict_proj['proj_type'] == 'p'):
         shutil.rmtree('gui', ignore_errors=True)
 
         os.remove('src/__CN_SMALL_NAME___app.py')
@@ -203,7 +258,7 @@ def copy_and_prune():
         os.remove('uninstall.py')
 
     # remove for CLI
-    elif (settings['project_type'] == 'c'):
+    elif (dict_proj['proj_type'] == 'c'):
         shutil.rmtree('gui', ignore_errors=True)
 
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
@@ -218,7 +273,7 @@ def copy_and_prune():
         os.remove('requirements.txt')
 
     # remove for GUI
-    elif (settings['project_type'] == 'g'):
+    elif (dict_proj['proj_type'] == 'g'):
 
         shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
 
@@ -254,7 +309,7 @@ def recurse_rename(path):
     skip_dirs = ['misc']
 
     # the replacement dict
-    reps = settings['project_reps']
+    reps = dict_proj['proj_reps']
 
     # returns only final path part for each entry
     lst = os.listdir(path)
@@ -317,7 +372,7 @@ def recurse_replace(path):
     skip_dirs = ['misc']
 
     # the replacement dict
-    reps = settings['project_reps']
+    reps = dict_proj['proj_reps']
 
     # returns only final path part for each entry
     lst = os.listdir(path)
@@ -387,16 +442,20 @@ def recurse_replace_headers(path):
     """
 
     # the replacement dict
-    reps = settings['project_reps']
+    reps = dict_proj['proj_reps']
 
     # set up an ugly array of header stuff
     line_rep = [
         ['# Project : ', '__CN_BIG_NAME__',   '/          \\ '],
         ['# Filename: ', '__CN_SMALL_NAME__', '|     ()     |'],
         ['# Date    : ', '__CN_DATE__',       '|            |'],
+        ['# Author  : ', '__CN_AUTHOR__',     '|   \\____/   |'],
+        ['# License : ', '__CN_LICENSE__',    ' \\          / '],
         ['<!-- Project : ', '__CN_BIG_NAME__',   '/          \\  -->'],
         ['<!-- Filename: ', '__CN_SMALL_NAME__', '|     ()     | -->'],
-        ['<!-- Date    : ', '__CN_DATE__',       '|            | -->']
+        ['<!-- Date    : ', '__CN_DATE__',       '|            | -->'],
+        ['<!-- Author  : ', '__CN_AUTHOR__',     '|   \\____/   | -->'],
+        ['<!-- License : ', '__CN_LICENSE__',    ' \\          /  -->'],
     ]
 
     # open file as text line array
@@ -452,7 +511,7 @@ def fix_readme(path):
     # lines, then save that array to a file
 
     # what type of project are we creating?
-    prj_type = settings['project_type']
+    proj_type = dict_proj['proj_type']
 
     # just a boolean flag to say if we are kajiggering
     # if True, we are in a block we don't want to copy
@@ -467,7 +526,7 @@ def fix_readme(path):
     new_data = []
 
     # what to look for in the text
-    if prj_type in 'mp':
+    if proj_type in 'mp':
         start_str = '<!-- __CN_APP_START__ -->'
         end_str = '<!-- __CN_APP_END__ -->'
         ignore_str = '<!-- __CN_MOD_'
@@ -516,7 +575,7 @@ def add_git_venv():
     """
 
     # make sure we are in current proj path w/chdir
-    os.chdir(settings['project_dir'])
+    os.chdir(dict_proj['proj_dir'])
 
     # add git folder
     cmd = 'git init'
@@ -538,7 +597,7 @@ if __name__ == '__main__':
         Code to run when called from command line
 
         This is the top level code of the program, called when the Python file
-        is invoked from the command line, e.g. "python pymaker.py".
+        is invoked from the command line, e.g. 'python pymaker.py'.
     """
 
     main()

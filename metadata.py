@@ -1,12 +1,10 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: version.py                                            |     ()     |
+# Filename: matadata.py                                           |     ()     |
 # Date    : 12/22/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
-
-# TODO: have versionator script replace version num in README
 
 # ------------------------------------------------------------------------------
 # Constants

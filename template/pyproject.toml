@@ -2,8 +2,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: pyproject.toml                                        |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __CN_AUTHOR__                                         |   \____/   |
+# License : __CN_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 [build-system]
@@ -19,7 +19,7 @@ version = "0.1.0"
 description = "__CN_SHORT_DESC__"
 readme = "README.md"
 authors = [
-    {name = "cyclopticnerve", email = "cyclopticnerve@gmail.com"}
+    {name = "__CN_AUTHOR__ ", email = "__CN_AUTHOR_EMAIL__"}
 ]
 license = {file = "LICENSE"}
 classifiers = [
@@ -37,6 +37,6 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/__CN_BIG_NAME__"
+Homepage = "https://github.com/__CN_AUTHOR__ /__CN_BIG_NAME__"
 
 # -)
