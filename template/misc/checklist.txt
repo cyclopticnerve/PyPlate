@@ -36,6 +36,8 @@ Release - VSCodium
 
     [] Headers/footers
     [] Docstrings
+    [] seperators
+    [] over 80 cols
     [] Check dependencies in pyproject.toml and install.py
     [] Update extra files in MANIFEST.in
     [] $ python -m pip freeze > requirements.txt

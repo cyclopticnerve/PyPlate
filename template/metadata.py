@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
-# Filename: version.py                                            |     ()     |
+# Filename: metadata.py                                           |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : __CN_AUTHOR__                                         |   \____/   |
 # License : __CN_LICENSE__                                         \          /
@@ -12,7 +12,7 @@
 # Constants
 # ------------------------------------------------------------------------------
 
-# these are the short description, keywords, and dependencies from pymaker
+# these are the short description, keywords, and dependencies for the project
 # they are stored here for projects that don't use pyproject.toml
 # these will be used in the GitHub repo
 CN_SHORT_DESC = '__CN_SHORT_DESC__'

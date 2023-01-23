@@ -19,7 +19,7 @@ version = "0.1.0"
 description = "__CN_SHORT_DESC__"
 readme = "README.md"
 authors = [
-    {name = "__CN_AUTHOR__ ", email = "__CN_AUTHOR_EMAIL__"}
+    {name = "__CN_AUTHOR__ ", email = "__CN_EMAIL__"}
 ]
 license = {file = "LICENSE"}
 classifiers = [

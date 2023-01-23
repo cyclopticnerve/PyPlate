@@ -1,0 +1,29 @@
+{
+    "type": {
+        "a": [
+            "all"
+        ],
+        "m": {
+            "folder": [
+                "file1",
+                "file2"
+            ],
+            "folder2": {
+                "subfolder1": [
+                    "file1"
+                ]
+            }
+        },
+        "p": {
+            "folder": [
+                "file1",
+                "file2"
+            ],
+            "folder2": {
+                "subfolder1": [
+                    "file1"
+                ]
+            }
+        }
+    }
+}
