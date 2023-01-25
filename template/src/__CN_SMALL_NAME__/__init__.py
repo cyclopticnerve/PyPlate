@@ -2,8 +2,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: __init__.py                                           |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : __CN_AUTHOR__                                         |   \____/   |
-# License : __CN_LICENSE__                                         \          /
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # this file is only for package projects (multiple modules)

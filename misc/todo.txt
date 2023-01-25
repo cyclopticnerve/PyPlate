@@ -3,8 +3,6 @@ misc
   checklist - compare to template
   todo -OK
 src
-  pyheaders.py - OK
-  pymaker.json - OK
   pymaker
 template
   ---

@@ -3,8 +3,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: uninstall.py                                          |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : __CN_AUTHOR__                                         |   \____/   |
-# License : __CN_LICENSE__                                         \          /
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -29,7 +29,7 @@ dict_uninstall = {
     'preflight': [
     ],
     'dirs': [
-        '${HOME}/.__CN_AUTHOR__ /__CN_SMALL_NAME__'
+        '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
     ],
     'files': {
     },

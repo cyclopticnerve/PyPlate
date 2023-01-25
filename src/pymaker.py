@@ -11,11 +11,8 @@
 # Imports
 # ------------------------------------------------------------------------------
 
-from pyconf import add_reps
-from pyheaders import replace_headers
-
 from datetime import datetime
-import json
+# import json
 import os
 import shlex
 import shutil
@@ -27,97 +24,72 @@ import subprocess
 
 # this is the dir where the script is being run from
 # (e.g. ~/Documents/Projects/Python/PyPlate/src/)
-CURR_DIR = os.path.dirname(os.path.abspath(__file__))
+DIR_SRC = os.path.dirname(os.path.abspath(__file__))
 
-# this is the default dir where the template files are located rel to the script
+# this is the dir where the template files are located rel to the script
 # (e.g. ~/Documents/Projects/Python/PyPlate/template/)
-TEMPLATE_DIR = os.path.abspath(f'{CURR_DIR}/../template')
+DIR_TEMPLATE = os.path.abspath(f'{DIR_SRC}/../template')
 
-# these are the default dirs for project location
-# (e.g. ~/Documents/Projects/Python/) (above PyPlate)
-BASE_DIR = os.path.abspath(f'{CURR_DIR}/../../')
+# this is the dir for project location (above PyPlate)
+# (e.g. ~/Documents/Projects/Python/)
+DIR_BASE = os.path.abspath(f'{DIR_SRC}/../../')
 
-# the default date format to use in headers
-DATE_FMT = '%x'
-
-# get the current user home dir
-USER_DIR = os.path.expanduser('~')
+# this is the current user home dir
+# (e.g. /home/cyclopticnerve/)
+DIR_USER = os.path.expanduser('~')
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-# the default conf settings for project paths (updated in get_dict_conf)
-# NB: the keys with values here are REQUIRED to prevent formatting errors if the
-# value is an empty string
-# these values will be used to replace values in dict_proj and ARE ONLY
-# user-editable, and ARE ONLY strings, no programming needed
-# these values are also usually only set ONCE for the life of the program,
-# so making them user-editable is reasonable, since they are set-and-forget
-dict_conf = {
-    'conf_base': BASE_DIR,
-    'conf_mods': '',
-    'conf_pkgs': '',
-    'conf_clis': '',
-    'conf_guis': '',
-    'conf_date': DATE_FMT,
-    'conf_auth': '',
-    'conf_mail': '',
-    'conf_lcns': '',
-    'conf_aftr': [
-        'git init',
-        'python -m venv venv',
-    ],
-    # FIXME: what to do with these
-    # 'conf_inst': '',
-    # 'conf_conf': '',
+# the default settings to use to create the project
+dict_settings = {
+    'project': {
+        'type': '',                 # m (Module), p (Package), c (CLI), g (GUI)
+        'dir':  '',                 # DIR_BASE/type_dir/Foo
+    },
+    'reps': {
+        '__CN_BIG_NAME__':   '',    # Foo
+        '__CN_SMALL_NAME__': '',    # foo
+        '__CN_DATE__':       '',    # 12/08/2022
+    },
+    'files': {                      # files to include in project
+        'common': [                 # common to all projects
+            'misc/',
+            'tests/test.py',
+            '.gitignore',
+            'LICENSE.txt',
+            'metadata.py',
+            'README.md',
+        ],
+        'm': [                      # for module projects
+            'src/__CN_SMALL_NAME___mod.py',
+            'tests/import_test_mod.py',
+            'MANIFEST.in',
+            'pyproject.toml',
+            'requirements.txt',
+        ],
+        'p': [                      # for package projects
+            'src/__CN_SMALL_NAME__/',
+            'tests/import_test_pkg.py',
+            'MANIFEST.in',
+            'pyproject.toml',
+            'requirements.txt',
+        ],
+        'c': [                      # for cli projects
+            'src/__CN_SMALL_NAME___app.py',
+            'install.py',
+            'uninstall.py',
+        ],
+        'g': [                      # for gui projects
+            'gui/',
+            'src/__CN_SMALL_NAME___app.py',
+            'install.py',
+            'uninstall.py',
+        ]
+    }
 }
 
-# the default settings to use to create the project (updated in get_dict_proj)
-# NB: these values will ONLY be used to replace text in
-# folder names/file names/file contents and ARE NOT user-editable
-# some of these are taken from dict_conf, and some are per-project
-# the per-project values will be taken from user input in get_dict_proj
-dict_proj = {
-    'proj_type': '',  # m (Module), p (Package), c (CLI), g (GUI)
-    'proj_dir':  '',  # conf_base/conf_mods/Foo, etc.
-}
-
-dict_reps = {
-    '__CN_BIG_NAME__':   '',  # Foo
-    '__CN_SMALL_NAME__': '',  # foo
-    '__CN_DATE__':       '',  # conf_date (12/08/2022)
-    '__CN_AUTHOR__':     '',  # conf_auth (cyclopticnerve)
-    '__CN_EMAIL__':      '',  # conf_mail (cyclopticnerve@gmail.com)
-    '__CN_LICENSE__':    '',  # conf_lcns (WTFPLv2)
-    # FIXME: what to do with these
-    # '__CN_INST_DIR__':   '',  # used in install.py/unimnstall.py
-    # '__CN_CONF_DIR__':   '',  # used in install.py/uninstall.py
-    # '__CN_GUI_EXEC__':   '',  # foo_gui.py (for .desktop file)
-    # '__CN_GUI_ICON__':   ''   # foo.png (for .desktop file)
-}
-
-dict_files = {
-    'common': [
-        'misc',
-        '.gitignore',
-        'LICENSE.txt',
-        'metadata.py',
-        'README.md',
-    ],
-    'module': [
-
-    ],
-    'package': [
-
-    ],
-    'cli': [
-
-    ],
-    'gui': [
-        'gui',
-    ]
-}
 # ------------------------------------------------------------------------------
 # Functions
 # ------------------------------------------------------------------------------
@@ -136,75 +108,25 @@ def main():
     """
 
     # call each step
-    get_dict_conf()
-    get_dict_proj()
-    copy_and_prune()
-    # recurse_rename(dict_proj['proj_dir'])
-    rename(dict_proj['proj_dir'])
-    # recurse_replace(dict_proj['proj_dir'])
+    get_project_info()
+    copy_template()
+    recurse(dict_settings['project']['dir'])
     # add_git_venv()
-
-
-# ------------------------------------------------------------------------------
-# Get conf settings
-# ------------------------------------------------------------------------------
-def get_dict_conf():
-
-    """
-        Get conf settings
-
-        Get already saved settings from user (or create defaults if not exists)
-    """
-
-    global dict_conf
-
-    # get conf path
-    conf_path = os.path.join(CURR_DIR, 'pymaker.json')
-
-    # no file, create it using defaults
-    if not os.path.exists(conf_path):
-        with open(conf_path, 'w') as file:
-            file.write(json.dumps(dict_conf, indent=4))
-
-            # warn user about fresh default file and exit
-            print('Edit the pymaker.json file before running. See README.md')
-            exit()
-
-    # there is a file
-    else:
-
-        # read conf dir
-        with open(conf_path) as file:
-            dict_conf = json.load(file)
-
-        # apply default value if key is empty
-        # NB: this is here in case the user edits the file manually and enters
-        # an empty value for one of the REQUIRED keys
-        # sure would be great if we had a function that could merge user and
-        # default dictionaries... -)
-        if dict_conf['conf_base'] == '':
-            dict_conf['conf_base'] = BASE_DIR
-        if dict_conf['conf_date'] == '':
-            dict_conf['conf_date'] = DATE_FMT
-
-        # write the file back (in case we changed something above)
-        with open(conf_path, 'w') as file:
-            file.write(json.dumps(dict_conf, indent=4))
 
 
 # ------------------------------------------------------------------------------
 # Get project info
 # ------------------------------------------------------------------------------
-def get_dict_proj():
+def get_project_info():
 
     """
         Get project info
 
-        Asks the user for project info, such as type, name, etc.
+        Asks the user for project info, such as type and name.
     """
 
-    global dict_conf
-    global dict_reps
+    # the settings dict (global b/c we will modify here)
+    global dict_settings
 
     # ask what type of project
     proj_type = input('Type of project: [M]odule | [P]ackage | [C]LI | [G]UI: ')
@@ -214,17 +136,13 @@ def get_dict_proj():
     proj_type = proj_type.lower()[0]
     if proj_type not in 'mpcg':
         exit()
-    dict_proj['proj_type'] = proj_type
+    dict_settings['project']['type'] = proj_type
 
-    # calculate project subdir
-    if dict_proj['proj_type'] in 'm':
-        prj_sub_dir = dict_conf['conf_mods']
-    elif dict_proj['proj_type'] in 'p':
-        prj_sub_dir = dict_conf['conf_pkgs']
-    elif dict_proj['proj_type'] in 'c':
-        prj_sub_dir = dict_conf['conf_clis']
-    if dict_proj['proj_type'] in 'g':
-        prj_sub_dir = dict_conf['conf_guis']
+    # configure subdir
+    if proj_type in 'mp':
+        type_dir = 'Libs/'
+    else:
+        type_dir = 'Apps/'
 
     # ask for project name
     prj_name_big = input('Project name: ')
@@ -232,246 +150,103 @@ def get_dict_proj():
     if prj_name_big == '':
         exit()
     prj_name_big = prj_name_big.capitalize()
-    dict_proj['proj_reps']['__CN_BIG_NAME__'] = prj_name_big
+    dict_settings['reps']['__CN_BIG_NAME__'] = prj_name_big
 
     # calculate final proj location
-    conf_base = dict_conf['conf_base']
-    dict_proj['proj_dir'] = os.path.join(conf_base, prj_sub_dir, prj_name_big)
-
-    # check if project folder exists
-    # NB: need a var here b/c brackets [] don't work inside f-string {}
-    tmp_path = dict_proj['proj_dir']
-    if os.path.exists(tmp_path):
-        print(f'Project {tmp_path} already exists')
+    prj_path = os.path.join(DIR_BASE, type_dir, prj_name_big)
+    if os.path.exists(prj_path):
+        print(f'Project {prj_path} already exists')
         exit()
+    dict_settings['project']['dir'] = prj_path
 
     # calculate small name
-    # NB: prj_name_small will be used later, so easier to set it to a var
-    prj_name_small = prj_name_big.lower()
-    dict_reps['__CN_SMALL_NAME__'] = prj_name_small
+    dict_settings['reps']['__CN_SMALL_NAME__'] = prj_name_big.lower()
 
     # calculate current date
-    dict_reps['__CN_DATE__'] = \
-        datetime.now().strftime(dict_conf['conf_date'])
-
-    # get author straight from conf
-    dict_reps['__CN_AUTHOR__'] = dict_conf['conf_auth']
-
-    # get email straight from conf
-    dict_reps['__CN_MAIL__'] = dict_conf['conf_mail']
-
-    # get license straight from conf
-    dict_reps['__CN_LICENSE__'] = dict_conf['conf_lcns']
-
-    # this starts the extension process
-    # we pass the conf dict read from pymaker.json and the reps dict that is
-    # hard coded here, to an external py file. there, new conf k/v pairs and new
-    # rep k/v pairs can be assesed and added to the reps k/v set.
-    dict_conf, dict_reps = add_reps(dict_conf, dict_reps)
-
-    print(json.dumps(dict_reps, indent=4))
-    exit()
-    # FIXME: what to do with these
-#     # calculate/make install dir
-#     conf_inst = dict_conf['conf_inst']
-#     small_name = dict_prj['proj_small_name']
-#     if conf_inst == '':
-#         conf_inst = f'{USER_DIR}/.{conf_auth}/{small_name}'
-
-#     dict_conf['conf_inst'] = os.path.abspath(conf_inst)
-#     os.makedirs(dict_conf['conf_inst'], exist_ok=True)
-#     dict_proj['proj_reps']['__CN_INST_DIR__'] = conf_inst
-
-#     # calculate/make config dir
-#     dict_conf['conf_conf'] = os.path.abspath(f'{conf_conf}/{prj_name_small}')
-#     os.makedirs(dict_conf['conf_conf'], exist_ok=True)
-#     dict_proj['proj_reps']['__CN_CONF_DIR__'] = dict_conf['conf_conf']
-
-#     # calculate gui location
-#     dict_proj['proj_reps']['__CN_GUI_EXEC__'] = \
-#         f'{USER_DIR}/.{conf_auth}/{prj_name_small}/gui/{prj_name_small}_gui.py'
-
-#     # calculuate icon location
-#     dict_proj['proj_reps']['__CN_GUI_ICON__'] = \
-#         f'{USER_DIR}/.local/share/icons/{conf_auth}/{prj_name_small}.png'
+    dict_settings['reps']['__CN_DATE__'] = datetime.now().strftime('%m/%d/%Y')
 
 
 # ------------------------------------------------------------------------------
-# Copy new project and remove unneccesary files
+# Copy template files to final location
 # ------------------------------------------------------------------------------
-def copy_and_prune():
+def copy_template():
 
     """
-        Copy new project and remove unneccesary files
+        Copy template files to final location
 
-        Copy all template files/folders to the new location, then remove the
-        files/folders not used for the type of project we are creating. This is
-        easier than only copying files we DO need.
+        Get file paths/names from dict_settings and copy them to the project
+        folder.
     """
 
-    # copy template to new project
-    shutil.copytree(TEMPLATE_DIR, dict_proj['proj_dir'])
+    # create target folder
+    prj_dir = dict_settings['project']['dir']
+    os.makedirs(prj_dir)
 
-    # switch to project path
-    os.chdir(dict_proj['proj_dir'])
+    # get project type
+    proj_type = dict_settings['project']['type']
 
-    # remove for module
-    if (dict_proj['proj_type'] == 'm'):
+    # the group of files, common and type
+    groups = [
+        dict_settings['files']['common'],
+        dict_settings['files'][proj_type]
+    ]
 
-        shutil.rmtree('gui', ignore_errors=True)
+    # for each group, common and type
+    for group in groups:
 
-        shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
-        os.remove('src/__CN_SMALL_NAME___app.py')
+        # for each file/folder in group
+        for file in group:
 
-        os.remove('tests/import_test_pkg.py')
+            # build old path/new path
+            old_path = os.path.join(DIR_TEMPLATE, file)
+            new_path = os.path.join(prj_dir, file)
 
-        os.remove('install.py')
-        os.remove('uninstall.py')
+            # if it's a dir, copy dir
+            if os.path.isdir(old_path):
+                shutil.copytree(old_path, new_path)
+            else:
 
-    # remove for package
-    elif (dict_proj['proj_type'] == 'p'):
-        shutil.rmtree('gui', ignore_errors=True)
+                # if it's a file, get the file's dir
+                tmp_path = os.path.dirname(new_path)
 
-        os.remove('src/__CN_SMALL_NAME___app.py')
-        os.remove('src/__CN_SMALL_NAME___mod.py')
+                # create dir if neccessary
+                os.makedirs(tmp_path, exist_ok=True)
 
-        os.remove('tests/import_test_mod.py')
-
-        os.remove('install.py')
-        os.remove('uninstall.py')
-
-    # remove for CLI
-    elif (dict_proj['proj_type'] == 'c'):
-        shutil.rmtree('gui', ignore_errors=True)
-
-        shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
-
-        os.remove('src/__CN_SMALL_NAME___mod.py')
-
-        os.remove('tests/import_test_mod.py')
-        os.remove('tests/import_test_pkg.py')
-
-        os.remove('MANIFEST.in')
-        os.remove('pyproject.toml')
-        os.remove('requirements.txt')
-
-    # remove for GUI
-    elif (dict_proj['proj_type'] == 'g'):
-
-        shutil.rmtree('src/__CN_SMALL_NAME__', ignore_errors=True)
-
-        os.remove('src/__CN_SMALL_NAME___mod.py')
-
-        os.remove('tests/import_test_mod.py')
-        os.remove('tests/import_test_pkg.py')
-
-        os.remove('MANIFEST.in')
-        os.remove('pyproject.toml')
-        os.remove('requirements.txt')
+                # then copy file
+                shutil.copy2(old_path, new_path)
 
 
 # ------------------------------------------------------------------------------
-# Recursive function for renaming files/folders
+# Recursivly scan files/folders for rename/replace functions
 # ------------------------------------------------------------------------------
-# def recurse_rename(path):
-
-#     """
-#         Recursive function for renaming files/folders
-
-#         Paramaters:
-#             path [string]: the folder to start recursively renaming from
-
-#         This is a recursive function to rename files under a given folder. It
-#         iterates over the contents of the folder, renaming files as it goes. If
-#         it encounters a folder, it calls itself recursively, passing that folder
-#         as the parameter. Once all files are renamed, it will then bubble up to
-#         rename all folders.
-#     """
-
-#     # don't rename these dirs or contents
-#     skip_dirs = ['misc']
-
-#     # the replacement dict
-#     reps = dict_proj['proj_reps']
-
-#     # returns only final path part for each entry
-#     lst = os.listdir(path)
-
-#     # for each file/folder
-#     for item in lst:
-
-#         # put path back together
-#         item_path = os.path.join(path, item)
-
-#         # if it's a dir
-#         if os.path.isdir(item_path):
-
-#             # always skip misc folder (never replace/rename)
-#             if item not in skip_dirs:
-
-
-#                 print('before dir:', item_path)
-
-#                 # recurse itself to find more files
-#                 recurse_rename(item_path)
-
-#                 print('after dir:', item_path)
-
-#         else:
-#             #TODO: put replace code here
-
-#         # called for each file and dir
-
-#         new_item = item
-#         # for each replacement key
-#         for key in reps.keys():
-
-#             # TODO: this prevents problems where we rename a file in a folder that
-#             # we (will) also renamed (not sure but it works?)
-#             # if key in item:
-
-#         # print('item:', item)
-#         # print('item_path:', item_path)
-
-#             # # do the string replace
-#             new_item = new_item.replace(key, reps[key])
-#         print('item:', new_item)
-#             # # remove trailing identifiers
-#             # new_item = new_item.replace('_app', '')
-#             # new_item = new_item.replace('_mod', '')
-
-#             # # create new path
-#         new_path = os.path.join(path, new_item)
-
-#             # do the actual rename
-#         os.rename(item_path, new_path)
-
-def rename(path):
+def recurse(path):
 
     """
-        Recursive function for renaming files/folders
+        Recursivly scan files/folders for rename/replace functions
 
         Paramaters:
-            path [string]: the folder to start recursively renaming from
+            path [string]: the folder to start recursively scanning from
 
-        This is a recursive function to rename files under a given folder. It
-        iterates over the contents of the folder, renaming files as it goes. If
-        it encounters a folder, it calls itself recursively, passing that folder
-        as the parameter. Once all files are renamed, it will then bubble up to
+        This is a recursive function to scan for files/folders under a given
+        folder. It iterates over the contents of the 'path' folder, checking if
+        each item is a file or a folder. If it encounters a folder, it calls
+        itself recursively, passing that folder as the parameter. If it
+        encounters a file, it calls methods to do text replacement of headers,
+        then other text. Finally it renames the file if the name contains a
+        replacement key. Once all files are renamed, it will then bubble up to
         rename all folders.
     """
 
     # don't rename these dirs or files, or change file contents
+    # NEXT: this should be editable (also skip_files? or figure out if each
+    # entry is folder or file?)
     skip_dirs = ['misc']
 
-    # the replacement dict
-    reps = dict_proj['proj_reps']
-
     # returns only final path part for each entry
-    lst = os.listdir(path)
+    dir_list = os.listdir(path)
 
     # for each file/folder
-    for item in lst:
+    for item in dir_list:
 
         # put path back together
         item_path = os.path.join(path, item)
@@ -482,148 +257,37 @@ def rename(path):
             # always skip misc folder (never replace/rename)
             if item not in skip_dirs:
 
-                print('before dir:', item_path)
-
                 # recurse itself to find more files
-                rename(item_path)
-
-                print('after dir:', item_path)
+                recurse(item_path)
 
         else:
-            replace(item_path)
+            # NEXT: do one open and pass array of lines to each function
+            replace_headers(item_path)
+            replace_text(item_path)
 
-        # called for each file and dir
+            # readme needs extra handling
+            if item == 'README.md':
+                fix_readme(item_path)
 
-        new_item = item
-        # for each replacement key
-        for key in reps.keys():
+        # called for each file/folder
+        rename(item_path)
 
-            # TODO: this prevents problems where we rename a file in a folder that
-            # we (will) also renamed (not sure but it works?)
-            # if key in item:
-
-            # print('item:', item)
-            # print('item_path:', item_path)
-
-            # # do the string replace
-            new_item = new_item.replace(key, reps[key])
-        print('item:', new_item)
-        # # remove trailing identifiers
-        # new_item = new_item.replace('_app', '')
-        # new_item = new_item.replace('_mod', '')
-
-        # # create new path
-        new_path = os.path.join(path, new_item)
-
-        # do the actual rename
-        os.rename(item_path, new_path)
-# ------------------------------------------------------------------------------
-# Recursive function for replacing text inside files
-# ------------------------------------------------------------------------------
-# def recurse_replace(path):
-
-#     """
-#         Recursive function for replacing text inside files
-
-#         Paramaters:
-#             path [string]: the file to replace text in
-
-#         This is a recursive function to replace text inside a file. Given a
-#         specific file, it iterates the file line by line, replacing text as it
-#         goes. When it is done, it saves the file to disk. This replaces the
-#         __CN_... stuff from the settings inside the file, as headers are
-#         delegated to the next function (recurse_replace_headers).
-#     """
-
-#     # don't rename these dirs or contents
-#     skip_dirs = ['misc']
-
-#     # the replacement dict
-#     reps = dict_proj['proj_reps']
-
-#     # returns only final path part for each entry
-#     lst = os.listdir(path)
-
-#     # for each file/folder
-#     for item in lst:
-
-#         # put path back together
-#         item_path = os.path.join(path, item)
-
-#         # if it's a dir
-#         if os.path.isdir(item_path):
-
-#             # always skip misc folder (never replace/rename)
-#             if item not in skip_dirs:
-
-#                 # recurse itself to find more files
-#                 recurse_replace(item_path)
-
-#         # if it's a file
-#         else:
-
-#             # replace headers in file
-#             recurse_replace_headers(item_path, reps)
-
-#             # open file as text line array
-#             with open(item_path) as file:
-#                 data = file.readlines()
-
-#             # for each line in array
-#             for i in range(0, len(data)):
-
-#                 # replace text in line
-#                 for key in reps.keys():
-#                     data[i] = data[i].replace(key, reps[key])
-
-#             # NB: i think file.read() strips the string, so we lose the
-#             # last blank line, which is part of my styling
-#             # so add it back in before saving
-#             data.append('\n')
-
-#             # save file with replacements
-#             with open(item_path, 'w') as file:
-#                 file.writelines(data)
-
-#             # readme needs extra handling
-#             if item == 'README.md':
-#                 fix_readme(item_path)
-
-def replace_headers():
-    # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
-# Filename: pyheaders.py                                          |     ()     |
-# Date    : 1/17/2023                                             |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
-# ------------------------------------------------------------------------------
-
-# NB: this code moved to its own file until i can figure out a better way to do
-# headers - ie user-agnostic, maybe as a rep... see misc/parshdr.py
 
 # ------------------------------------------------------------------------------
-# Functions
+# Replace header text inside files
 # ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Function for replacing header text inside files
-# ------------------------------------------------------------------------------
-def replace_headers(lines, reps):
+def replace_headers(path):
 
     """
-        Function for replacing header text inside files
+        Replace header text inside files
 
         Paramaters:
-            lines [list]: the file contents as a list of lines
-            reps [list]: the list of replacements to use inside the headers
+            path [string]: the path to file for replacing header text
 
-        Returns:
-            [list]: the new list of lines representing the file
-
-        This is a function to replace header text inside a file. Given a list of
-        file lines and a list of replacement strings, it iterates the file line
-        by line, replacing header text as it goes. When it is done, it saves the
-        file to disk. This replaces the __CN_.. stuff inside headers.
+        This is a function to replace header text inside a file. Given a path to
+        a file, it iterates the file line by line, replacing header text as it
+        goes. When it is done, it saves the file to disk. This replaces the
+        __CN_.. stuff inside headers.
     """
 
     # an array that represents the three sections of a header line
@@ -631,18 +295,17 @@ def replace_headers(lines, reps):
         ['# Project : ', '__CN_BIG_NAME__',   '/          \\ '],
         ['# Filename: ', '__CN_SMALL_NAME__', '|     ()     |'],
         ['# Date    : ', '__CN_DATE__',       '|            |'],
-        ['# Author  : ', '__CN_AUTHOR__',     '|   \\____/   |'],
-        ['# License : ', '__CN_LICENSE__',    ' \\          / '],
         ['<!-- Project : ', '__CN_BIG_NAME__',   '/          \\  -->'],
         ['<!-- Filename: ', '__CN_SMALL_NAME__', '|     ()     | -->'],
         ['<!-- Date    : ', '__CN_DATE__',       '|            | -->'],
-        ['<!-- Author  : ', '__CN_AUTHOR__',     '|   \\____/   | -->'],
-        ['<!-- License : ', '__CN_LICENSE__',    ' \\          /  -->'],
     ]
 
+    # the array of dunder replacements we will use
+    reps = dict_settings['reps']
+
     # open file as text line array
-    # with open(path) as file:
-    #     lines = file.readlines()
+    with open(path) as file:
+        lines = file.readlines()
 
     # for each line in array
     for i in range(0, len(lines)):
@@ -669,64 +332,62 @@ def replace_headers(lines, reps):
                 # replace text in line
                 lines[i] = rep_str
 
-    # return file contents with header replacements
-    return lines
-
-# -)
-
-def replace(path):
-
-    """
-        Recursive function for replacing text inside files
-
-        Paramaters:
-            path [string]: the file to replace text in
-
-        This is a recursive function to replace text inside a file. Given a
-        specific file, it iterates the file line by line, replacing text as it
-        goes. When it is done, it saves the file to disk. This replaces the
-        __CN_... stuff from the settings inside the file, as headers are
-        delegated to the next function (recurse_replace_headers).
-    """
-
-    # the replacement dict
-    reps = dict_proj['proj_reps']
-
-    # open file as text line array
-    with open(path) as file:
-        data = file.readlines()
-
-    # replace headers in file
-    data = replace_headers(data, reps)
-
-    # for each line in array
-    for i in range(0, len(data)):
-
-        # replace text in line
-        for key in reps.keys():
-            data[i] = data[i].replace(key, reps[key])
-
-    # NB: i think file.read() strips the string, so we lose the
-    # last blank line, which is part of my styling
-    # so add it back in before saving
-    data.append('\n')
-
-    # save file with replacements
+    # save the file with changes
     with open(path, 'w') as file:
-        file.writelines(data)
-
-    # readme needs extra handling
-    if item == 'README.md':
-        fix_readme(path)
+        file.writelines(lines)
 
 
 # ------------------------------------------------------------------------------
-# Cleans out the unneccessry parts of the README file
+# Replace text inside files
+# ------------------------------------------------------------------------------
+def replace_text(path):
+
+    """
+        Replace text inside files
+
+        Paramaters:
+            path [string]: the path to the file for replacing text
+
+        This is a function to replace text inside a file. Given a path to a
+        file, it iterates the file line by line, replacing text as it goes. When
+        it is done, it saves the file to disk. This replaces the __CN_... stuff
+        inside the file, excluding headers (which are already handled).
+    """
+
+    # the array of dunder replacements we will use
+    reps = dict_settings['reps']
+
+    # open file as text line array
+    with open(path) as file:
+        lines = file.readlines()
+
+    # for each line in array
+    for i in range(0, len(lines)):
+
+        # replace text in line
+        for key in reps.keys():
+            lines[i] = lines[i].replace(key, reps[key])
+
+    # NB: i think file.readlines() strips the string, so we lose the
+    # last blank line, which is part of my styling
+    # so add it back in before saving
+    lines.append('\n')
+
+    # save file with replacements
+    with open(path, 'w') as file:
+        file.writelines(lines)
+
+
+# ------------------------------------------------------------------------------
+# Remove unneccesary parts of the README file
 # ------------------------------------------------------------------------------
 def fix_readme(path):
 
     """
-        Cleans out the unneccesary parts of the README file
+        Remove unneccesary parts of the README file
+
+        Paramaters:
+            path [string]: the path to the README for removing text
 
         This function removes sections of the README file that are not
         appropriate to the specified type of project, such as Module/Package or
@@ -739,11 +400,11 @@ def fix_readme(path):
     # lines, then save that array to a file
 
     # what type of project are we creating?
-    proj_type = dict_proj['proj_type']
+    proj_type = dict_settings['project']['type']
 
     # just a boolean flag to say if we are kajiggering
     # if True, we are in a block we don't want to copy
-    in_it = False
+    ignore = False
 
     # NB: we use a new array vs. in-situ replacement here b/c we are removing
     # A LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
@@ -751,9 +412,9 @@ def fix_readme(path):
     # source code. so we opt for not copying those lines.
 
     # where to put the needed lines
-    new_data = []
+    new_lines = []
 
-    # what to look for in the text
+    # what to ignore in the text
     if proj_type in 'mp':
         start_str = '<!-- __CN_APP_START__ -->'
         end_str = '<!-- __CN_APP_END__ -->'
@@ -763,35 +424,96 @@ def fix_readme(path):
         end_str = '<!-- __CN_MOD_END__ -->'
         ignore_str = '<!-- __CN_APP_'
 
-    # get the file data
+    # get the file line
     with open(path) as file:
-        data = file.readlines()
+        lines = file.readlines()
 
     # for each line
-    for line in data:
+    for line in lines:
 
         # check if we are in a block
         if start_str in line:
-            in_it = True
+            ignore = True
 
-        # it's a valid data block, just copy it
-        if not in_it:
+        # it's a valid line block, just copy it
+        if not ignore:
 
             # ignore block wrapper lines
             if ignore_str not in line:
-                new_data.append(line)
+                new_lines.append(line)
 
         # check if we have left the block
         if end_str in line:
-            in_it = False
+            ignore = False
 
-    # save the kajiggered data line
+    # save the kajiggered line line
     with open(path, 'w') as file:
-        file.writelines(new_data)
+        file.writelines(new_lines)
 
 
 # ------------------------------------------------------------------------------
-# Add venv and .git folders to new project
+# Function for renaming files/folders
+# ------------------------------------------------------------------------------
+def rename(path):
+
+    """
+        Function for renaming files/folders
+
+        Paramaters:
+            path [string]: the path to file/folder for renaming
+
+        This is a function to rename files/folders. Given a path to a
+        file/folder, it renames the path by replacing keys in the dict_settings
+        keys with their appropriate replacements.
+    """
+
+    """
+
+        if file:
+            just loop over reps, replacing all, and rename old_path to new_path
+
+        if folder:
+            os.renames? replace all in all parts, and do one rename at end
+            os.rename? replace current part, working back up?
+    """
+
+    # the array of dunder replacements we will use
+    reps = dict_settings['reps']
+
+    new_path = path
+    changed = False
+
+    # for each replacement key
+    for key in reps.keys():
+
+        # TODO: this prevents problems where we rename a file in a folder that
+        # we (will) also renamed (not sure but it works?)
+        # if key in item:
+
+        # print('item:', item)
+        # print('item_path:', item_path)
+
+        # # do the string replace
+        if key in new_path:
+            new_path = new_path.replace(key, reps[key])
+            changed = True
+
+    # print('item:', new_item)
+    # # # remove trailing identifiers
+    # # new_item = new_item.replace('_app', '')
+    # # new_item = new_item.replace('_mod', '')
+
+    # # # create new path
+    # new_path = os.path.join(path, new_item)
+
+    # do the actual rename
+    if changed:
+        print(f'rename {path} to {new_path}')
+    # os.rename(path, new_path)
+
+
+# ------------------------------------------------------------------------------
+# Add .git and venv folders to new project
 # ------------------------------------------------------------------------------
 def add_git_venv():
 
@@ -803,7 +525,7 @@ def add_git_venv():
     """
 
     # make sure we are in current proj path w/chdir
-    os.chdir(dict_proj['proj_dir'])
+    os.chdir(dict_settings['project']['dir'])
 
     # add git folder
     cmd = 'git init'

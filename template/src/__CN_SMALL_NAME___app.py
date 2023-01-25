@@ -3,8 +3,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: __CN_SMALL_NAME__.py                                  |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : __CN_AUTHOR__                                         |   \____/   |
-# License : __CN_LICENSE__                                         \          /
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------

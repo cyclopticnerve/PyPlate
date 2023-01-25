@@ -53,7 +53,7 @@ foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pymaker.py
 ```
 
 Enter the required information, and 'pymaker.py' will create the required files 
-and folders in a subdirectory of 'BASE_DIR/SUB_DIR'.
+and folders in a subdirectory of 'DIR_BASE'.
 
 From there you are free to modify the projects in your favorite IDE.
 

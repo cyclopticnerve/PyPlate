@@ -2,8 +2,8 @@
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: .gitignore                                            |     ()     |
 # Date    : __CN_DATE__                                           |            |
-# Author  : __CN_AUTHOR__                                         |   \____/   |
-# License : __CN_LICENSE__                                         \          /
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # shamelessly stolen from 
@@ -96,7 +96,7 @@ ipython_config.py
 
 # pyenv
 #   For a library or package, you might want to ignore these files since the
-#   code is intended to run in multiple environments; otherwise, check them in:
+#   code is intended to run in multiple environments; otherwise, check them in
 #.python-version
 
 # pipenv
