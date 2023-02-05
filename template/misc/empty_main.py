@@ -33,7 +33,7 @@ def main():
         The main function of the program
 
         This function is the main entry point for the program, initializing the
-        program. and performing it's steps.
+        program, and performing it's steps.
     """
 
     # call the steps in order
@@ -50,7 +50,6 @@ def func():
 
         Paramaters:
             var_name [type]: description
-                second line
 
         Returns:
             [type]: description
@@ -73,7 +72,7 @@ if __name__ == '__main__':
         Code to run when called from command line
 
         This is the top level code of the program, called when the Python file
-        is invoked from the command line, e.g. "python __CN_SMALL_NAME__.py".
+        is invoked from the command line.
     """
 
     main()

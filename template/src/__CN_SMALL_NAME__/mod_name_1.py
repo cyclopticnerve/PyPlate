@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
-# Filename: # TODO: fix name                                      |     ()     |
+# Filename: # FIXME: fix name                                     |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /

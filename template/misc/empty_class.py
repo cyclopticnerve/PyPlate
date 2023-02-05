@@ -54,7 +54,6 @@ class Main:
 
             Paramaters:
                 var_name [type]: description
-                    second line
 
             Returns:
                 [type]: description
@@ -77,7 +76,6 @@ class Main:
 
             Paramaters:
                 var_name [type]: description
-                    second line
 
             Returns:
                 [type]: description

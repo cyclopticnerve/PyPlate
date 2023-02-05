@@ -1,3 +1,10 @@
+testing
+  module
+    
+
+
+
+
 
 misc
   checklist - compare to template
@@ -12,58 +19,21 @@ top-level
   metadata - OK
   readme - OK
 
-test each of mpcg with no or empty json file to make sure blanks don't break reps
+fix app/mod naming to end in .py
 
-offload asking for reps to another file
-pass reps dict and get it back to do new reps
+versionator script 
 
-track version/keywords/deps and add to checklist
-put short desc/version/keywords/deps in a metadata.json file and make a script 
-that can update them in other files
-maybe surround with quoted special tags?
-
-# DONE: files with replacements missing last blank line after # -)
-
-# DONE: In package init do from .module import *
-
-# DONE: Loop over files/dirs using for f in os.listdir()
-
-# DONE: Where do we keep short description and keywords when making an app, we 
-need those for GitHub repository
-
-# DONE: pymaker - first run specify base dir for libs/apps
-store that and use for future runs
+try to use more list/dict comprehensions
 
 add argparse to empty_exe.py
   or make argparse_helper module that can be added if necessary
 
-I18N all user-facing strings (i.e. print statements)
-
-Make all included files in a list or json
-Use that to copy_and_prune
-
-basically the template should consist of:
-folders(renameable)
-  files (renameable)
-    containing reps and customized headers/footers
-top-level files (renameable)
-  containing reps and customized headers/footers
-a config file for reps
-a config file for which files/folders are included in which project types
-
-# TODO: Module/Package: get rid of import tests after ensuring __init__.py works
+# Module/Package: get rid of import tests after ensuring __init__.py works
 # as expected
-# TODO: CLI/GUI: what files to add to install.py when copying
+# CLI/GUI: what files to add to install.py when copying
 # (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and
 # !/.cyclopticnerve/proj/app/gui)
 
-given a starting folder:
-  recurse down to file level
-    rename file
-    replace text in file
-  bubble up to folder
-    rename folder
-    #
 some sort of script to go back after and check that all reps are done
 (for files added after initial creation - files added from misc)
 

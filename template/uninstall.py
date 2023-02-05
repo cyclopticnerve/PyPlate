@@ -73,7 +73,7 @@ if __name__ == '__main__':
         Code to run when called from command line
 
         This is the top level code of the program, called when the Python file
-        is invoked from the command line, e.g. "python uninstall.py".
+        is invoked from the command line.
     """
 
     main()

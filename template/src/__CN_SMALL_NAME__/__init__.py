@@ -16,13 +16,14 @@
 
 # import all modules in package to get full dot notation from package import
 # from <package> imoport <module>
-# TODO: fix these names
-from .__CN_SMALL_NAME__ import * # noqa W0611 (unused import)
+# TODO: whick to use?
+from .__CN_SMALL_NAME__ import *  # noqa W0611 (unused import)
+# FIXME: fix name
 # from __CN_SMALL_NAME__ import mod_name_1 # noqa W0611 (unused import)
 # from __CN_SMALL_NAME__ import mod_name_2 # noqa W0611 (unused import)
 
 # from <package_name> import *
-# TODO: fix these names
+# FIXME: fix name
 # __all__ = ['mod_name_1', 'mod_name_2']  # ['module_name', ...]
 
 # -)

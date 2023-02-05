@@ -15,11 +15,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "__CN_SMALL_NAME__"
-version = "0.1.0"
+version = "__CN_VERSION__"
 description = "__CN_SHORT_DESC__"
 readme = "README.md"
 authors = [
-    {name = "cyclopticnerve", email = "__CN_EMAIL__"}
+    {name = "cyclopticnerve", email = "cyclopticnerve@gmail.com"}
 ]
 license = {file = "LICENSE"}
 classifiers = [
