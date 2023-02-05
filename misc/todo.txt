@@ -19,7 +19,7 @@ top-level
   metadata - OK
   readme - OK
 
-fix app/mod naming to end in .py
+
 
 versionator script 
 

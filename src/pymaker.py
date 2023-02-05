@@ -355,69 +355,6 @@ def recurse(path):
 # ------------------------------------------------------------------------------
 # Replace header text inside files
 # ------------------------------------------------------------------------------
-def replace_headers_old(path):
-    """
-        Replace header text inside files
-
-        Paramaters:
-            path [string]: the path to file for replacing header text
-
-        This is a function to replace header text inside a file. Given a path to
-        a file, it iterates the file line by line, replacing header text as it
-        goes. When it is done, it saves the file to disk. This replaces the
-        __CN_.. stuff inside headers.
-    """
-
-    # an array that represents the three sections of a header line
-    hdr_lines = [
-        ['# Project : ', '__CN_BIG_NAME__',   '/          \\ '],
-        ['# Filename: ', '__CN_SMALL_NAME__', '|     ()     |'],
-        ['# Date    : ', '__CN_DATE__',       '|            |'],
-        ['<!-- Project : ', '__CN_BIG_NAME__',   '/          \\  -->'],
-        ['<!-- Filename: ', '__CN_SMALL_NAME__', '|     ()     | -->'],
-        ['<!-- Date    : ', '__CN_DATE__',       '|            | -->'],
-    ]
-
-    # the array of dunder replacements we will use
-    reps = dict_settings['reps']
-
-    # open file as text line array
-    with open(path) as file:
-        lines = file.readlines()
-
-    # for each line in array
-    for i in range(0, len(lines)):
-
-        # for each repl line
-        for hdr_line in hdr_lines:
-
-            # build start str
-            key = hdr_line[0] + hdr_line[1]
-
-            # if the key is in the line
-            if key in lines[i]:
-
-                # replace the dunder
-                rep = reps[hdr_line[1]]
-
-                # calculate spaces
-                spaces = 80 - (len(hdr_line[0]) + len(rep) + len(hdr_line[2]))
-                spaces_str = ' ' * spaces
-
-                # create replacement string (with newline!!!)
-                rep_str = f'{hdr_line[0]}{rep}{spaces_str}{hdr_line[2].strip()}\n'
-
-                # replace text in line
-                lines[i] = rep_str
-
-    # save the file with changes
-    with open(path, 'w') as file:
-        file.writelines(lines)
-
-
-# ------------------------------------------------------------------------------
-# Replace header text inside files
-# ------------------------------------------------------------------------------
 def replace_headers(lines):
     """
         Replace header text inside files
@@ -479,46 +416,6 @@ def replace_headers(lines):
 # ------------------------------------------------------------------------------
 # Replace text inside files
 # ------------------------------------------------------------------------------
-def replace_text_old(path):
-    """
-        Replace text inside files
-
-        Paramaters:
-            path [string]: the path to the file for replacing text
-
-        This is a function to replace text inside a file. Given a path to a
-        file, it iterates the file line by line, replacing text as it goes. When
-        it is done, it saves the file to disk. This replaces the __CN_... stuff
-        inside the file, excluding headers (which are already handled).
-    """
-
-    # the array of dunder replacements we will use
-    reps = dict_settings['reps']
-
-    # open file as text line array
-    with open(path) as file:
-        lines = file.readlines()
-
-    # for each line in array
-    for i in range(0, len(lines)):
-
-        # replace text in line
-        for key in reps.keys():
-            lines[i] = lines[i].replace(key, reps[key])
-
-    # i think file.readlines() strips the string, so we lose the
-    # last blank line, which is part of my styling
-    # so add it back in before saving
-    lines.append('\n')
-
-    # save file with replacements
-    with open(path, 'w') as file:
-        file.writelines(lines)
-
-
-# ------------------------------------------------------------------------------
-# Replace text inside files
-# ------------------------------------------------------------------------------
 def replace_text(lines):
     """
         Replace text inside files
@@ -548,78 +445,6 @@ def replace_text(lines):
 
     # save file with replacements
     return lines
-
-
-# ------------------------------------------------------------------------------
-# Remove unneccesary parts of the README file
-# ------------------------------------------------------------------------------
-def fix_readme_old(path):
-    """
-        Remove unneccesary parts of the README file
-
-        Paramaters:
-            path [string]: the path to the README for removing text
-
-        This function removes sections of the README file that are not
-        appropriate to the specified type of project, such as Module/Package or
-        CLI/GUI.
-    """
-
-    # the strategy here is to go through the full README and only copy lines
-    # that are 1) not in any block or 2) in the block we want
-    # the most efficient way to do this is to have an array that recieves wanted
-    # lines, then save that array to a file
-
-    # what type of project are we creating?
-    proj_type = dict_settings['project']['type']
-
-    # just a boolean flag to say if we are kajiggering
-    # if True, we are in a block we don't want to copy
-    ignore = False
-
-    # we use a new array vs. in-situ replacement here b/c we are removing
-    # A LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
-    # while that would look *ok* in the reulting Markdown, looks UGLY in the
-    # source code. so we opt for not copying those lines.
-
-    # where to put the needed lines
-    new_lines = []
-
-    # what to ignore in the text
-    if proj_type in 'mp':
-        start_str = '<!-- __CN_APP_START__ -->'
-        end_str = '<!-- __CN_APP_END__ -->'
-        ignore_str = '<!-- __CN_MOD_'
-    else:
-        start_str = '<!-- __CN_MOD_START__ -->'
-        end_str = '<!-- __CN_MOD_END__ -->'
-        ignore_str = '<!-- __CN_APP_'
-
-    # get the file line
-    with open(path) as file:
-        lines = file.readlines()
-
-    # for each line
-    for line in lines:
-
-        # check if we are in a block
-        if start_str in line:
-            ignore = True
-
-        # it's a valid line block, just copy it
-        if not ignore:
-
-            # ignore block wrapper lines
-            if ignore_str not in line:
-                new_lines.append(line)
-
-        # check if we have left the block
-        if end_str in line:
-            ignore = False
-
-    # save the kajiggered line line
-    with open(path, 'w') as file:
-        file.writelines(new_lines)
 
 
 # ------------------------------------------------------------------------------
@@ -751,7 +576,7 @@ def remove_exts(path):
     if len(file_array) > 1:
 
         # the result is the pre-dot plus first dot
-        base = file_array[0] + '.' + file_array[1]
+        base = file_array[0] + '.' + file_array[-1]
 
     return os.path.join(dir, base)
 
