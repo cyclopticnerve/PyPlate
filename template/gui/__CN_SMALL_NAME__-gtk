@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: __CN_SMALL_NAME___gui.py                              |     ()     |
@@ -8,10 +8,18 @@
 # ------------------------------------------------------------------------------
 
 # TODO: flesh this out more once we use it for a gui app
+# TODO: check for gtk version 3/4
+#   load ui file based on installed GTK version
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
+import gi
+# TODO: test if v4 exitst, if not use v3
+gi.require_version('Adw', '1')
+gi.require_version('Gtk', '4.0')
+
+from gi.repository import Adw, Gtk
 import os
 import sys
 
@@ -46,7 +54,30 @@ def main():
         GUI and attaching it to the underlying Python program.
     """
 
-    pass
+
+gi.require_version('Adw', '1')
+gi.require_version('Gtk', '4.0')
+
+# TODO: this will be path to v3 or v4 ui file
+gui_path = 'test.ui'
+
+
+class MyApp(Adw.Application):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.connect('activate', self.on_activate)
+
+    def on_activate(self, app):
+        builder = Gtk.Builder()
+        builder.add_from_file(gui_path)
+
+        win = builder.get_object('window1')
+        self.add_window(win)
+        win.present()
+
+
+MyApp().run()
 
 
 # ------------------------------------------------------------------------------

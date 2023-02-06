@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_BIG_NAME__                                        /          \
 # Filename: uninstall.py                                          |     ()     |
