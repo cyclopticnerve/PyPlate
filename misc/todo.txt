@@ -20,6 +20,8 @@ top-level
   readme - OK
 
 
+move pymaker to /usr/bin so we can call it from anywhere
+add param to set location of project
 
 versionator script 
 

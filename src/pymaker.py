@@ -63,27 +63,29 @@ dict_settings = {
             'README.md',
         ],
         'm': [                      # for module projects
-            'src/__CN_SMALL_NAME__.py.mod',
-            'tests/import_test_mod.py',
+            'src/__CN_SMALL_NAME__.mod.py',
+            'tests/import_test.mod.py',
             'MANIFEST.in',
             'pyproject.toml',
             'requirements.txt',
         ],
         'p': [                      # for package projects
             'src/__CN_SMALL_NAME__/',
-            'tests/import_test_pkg.py',
+            'tests/import_test.pkg.py',
             'MANIFEST.in',
             'pyproject.toml',
             'requirements.txt',
         ],
         'c': [                      # for cli projects
-            'src/__CN_SMALL_NAME__.py.app',
+            'src/__CN_SMALL_NAME__.app.py',
+            'argparse.py'
             'install.py',
             'uninstall.py',
         ],
         'g': [                      # for gui projects
             'gui/',
-            'src/__CN_SMALL_NAME__.py.app',
+            'src/__CN_SMALL_NAME__.app.py',
+            'argparse.py'
             'install.py',
             'uninstall.py',
         ]
@@ -168,12 +170,13 @@ def get_project_info():
             continue
 
         # check for valid name
-        if not check_name(prj_name):
+        if not validate_name(prj_name):
             continue
 
         # capitalize proj name if necessary (only for names with spaces)
-        prj_name_big = ' '.join(word.capitalize() for word in
-                                prj_name.split(' '))
+        # prj_name_big = ' '.join(word.capitalize() for word in
+        #                         prj_name.split(' '))
+        prj_name_big = prj_name
         dict_settings['reps']['__CN_BIG_NAME__'] = prj_name_big
 
         # calculate final proj location
@@ -200,7 +203,7 @@ def get_project_info():
 # ------------------------------------------------------------------------------
 # Check project name for allowed characters
 # ------------------------------------------------------------------------------
-def check_name(name):
+def validate_name(name):
 
     """
         Check project name for allowed characters
@@ -220,7 +223,7 @@ def check_name(name):
     # create match pattern strings
     pattern_start = r'(^[a-zA-Z])'
     pattern_end = r'([a-zA-Z0-9]$)'
-    pattern_middle = r'(^[a-zA-Z0-9_\- ]*$)'
+    pattern_middle = r'(^[a-zA-Z0-9\-]*$)'
 
     # match start or return false
     search_start = re.search(pattern_start, name)
@@ -237,8 +240,7 @@ def check_name(name):
     # match middle or return false
     search_middle = re.search(pattern_middle, name)
     if not search_middle:
-        print('Project names must contain only letters, numbers, hyphens (-),'
-              ' underscores (_), and spaces')
+        print('Project names must contain only letters, numbers, or "-"')
         return False
 
     # if we made it this far, return true
@@ -600,7 +602,7 @@ def remove_exts(path):
 # Add .git and venv folders to new project
 # ------------------------------------------------------------------------------
 def add_extras():
-    
+
     """
         Add .git and venv folders to new project
 

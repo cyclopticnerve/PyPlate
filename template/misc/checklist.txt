@@ -19,6 +19,9 @@ GitHub
     [] Make 'dev' default branch
     [] Add description and search tags
 
+Module/Project
+    [] $ python -m pip install -e .
+
 ================================================================================
 
 Release - VSCodium
@@ -27,11 +30,7 @@ Release - VSCodium
 
     --- Unit tests
     Packages/Modules
-        [] Run tests/import_test_xxx.py
-        [] Internal test (sys.path)
         [] Test build - $ python -m build
-        [] Install/test in venv (this project)
-            $ python -m pip install -e .
         [] Test in VM using GitHub/README
 
     [] Headers/footers
@@ -42,6 +41,7 @@ Release - VSCodium
     [] Update extra files in MANIFEST.in
     [] $ python -m pip freeze > requirements.txt
     [] Remove '-e' from requirements
+    [] README usage/notes
     [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
     [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
     --- Generate docs
