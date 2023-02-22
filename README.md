@@ -46,13 +46,13 @@ Lastly, you can delete the downloaded folder, if you copied it.
 Just delete the 'PyPlate' folder from wherever you put it in the install step.
 
 ## Usage
-To create a project, cd into the 'PyPlate/src/' directory, and run 'pymaker.py':
+To create a project, cd into the 'PyPlate/src/' directory, and run 'pyplate.py':
 ``` bash
 foo@bar:~$ cd Documents/Projects/Python/PyPlate/src
-foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pymaker.py
+foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pyplate.py
 ```
 
-Enter the required information, and 'pymaker.py' will create the required files 
+Enter the required information, and 'pyplate.py' will create the required files 
 and folders in a subdirectory of 'DIR_BASE'.
 
 From there you are free to modify the projects in your favorite IDE.

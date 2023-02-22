@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_BIG_NAME__                                        /          \
+# Project : __CN_NAME_BIG__                                        /          \
 # Filename: # FIXME: fix name                                     |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -27,7 +27,6 @@
 # Short description
 # ------------------------------------------------------------------------------
 def func_1():
-
     """
         Short description
 

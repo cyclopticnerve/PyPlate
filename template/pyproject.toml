@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_BIG_NAME__                                        /          \
+# Project : __CN_NAME_BIG__                                        /          \
 # Filename: pyproject.toml                                        |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -7,21 +7,16 @@
 # ------------------------------------------------------------------------------
 
 [build-system]
-requires = [
-    "setuptools>=59.6.0",
-    "wheel"
-]
+requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__CN_SMALL_NAME__"
-version = "0.1.0"
-description = "__CN_SHORT_DESC__"
+name = "__CN_NAME_SMALL__"
+version = "0.0.0"
+description = ""
 readme = "README.md"
-authors = [
-    {name = "cyclopticnerve", email = "cyclopticnerve@gmail.com"}
-]
-license = {file = "LICENSE.txt"}
+authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
+license = { file = "LICENSE.txt" }
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
@@ -29,14 +24,12 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = [
-    # __CN_KEYWORDS__
 ]
 dependencies = [
-    # __CN_PY_DEPS__
-] 
+]
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/__CN_BIG_NAME__"
+Homepage = "https://github.com/cyclopticnerve/__CN_NAME_BIG__"
 
 # -)

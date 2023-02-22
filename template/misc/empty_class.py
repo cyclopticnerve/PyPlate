@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_BIG_NAME__                                        /          \
-# Filename: __CN_SMALL_NAME__.py                                  |     ()     |
+# Project : __CN_NAME_BIG__                                        /          \
+# Filename: __CN_NAME_SMALL__.py                                  |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -48,7 +48,6 @@ class Main:
     # Short description
     # --------------------------------------------------------------------------
     def __init__(self):
-
         """
             Short description
 
@@ -70,7 +69,6 @@ class Main:
     # Short description
     # --------------------------------------------------------------------------
     def do_foo(self):
-
         """
             Short description
 

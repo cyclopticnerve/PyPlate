@@ -1,7 +1,6 @@
-#! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CN_BIG_NAME__                                        /          \
-# Filename: __CN_SMALL_NAME__.py                                  |     ()     |
+# Project : __CN_NAME_BIG__                                        /          \
+# Filename: # FIXME: fix name                                     |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -25,26 +24,9 @@
 
 
 # ------------------------------------------------------------------------------
-# The main function of the program
-# ------------------------------------------------------------------------------
-def main():
-
-    """
-        The main function of the program
-
-        This function is the main entry point for the program, initializing the
-        program, and performing it's steps.
-    """
-
-    # call the steps in order
-    func()
-
-
-# ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
-def func():
-
+def func_2():
     """
         Short description
 
@@ -60,21 +42,6 @@ def func():
         Long description
     """
 
-    return ('this is a test')
-
-
-# ------------------------------------------------------------------------------
-# Code to run when called from command line
-# ------------------------------------------------------------------------------
-if __name__ == '__main__':
-
-    """
-        Code to run when called from command line
-
-        This is the top level code of the program, called when the Python file
-        is invoked from the command line.
-    """
-
-    main()
+    return ('this is a test 2')
 
 # -)

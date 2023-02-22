@@ -10,7 +10,7 @@ misc
   checklist - compare to template
   todo -OK
 src
-  pymaker
+  pyplate
 template
   ---
 top-level
@@ -20,7 +20,13 @@ top-level
   readme - OK
 
 
-move pymaker to /usr/bin so we can call it from anywhere
+Rename pymaker.py to pyplate.py
+Use pyplate to make a project called pymaker
+Install pymaker like a CLI
+
+for pkg type, make sure all submodule names are in __init__.py
+
+move pyplate to /usr/bin so we can call it from anywhere
 add param to set location of project
 
 versionator script 
@@ -46,12 +52,12 @@ Can't compare tags in main as changelog will be modified after tag is added
 
 when creating a CLI or GUI app, after creating venv, download and install 
 installerator and configurator and build and pylama
-default install script should be modified by pymaker to download and install 
+default install script should be modified by pyplate to download and install 
 installator and configurator in the prerequisites
 Add pip install from GitHub instructions to readme
 How to know if we are using the latest version of pyplate, installer and 
 configurator
-pyproject reqs should include inst/cfg for gui/cli but they need to be in pyPI
+pyproject deps should include inst/cfg for gui/cli but they need to be in pyPI
 pyproject.toml should automatically add configurator and installerator for 
 cli/gui apps
 
@@ -60,13 +66,13 @@ $ twine upload -r testpypi dist/*
 $ twine upload dist/*
 
 install from testpypi/pypi
-$ python3 -m pip install -i https://test.pypi.org/simple/ __CN_BIG_NAME__
-$ python3 -m pip install __CN_BIG_NAME__
+$ python3 -m pip install -i https://test.pypi.org/simple/ __CN_NAME_BIG__
+$ python3 -m pip install __CN_NAME_BIG__
 
 install from github
 https://packaging.python.org/en/latest/tutorials/installing-packages/#id23
-python3 -m pip install git+https://github.com/cyclopticnerve/__CN_BIG_NAME__
+python3 -m pip install git+https://github.com/cyclopticnerve/__CN_NAME_BIG__
 requirements? pip install -r requirements.txt
 
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__CN_BIG_NAME__.git#egg=__CN_BIG_NAME__         # from default branch
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__CN_BIG_NAME__.git@maine#egg=__CN_BIG_NAME__   # from specific branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/__CN_NAME_BIG__.git#egg=__CN_NAME_BIG__         # from default branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/__CN_NAME_BIG__.git@maine#egg=__CN_NAME_BIG__   # from specific branch

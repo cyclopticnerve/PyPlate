@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_BIG_NAME__                                        /          \
-# Filename: __CN_SMALL_NAME__.desktop                             |     ()     |
+# Project : __CN_NAME_BIG__                                        /          \
+# Filename: __CN_NAME_SMALL__.desktop                             |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -11,11 +11,11 @@ Encoding=UTF-8
 Version=1.0
 Type=Application
 Terminal=false
-Categories=
-Comment=__CN_SHORT_DESC__
+Categories=__CN_GUI_CATEGORIES__
+Comment=
 Exec=__CN_GUI_EXEC__
 Path=
-Name=__CN_BIG_NAME__
+Name=__CN_NAME_BIG__
 Icon=__CN_GUI_ICON__
 X-Desktop-File-Install-Version=0.26
 

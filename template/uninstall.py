@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CN_BIG_NAME__                                        /          \
+# Project : __CN_NAME_BIG__                                        /          \
 # Filename: uninstall.py                                          |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -24,12 +24,12 @@ import installerator
 # define the uninstall settings
 dict_uninstall = {
     'general': {
-        'name': '__CN_BIG_NAME__'
+        'name': '__CN_NAME_BIG__'
     },
     'preflight': [
     ],
     'dirs': [
-        '${HOME}/.cyclopticnerve/__CN_SMALL_NAME__'
+        '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__'
     ],
     'files': {
     },
@@ -46,7 +46,6 @@ dict_uninstall = {
 # Run the Uninstaller module
 # ------------------------------------------------------------------------------
 def main():
-
     """
         Run the Uninstaller module
 

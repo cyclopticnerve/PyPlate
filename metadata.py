@@ -16,7 +16,8 @@
 CN_SHORT_DESC = 'A template for creating packages/modules/CLI apps/GTK3 apps '\
     'in Python'
 CN_KEYWORDS = 'python;template;package;module;cli;app;gui;gtk3'
-CN_DEPENDS = ''
+CN_SYS_DEPS = ''
+CN_PY_DEPS = ''
 
 # this is the canonical (only and absolute) version number string for this
 # project

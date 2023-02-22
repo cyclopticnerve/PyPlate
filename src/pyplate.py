@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: pymaker.py                                            |     ()     |
+# Filename: pyplate.py                                            |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -49,46 +49,43 @@ dict_settings = {
         'path': '',                 # path to project (DIR_BASE/type_dir/Foo)
     },
     'reps': {
-        '__CN_BIG_NAME__':   '',    # Foo
-        '__CN_SMALL_NAME__': '',    # foo
+        '__CN_NAME_BIG__':   '',    # Foo
+        '__CN_NAME_SMALL__': '',    # foo
         '__CN_DATE__':       '',    # 12/08/2022
     },
     'files': {                      # files to include in project
         'common': [                 # common to all projects
             'misc/',
-            'tests/test.py',
+            'tests/',
             '.gitignore',
             'LICENSE.txt',
             'metadata.py',
             'README.md',
+            'requirements.txt',
         ],
         'm': [                      # for module projects
-            'src/__CN_SMALL_NAME__.mod.py',
-            'tests/import_test.mod.py',
+            'src/__CN_NAME_SMALL__.mod.py',
             'MANIFEST.in',
             'pyproject.toml',
-            'requirements.txt',
         ],
         'p': [                      # for package projects
-            'src/__CN_SMALL_NAME__/',
-            'tests/import_test.pkg.py',
+            'src/__CN_NAME_SMALL__/',
             'MANIFEST.in',
             'pyproject.toml',
-            'requirements.txt',
         ],
         'c': [                      # for cli projects
-            'src/__CN_SMALL_NAME__.app.py',
+            'src/__CN_NAME_SMALL__.app.py',
             'argparse.py'
             'install.py',
             'uninstall.py',
         ],
         'g': [                      # for gui projects
             'gui/',
-            'src/__CN_SMALL_NAME__.app.py',
+            'src/__CN_NAME_SMALL__.app.py',
             'argparse.py'
             'install.py',
             'uninstall.py',
-        ]
+        ],
     }
 }
 
@@ -101,7 +98,6 @@ dict_settings = {
 # Main function
 # ------------------------------------------------------------------------------
 def main():
-
     """
         Main function
 
@@ -120,7 +116,6 @@ def main():
 # Get project info
 # ------------------------------------------------------------------------------
 def get_project_info():
-
     """
         Get project info
 
@@ -173,11 +168,9 @@ def get_project_info():
         if not validate_name(prj_name):
             continue
 
-        # capitalize proj name if necessary (only for names with spaces)
-        # prj_name_big = ' '.join(word.capitalize() for word in
-        #                         prj_name.split(' '))
+        # assume entered name is final
         prj_name_big = prj_name
-        dict_settings['reps']['__CN_BIG_NAME__'] = prj_name_big
+        dict_settings['reps']['__CN_NAME_BIG__'] = prj_name_big
 
         # calculate final proj location
         prj_path = os.path.join(DIR_BASE, type_dir, prj_name_big)
@@ -193,8 +186,7 @@ def get_project_info():
 
     # calculate small name
     prj_name_small = prj_name_big.lower()
-    prj_name_small = prj_name_small.replace(' ', '_')
-    dict_settings['reps']['__CN_SMALL_NAME__'] = prj_name_small
+    dict_settings['reps']['__CN_NAME_SMALL__'] = prj_name_small
 
     # calculate current date
     dict_settings['reps']['__CN_DATE__'] = datetime.now().strftime('%m/%d/%Y')
@@ -204,7 +196,6 @@ def get_project_info():
 # Check project name for allowed characters
 # ------------------------------------------------------------------------------
 def validate_name(name):
-
     """
         Check project name for allowed characters
 
@@ -217,13 +208,13 @@ def validate_name(name):
         This function checks the passed name for three criteria:
         1. starts with an alpha char
         2. ends with an alphanumeric char
-        3. contains only alphanumeric, _, -, ' '
+        3. contains only alphanumeric chars
     """
 
     # create match pattern strings
     pattern_start = r'(^[a-zA-Z])'
     pattern_end = r'([a-zA-Z0-9]$)'
-    pattern_middle = r'(^[a-zA-Z0-9\-]*$)'
+    pattern_middle = r'(^[a-zA-Z0-9]*$)'
 
     # match start or return false
     search_start = re.search(pattern_start, name)
@@ -240,7 +231,7 @@ def validate_name(name):
     # match middle or return false
     search_middle = re.search(pattern_middle, name)
     if not search_middle:
-        print('Project names must contain only letters, numbers, or "-"')
+        print('Project names must contain only letters and numbers')
         return False
 
     # if we made it this far, return true
@@ -251,7 +242,6 @@ def validate_name(name):
 # Copy template files to final location
 # ------------------------------------------------------------------------------
 def copy_template():
-
     """
         Copy template files to final location
 
@@ -301,7 +291,6 @@ def copy_template():
 # Recursivly scan files/folders for replace/rename functions
 # ------------------------------------------------------------------------------
 def recurse(path):
-
     """
         Recursivly scan files/folders for replace/rename functions
 
@@ -363,7 +352,6 @@ def recurse(path):
 # Replace header text inside files
 # ------------------------------------------------------------------------------
 def replace_headers(lines):
-
     """
         Replace header text inside files
 
@@ -379,13 +367,18 @@ def replace_headers(lines):
         the __CN_.. stuff inside headers.
     """
 
+    # NEXT: this could be done better with regex
+
     # an array that represents the three sections of a header line
+    # NB: we keep the trailing spaces here to accurately count the number of
+    # spaces needed to format
+    # we will strip them later to avoid pylama reporting trialing spaces
     hdr_lines = [
-        ['# Project : ', '__CN_BIG_NAME__',   '/          \\ '],
-        ['# Filename: ', '__CN_SMALL_NAME__', '|     ()     |'],
+        ['# Project : ', '__CN_NAME_BIG__',   '/          \\ '],
+        ['# Filename: ', '__CN_NAME_SMALL__', '|     ()     |'],
         ['# Date    : ', '__CN_DATE__',       '|            |'],
-        ['<!-- Project : ', '__CN_BIG_NAME__',   '/          \\  -->'],
-        ['<!-- Filename: ', '__CN_SMALL_NAME__', '|     ()     | -->'],
+        ['<!-- Project : ', '__CN_NAME_BIG__',   '/          \\  -->'],
+        ['<!-- Filename: ', '__CN_NAME_SMALL__', '|     ()     | -->'],
         ['<!-- Date    : ', '__CN_DATE__',       '|            | -->'],
     ]
 
@@ -412,12 +405,12 @@ def replace_headers(lines):
                 spaces_str = ' ' * spaces
 
                 # create replacement string (with newline!!!)
-                rep_str = f'{hdr_line[0]}{rep}{spaces_str}{hdr_line[2].strip()}\n'
+                rep_s = f'{hdr_line[0]}{rep}{spaces_str}{hdr_line[2].strip()}\n'
 
                 # replace text in line
-                lines[i] = rep_str
+                lines[i] = rep_s
 
-    # save the file with changes
+    # return the changed lines
     return lines
 
 
@@ -425,7 +418,6 @@ def replace_headers(lines):
 # Replace text inside files
 # ------------------------------------------------------------------------------
 def replace_text(lines):
-
     """
         Replace text inside files
 
@@ -450,7 +442,8 @@ def replace_text(lines):
 
         # replace text in line
         for key in reps.keys():
-            lines[i] = lines[i].replace(key, reps[key])
+            if key in lines[i]:
+                lines[i] = lines[i].replace(key, reps[key])
 
     # save file with replacements
     return lines
@@ -460,7 +453,6 @@ def replace_text(lines):
 # Remove unneccesary parts of the README file
 # ------------------------------------------------------------------------------
 def fix_readme(lines):
-
     """
         Remove unneccesary parts of the README file
 
@@ -531,7 +523,6 @@ def fix_readme(lines):
 # Function for renaming files/folders
 # ------------------------------------------------------------------------------
 def rename(path):
-
     """
         Function for renaming files/folders
 
@@ -563,7 +554,6 @@ def rename(path):
 # Function for removinf extraneous exts (for duplicate files in template)
 # ------------------------------------------------------------------------------
 def remove_exts(path):
-
     """
         Function to remove extraneous exts (for duplicate files in template)
 
@@ -602,7 +592,6 @@ def remove_exts(path):
 # Add .git and venv folders to new project
 # ------------------------------------------------------------------------------
 def add_extras():
-
     """
         Add .git and venv folders to new project
 

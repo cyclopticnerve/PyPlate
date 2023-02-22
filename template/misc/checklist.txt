@@ -3,8 +3,8 @@ Initialize
 
 VSCodium
     [] Open any .py file
-    [] Switch to venv interpreter - bottom right of status bar
     [] Install pylama in venv (popup in bottom right)
+    --- Switch to venv interpreter - bottom right of status bar
     --- Make sure you are in project dir (terminal at bottom)
     --- Run 'source venv/bin/activate'
     [] python -m pip install -r requirements.txt

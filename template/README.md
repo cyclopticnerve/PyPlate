@@ -1,12 +1,12 @@
 <!----------------------------------------------------------------------------->
-<!-- Project : __CN_BIG_NAME__                                 /          \  -->
+<!-- Project : __CN_NAME_BIG__                                 /          \  -->
 <!-- Filename: README.md                                      |     ()     | -->
 <!-- Date    : __CN_DATE__                                    |            | -->
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-# __CN_BIG_NAME__
+# __CN_NAME_BIG__
 
 <!-- Tagline, common to all projects-->
 ## "It mostly works™"
@@ -23,14 +23,17 @@ __CN_SHORT_DESC__
 
 ## Requirements
 <!-- __CN_MOD_START__ -->
-<!-- __CN_PY_DEPS__ -->
+<!-- __CN_PY_DEPS_START__ -->
+None
+<!-- __CN_PY_DEPS_END__ -->
 <!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
 This application requires:
 
 [Configurator](https://github.com/cyclopticnerve/Configurator)<br>
 [Installerator](https://github.com/cyclopticnerve/Installerator)<br>
-<!-- __CN_PY_DEPS__ -->
+<!-- __CN_PY_DEPS_START__ -->
+<!-- __CN_PY_DEPS_END__ -->
 <!-- __CN_APP_END__ -->
 
 ## Installing
@@ -42,24 +45,24 @@ to make sure you have the lastest software installed.
 
 <!-- __CN_MOD_START__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/__CN_BIG_NAME__/releases/latest)
+[latest release](https://github.com/cyclopticnerve/__CN_NAME_BIG__/releases/latest)
 from the main branch.<br>
 Download the 'Source Code (tar.gz)' file.
 
 Then install it using:
 ```bash
 foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ python -m pip install __CN_BIG_NAME__-__CN_VERSION__.tar.gz
+foo@bar:~/Downloads$ python -m pip install __CN_NAME_BIG__-__CN_VERSION__.tar.gz
 ```
 Or you can clone the git repo to get the latest (and often broken) code from the 
 dev branch:
 ```bash
 foo@bar:~$ python -m pip install build
 foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_BIG_NAME__
-foo@bar:~/Downloads$ cd __CN_BIG_NAME__
-foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m build
-foo@bar:~/Downloads/__CN_BIG_NAME__$ python -m pip install ./dist/__CN_SMALL_NAME__-__CN_VERSION__.tar.gz -r ./requirements.txt
+foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_NAME_BIG__
+foo@bar:~/Downloads$ cd __CN_NAME_BIG__
+foo@bar:~/Downloads/__CN_NAME_BIG__$ python -m build
+foo@bar:~/Downloads/__CN_NAME_BIG__$ python -m pip install ./dist/__CN_NAME_SMALL__-__CN_VERSION__.tar.gz -r ./requirements.txt
 ```
 <!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
@@ -68,34 +71,34 @@ Make sure you've installed
 and
 [Installerator](https://github.com/cyclopticnerve/Installerator).<br>
 You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/__CN_BIG_NAME__/releases/latest)
+[latest release](https://github.com/cyclopticnerve/__CN_NAME_BIG__/releases/latest)
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.<br>
 Then run the 'install.py' file from there:
 ```bash
-foo@bar:~$ cd Downloads/__CN_BIG_NAME__-__CN_VERSION__
-foo@bar:~/Downloads/__CN_BIG_NAME__-__CN_VERSION__$ ./install.py
+foo@bar:~$ cd Downloads/__CN_NAME_BIG__-__CN_VERSION__
+foo@bar:~/Downloads/__CN_NAME_BIG__-__CN_VERSION__$ ./install.py
 ```
 Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:
 ```bash
 foo@bar:~$ cd Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_BIG_NAME__
-foo@bar:~/Downloads$ cd __CN_BIG_NAME__
-foo@bar:~/Downloads/__CN_BIG_NAME__$ ./install.py
+foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_NAME_BIG__
+foo@bar:~/Downloads$ cd __CN_NAME_BIG__
+foo@bar:~/Downloads/__CN_NAME_BIG__$ ./install.py
 ```
 <!-- __CN_APP_END__ -->
 
 ## Uninstalling
 <!-- __CN_MOD_START__ -->
 ```bash
-foo@bar:~$ python -m pip uninstall __CN_SMALL_NAME__
+foo@bar:~$ python -m pip uninstall __CN_NAME_SMALL__
 ```
 <!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
 ```bash
-foo@bar:~$ cd .cyclopticnerve/__CN_SMALL_NAME__
-foo@bar:~/.cyclopticnerve/__CN_SMALL_NAME__$ ./uninstall.py
+foo@bar:~$ cd .cyclopticnerve/__CN_NAME_SMALL__
+foo@bar:~/.cyclopticnerve/__CN_NAME_SMALL__$ ./uninstall.py
 ```
 <!-- __CN_APP_END__ -->
 
