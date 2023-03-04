@@ -369,10 +369,11 @@ def recurse(path):
     """
 
     # don't rename these dirs or files, or change file contents
-    # NB: must not end in '/'!!!
+    # also trim any trailing '/'
     skip_dirs = [
         'misc'
     ]
+    skip_dirs = [item.rstrip('/') for item in skip_dirs]
 
     # get list of replaceable file names
     items = [item for item in os.listdir(path) if item not in skip_dirs]
