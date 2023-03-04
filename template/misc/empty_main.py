@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_NAME_BIG__                                        /          \
-# Filename: __CN_NAME_SMALL__                                     |     ()     |
+# Filename: __CN_NAME_SMALL__.py                                  |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /

@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-
 from datetime import datetime
 import os
 import re
@@ -24,15 +23,15 @@ import subprocess
 
 # this is the dir where the script is being run from
 # (e.g. ~/Documents/Projects/Python/PyPlate/src/)
-DIR_SRC = os.path.dirname(os.path.abspath(__file__))
+DIR_CURR = os.path.dirname(os.path.abspath(__file__))
 
 # this is the dir where the template files are located rel to the script
 # (e.g. ~/Documents/Projects/Python/PyPlate/template/)
-DIR_TEMPLATE = os.path.abspath(f'{DIR_SRC}/../template')
+DIR_TEMPLATE = os.path.abspath(f'{DIR_CURR}/../template')
 
 # this is the dir for project location (above PyPlate)
 # (e.g. ~/Documents/Projects/Python/)
-DIR_BASE = os.path.abspath(f'{DIR_SRC}/../../')
+DIR_BASE = os.path.abspath(f'{DIR_CURR}/../../')
 
 # this is the current user home dir
 # (e.g. /home/cyclopticnerve/)
@@ -64,7 +63,7 @@ dict_settings = {
             'requirements.txt',
         ],
         'm': [                      # for module projects
-            'src/__CN_NAME_SMALL__.mod.py',
+            'src/__CN_NAME_SMALL__-mod.py',
             'MANIFEST.in',
             'pyproject.toml',
         ],
@@ -74,17 +73,15 @@ dict_settings = {
             'pyproject.toml',
         ],
         'c': [                      # for cli projects
-            'src/__CN_NAME_SMALL__.app.py',
-            'argparse.py'
-            'install.py',
-            'uninstall.py',
+            'src/__CN_NAME_SMALL__-app.py',
+            'install',
+            'uninstall',
         ],
         'g': [                      # for gui projects
             'gui/',
-            'src/__CN_NAME_SMALL__.app.py',
-            'argparse.py'
-            'install.py',
-            'uninstall.py',
+            'src/__CN_NAME_SMALL__-app.py',
+            'install',
+            'uninstall',
         ],
     }
 }
@@ -93,6 +90,10 @@ dict_settings = {
 # Functions
 # ------------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------------
+# Public function
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Main function
@@ -129,8 +130,9 @@ def get_project_info():
     while True:
 
         # ask what type of project
-        proj_type = input('Project type: [M]odule | [P]ackage | [C]LI | '
-                          '[G]UI: ')
+        proj_type = input(
+            'Project type: [M]odule | [P]ackage | [C]LI | [G]UI: '
+        )
 
         # check for blank type
         proj_type = proj_type.strip()
@@ -165,12 +167,11 @@ def get_project_info():
             continue
 
         # check for valid name
-        if not validate_name(prj_name):
+        if not _validate_name(prj_name):
             continue
 
         # assume entered name is final
         prj_name_big = prj_name
-        dict_settings['reps']['__CN_NAME_BIG__'] = prj_name_big
 
         # calculate final proj location
         prj_path = os.path.join(DIR_BASE, type_dir, prj_name_big)
@@ -181,6 +182,7 @@ def get_project_info():
             continue
 
         # if name is valid, move on
+        dict_settings['reps']['__CN_NAME_BIG__'] = prj_name_big
         dict_settings['project']['path'] = prj_path
         break
 
@@ -193,9 +195,151 @@ def get_project_info():
 
 
 # ------------------------------------------------------------------------------
+# Copy template files to final location
+# ------------------------------------------------------------------------------
+def copy_template():
+    """
+        Copy template files to final location
+
+        Get file paths/names from dict_settings and copy them to the project
+        folder.
+    """
+
+    # create target folder
+    prj_path = dict_settings['project']['path']
+    os.makedirs(prj_path)
+
+    # get project type
+    proj_type = dict_settings['project']['type']
+
+    # the group of files, common and type
+    groups = [
+        dict_settings['files']['common'],
+        dict_settings['files'][proj_type]
+    ]
+
+    # for each group, common and type
+    for group in groups:
+
+        # for each file/folder in group
+        for file in group:
+
+            # build old path/new path
+            path_old = os.path.join(DIR_TEMPLATE, file)
+            path_new = os.path.join(prj_path, file)
+
+            # if it's a dir, copy dir
+            if os.path.isdir(path_old):
+                shutil.copytree(path_old, path_new)
+            else:
+
+                # if it's a file, get the file's dir and create
+                dir_new = os.path.dirname(path_new)
+                os.makedirs(dir_new, exist_ok=True)
+
+                # then copy file
+                shutil.copy2(path_old, path_new)
+
+
+# ------------------------------------------------------------------------------
+# Recursivly scan files/folders for replace/rename functions
+# ------------------------------------------------------------------------------
+def recurse(path):
+    """
+        Recursivly scan files/folders for replace/rename functions
+
+        Paramaters:
+            path [string]: the folder to start recursively scanning from
+
+        This is a recursive function to scan for files/folders under a given
+        folder. It iterates over the contents of the 'path' folder, checking if
+        each item is a file or a folder. If it encounters a folder, it calls
+        itself recursively, passing that folder as the parameter. If it
+        encounters a file, it calls methods to do text replacement of headers,
+        then other text. Finally it renames the file if the name contains a
+        replacement key. Once all files are renamed, it will then bubble up to
+        rename all folders.
+    """
+
+    # don't rename these dirs or files, or change file contents
+    # also trim any trailing '/'
+    skip_dirs = [
+        'misc'
+    ]
+    skip_dirs = [item.rstrip('/') for item in skip_dirs]
+
+    # get list of replaceable file names
+    items = [item for item in os.listdir(path) if item not in skip_dirs]
+    for item in items:
+
+        # put path back together
+        path_item = os.path.join(path, item)
+
+        # if it's a dir
+        if os.path.isdir(path_item):
+
+            # recurse itself to find more files
+            recurse(path_item)
+
+        else:
+
+            # open file and get lines
+            with open(path_item) as file:
+                lines = file.readlines()
+
+            # replace headers/text from lines
+            lines = _replace_headers(lines)
+            lines = _replace_text(lines)
+
+            # readme needs extra handling
+            if item == 'README.md':
+                lines = _fix_readme(lines)
+
+            # save lines
+            with open(path_item, 'w') as file:
+                file.writelines(lines)
+
+        # called for each file/folder
+        _rename(path_item)
+
+
+# ------------------------------------------------------------------------------
+# Add .git and .venv folders to new project
+# ------------------------------------------------------------------------------
+def add_extras():
+    """
+        Add .git and .venv folders to new project
+
+        Adds a .git folder (repository) and a .venv (virtual environment) folder
+        to the project, and sets them up as necessary.
+    """
+
+    # get project directory
+    proj_dir = dict_settings['project']['path']
+
+    # make sure we are in current proj path
+    os.chdir(proj_dir)
+
+    # add git folder
+    cmd = 'git init'
+    cmd_array = shlex.split(cmd)
+    subprocess.run(cmd_array)
+
+    # add venv dir
+    # use '.venv' to be compatible with VSCodium
+    cmd = 'python -m venv .venv'
+    cmd_array = shlex.split(cmd)
+    subprocess.run(cmd_array)
+
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # Check project name for allowed characters
 # ------------------------------------------------------------------------------
-def validate_name(name):
+def _validate_name(name):
     """
         Check project name for allowed characters
 
@@ -239,119 +383,9 @@ def validate_name(name):
 
 
 # ------------------------------------------------------------------------------
-# Copy template files to final location
-# ------------------------------------------------------------------------------
-def copy_template():
-    """
-        Copy template files to final location
-
-        Get file paths/names from dict_settings and copy them to the project
-        folder.
-    """
-
-    # create target folder
-    prj_path = dict_settings['project']['path']
-    os.makedirs(prj_path)
-
-    # get project type
-    proj_type = dict_settings['project']['type']
-
-    # the group of files, common and type
-    groups = [
-        dict_settings['files']['common'],
-        dict_settings['files'][proj_type]
-    ]
-
-    # for each group, common and type
-    for group in groups:
-
-        # for each file/folder in group
-        for file in group:
-
-            # build old path/new path
-            path_old = os.path.join(DIR_TEMPLATE, file)
-            path_new = os.path.join(prj_path, file)
-
-            # if it's a dir, copy dir
-            if os.path.isdir(path_old):
-                shutil.copytree(path_old, path_new)
-            else:
-
-                # if it's a file, get the file's dir
-                dir_new = os.path.dirname(path_new)
-
-                # create dir if neccessary
-                os.makedirs(dir_new, exist_ok=True)
-
-                # then copy file
-                shutil.copy2(path_old, path_new)
-
-
-# ------------------------------------------------------------------------------
-# Recursivly scan files/folders for replace/rename functions
-# ------------------------------------------------------------------------------
-def recurse(path):
-    """
-        Recursivly scan files/folders for replace/rename functions
-
-        Paramaters:
-            path [string]: the folder to start recursively scanning from
-
-        This is a recursive function to scan for files/folders under a given
-        folder. It iterates over the contents of the 'path' folder, checking if
-        each item is a file or a folder. If it encounters a folder, it calls
-        itself recursively, passing that folder as the parameter. If it
-        encounters a file, it calls methods to do text replacement of headers,
-        then other text. Finally it renames the file if the name contains a
-        replacement key. Once all files are renamed, it will then bubble up to
-        rename all folders.
-    """
-
-    # don't rename these dirs or files, or change file contents
-    # NB: must not end in '/'!!!
-    skip_dirs = [
-        'misc'
-    ]
-
-    # get list of replaceable file names
-    items = [item for item in os.listdir(path) if item not in skip_dirs]
-    for item in items:
-
-        # put path back together
-        path_item = os.path.join(path, item)
-
-        # if it's a dir
-        if os.path.isdir(path_item):
-
-            # recurse itself to find more files
-            recurse(path_item)
-
-        else:
-
-            # open file and get lines
-            with open(path_item) as file:
-                lines = file.readlines()
-
-            # replace headers/text from lines
-            lines = replace_headers(lines)
-            lines = replace_text(lines)
-
-            # readme needs extra handling
-            if item == 'README.md':
-                lines = fix_readme(lines)
-
-            # save lines
-            with open(path_item, 'w') as file:
-                file.writelines(lines)
-
-        # called for each file/folder
-        rename(path_item)
-
-
-# ------------------------------------------------------------------------------
 # Replace header text inside files
 # ------------------------------------------------------------------------------
-def replace_headers(lines):
+def _replace_headers(lines):
     """
         Replace header text inside files
 
@@ -370,9 +404,9 @@ def replace_headers(lines):
     # NEXT: this could be done better with regex
 
     # an array that represents the three sections of a header line
-    # NB: we keep the trailing spaces here to accurately count the number of
+    # we keep the trailing spaces here to accurately count the number of
     # spaces needed to format
-    # we will strip them later to avoid pylama reporting trialing spaces
+    # we will strip them later to avoid linter reporting trailing spaces
     hdr_lines = [
         ['# Project : ', '__CN_NAME_BIG__',   '/          \\ '],
         ['# Filename: ', '__CN_NAME_SMALL__', '|     ()     |'],
@@ -417,7 +451,7 @@ def replace_headers(lines):
 # ------------------------------------------------------------------------------
 # Replace text inside files
 # ------------------------------------------------------------------------------
-def replace_text(lines):
+def _replace_text(lines):
     """
         Replace text inside files
 
@@ -452,7 +486,7 @@ def replace_text(lines):
 # ------------------------------------------------------------------------------
 # Remove unneccesary parts of the README file
 # ------------------------------------------------------------------------------
-def fix_readme(lines):
+def _fix_readme(lines):
     """
         Remove unneccesary parts of the README file
 
@@ -522,7 +556,7 @@ def fix_readme(lines):
 # ------------------------------------------------------------------------------
 # Function for renaming files/folders
 # ------------------------------------------------------------------------------
-def rename(path):
+def _rename(path):
     """
         Function for renaming files/folders
 
@@ -542,8 +576,8 @@ def rename(path):
     for key in reps.keys():
         new_path = new_path.replace(key, reps[key])
 
-    # fix filenames with extras added on (.app, .mod, etc.)
-    new_path = remove_exts(new_path)
+    # fix filenames with extras added on (.app.py, .mod.py, etc.)
+    new_path = _remove_exts(new_path)
 
     # do the replacement in os (test exists for already renamed)
     if os.path.exists(path):
@@ -553,7 +587,7 @@ def rename(path):
 # ------------------------------------------------------------------------------
 # Function for removinf extraneous exts (for duplicate files in template)
 # ------------------------------------------------------------------------------
-def remove_exts(path):
+def _remove_exts(path):
     """
         Function to remove extraneous exts (for duplicate files in template)
 
@@ -577,50 +611,16 @@ def remove_exts(path):
     # if there is at least one dot
     if len(file_array) > 2:
 
-        # no ext for app file
-        if file_array[1] == 'app':
-            base = file_array[0]
-        else:
-
-            # the result is the pre-dot plus last dot
-            base = file_array[0] + '.' + file_array[-1]
+        # the result is the pre-dot plus last dot
+        base = file_array[0] + '.' + file_array[-1]
 
     return os.path.join(dir, base)
-
-
-# ------------------------------------------------------------------------------
-# Add .git and venv folders to new project
-# ------------------------------------------------------------------------------
-def add_extras():
-    """
-        Add .git and venv folders to new project
-
-        Adds a .git folder (repository) and a venv (virtual environment) folder
-        to the project, and sets them up as necessary.
-    """
-
-    dir = dict_settings['project']['path']
-
-    # make sure we are in current proj path w/chdir
-    os.chdir(dir)
-
-    # add git folder
-    cmd = 'git init'
-    cmd_array = shlex.split(cmd)
-    subprocess.run(cmd_array)
-
-    # add venv dir
-    # NB: use '.venv' to be compatible with VSCodium
-    cmd = 'python -m venv .venv'
-    cmd_array = shlex.split(cmd)
-    subprocess.run(cmd_array)
 
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-
     """
         Code to run when called from command line
 

@@ -1,17 +1,50 @@
 
+Initialize
+
+VSCodium
+    [] Open any .py file
+    [] Install pylama in venv (popup in bottom right)
+    --- Switch to venv interpreter - bottom right of status bar
+    --- Make sure you are in project dir (terminal at bottom)
+    --- Run 'source venv/bin/activate'
+    [] python -m pip install -r requirements.txt
+    
+    [] Stage all changes
+    [] Commit 'first commit'
+    [] Publish 'main' branch
+    [] Checkout new branch 'dev' from 'main'
+    [] Publish 'dev' branch
+
+GitHub
+    [] Make 'dev' default branch
+    [] Add description and search tags
+
+Module/Project (in .venv)
+    [] $ python -m pip install -e .
+
 ================================================================================
 
 Release - VSCodium
 
     on 'dev':
 
+    --- Unit tests
+    Packages/Modules
+        [] Test build - $ python -m build
+        [] Test in VM using GitHub/README
+
+        
+------------------------------------------
     [] Headers/footers
     [] Docstrings
+    [] seperators
+    [] over 80 cols
     [] Check all noqa for good use
     [] Check dependencies in pyproject.toml and install.py
     [] Update extra files in MANIFEST.in
     [] $ python -m pip freeze > requirements.txt
     [] Remove '-e' from requirements
+    [] README usage/notes
     [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
     [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
     --- Generate docs

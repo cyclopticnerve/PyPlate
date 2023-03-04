@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_NAME_BIG__                                        /          \
-# Filename: __CN_NAME_SMALL__.py                                  |     ()     |
+# Filename: install                                               |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -11,13 +11,33 @@
 # Imports
 # ------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
+import installerator
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
+
+# define the install settings
+dict_install = {
+    'general': {
+        'name': '__CN_NAME_BIG__'
+    },
+    'preflight': [
+    ],
+    'sys_deps': [
+	],
+    'py_deps': [
+	],
+    'dirs': [
+        '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__'
+    ],
+    'files': {
+        'LICENSE.txt': '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__',
+        'uninstall.py': '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__'
+    },
+    'postflight': [
+    ]
+}
 
 # ------------------------------------------------------------------------------
 # Functions
@@ -25,47 +45,30 @@
 
 
 # ------------------------------------------------------------------------------
-# The main function of the program
+# Run the Installer module
 # ------------------------------------------------------------------------------
 def main():
     """
-        The main function of the program
+        Run the Installer module
 
-        This function is the main entry point for the program, initializing the
-        program, and performing it's steps.
+        This is the main installer function, which creates an instance of the
+        Installer class and runs it's main function, with the global
+        dictionary created above.
     """
 
-    # call the steps in order
-    func()
+    # instantiate installerator class
+    # package.module.class
+    installer = installerator.installerator.Installerator()
 
-
-# ------------------------------------------------------------------------------
-# Short description
-# ------------------------------------------------------------------------------
-def func():
-    """
-        Short description
-
-        Paramaters:
-            var_name [type]: description
-
-        Returns:
-            [type]: description
-
-        Raises:
-            exception_type(vars): description
-
-        Long description
-    """
-
-    return ('this is a test')
+    # # run the instance
+    # class.method
+    installer.run(dict_install)
 
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-
     """
         Code to run when called from command line
 

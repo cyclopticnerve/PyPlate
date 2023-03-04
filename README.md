@@ -26,12 +26,12 @@ to make sure you have the lastest software installed.
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
 from the main branch.<br>
-Download either the 'tar.gz' or '.zip' file and extract it.
+Download either the 'tar.gz' or 'zip' file and extract it.
 
-Or you can clone the git repo to get the latest (and often broken) code 
-from the dev branch:
+Or you can clone the git repo to get the latest (and often broken) code from the
+dev branch:
 ```bash
-foo@bar:~$ cd Downloads
+foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
 Next, cut/copy/paste/cp/mv the 'PyPlate' directory wherever you want. For all 
@@ -48,12 +48,18 @@ Just delete the 'PyPlate' folder from wherever you put it in the install step.
 ## Usage
 To create a project, cd into the 'PyPlate/src/' directory, and run 'pyplate.py':
 ``` bash
-foo@bar:~$ cd Documents/Projects/Python/PyPlate/src
+foo@bar:~$ cd ~/Documents/Projects/Python/PyPlate/src
 foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pyplate.py
 ```
 
 Enter the required information, and 'pyplate.py' will create the required files 
-and folders in a subdirectory of 'DIR_BASE'.
+and folders in a subdirectory of 'DIR_BASE', where 'DIR_BASE' is the directory 
+above 'PyPlate'.<br>
+In our example, 'DIR_BASE' is '~/Documents/Projects/Python'.
+
+So Modules/Packages will be generated in 
+'~/Documents/Projects/Python/Libs', and CLI/GUI apps will be generated in 
+'~/Documents/Projects/Python/Apps'.
 
 From there you are free to modify the projects in your favorite IDE.
 
