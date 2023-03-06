@@ -28,17 +28,44 @@ def main():
         program, and performing it's steps.
     """
 
+    # NB: use this if you need to
     # parse args
-    args = parse_args()
+    # args = _parse_args()
 
     # call the steps in order
     func()
 
 
 # ------------------------------------------------------------------------------
+# Short description
+# ------------------------------------------------------------------------------
+def func():
+    """
+        Short description
+
+        Paramaters:
+            var_name [type]: description
+
+        Returns:
+            [type]: description
+
+        Raises:
+            exception_type(vars): description
+
+        Long description
+    """
+
+    return ('this is a test')
+
+
+# ------------------------------------------------------------------------------
+# Helper functions
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # Parses the command line
 # ------------------------------------------------------------------------------
-def parse_args():
+def _parse_args():
     """
         Parses the command line
 
@@ -65,13 +92,8 @@ def parse_args():
         version='__CN_VERSION__'
     )
 
-    # --------------------------------------------------------------------------
-
-    # FIXME: add args here
-    # https://docs.python.org/3/library/argparse.html
-    # parser.add_argument('--bar')
-
-    # --------------------------------------------------------------------------
+    # add any position/optional args\
+    _add_args()
 
     # parse the cmd-line args
     args = parser.parse_args()
@@ -88,25 +110,18 @@ def parse_args():
 
 
 # ------------------------------------------------------------------------------
-# Short description
+# Add arguments to command-line parser
 # ------------------------------------------------------------------------------
-def func():
-    """
-        Short description
+def _add_args(parser):
 
-        Paramaters:
-            var_name [type]: description
+    # NB: add args here
+    # https://docs.python.org/3/library/argparse.html
+    # parser.add_argument(
+    #     '--bar'
+    # )
 
-        Returns:
-            [type]: description
-
-        Raises:
-            exception_type(vars): description
-
-        Long description
-    """
-
-    return ('this is a test')
+    # used in case above code is commented (like pass)
+    return
 
 
 # ------------------------------------------------------------------------------

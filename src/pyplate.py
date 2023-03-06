@@ -63,7 +63,7 @@ dict_settings = {
             'requirements.txt',
         ],
         'm': [                      # for module projects
-            'src/__CN_NAME_SMALL__-mod.py',
+            'src/__CN_NAME_SMALL__.mod.py',
             'MANIFEST.in',
             'pyproject.toml',
         ],
@@ -73,13 +73,13 @@ dict_settings = {
             'pyproject.toml',
         ],
         'c': [                      # for cli projects
-            'src/__CN_NAME_SMALL__-app.py',
+            'src/__CN_NAME_SMALL__.app.py',
             'install',
             'uninstall',
         ],
         'g': [                      # for gui projects
             'gui/',
-            'src/__CN_NAME_SMALL__-app.py',
+            'src/__CN_NAME_SMALL__.app.py',
             'install',
             'uninstall',
         ],
@@ -92,7 +92,7 @@ dict_settings = {
 
 
 # ------------------------------------------------------------------------------
-# Public function
+# Public functions
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -355,24 +355,22 @@ def _validate_name(name):
         3. contains only alphanumeric chars
     """
 
-    # create match pattern strings
-    pattern_start = r'(^[a-zA-Z])'
-    pattern_end = r'([a-zA-Z0-9]$)'
-    pattern_middle = r'(^[a-zA-Z0-9]*$)'
-
     # match start or return false
+    pattern_start = r'(^[a-zA-Z])'
     search_start = re.search(pattern_start, name)
     if not search_start:
         print('Project names must start with a letter')
         return False
 
     # match end or return false
+    pattern_end = r'([a-zA-Z0-9]$)'
     search_end = re.search(pattern_end, name)
     if not search_end:
         print('Project names must end with a letter or number')
         return False
 
     # match middle or return false
+    pattern_middle = r'(^[a-zA-Z0-9]*$)'
     search_middle = re.search(pattern_middle, name)
     if not search_middle:
         print('Project names must contain only letters and numbers')
@@ -400,8 +398,6 @@ def _replace_headers(lines):
         it goes. When it is done, it returns lhe list of lines. This replaces
         the __CN_.. stuff inside headers.
     """
-
-    # NEXT: this could be done better with regex
 
     # an array that represents the three sections of a header line
     # we keep the trailing spaces here to accurately count the number of

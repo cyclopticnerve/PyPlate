@@ -7,7 +7,10 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# TODO: what to do with main files that have argparse stuff?
+# FIXME: what to do with main files that have argparse stuff?
+# replace __CN_VERSION__
+# replace __CN_SHORT_DESC__
+
 # TODO: for pkg type, make sure all submodule names are in __init__.py
 # NEED TO TEST IF * IS SUFFICENT!!!
 
@@ -68,13 +71,15 @@ def main():
         module, and performing it's steps.
     """
 
-    # do proactive replacements (replaces needed text)
+    # do proactive replacements in specific files (replaces needed text)
     do_toml()
     do_install()
     do_desktop()
     do_readme()
 
     # do preventative checks (does not replace anything, just prints/warns)
+    # NOT ENTIRELY TRUE - it DOES do version/desc replacement in .py files that
+    # have a parse_args() function
     recurse(DIR_CURR)
 
 
@@ -87,8 +92,6 @@ def do_toml():
 
         Replaces things like the keywords, requirements, etc. in the toml file.
     """
-
-    # TODO: deps must have version?
 
     # this function will ALWAYS create a multi-line array, e.g.:
     # keywords = [
@@ -134,7 +137,7 @@ def do_toml():
         r'(^\s*keywords[\t ]*=)'
         r'(.*?\])'
     )
-    split_str = split_quote(CN_KEYWORDS)
+    split_str = _split_quote(CN_KEYWORDS)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}]'
     text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
@@ -145,7 +148,7 @@ def do_toml():
         r'(^\s*dependencies[\t ]*=)'
         r'(.*?\])'
     )
-    split_str = split_quote(CN_PY_DEPS)
+    split_str = _split_quote(CN_PY_DEPS)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}]'
     text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
@@ -180,7 +183,7 @@ def do_install():
         r'(^\s*\'sys_deps\'[\t ]*:)'
         r'(.*?\])'
     )
-    split_str = split_quote(CN_SYS_DEPS, tabs=2)
+    split_str = _split_quote(CN_SYS_DEPS, tabs=2)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}\t\]'
     text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
@@ -191,7 +194,7 @@ def do_install():
         r'(^\s*\'py_deps\'[\t ]*:)'
         r'(.*?\])'
     )
-    split_str = split_quote(CN_PY_DEPS, tabs=2)
+    split_str = _split_quote(CN_PY_DEPS, tabs=2)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}\t\]'
     text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
@@ -304,7 +307,7 @@ def do_readme():
         r'(.*?)'
         r'(<!--[\t ]*__CN_PY_DEPS_END__[\t ]*-->)'
     )
-    split_str = split_quote(CN_PY_DEPS, tabs=0, quote='', join='')
+    split_str = _split_quote(CN_PY_DEPS, tabs=0, quote='', join='')
     rep_str = rf'\g<1>\n{split_str}\g<3>'
     text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
@@ -395,20 +398,27 @@ def recurse(path):
                 text = file.read()
 
             # check headers of every file
-            check_headers(path_item, text)
+            _check_headers(path_item, text)
 
             # don't check contents of metadata.py
             if item != 'metadata.py':
-                check_dunders(path_item, text)
+                _check_dunders(path_item, text)
+
+            # check fo parse_args method
+            _check_parse_args(path_item, text)
 
         # check file paths (subdirs and such)
-        check_path(path_item)
+        _check_path(path_item)
+
+# ------------------------------------------------------------------------------
+# Helper functions
+# ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
 # Checks header values for dunders
 # ------------------------------------------------------------------------------
-def check_headers(path_item, text):
+def _check_headers(path_item, text):
     """
         Checks header values for dunders
 
@@ -456,7 +466,7 @@ def check_headers(path_item, text):
 # ------------------------------------------------------------------------------
 # Checks file contents for dunders
 # ------------------------------------------------------------------------------
-def check_dunders(path_item, text):
+def _check_dunders(path_item, text):
     """
         Checks file contents for dunders
 
@@ -478,7 +488,7 @@ def check_dunders(path_item, text):
 # ------------------------------------------------------------------------------
 # Checks file paths for dunders
 # ------------------------------------------------------------------------------
-def check_path(path_item):
+def _check_path(path_item):
     """
         Checks file paths for dunders
 
@@ -497,9 +507,56 @@ def check_path(path_item):
 
 
 # ------------------------------------------------------------------------------
+# Checks file contents for parse_args
+# ------------------------------------------------------------------------------
+def _check_parse_args(path_item, text):
+    """
+        Checks file contents for parse_args
+
+        Paramaters:
+            path_item [string]: the full path to file to be checked for text
+            text [string]: the contents of the file to be checked
+
+        This function checks that none of the files paths contains an unreplaced
+        dunder variable from the initial project info.
+    """
+
+    # TODO: look in any file that has a parse_args function,
+    # replace version(2) and desc(1)
+
+    # first check if path ends in .py
+    if os.path.splitext(path_item) == 'py':
+
+        # check for regex
+        pattern_str = (
+            r'(^def _parse_args\(\):.*?print\(\'.*?version )'
+            r'(.*?)'
+            r'(\'\))'
+        )
+        rep_str = rf'\g<1>{CN_VERSION}\g<3>'
+        text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+
+        pattern_str = (
+            r'(^def _parse_args\(\):.*?parser.add_argument.*version=\')'
+            r'(.*?)'
+            r'(\')'
+        )
+        rep_str = rf'\g<1>{CN_VERSION}\g<3>'
+        text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+
+        pattern_str = (
+            r'(^def _parse_args\(\):.*?description=\')'
+            r'(.*?)'
+            r'(\')'
+        )
+        rep_str = rf'\g<1>{CN_SHORT_DESC}\g<3>'
+        text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+
+
+# ------------------------------------------------------------------------------
 # A helper function to split keywords and dependencies
 # ------------------------------------------------------------------------------
-def split_quote(str_in, tabs=1, split=',', quote='"', join=','):
+def _split_quote(str_in, tabs=1, split=',', quote='"', join=','):
     """
         A helper function to split keywords and dependencies
 

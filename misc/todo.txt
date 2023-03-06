@@ -23,15 +23,21 @@ DONE some sort of script to go back after and check that all reps are done
 DONE keep. .py ext in pyplate/project
 (to use linter, files must have .py ext)
 
-no version num in pyplate readme?
+TODO: no version num in pyplate readme?
 cuz if not, get rid of metadata.py in pyplate and just hardcode stuff
 
+TODO: what about exec/icon paths in .desktop?
+
 NEXT for pkg type, make sure all submodule names are in __init__.py
+# NEED TO TEST IF * IS SUFFICENT!!!
 
 NEXT Module/Package: get rid of import tests after ensuring __init__.py works as expected
 
 NEXT finish argparse test to see if we can count args needed vs. args given
 
+NEXT: _replace_headers could be done better with regex
+# (^#\s*)(Filename)(\s*)(:\s*)([A-Za-z0-9/._-]*)(\s*)(.*)(.$)
+# use last group to check for slash, one less space if slash present
 
 remove some exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
@@ -43,6 +49,16 @@ move pyplate to /usr/bin so we can call it from anywhere
 add param to set location of project
 
 try to use more list/dict comprehensions
+
+Check that first line of docstring matches comment block
+CHeck that last line of docstring ends w/ a period
+
+check for docstrings - other linter? pydocstyle?
+docstring types have params wrapped in parnes, not brackets
+where do we use brackets?
+
+'function' not in a class
+'method' in a class
 
 CLI/GUI: what files to add to install.py when copying
 (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and !/.cyclopticnerve/proj/app/gui)

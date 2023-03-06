@@ -20,7 +20,7 @@
 from __CN_NAME_SMALL__ import *  # noqa W0401 (import * used)
 
 # from <package> imoport <module>
-# FIXME: fix names
+# TODO: fix names
 # from __CN_NAME_SMALL__ import mod_name_1  # noqa W0611 (unused import)
 # from __CN_NAME_SMALL__ import mod_name_2  # noqa W0611 (unused import)
 

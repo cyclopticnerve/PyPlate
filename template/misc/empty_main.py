@@ -28,63 +28,12 @@ def main():
         program, and performing it's steps.
     """
 
+    # NB: use this if you need to
     # parse args
-    args = parse_args()
+    # args = _parse_args()
 
     # call the steps in order
     func()
-
-
-# ------------------------------------------------------------------------------
-# Parses the command line
-# ------------------------------------------------------------------------------
-def parse_args():
-    """
-        Parses the command line
-
-        Returns:
-            [dict]: A dict of command line options and their values
-
-        This function parses the command line and collates required/optional
-        values
-    """
-
-    # always print prog name/version
-    print('__CN_NAME_BIG__ version __CN_VERSION__')
-
-    # create the pasrser
-    parser = argparse.ArgumentParser(
-        description='__CN_SHORT_DESC__'
-    )
-
-    # add default cmd-line args
-    parser.add_argument(
-        '-v',
-        '--version',
-        action='version',
-        version='__CN_VERSION__'
-    )
-
-    # --------------------------------------------------------------------------
-
-    # FIXME: add args here
-    # https://docs.python.org/3/library/argparse.html
-    # parser.add_argument('--bar')
-
-    # --------------------------------------------------------------------------
-
-    # parse the cmd-line args
-    args = parser.parse_args()
-
-    # convert args to dict
-    ret_args = vars(args)
-
-    # if no args, print usage
-    if len(ret_args) == 0:
-        parser.print_usage()
-
-    # return the parsed args
-    return ret_args
 
 
 # ------------------------------------------------------------------------------
@@ -107,6 +56,72 @@ def func():
     """
 
     return ('this is a test')
+
+
+# ------------------------------------------------------------------------------
+# Helper functions
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Parses the command line
+# ------------------------------------------------------------------------------
+def _parse_args():
+    """
+        Parses the command line
+
+        Returns:
+            [dict]: A dict of command line options and their values
+
+        This function parses the command line and collates required/optional
+        values.
+    """
+
+    # always print prog name/version
+    print('__CN_NAME_BIG__ version __CN_VERSION__')
+
+    # create the pasrser
+    parser = argparse.ArgumentParser(
+        description='__CN_SHORT_DESC__'
+    )
+
+    # add default cmd-line args
+    parser.add_argument(
+        '-v',
+        '--version',
+        action='version',
+        version='__CN_VERSION__'
+    )
+
+    # add any position/optional args\
+    _add_args()
+
+    # parse the cmd-line args
+    args = parser.parse_args()
+
+    # convert args to dict
+    ret_args = vars(args)
+
+    # if no args, print usage
+    if len(ret_args) == 0:
+        parser.print_usage()
+
+    # return the parsed args
+    return ret_args
+
+
+# ------------------------------------------------------------------------------
+# Add arguments to command-line parser
+# ------------------------------------------------------------------------------
+def _add_args(parser):
+
+    # NB: add args here
+    # https://docs.python.org/3/library/argparse.html
+    # parser.add_argument(
+    #     '--bar'
+    # )
+
+    # used in case above code is commented (like pass)
+    return
 
 
 # ------------------------------------------------------------------------------

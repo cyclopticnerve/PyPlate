@@ -7,7 +7,7 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# FIXME: flesh this out more once we use it for a gui app
+# TODO: flesh this out more once we use it for a gui app
 # this is a hot mess
 # what level indenting???
 
@@ -18,14 +18,15 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-import sys
+import argparse
 import os
+import sys
+
 from gi.repository import Adw, Gtk
 import gi
 # TODO: test if v4 exitst, if not use v3
 gi.require_version('Adw', '1')
 gi.require_version('Gtk', '4.0')
-
 
 # import main py file
 DIR_CURR = os.path.abspath(os.path.dirname(__file__))
@@ -49,13 +50,15 @@ def main():
         GUI and attaching it to the underlying Python program.
     """
 
-
     gi.require_version('Adw', '1')
     gi.require_version('Gtk', '4.0')
 
     # TODO: this will be path to v3 or v4 ui file
     gui_path = 'test.ui'
 
+    # NB: use this if you need to
+    # parse args
+    # args = _parse_args()
 
     class MyApp(Adw.Application):
 
@@ -71,8 +74,73 @@ def main():
             self.add_window(win)
             win.present()
 
-
     MyApp().run()
+
+
+# ------------------------------------------------------------------------------
+# Helper functions
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Parses the command line
+# ------------------------------------------------------------------------------
+def _parse_args():
+    """
+        Parses the command line
+
+        Returns:
+            [dict]: A dict of command line options and their values
+
+        This function parses the command line and collates required/optional
+        values.
+    """
+
+    # always print prog name/version
+    print('__CN_NAME_BIG__ version __CN_VERSION__')
+
+    # create the pasrser
+    parser = argparse.ArgumentParser(
+        description='__CN_SHORT_DESC__'
+    )
+
+    # add default cmd-line args
+    parser.add_argument(
+        '-v',
+        '--version',
+        action='version',
+        version='__CN_VERSION__'
+    )
+
+    # add any position/optional args\
+    _add_args()
+
+    # parse the cmd-line args
+    args = parser.parse_args()
+
+    # convert args to dict
+    ret_args = vars(args)
+
+    # if no args, print usage
+    if len(ret_args) == 0:
+        parser.print_usage()
+
+    # return the parsed args
+    return ret_args
+
+
+# ------------------------------------------------------------------------------
+# Add arguments to command-line parser
+# ------------------------------------------------------------------------------
+def _add_args(parser):
+
+    # NB: add args here
+    # https://docs.python.org/3/library/argparse.html
+    # parser.add_argument(
+    #     '--bar'
+    # )
+
+    # used in case above code is commented (like pass)
+    return
 
 
 # ------------------------------------------------------------------------------

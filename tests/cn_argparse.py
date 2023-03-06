@@ -227,15 +227,16 @@ add_argument
 }
 """
 
-# ------------------------------------------------------------------------------
-# Functions
-# ------------------------------------------------------------------------------
+
+def main():
+    args = parse_args()
+    print('-----')
+    print(args)
+    print('-----')
+    print('foo')
 
 
-# ------------------------------------------------------------------------------
-# The main function of the module
-# ------------------------------------------------------------------------------
-def parse():
+def parse_args():
     """
         The main function of the module
 
@@ -260,15 +261,11 @@ def parse():
         '-v',
         '--version',
         action='version',
-        version='__CN_VERSION__',
-        help='Shows the version number for this program'
+        version='__CN_VERSION__'
     )
 
-    # --------------------------------------------------------------------------
-
-    parser.add_argument('--bar')
-
-    # --------------------------------------------------------------------------
+    # isolate the code to add args
+    _add_args(parser)
 
     # # parse the cmd-line args
     args = parser.parse_args()
@@ -284,10 +281,13 @@ def parse():
     return ret_args
 
 
-args = parse()
+def _add_args(parser):
 
-print('-----')
-print(args)
-print('foo')
+    parser.add_argument('--bar')
+    return
+
+
+if __name__ == '__main__':
+    main()
 
 # -)
