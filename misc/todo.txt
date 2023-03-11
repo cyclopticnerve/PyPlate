@@ -1,5 +1,5 @@
 testing
-  module
+  module - OK
     
 misc
   checklist - OK
@@ -15,12 +15,12 @@ top-level
 
 DONE: versionator script 
 
-DONE add argparse to empty_exe.py
+DONE: add argparse to empty_exe.py
 
-DONE some sort of script to go back after and check that all reps are done
+DONE: some sort of script to go back after and check that all reps are done
 (for files added after initial creation - files added from misc)
 
-DONE keep. .py ext in pyplate/project
+DONE: keep. .py ext in pyplate/project
 (to use linter, files must have .py ext)
 
 TODO: no version num in pyplate readme?
@@ -28,16 +28,26 @@ cuz if not, get rid of metadata.py in pyplate and just hardcode stuff
 
 TODO: what about exec/icon paths in .desktop?
 
-NEXT for pkg type, make sure all submodule names are in __init__.py
+TODO: for pkg type, make sure all submodule names are in __init__.py
 # NEED TO TEST IF * IS SUFFICENT!!!
 
-NEXT Module/Package: get rid of import tests after ensuring __init__.py works as expected
+TODO: in metadata.py, break py deps into lines and add links for README
 
-NEXT finish argparse test to see if we can count args needed vs. args given
+TODO: metadata.py : get freedesktop format locations for exec/icon
+
+TODO: metadata.py shows tags in README that are ok (__CN_MOD_START etc)
+don't want to ignore whole file!
+
+NEXT: Module/Package: get rid of import tests after ensuring __init__.py works as expected
+
+NEXT: finish argparse test to see if we can count args needed vs. args given
 
 NEXT: _replace_headers could be done better with regex
-# (^#\s*)(Filename)(\s*)(:\s*)([A-Za-z0-9/._-]*)(\s*)(.*)(.$)
+# (^#\s*)(Filename)(\s*)(:\s*)(\w*)(\s*)(.*)(.$)
 # use last group to check for slash, one less space if slash present
+
+check readme for install instructions 
+one has big name, one has small name for tar.gz
 
 remove some exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
@@ -87,7 +97,7 @@ $ twine upload -r testpypi dist/*
 $ twine upload dist/*
 
 install from testpypi/pypi
-$ python3 -m pip install -i https://test.pypi.org/simple/ __CN_NAME_BIG__
+$ python3 -m pip install -i https://test.pypi.org/simple/__CN_NAME_BIG__
 $ python3 -m pip install __CN_NAME_BIG__
 
 install from github

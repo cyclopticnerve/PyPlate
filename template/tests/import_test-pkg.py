@@ -40,4 +40,4 @@
 
 # # WORKS, BUT NOT RECOMMENDED!!!
 # from __CN_NAME_SMALL__ import *
-# print(mod_name_1.func_1())                                 # (same as #3)
+# print(mod_name_1.func_1())                                 # 9 (same as #3)

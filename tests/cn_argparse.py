@@ -216,7 +216,7 @@ add_argument
     'allow_abbrev': True,
     'argument_default': None,
     'conflict_handler': 'error',
-    'description': '__CN_SHORT_DESC__',
+    'description': 'CN_SHORT_DESC',
     'epilog': None,
     'exit_on_error': True,
     'formatter_class': <class 'argparse.HelpFormatter'>,
@@ -249,11 +249,11 @@ def parse_args():
     """
 
     # always print prog name/version
-    print('__CN_NAME_BIG__ version __CN_VERSION__')
+    print('__CN_NAME_BIG__ version CN_VERSION')
 
     # create the pasrser
     parser = argparse.ArgumentParser(
-        description='__CN_SHORT_DESC__'
+        description='CN_SHORT_DESC'
     )
 
     # add default cmd-line args
@@ -261,7 +261,7 @@ def parse_args():
         '-v',
         '--version',
         action='version',
-        version='__CN_VERSION__'
+        version='CN_VERSION'
     )
 
     # isolate the code to add args

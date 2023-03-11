@@ -18,7 +18,7 @@ import re
 # ------------------------------------------------------------------------------
 
 # this is the dir where the script is being run from
-DIR_CURR = os.path.abspath(os.path.dirname(__file__))
+DIR_CURR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # this is the canonical (only and absolute) version number string for this
 # project
@@ -30,7 +30,7 @@ CN_VERSION = '0.1.0'
 
 # these are the short description, keywords, and dependencies for the project
 # they are stored here for projects that don't use pyproject.toml
-# these will be used in the GitHub repo
+# these will be used in the GitHub repo and README
 # delimiters for CN_KEYWORDS and CN_XXX_DEPS MUST be comma
 CN_SHORT_DESC = ''
 CN_KEYWORDS = ''
@@ -48,10 +48,10 @@ CN_GUI_CATEGORIES = ''
 CN_GUI_EXEC = ''
 CN_GUI_ICON = ''
 
-# ------------------------------------------------------------------------------
-# Functions
-# ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
+# Public functions
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # The main function of the module
@@ -61,7 +61,7 @@ def main():
         The main function of the module
 
         This function is the main entry point for the module, initializing the
-        module, and performing it's steps.
+        module, and performing its steps.
     """
 
     # do proactive replacements in specific files (replaces needed text)
@@ -298,7 +298,7 @@ def do_readme():
         r'(.*?)'
         r'(<!--[\t ]*__CN_PY_DEPS_END__[\t ]*-->)'
     )
-    split_str = _split_quote(CN_PY_DEPS, tabs=0, quote='', join='')
+    split_str = _split_quote(CN_PY_DEPS, tabs=0, quote='', join='<br>')
     rep_str = rf'\g<1>\n{split_str}\g<3>'
     text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
@@ -318,7 +318,7 @@ def do_readme():
         r'(\$ python -m pip install ./dist/)'
         r'(.*-)'   # CN_NAME_SMALL
         r'(.*?)'   # CN_VERSION
-        r'(\.tar\.gz -r ./requirements.txt$)'
+        r'(\.tar\.gz$)'
     )
     rep_str = rf'\g<1>\g<2>\g<3>\g<4>{CN_VERSION}\g<6>'
     text = re.sub(pattern_py, rep_str, text, 1, re.I | re.M)
@@ -362,15 +362,28 @@ def recurse(path):
         replaced.
     """
 
-    # don't rename these dirs or files, or change file contents
-    # also trim any trailing '/'
-    skip_dirs = [
-        'misc'
+    # don't replace headers, text, or names for these folders/files
+    skip_all = [
+        'misc',
+        '.venv',
+        '.git'
     ]
-    skip_dirs = [item.rstrip('/') for item in skip_dirs]
+    skip_headers = [
+    ]
+    skip_text = [
+        'metadata.py'
+    ]
+    skip_rename = [
+    ]
+
+    # strip trailing slashes to match path component
+    skip_all = [item.rstrip('/') for item in skip_all]
+    skip_headers = [item.rstrip('/') for item in skip_headers]
+    skip_text = [item.rstrip('/') for item in skip_text]
+    skip_rename = [item.rstrip('/') for item in skip_rename]
 
     # get list of replaceable file names
-    items = [item for item in os.listdir(path) if item not in skip_dirs]
+    items = [item for item in os.listdir(path) if item not in skip_all]
     for item in items:
 
         # put path back together
@@ -389,22 +402,24 @@ def recurse(path):
                 text = file.read()
 
             # check headers of every file
-            _check_headers(path_item, text)
+            if item not in skip_headers:
+                _check_headers(path_item, text)
 
             # don't check contents of metadata.py
-            if item != 'metadata.py':
+            if item not in skip_text:
                 _check_dunders(path_item, text)
 
             # check fo parse_args method
             _check_parse_args(path_item, text)
 
         # check file paths (subdirs and such)
-        _check_path(path_item)
+        if item not in skip_rename:
+            _check_path(path_item)
+
 
 # ------------------------------------------------------------------------------
-# Helper functions
+# Private functions
 # ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Checks header values for dunders
@@ -424,34 +439,50 @@ def _check_headers(path_item, text):
     # check project name
     proj_name = os.path.basename(DIR_CURR)
     pattern = (
-        r'(^\s*(<!--|#) Project : )'
-        r'(.*?)'
+        r'(^\s*<!--|#\s*)'
+        r'(Project)'
+        r'(\s*:\s*)'
+        r'(.*?)' ##
         r'(\s)'
     )
     res = re.search(pattern, text, re.I | re.M)
-    if res and proj_name != res.group(3):
+    if res and res.group(4) != proj_name:
         print(f'{path_item}: Header Project name should be \'{proj_name}\'')
 
     # check file name
     file_name = os.path.basename(path_item)
     pattern = (
-        r'(^\s*(<!--|#) Filename : )'
-        r'(.*?)'
+        r'(^\s*<!--|#\s*)'
+        r'(Filename)'
+        r'(\s*:\s*)'
+        r'(.*?)' ##
         r'(\s)'
     )
     res = re.search(pattern, text, re.I | re.M)
-    if res and file_name != res.group(3):
+    if res and res.group(4) != file_name:
         print(f'{path_item}: Header Filename should be \'{file_name}\'')
 
     # check date
     pattern = (
-        r'(^\s*(<!--|#) Date    : )'
-        r'(__CN_DATE.*?)'
+         r'(^\s*<!--|#\s*)'
+        r'(Date)'
+        r'(\s*:\s*)'
+        r'(.*?)' ##
         r'(\s)'
     )
     res = re.search(pattern, text, re.I | re.M)
     if res:
-        print(f'{path_item}: Header Date is not set')
+
+        # there is *something* in the date field
+        if res.group(4) != '':
+
+            # check for valid date
+            pattern2 = ('\d*/\d*/\d*')
+            res2 = re.search(pattern2, res.group(4), re.I | re.M)
+            if not res2:
+                print(f'{path_item}: Header Date is not set')
+        else:
+            print(f'{path_item}: Header Date is not set')
 
 
 # ------------------------------------------------------------------------------
@@ -471,9 +502,10 @@ def _check_dunders(path_item, text):
 
     # check for dunders in text
     pattern = r'__CN_.*?__'
-    res = re.search(pattern, text, re.I | re.M)
+    res = re.findall(pattern, text, re.I | re.M)
     if res:
-        print(f'{path_item}: Text contains {res.group(0)}')
+        for item in res:
+            print(f'{path_item}: Text contains {item}')
 
 
 # ------------------------------------------------------------------------------

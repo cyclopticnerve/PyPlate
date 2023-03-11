@@ -1,2 +1,0 @@
-check readme for install instructions 
-one has big name, one has small name for tar.gz

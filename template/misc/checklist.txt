@@ -2,12 +2,12 @@
 Initialize
 
 VSCodium
-    [] Open any .py file
-    [] Install pylama in venv (popup in bottom right)
+    [] python -m pip install -r requirements.txt
+    --- Open any .py file
+    --- Install pylama in venv (popup in bottom right)
     --- Switch to venv interpreter - bottom right of status bar
     --- Make sure you are in project dir (terminal at bottom)
     --- Run 'source venv/bin/activate'
-    [] python -m pip install -r requirements.txt
     
     [] Stage all changes
     [] Commit 'first commit'
@@ -15,12 +15,13 @@ VSCodium
     [] Checkout new branch 'dev' from 'main'
     [] Publish 'dev' branch
 
+Module/Project (in .venv)
+    [] $ python -m pip install -e .
+
 GitHub
     [] Make 'dev' default branch
     [] Add description and search tags
 
-Module/Project (in .venv)
-    [] $ python -m pip install -e .
 
 ================================================================================
 

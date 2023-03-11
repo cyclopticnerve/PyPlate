@@ -86,10 +86,6 @@ dict_settings = {
     }
 }
 
-# ------------------------------------------------------------------------------
-# Functions
-# ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -137,6 +133,10 @@ def get_project_info():
         # check for blank type
         proj_type = proj_type.strip()
         if proj_type == '':
+            continue
+
+        # check if input > 1 (only allow one letter)
+        if len(proj_type) > 1:
             continue
 
         # check for valid type
@@ -261,15 +261,26 @@ def recurse(path):
         rename all folders.
     """
 
-    # don't rename these dirs or files, or change file contents
-    # also trim any trailing '/'
-    skip_dirs = [
+    # don't replace headers, text, or names for these folders/files
+    skip_all = [
         'misc'
     ]
-    skip_dirs = [item.rstrip('/') for item in skip_dirs]
+    skip_headers = [
+    ]
+    skip_text = [
+        'metadata.py'
+    ]
+    skip_rename = [
+    ]
 
-    # get list of replaceable file names
-    items = [item for item in os.listdir(path) if item not in skip_dirs]
+    # strip trailing slashes to match path component
+    skip_all = [item.rstrip('/') for item in skip_all]
+    skip_headers = [item.rstrip('/') for item in skip_headers]
+    skip_text = [item.rstrip('/') for item in skip_text]
+    skip_rename = [item.rstrip('/') for item in skip_rename]
+
+    # get list of file names in dest dir
+    items = [item for item in os.listdir(path) if item not in skip_all]
     for item in items:
 
         # put path back together
@@ -288,8 +299,12 @@ def recurse(path):
                 lines = file.readlines()
 
             # replace headers/text from lines
-            lines = _replace_headers(lines)
-            lines = _replace_text(lines)
+            if item not in skip_headers:
+                lines = _replace_headers(lines, item)
+
+            # if item != 'metadata.py':
+            if item not in skip_text:
+                lines = _replace_text(lines)
 
             # readme needs extra handling
             if item == 'README.md':
@@ -300,7 +315,8 @@ def recurse(path):
                 file.writelines(lines)
 
         # called for each file/folder
-        _rename(path_item)
+        if item not in skip_rename:
+            _rename(path_item)
 
 
 # ------------------------------------------------------------------------------
@@ -373,7 +389,7 @@ def _validate_name(name):
     pattern_middle = r'(^[a-zA-Z0-9]*$)'
     search_middle = re.search(pattern_middle, name)
     if not search_middle:
-        print('Project names must contain only letters and numbers')
+        print('Project names must contain only letters or numbers')
         return False
 
     # if we made it this far, return true
@@ -383,7 +399,7 @@ def _validate_name(name):
 # ------------------------------------------------------------------------------
 # Replace header text inside files
 # ------------------------------------------------------------------------------
-def _replace_headers(lines):
+def _replace_headers(lines, item):
     """
         Replace header text inside files
 
@@ -399,21 +415,34 @@ def _replace_headers(lines):
         the __CN_.. stuff inside headers.
     """
 
+    # the array of dunder replacements we will use
+    reps = dict_settings['reps']
+
+    # the filename we *might* replace
+    # print(item)
+    # new_name = _rename(item)
+    # print(new_name)
+
+    # rep_item = item.replace('__CN_NAME_SMALL__', reps['__CN_NAME_SMALL__'])
+
     # an array that represents the three sections of a header line
     # we keep the trailing spaces here to accurately count the number of
     # spaces needed to format
     # we will strip them later to avoid linter reporting trailing spaces
     hdr_lines = [
-        ['# Project : ', '__CN_NAME_BIG__',   '/          \\ '],
-        ['# Filename: ', '__CN_NAME_SMALL__', '|     ()     |'],
-        ['# Date    : ', '__CN_DATE__',       '|            |'],
-        ['<!-- Project : ', '__CN_NAME_BIG__',   '/          \\  -->'],
-        ['<!-- Filename: ', '__CN_NAME_SMALL__', '|     ()     | -->'],
-        ['<!-- Date    : ', '__CN_DATE__',       '|            | -->'],
+        ['# Project : ',    '__CN_NAME_BIG__',   '/          \\ ',
+            reps['__CN_NAME_BIG__']],
+        # ['# Filename: ',    '__CN_NAME_SMALL__', '|     ()     |',
+        #     rep_item],
+        ['# Date    : ',    '__CN_DATE__',       '|            |',
+            reps['__CN_DATE__']],
+        ['<!-- Project : ', '__CN_NAME_BIG__',   '/          \\  -->',
+            reps['__CN_NAME_BIG__']],
+        # ['<!-- Filename: ', '__CN_NAME_SMALL__', '|     ()     | -->',
+        #     rep_item],
+        ['<!-- Date    : ', '__CN_DATE__',       '|            | -->',
+            reps['__CN_DATE__']]
     ]
-
-    # the array of dunder replacements we will use
-    reps = dict_settings['reps']
 
     # for each line in array
     for i in range(0, len(lines)):
@@ -428,14 +457,16 @@ def _replace_headers(lines):
             if key in lines[i]:
 
                 # replace the dunder
-                rep = reps[hdr_line[1]]
+                rep = hdr_line[3]
 
                 # calculate spaces
-                spaces = 80 - (len(hdr_line[0]) + len(rep) + len(hdr_line[2]))
+                spaces = (80 - (len(hdr_line[0]) + len(rep) + len(hdr_line[2])))
                 spaces_str = ' ' * spaces
 
                 # create replacement string (with newline!!!)
-                rep_s = f'{hdr_line[0]}{rep}{spaces_str}{hdr_line[2].strip()}\n'
+                rep_s = (
+                    f'{hdr_line[0]}{rep}{spaces_str}{hdr_line[2].strip()}\n'
+                )
 
                 # replace text in line
                 lines[i] = rep_s

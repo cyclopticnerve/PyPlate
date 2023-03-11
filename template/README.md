@@ -12,7 +12,7 @@
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
 <!-- __CN_SHORT_DESC_START__ -->
-__CN_SHORT_DESC__
+CN_SHORT_DESC
 <!-- __CN_SHORT_DESC_END__ -->
 
 <!-- ![Screenshot](misc/screenshot.jpg) -->
@@ -48,7 +48,7 @@ Download the 'Source Code (tar.gz)' file.
 Then install it using:
 ```bash
 foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ python -m pip install __CN_NAME_BIG__-__CN_VERSION__.tar.gz
+foo@bar:~/Downloads$ python -m pip install __CN_NAME_BIG__-0.1.0.tar.gz
 ```
 Or you can clone the git repo to get the latest (and often broken) code from the 
 dev branch:
@@ -58,7 +58,7 @@ foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__CN_NAME_BIG__
 foo@bar:~/Downloads$ cd __CN_NAME_BIG__
 foo@bar:~/Downloads/__CN_NAME_BIG__$ python -m build
-foo@bar:~/Downloads/__CN_NAME_BIG__$ python -m pip install ./dist/__CN_NAME_SMALL__-__CN_VERSION__.tar.gz
+foo@bar:~/Downloads/__CN_NAME_BIG__$ python -m pip install ./dist/__CN_NAME_SMALL__-0.1.0.tar.gz
 ```
 <!-- __CN_MOD_END__ -->
 <!-- __CN_APP_START__ -->
@@ -73,8 +73,8 @@ Download either the 'tar.gz' or '.zip' file and extract it.
 
 Then run the 'install.py' file from there:
 ```bash
-foo@bar:~$ cd ~/Downloads/__CN_NAME_BIG__-__CN_VERSION__
-foo@bar:~/Downloads/__CN_NAME_BIG__-__CN_VERSION__$ ./install.py
+foo@bar:~$ cd ~/Downloads/__CN_NAME_BIG__-CN_VERSION
+foo@bar:~/Downloads/__CN_NAME_BIG__-CN_VERSION$ ./install.py
 ```
 Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:

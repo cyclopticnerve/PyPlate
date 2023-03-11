@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __CN_NAME_BIG__                                        /          \
-# Filename: __CN_NAME_SMALL___gui.py                              |     ()     |
+# Filename: __CN_NAME_SMALL__-gtk.py                              |     ()     |
 # Date    : __CN_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -96,11 +96,11 @@ def _parse_args():
     """
 
     # always print prog name/version
-    print('__CN_NAME_BIG__ version __CN_VERSION__')
+    print('__CN_NAME_BIG__ version CN_VERSION')
 
     # create the pasrser
     parser = argparse.ArgumentParser(
-        description='__CN_SHORT_DESC__'
+        description='CN_SHORT_DESC'
     )
 
     # add default cmd-line args
@@ -108,7 +108,7 @@ def _parse_args():
         '-v',
         '--version',
         action='version',
-        version='__CN_VERSION__'
+        version='CN_VERSION'
     )
 
     # add any position/optional args\
