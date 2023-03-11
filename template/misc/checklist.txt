@@ -48,7 +48,7 @@ Release - VSCodium
     [] README usage/notes
     [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
     [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
-    --- Generate docs
+    [] Generate docs - $cd src, $python -m pdoc3 --html -f -o ../docs .
     [] Commit/push 'dev' for 'next release'
     [] Checkout new branch 'release' from 'dev'
 
