@@ -10,34 +10,34 @@
 
 # ------------------------------------------------------------------------------
 
-# import __CN_NAME_SMALL__                                   # 1 one
-# print(__CN_NAME_SMALL__.func())
+# import __PP_NAME_SMALL__                                   # 1 one
+# print(__PP_NAME_SMALL__.func())
 
-# import __CN_NAME_SMALL__ as mod                            # 2 one as
+# import __PP_NAME_SMALL__ as mod                            # 2 one as
 # print(mod.func())
 
-# from __CN_NAME_SMALL__ import func                         # 3 from one
+# from __PP_NAME_SMALL__ import func                         # 3 from one
 # print(func())
 
-# from __CN_NAME_SMALL__ import func as afunc                # 4 from one as
+# from __PP_NAME_SMALL__ import func as afunc                # 4 from one as
 # print(afunc())
 
 # # THIS ONE IS NOT USED!!!
-# import __CN_NAME_SMALL__.func                              # 5 two
-# print(__CN_NAME_SMALL__.func())                            # (same as #1)
+# import __PP_NAME_SMALL__.func                              # 5 two
+# print(__PP_NAME_SMALL__.func())                            # (same as #1)
 
 # # THIS ONE IS NOT USED!!!
-# import __CN_NAME_SMALL__.func as afunc                     # 6 two as
+# import __PP_NAME_SMALL__.func as afunc                     # 6 two as
 # print(afunc())                                             # (same as #4)
 
 # # THIS ONE DOES NOT EXIST!!!
-# from __CN_NAME_SMALL__.__CN_NAME_SMALL__ import func       # 7 from two
+# from __PP_NAME_SMALL__.__PP_NAME_SMALL__ import func       # 7 from two
 # print(func())
 
 # # THIS ONE DOES NOT EXIST!!!
-# from __CN_NAME_SMALL__.__CN_NAME_SMALL__ import func as afunc   # 8 from two as
+# from __PP_NAME_SMALL__.__PP_NAME_SMALL__ import func as afunc   # 8 from two as
 # print(afunc())
 
 # # WORKS, BUT NOT RECOMMENDED!!!
-# from __CN_NAME_SMALL__ import *
+# from __PP_NAME_SMALL__ import *
 # print(func())                                                   # (same as #3)

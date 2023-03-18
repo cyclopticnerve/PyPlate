@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: install                                               |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ import installerator
 # define the install settings
 dict_install = {
     'general': {
-        'name': '__CN_NAME_BIG__'
+        'name': '__PP_NAME_BIG__'
     },
     'preflight': [
     ],
@@ -29,11 +29,11 @@ dict_install = {
     'py_deps': [
 	],
     'dirs': [
-        '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__'
+        '${HOME}/.cyclopticnerve/__CPPNAME_SMALL__'
     ],
     'files': {
-        'LICENSE.txt': '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__',
-        'uninstall.py': '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__'
+        'LICENSE.txt': '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__',
+        'uninstall.py': '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
     },
     'postflight': [
     ]

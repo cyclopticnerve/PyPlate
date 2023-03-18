@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: __init__.py                                           |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -17,11 +17,11 @@
 # import all modules in package to get full dot notation from package import
 
 # TODO: test this if we need names, metadata.py needs to check for them
-from __CN_NAME_SMALL__ import *  # noqa W0401 (import * used)
+from __PP_NAME_SMALL__ import *  # noqa W0401 (import * used)
 
 # from <package> imoport <module>
 # TODO: fix names
-# from __CN_NAME_SMALL__ import mod_name_1  # noqa W0611 (unused import)
-# from __CN_NAME_SMALL__ import mod_name_2  # noqa W0611 (unused import)
+# from __PP_NAME_SMALL__ import mod_name_1  # noqa W0611 (unused import)
+# from __PP_NAME_SMALL__ import mod_name_2  # noqa W0611 (unused import)
 
 # -)

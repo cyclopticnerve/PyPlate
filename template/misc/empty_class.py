@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
-# Filename:                                                       |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: empty_class.py                                        |     ()     |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------

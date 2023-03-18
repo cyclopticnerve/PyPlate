@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: pyproject.toml                                        |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__CN_NAME_SMALL__"
+name = "__PP_NAME_SMALL__"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -30,6 +30,6 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/__CN_NAME_BIG__"
+Homepage = "https://github.com/cyclopticnerve/__PP_NAME_BIG__"
 
 # -)

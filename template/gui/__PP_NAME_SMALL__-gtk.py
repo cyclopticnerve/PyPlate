@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
-# Filename: __CN_NAME_SMALL__-gtk.py                              |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename:                                                       |     ()     |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ gi.require_version('Gtk', '4.0')
 DIR_CURR = os.path.abspath(os.path.dirname(__file__))
 up_one = os.path.abspath(os.path.join(DIR_CURR, '..'))
 sys.path.insert(1, up_one)
-import __CN_NAME_SMALL__.py  # noqa E402 (import not at top of file)
+import __PP_NAME_SMALL__.py  # noqa E402 (import not at top of file)
 
 # ------------------------------------------------------------------------------
 # Functions
@@ -96,11 +96,11 @@ def _parse_args():
     """
 
     # always print prog name/version
-    print('__CN_NAME_BIG__ version CN_VERSION')
+    print('__PP_NAME_BIG__ version PP_VERSION')
 
     # create the pasrser
     parser = argparse.ArgumentParser(
-        description='CN_SHORT_DESC'
+        description='PP_SHORT_DESC'
     )
 
     # add default cmd-line args
@@ -108,7 +108,7 @@ def _parse_args():
         '-v',
         '--version',
         action='version',
-        version='CN_VERSION'
+        version='PP_VERSION'
     )
 
     # add any position/optional args\

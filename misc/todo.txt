@@ -23,6 +23,12 @@ DONE: some sort of script to go back after and check that all reps are done
 DONE: keep. .py ext in pyplate/project
 (to use linter, files must have .py ext)
 
+TODO: initial filename in header of first src file (src/modtest - modtest.py)
+how to do this? replace w/filename? rep __PP_NAME_SMALL__.py?
+still gets checked by metadata.py
+would have to recurse again after rename
+TODO: recurse code in pyplate/metadata similar... can we combine?
+
 TODO: no version num in pyplate readme?
 cuz if not, get rid of metadata.py in pyplate and just hardcode stuff
 
@@ -32,11 +38,10 @@ TODO: for pkg type, make sure all submodule names are in __init__.py
 # NEED TO TEST IF * IS SUFFICENT!!!
 
 TODO: in metadata.py, break py deps into lines and add links for README
-
 TODO: metadata.py : get freedesktop format locations for exec/icon
-
-TODO: metadata.py shows tags in README that are ok (__CN_MOD_START etc)
+TODO: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
 don't want to ignore whole file!
+TODO: metadata.py: this file's headers not replaced as it is in misc/
 
 NEXT: Module/Package: get rid of import tests after ensuring __init__.py works as expected
 
@@ -97,13 +102,13 @@ $ twine upload -r testpypi dist/*
 $ twine upload dist/*
 
 install from testpypi/pypi
-$ python3 -m pip install -i https://test.pypi.org/simple/__CN_NAME_BIG__
-$ python3 -m pip install __CN_NAME_BIG__
+$ python3 -m pip install -i https://test.pypi.org/simple/__PP_NAME_BIG__
+$ python3 -m pip install __PP_NAME_BIG__
 
 install from github
 https://packaging.python.org/en/latest/tutorials/installing-packages/#id23
-python3 -m pip install git+https://github.com/cyclopticnerve/__CN_NAME_BIG__
+python3 -m pip install git+https://github.com/cyclopticnerve/__PP_NAME_BIG__
 requirements? pip install -r requirements.txt
 
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__CN_NAME_BIG__.git#egg=__CN_NAME_BIG__         # from default branch
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__CN_NAME_BIG__.git@maine#egg=__CN_NAME_BIG__   # from specific branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git#egg=__PP_NAME_BIG__         # from default branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git@maine#egg=__PP_NAME_BIG__   # from specific branch

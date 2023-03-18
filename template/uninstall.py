@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
+# Project : __CPPNAME_BIG__                                        /          \
 # Filename: uninstall                                             |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -20,12 +20,12 @@ import installerator
 # define the uninstall settings
 dict_uninstall = {
     'general': {
-        'name': '__CN_NAME_BIG__'
+        'name': '__PP_NAME_BIG__'
     },
     'preflight': [
     ],
     'dirs': [
-        '${HOME}/.cyclopticnerve/__CN_NAME_SMALL__'
+        '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
     ],
     'files': {
     },

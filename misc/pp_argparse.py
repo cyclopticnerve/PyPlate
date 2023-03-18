@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
-# Filename: cn_argparse.py                                        |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: pp_argparse.py                                        |     ()     |
+# Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -216,7 +216,7 @@ add_argument
     'allow_abbrev': True,
     'argument_default': None,
     'conflict_handler': 'error',
-    'description': 'CN_SHORT_DESC',
+    'description': 'PP_SHORT_DESC',
     'epilog': None,
     'exit_on_error': True,
     'formatter_class': <class 'argparse.HelpFormatter'>,
@@ -249,11 +249,11 @@ def parse_args():
     """
 
     # always print prog name/version
-    print('__CN_NAME_BIG__ version CN_VERSION')
+    print('__PP_NAME_BIG__ version PP_VERSION')
 
     # create the pasrser
     parser = argparse.ArgumentParser(
-        description='CN_SHORT_DESC'
+        description='PP_SHORT_DESC'
     )
 
     # add default cmd-line args
@@ -261,7 +261,7 @@ def parse_args():
         '-v',
         '--version',
         action='version',
-        version='CN_VERSION'
+        version='PP_VERSION'
     )
 
     # isolate the code to add args

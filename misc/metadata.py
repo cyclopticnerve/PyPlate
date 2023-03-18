@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
+# Project : ModTest                                                /          \
 # Filename: metadata.py                                           |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Date    : 03/17/2023                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -10,43 +10,32 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
+import json
 import os
 import re
+
+# TODO: text in pp_argparse
+# TODO: text in empty_main
+# TODO: text in README
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
 # this is the dir where the script is being run from
-DIR_CURR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+this_dir = os.path.dirname(__file__)
+DIR_CURR = os.path.abspath(this_dir)
 
-# this is the canonical (only and absolute) version number string for this
-# project
-# this should provide the absolute version number string (in semantic notation)
-# of this project, and all other version numbers should be superceded by this
-# string
-# format is N.N.N
-CN_VERSION = '0.1.0'
+# this is the project dir
+prj_dir = os.path.join(this_dir, '..')
+DIR_PROJ = os.path.abspath(prj_dir)
 
-# these are the short description, keywords, and dependencies for the project
-# they are stored here for projects that don't use pyproject.toml
-# these will be used in the GitHub repo and README
-# delimiters for CN_KEYWORDS and CN_XXX_DEPS MUST be comma
-CN_SHORT_DESC = ''
-CN_KEYWORDS = ''
-CN_SYS_DEPS = ''
-CN_PY_DEPS = ''
-
-# gui categories MUST be seperated by semicolon and MUST end with semicolon
-# this is mostly for desktops that use a windows-stylew menu/submenu, not for
-# Ubuntu-style overviews
-CN_GUI_CATEGORIES = ''
-
-# if exec/icon paths are not absolute, they will be found in standard paths
-# these paths vary, but I will add them here in the comments when I figure them
-# out
-CN_GUI_EXEC = ''
-CN_GUI_ICON = ''
+# load settings file
+file_settings = os.path.join(DIR_CURR, 'settings.json')
+path_settings = os.path.abspath(file_settings)
+if os.path.exists(path_settings):
+    with open(file_settings, 'r', encoding='utf-8') as f:
+        DICT_SETTINGS = json.load(f)
 
 
 # ------------------------------------------------------------------------------
@@ -73,7 +62,7 @@ def main():
     # do preventative checks (does not replace anything, just prints/warns)
     # NOT ENTIRELY TRUE - it DOES do version/desc replacement in .py files that
     # have a parse_args() function
-    recurse(DIR_CURR)
+    recurse(DIR_PROJ)
 
 
 # ------------------------------------------------------------------------------
@@ -95,13 +84,13 @@ def do_toml():
     # also if the input file's array was empty or not
 
     # check if the file exists
-    prj_toml = os.path.join(DIR_CURR, 'pyproject.toml')
+    prj_toml = os.path.join(DIR_PROJ, 'pyproject.toml')
     if not os.path.exists(prj_toml):
         return
 
     # open file and get contents
-    with open(prj_toml) as file:
-        text = file.read()
+    with open(prj_toml, 'r', encoding='utf-8') as f:
+        text = f.read()
 
     # replace version
     pattern_str = (
@@ -110,8 +99,9 @@ def do_toml():
         r'(^\s*version[\t ]*=)'
         r'(.*?$)'
     )
-    rep_str = rf'\g<1>\g<2>\g<3> "{CN_VERSION}"'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+    rep_str = rf'\g<1>\g<2>\g<3> "{PP_VERSION}"'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # replace short description
     pattern_str = (
@@ -120,8 +110,9 @@ def do_toml():
         r'(^\s*description[\t ]*=)'
         r'(.*?$)'
     )
-    rep_str = rf'\g<1>\g<2>\g<3> "{CN_SHORT_DESC}"'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    PP_SHORT_DESC = DICT_SETTINGS['metadata']['PP_SHORT_DESC']
+    rep_str = rf'\g<1>\g<2>\g<3> "{PP_SHORT_DESC}"'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # replace keywords array
     pattern_str = (
@@ -130,9 +121,10 @@ def do_toml():
         r'(^\s*keywords[\t ]*=)'
         r'(.*?\])'
     )
-    split_str = _split_quote(CN_KEYWORDS)
+    PP_KEYWORDS = DICT_SETTINGS['metadata']['PP_KEYWORDS']
+    split_str = _split_quote(PP_KEYWORDS)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}]'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # replace dependencies array
     pattern_str = (
@@ -141,13 +133,14 @@ def do_toml():
         r'(^\s*dependencies[\t ]*=)'
         r'(.*?\])'
     )
-    split_str = _split_quote(CN_PY_DEPS)
+    PP_PY_DEPS = DICT_SETTINGS['metadata']['PP_PY_DEPS']
+    split_str = _split_quote(PP_PY_DEPS)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}]'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # save file
-    with open(prj_toml, 'w') as file:
-        file.write(text)
+    with open(prj_toml, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 # ------------------------------------------------------------------------------
@@ -161,24 +154,13 @@ def do_install():
     """
 
     # check if the file exists
-    prj_inst = os.path.join(DIR_CURR, 'install.py')
+    prj_inst = os.path.join(DIR_PROJ, 'install.py')
     if not os.path.exists(prj_inst):
         return
 
     # open file and get content
-    with open(prj_inst) as file:
-        text = file.read()
-
-    # replace system dependencies array
-    pattern_str = (
-        r'(^\s*dict_install[\t ]*=)'
-        r'(.*?)'
-        r'(^\s*\'sys_deps\'[\t ]*:)'
-        r'(.*?\])'
-    )
-    split_str = _split_quote(CN_SYS_DEPS, tabs=2)
-    rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}\t\]'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    with open(prj_inst, 'r', encoding='utf-8') as f:
+        text = f.read()
 
     # replace python dependencies array
     pattern_str = (
@@ -187,13 +169,26 @@ def do_install():
         r'(^\s*\'py_deps\'[\t ]*:)'
         r'(.*?\])'
     )
-    split_str = _split_quote(CN_PY_DEPS, tabs=2)
+    PP_PY_DEPS = DICT_SETTINGS['metadata']['PP_PY_DEPS']
+    split_str = _split_quote(PP_PY_DEPS, tabs=2)
     rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}\t\]'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
+
+    # replace system dependencies array
+    pattern_str = (
+        r'(^\s*dict_install[\t ]*=)'
+        r'(.*?)'
+        r'(^\s*\'sys_deps\'[\t ]*:)'
+        r'(.*?\])'
+    )
+    PP_SYS_DEPS = DICT_SETTINGS['metadata']['PP_SYS_DEPS']
+    split_str = _split_quote(PP_SYS_DEPS, tabs=2)
+    rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}\t\]'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # save file
-    with open(prj_inst, 'w') as file:
-        file.write(text)
+    with open(prj_inst, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 # ------------------------------------------------------------------------------
@@ -208,10 +203,10 @@ def do_desktop():
     """
 
     # since we don't do replacements in this file, we need to get the path to
-    # the desktop file without knowing the project's CN_NAME_SMALL value
+    # the desktop file without knowing the project's PP_NAME_SMALL value
 
     # first get the gui dir
-    gui_dir = os.path.join(DIR_CURR, 'gui')
+    gui_dir = os.path.join(DIR_PROJ, 'gui')
     if not os.path.exists(gui_dir):
         return
 
@@ -232,21 +227,8 @@ def do_desktop():
         return
 
     # open file and get contents
-    with open(prj_desk) as file:
-        text = file.read()
-
-    # replace categories
-    pattern_str = (
-        r'(^\s*\[Desktop Entry\]\s*$)'
-        r'(.*?)'
-        r'(^\s*Categories[\t ]*=)'
-        r'(.*?$)'
-    )
-    cat_str = CN_GUI_CATEGORIES
-    if not cat_str.endswith(';'):
-        cat_str = cat_str + ';'
-    rep_str = rf'\g<1>\g<2>\g<3>{cat_str}'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    with open(prj_desk, 'r', encoding='utf-8') as f:
+        text = f.read()
 
     # replace short description
     pattern_str = (
@@ -255,17 +237,54 @@ def do_desktop():
         r'(^\s*Comment[\t ]*=)'
         r'(.*?$)'
     )
-    rep_str = rf'\g<1>\g<2>\g<3>{CN_SHORT_DESC}'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    PP_SHORT_DESC = DICT_SETTINGS['metadata']['PP_SHORT_DESC']
+    rep_str = rf'\g<1>\g<2>\g<3>{PP_SHORT_DESC}'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
+
+    # replace categories
+    pattern_str = (
+        r'(^\s*\[Desktop Entry\]\s*$)'
+        r'(.*?)'
+        r'(^\s*Categories[\t ]*=)'
+        r'(.*?$)'
+    )
+    PP_GUI_CATEGORIES = DICT_SETTINGS['metadata']['PP_GUI_CATEGORIES']
+    if not PP_GUI_CATEGORIES.endswith(';'):
+        PP_GUI_CATEGORIES = PP_GUI_CATEGORIES + ';'
+    rep_str = rf'\g<1>\g<2>\g<3>{PP_GUI_CATEGORIES}'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
+
+    # replace exec
+    pattern_str = (
+        r'(^\s*\[Desktop Entry\]\s*$)'
+        r'(.*?)'
+        r'(^\s*Exec[\t ]*=)'
+        r'(.*?$)'
+    )
+    PP_GUI_EXEC = DICT_SETTINGS['metadata']['PP_GUI_EXEC']
+    rep_str = rf'\g<1>\g<2>\g<3>{PP_GUI_EXEC}'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
+
+    # replace icon
+    pattern_str = (
+        r'(^\s*\[Desktop Entry\]\s*$)'
+        r'(.*?)'
+        r'(^\s*Icon[\t ]*=)'
+        r'(.*?$)'
+    )
+    PP_GUI_ICON = DICT_SETTINGS['metadata']['PP_GUI_ICON']
+    rep_str = rf'\g<1>\g<2>\g<3>{PP_GUI_ICON}'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # save file
-    with open(prj_desk, 'w') as file:
-        file.write(text)
+    with open(prj_desk, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 # ------------------------------------------------------------------------------
 # Replace text in the README file
 # ------------------------------------------------------------------------------
+
 def do_readme():
     """
         Replace text in the README file
@@ -275,74 +294,80 @@ def do_readme():
     """
 
     # check if the file exists
-    prj_read = os.path.join(DIR_CURR, 'README.md')
+    prj_read = os.path.join(DIR_PROJ, 'README.md')
     if not os.path.exists(prj_read):
         return
 
     # open file and get contents
-    with open(prj_read) as file:
-        text = file.read()
+    with open(prj_read, 'r', encoding='utf-8') as f:
+        text = f.read()
 
     # replace short description
     pattern_str = (
-        r'(<!--[\t ]*__CN_SHORT_DESC_START__[\t ]*-->)'
+        r'(<!--[\t ]*__PP_SHORT_DESC_START__[\t ]*-->)'
         r'(.*?)'
-        r'(<!--[\t ]*__CN_SHORT_DESC_END__[\t ]*-->)'
+        r'(<!--[\t ]*__PP_SHORT_DESC_END__[\t ]*-->)'
     )
-    rep_str = rf'\g<1>\n{CN_SHORT_DESC}\n\g<3>'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    PP_SHORT_DESC = DICT_SETTINGS['metadata']['PP_SHORT_DESC']
+    rep_str = rf'\g<1>\n{PP_SHORT_DESC}\n\g<3>'
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # replace dependencies array
     pattern_str = (
-        r'(<!--[\t ]*__CN_PY_DEPS_START__[\t ]*-->)'
+        r'(<!--[\t ]*__PP_PY_DEPS_START__[\t ]*-->)'
         r'(.*?)'
-        r'(<!--[\t ]*__CN_PY_DEPS_END__[\t ]*-->)'
+        r'(<!--[\t ]*__PP_PY_DEPS_END__[\t ]*-->)'
     )
-    split_str = _split_quote(CN_PY_DEPS, tabs=0, quote='', join='<br>')
+    PP_PY_DEPS = DICT_SETTINGS['metadata']['PP_PY_DEPS']
+    split_str = _split_quote(PP_PY_DEPS, tabs=0, quote='', join='<br>')
     rep_str = rf'\g<1>\n{split_str}\g<3>'
-    text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
+    text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
     # replace version
-    pattern_py = (
+    pattern_vers = (
         r'(^\s*foo@bar:~/Downloads\$ python -m pip install )'
-        r'(.*-)'   # CN_NAME_BIG
-        r'(.*?)'   # CN_VERSION
+        r'(.*-)'   # __PP_NAME_BIG__
+        r'(.*?)'   # PP_VERSION
         r'(\.tar\.gz$)'
     )
-    rep_str = rf'\g<1>\g<2>{CN_VERSION}\g<4>'
-    text = re.sub(pattern_py, rep_str, text, 1, re.I | re.M)
+    PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+    rep_str = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+    text = re.sub(pattern_vers, rep_str, text, re.I | re.M)
 
-    pattern_py = (
+    pattern_vers = (
         r'(^\s*foo@bar:~/Downloads/)'
-        r'(.*?)'   # CN_NAME_BIG
+        r'(.*?)'   # __PP_NAME_BIG__
         r'(\$ python -m pip install ./dist/)'
-        r'(.*-)'   # CN_NAME_SMALL
-        r'(.*?)'   # CN_VERSION
+        r'(.*-)'   # __PP_NAME_SMALL__
+        r'(.*?)'   # PP_VERSION
         r'(\.tar\.gz$)'
     )
-    rep_str = rf'\g<1>\g<2>\g<3>\g<4>{CN_VERSION}\g<6>'
-    text = re.sub(pattern_py, rep_str, text, 1, re.I | re.M)
+    PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+    rep_str = rf'\g<1>\g<2>\g<3>\g<4>{PP_VERSION}\g<6>'
+    text = re.sub(pattern_vers, rep_str, text, re.I | re.M)
 
-    pattern_py = (
+    pattern_vers = (
         r'(^\s*foo@bar:~\$ cd Downloads/)'
-        r'(.*-)'   # CN_NAME_BIG
-        r'(.*$)'   # CN_VERSION
+        r'(.*-)'   # __PP_NAME_BIG__
+        r'(.*$)'   # PP_VERSION
     )
-    rep_str = rf'\g<1>\g<2>{CN_VERSION}'
-    text = re.sub(pattern_py, rep_str, text, 1, re.I | re.M)
+    PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+    rep_str = rf'\g<1>\g<2>{PP_VERSION}'
+    text = re.sub(pattern_vers, rep_str, text, re.I | re.M)
 
-    pattern_py = (
+    pattern_vers = (
         r'(^\s*foo@bar:~/Downloads/)'
-        r'(.*-)'   # CN_NAME_BIG
-        r'(.*)'   # CN_VERSION
+        r'(.*-)'   # __PP_NAME_BIG__
+        r'(.*)'    # PP_VERSION
         r'(\$ \./install.py$)'
     )
-    rep_str = rf'\g<1>\g<2>{CN_VERSION}\g<4>'
-    text = re.sub(pattern_py, rep_str, text, 1, re.I | re.M)
+    PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+    rep_str = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+    text = re.sub(pattern_vers, rep_str, text, re.I | re.M)
 
     # save file
-    with open(prj_read, 'w') as file:
-        file.write(text)
+    with open(prj_read, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 # ------------------------------------------------------------------------------
@@ -363,27 +388,26 @@ def recurse(path):
     """
 
     # don't replace headers, text, or names for these folders/files
-    skip_all = [
-        'misc',
+    skip_dirs = [
         '.venv',
         '.git'
     ]
-    skip_headers = [
-    ]
-    skip_text = [
-        'metadata.py'
-    ]
-    skip_rename = [
-    ]
+    # skip_headers = [
+    # ]
+    # skip_text = [
+    #     'metadata.py'
+    # ]
+    # skip_rename = [
+    # ]
 
     # strip trailing slashes to match path component
-    skip_all = [item.rstrip('/') for item in skip_all]
-    skip_headers = [item.rstrip('/') for item in skip_headers]
-    skip_text = [item.rstrip('/') for item in skip_text]
-    skip_rename = [item.rstrip('/') for item in skip_rename]
+    skip_dirs = [item.rstrip('/') for item in skip_dirs]
+    # skip_headers = [item.rstrip('/') for item in skip_headers]
+    # skip_text = [item.rstrip('/') for item in skip_text]
+    # skip_rename = [item.rstrip('/') for item in skip_rename]
 
     # get list of replaceable file names
-    items = [item for item in os.listdir(path) if item not in skip_all]
+    items = [item for item in os.listdir(path) if item not in skip_dirs]
     for item in items:
 
         # put path back together
@@ -398,23 +422,27 @@ def recurse(path):
         else:
 
             # open file and get lines
-            with open(path_item) as file:
-                text = file.read()
+            with open(path_item, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
 
             # check headers of every file
-            if item not in skip_headers:
-                _check_headers(path_item, text)
+            # if item not in skip_headers:
+            _check_headers(path_item, lines)
 
             # don't check contents of metadata.py
-            if item not in skip_text:
-                _check_dunders(path_item, text)
+            # if item not in skip_text:
+            if (
+                item != 'metadata.py' and
+                item != 'settings.json'
+            ):
+                _check_dunders(path_item, lines)
 
             # check fo parse_args method
-            _check_parse_args(path_item, text)
+            _check_parse_args(path_item, lines)
 
         # check file paths (subdirs and such)
-        if item not in skip_rename:
-            _check_path(path_item)
+        # if item not in skip_rename:
+        _check_path(path_item)
 
 
 # ------------------------------------------------------------------------------
@@ -424,7 +452,7 @@ def recurse(path):
 # ------------------------------------------------------------------------------
 # Checks header values for dunders
 # ------------------------------------------------------------------------------
-def _check_headers(path_item, text):
+def _check_headers(path_item, lines):
     """
         Checks header values for dunders
 
@@ -437,58 +465,61 @@ def _check_headers(path_item, text):
     """
 
     # check project name
-    proj_name = os.path.basename(DIR_CURR)
+    proj_name = os.path.basename(DIR_PROJ)
     pattern = (
-        r'(^\s*<!--|#\s*)'
+        r'(^\s*(<!--|#)\s*)'
         r'(Project)'
         r'(\s*:\s*)'
-        r'(.*?)' ##
+        r'(.*?)'
         r'(\s)'
     )
-    res = re.search(pattern, text, re.I | re.M)
-    if res and res.group(4) != proj_name:
-        print(f'{path_item}: Header Project name should be \'{proj_name}\'')
+    for i in range(0, len(lines)):
+        res = re.search(pattern, lines[i], re.I | re.M)
+        if res and res.group(5) != proj_name:
+            print(f'{path_item}:{i + 1}: Header Project name should be \'{proj_name}\'')
 
     # check file name
     file_name = os.path.basename(path_item)
     pattern = (
-        r'(^\s*<!--|#\s*)'
+        r'(^\s*(<!--|#)\s*)'
         r'(Filename)'
         r'(\s*:\s*)'
-        r'(.*?)' ##
+        r'(.*?)'
         r'(\s)'
     )
-    res = re.search(pattern, text, re.I | re.M)
-    if res and res.group(4) != file_name:
-        print(f'{path_item}: Header Filename should be \'{file_name}\'')
+    for i in range(0, len(lines)):
+        res = re.search(pattern, lines[i], re.I | re.M)
+        if res and res.group(5) != file_name:
+            print(f'{path_item}:{i + 1}: Header Filename should be \'{file_name}\'')
 
     # check date
     pattern = (
-         r'(^\s*<!--|#\s*)'
+        r'(^\s*(<!--|#)\s*)'
         r'(Date)'
         r'(\s*:\s*)'
-        r'(.*?)' ##
+        r'(.*?)'
         r'(\s)'
     )
-    res = re.search(pattern, text, re.I | re.M)
-    if res:
+    for i in range(0, len(lines)):
+        res = re.search(pattern, lines[i], re.I | re.M)
+        if res:
 
-        # there is *something* in the date field
-        if res.group(4) != '':
+            # there is *something* in the date field
+            if res.group(5) != '':
 
-            # check for valid date
-            pattern2 = ('\d*/\d*/\d*')
-            res2 = re.search(pattern2, res.group(4), re.I | re.M)
-            if not res2:
-                print(f'{path_item}: Header Date is not set')
-        else:
-            print(f'{path_item}: Header Date is not set')
+                # check for valid date
+                pattern2 = r'\d*/\d*/\d*'
+                res2 = re.search(pattern2, res.group(5), re.I | re.M)
+                if not res2:
+                    print(f'{path_item}:{i + 1}: Header Date is not set')
+            else:
+                print(f'{path_item}:{i + 1}: Header Date is not set')
 
 
 # ------------------------------------------------------------------------------
 # Checks file contents for dunders
 # ------------------------------------------------------------------------------
-def _check_dunders(path_item, text):
+def _check_dunders(path_item, lines):
     """
         Checks file contents for dunders
 
@@ -500,12 +531,77 @@ def _check_dunders(path_item, text):
         dunder variable from the initial project info.
     """
 
+    # TODO get these from dict_settings['info'], dict_settings['metadata']
+    # the dunders to look for
+    reps = [rep for rep in DICT_SETTINGS['info'] and DICT_SETTINGS['metadata']]
+    # reps = [
+    #     '__PP_NAME_BIG__',
+    #     '__PP_NAME_SMALL__',
+    #     '__PP_DATE__',
+    #     'PP_VERSION',
+    #     'PP_SHORT_DESC',
+    #     'pp_KEYWORDS',
+    #     'PP_PY_DEPS',
+    #     'PP_SYS_DEPS',
+    # ]
+
     # check for dunders in text
-    pattern = r'__CN_.*?__'
-    res = re.findall(pattern, text, re.I | re.M)
-    if res:
-        for item in res:
-            print(f'{path_item}: Text contains {item}')
+    for rep in reps:
+        pattern = rf'{rep}'
+        for i in range(0, len(lines)):
+            res = re.findall(pattern, lines[i], re.I | re.M)
+            if res:
+                for item in res:
+                    print(f'{path_item}:{i + 1}: Text contains {item}')
+
+
+# ------------------------------------------------------------------------------
+# Checks file contents for parse_args
+# ------------------------------------------------------------------------------
+def _check_parse_args(path_item, lines):
+    """
+        Checks file contents for parse_args
+
+        Paramaters:
+            path_item [string]: the full path to file to be checked for text
+            text [string]: the contents of the file to be checked
+
+        This function checks that none of the files paths contains an unreplaced
+        dunder variable from the initial project info.
+    """
+
+# TODO: this should be done with replace and then checked again after
+
+    # first check if path ends in .py
+    if os.path.splitext(path_item) == 'py':
+
+        # check for regex
+        pattern_str = (
+            r'(^def _parse_args\(\):.*?print\(\'.*?version )'
+            r'(.*?)'
+            r'(\'\))'
+        )
+        PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+        rep_str = rf'\g<1>{PP_VERSION}\g<3>'
+        text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
+
+        pattern_str = (
+            r'(^def _parse_args\(\):.*?parser.add_argument.*version=\')'
+            r'(.*?)'
+            r'(\')'
+        )
+        PP_VERSION = DICT_SETTINGS['metadata']['PP_VERSION']
+        rep_str = rf'\g<1>{PP_VERSION}\g<3>'
+        text = re.sub(pattern_str, rep_str, text, e.I | re.M | re.S)
+
+        pattern_str = (
+            r'(^def _parse_args\(\):.*?description=\')'
+            r'(.*?)'
+            r'(\')'
+        )
+        PP_SHORT_DESC = DICT_SETTINGS['metadata']['PP_SHORT_DESC']
+        rep_str = rf'\g<1>{PP_SHORT_DESC}\g<3>'
+        text = re.sub(pattern_str, rep_str, text, re.I | re.M | re.S)
 
 
 # ------------------------------------------------------------------------------
@@ -523,54 +619,10 @@ def _check_path(path_item):
     """
 
     # check for dunders in path
-    pattern = r'__CN_.*?__'
+    pattern = r'__PP_.*?__'
     res = re.search(pattern, path_item, re.I | re.M)
     if res:
         print(f'{path_item}: Path contains {res.group(0)}')
-
-
-# ------------------------------------------------------------------------------
-# Checks file contents for parse_args
-# ------------------------------------------------------------------------------
-def _check_parse_args(path_item, text):
-    """
-        Checks file contents for parse_args
-
-        Paramaters:
-            path_item [string]: the full path to file to be checked for text
-            text [string]: the contents of the file to be checked
-
-        This function checks that none of the files paths contains an unreplaced
-        dunder variable from the initial project info.
-    """
-
-    # first check if path ends in .py
-    if os.path.splitext(path_item) == 'py':
-
-        # check for regex
-        pattern_str = (
-            r'(^def _parse_args\(\):.*?print\(\'.*?version )'
-            r'(.*?)'
-            r'(\'\))'
-        )
-        rep_str = rf'\g<1>{CN_VERSION}\g<3>'
-        text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
-
-        pattern_str = (
-            r'(^def _parse_args\(\):.*?parser.add_argument.*version=\')'
-            r'(.*?)'
-            r'(\')'
-        )
-        rep_str = rf'\g<1>{CN_VERSION}\g<3>'
-        text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
-
-        pattern_str = (
-            r'(^def _parse_args\(\):.*?description=\')'
-            r'(.*?)'
-            r'(\')'
-        )
-        rep_str = rf'\g<1>{CN_SHORT_DESC}\g<3>'
-        text = re.sub(pattern_str, rep_str, text, 1, re.I | re.M | re.S)
 
 
 # ------------------------------------------------------------------------------
@@ -645,3 +697,4 @@ if __name__ == '__main__':
     main()
 
 # -)
+

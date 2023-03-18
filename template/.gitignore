@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project : __CN_NAME_BIG__                                        /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: .gitignore                                            |     ()     |
-# Date    : __CN_DATE__                                           |            |
+# Date    : 12/19/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ ipython_config.py
 # pyenv
 #   For a library or package, you might want to ignore these files since the
 #   code is intended to run in multiple environments; otherwise, check them in
-# .python-version
+.python-version
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in
