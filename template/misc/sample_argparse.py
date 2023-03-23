@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: pp_argparse.py                                        |     ()     |
+# Filename: sample_argparse.py                                    |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /

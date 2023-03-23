@@ -15,13 +15,7 @@
 # ------------------------------------------------------------------------------
 
 # import all modules in package to get full dot notation from package import
-
-# TODO: test this if we need names, metadata.py needs to check for them
-from __PP_NAME_SMALL__ import *  # noqa W0401 (import * used)
-
 # from <package> imoport <module>
-# TODO: fix names
-# from __PP_NAME_SMALL__ import mod_name_1  # noqa W0611 (unused import)
-# from __PP_NAME_SMALL__ import mod_name_2  # noqa W0611 (unused import)
+from __PP_NAME_SMALL__ import __file__
 
 # -)

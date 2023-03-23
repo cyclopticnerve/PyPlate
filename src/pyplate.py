@@ -35,14 +35,17 @@ DIR_TEMPLATE = os.path.abspath(path)
 # this is the dir for project location (above PyPlate)
 # (e.g. ~/Documents/Projects/Python/)
 path = os.path.join(DIR_CURR, '..', '..')
-DIR_BASE = os.path.abspath(path)
+DIR_PRJ_BASE = os.path.abspath(path)
 
 # this is the current user home dir
 # (e.g. /home/cyclopticnerve/)
 DIR_USER = os.path.expanduser('~')
 
+# date format
+PRJ_DATE = '%m/%d/%Y'
+
 # files to include in project
-# NB: paths are relative to DIR_TEMPLATE
+# paths are relative to DIR_TEMPLATE
 DICT_FILES = {
     'common': [                 # common to all projects
         'docs',
@@ -78,24 +81,23 @@ DICT_FILES = {
 
 # the array of header strings to match for replacement
 LIST_HEADER = [
-    ['# Project : ',    '__PP_NAME_BIG__',   '/          \\ '],
-    ['# Date    : ',    '__PP_DATE__',       '|            |'],
-    ['<!-- Project : ', '__PP_NAME_BIG__',   '/          \\  -->'],
-    ['<!-- Date    : ', '__PP_DATE__',       '|            | -->'],
+    ['Project',  '__PP_NAME_BIG__'],
+    ['Filename', '__PP_NAME_SMALL__'],
+    ['Date',     '__PP_DATE__'],
 ]
 
-# the dict of README tags to find/replace
+# the dict of README sections/tags to remove
 DICT_README = {
     'mp': {
-        'start_str':  '<!-- __PP_APP_START__ -->',
-        'end_str':    '<!-- __PP_APP_END__ -->',
-        'ignore_str': '<!-- __PP_MOD_',
+        'delete_start': '<!-- __PP_APP_START__ -->',
+        'delete_end':   '<!-- __PP_APP_END__ -->',
+        'delete_tag':   '<!-- __PP_MOD_',
     },
     'cg': {
-        'start_str':  '<!-- __PP_MOD_START__ -->',
-        'end_str':    '<!-- __PP_MOD_END__ -->',
-        'ignore_str': '<!-- __PP_APP_',
-    }
+        'delete_start': '<!-- __PP_MOD_START__ -->',
+        'delete_end':   '<!-- __PP_MOD_END__ -->',
+        'delete_tag':   '<!-- __PP_APP_',
+    },
 }
 
 # ------------------------------------------------------------------------------
@@ -103,41 +105,47 @@ DICT_README = {
 # ------------------------------------------------------------------------------
 
 # the default settings to use to create the project
-# NB: these can be used later by metadata.py (in misc/settings.json)
+# these can be used later by metadata.py (in misc/settings.json)
 
-# the following caveats apply:
+# 'project' and 'info' are set using get_project_info()
+# 'metadata' will be edited by the user through 'misc/settings.json'
+
+# the following caveats apply to 'metadata':
+
+# PP_VERSION = '0.1.0'
 # this is the canonical (only and absolute) version number string for this
 # project
 # this should provide the absolute version number string (in semantic notation)
 # of this project, and all other version numbers should be superceded by this
 # string
 # format is N.N.N
-# PP_VERSION = '0.1.0'
 
-# # these are the short description, keywords, and dependencies for the project
-# # they are stored here for projects that don't use pyproject.toml
-# # these will be used in the GitHub repo and README
-# # delimiters for PP_KEYWORDS and PP_XXX_DEPS MUST be comma
 # PP_SHORT_DESC = ''
 # PP_KEYWORDS = ''
 # PP_SYS_DEPS = ''
 # PP_PY_DEPS = ''
+# these are the short description, keywords, and dependencies for the project
+# they are stored here for projects that don't use pyproject.toml
+# these will be used in the GitHub repo and README.md
+# delimiters for PP_KEYWORDS and PP_XXX_DEPS MUST be comma
 
-# # gui categories MUST be seperated by semicolon and MUST end with semicolon
-# # this is mostly for desktops that use a windows-stylew menu/submenu, not for
-# # Ubuntu-style overviews
 # PP_GUI_CATEGORIES = ''
+# gui categories MUST be seperated by semicolon and MUST end with semicolon,
+# athough the final ';' will be added if necessary
+# this is mostly for desktops that use a windows-stylew menu/submenu, not for
+# Ubuntu-style overviews
 
-# # if exec/icon paths are not absolute, they will be found in standard paths
-# # these paths vary, but I will add them here in the comments when I figure them
-# # out
 # PP_GUI_EXEC = ''
 # PP_GUI_ICON = ''
+# if exec/icon paths are not absolute, they will be found in standard paths
+# these paths vary, but I will add them here in the comments when I figure them
+# out
+
 
 dict_settings = {
     'project': {
         'type': '',                 # m (Module), p (Package), c (CLI), g (GUI)
-        'path': '',                 # path to project (DIR_BASE/type_dir/Foo)
+        'path': '',                 # path to project (DIR_PRJ_BASE/type_dir/Foo)
     },
     'info': {
         '__PP_NAME_BIG__':   '',    # Foo
@@ -145,14 +153,14 @@ dict_settings = {
         '__PP_DATE__':       '',    # 12/08/2022
     },
     'metadata': {
-        'PP_VERSION':        '0.1.0',
-        'PP_SHORT_DESC':     '',
-        'PP_KEYWORDS':       '',
-        'PP_PY_DEPS':        '',
-        'PP_SYS_DEPS':       '',
-        'PP_GUI_CATEGORIES': '',
-        'PP_GUI_EXEC':       '',
-        'PP_GUI_ICON':       '',
+        'PP_VERSION':        '0.1.0',   # N.N.N
+        'PP_SHORT_DESC':     '',        # short description
+        'PP_KEYWORDS':       '',        # Python,app,to,do,something
+        'PP_PY_DEPS':        '',        # numpy,pylint,tomli
+        'PP_SYS_DEPS':       '',        # python3.10,imagemagick
+        'PP_GUI_CATEGORIES': '',        # Programs;Python;Utilities;
+        'PP_GUI_EXEC':       '',        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__-gtk.py  # noqa
+        'PP_GUI_ICON':       '',        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__.png     # noqa
     }
 }
 
@@ -172,14 +180,14 @@ def main():
         creating a project.
     """
 
-    # call each step
+    # call each step to create project
     get_project_info()
     copy_template()
+    add_extras()
 
+    # call recurse to do replacements in final project location
     path = dict_settings['project']['path']
     recurse(path)
-
-    add_extras()
 
 
 # ------------------------------------------------------------------------------
@@ -231,7 +239,7 @@ def get_project_info():
             continue
 
         # calculate final proj location
-        prj_path = os.path.join(DIR_BASE, type_dir, prj_name_big)
+        prj_path = os.path.join(DIR_PRJ_BASE, type_dir, prj_name_big)
 
         # check if project already exists
         if os.path.exists(prj_path):
@@ -248,7 +256,7 @@ def get_project_info():
     dict_settings['info']['__PP_NAME_SMALL__'] = prj_name_small
 
     # calculate current date
-    prj_date = datetime.now().strftime('%m/%d/%Y')
+    prj_date = datetime.now().strftime(PRJ_DATE)
     dict_settings['info']['__PP_DATE__'] = prj_date
 
 
@@ -298,70 +306,9 @@ def copy_template():
 
     # write dict_settings to a file in misc
     file_path = os.path.join(prj_path, 'misc', 'settings.json')
-    with open(file_path, 'w') as f:
+    with open(file_path, 'w', encoding='utf-8') as f:
         dict_str = json.dumps(dict_settings, indent=4)
         f.write(dict_str)
-
-
-# ------------------------------------------------------------------------------
-# Recursivly scan files/folders for replace/rename functions
-# ------------------------------------------------------------------------------
-def recurse(path):
-    """
-        Recursivly scan files/folders for replace/rename functions
-
-        Paramaters:
-            path [string]: the folder to start recursively scanning from
-
-        This is a recursive function to scan for files/folders under a given
-        folder. It iterates over the contents of the 'path' folder, checking if
-        each item is a file or a folder. If it encounters a folder, it calls
-        itself recursively, passing that folder as the parameter. If it
-        encounters a file, it calls methods to do text replacement of headers,
-        then other text. Finally it renames the file if the name contains a
-        replacement key. Once all files are renamed, it will then bubble up to
-        rename all folders.
-    """
-
-    # get list of file names in dest dir
-    items = [item for item in os.listdir(path)]
-    for item in items:
-
-        # put path back together
-        path_item = os.path.join(path, item)
-
-        # if it's a dir
-        if os.path.isdir(path_item):
-
-            # recurse itself to find more files
-            recurse(path_item)
-
-        else:
-
-            # open file and get lines
-            with open(path_item, 'r') as f:
-                lines = f.readlines()
-
-            # replace headers from lines
-            lines = _replace_headers(lines)
-
-            # replace text from lines (skipping text in certain files in misc)
-            if (
-                item != 'metadata.py' and
-                item != 'settings.json'
-            ):
-                lines = _replace_text(lines)
-
-            # readme needs extra handling (if it is not excluded anywhere else)
-            if item == 'README.md':
-                lines = _fix_readme(lines)
-
-            # save lines
-            with open(path_item, 'w') as f:
-                f.writelines(lines)
-
-        # called for each file/folder
-        _rename(path_item)
 
 
 # ------------------------------------------------------------------------------
@@ -389,6 +336,90 @@ def add_extras():
     cmd = 'python -m venv .venv'
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array)
+
+
+# ------------------------------------------------------------------------------
+# Recursivly scan files/folders for replace/rename functions
+# ------------------------------------------------------------------------------
+def recurse(path):
+    """
+        Recursivly scan files/folders for replace/rename functions
+
+        Paramaters:
+            path [string]: the folder to start recursively scanning from
+
+        This is a recursive function to scan for files/folders under a given
+        folder. It iterates over the contents of the 'path' folder, checking if
+        each item is a file or a folder. If it encounters a folder, it calls
+        itself recursively, passing that folder as the parameter. If it
+        encounters a file, it calls methods to do text replacement of headers,
+        then other text. Finally it renames the file if the name contains a
+        replacement key. Once all files are renamed, it will then bubble up to
+        rename all folders.
+    """
+
+    # blacklist
+    # don't replace headers, text, or path names for these items
+    skip_all = [
+        '.venv',
+        '.git',
+    ]
+    skip_headers = [
+    ]
+    skip_text = [
+        'metadata.py',
+        'settings.json',
+        'checklist.txt',
+    ]
+    skip_rename = [
+    ]
+
+    # remove all trailing slashes
+    skip_all = [item.rstrip('/') for item in skip_all]
+    skip_headers = [item.rstrip('/') for item in skip_headers]
+    skip_text = [item.rstrip('/') for item in skip_text]
+    skip_rename = [item.rstrip('/') for item in skip_rename]
+
+    # TODO: make this use text
+
+    # get list of file names in dest dir
+    items = [item for item in os.listdir(path) if item not in skip_all]
+    for item in items:
+
+        # put path back together
+        path_item = os.path.join(path, item)
+
+        # if it's a dir
+        if os.path.isdir(path_item):
+
+            # recurse itself to find more files
+            recurse(path_item)
+
+        else:
+
+            # open file and get lines
+            with open(path_item, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+
+                # replace headers from lines
+                if item not in skip_headers:
+                    lines = _replace_headers(lines)
+
+                # replace text from lines
+                if item not in skip_text:
+                    lines = _replace_text(lines)
+
+                # readme needs extra handling
+                if item == 'README.md':
+                    lines = _fix_readme(lines)
+
+            # save lines
+            with open(path_item, 'w', encoding='utf-8') as f:
+                f.writelines(lines)
+
+        # called for each file/folder
+        if item not in skip_rename:
+            _rename(path_item)
 
 
 # ------------------------------------------------------------------------------
@@ -470,28 +501,49 @@ def _replace_headers(lines):
     for i in range(0, len(lines)):
 
         # for each repl line
-        for hdr_line in LIST_HEADER:
+        for hdr_pair in LIST_HEADER:
 
-            # build start str
-            key = hdr_line[0] + hdr_line[1]
+            # pattern
+            pattern = (
+                r'(# |<!-- )'
+                rf'({hdr_pair[0]})'
+                r'( *: )'
+                rf'({hdr_pair[1]})'
+                r'([^ ]*)'
+                r'( *)'
+                r'(.*)'
+            )
+            res = re.search(pattern, lines[i])
 
-            # if the key is in the line
-            if key in lines[i]:
+            if res:
 
-                # replace the dunder
-                rep = prj_info[hdr_line[1]]
+                # get the new value from settings
+                rep = prj_info[hdr_pair[1]]
 
-                # calculate spaces
-                spaces = (80 - (len(hdr_line[0]) + len(rep) + len(hdr_line[2])))
-                spaces_str = ' ' * spaces
-
-                # create replacement string (with newline!!!)
-                rep_s = (
-                    f'{hdr_line[0]}{rep}{spaces_str}{hdr_line[2].strip()}\n'
+                # count what we will need without spaces
+                key_cnt = (
+                    len(res.group(1)) +
+                    len(res.group(2)) +
+                    len(res.group(3)) +
+                    len(rep) +
+                    len(res.group(5)) +
+                    len(res.group(7))
                 )
 
-                # replace text in line
-                lines[i] = rep_s
+                # make spaces
+                # NB: this looks funky but it works:
+                # 1. get the length of the old line (NOT always 80 since we
+                # can't have trailing spaces)
+                # 2. subtract 1 for the newline
+                # 3. subtract the other match lengths
+                spaces = (
+                    len(lines[i]) - 1 - key_cnt
+                )
+                spaces_str = ' ' * spaces
+
+                # replace text in the line
+                rep_str = rf'\g<1>\g<2>\g<3>{rep}\g<5>{spaces_str}\g<7>'
+                lines[i] = re.sub(pattern, rep_str, lines[i])
 
     # return the changed lines
     return lines
@@ -516,8 +568,6 @@ def _replace_text(lines):
         __PP_... stuff inside the file, excluding headers (which are already
         handled).
     """
-
-    # NEXT: do this with regex
 
     # the array of dunder replacements we will use
     prj_info = dict_settings['info']
@@ -555,48 +605,47 @@ def _fix_readme(lines):
     # the strategy here is to go through the full README and only copy lines
     # that are 1) not in any block or 2) in the block we want
     # the most efficient way to do this is to have an array that recieves wanted
-    # lines, then save that array to a file
-
-    # what type of project are we creating?
-    proj_type = dict_settings['project']['type']
-
-    # just a boolean flag to say if we are kajiggering
-    # if True, we are in a block we don't want to copy
-    ignore = False
+    # lines, then return that array
 
     # NB: we use a new array vs. in-situ replacement here b/c we are removing
     # A LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
     # while that would look *ok* in the reulting Markdown, looks UGLY in the
     # source code. so we opt for not copying those lines.
 
+    # just a boolean flag to say if we are kajiggering
+    # if True, we are in a block we don't want to copy
+    ignore = False
+
     # where to put the needed lines
     new_lines = []
 
+    # what type of project are we creating?
+    prj_type = dict_settings['project']['type']
+
     # what to ignore in the text
-    start_str = DICT_README['mp']['start_str']
-    end_str = DICT_README['mp']['end_str']
-    ignore_str = DICT_README['mp']['ignore_str']
-    if proj_type in 'cg':
-        start_str = DICT_README['cg']['start_str']
-        end_str = DICT_README['cg']['end_str']
-        ignore_str = DICT_README['cg']['ignore_str']
+    for key in DICT_README.keys():
+        if prj_type in key:
+
+            delete_start = DICT_README[key]['delete_start']
+            delete_end = DICT_README[key]['delete_end']
+            delete_tag = DICT_README[key]['delete_tag']
 
     # for each line
     for line in lines:
 
-        # check if we are in a block
-        if start_str in line:
+        # check if we have entered an invalid block
+        if delete_start in line:
             ignore = True
 
-        # it's a valid line block, just copy it
+        # we're still in a valid block
         if not ignore:
 
             # ignore block wrapper lines
-            if ignore_str not in line:
+            if delete_tag not in line:
                 new_lines.append(line)
 
-        # check if we have left the block
-        if end_str in line:
+        # check if we have left the invalid block
+        if delete_end in line:
             ignore = False
 
     # return the new set of lines

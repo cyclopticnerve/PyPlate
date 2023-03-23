@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : ModTest                                                /          \
+# Project : PyPlate                                                /          \
 # Filename: metadata.py                                           |     ()     |
 # Date    : 03/17/2023                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -531,7 +531,7 @@ def _check_dunders(path_item, lines):
         dunder variable from the initial project info.
     """
 
-    # TODO get these from dict_settings['info'], dict_settings['metadata']
+    # TODO: get these from dict_settings['info'], dict_settings['metadata']
     # the dunders to look for
     reps = [rep for rep in DICT_SETTINGS['info'] and DICT_SETTINGS['metadata']]
     # reps = [

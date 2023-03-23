@@ -13,10 +13,10 @@ Type=Application
 Terminal=false
 Categories=;
 Comment=
-Exec=PP_GUI_EXEC
+Exec=
 Path=
-Name=PP_NAME_BIG
-Icon=PP_GUI_ICON
+Name=__PP_NAME_BIG__
+Icon=
 X-Desktop-File-Install-Version=0.26
 
 # -)

@@ -13,43 +13,44 @@ tests
 top-level
   OK
 
-DONE: versionator script 
 
-DONE: add argparse to empty_exe.py
 
-DONE: some sort of script to go back after and check that all reps are done
-(for files added after initial creation - files added from misc)
+TODO: put version num in pyplate readme/update value in misc/settings.json
+should we also put other stuff there? or is that gwtting too close to a "make PyPlate
+using PyPlate" thing?
 
-DONE: keep. .py ext in pyplate/project
-(to use linter, files must have .py ext)
-
-TODO: initial filename in header of first src file (src/modtest - modtest.py)
-how to do this? replace w/filename? rep __PP_NAME_SMALL__.py?
-still gets checked by metadata.py
-would have to recurse again after rename
-TODO: recurse code in pyplate/metadata similar... can we combine?
-
-TODO: no version num in pyplate readme?
-cuz if not, get rid of metadata.py in pyplate and just hardcode stuff
-
-TODO: what about exec/icon paths in .desktop?
-
-TODO: for pkg type, make sure all submodule names are in __init__.py
-# NEED TO TEST IF * IS SUFFICENT!!!
-
-TODO: in metadata.py, break py deps into lines and add links for README
 TODO: metadata.py : get freedesktop format locations for exec/icon
 TODO: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
 don't want to ignore whole file!
-TODO: metadata.py: this file's headers not replaced as it is in misc/
+TODO: metadata.py: metadata's own headers not replaced as it is in misc/
 
-NEXT: Module/Package: get rid of import tests after ensuring __init__.py works as expected
+TODO: Module/Package: get rid of import tests after ensuring __init__.py works as expected
+Check for */explicit names, see below
+TODO: for pkg type, make sure all submodule names are in __init__.py
+# NEED TO TEST IF * IS SUFFICENT!!!
 
+
+
+
+NEXT: put blaclist/whitelist back in for recursing (easier to maintain/move to agnostic)
+NEXT: recurse code in pyplate/metadata similar... can we combine?
+NEXT: in metadata.py, break py deps into lines and add links for README
 NEXT: finish argparse test to see if we can count args needed vs. args given
+NEXT: make checklist as html/interactive
+NEXT: change all header date to version ???
 
-NEXT: _replace_headers could be done better with regex
-# (^#\s*)(Filename)(\s*)(:\s*)(\w*)(\s*)(.*)(.$)
-# use last group to check for slash, one less space if slash present
+DONE: versionator script 
+DONE: add argparse to empty_exe.py
+DONE: some sort of script to go back after and check that all reps are done
+(for files added after initial creation - files added from misc)
+DONE: keep. .py ext in pyplate/project
+(to use linter, files must have .py ext)
+DONE: initial filename in header of first src file (src/modtest - modtest.py)
+how to do this? replace w/filename? rep __PP_NAME_SMALL__.py?
+still gets checked by metadata.py
+would have to recurse again after rename
+DONE: what about exec/icon paths in .desktop?
+DONE: _replace_headers could be done better with regex
 
 check readme for install instructions 
 one has big name, one has small name for tar.gz
@@ -64,19 +65,20 @@ move pyplate to /usr/bin so we can call it from anywhere
 add param to set location of project
 
 try to use more list/dict comprehensions
+try to veduce re flags
 
 Check that first line of docstring matches comment block
 CHeck that last line of docstring ends w/ a period
 
 check for docstrings - other linter? pydocstyle?
-docstring types have params wrapped in parnes, not brackets
+docstring types have params wrapped in parens, not brackets
 where do we use brackets?
 
 'function' not in a class
 'method' in a class
 
 CLI/GUI: what files to add to install.py when copying
-(i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and !/.cyclopticnerve/proj/app/gui)
+(i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and ~/.cyclopticnerve/proj/app/gui)
 
 Change log should be cumulative with an entry for each version number and date 
 of release
