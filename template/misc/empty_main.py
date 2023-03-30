@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename:                                                       |     ()     |
+# Filename: empty_main.py                                         |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -100,7 +100,7 @@ def _parse_args():
         version='PP_VERSION'
     )
 
-    # add any position/optional args\
+    # add any position/optional args
     _add_args()
 
     # parse the cmd-line args

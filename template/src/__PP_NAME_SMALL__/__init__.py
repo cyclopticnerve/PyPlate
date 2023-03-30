@@ -14,8 +14,10 @@
 # Imports
 # ------------------------------------------------------------------------------
 
-# import all modules in package to get full dot notation from package import
-# from <package> imoport <module>
-from __PP_NAME_SMALL__ import __file__
+# __PP_IMPORTS_START__
+from __PP_NAME_SMALL__ import mod_name_1  # noqa W0611 (unused import)
+from __PP_NAME_SMALL__ import mod_name_2  # noqa W0611 (unused import)
+__all__ = ['mod_name_1', 'mod_name_2']
+# __PP_IMPORTS_END__
 
 # -)

@@ -105,7 +105,7 @@ DICT_README = {
 # ------------------------------------------------------------------------------
 
 # the default settings to use to create the project
-# these can be used later by metadata.py (in misc/settings.json)
+# these can be used later by metadata.py (from misc/settings.json)
 
 # 'project' and 'info' are set using get_project_info()
 # 'metadata' will be edited by the user through 'misc/settings.json'
@@ -141,26 +141,27 @@ DICT_README = {
 # these paths vary, but I will add them here in the comments when I figure them
 # out
 
-
 dict_settings = {
     'project': {
-        'type': '',                 # m (Module), p (Package), c (CLI), g (GUI)
-        'path': '',                 # path to project (DIR_PRJ_BASE/type_dir/Foo)
+        'type': '',                # m (Module), p (Package), c (CLI), g (GUI)
+        'path': '',                # path to project (DIR_PRJ_BASE/type_dir/Foo)
     },
     'info': {
-        '__PP_NAME_BIG__':   '',    # Foo
-        '__PP_NAME_SMALL__': '',    # foo
-        '__PP_DATE__':       '',    # 12/08/2022
+        '__PP_NAME_BIG__':   '',   # Foo
+        '__PP_NAME_SMALL__': '',   # foo
+        '__PP_DATE__':       '',   # 12/08/2022
     },
     'metadata': {
-        'PP_VERSION':        '0.1.0',   # N.N.N
-        'PP_SHORT_DESC':     '',        # short description
-        'PP_KEYWORDS':       '',        # Python,app,to,do,something
-        'PP_PY_DEPS':        '',        # numpy,pylint,tomli
-        'PP_SYS_DEPS':       '',        # python3.10,imagemagick
-        'PP_GUI_CATEGORIES': '',        # Programs;Python;Utilities;
-        'PP_GUI_EXEC':       '',        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__-gtk.py  # noqa
-        'PP_GUI_ICON':       '',        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__.png     # noqa
+        'PP_VERSION':        '0.1.0',  # N.N.N
+        'PP_SHORT_DESC':     '',       # short description
+        'PP_KEYWORDS':       '',       # Python,app,to,do,something
+        'PP_PY_DEPS':        '',       # numpy,pylint,tomli
+        'PP_SYS_DEPS':       '',       # python3.10,imagemagick
+        'PP_GUI_CATEGORIES': '',       # Programs;Python;Utilities;
+        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__-gtk.py
+        'PP_GUI_EXEC':       '',
+        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__.png
+        'PP_GUI_ICON':       '',
     }
 }
 
@@ -323,6 +324,7 @@ def add_extras():
     """
 
     # make sure we are in current proj path
+    curr_dir = os.getcwd()
     dir = dict_settings['project']['path']
     os.chdir(dir)
 
@@ -337,15 +339,18 @@ def add_extras():
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array)
 
+    # go back to old dir
+    os.chdir(curr_dir)
+
 
 # ------------------------------------------------------------------------------
-# Recursivly scan files/folders for replace/rename functions
+# Recursively scan files/folders for replace/rename functions
 # ------------------------------------------------------------------------------
 def recurse(path):
     """
-        Recursivly scan files/folders for replace/rename functions
+        Recursively scan files/folders for replace/rename functions
 
-        Paramaters:
+        Parameters:
             path [string]: the folder to start recursively scanning from
 
         This is a recursive function to scan for files/folders under a given
@@ -379,8 +384,6 @@ def recurse(path):
     skip_headers = [item.rstrip('/') for item in skip_headers]
     skip_text = [item.rstrip('/') for item in skip_text]
     skip_rename = [item.rstrip('/') for item in skip_rename]
-
-    # TODO: make this use text
 
     # get list of file names in dest dir
     items = [item for item in os.listdir(path) if item not in skip_all]
@@ -433,7 +436,7 @@ def _validate_name(name):
     """
         Check project name for allowed characters
 
-        Paramaters:
+        Parameters:
             name [string]: the name to check for allowed characters
 
         Returns:
@@ -482,7 +485,7 @@ def _replace_headers(lines):
     """
         Replace header text inside files
 
-        Paramaters:
+        Parameters:
             lines [list]: the list of file lines for replacing header text
 
         Returns:
@@ -556,7 +559,7 @@ def _replace_text(lines):
     """
         Replace text inside files
 
-        Paramaters:
+        Parameters:
             lines [list]: the list of file lines for replacing text
 
         Returns:
@@ -585,13 +588,13 @@ def _replace_text(lines):
 
 
 # ------------------------------------------------------------------------------
-# Remove unneccesary parts of the README file
+# Remove unnecessary parts of the README file
 # ------------------------------------------------------------------------------
 def _fix_readme(lines):
     """
-        Remove unneccesary parts of the README file
+        Remove unnecessary parts of the README file
 
-        Paramaters:
+        Parameters:
             lines [list]: the list of file lines for removing README text
 
         Returns:
@@ -604,12 +607,12 @@ def _fix_readme(lines):
 
     # the strategy here is to go through the full README and only copy lines
     # that are 1) not in any block or 2) in the block we want
-    # the most efficient way to do this is to have an array that recieves wanted
+    # the most efficient way to do this is to have an array that receives wanted
     # lines, then return that array
 
     # NB: we use a new array vs. in-situ replacement here b/c we are removing
     # A LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
-    # while that would look *ok* in the reulting Markdown, looks UGLY in the
+    # while that would look *ok* in the resulting Markdown, looks UGLY in the
     # source code. so we opt for not copying those lines.
 
     # just a boolean flag to say if we are kajiggering
@@ -659,7 +662,7 @@ def _rename(path):
     """
         Function for renaming files/folders
 
-        Paramaters:
+        Parameters:
             path [string]: the path to file/folder for renaming
 
         This is a function to rename files/folders. Given a path to a
@@ -678,7 +681,7 @@ def _rename(path):
     for key in prj_info.keys():
         new_path = new_path.replace(key, prj_info[key])
 
-    # remove erronious exts
+    # remove erroneous exts
     new_path = _remove_exts(new_path)
 
     # do the replacement in os (test exists for already renamed)
@@ -693,14 +696,14 @@ def _remove_exts(path):
     """
         Function for removing extraneous exts (for duplicate files in template)
 
-        Paramaters:
+        Parameters:
             path [string]: the path to file/folder for removing exts
 
         Returns:
             [string]: the file with only the last ext
 
         This is a function to remove extraneous extensions. Given a path to a
-        file/folder, it renames the path by removing extranious extensions.
+        file/folder, it renames the path by removing extraneous extensions.
     """
 
     # split dir/file

@@ -1,56 +1,39 @@
 testing
-  module - OK
-    
-misc
-  checklist - OK
-  todo - OK (this file)
-src
-  pyplate - OK
-template
-  ---
-tests
-  OK
-top-level
-  OK
-
+  DONE: module
 
 
 TODO: put version num in pyplate readme/update value in misc/settings.json
-should we also put other stuff there? or is that gwtting too close to a "make PyPlate
+should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
 
-TODO: metadata.py : get freedesktop format locations for exec/icon
-TODO: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
-don't want to ignore whole file!
-TODO: metadata.py: metadata's own headers not replaced as it is in misc/
-
+TODO: metadata.py: get freedesktop format locations for exec/icon
 TODO: Module/Package: get rid of import tests after ensuring __init__.py works as expected
-Check for */explicit names, see below
-TODO: for pkg type, make sure all submodule names are in __init__.py
-# NEED TO TEST IF * IS SUFFICENT!!!
+TODO: metadata consts to dunders - use find/replace
 
 
-
-
-NEXT: put blaclist/whitelist back in for recursing (easier to maintain/move to agnostic)
+NEXT: README: if there is a file in misc starting with 'screenshot', uncomment that line in README
+what to do about placeholder file? and file ext?
+NEXT: put recursion blacklist of project in settings.json (will need default in pyplate)
 NEXT: recurse code in pyplate/metadata similar... can we combine?
 NEXT: in metadata.py, break py deps into lines and add links for README
 NEXT: finish argparse test to see if we can count args needed vs. args given
 NEXT: make checklist as html/interactive
 NEXT: change all header date to version ???
+NEXT: check cspell
+NEXT: run every f-ing linter
 
+
+DONE: metadata.py: metadata's own headers not replaced as it is in misc/
+DONE: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
+DONE: put blacklist back in for recursing (easier to maintain/move to agnostic)
 DONE: versionator script 
 DONE: add argparse to empty_exe.py
 DONE: some sort of script to go back after and check that all reps are done
-(for files added after initial creation - files added from misc)
 DONE: keep. .py ext in pyplate/project
-(to use linter, files must have .py ext)
 DONE: initial filename in header of first src file (src/modtest - modtest.py)
-how to do this? replace w/filename? rep __PP_NAME_SMALL__.py?
-still gets checked by metadata.py
-would have to recurse again after rename
 DONE: what about exec/icon paths in .desktop?
 DONE: _replace_headers could be done better with regex
+DONE: for pkg type, make sure all submodule names are in __init__.py
 
 check readme for install instructions 
 one has big name, one has small name for tar.gz
@@ -65,7 +48,7 @@ move pyplate to /usr/bin so we can call it from anywhere
 add param to set location of project
 
 try to use more list/dict comprehensions
-try to veduce re flags
+try to reduce re flags
 
 Check that first line of docstring matches comment block
 CHeck that last line of docstring ends w/ a period

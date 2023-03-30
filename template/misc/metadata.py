@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : PkgTest                                                /          \
 # Filename: metadata.py                                           |     ()     |
-# Date    : __PP_DATE__                                           |            |
+# Date    : 03/23/2023                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -18,20 +18,16 @@ import re
 # Constants
 # ------------------------------------------------------------------------------
 
-# this is the dir where the script is being run from
-curr_dir = os.path.dirname(__file__)
-DIR_CURR = os.path.abspath(curr_dir)
-
 # this is the project dir
+curr_dir = os.path.dirname(__file__)
 prj_dir = os.path.join(curr_dir, '..')
 DIR_PROJ = os.path.abspath(prj_dir)
 
 # load settings file
 DICT_SETTINGS = []
-file_settings = os.path.join(DIR_CURR, 'settings.json')
-path_settings = os.path.abspath(file_settings)
-if os.path.exists(path_settings):
-    with open(path_settings, 'r', encoding='utf-8') as f:
+file_settings = os.path.join(DIR_PROJ, 'misc', 'settings.json')
+if os.path.exists(file_settings):
+    with open(file_settings, 'r', encoding='utf-8') as f:
         DICT_SETTINGS = json.load(f)
 
 # ------------------------------------------------------------------------------
@@ -62,6 +58,7 @@ def main():
     do_toml()
     do_install()
     do_desktop()
+    do_init()
     do_readme()
 
     # do replacements for PP_ stuff
@@ -69,7 +66,7 @@ def main():
     recurse(DIR_PROJ)
 
     # print error count (__PP_ stuff found)
-    print(f'error count: {err_cnt}')
+    print(f'Errors: {err_cnt}')
 
 
 # ------------------------------------------------------------------------------
@@ -215,7 +212,6 @@ def do_desktop():
         return
 
     # next list all files in gui dir
-    # gui_files = {}
     gui_files = os.listdir(gui_dir)
     if len(gui_files) == 0:
         return
@@ -280,6 +276,84 @@ def do_desktop():
 
     # save file
     with open(prj_desk, 'w', encoding='utf-8') as f:
+        f.write(text)
+
+
+# ------------------------------------------------------------------------------
+# Replace text in the __init__.py file
+# ------------------------------------------------------------------------------
+def do_init():
+    """
+        Replace text in the __init__.py file
+
+        Replaces the 'from __PP_NAME_SMALL__ import filename' text in the
+        __init__.py file.
+    """
+
+    # get path to package folder inside src
+    pp_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    dir_pkg = os.path.join(DIR_PROJ, 'src', pp_small)
+    if not os.path.exists(dir_pkg):
+        return
+
+    # initial value of path to __init__ file
+    prj_init = ''
+
+    # initial list of files that are NOT __init__
+    lst_files = []
+
+    # get all files in package dir and enumerate
+    lst_names = os.listdir(dir_pkg)
+    if len(lst_names) == 0:
+        return
+    for item in lst_names:
+
+        # rebuild path
+        path = os.path.join(dir_pkg, item)
+
+        # if it's __init__
+        if item == '__init__.py':
+            prj_init = path
+
+        else:
+
+            # if it's a file, not a dir (__pycache__)
+            if (os.path.isfile(path)):
+
+                # strip ext and add to list
+                short_item = os.path.splitext(item)[0]
+                lst_files.append(short_item)
+
+    # sort file list to look pretty (listdir is not sorted)
+    lst_files.sort()
+
+    # format list for imports section
+    lst_imports = [
+        f'from {pp_small} import {item}  # noqa W0611 (unused import)'
+        for item in lst_files
+    ]
+    str_imports = '\n'.join(lst_imports)
+
+    # format __all__ for completeness
+    lst_all = [f'\'{item}\'' for item in lst_files]
+    str_all_j = ', '.join(lst_all)
+    str_all = f'__all__ = [{str_all_j}]'
+
+    # open file and get contents
+    with open(prj_init, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+        # replace imports block
+        pattern_str = (
+            r'(^#[\t ]*__PP_IMPORTS_START__[\t ]*)'
+            r'(.*?)'
+            r'(^#[\t ]*__PP_IMPORTS_END__[\t ]*)'
+        )
+        rep_str = rf'\g<1>\n{str_imports}\n{str_all}\n\g<3>'
+        text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
+
+    # save file
+    with open(prj_init, 'w', encoding='utf-8') as f:
         f.write(text)
 
 
@@ -395,28 +469,29 @@ def recurse(path):
         '.venv',
         '.git',
         'dist',
+        'docs',
+        'checklist.txt',
+        'settings.json',
         'snippets.txt',
-        'empty_class.py',
-        'empty_main.py',
-        'empty_mod.py',
-        'sample_argparse.py',
+        'todo.txt',
+        'tests',
+        '__pycache__',
+        'PKG-INFO',
     ]
     skip_headers = [
     ]
     skip_dunders = [
         'metadata.py',
-        'settings.json',
-        'checklist.txt',
         'README.md',
     ]
     skip_rename = [
     ]
 
     # strip trailing slashes to match path component
-    skip_all = [item.rstrip('/') for item in skip_all]
-    skip_headers = [item.rstrip('/') for item in skip_headers]
-    skip_dunders = [item.rstrip('/') for item in skip_dunders]
-    skip_rename = [item.rstrip('/') for item in skip_rename]
+    skip_all = [item.strip('/') for item in skip_all]
+    skip_headers = [item.strip('/') for item in skip_headers]
+    skip_dunders = [item.strip('/') for item in skip_dunders]
+    skip_rename = [item.strip('/') for item in skip_rename]
 
     # get list of replaceable file names
     items = [item for item in os.listdir(path) if item not in skip_all]
@@ -435,15 +510,15 @@ def recurse(path):
 
             # open file and get lines
             with open(path_item, 'r', encoding='utf-8') as f:
-                text = f.read()
+                lines = f.readlines()
 
                 # check headers of every file
                 if item not in skip_headers:
-                    _check_headers(path_item, text)
+                    _check_headers(path_item, lines)
 
                 # don't check contents of metadata.py
                 if item not in skip_dunders:
-                    _check_dunders(text)
+                    _check_dunders(path_item, lines)
 
         # check file paths (subdirs and such)
         if item not in skip_rename:
@@ -457,117 +532,124 @@ def recurse(path):
 # ------------------------------------------------------------------------------
 # Checks header values for dunders
 # ------------------------------------------------------------------------------
-def _check_headers(path_item, text):
+def _check_headers(path_item, lines):
     """
         Checks header values for dunders
 
         Paramaters:
         '__PP_NAME_SMALL__.egg-info',
             path_item [string]: the full path to file to be checked
-            text [string]: the contents of the file to be checked
+            lines [array]: the contents of the file to be checked
 
         This function checks the files headers for values that either do not
         match the file's project/file name, or do not have a date set.
     """
 
-    # check project name
-    proj_name = os.path.basename(DIR_PROJ)
-    pattern = (
-        r'(^\s*(<!--|#)\s*)'
-        r'(Project)'
-        r'(\s*:\s*)'
-        r'(.*?)'
-        r'(\s)'
-    )
-    res = re.search(pattern, text, flags=re.M | re.S)
-    if res and res.group(5) != proj_name:
-        print(
-            f'{path_item}:{i + 1}: Header Project name should be '
-            f'\'{proj_name}\''
+    for i in range(0, len(lines)):
+        line = lines[i]
+
+        # check project name
+        proj_name = os.path.basename(DIR_PROJ)
+        pattern = (
+            r'(^\s*(<!--|#)\s*)'
+            r'(Project)'
+            r'(\s*:\s*)'
+            r'(.*?)'
+            r'(\s)'
         )
+        res = re.search(pattern, line, flags=re.M | re.S)
+        if res and res.group(5) != proj_name:
+            print(
+                f'{path_item}:{i + 1}: Header Project name should be '
+                f'\'{proj_name}\''
+            )
 
-        # inc error count
-        global err_cnt
-        err_cnt += 1
+            # inc error count
+            global err_cnt
+            err_cnt += 1
 
-    # check file name
-    file_name = os.path.basename(path_item)
-    pattern = (
-        r'(^\s*(<!--|#)\s*)'
-        r'(Filename)'
-        r'(\s*:\s*)'
-        r'(.*?)'
-        r'(\s)'
-    )
-    res = re.search(pattern, text, flags=re.M | re.S)
-    if res and res.group(5) != file_name:
-        print(
-            f'{path_item}:{i + 1}: Header Filename should be '
-            f'\'{file_name}\''
+        # check file name
+        file_name = os.path.basename(path_item)
+        pattern = (
+            r'(^\s*(<!--|#)\s*)'
+            r'(Filename)'
+            r'(\s*:\s*)'
+            r'(.*?)'
+            r'(\s)'
         )
+        res = re.search(pattern, line, flags=re.M | re.S)
+        if res and res.group(5) != file_name:
+            print(
+                f'{path_item}:{i + 1}: Header Filename should be '
+                f'\'{file_name}\''
+            )
 
-        # inc error count
-        global err_Cnt
-        err_cnt += 1
+            # inc error count
+            global err_Cnt
+            err_cnt += 1
 
-    # check date
-    pattern = (
-        r'(^\s*(<!--|#)\s*)'
-        r'(Date)'
-        r'(\s*:\s*)'
-        r'(.*?)'
-        r'(\s)'
-    )
-    res = re.search(pattern, text, flags=re.M | re.S)
-    if res:
+        # check date
+        pattern = (
+            r'(^\s*(<!--|#)\s*)'
+            r'(Date)'
+            r'(\s*:\s*)'
+            r'(.*?)'
+            r'(\s)'
+        )
+        res = re.search(pattern, line, flags=re.M | re.S)
+        if res:
 
-        # there is *something* in the date field
-        if res.group(5) != '':
+            # there is *something* in the date field
+            if res.group(5) != '':
 
-            # check for valid date
-            pattern2 = r'\d*/\d*/\d*'
-            res2 = re.search(pattern2, res.group(5))
-            if not res2:
+                # check for valid date
+                pattern2 = r'\d*/\d*/\d*'
+                res2 = re.search(pattern2, res.group(5))
+                if not res2:
+                    print(f'{path_item}:{i + 1}: Header Date is not set')
+
+                    # inc error count
+                    global err_Cnt
+                    err_cnt += 1
+
+            else:
                 print(f'{path_item}:{i + 1}: Header Date is not set')
 
                 # inc error count
                 global err_Cnt
                 err_cnt += 1
 
-        else:
-            print(f'{path_item}:{i + 1}: Header Date is not set')
-
-            # inc error count
-            global err_Cnt
-            err_cnt += 1
-
 
 # ------------------------------------------------------------------------------
 # Checks file contents for dunders
 # ------------------------------------------------------------------------------
-def _check_dunders(text):
+def _check_dunders(path_item, lines):
     """
         Checks file contents for dunders
 
         Paramaters:
             path_item [string]: the full path to file to be checked for text
-            text [string]: the contents of the file to be checked
+            lines [array]: the contents of the file to be checked
 
         This function checks that none of the files contains an unreplaced
         dunder variable from the initial project info.
     """
 
-    # the dunders to look for
-    reps = [rep for rep in DICT_SETTINGS['info'] and DICT_SETTINGS['metadata']]
+    for i in range(0, len(lines)):
+        line = lines[i]
 
-    # check for dunders in text
-    for rep in reps:
-        if rep in text:
-            print(f'{path_item}:{i + 1}: Text contains {rep}')
+        # the dunders to look for
+        reps = [rep for rep in DICT_SETTINGS['info'] and
+                DICT_SETTINGS['metadata']]
 
-            # inc error count
-            global err_cnt
-            err_cnt += 1
+        # check for dunders in text
+        for rep in reps:
+            if rep in line:
+                print(f'{path_item}:{i + 1}: Text contains {rep}')
+
+                # inc error count
+                global err_cnt
+                err_cnt += 1
 
 
 # ------------------------------------------------------------------------------
@@ -618,7 +700,7 @@ def _split_quote(str_in, tabs=1, split=',', quote='"', join=','):
         will produce the following output:
 
         \t"foo",
-        \t"bar"
+        \t"bar"\n
 
     """
 
