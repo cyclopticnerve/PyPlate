@@ -11,8 +11,8 @@ requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__PP_NAME_SMALL__"
-version = "0.1.0"
+name = "A"
+version = "0.0.0"
 description = ""
 readme = "README.md"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]

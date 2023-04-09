@@ -39,7 +39,7 @@ def func_2():
         Raises:
             exception_type(vars): description
 
-        Long description
+        Long description.
     """
 
     return ('this is a test 2')

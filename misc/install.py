@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __CPPNAME_BIG__                                        /          \
-# Filename: uninstall                                             |     ()     |
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: install.py                                            |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -10,24 +10,29 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-
 import installerator
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-# define the uninstall settings
-dict_uninstall = {
+# define the install settings
+dict_install = {
     'general': {
         'name': '__PP_NAME_BIG__'
     },
     'preflight': [
     ],
+    'py_deps': [
+    ],
+    'sys_deps': [
+    ],
     'dirs': [
         '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
     ],
     'files': {
+        'LICENSE.txt': '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__',
+        'uninstall.py': '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
     },
     'postflight': [
     ]
@@ -39,24 +44,24 @@ dict_uninstall = {
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Run the Uninstaller module
+# Run the Installer module
 # ------------------------------------------------------------------------------
 def main():
     """
-        Run the Uninstaller module
+        Run the Installer module
 
-        This is the main uninstaller function, which creates an instance of the
-        Uninstaller class and runs it's main function, with the global
+        This is the main installer function, which creates an instance of the
+        Installer class and runs it's main function, with the global
         dictionary created above.
     """
 
-    # instantiate uninstallerator class
+    # instantiate installerator class
     # package.module.class
-    uninstaller = installerator.uninstallerator.Uninstallerator()
+    installer = installerator.installerator.Installerator()
 
     # # run the instance
     # class.method
-    uninstaller.run(dict_uninstall)
+    installer.run(dict_install)
 
 
 # ------------------------------------------------------------------------------

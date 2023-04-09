@@ -31,12 +31,13 @@ class Main:
         Short description
 
         Properties:
-            prop_name [type]: description
+            foo [string]: a string to hold the foo value
 
         Methods:
-            method_name: description
+            set_foo(foo[str]): sets the value of foo
+            [str]: get_foo(): gets the value of foo
 
-        Long description
+        Long description.
     """
 
     # --------------------------------------------------------------------------
@@ -44,25 +45,36 @@ class Main:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Short description
+    # Sets the value of foo
     # --------------------------------------------------------------------------
-    def do_foo(self):
+    def set_foo(self, foo):
         """
-            Short description
+            Sets the new value of foo
 
             Paramaters:
-                var_name [type]: description
+                foo [str]: the new value of foo
 
-            Returns:
-                [type]: description
-
-            Raises:
-                exception_type(vars): description
-
-            Long description
+            Long description.
         """
 
-        print(self.foo)
+        # print the current value of foo
+        self.foo = foo
+
+    # --------------------------------------------------------------------------
+    # Gets the current value of foo
+    # --------------------------------------------------------------------------
+    def get_foo(self):
+        """
+            Gets the current value of foo
+
+            Returns:
+                [str]: the current value of foo
+
+            Long description.
+        """
+
+        # print the current value of foo
+        return self.foo
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -75,18 +87,10 @@ class Main:
         """
             Initialize the new object
 
-            Paramaters:
-                var_name [type]: description
-
-            Returns:
-                [type]: description
-
-            Raises:
-                exception_type(vars): description
-
-            Long description
+            Long description.
         """
 
+        # set the initial value of foo
         self.foo = 'foo'
 
 # -)

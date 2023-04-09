@@ -39,7 +39,33 @@ def func():
         Raises:
             exception_type(vars): description
 
-        Long description
+        Long description.
+    """
+
+    return _func()
+
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Short description
+# ------------------------------------------------------------------------------
+def _func():
+    """
+        Short description
+
+        Paramaters:
+            var_name [type]: description
+
+        Returns:
+            [type]: description
+
+        Raises:
+            exception_type(vars): description
+
+        Long description.
     """
 
     return ('this is a test')

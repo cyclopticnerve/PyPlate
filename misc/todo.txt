@@ -1,28 +1,55 @@
 testing
-  DONE: module
+  module
+    reqs
+    pre - ok
+    blank - ok
+    full - ok
+  package
+    reqs
+    pre - 
+    blank - 
+    full - 
+  cli
+    reqs
+    pre - 
+    blank - 
+    full - 
 
+
+TODO: what to do with snippets.txt? do we need it?
+TODO: test README instructions for modtest - latest/clone/ununstall (and check for upper/lowercase in names)
+TODO: metadata.py: get freedesktop format locations for exec/icon
+TODO: metadata consts to dunders - use find/replace
+TODO: spellcheck
+TODO: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
 
 TODO: put version num in pyplate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
 
-TODO: metadata.py: get freedesktop format locations for exec/icon
-TODO: Module/Package: get rid of import tests after ensuring __init__.py works as expected
-TODO: metadata consts to dunders - use find/replace
 
-
+NEXT: make py deps have values that are versions (=>3.10) etc for pyproject.toml?
+NEXT: figure out what to do with install/uninstall - PyInstaller? Inetallerator?
+NEXT: conf files from json to toml, add comments
+NEXT: README: need to figure out if Installerator/Configurator are actually deps
 NEXT: README: if there is a file in misc starting with 'screenshot', uncomment that line in README
 what to do about placeholder file? and file ext?
-NEXT: put recursion blacklist of project in settings.json (will need default in pyplate)
 NEXT: recurse code in pyplate/metadata similar... can we combine?
-NEXT: in metadata.py, break py deps into lines and add links for README
-NEXT: finish argparse test to see if we can count args needed vs. args given
 NEXT: make checklist as html/interactive
 NEXT: change all header date to version ???
 NEXT: check cspell
 NEXT: run every f-ing linter
+NEXT: inverstigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: why does PP_SHORT_DESC/PP_VERSION change in misc/empty_main.py?
+DONE: __PP_NAME_BIG__ in empty_main.py? can we live with one error?
+DONE: in metadata.json, make py deps into dict and add links for README
+DONE: check _split_quote in toml/install
+DONE: gui categories have commas in file, split on comma and join with semicolon
+DONE: finish argparse test to see if we can count args needed vs. args given
+DONE: put recursion blacklist of project in settings.json (will need default in pyplate)
+DONE: Module/Package: get rid of import tests after ensuring __init__.py works as expected
 DONE: metadata.py: metadata's own headers not replaced as it is in misc/
 DONE: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
 DONE: put blacklist back in for recursing (easier to maintain/move to agnostic)

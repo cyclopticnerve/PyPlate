@@ -37,10 +37,6 @@ DIR_TEMPLATE = os.path.abspath(path)
 path = os.path.join(DIR_CURR, '..', '..')
 DIR_PRJ_BASE = os.path.abspath(path)
 
-# this is the current user home dir
-# (e.g. /home/cyclopticnerve/)
-DIR_USER = os.path.expanduser('~')
-
 # date format
 PRJ_DATE = '%m/%d/%Y'
 
@@ -48,6 +44,7 @@ PRJ_DATE = '%m/%d/%Y'
 # paths are relative to DIR_TEMPLATE
 DICT_FILES = {
     'common': [                 # common to all projects
+        'conf',
         'docs',
         'misc',
         'tests',
@@ -68,14 +65,38 @@ DICT_FILES = {
     ],
     'c': [                      # for cli projects
         'src/__PP_NAME_SMALL__.app.py',
-        'install.py',
-        'uninstall.py',
     ],
     'g': [                      # for gui projects
         'gui',
         'src/__PP_NAME_SMALL__.app.py',
-        'install.py',
-        'uninstall.py',
+    ],
+}
+
+# folders/files to ignore when doing replacements
+DICT_BLACKLIST = {
+
+    # don't do anything with these files/folders
+    'skip_all': [
+        '.venv',
+        '.git',
+        'dist',
+        'docs',
+        'misc',
+        'metadata.json',
+        'settings.json',
+        'tests',
+        '__pycache__',
+        'PKG-INFO',
+    ],
+    # don't fix/check headers
+    'skip_headers': [
+    ],
+    # don't fix/check text
+    'skip_text': [
+        'metadata.py',
+    ],
+    # don't fix/check path
+    'skip_path': [
     ],
 }
 
@@ -89,14 +110,14 @@ LIST_HEADER = [
 # the dict of README sections/tags to remove
 DICT_README = {
     'mp': {
-        'delete_start': '<!-- __PP_APP_START__ -->',
-        'delete_end':   '<!-- __PP_APP_END__ -->',
-        'delete_tag':   '<!-- __PP_MOD_',
+        'delete_start': '<!-- __RM_APP_START__ -->',
+        'delete_end':   '<!-- __RM_APP_END__ -->',
+        'delete_tag':   '<!-- __RM_MOD_',
     },
     'cg': {
-        'delete_start': '<!-- __PP_MOD_START__ -->',
-        'delete_end':   '<!-- __PP_MOD_END__ -->',
-        'delete_tag':   '<!-- __PP_APP_',
+        'delete_start': '<!-- __RM_MOD_START__ -->',
+        'delete_end':   '<!-- __RM_MOD_END__ -->',
+        'delete_tag':   '<!-- __RM_APP_',
     },
 }
 
@@ -108,61 +129,20 @@ DICT_README = {
 # these can be used later by metadata.py (from misc/settings.json)
 
 # 'project' and 'info' are set using get_project_info()
-# 'metadata' will be edited by the user through 'misc/settings.json'
+# 'skip' is used by recurse()
 
-# the following caveats apply to 'metadata':
-
-# PP_VERSION = '0.1.0'
-# this is the canonical (only and absolute) version number string for this
-# project
-# this should provide the absolute version number string (in semantic notation)
-# of this project, and all other version numbers should be superceded by this
-# string
-# format is N.N.N
-
-# PP_SHORT_DESC = ''
-# PP_KEYWORDS = ''
-# PP_SYS_DEPS = ''
-# PP_PY_DEPS = ''
-# these are the short description, keywords, and dependencies for the project
-# they are stored here for projects that don't use pyproject.toml
-# these will be used in the GitHub repo and README.md
-# delimiters for PP_KEYWORDS and PP_XXX_DEPS MUST be comma
-
-# PP_GUI_CATEGORIES = ''
-# gui categories MUST be seperated by semicolon and MUST end with semicolon,
-# athough the final ';' will be added if necessary
-# this is mostly for desktops that use a windows-stylew menu/submenu, not for
-# Ubuntu-style overviews
-
-# PP_GUI_EXEC = ''
-# PP_GUI_ICON = ''
-# if exec/icon paths are not absolute, they will be found in standard paths
-# these paths vary, but I will add them here in the comments when I figure them
-# out
-
-dict_settings = {
+g_dict_settings = {
     'project': {
-        'type': '',                # m (Module), p (Package), c (CLI), g (GUI)
-        'path': '',                # path to project (DIR_PRJ_BASE/type_dir/Foo)
+        # m (Module), p (Package), c (CLI), g (GUI)
+        'type':                 '',
+        # path to project (DIR_PRJ_BASE/type_dir/Foo)
+        'path':                 '',
     },
     'info': {
-        '__PP_NAME_BIG__':   '',   # Foo
-        '__PP_NAME_SMALL__': '',   # foo
-        '__PP_DATE__':       '',   # 12/08/2022
+        '__PP_NAME_BIG__':      '',     # Foo
+        '__PP_NAME_SMALL__':    '',     # foo
+        '__PP_DATE__':          '',     # 12/08/2022
     },
-    'metadata': {
-        'PP_VERSION':        '0.1.0',  # N.N.N
-        'PP_SHORT_DESC':     '',       # short description
-        'PP_KEYWORDS':       '',       # Python,app,to,do,something
-        'PP_PY_DEPS':        '',       # numpy,pylint,tomli
-        'PP_SYS_DEPS':       '',       # python3.10,imagemagick
-        'PP_GUI_CATEGORIES': '',       # Programs;Python;Utilities;
-        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__-gtk.py
-        'PP_GUI_EXEC':       '',
-        # DIR_USR/.cyclopticnerve/__PP_NAME_BIG__/gui/__PP_NAME_SMALL__.png
-        'PP_GUI_ICON':       '',
-    }
 }
 
 
@@ -187,7 +167,7 @@ def main():
     add_extras()
 
     # call recurse to do replacements in final project location
-    path = dict_settings['project']['path']
+    path = g_dict_settings['project']['path']
     recurse(path)
 
 
@@ -202,7 +182,7 @@ def get_project_info():
     """
 
     # the settings dict (global b/c we will modify here)
-    global dict_settings
+    global g_dict_settings
 
     # loop forever until we get a valid type
     while True:
@@ -219,7 +199,7 @@ def get_project_info():
 
             # we got a valid type
             prj_type = prj_type.lower()
-            dict_settings['project']['type'] = prj_type
+            g_dict_settings['project']['type'] = prj_type
             break
 
     # configure subdir
@@ -248,17 +228,17 @@ def get_project_info():
             continue
 
         # if name is valid, move on
-        dict_settings['info']['__PP_NAME_BIG__'] = prj_name_big
-        dict_settings['project']['path'] = prj_path
+        g_dict_settings['info']['__PP_NAME_BIG__'] = prj_name_big
+        g_dict_settings['project']['path'] = prj_path
         break
 
     # calculate small name
     prj_name_small = prj_name_big.lower()
-    dict_settings['info']['__PP_NAME_SMALL__'] = prj_name_small
+    g_dict_settings['info']['__PP_NAME_SMALL__'] = prj_name_small
 
     # calculate current date
     prj_date = datetime.now().strftime(PRJ_DATE)
-    dict_settings['info']['__PP_DATE__'] = prj_date
+    g_dict_settings['info']['__PP_DATE__'] = prj_date
 
 
 # ------------------------------------------------------------------------------
@@ -268,16 +248,16 @@ def copy_template():
     """
         Copy template files to final location
 
-        Get file paths/names from dict_settings and copy them to the project
+        Get file paths/names from g_dict_settings and copy them to the project
         folder.
     """
 
     # create target folder
-    prj_path = dict_settings['project']['path']
+    prj_path = g_dict_settings['project']['path']
     os.makedirs(prj_path)
 
     # get project type
-    proj_type = dict_settings['project']['type']
+    proj_type = g_dict_settings['project']['type']
 
     # the group of files, common and type
     groups = [
@@ -305,10 +285,16 @@ def copy_template():
             # then copy file
             shutil.copy2(path_old, path_new)
 
-    # write dict_settings to a file in misc
-    file_path = os.path.join(prj_path, 'misc', 'settings.json')
+    # write g_dict_settings to conf file
+    file_path = os.path.join(prj_path, 'conf', 'settings.json')
     with open(file_path, 'w', encoding='utf-8') as f:
-        dict_str = json.dumps(dict_settings, indent=4)
+        dict_str = json.dumps(g_dict_settings, indent=4)
+        f.write(dict_str)
+
+    # write DICT_BLACKLIST to conf file
+    file_path = os.path.join(prj_path, 'conf', 'blacklist.json')
+    with open(file_path, 'w', encoding='utf-8') as f:
+        dict_str = json.dumps(DICT_BLACKLIST, indent=4)
         f.write(dict_str)
 
 
@@ -325,7 +311,7 @@ def add_extras():
 
     # make sure we are in current proj path
     curr_dir = os.getcwd()
-    dir = dict_settings['project']['path']
+    dir = g_dict_settings['project']['path']
     os.chdir(dir)
 
     # add git folder
@@ -334,7 +320,7 @@ def add_extras():
     subprocess.run(cmd_array)
 
     # add venv dir
-    # use '.venv' to be compatible with VSCodium
+    # NB: use '.venv' to be compatible with VSCodium
     cmd = 'python -m venv .venv'
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array)
@@ -365,25 +351,16 @@ def recurse(path):
 
     # blacklist
     # don't replace headers, text, or path names for these items
-    skip_all = [
-        '.venv',
-        '.git',
-    ]
-    skip_headers = [
-    ]
-    skip_text = [
-        'metadata.py',
-        'settings.json',
-        'checklist.txt',
-    ]
-    skip_rename = [
-    ]
+    skip_all = DICT_BLACKLIST['skip_all']
+    skip_headers = DICT_BLACKLIST['skip_headers']
+    skip_text = DICT_BLACKLIST['skip_text']
+    skip_path = DICT_BLACKLIST['skip_path']
 
     # remove all trailing slashes
     skip_all = [item.rstrip('/') for item in skip_all]
     skip_headers = [item.rstrip('/') for item in skip_headers]
     skip_text = [item.rstrip('/') for item in skip_text]
-    skip_rename = [item.rstrip('/') for item in skip_rename]
+    skip_path = [item.rstrip('/') for item in skip_path]
 
     # get list of file names in dest dir
     items = [item for item in os.listdir(path) if item not in skip_all]
@@ -406,11 +383,11 @@ def recurse(path):
 
                 # replace headers from lines
                 if item not in skip_headers:
-                    lines = _replace_headers(lines)
+                    lines = _fix_headers(lines)
 
                 # replace text from lines
                 if item not in skip_text:
-                    lines = _replace_text(lines)
+                    lines = _fix_text(lines)
 
                 # readme needs extra handling
                 if item == 'README.md':
@@ -421,8 +398,8 @@ def recurse(path):
                 f.writelines(lines)
 
         # called for each file/folder
-        if item not in skip_rename:
-            _rename(path_item)
+        if item not in skip_path:
+            _fix_path(path_item)
 
 
 # ------------------------------------------------------------------------------
@@ -481,7 +458,7 @@ def _validate_name(name):
 # ------------------------------------------------------------------------------
 # Replace header text inside files
 # ------------------------------------------------------------------------------
-def _replace_headers(lines):
+def _fix_headers(lines):
     """
         Replace header text inside files
 
@@ -498,7 +475,7 @@ def _replace_headers(lines):
     """
 
     # the array of dunder replacements we will use
-    prj_info = dict_settings['info']
+    prj_info = g_dict_settings['info']
 
     # for each line in array
     for i in range(0, len(lines)):
@@ -555,7 +532,7 @@ def _replace_headers(lines):
 # ------------------------------------------------------------------------------
 # Replace text inside files
 # ------------------------------------------------------------------------------
-def _replace_text(lines):
+def _fix_text(lines):
     """
         Replace text inside files
 
@@ -573,7 +550,7 @@ def _replace_text(lines):
     """
 
     # the array of dunder replacements we will use
-    prj_info = dict_settings['info']
+    prj_info = g_dict_settings['info']
 
     # for each line in array
     for i in range(0, len(lines)):
@@ -623,7 +600,7 @@ def _fix_readme(lines):
     new_lines = []
 
     # what type of project are we creating?
-    prj_type = dict_settings['project']['type']
+    prj_type = g_dict_settings['project']['type']
 
     # what to ignore in the text
     for key in DICT_README.keys():
@@ -658,7 +635,7 @@ def _fix_readme(lines):
 # ------------------------------------------------------------------------------
 # Function for renaming files/folders
 # ------------------------------------------------------------------------------
-def _rename(path):
+def _fix_path(path):
     """
         Function for renaming files/folders
 
@@ -666,12 +643,12 @@ def _rename(path):
             path [string]: the path to file/folder for renaming
 
         This is a function to rename files/folders. Given a path to a
-        file/folder, it renames the path by replacing keys in the dict_settings
+        file/folder, it renames the path by replacing keys in the g_dict_settings
         keys with their appropriate replacements.
     """
 
     # the array of dunder replacements we will use
-    prj_info = dict_settings['info']
+    prj_info = g_dict_settings['info']
 
     # store paths before changing
     old_path = path

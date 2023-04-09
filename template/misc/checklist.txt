@@ -3,13 +3,7 @@ Initialize
 
     VSCodium
         [] install reqs - $ python -m pip install -r requirements.txt
-        [] install in venv - $ python -m pip install -e .
-        --- Open any .py file
-        --- Install pylama in venv (popup in bottom right)
-        --- Switch to venv interpreter - bottom right of status bar
-        --- Make sure you are in project dir (terminal at bottom)
-        --- Run 'source venv/bin/activate'
-        
+        [] install in venv - $ python -m pip install -e .        
         [] Stage all changes
         [] Commit 'first commit'
         [] Publish 'main' branch
@@ -30,6 +24,7 @@ Release
             [] TODO tree
             [] todo.txt file
             [] Headers/footers
+            [] Private methods start with underscore
             [] Docstrings
             [] seperators
             [] over 80 cols
