@@ -44,6 +44,50 @@ if os.path.exists(file_blacklist):
     with open(file_blacklist, 'r', encoding='utf-8') as f:
         DICT_BLACKLIST = json.load(f)
 
+# TODO: what to do about descs? toml? or help file?
+# 'metadata' will be edited by the user through 'conf/metadata.json'
+
+# the following caveats apply to 'metadata':
+
+# PP_VERSION
+# this is the canonical (only and absolute) version number string for this
+# project
+# this should provide the absolute version number string (in semantic notation)
+# of this project, and all other version numbers should be superceded by this
+# string
+
+# PP_SHORT_DESC
+# this is the short description of the project, used in README.md and
+# # pyproject.toml
+
+# PP_KEYWORDS
+# these are the keywords for the project, for use in pyproject.toml for the PyPI
+# listing, and should also be used in the GitHub project page
+# delimiters for all entries MUST be comman
+
+# PP_PY_DEPS
+# these are the python dependencies for the project
+# they are stored here for install.py, pyproject.toml, and README.md
+# it is a dictionary where the key is the dep name, and the value is a link to
+# the download page (for README)
+# when used in pyproject.toml or install.py, it will be automatically downloaded
+# from PyPI by pip using just the name
+
+# PP_SYS_DEPS
+# these are the sytem dependencies for the project
+# they are stored here for install.py
+# delimiters for all entries MUST be comma
+
+# PP_GUI_CATEGORIES = ''
+# PP_GUI_EXEC = ''
+# PP_GUI_ICON = ''
+# this is mostly for desktops that use a windows-stylew menu/submenu, not for
+# Ubuntu-style overviews, and will be used in the __PP_NAME_BIG__.desktop file
+# gui categories MUST be seperated by a comma
+# if exec/icon paths are not absolute, they will be found in standard paths
+# these paths vary, but I will add them here in the comments when I figure them
+# out
+
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
@@ -109,6 +153,10 @@ def fix_toml():
     with open(prj_toml, 'r', encoding='utf-8') as f:
         text = f.read()
 
+        # NB: we do a dunder replace here because putting a dunder as the
+        # default name in the toml file causes the linter to choke, so we use a
+        # dummy name
+
         # replace name
         pattern_str = (
             r'(^\s*\[project\]\s*$)'
@@ -128,6 +176,8 @@ def fix_toml():
             r'(.*?$)'
         )
         PP_VERSION = DICT_METADATA['PP_VERSION']
+        if PP_VERSION == '':
+            PP_VERSION = '0.0.0'
         rep_str = rf'\g<1>\g<2>\g<3> "{PP_VERSION}"'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 
@@ -458,7 +508,7 @@ def fix_readme():
 
         # no split str, use default
         if split_str == '':
-            split_str = 'None'
+            split_str = 'None\n'
 
         # replace text
         rep_str = rf'\g<1>\n{split_str}\g<3>'
@@ -470,8 +520,8 @@ def fix_readme():
         # replace version
         pattern_vers = (
             r'(\s*foo@bar:~/Downloads\$ python -m pip install )'
-            r'(.*-)'   # __PP_NAME_BIG__
-            r'(.*?)'   # PP_VERSION
+            r'(.*-)'
+            r'(.*?)'
             r'(\.tar\.gz)'
         )
         rep_str = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
@@ -479,10 +529,10 @@ def fix_readme():
 
         pattern_vers = (
             r'(\s*foo@bar:~/Downloads/)'
-            r'(.*?)'   # __PP_NAME_BIG__
+            r'(.*?)'
             r'(\$ python -m pip install ./dist/)'
-            r'(.*-)'   # __PP_NAME_SMALL__
-            r'(.*?)'   # PP_VERSION
+            r'(.*-)'
+            r'(.*?)'
             r'(\.tar\.gz)'
         )
         rep_str = rf'\g<1>\g<2>\g<3>\g<4>{PP_VERSION}\g<6>'
@@ -490,16 +540,16 @@ def fix_readme():
 
         pattern_vers = (
             r'(\s*foo@bar:~\$ cd ~/Downloads/)'
-            r'(.*-)'   # __PP_NAME_BIG__
-            r'(.*)'    # PP_VERSION
+            r'(.*-)'
+            r'(.*)'
         )
         rep_str = rf'\g<1>\g<2>{PP_VERSION}'
         text = re.sub(pattern_vers, rep_str, text)
 
         pattern_vers = (
             r'(\s*foo@bar:~/Downloads/)'
-            r'(.*-)'   # __PP_NAME_BIG__
-            r'(.*)'    # PP_VERSION
+            r'(.*-)'
+            r'(.*)'
             r'(\$ \./install.py)'
         )
         rep_str = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
@@ -517,7 +567,7 @@ def fix_argparse():
     """
         Replace text for argparse stuff
 
-        This function replaces __PP and PP_ variables in any file that uses
+        This function replaces PP_ variables in any file that uses
         argparse.
     """
 
@@ -537,8 +587,8 @@ def fix_argparse():
     items = [item for item in items if os.path.splitext(item)[1] == '.py']
 
     # add the template files
-    empty_main = os.path.join(DIR_PROJ, 'misc', 'empty_main.py')
-    items.append(empty_main)
+    # empty_main = os.path.join(DIR_PROJ, 'misc', 'empty_main.py')
+    # items.append(empty_main)
 
     # for each file
     for path_item in items:
@@ -586,7 +636,7 @@ def recurse(path):
         Recurse through the folder structure looking for errors
 
         Paramaters:
-            path [str]: the file path to start looking for errors
+            path [string]: the file path to start looking for errors
 
         This function recurses through the project directory, looking for errors
         in each file's headers and content for strings that do not match their
@@ -652,7 +702,7 @@ def _check_headers(path_item, lines):
         Checks header values for dunders
 
         Paramaters:
-            path_item [str: the full path to file to be checked
+            path_item [string]: the full path to file to be checked
             lines [array]: the contents of the file to be checked
 
         This function checks the files headers for values that either do not
@@ -741,7 +791,7 @@ def _check_text(path_item, lines):
         Checks file contents for replacements
 
         Paramaters:
-            path_item [str]: the full path to file to be checked for text
+            path_item [string]: the full path to file to be checked for text
             lines [array]: the contents of the file to be checked
 
         This function checks that none of the files contains an unreplaced
@@ -774,7 +824,7 @@ def _check_path(path_item):
         Checks file paths for dunders
 
         Paramaters:
-            path_item [str]: the full path to file to be checked for text
+            path_item [string]: the full path to file to be checked for text
 
         This function checks that none of the files paths contains an unreplaced
         dunder variable from the initial project info.
@@ -799,15 +849,15 @@ def _split_quote(str_in, split=',', quote='', lead='', join=',', tail=''):
         A helper function to split and reformat keywords and dependencies
 
         Paramaters:
-            str_in [str]: the string to split
-            split [str]: the character to split on
-            quote [str]: the character to use to quote each entry (or empty)
-            lead [str]: the string to preceed the formatted string (or empty)
-            join [str]: the string to join each line in the output (or empty)
-            tail [str]: the string to follow the formatted string (or empty)
+            str_in [string]: the string to split
+            split [string]: the character to split on
+            quote [string]: the character to use to quote each entry (or empty)
+            lead [string]: the string to preceed the formatted string (or empty)
+            join [string]: the string to join each line in the output (or empty)
+            tail [string]: the string to follow the formatted string (or empty)
 
         Returns:
-            [str]: a new string which is split, quoted, joined, and
+            [string]: a new string which is split, quoted, joined, and
             surrounded by the lead and tail strings
 
         This function takes a string and splits it using the split param, then

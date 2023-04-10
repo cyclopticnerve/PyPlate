@@ -16,18 +16,18 @@ testing
     full - 
 
 
-TODO: what to do with snippets.txt? do we need it?
-TODO: test README instructions for modtest - latest/clone/ununstall (and check for upper/lowercase in names)
-TODO: metadata.py: get freedesktop format locations for exec/icon
-TODO: metadata consts to dunders - use find/replace
-TODO: spellcheck
-TODO: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
-
 TODO: put version num in pyplate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
 
+TODO: spellcheck
+TODO: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
 
+TODO: test README instructions for modtest - latest/clone/ununstall (and check for upper/lowercase in names)
+TODO: metadata.py: get freedesktop format locations for exec/icon
+TODO: metadata consts to dunders - use find/replace
+
+NEXT: what to do with snippets.txt? do we need it?
 NEXT: make py deps have values that are versions (=>3.10) etc for pyproject.toml?
 NEXT: figure out what to do with install/uninstall - PyInstaller? Inetallerator?
 NEXT: conf files from json to toml, add comments
