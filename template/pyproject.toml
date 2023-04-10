@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "A"
-version = "0.0.0"
+version = "0"
 description = ""
 readme = "README.md"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]

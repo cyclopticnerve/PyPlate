@@ -34,8 +34,8 @@ class Main:
             foo [string]: a string to hold the foo value
 
         Methods:
-            set_foo(foo[str]): sets the value of foo
-            [str]: get_foo(): gets the value of foo
+            set_foo(foo [str]): sets the value of foo
+            [str] get_foo(): gets the value of foo
 
         Long description.
     """
@@ -87,7 +87,9 @@ class Main:
         """
             Initialize the new object
 
-            Long description.
+            Initializes a new instance of the class, setting the default values
+            of its properties, and any other code that needs to run to create a
+            new object.
         """
 
         # set the initial value of foo

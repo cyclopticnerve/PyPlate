@@ -66,13 +66,9 @@ def func():
 
 
 # ------------------------------------------------------------------------------
-# Private functions
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
 # Add command line args to the parser
 # ------------------------------------------------------------------------------
-def _add_args(argparser):
+def add_args(argparser):
     """
         Add command line args to the parser
 
@@ -87,6 +83,10 @@ def _add_args(argparser):
 
     # argparser.add_argument('-f')
 
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Parse command line args and return the dict
@@ -110,8 +110,8 @@ def _parse_args():
     # always print prog name/version
     print('__PP_NAME_BIG__ version PP_VERSION')
 
-    # add arguments here
-    _add_args(argparser)
+    # add arguments from the function above
+    add_args(argparser)
 
     # parse the arg list into a Namespace object (similar to dict)
     # NB: if there is an error in the command line, this function will:

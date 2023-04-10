@@ -35,7 +35,7 @@ class Main:
 
         Methods:
             method_name(param_name [type]): description
-            [return_type]: method_name(parma_name[type]): description
+            [return_type]: method_name(param_name[type]): description
 
         Long description.
     """

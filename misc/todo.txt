@@ -22,11 +22,15 @@ using PyPlate" thing?
 
 TODO: spellcheck
 TODO: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
+TODO: diff main pyplate dir with template
 
 TODO: test README instructions for modtest - latest/clone/ununstall (and check for upper/lowercase in names)
 TODO: metadata.py: get freedesktop format locations for exec/icon
 TODO: metadata consts to dunders - use find/replace
 
+
+NEXT: docs module starts at src? need to start at module/package
+Does it do the same thiong when built?
 NEXT: what to do with snippets.txt? do we need it?
 NEXT: make py deps have values that are versions (=>3.10) etc for pyproject.toml?
 NEXT: figure out what to do with install/uninstall - PyInstaller? Inetallerator?

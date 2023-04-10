@@ -112,14 +112,14 @@ def main():
     """
 
     # do proactive replacements in specific files (replaces needed text)
-    fix_toml()
+    fix_pyproject()
     fix_install()
     fix_desktop()
     fix_init()
     fix_readme()
     fix_argparse()
 
-    # find __PP_  and PP_ stuff
+    # find __PP_ /PP_ stuff
     recurse(DIR_PROJ)
 
     # print error count (__PP_/PP_ stuff found)
@@ -129,7 +129,7 @@ def main():
 # ------------------------------------------------------------------------------
 # Replace text in the pyproject.toml file
 # ------------------------------------------------------------------------------
-def fix_toml():
+def fix_pyproject():
     """
         Replace text in the pyproject.toml file
 
@@ -176,8 +176,6 @@ def fix_toml():
             r'(.*?$)'
         )
         PP_VERSION = DICT_METADATA['PP_VERSION']
-        if PP_VERSION == '':
-            PP_VERSION = '0.0.0'
         rep_str = rf'\g<1>\g<2>\g<3> "{PP_VERSION}"'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 

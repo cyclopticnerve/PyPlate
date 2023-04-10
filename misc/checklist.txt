@@ -36,7 +36,7 @@ Release
             [] README usage/notes
             [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
-            [] Generate docs - $python -m pdoc --html -f -o docs src
+            [] Generate docs - $python -m pdoc --html -f -o docs src/pkgtest
             [] Commit/push 'dev' for 'next release'
             [] Checkout new branch 'release' from 'dev'
 
