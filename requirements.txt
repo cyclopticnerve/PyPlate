@@ -1,7 +1,6 @@
 astroid==2.14.2
 autopep8==2.0.1
 build==0.10.0
-configurator==3.1.0
 dill==0.3.6
 duckdb==0.7.1
 isort==5.12.0

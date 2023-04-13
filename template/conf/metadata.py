@@ -117,6 +117,7 @@ def main():
     fix_desktop()
     fix_init()
     fix_readme()
+    fix_ui()
     fix_argparse()
 
     # find __PP_ /PP_ stuff
@@ -301,23 +302,28 @@ def fix_desktop():
     """
 
     # first get the gui dir
-    gui_dir = os.path.join(DIR_PROJ, 'misc')
-    if not os.path.exists(gui_dir):
+    pp_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    dir_gui = os.path.join(DIR_PROJ, 'src', pp_small)
+    if not os.path.exists(dir_gui):
         return
 
     # next list all files in gui dir
-    gui_files = os.listdir(gui_dir)
+    gui_files = os.listdir(dir_gui)
     if len(gui_files) == 0:
         return
 
     # then get a list of all the files ending in .desktop
-    prj_desk = [item for item in gui_files if
-                os.path.splitext(item)[1] == '.desktop']
-    if len(prj_desk) != 1:
+    dsk_files = []
+    items = os.listdir(dir_gui)
+    for item in items:
+        arr = os.path.splitext(item)
+        if len(arr) > 1 and arr[1] == 'desktop':
+            dsk_files.append(item)
+    if len(dsk_files) == 0:
         return
 
     # get path to desktop file
-    path_desk = os.path.join(gui_dir, prj_desk[0])
+    path_desk = os.path.join(dir_gui, dsk_files[0])
 
     # open file and get contents
     with open(path_desk, 'r', encoding='utf-8') as f:
@@ -429,7 +435,7 @@ def fix_init():
 
     # format list for imports section
     lst_imports = [
-        f'from {pp_small} import {item}  # noqa W0611 (unused import)'
+        f'from {pp_small} import {item}  # noqa: W0611 (unused import)'
         for item in lst_files
     ]
     str_imports = '\n'.join(lst_imports)
@@ -559,6 +565,76 @@ def fix_readme():
 
 
 # ------------------------------------------------------------------------------
+# Replace text in the UI file
+# ------------------------------------------------------------------------------
+def fix_ui():
+    """
+        Replace text in the UI file
+
+        Replace short description, program name, and version number in the
+        UI file.
+    """
+
+    # first get the gui dir
+    pp_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    dir_gui = os.path.join(DIR_PROJ, 'src', pp_small)
+    if not os.path.exists(dir_gui):
+        return
+
+    # next list all files in gui dir
+    ui_files = os.listdir(dir_gui)
+    if len(ui_files) == 0:
+        return
+
+    # # then get a list of all the files ending in .ui
+    ui_files = []
+    items = os.listdir(dir_gui)
+    for item in items:
+        arr = os.path.splitext(item)
+        if len(arr) > 1 and arr[1] == 'ui':
+            ui_files.append(item)
+    if len(ui_files) == 0:
+        return
+
+    # get metadata
+    dict_meta = DICT_METADATA
+
+    # for each ui file
+    for item in ui_files:
+
+        # get path to ui file
+        path_ui = os.path.join(dir_gui, item)
+
+        # open file and get contents
+        with open(path_ui, 'r', encoding='utf-8') as f:
+            text = f.read()
+
+            pattern_str = (
+                r'(<object class=\"GtkAboutDialog\".*?)'
+                r'(<property name=\"version\">)'
+                r'(.*?)'
+                r'(</property>.*)'
+            )
+            PP_VERSION = DICT_METADATA['PP_VERSION']
+            rep_str = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+            text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
+
+            pattern_str = (
+                r'(<object class=\"GtkAboutDialog\".*?)'
+                r'(<property name=\"comments\".*?\>)'
+                r'(.*?)'
+                r'(</property>)'
+            )
+            PP_SHORT_DESC = dict_meta['PP_SHORT_DESC']
+            rep_str = rf'\g<1>\g<2>{PP_SHORT_DESC}\g<4>'
+            text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
+
+        # save file
+        with open(path_ui, 'w', encoding='utf-8') as f:
+            f.write(text)
+
+
+# ------------------------------------------------------------------------------
 # Replace text for argparse stuff
 # ------------------------------------------------------------------------------
 def fix_argparse():
@@ -583,10 +659,6 @@ def fix_argparse():
 
     # get all .py files
     items = [item for item in items if os.path.splitext(item)[1] == '.py']
-
-    # add the template files
-    # empty_main = os.path.join(DIR_PROJ, 'misc', 'empty_main.py')
-    # items.append(empty_main)
 
     # for each file
     for path_item in items:

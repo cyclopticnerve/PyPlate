@@ -43,7 +43,9 @@ PRJ_DATE = '%m/%d/%Y'
 # files to include in project
 # paths are relative to DIR_TEMPLATE
 DICT_FILES = {
-    'common': [                 # common to all projects
+
+    # common to all projects
+    'common': [
         'conf',
         'docs',
         'misc',
@@ -53,22 +55,29 @@ DICT_FILES = {
         'README.md',
         'requirements.txt',
     ],
-    'm': [                      # for module projects
+
+    # for module projects
+    'm': [
         'src/__PP_NAME_SMALL__.mod.py',
         'MANIFEST.in',
         'pyproject.toml',
     ],
-    'p': [                      # for package projects
-        'src/__PP_NAME_SMALL__',
+
+    # for package projects
+    'p': [
+        'src/__PP_NAME_SMALL__.pkg',
         'MANIFEST.in',
         'pyproject.toml',
     ],
-    'c': [                      # for cli projects
-        'src/__PP_NAME_SMALL__.app.py',
+
+    # for cli projects
+    'c': [
+        'src/__PP_NAME_SMALL__.cli.py',
     ],
-    'g': [                      # for gui projects
-        'gui',
-        'src/__PP_NAME_SMALL__.app.py',
+
+    # for gui projects
+    'g': [
+        'src/__PP_NAME_SMALL__.gui',
     ],
 }
 
@@ -82,19 +91,23 @@ DICT_BLACKLIST = {
         'dist',
         'docs',
         'misc',
-        'metadata.json',
-        'settings.json',
         'tests',
         '__pycache__',
         'PKG-INFO',
+        '__PP_NAME_SMALL__.png',
     ],
+
     # don't fix/check headers
     'skip_headers': [
     ],
+
     # don't fix/check text
     'skip_text': [
+        'metadata.json',
         'metadata.py',
+        'settings.json',
     ],
+
     # don't fix/check path
     'skip_path': [
     ],
@@ -139,8 +152,8 @@ g_dict_settings = {
         'path':                 '',
     },
     'info': {
-        '__PP_NAME_BIG__':      '',     # Foo
-        '__PP_NAME_SMALL__':    '',     # foo
+        '__PP_NAME_BIG__':      '',     # MyProject
+        '__PP_NAME_SMALL__':    '',     # myproject
         '__PP_DATE__':          '',     # 12/08/2022
     },
 }
@@ -164,7 +177,7 @@ def main():
     # call each step to create project
     get_project_info()
     copy_template()
-    add_extras()
+    # TODO add_extras()
 
     # call recurse to do replacements in final project location
     path = g_dict_settings['project']['path']
@@ -397,63 +410,18 @@ def recurse(path):
             with open(path_item, 'w', encoding='utf-8') as f:
                 f.writelines(lines)
 
-        # called for each file/folder
-        if item not in skip_path:
-            _fix_path(path_item)
+            # TODO
+            # # called for each file/folder
+            # if item not in skip_path:
+            #     _fix_name(path_item)
+            # # called for each file/folder
+            # if item not in skip_path:
+            #     _fix_name(path_item)
 
 
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Check project name for allowed characters
-# ------------------------------------------------------------------------------
-def _validate_name(name):
-    """
-        Check project name for allowed characters
-
-        Parameters:
-            name [string]: the name to check for allowed characters
-
-        Returns:
-            [bool]: whether the name is valid to use
-
-        This function checks the passed name for four criteria:
-        1. blank name
-        2. starts with an alpha char
-        3. ends with an alphanumeric char
-        4. contains only alphanumeric chars
-    """
-
-    # 1. check for blank name
-    if name == '':
-        return False
-
-    # 2. match start or return false
-    pattern = r'(^[a-zA-Z])'
-    res = re.search(pattern, name)
-    if not res:
-        print('Project names must start with a letter')
-        return False
-
-    # 3. match end or return false
-    pattern = r'([a-zA-Z0-9]$)'
-    res = re.search(pattern, name)
-    if not res:
-        print('Project names must end with a letter or number')
-        return False
-
-    # 4. match middle or return false
-    pattern = r'(^[a-zA-Z0-9]*$)'
-    res = re.search(pattern, name)
-    if not res:
-        print('Project names must contain only letters or numbers')
-        return False
-
-    # if we made it this far, return true
-    return True
-
 
 # ------------------------------------------------------------------------------
 # Replace header text inside files
@@ -606,6 +574,7 @@ def _fix_readme(lines):
     for key in DICT_README.keys():
         if prj_type in key:
 
+            # get values for keys
             delete_start = DICT_README[key]['delete_start']
             delete_end = DICT_README[key]['delete_end']
             delete_tag = DICT_README[key]['delete_tag']
@@ -633,6 +602,55 @@ def _fix_readme(lines):
 
 
 # ------------------------------------------------------------------------------
+# Check project name for allowed characters
+# ------------------------------------------------------------------------------
+def _validate_name(name):
+    """
+        Check project name for allowed characters
+
+        Parameters:
+            name [string]: the name to check for allowed characters
+
+        Returns:
+            [bool]: whether the name is valid to use
+
+        This function checks the passed name for four criteria:
+        1. blank name
+        2. starts with an alpha char
+        3. ends with an alphanumeric char
+        4. contains only alphanumeric chars
+    """
+
+    # 1. check for blank name
+    if name == '':
+        return False
+
+    # 2. match start or return false
+    pattern = r'(^[a-zA-Z])'
+    res = re.search(pattern, name)
+    if not res:
+        print('Project names must start with a letter')
+        return False
+
+    # 3. match end or return false
+    pattern = r'([a-zA-Z0-9]$)'
+    res = re.search(pattern, name)
+    if not res:
+        print('Project names must end with a letter or number')
+        return False
+
+    # 4. match middle or return false
+    pattern = r'(^[a-zA-Z0-9]*$)'
+    res = re.search(pattern, name)
+    if not res:
+        print('Project names must contain only letters or numbers')
+        return False
+
+    # if we made it this far, return true
+    return True
+
+
+# ------------------------------------------------------------------------------
 # Function for renaming files/folders
 # ------------------------------------------------------------------------------
 def _fix_path(path):
@@ -643,35 +661,39 @@ def _fix_path(path):
             path [string]: the path to file/folder for renaming
 
         This is a function to rename files/folders. Given a path to a
-        file/folder, it renames the path by replacing keys in the g_dict_settings
-        keys with their appropriate replacements.
+        file/folder, it renames the path by replacing keys in the
+        g_dict_settings keys with their appropriate replacements.
     """
 
-    # the array of dunder replacements we will use
-    prj_info = g_dict_settings['info']
+    # # the array of dunder replacements we will use
+    # prj_info = g_dict_settings['info']
 
-    # store paths before changing
-    old_path = path
-    new_path = path
+    # # store paths before changing
+    # old_path = path
+    # new_path = path
 
-    # replace all replacements in path
-    for key in prj_info.keys():
-        new_path = new_path.replace(key, prj_info[key])
+    # # remove erroneous exts
+    # # new_path = _remove_exts(new_path)
 
-    # remove erroneous exts
-    new_path = _remove_exts(new_path)
+    # # replace all replacements in path
+    # for key in prj_info.keys():
+    #     new_path = new_path.replace(key, prj_info[key])
 
-    # do the replacement in os (test exists for already renamed)
-    if not os.path.exists(new_path):
-        os.renames(old_path, new_path)
+    # print('old_path:', old_path)
+    # print('new_path:', new_path)
+
+    # # do the replacement in os (test exists for already renamed)
+    # if not os.path.exists(new_path):
+    #     os.renames(old_path, new_path)
 
 
 # ------------------------------------------------------------------------------
 # Function for removing extraneous exts (for duplicate files in template)
 # ------------------------------------------------------------------------------
-def _remove_exts(path):
+def _fix_name(path):
     """
-        Function for removing extraneous exts (for duplicate files in template)
+        Function for removing extraneous exts (for duplicate files or folders
+        in template)
 
         Parameters:
             path [string]: the path to file/folder for removing exts
@@ -682,21 +704,46 @@ def _remove_exts(path):
         This is a function to remove extraneous extensions. Given a path to a
         file/folder, it renames the path by removing extraneous extensions.
     """
+    pass
+    # # the array of dunder replacements we will use
+    # prj_info = g_dict_settings['info']
 
-    # split dir/file
-    dir_name = os.path.dirname(path)
-    base = os.path.basename(path)
+    # # split the path into everything up to last part, and last part itself
+    # path_to, path_last = os.path.split(path)
+    # # print('path_to:', path_to)
+    # # print('path_last:', path_last)
 
-    # split file name by dot
-    file_array = base.split('.')
+    # # the default new name
+    # new_name = path_last
 
-    # if there is at least one dot
-    if len(file_array) > 2:
+    # # split last part by dot
+    # last_array = path_last.split('.')
+    # # print(last_array)
+    # # replace all replacements in path
+    # for key in prj_info.keys():
+    #     new_path = new_path.replace(key, prj_info[key])
+    # # if there are two dots, probably a file
+    # if len(last_array) > 2:
 
-        # the result is the pre-dot plus last dot
-        base = file_array[0] + '.' + file_array[-1]
+    #     # put back together using main name and last ext
+    #     new_name = last_array[0] + '.' + last_array[-1]
 
-    return os.path.join(dir_name, base)
+    # # if there is only one dot, probably a folder
+    # elif len(last_array) > 1 and os.path.isdir(path):
+
+    #     # just use main name
+    #     new_name = last_array[0]
+    #     # print('new_name:', new_name)
+
+    # # put new name back with the 'up to last part'
+    # new_path = os.path.join(path_to, new_name)
+
+    # # do the replacement in os (test exists for already renamed)
+    # if not os.path.exists(new_path):
+    #     os.renames(old_path, new_path)
+    # # print('old_path:', path)
+    # # print('new_path:', new_path)
+    # return new_path
 
 
 # ------------------------------------------------------------------------------

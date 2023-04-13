@@ -7,18 +7,28 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# TODO: flesh this out more once we use it for a gui app
+# this is a hot mess
+# what level indenting???
+
+# TODO: init controls in window
+# TODO: set handler to class?
+
+# TODO: check for gtk version 3/4
+#   does gi.rtepository have a >= ?
+#   load ui file based on installed GTK version
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
+
 import argparse
+import os
 
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
+import gi
+gi.require_version('Adw', '1')
+gi.require_version('Gtk', '4.0')
+from gi.repository import Adw, Gtk  # noqa: E402 (module import not at top of file)
 
 
 # ------------------------------------------------------------------------------
@@ -33,46 +43,48 @@ def main():
         The main function of the program
 
         This function is the main entry point for the program, initializing the
-        program, and performing it's steps.
+        GUI and attaching it to the underlying Python program.
     """
 
     # NB: uncomment this line and add args to _add_args()
     # args = _parse_args()
 
-    # call the steps in order
-    print(func())
+# ------------------------------------------------------------------------------
 
+    curr_dir = os.path.dirname(__file__)
+    gui_path = os.path.join(curr_dir, 'gui', '__PP_NAME_SMALL__-gtk4.ui')
+
+    class MyApp(Adw.Application):
+
+        def __init__(self, **kwargs):
+            super().__init__(**kwargs)
+            self.connect('activate', self.on_activate)
+
+        def on_activate(self, app):
+
+            # load file from abs path
+            builder = Gtk.Builder(self)
+            builder.add_from_file(gui_path)
+
+            # show window
+            win = builder.get_object('window1')
+            self.add_window(win)
+            win.present()
+
+        def clicked(self, obj):
+            print('click')
+
+    # show the window
+    my_app = MyApp()
+    my_app.run()
 
 # ------------------------------------------------------------------------------
-# Short description
-# ------------------------------------------------------------------------------
-def func():
-    """
-        Short description
 
-        Paramaters:
-            var_name [type]: description
-
-        Returns:
-            [type]: description
-
-        Raises:
-            exception_type(vars): description
-
-        Long description.
-    """
-
-    return ('this is a test')
-
-
-# ------------------------------------------------------------------------------
-# Private functions
-# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Add command line args to the parser
 # ------------------------------------------------------------------------------
-def _add_args(argparser):
+def add_args(argparser):
     """
         Add command line args to the parser
 
@@ -87,6 +99,10 @@ def _add_args(argparser):
 
     # argparser.add_argument('-f')
 
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Parse command line args and return the dict
@@ -104,14 +120,14 @@ def _parse_args():
 
     # create the parser
     argparser = argparse.ArgumentParser(
-        description='PP_SHORT_DESC'
+        description='A short description'
     )
 
     # always print prog name/version
-    print('__PP_NAME_BIG__ version PP_VERSION')
+    print('GUITest version 0.1.0')
 
     # add arguments here
-    _add_args(argparser)
+    add_args(argparser)
 
     # parse the arg list into a Namespace object (similar to dict)
     # NB: if there is an error in the command line, this function will:

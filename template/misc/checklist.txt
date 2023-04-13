@@ -21,6 +21,7 @@ Release
     VSCodium
 
         All
+            [] screenshot in misc/README
             [] TODO tree
             [] todo.txt file
             [] Headers/footers
@@ -37,6 +38,13 @@ Release
             [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
             [] Generate docs - $python -m pdoc --html -f -o docs src
+            
+            GUI 
+                [] file properties in Glade - errors, 
+                [] toolkit version matches gi.repository number
+                [] all I18N strings
+                [] about dialog icon path
+                
             [] Commit/push 'dev' for 'next release'
             [] Checkout new branch 'release' from 'dev'
 

@@ -6,14 +6,20 @@ testing
     full - ok
   package
     reqs
-    pre - 
-    blank - 
-    full - 
+    pre - ok
+    blank - ok
+    full - ok
   cli
+    reqs
+    pre - ok
+    blank - ok
+    full - ok
+  gui
     reqs
     pre - 
     blank - 
     full - 
+    
 
 
 TODO: put version num in pyplate readme/update value in misc/settings.json
