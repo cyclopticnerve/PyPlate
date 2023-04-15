@@ -34,8 +34,8 @@ class Main:
             foo [string]: a string to hold the foo value
 
         Methods:
-            set_foo(foo [str]): sets the value of foo
-            [str] get_foo(): gets the value of foo
+            set_foo(foo [str]): sets the new value of foo
+            [str] get_foo(): gets the current value of foo
 
         Long description.
     """
@@ -45,7 +45,7 @@ class Main:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Sets the value of foo
+    # Sets the new value of foo
     # --------------------------------------------------------------------------
     def set_foo(self, foo):
         """
@@ -57,7 +57,7 @@ class Main:
             Long description.
         """
 
-        # print the current value of foo
+        # set the new value of foo
         self.foo = foo
 
     # --------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class Main:
             Long description.
         """
 
-        # print the current value of foo
+        # return the current value of foo
         return self.foo
 
     # --------------------------------------------------------------------------
@@ -91,6 +91,8 @@ class Main:
             of its properties, and any other code that needs to run to create a
             new object.
         """
+        # NB: do not call setter functions in constructor
+        # (do everything manually)
 
         # set the initial value of foo
         self.foo = 'foo'

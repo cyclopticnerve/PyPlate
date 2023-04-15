@@ -78,6 +78,7 @@ DICT_FILES = {
     # for gui projects
     'g': [
         'src/__PP_NAME_SMALL__.gui',
+        'src/__PP_NAME_SMALL__.gui.py',
     ],
 }
 
@@ -94,6 +95,10 @@ DICT_BLACKLIST = {
         'tests',
         '__pycache__',
         'PKG-INFO',
+    ],
+
+    # dont't fix internals, but path is ok
+    'skip_file': [
         '__PP_NAME_SMALL__.png',
     ],
 
@@ -105,7 +110,7 @@ DICT_BLACKLIST = {
     'skip_text': [
         'metadata.json',
         'metadata.py',
-        'settings.json',
+        "settings.json",
     ],
 
     # don't fix/check path
@@ -177,7 +182,7 @@ def main():
     # call each step to create project
     get_project_info()
     copy_template()
-    # TODO add_extras()
+    add_extras()
 
     # call recurse to do replacements in final project location
     path = g_dict_settings['project']['path']
@@ -279,7 +284,7 @@ def copy_template():
     ]
 
     # for each group, common and type
-    items = [item for group in groups for item in group]
+    items = [item.strip(os.sep) for group in groups for item in group]
     for item in items:
 
         # build old path/new path
@@ -365,15 +370,17 @@ def recurse(path):
     # blacklist
     # don't replace headers, text, or path names for these items
     skip_all = DICT_BLACKLIST['skip_all']
+    skip_file = DICT_BLACKLIST['skip_file']
     skip_headers = DICT_BLACKLIST['skip_headers']
     skip_text = DICT_BLACKLIST['skip_text']
     skip_path = DICT_BLACKLIST['skip_path']
 
     # remove all trailing slashes
-    skip_all = [item.rstrip('/') for item in skip_all]
-    skip_headers = [item.rstrip('/') for item in skip_headers]
-    skip_text = [item.rstrip('/') for item in skip_text]
-    skip_path = [item.rstrip('/') for item in skip_path]
+    skip_all = [item.strip(os.sep) for item in skip_all]
+    skip_file = [item.strip(os.sep) for item in skip_file]
+    skip_headers = [item.strip(os.sep) for item in skip_headers]
+    skip_text = [item.strip(os.sep) for item in skip_text]
+    skip_path = [item.strip(os.sep) for item in skip_path]
 
     # get list of file names in dest dir
     items = [item for item in os.listdir(path) if item not in skip_all]
@@ -390,33 +397,38 @@ def recurse(path):
 
         else:
 
-            # open file and get lines
-            with open(path_item, 'r', encoding='utf-8') as f:
-                lines = f.readlines()
+            # only open files we should be mucking in
+            if item not in skip_file:
 
-                # replace headers from lines
-                if item not in skip_headers:
-                    lines = _fix_headers(lines)
+                # open file and get lines
+                with open(path_item, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
 
-                # replace text from lines
-                if item not in skip_text:
-                    lines = _fix_text(lines)
+                    # replace headers from lines
+                    if item not in skip_headers:
+                        lines = _fix_headers(lines)
 
-                # readme needs extra handling
-                if item == 'README.md':
-                    lines = _fix_readme(lines)
+                    # replace text from lines
+                    if item not in skip_text:
+                        lines = _fix_text(lines)
 
-            # save lines
-            with open(path_item, 'w', encoding='utf-8') as f:
-                f.writelines(lines)
+                    # readme needs extra handling
+                    if item == 'README.md':
+                        lines = _fix_readme(lines)
 
-            # TODO
-            # # called for each file/folder
-            # if item not in skip_path:
-            #     _fix_name(path_item)
-            # # called for each file/folder
-            # if item not in skip_path:
-            #     _fix_name(path_item)
+                # save lines
+                with open(path_item, 'w', encoding='utf-8') as f:
+                    f.writelines(lines)
+
+        # fix path/ext
+        if item not in skip_path:
+            new_path = _fix_path(path_item)
+
+            # if a rename is required
+            if path_item != new_path:
+
+                # do the rename
+                os.rename(path_item, new_path)
 
 
 # ------------------------------------------------------------------------------
@@ -602,6 +614,65 @@ def _fix_readme(lines):
 
 
 # ------------------------------------------------------------------------------
+# Function for renaming files/folders
+# ------------------------------------------------------------------------------
+def _fix_path(path):
+    """
+        Function for renaming files/folders
+
+        Parameters:
+            path [string]: the path to the file/folder for renaming
+
+        Returns:
+            [string]: the new path for the specified folder/file
+
+        This is a function to rename files/folders. Given a path to a
+        file/folder, it renames the path by replacing keys in the
+        g_dict_settings keys with their appropriate replacements, and also
+        removes any extraneous exts. This allows us to have different files and
+        folders with the same name/ext, but quialifiers in between, thus:
+        __PP_NAME_SMALL__.gui.py
+        __PP_NAME_SMALL__.cli.py
+        can cexist in the template, but will both end up as:
+        __PP_NAME_SMALL__.py
+        in the project.
+    """
+
+    # the array of dunder replacements we will use
+    prj_info = g_dict_settings['info']
+
+    # split the path into everything up to last part, and last part itself
+    old_dir, old_file = os.path.split(path)
+
+    # replace dunders in last path component
+    for key in prj_info.keys():
+        old_file = old_file.replace(key, prj_info[key])
+
+    # split last part by dot
+    dot_array = old_file.split('.')
+
+    # if there are two or more dots
+    # foo.bar.py
+    if len(dot_array) > 2:
+
+        # put back together using main name and last ext
+        old_file = dot_array[0] + '.' + dot_array[-1]
+
+    # if there is only one dot, and it's a folder
+    # foo.bar/
+    elif len(dot_array) > 1 and os.path.isdir(path):
+
+        # just use main name
+        old_file = dot_array[0]
+
+    # put new name back with the 'up to last part'
+    new_path = os.path.join(old_dir, old_file)
+
+    # return the new path name
+    return new_path
+
+
+# ------------------------------------------------------------------------------
 # Check project name for allowed characters
 # ------------------------------------------------------------------------------
 def _validate_name(name):
@@ -648,102 +719,6 @@ def _validate_name(name):
 
     # if we made it this far, return true
     return True
-
-
-# ------------------------------------------------------------------------------
-# Function for renaming files/folders
-# ------------------------------------------------------------------------------
-def _fix_path(path):
-    """
-        Function for renaming files/folders
-
-        Parameters:
-            path [string]: the path to file/folder for renaming
-
-        This is a function to rename files/folders. Given a path to a
-        file/folder, it renames the path by replacing keys in the
-        g_dict_settings keys with their appropriate replacements.
-    """
-
-    # # the array of dunder replacements we will use
-    # prj_info = g_dict_settings['info']
-
-    # # store paths before changing
-    # old_path = path
-    # new_path = path
-
-    # # remove erroneous exts
-    # # new_path = _remove_exts(new_path)
-
-    # # replace all replacements in path
-    # for key in prj_info.keys():
-    #     new_path = new_path.replace(key, prj_info[key])
-
-    # print('old_path:', old_path)
-    # print('new_path:', new_path)
-
-    # # do the replacement in os (test exists for already renamed)
-    # if not os.path.exists(new_path):
-    #     os.renames(old_path, new_path)
-
-
-# ------------------------------------------------------------------------------
-# Function for removing extraneous exts (for duplicate files in template)
-# ------------------------------------------------------------------------------
-def _fix_name(path):
-    """
-        Function for removing extraneous exts (for duplicate files or folders
-        in template)
-
-        Parameters:
-            path [string]: the path to file/folder for removing exts
-
-        Returns:
-            [string]: the file with only the last ext
-
-        This is a function to remove extraneous extensions. Given a path to a
-        file/folder, it renames the path by removing extraneous extensions.
-    """
-    pass
-    # # the array of dunder replacements we will use
-    # prj_info = g_dict_settings['info']
-
-    # # split the path into everything up to last part, and last part itself
-    # path_to, path_last = os.path.split(path)
-    # # print('path_to:', path_to)
-    # # print('path_last:', path_last)
-
-    # # the default new name
-    # new_name = path_last
-
-    # # split last part by dot
-    # last_array = path_last.split('.')
-    # # print(last_array)
-    # # replace all replacements in path
-    # for key in prj_info.keys():
-    #     new_path = new_path.replace(key, prj_info[key])
-    # # if there are two dots, probably a file
-    # if len(last_array) > 2:
-
-    #     # put back together using main name and last ext
-    #     new_name = last_array[0] + '.' + last_array[-1]
-
-    # # if there is only one dot, probably a folder
-    # elif len(last_array) > 1 and os.path.isdir(path):
-
-    #     # just use main name
-    #     new_name = last_array[0]
-    #     # print('new_name:', new_name)
-
-    # # put new name back with the 'up to last part'
-    # new_path = os.path.join(path_to, new_name)
-
-    # # do the replacement in os (test exists for already renamed)
-    # if not os.path.exists(new_path):
-    #     os.renames(old_path, new_path)
-    # # print('old_path:', path)
-    # # print('new_path:', new_path)
-    # return new_path
 
 
 # ------------------------------------------------------------------------------

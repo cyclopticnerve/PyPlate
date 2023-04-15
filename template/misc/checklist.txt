@@ -55,9 +55,9 @@ Release
                 [] Test in VM using GitHub/README
 
         bracnch 'release'
+            [] Change any DEBUG to 0
             [] Publish branch
             ??? Modify files as necessary (delete .gitignore, etc.)
-            [] Change any DEBUG to 0
             [] Build - $ python -m build
             --- Upload to TestPyPI/PyPI
             [] Commit/push 'release'

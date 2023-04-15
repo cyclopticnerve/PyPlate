@@ -141,6 +141,7 @@ if __name__ == '__main__':
         is invoked from the command line.
     """
 
+    # run main function
     main()
 
 # -)

@@ -1,40 +1,52 @@
 testing
   module
-    reqs
-    pre - ok
-    blank - ok
-    full - ok
-  package
-    reqs
-    pre - ok
-    blank - ok
-    full - ok
-  cli
-    reqs
-    pre - ok
-    blank - ok
-    full - ok
-  gui
-    reqs
+    reqs - 
     pre - 
     blank - 
     full - 
+    inst release - 
+    inst latest - 
+  package
+    reqs - 
+    pre - 
+    blank - 
+    full - 
+    inst release - 
+    inst latest - 
+  cli
+    reqs - 
+    pre - 
+    blank - 
+    full - 
+    inst release - 
+    inst latest - 
+  gui
+    reqs - 
+    pre - 
+    blank - 
+    full - 
+    inst release - 
+    inst latest - 
     
-
 
 TODO: put version num in pyplate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
 
+TODO: test README instructions for all - latest/clone/ununstall (and check for upper/lowercase in names)
+check readme for install instructions 
+one has big name, one has small name for tar.gz
 TODO: spellcheck
 TODO: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
+also look at official python docs
+or autoDocstring ext
+
 TODO: diff main pyplate dir with template
-
-TODO: test README instructions for modtest - latest/clone/ununstall (and check for upper/lowercase in names)
 TODO: metadata.py: get freedesktop format locations for exec/icon
-TODO: metadata consts to dunders - use find/replace
+TODO: metadata.py: consts to dunders - use find/replace
 
 
+NEXT: custom snippets https://code.visualstudio.com/docs/editor/userdefinedsnippets
 NEXT: docs module starts at src? need to start at module/package
 Does it do the same thiong when built?
 NEXT: what to do with snippets.txt? do we need it?
@@ -72,8 +84,6 @@ DONE: what about exec/icon paths in .desktop?
 DONE: _replace_headers could be done better with regex
 DONE: for pkg type, make sure all submodule names are in __init__.py
 
-check readme for install instructions 
-one has big name, one has small name for tar.gz
 
 remove some exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
@@ -89,11 +99,11 @@ try to reduce re flags
 
 Check that first line of docstring matches comment block
 CHeck that last line of docstring ends w/ a period
-
 check for docstrings - other linter? pydocstyle?
 docstring types have params wrapped in parens, not brackets
 where do we use brackets?
 
+def keyword:
 'function' not in a class
 'method' in a class
 
@@ -104,9 +114,6 @@ Change log should be cumulative with an entry for each version number and date
 of release
 Still working on this - need to compare tags but no tags in dev
 Can't compare tags in main as changelog will be modified after tag is added
-
-
-
 
 when creating a CLI or GUI app, after creating venv, download and install 
 installerator and configurator and build and pylama

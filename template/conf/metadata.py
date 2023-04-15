@@ -162,40 +162,42 @@ def fix_pyproject():
         pattern_str = (
             r'(^\s*\[project\]\s*$)'
             r'(.*?)'
-            r'(^\s*name[\t ]*=)'
+            r'(^\s*name[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
         PP_NAME = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
-        rep_str = rf'\g<1>\g<2>\g<3> "{PP_NAME}"'
+        rep_str = rf'\g<1>\g<2>\g<3>"{PP_NAME}"'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 
         # replace version
         pattern_str = (
             r'(^\s*\[project\]\s*$)'
             r'(.*?)'
-            r'(^\s*version[\t ]*=)'
+            r'(^\s*version[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
         PP_VERSION = DICT_METADATA['PP_VERSION']
-        rep_str = rf'\g<1>\g<2>\g<3> "{PP_VERSION}"'
+        if PP_VERSION == '':
+            PP_VERSION = '0'
+        rep_str = rf'\g<1>\g<2>\g<3>"{PP_VERSION}"'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 
         # replace short description
         pattern_str = (
             r'(^\s*\[project\]\s*$)'
             r'(.*?)'
-            r'(^\s*description[\t ]*=)'
+            r'(^\s*description[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
         PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        rep_str = rf'\g<1>\g<2>\g<3> "{PP_SHORT_DESC}"'
+        rep_str = rf'\g<1>\g<2>\g<3>"{PP_SHORT_DESC}"'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 
         # # replace keywords array
         pattern_str = (
             r'(^\s*\[project\]\s*$)'
             r'(.*?)'
-            r'(^\s*keywords[\t ]*=)'
+            r'(^\s*keywords[\t ]*=[\t ]*)'
             r'(.*?\])'
         )
 
@@ -205,14 +207,14 @@ def fix_pyproject():
                                  join=',\n\t', tail='\n')
 
         # replace string
-        rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}]'
+        rep_str = rf'\g<1>\g<2>\g<3>[\n{split_str}]'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 
         # replace dependencies array
         pattern_str = (
             r'(^\s*\[project\]\s*$)'
             r'(.*?)'
-            r'(^\s*dependencies[\t ]*=)'
+            r'(^\s*dependencies[\t ]*=[\t ]*)'
             r'(.*?\])'
         )
 
@@ -223,7 +225,7 @@ def fix_pyproject():
                                  join=',\n\t', tail='\n')
 
         # replace string
-        rep_str = rf'\g<1>\g<2>\g<3> [\n{split_str}]'
+        rep_str = rf'\g<1>\g<2>\g<3>[\n{split_str}]'
         text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 
     # save file
@@ -596,9 +598,6 @@ def fix_ui():
     if len(ui_files) == 0:
         return
 
-    # get metadata
-    dict_meta = DICT_METADATA
-
     # for each ui file
     for item in ui_files:
 
@@ -625,7 +624,7 @@ def fix_ui():
                 r'(.*?)'
                 r'(</property>)'
             )
-            PP_SHORT_DESC = dict_meta['PP_SHORT_DESC']
+            PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
             rep_str = rf'\g<1>\g<2>{PP_SHORT_DESC}\g<4>'
             text = re.sub(pattern_str, rep_str, text, flags=re.M | re.S)
 

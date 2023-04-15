@@ -43,10 +43,13 @@ foo@bar:~/Downloads$ python -m pip install __PP_NAME_BIG__-PP_VERSION.tar.gz
 Or you can clone the git repo to get the latest (and often broken) code from the 
 dev branch:
 ```bash
-foo@bar:~$ python -m pip install build
 foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__PP_NAME_BIG__
 foo@bar:~/Downloads$ cd __PP_NAME_BIG__
+```
+Then build and install:
+```bash
+foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install build
 foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m build
 foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install ./dist/__PP_NAME_SMALL__-PP_VERSION.tar.gz
 ```
