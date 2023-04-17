@@ -36,8 +36,8 @@ foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
 
-Next, copy or cut/paste the 'PyPlate' directory wherever you want. For all
-examples below, we will use '~/Documents/Projects/Python/'.
+Next, cut/copy/paste the 'PyPlate' directory wherever you want. For all examples
+below, we will use '~/Documents/Projects/Python/'.
 ```bash
 foo@bar:~/Downloads$ mv PyPlate ~/Documents/Projects/Python
 ```
