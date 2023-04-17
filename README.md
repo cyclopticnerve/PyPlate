@@ -26,7 +26,8 @@ to make sure you have the lastest software installed.
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
 from the main branch.<br>
-Download either the 'tar.gz' or 'zip' file and extract it.
+Download either the 'tar.gz' or 'zip' file and extract it.<br>
+Rename the folder 'PyPlate' (without the version number').
 
 Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:
@@ -34,10 +35,11 @@ dev branch:
 foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
-Next, cut/copy/paste/cp/mv the 'PyPlate' directory wherever you want. For all 
+
+Next, copy or cut/paste the 'PyPlate' directory wherever you want. For all
 examples below, we will use '~/Documents/Projects/Python/'.
 ```bash
-foo@bar:~/Downloads$ cp PyPlate ~/Documents/Projects/Python
+foo@bar:~/Downloads$ mv PyPlate ~/Documents/Projects/Python
 ```
 
 Lastly, you can delete the downloaded folder, if you copied it.

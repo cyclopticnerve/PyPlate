@@ -369,18 +369,19 @@ def recurse(path):
 
     # blacklist
     # don't replace headers, text, or path names for these items
-    skip_all = DICT_BLACKLIST['skip_all']
-    skip_file = DICT_BLACKLIST['skip_file']
-    skip_headers = DICT_BLACKLIST['skip_headers']
-    skip_text = DICT_BLACKLIST['skip_text']
-    skip_path = DICT_BLACKLIST['skip_path']
+    # skip_all = DICT_BLACKLIST['skip_all']
+    # skip_file = DICT_BLACKLIST['skip_file']
+    # skip_headers = DICT_BLACKLIST['skip_headers']
+    # skip_text = DICT_BLACKLIST['skip_text']
+    # skip_path = DICT_BLACKLIST['skip_path']
 
     # remove all trailing slashes
-    skip_all = [item.strip(os.sep) for item in skip_all]
-    skip_file = [item.strip(os.sep) for item in skip_file]
-    skip_headers = [item.strip(os.sep) for item in skip_headers]
-    skip_text = [item.strip(os.sep) for item in skip_text]
-    skip_path = [item.strip(os.sep) for item in skip_path]
+    skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_all']]
+    skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_file']]
+    skip_headers = [item.strip(os.sep)
+                    for item in DICT_BLACKLIST['skip_headers']]
+    skip_text = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_text']]
+    skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_path']]
 
     # get list of file names in dest dir
     items = [item for item in os.listdir(path) if item not in skip_all]

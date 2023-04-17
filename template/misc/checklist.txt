@@ -3,7 +3,10 @@ Initialize
 
     VSCodium
         [] install reqs - $ python -m pip install -r requirements.txt
-        [] install in venv - $ python -m pip install -e .        
+
+        Mod/Pkg
+            [] install in venv - $ python -m pip install -e .  
+
         [] Stage all changes
         [] Commit 'first commit'
         [] Publish 'main' branch
@@ -27,6 +30,7 @@ Release
             [] Headers/footers
             [] Private methods start with underscore
             [] Docstrings
+            [] spellcheck
             [] seperators
             [] over 80 cols
             [] Check all noqa for good use
@@ -35,7 +39,8 @@ Release
             [] $ python -m pip freeze > requirements.txt
             [] Remove '-e' from requirements
             [] README usage/notes
-            [] Change version number in __init__.py/__main__.py, README.md and pyproject.toml
+            [] Change version number in conf/metadata.json
+            [] run conf/metadata.py
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
             [] Generate docs - $python -m pdoc --html -f -o docs src
             
@@ -44,13 +49,15 @@ Release
                 [] toolkit version matches gi.repository number
                 [] all I18N strings
                 [] about dialog icon path
+                [] do I18N for .po/.pot in src/gui/locale
                 
             [] Commit/push 'dev' for 'next release'
             [] Checkout new branch 'release' from 'dev'
 
         branch 'dev'
             --- Unit tests
-            Packages/Modules
+
+            Mod/Pkg
                 [] Test build - $ python -m build
                 [] Test in VM using GitHub/README
 
