@@ -14,6 +14,9 @@
 # TODO: init controls in window
 # TODO: set handler to class?
 
+# TODO: move handler class to a seperate file
+# how to get calsses together - without circular reference?
+
 # TODO: check for gtk version 3/4
 #   does gi.rtepository have a >= ?
 #   load ui file based on installed GTK version

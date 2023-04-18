@@ -23,12 +23,6 @@ None
 <!-- __RM_PY_DEPS_END__ -->
 
 ## Installing
-You should first run:
-```bash
-foo@bar:~$ sudo apt update && sudo apt upgrade
-```
-to make sure you have the lastest software installed.
-
 <!-- __RM_MOD_START__ -->
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/__PP_NAME_BIG__/releases/latest)

@@ -11,23 +11,17 @@
 ## "It mostly works™"
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
-A template for creating modules/packages/CLI apps/GTK3 apps in Python
+A program for creating module/package/CLI/GUI projects in Python from a template
 
 ## Requirements
 None
 
 ## Installing
-You should first run:
-```bash
-foo@bar:~$ sudo apt update && sudo apt upgrade
-```
-to make sure you have the lastest software installed.
-
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
 from the main branch.<br>
 Download either the 'tar.gz' or 'zip' file and extract it.<br>
-Rename the folder 'PyPlate' (without the version number').
+Rename the folder 'PyPlate' (without the version number).
 
 Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:
@@ -36,7 +30,7 @@ foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
 ```
 
-Next, cut/copy/paste the 'PyPlate' directory wherever you want. For all examples
+Next, cut/copy/paste the 'PyPlate' directory wherever you want. For the examples
 below, we will use '~/Documents/Projects/Python/'.
 ```bash
 foo@bar:~/Downloads$ mv PyPlate ~/Documents/Projects/Python

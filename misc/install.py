@@ -17,7 +17,7 @@ import installerator
 # ------------------------------------------------------------------------------
 
 # define the install settings
-dict_install = {
+g_dict_install = {
     'general': {
         'name': '__PP_NAME_BIG__'
     },
@@ -51,7 +51,7 @@ def main():
         Run the Installer module
 
         This is the main installer function, which creates an instance of the
-        Installer class and runs it's main function, with the global
+        Installer class and runs its main function, with the global
         dictionary created above.
     """
 
@@ -61,7 +61,7 @@ def main():
 
     # # run the instance
     # class.method
-    installer.run(dict_install)
+    installer.run(g_dict_install)
 
 
 # ------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ import installerator
 # ------------------------------------------------------------------------------
 
 # define the uninstall settings
-dict_uninstall = {
+g_dict_uninstall = {
     'general': {
         'name': '__PP_NAME_BIG__'
     },
@@ -55,7 +55,7 @@ def main():
 
     # # run the instance
     # class.method
-    uninstaller.run(dict_uninstall)
+    uninstaller.run(g_dict_uninstall)
 
 
 # ------------------------------------------------------------------------------

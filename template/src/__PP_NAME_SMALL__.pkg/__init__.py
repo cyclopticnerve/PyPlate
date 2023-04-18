@@ -6,10 +6,6 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# this file is only for package projects (multiple modules)
-# put any code here that you want to run whenever this package or its modules
-# are imported in a project
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------

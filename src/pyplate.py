@@ -38,7 +38,7 @@ path = os.path.join(DIR_CURR, '..', '..')
 DIR_PRJ_BASE = os.path.abspath(path)
 
 # date format
-PRJ_DATE = '%m/%d/%Y'
+DICT_DATE = '%m/%d/%Y'
 
 # files to include in project
 # paths are relative to DIR_TEMPLATE
@@ -145,10 +145,6 @@ DICT_README = {
 
 # the default settings to use to create the project
 # these can be used later by metadata.py (from misc/settings.json)
-
-# 'project' and 'info' are set using get_project_info()
-# 'skip' is used by recurse()
-
 g_dict_settings = {
     'project': {
         # m (Module), p (Package), c (CLI), g (GUI)
@@ -196,7 +192,8 @@ def get_project_info():
     """
         Get project info
 
-        Asks the user for project info, such as type and name.
+        Asks the user for project info, such as type and name to
+        g_dict_settings.
     """
 
     # the settings dict (global b/c we will modify here)
@@ -237,7 +234,7 @@ def get_project_info():
         if not _validate_name(prj_name_big):
             continue
 
-        # calculate final proj location
+        # calculate final project location
         prj_path = os.path.join(DIR_PRJ_BASE, type_dir, prj_name_big)
 
         # check if project already exists
@@ -255,7 +252,7 @@ def get_project_info():
     g_dict_settings['info']['__PP_NAME_SMALL__'] = prj_name_small
 
     # calculate current date
-    prj_date = datetime.now().strftime(PRJ_DATE)
+    prj_date = datetime.now().strftime(DICT_DATE)
     g_dict_settings['info']['__PP_DATE__'] = prj_date
 
 
@@ -266,24 +263,24 @@ def copy_template():
     """
         Copy template files to final location
 
-        Get file paths/names from g_dict_settings and copy them to the project
+        Get file paths/names from DICT_FILES and copy them to the project
         folder.
     """
+
+    # get project type
+    prj_type = g_dict_settings['project']['type']
 
     # create target folder
     prj_path = g_dict_settings['project']['path']
     os.makedirs(prj_path)
 
-    # get project type
-    proj_type = g_dict_settings['project']['type']
-
     # the group of files, common and type
     groups = [
         DICT_FILES['common'],
-        DICT_FILES[proj_type]
+        DICT_FILES[prj_type]
     ]
 
-    # for each group, common and type
+    # for each group, common and type, remove leading/triling slashes
     items = [item.strip(os.sep) for group in groups for item in group]
     for item in items:
 
@@ -303,16 +300,16 @@ def copy_template():
             # then copy file
             shutil.copy2(path_old, path_new)
 
-    # write g_dict_settings to conf file
-    file_path = os.path.join(prj_path, 'conf', 'settings.json')
-    with open(file_path, 'w', encoding='utf-8') as f:
-        dict_str = json.dumps(g_dict_settings, indent=4)
-        f.write(dict_str)
-
     # write DICT_BLACKLIST to conf file
     file_path = os.path.join(prj_path, 'conf', 'blacklist.json')
     with open(file_path, 'w', encoding='utf-8') as f:
         dict_str = json.dumps(DICT_BLACKLIST, indent=4)
+        f.write(dict_str)
+
+    # write g_dict_settings to conf file
+    file_path = os.path.join(prj_path, 'conf', 'settings.json')
+    with open(file_path, 'w', encoding='utf-8') as f:
+        dict_str = json.dumps(g_dict_settings, indent=4)
         f.write(dict_str)
 
 
@@ -368,14 +365,7 @@ def recurse(path):
     """
 
     # blacklist
-    # don't replace headers, text, or path names for these items
-    # skip_all = DICT_BLACKLIST['skip_all']
-    # skip_file = DICT_BLACKLIST['skip_file']
-    # skip_headers = DICT_BLACKLIST['skip_headers']
-    # skip_text = DICT_BLACKLIST['skip_text']
-    # skip_path = DICT_BLACKLIST['skip_path']
-
-    # remove all trailing slashes
+    # remove all leading/trailing slashes
     skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_all']]
     skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_file']]
     skip_headers = [item.strip(os.sep)
@@ -563,12 +553,11 @@ def _fix_readme(lines):
         CLI/GUI.
     """
 
-    # the strategy here is to go through the full README and only copy lines
+    # NB: the strategy here is to go through the full README and only copy lines
     # that are 1) not in any block or 2) in the block we want
     # the most efficient way to do this is to have an array that receives wanted
     # lines, then return that array
-
-    # NB: we use a new array vs. in-situ replacement here b/c we are removing
+    # we use a new array vs. in-situ replacement here b/c we are removing
     # A LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
     # while that would look *ok* in the resulting Markdown, looks UGLY in the
     # source code. so we opt for not copying those lines.
@@ -615,28 +604,30 @@ def _fix_readme(lines):
 
 
 # ------------------------------------------------------------------------------
-# Function for renaming files/folders
+# Function for renaming folders/files
 # ------------------------------------------------------------------------------
 def _fix_path(path):
     """
-        Function for renaming files/folders
+        Function for renaming folders/files
 
         Parameters:
-            path [string]: the path to the file/folder for renaming
+            path [string]: the path to the folder/file for renaming
 
         Returns:
             [string]: the new path for the specified folder/file
 
-        This is a function to rename files/folders. Given a path to a
-        file/folder, it renames the path by replacing keys in the
+        This is a function to rename folders/files. Given a path to a
+        folder/file, it renames the path by replacing items in the
         g_dict_settings keys with their appropriate replacements, and also
         removes any extraneous exts. This allows us to have different files and
         folders with the same name/ext, but quialifiers in between, thus:
         __PP_NAME_SMALL__.gui.py
         __PP_NAME_SMALL__.cli.py
-        can cexist in the template, but will both end up as:
+        can cexist in template/src, but will both end up as:
         __PP_NAME_SMALL__.py
-        in the project.
+        in project/src, and then
+        project.py
+        after __PP_NAME_SMALL__ replacement.
     """
 
     # the array of dunder replacements we will use
@@ -666,7 +657,7 @@ def _fix_path(path):
         # just use main name
         old_file = dot_array[0]
 
-    # put new name back with the 'up to last part'
+    # put new name back with the 'up to last' part
     new_path = os.path.join(old_dir, old_file)
 
     # return the new path name
@@ -693,26 +684,32 @@ def _validate_name(name):
         4. contains only alphanumeric chars
     """
 
-    # 1. check for blank name
+    # NB: there is an easier way to do this with regex:
+    # ^([a-zA-Z]|[a-zA-Z]+[a-zA-Z\d]*[a-zA-Z\d]+)$
+    # in casse you were looking for it. I don't use it here because I want to
+    # give the user as much feedback as possible. So I break down the regex into
+    # steps where each step explains which part of the name is wrong.
+
+    # check for blank name
     if name == '':
         return False
 
-    # 2. match start or return false
+    # match start or return false
     pattern = r'(^[a-zA-Z])'
     res = re.search(pattern, name)
     if not res:
         print('Project names must start with a letter')
         return False
 
-    # 3. match end or return false
-    pattern = r'([a-zA-Z0-9]$)'
+    # match end or return false
+    pattern = r'([a-zA-Z\d]$)'
     res = re.search(pattern, name)
     if not res:
         print('Project names must end with a letter or number')
         return False
 
-    # 4. match middle or return false
-    pattern = r'(^[a-zA-Z0-9]*$)'
+    # match middle or return false
+    pattern = r'(^[a-zA-Z\d]*$)'
     res = re.search(pattern, name)
     if not res:
         print('Project names must contain only letters or numbers')
