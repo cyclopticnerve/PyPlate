@@ -3,9 +3,9 @@
 # import os
 # import sys
 
-# DIR_CURR = os.path.abspath(os.path.dirname(__file__))
-# src_dir = os.path.abspath(os.path.join(DIR_CURR, '../src'))
-# sys.path.insert(1, src_dir)
+# dir = os.path.dirname(__file__)
+# dir_src = os.path.abspath(os.path.join(dir, '..', 'src'))
+# sys.path.insert(0, dir_src)
 
 # ------------------------------------------------------------------------------
 

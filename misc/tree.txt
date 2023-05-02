@@ -1,0 +1,70 @@
+.
+├── conf
+│   ├── blacklist.json
+│   ├── metadata.json
+│   ├── metadata.py
+│   └── settings.json
+├── docs
+│   └── ABOUT
+├── misc
+│   ├── checklist.txt
+│   ├── import_test.mod.py
+│   ├── import_test.pkg.py
+│   ├── install.py
+│   ├── __PP_NAME_SMALL__.gui.gtk4.py
+│   ├── screenshot.jpg
+│   ├── snippets.txt
+│   ├── style.txt
+│   ├── todo.txt
+│   ├── tree.txt
+│   └── uninstall.py
+├── src
+│   └── pyplate.py
+├── template
+│   ├── conf
+│   │   ├── blacklist.json
+│   │   ├── metadata.json
+│   │   ├── metadata.py
+│   │   └── settings.json
+│   ├── docs
+│   │   └── ABOUT
+│   ├── misc
+│   │   ├── checklist.txt
+│   │   ├── empty_class.py
+│   │   ├── empty_cli.py
+│   │   ├── empty_mod.py
+│   │   ├── screenshot.jpg
+│   │   ├── snippets.txt
+│   │   ├── style.txt
+│   │   ├── todo.txt
+│   │   └── tree.txt
+│   ├── src
+│   │   ├── __PP_NAME_SMALL__.gui
+│   │   │   ├── locale
+│   │   │   │   └── en_US.po
+│   │   │   ├── __pycache__
+│   │   │   ├── __PP_NAME_BIG__.desktop
+│   │   │   ├── __PP_NAME_BIG__Handler.py
+│   │   │   ├── __PP_NAME_SMALL__-gtk3.ui
+│   │   │   └── __PP_NAME_SMALL__.png
+│   │   ├── __PP_NAME_SMALL__.pkg
+│   │   │   ├── __init__.py
+│   │   │   ├── mod_name_1.py
+│   │   │   └── mod_name_2.py
+│   │   ├── __PP_NAME_SMALL__.cli.py
+│   │   ├── __PP_NAME_SMALL__.gui.py
+│   │   └── __PP_NAME_SMALL__.mod.py
+│   ├── tests
+│   │   └── ABOUT
+│   ├── CHANGELOG.md
+│   ├── LICENSE.txt
+│   ├── MANIFEST.in
+│   ├── pyproject.toml
+│   ├── README.md
+│   └── requirements.txt
+├── tests
+│   └── ABOUT
+├── CHANGELOG.md
+├── LICENSE.txt
+├── README.md
+└── requirements.txt

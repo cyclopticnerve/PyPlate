@@ -22,20 +22,20 @@ import subprocess
 # Constants
 # ------------------------------------------------------------------------------
 
-# this is the dir where the script is being run from
+# this is the dir above where the script is being run from
 # (e.g. ~/Documents/Projects/Python/PyPlate/src/)
-path = os.path.abspath(__file__)
-DIR_CURR = os.path.dirname(path)
+dir = os.path.dirname(__file__)
+dir_pyplate = os.path.join(dir, '..')
+DIR_PYPLATE = os.path.abspath(dir_pyplate)
 
 # this is the dir where the template files are located rel to the script
 # (e.g. ~/Documents/Projects/Python/PyPlate/template/)
-path = os.path.join(DIR_CURR, '..', 'template')
-DIR_TEMPLATE = os.path.abspath(path)
+DIR_TEMPLATE = os.path.join(DIR_PYPLATE, 'template')
 
 # this is the dir for project location (above PyPlate)
 # (e.g. ~/Documents/Projects/Python/)
-path = os.path.join(DIR_CURR, '..', '..')
-DIR_PRJ_BASE = os.path.abspath(path)
+dir_base = os.path.join(DIR_PYPLATE, '..')
+DIR_BASE = os.path.abspath(dir_base)
 
 # date format
 DICT_DATE = '%m/%d/%Y'
@@ -51,6 +51,7 @@ DICT_FILES = {
         'misc',
         'tests',
         '.gitignore',
+        'CHANGELOG.md',
         'LICENSE.txt',
         'README.md',
         'requirements.txt',
@@ -77,7 +78,7 @@ DICT_FILES = {
 
     # for gui projects
     'g': [
-        'src/__PP_NAME_SMALL__.gui',
+        'src/gui',
         'src/__PP_NAME_SMALL__.gui.py',
     ],
 }
@@ -103,7 +104,7 @@ DICT_BLACKLIST = {
     ],
 
     # don't fix/check headers
-    'skip_headers': [
+    'skip_header': [
     ],
 
     # don't fix/check text
@@ -128,14 +129,14 @@ LIST_HEADER = [
 # the dict of README sections/tags to remove
 DICT_README = {
     'mp': {
-        'delete_start': '<!-- __RM_APP_START__ -->',
-        'delete_end':   '<!-- __RM_APP_END__ -->',
-        'delete_tag':   '<!-- __RM_MOD_',
+        'rm_delete_start': '<!-- __RM_APP_START__ -->',
+        'rm_delete_end':   '<!-- __RM_APP_END__ -->',
+        'rm_delete_tag':   '<!-- __RM_MOD_',
     },
     'cg': {
-        'delete_start': '<!-- __RM_MOD_START__ -->',
-        'delete_end':   '<!-- __RM_MOD_END__ -->',
-        'delete_tag':   '<!-- __RM_APP_',
+        'rm_delete_start': '<!-- __RM_MOD_START__ -->',
+        'rm_delete_end':   '<!-- __RM_MOD_END__ -->',
+        'rm_delete_tag':   '<!-- __RM_APP_',
     },
 }
 
@@ -149,8 +150,8 @@ g_dict_settings = {
     'project': {
         # m (Module), p (Package), c (CLI), g (GUI)
         'type':                 '',
-        # path to project (DIR_PRJ_BASE/type_dir/Foo)
-        'path':                 '',
+        # path to project (DIR_BASE/dir_type/MyProject)
+        'dir':                  '',
     },
     'info': {
         '__PP_NAME_BIG__':      '',     # MyProject
@@ -165,24 +166,26 @@ g_dict_settings = {
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Main function
+# The main function of the program
 # ------------------------------------------------------------------------------
 def main():
     """
-        Main function
+        The main function of the program
 
-        This is the main function, which calls each step in the process of
-        creating a project.
+        This function is the main entry point for the program, initializing the
+        program, and performing its steps.
     """
 
     # call each step to create project
     get_project_info()
     copy_template()
-    add_extras()
 
     # call recurse to do replacements in final project location
-    path = g_dict_settings['project']['path']
-    recurse(path)
+    dir = g_dict_settings['project']['dir']
+    recurse(dir)
+
+    # do stuff to final dir after recurse
+    do_extras()
 
 
 # ------------------------------------------------------------------------------
@@ -192,7 +195,7 @@ def get_project_info():
     """
         Get project info
 
-        Asks the user for project info, such as type and name to
+        Asks the user for project info, such as type and name, to be saved to
         g_dict_settings.
     """
 
@@ -203,57 +206,57 @@ def get_project_info():
     while True:
 
         # ask what type of project
-        prj_type = input(
+        type_prj = input(
             'Project type: [m]odule | [p]ackage | [c]li | [g]ui: '
         )
 
         # check project type
         pattern = r'(^(m|p|c|g{1})$)'
-        res = re.search(pattern, prj_type, re.I)
+        res = re.search(pattern, type_prj, re.I)
         if res:
 
             # we got a valid type
-            prj_type = prj_type.lower()
-            g_dict_settings['project']['type'] = prj_type
+            type_prj = type_prj.lower()
+            g_dict_settings['project']['type'] = type_prj
             break
 
     # configure subdir
-    type_dir = ''
-    if prj_type in 'mp':
-        type_dir = 'Libs'
+    dir_type = ''
+    if type_prj in 'mp':
+        dir_type = 'Libs'
     else:
-        type_dir = 'Apps'
+        dir_type = 'Apps'
 
     # loop forever until we get a valid name and path
     while True:
 
         # ask for project name
-        prj_name_big = input('Project name: ')
+        info_name_big = input('Project name: ')
 
         # check for valid name
-        if not _validate_name(prj_name_big):
+        if not _fix_name(info_name_big):
             continue
 
         # calculate final project location
-        prj_path = os.path.join(DIR_PRJ_BASE, type_dir, prj_name_big)
+        dir_prj = os.path.join(DIR_BASE, dir_type, info_name_big)
 
         # check if project already exists
-        if os.path.exists(prj_path):
-            print(f'Project {prj_path} already exists')
+        if os.path.exists(dir_prj):
+            print(f'Project {dir_prj} already exists')
             continue
 
         # if name is valid, move on
-        g_dict_settings['info']['__PP_NAME_BIG__'] = prj_name_big
-        g_dict_settings['project']['path'] = prj_path
+        g_dict_settings['info']['__PP_NAME_BIG__'] = info_name_big
+        g_dict_settings['project']['dir'] = dir_prj
         break
 
     # calculate small name
-    prj_name_small = prj_name_big.lower()
-    g_dict_settings['info']['__PP_NAME_SMALL__'] = prj_name_small
+    info_name_small = info_name_big.lower()
+    g_dict_settings['info']['__PP_NAME_SMALL__'] = info_name_small
 
     # calculate current date
-    prj_date = datetime.now().strftime(DICT_DATE)
-    g_dict_settings['info']['__PP_DATE__'] = prj_date
+    info_date = datetime.now().strftime(DICT_DATE)
+    g_dict_settings['info']['__PP_DATE__'] = info_date
 
 
 # ------------------------------------------------------------------------------
@@ -268,25 +271,25 @@ def copy_template():
     """
 
     # get project type
-    prj_type = g_dict_settings['project']['type']
+    type_prj = g_dict_settings['project']['type']
 
     # create target folder
-    prj_path = g_dict_settings['project']['path']
-    os.makedirs(prj_path)
+    dir_prj = g_dict_settings['project']['dir']
+    os.makedirs(dir_prj)
 
     # the group of files, common and type
     groups = [
         DICT_FILES['common'],
-        DICT_FILES[prj_type]
+        DICT_FILES[type_prj]
     ]
 
-    # for each group, common and type, remove leading/triling slashes
+    # for each group, common and type, remove leading/trailing slashes
     items = [item.strip(os.sep) for group in groups for item in group]
     for item in items:
 
         # build old path/new path
         path_old = os.path.join(DIR_TEMPLATE, item)
-        path_new = os.path.join(prj_path, item)
+        path_new = os.path.join(dir_prj, item)
 
         # if it's a dir, copy dir
         if os.path.isdir(path_old):
@@ -300,61 +303,41 @@ def copy_template():
             # then copy file
             shutil.copy2(path_old, path_new)
 
+    # copy the 'starter kit' of requirements
+    # NB: this is all the reqs collected while developing PyPlate
+    # should be a good place to start developing a project in VSCode
+    # also by copying from this project rather than hard-coding the list, it
+    # will get updated every time the PyPlate project file is updated, making
+    # it future-proof*
+    # (* not guaranteed to be future-proof)
+    path_old = os.path.join(DIR_PYPLATE, 'requirements.txt')
+    path_new = os.path.join(dir_prj, 'requirements.txt')
+    shutil.copy2(path_old, path_new)
+
     # write DICT_BLACKLIST to conf file
-    file_path = os.path.join(prj_path, 'conf', 'blacklist.json')
-    with open(file_path, 'w', encoding='utf-8') as f:
-        dict_str = json.dumps(DICT_BLACKLIST, indent=4)
-        f.write(dict_str)
+    path_blacklist = os.path.join(dir_prj, 'conf', 'blacklist.json')
+    with open(path_blacklist, 'w', encoding='utf-8') as f:
+        dict_blacklist = json.dumps(DICT_BLACKLIST, indent=4)
+        f.write(dict_blacklist)
 
     # write g_dict_settings to conf file
-    file_path = os.path.join(prj_path, 'conf', 'settings.json')
-    with open(file_path, 'w', encoding='utf-8') as f:
-        dict_str = json.dumps(g_dict_settings, indent=4)
-        f.write(dict_str)
+    path_settings = os.path.join(dir_prj, 'conf', 'settings.json')
+    with open(path_settings, 'w', encoding='utf-8') as f:
+        dict_settings = json.dumps(g_dict_settings, indent=4)
+        f.write(dict_settings)
 
 
 # ------------------------------------------------------------------------------
-# Add .git and .venv folders to new project
+# Recursively scan folders/files for replace/rename functions
 # ------------------------------------------------------------------------------
-def add_extras():
+def recurse(dir):
     """
-        Add .git and .venv folders to new project
-
-        Adds a .git folder (repository) and a .venv (virtual environment) folder
-        to the project, and sets them up as necessary.
-    """
-
-    # make sure we are in current proj path
-    curr_dir = os.getcwd()
-    dir = g_dict_settings['project']['path']
-    os.chdir(dir)
-
-    # add git folder
-    cmd = 'git init'
-    cmd_array = shlex.split(cmd)
-    subprocess.run(cmd_array)
-
-    # add venv dir
-    # NB: use '.venv' to be compatible with VSCodium
-    cmd = 'python -m venv .venv'
-    cmd_array = shlex.split(cmd)
-    subprocess.run(cmd_array)
-
-    # go back to old dir
-    os.chdir(curr_dir)
-
-
-# ------------------------------------------------------------------------------
-# Recursively scan files/folders for replace/rename functions
-# ------------------------------------------------------------------------------
-def recurse(path):
-    """
-        Recursively scan files/folders for replace/rename functions
+        Recursively scan folders/files for replace/rename functions
 
         Parameters:
-            path [string]: the folder to start recursively scanning from
+            dir [string]: the directory to start recursively scanning from
 
-        This is a recursive function to scan for files/folders under a given
+        This is a recursive function to scan for folders/files under a given
         folder. It iterates over the contents of the 'path' folder, checking if
         each item is a file or a folder. If it encounters a folder, it calls
         itself recursively, passing that folder as the parameter. If it
@@ -365,20 +348,20 @@ def recurse(path):
     """
 
     # blacklist
+    # don't check everything, headers, text, or path names for these items
     # remove all leading/trailing slashes
     skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_all']]
     skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_file']]
-    skip_headers = [item.strip(os.sep)
-                    for item in DICT_BLACKLIST['skip_headers']]
+    skip_header = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_header']]
     skip_text = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_text']]
     skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_path']]
 
     # get list of file names in dest dir
-    items = [item for item in os.listdir(path) if item not in skip_all]
+    items = [item for item in os.listdir(dir) if item not in skip_all]
     for item in items:
 
         # put path back together
-        path_item = os.path.join(path, item)
+        path_item = os.path.join(dir, item)
 
         # if it's a dir
         if os.path.isdir(path_item):
@@ -396,8 +379,8 @@ def recurse(path):
                     lines = f.readlines()
 
                     # replace headers from lines
-                    if item not in skip_headers:
-                        lines = _fix_headers(lines)
+                    if item not in skip_header:
+                        lines = _fix_header(lines)
 
                     # replace text from lines
                     if item not in skip_text:
@@ -413,13 +396,54 @@ def recurse(path):
 
         # fix path/ext
         if item not in skip_path:
-            new_path = _fix_path(path_item)
+            path_new = _fix_path(path_item)
 
             # if a rename is required
-            if path_item != new_path:
+            if path_item != path_new:
 
                 # do the rename
-                os.rename(path_item, new_path)
+                os.rename(path_item, path_new)
+
+
+# ------------------------------------------------------------------------------
+# Add extra folders/file to new project after recurse
+# ------------------------------------------------------------------------------
+def do_extras():
+    """
+        Add extra folders/files to new project after recurse
+
+        Adds a .git folder (repository) and a .venv (virtual environment) folder
+        to the project, and sets them up as necessary.
+    """
+
+    # get pyplate/src dir
+    dir_curr = os.getcwd()
+
+    # make sure we are in project path
+    dir_prj = g_dict_settings['project']['dir']
+    os.chdir(dir_prj)
+
+    # add git folder
+    cmd = 'git init'
+    cmd_array = shlex.split(cmd)
+    subprocess.run(cmd_array)
+
+    # add venv dir
+    # NB: use '.venv' to be compatible with VSCodium
+    cmd = 'python -m venv .venv'
+    cmd_array = shlex.split(cmd)
+    subprocess.run(cmd_array)
+
+    # create tree
+    path_tree = os.path.join(dir_prj, 'misc', 'tree.txt')
+    with open(path_tree, 'w', encoding='utf-8') as f:
+
+        cmd = 'tree --dirsfirst --noreport --gitignore'
+        cmd_array = shlex.split(cmd)
+        subprocess.run(cmd_array, stdout=f)
+
+    # go back to old dir
+    os.chdir(dir_curr)
 
 
 # ------------------------------------------------------------------------------
@@ -429,7 +453,7 @@ def recurse(path):
 # ------------------------------------------------------------------------------
 # Replace header text inside files
 # ------------------------------------------------------------------------------
-def _fix_headers(lines):
+def _fix_header(lines):
     """
         Replace header text inside files
 
@@ -446,7 +470,7 @@ def _fix_headers(lines):
     """
 
     # the array of dunder replacements we will use
-    prj_info = g_dict_settings['info']
+    info = g_dict_settings['info']
 
     # for each line in array
     for i in range(0, len(lines)):
@@ -469,7 +493,7 @@ def _fix_headers(lines):
             if res:
 
                 # get the new value from settings
-                rep = prj_info[hdr_pair[1]]
+                rep = info[hdr_pair[1]]
 
                 # count what we will need without spaces
                 key_cnt = (
@@ -487,14 +511,14 @@ def _fix_headers(lines):
                 # can't have trailing spaces)
                 # 2. subtract 1 for the newline
                 # 3. subtract the other match lengths
-                spaces = (
+                int_spaces = (
                     len(lines[i]) - 1 - key_cnt
                 )
-                spaces_str = ' ' * spaces
+                str_spaces = ' ' * int_spaces
 
                 # replace text in the line
-                rep_str = rf'\g<1>\g<2>\g<3>{rep}\g<5>{spaces_str}\g<7>'
-                lines[i] = re.sub(pattern, rep_str, lines[i])
+                str_rep = rf'\g<1>\g<2>\g<3>{rep}\g<5>{str_spaces}\g<7>'
+                lines[i] = re.sub(pattern, str_rep, lines[i])
 
     # return the changed lines
     return lines
@@ -521,15 +545,15 @@ def _fix_text(lines):
     """
 
     # the array of dunder replacements we will use
-    prj_info = g_dict_settings['info']
+    info = g_dict_settings['info']
 
     # for each line in array
     for i in range(0, len(lines)):
 
         # replace text in line
-        for key in prj_info.keys():
+        for key in info.keys():
             if key in lines[i]:
-                lines[i] = lines[i].replace(key, prj_info[key])
+                lines[i] = lines[i].replace(key, info[key])
 
     # save file with replacements
     return lines
@@ -570,33 +594,33 @@ def _fix_readme(lines):
     new_lines = []
 
     # what type of project are we creating?
-    prj_type = g_dict_settings['project']['type']
+    type_prj = g_dict_settings['project']['type']
 
     # what to ignore in the text
     for key in DICT_README.keys():
-        if prj_type in key:
+        if type_prj in key:
 
             # get values for keys
-            delete_start = DICT_README[key]['delete_start']
-            delete_end = DICT_README[key]['delete_end']
-            delete_tag = DICT_README[key]['delete_tag']
+            rm_delete_start = DICT_README[key]['rm_delete_start']
+            rm_delete_end = DICT_README[key]['rm_delete_end']
+            rm_delete_tag = DICT_README[key]['rm_delete_tag']
 
     # for each line
     for line in lines:
 
         # check if we have entered an invalid block
-        if delete_start in line:
+        if rm_delete_start in line:
             ignore = True
 
         # we're still in a valid block
         if not ignore:
 
             # ignore block wrapper lines
-            if delete_tag not in line:
+            if rm_delete_tag not in line:
                 new_lines.append(line)
 
         # check if we have left the invalid block
-        if delete_end in line:
+        if rm_delete_end in line:
             ignore = False
 
     # return the new set of lines
@@ -620,54 +644,55 @@ def _fix_path(path):
         folder/file, it renames the path by replacing items in the
         g_dict_settings keys with their appropriate replacements, and also
         removes any extraneous exts. This allows us to have different files and
-        folders with the same name/ext, but quialifiers in between, thus:
+        folders with the same name/ext, but qualifiers in between, thus:
         __PP_NAME_SMALL__.gui.py
         __PP_NAME_SMALL__.cli.py
-        can cexist in template/src, but will both end up as:
-        __PP_NAME_SMALL__.py
-        in project/src, and then
+        can coexist in template/src, but will both end up as:
+        project.gui.py
+        project.cli.py
+        after __PP_NAME_SMALL__ replacement, and then:
         project.py
-        after __PP_NAME_SMALL__ replacement.
+        after ext replacement.
     """
 
     # the array of dunder replacements we will use
-    prj_info = g_dict_settings['info']
+    info = g_dict_settings['info']
 
     # split the path into everything up to last part, and last part itself
-    old_dir, old_file = os.path.split(path)
+    dir_old, file_old = os.path.split(path)
 
     # replace dunders in last path component
-    for key in prj_info.keys():
-        old_file = old_file.replace(key, prj_info[key])
+    for key in info.keys():
+        file_old = file_old.replace(key, info[key])
 
     # split last part by dot
-    dot_array = old_file.split('.')
+    dot_array = file_old.split('.')
 
     # if there are two or more dots
     # foo.bar.py
     if len(dot_array) > 2:
 
         # put back together using main name and last ext
-        old_file = dot_array[0] + '.' + dot_array[-1]
+        file_old = dot_array[0] + '.' + dot_array[-1]
 
     # if there is only one dot, and it's a folder
     # foo.bar/
     elif len(dot_array) > 1 and os.path.isdir(path):
 
         # just use main name
-        old_file = dot_array[0]
+        file_old = dot_array[0]
 
     # put new name back with the 'up to last' part
-    new_path = os.path.join(old_dir, old_file)
+    path_new = os.path.join(dir_old, file_old)
 
     # return the new path name
-    return new_path
+    return path_new
 
 
 # ------------------------------------------------------------------------------
 # Check project name for allowed characters
 # ------------------------------------------------------------------------------
-def _validate_name(name):
+def _fix_name(name):
     """
         Check project name for allowed characters
 
@@ -686,9 +711,11 @@ def _validate_name(name):
 
     # NB: there is an easier way to do this with regex:
     # ^([a-zA-Z]|[a-zA-Z]+[a-zA-Z\d]*[a-zA-Z\d]+)$
-    # in casse you were looking for it. I don't use it here because I want to
-    # give the user as much feedback as possible. So I break down the regex into
-    # steps where each step explains which part of the name is wrong.
+    # AND OMG DID IT TAKE A LONG TIME TO FIND IT!
+    # in case you were looking for it. It will give you a quick yes-no answer.
+    # I don't use it here because I want to give the user as much feedback as
+    # possible, so I break down the regex into steps where each step explains
+    # which part of the name is wrong.
 
     # check for blank name
     if name == '':
@@ -730,6 +757,7 @@ if __name__ == '__main__':
         is invoked from the command line.
     """
 
+    # run main function
     main()
 
 # -)

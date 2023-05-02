@@ -42,6 +42,33 @@ def func_1():
         Long description.
     """
 
-    return ('this is a test 1')
+    print('this is func_1')
+    return _func_1()
+
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Short description
+# ------------------------------------------------------------------------------
+def _func_1():
+    """
+        Short description
+
+        Paramaters:
+            var_name [type]: description
+
+        Returns:
+            [type]: description
+
+        Raises:
+            exception_type(vars): description
+
+        Long description.
+    """
+
+    return ('this is _func_1')
 
 # -)

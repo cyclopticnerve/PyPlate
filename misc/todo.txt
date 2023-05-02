@@ -28,55 +28,86 @@ testing
     inst release - 
     inst latest - 
 
+empty_class - 
+empty_cli   - __PP_NAME_SMALL__.cli.py
+empty_mod   - __PP_NAME_SMALL__.mod.py
+empty_mod   - mod_name_1.py
+empty_mod   - mod_name_2.py
+empty_cli   - __PP_NAME_SMALL__.gui.py
 
-TODO: put version num in pyplate readme/update value in misc/settings.json
+hdr txt path
+0   0   0       skip_all
+0   0   1       skip_headers/skip_text (skip_file)
+0   1   0       skip_headers/skip_path
+0   1   1       skip_headers
+1   0   0       skip_text/skip_path
+1   0   1       skip_text
+1   1   0       skip_path
+1   1   1
+
+
+TODO: put version num in PyPlate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
-
-TODO: Pyplate should only do dunders in source folder and top level files
-Same with metadata
-Blacklist is too messy
-
-TODO: test README instructions for all - latest/clone/ununstall
+TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
 check readme for install instructions 
 one has big name, one has small name for tar.gz
-
-TODO: spellcheck
-TODO: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
-also look at official python docs
-or autoDocstring ext
-
-TODO: diff main pyplate dir with template (before metadata)
 TODO: metadata.py: get freedesktop format locations for exec/icon
-TODO: metadata.py: consts to dunders - use find/replace
 
 
+NEXT: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
+also look at official python docs or autoDocstring ext
+check for docstrings linter? pydocstyle?
+how to document text/json files in docs? add files? and how to add LOONG documentation
+to docs? i.e. long descs of each param?
+NEXT: metadata should do replacements first, then do checks
+NEXT: metadata.py: consts to dunders - use find/replace
+NEXT: add version number as a heading to README
+NEXT: add changelog to README
+NEXT: PyPlate should only do dunders in source folder and top level files
+Same with metadata
+Blacklist is too messy - whitelist is easier?
 NEXT: document the template structure in README
-NEXT: run pip freeze into template during copy
-NEXT: convert pyplate recurse stuff from lines[] to text()
+NEXT: convert PyPlate recurse stuff from lines[] to text()
 NEXT: move all string-based constants to files in conf
 NEXT: releases in GItHub have version number in file/folder name
 Makes it hard to overwrite older versions when copy/paste
-alos correlates to pyplate readme
+also correlates to PyPlate readme
 NEXT: custom snippets https://code.visualstudio.com/docs/editor/userdefinedsnippets
 NEXT: docs module starts at src? need to start at module/package
-Does it do the same thiong when built?
+Does it do the same thing when built?
 NEXT: what to do with snippets.txt? do we need it?
 NEXT: make py deps have values that are versions (=>3.10) etc for pyproject.toml?
-NEXT: figure out what to do with install/uninstall - PyInstaller? Inetallerator?
+NEXT: figure out what to do with install/uninstall - PyInstaller? Installerator?
 NEXT: conf files from json to toml, add comments
 NEXT: README: need to figure out if Installerator/Configurator are actually deps
 NEXT: README: if there is a file in misc starting with 'screenshot', uncomment that line in README
 what to do about placeholder file? and file ext?
-NEXT: recurse code in pyplate/metadata similar... can we combine?
+NEXT: recurse code in PyPlate/metadata similar... can we combine?
 NEXT: make checklist as html/interactive
+NEXT: make tree.txt/style.txt as html w/checkboxes
 NEXT: change all header date to version ???
 NEXT: check cspell
 NEXT: run every f-ing linter
-NEXT: inverstigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
+NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
-    
+
+DONE: spellcheck
+DONE: diff main PyPlate dir with template (before metadata)
+DONE: add reqs/docs/changelog to metadata.py
+DONE: Move all style entries from todo and checklist into separate style guide
+DONE: copy project reqs from PyPlate reqs, which are pulled from .venv
+DONE: check for _path, _file, _dir, _str, _lst and swap
+DONE: check for path_, file_, dir_, str_, lst_
+DONE: check for _proj and make _prj
+DONE: check for proj_ and make prj_
+DONE: check for _prj and swap
+DONE: check for prj_
+DONE: path - whole thing
+DONE: file - name only
+DONE: dir - up to name or if a folder
+DONE: run pip freeze into template during copy
 DONE: docs folder is empty in template, so doesn't get into GitHub
 DONE: why does PP_SHORT_DESC/PP_VERSION change in misc/empty_main.py?
 DONE: __PP_NAME_BIG__ in empty_main.py? can we live with one error?
@@ -84,7 +115,7 @@ DONE: in metadata.json, make py deps into dict and add links for README
 DONE: check _split_quote in toml/install
 DONE: gui categories have commas in file, split on comma and join with semicolon
 DONE: finish argparse test to see if we can count args needed vs. args given
-DONE: put recursion blacklist of project in settings.json (will need default in pyplate)
+DONE: put recursion blacklist of project in settings.json (will need default in PyPlate)
 DONE: Module/Package: get rid of import tests after ensuring __init__.py works as expected
 DONE: metadata.py: metadata's own headers not replaced as it is in misc/
 DONE: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
@@ -92,34 +123,21 @@ DONE: put blacklist back in for recursing (easier to maintain/move to agnostic)
 DONE: versionator script 
 DONE: add argparse to empty_exe.py
 DONE: some sort of script to go back after and check that all reps are done
-DONE: keep. .py ext in pyplate/project
+DONE: keep. .py ext in PyPlate/project
 DONE: initial filename in header of first src file (src/modtest - modtest.py)
 DONE: what about exec/icon paths in .desktop?
 DONE: _replace_headers could be done better with regex
 DONE: for pkg type, make sure all submodule names are in __init__.py
 
 
-remove some exts from executables after installing
+remove .py exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
 
-Use pyplate to make a project called pymaker
-Install pymaker like a CLI
+Use PyPlate to make a project called PyMaker
+Install PyMaker like a CLI
 
-move pyplate to /usr/bin so we can call it from anywhere
+move PyPlate/PyMaker to /usr/bin so we can call it from anywhere
 add param to set location of project
-
-try to use more list/dict comprehensions
-try to reduce re flags
-
-Check that first line of docstring matches comment block
-Check that last line of docstring ends w/ a period
-check for docstrings - other linter? pydocstyle?
-docstring types have params wrapped in parens, not brackets
-where do we use brackets?
-
-def keyword:
-'function' not in a class
-'method' in a class
 
 CLI/GUI: what files to add to install.py when copying
 (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and ~/.cyclopticnerve/proj/app/gui)
@@ -131,10 +149,10 @@ Can't compare tags in main as changelog will be modified after tag is added
 
 when creating a CLI or GUI app, after creating venv, download and install 
 installerator and configurator and build and pylama
-default install script should be modified by pyplate to download and install 
+default install script should be modified by PyPlate to download and install 
 installator and configurator in the prerequisites
 Add pip install from GitHub instructions to readme
-How to know if we are using the latest version of pyplate, installer and 
+How to know if we are using the latest version of PyPlate, installer and 
 configurator
 pyproject deps should include inst/cfg for gui/cli but they need to be in pyPI
 pyproject.toml should automatically add configurator and installerator for 
@@ -155,3 +173,49 @@ requirements? pip install -r requirements.txt
 
 python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git#egg=__PP_NAME_BIG__         # from default branch
 python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git@maine#egg=__PP_NAME_BIG__   # from specific branch
+
+
+# TODO: what to do about descs? toml? or help file?
+# 'metadata' will be edited by the user through 'conf/metadata.json'
+
+# the following caveats apply to 'metadata':
+
+# PP_VERSION
+# this is the canonical (only and absolute) version number string for this
+# project
+# this should provide the absolute version number string (in semantic notation)
+# of this project, and all other version numbers should be superseded by this
+# string
+
+# PP_SHORT_DESC
+# this is the short description of the project, used in README.md and
+# # pyproject.toml
+
+# PP_KEYWORDS
+# these are the keywords for the project, for use in pyproject.toml for the PyPI
+# listing, and should also be used in the GitHub project page
+# delimiters for all entries MUST be common
+
+# PP_PY_DEPS
+# these are the python dependencies for the project
+# they are stored here for install.py, pyproject.toml, and README.md
+# it is a dictionary where the key is the dep name, and the value is a link to
+# the download page (for README)
+# when used in pyproject.toml or install.py, it will be automatically downloaded
+# from PyPI by pip using just the name
+
+# PP_SYS_DEPS
+# these are the system dependencies for the project
+# they are stored here for install.py
+# delimiters for all entries MUST be comma
+
+# PP_GUI_CATEGORIES = ''
+# PP_GUI_EXEC = ''
+# PP_GUI_ICON = ''
+# this is mostly for desktops that use a windows-style menu/submenu, not for
+# Ubuntu-style overviews, and will be used in the __PP_NAME_BIG__.desktop file
+# gui categories MUST be separated by a comma
+# if exec/icon paths are not absolute, they will be found in standard paths
+# these paths vary, but I will add them here in the comments when I figure them
+# out
+

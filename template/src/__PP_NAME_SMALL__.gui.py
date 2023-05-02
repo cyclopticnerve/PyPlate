@@ -7,27 +7,25 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# TODO: flesh this out more once we use it for a gui app
-# this is a hot mess
-# what level indenting???
-
-# TODO: init controls in window
-# TODO: set handler to class?
-
-# TODO: move handler class to seperate file
-#     how to avoid circular imports?
-
-# TODO: check for gtk version 3/4
-#   does gi.rtepository have a >= ?
-#   load ui file based on installed GTK version
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 import argparse
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk  # noqa: E402 (module import not at top of file)
+import os
+import sys
+
+# this is the dir where the script is being run from
+# # (e.g. ~/Documents/Projects/Python/Apps/__PP_NAME_BIG__)
+dir_curr = os.path.dirname(__file__)
+
+# this is the dir where the gui files are located relative to the script
+# (e.g. ~/Documents/Projects/Python/Apps/__PP_NAME_BIG__/gui)
+dir_gui = os.path.join(dir_curr, 'gui')
+
+# add gui path to sys path to import handler
+sys.path.insert(0, dir_gui)
+
+import __PP_NAME_BIG__Handler as handler  # noqa: E402 (import not at top of file)
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -50,40 +48,37 @@ def main():
         The main function of the program
 
         This function is the main entry point for the program, initializing the
-        GUI and attaching it to the underlying Python program.
+        program, and performing its steps.
     """
 
     # NB: uncomment this line and add args to _add_args()
     # args = _parse_args()
 
-# ------------------------------------------------------------------------------
-
-    class __PP_NAME_BIG__App(Gtk.Application):
-
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-            self.connect('activate', self.on_activate)
-
-        def on_activate(self, app):
-
-            # load file from abs path
-            builder = Gtk.Builder()
-            builder.add_from_file('__PP_NAME_SMALL__-gtk3.ui')
-            builder.connect_signals(self)
-
-            # show window
-            winMain = builder.get_object('__PP_NAME_SMALL__.winMain')
-            self.add_window(winMain)
-            winMain.present()
-
-        # def clicked(self, obj):
-        #     print('click')
-
     # show the window
-    __PP_NAME_SMALL__App = __PP_NAME_BIG__App()
+    __PP_NAME_SMALL__App = __PP_NAME_BIG__handler.__PP_NAME_BIG__App()  # noqa: E602 (undefined name)
     __PP_NAME_SMALL__App.run()
 
+
 # ------------------------------------------------------------------------------
+# Short description
+# ------------------------------------------------------------------------------
+def func():
+    """
+        Short description
+
+        Paramaters:
+            var_name [type]: description
+
+        Returns:
+            [type]: description
+
+        Raises:
+            exception_type(vars): description
+
+        Long description.
+    """
+
+    return ('this is a test')
 
 
 # ------------------------------------------------------------------------------
@@ -120,18 +115,18 @@ def _parse_args():
             [dict]: the dict of commands passed on the command line
 
         This function gets the command line passed to the program, parses it,
-        and returns the command line options as a list.
+        and returns the command line options as a dict.
     """
 
     # create the parser
     argparser = argparse.ArgumentParser(
-        description='A short description'
+        description='PP_SHORT_DESC'
     )
 
     # always print prog name/version
-    print('GUITest version 0.1.0')
+    print('__PP_NAME_BIG__ version PP_VERSION')
 
-    # add arguments here
+    # add arguments from the function above
     add_args(argparser)
 
     # parse the arg list into a Namespace object (similar to dict)
@@ -145,10 +140,10 @@ def _parse_args():
     argparser.print_usage()
 
     # convert agrs to dict
-    arg_dict = vars(args)
+    dict_args = vars(args)
 
     # return the object for inspection
-    return arg_dict
+    return dict_args
 
 
 # ------------------------------------------------------------------------------
@@ -162,6 +157,7 @@ if __name__ == '__main__':
         is invoked from the command line.
     """
 
+    # run main function
     main()
 
 # -)

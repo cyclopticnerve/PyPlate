@@ -11,10 +11,16 @@
 ## "It mostly works™"
 [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
+<!-- __RM_SHORT_DESC_START__ -->
 A program for creating module/package/CLI/GUI projects in Python from a template
+<!-- __RM_SHORT_DESC_END__ -->
+
+<!-- ![Screenshot](misc/screenshot.jpg) -->
 
 ## Requirements
+<!-- __RM_PY_DEPS_START__ -->
 None
+<!-- __RM_PY_DEPS_END__ -->
 
 ## Installing
 You can download the (hopefully stable)
@@ -48,10 +54,9 @@ foo@bar:~$ cd ~/Documents/Projects/Python/PyPlate/src
 foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pyplate.py
 ```
 
-Enter the required information, and 'pyplate.py' will create the required files 
-and folders in a subdirectory of 'DIR_BASE', where 'DIR_BASE' is the directory 
-above 'PyPlate'.<br>
-In our example, 'DIR_BASE' is '~/Documents/Projects/Python'.
+Enter the required information, and 'pyplate.py' will create the required files
+and folders in a subdirectory of 'DIR_BASE', where 'DIR_BASE' is the directory
+above 'PyPlate'. In our example, 'DIR_BASE' is '~/Documents/Projects/Python'.
 
 So Modules/Packages will be generated in 
 '~/Documents/Projects/Python/Libs', and CLI/GUI apps will be generated in 
@@ -60,7 +65,6 @@ So Modules/Packages will be generated in
 From there you are free to modify the projects in your favorite IDE.
 
 ## Notes
-
 If you make any changes to this template to better suit your own style/setup, 
 please let me know or send a pull request. I will take a look and see if I can 
 incorporate your changes to make them user-agnostic. This way the template can 

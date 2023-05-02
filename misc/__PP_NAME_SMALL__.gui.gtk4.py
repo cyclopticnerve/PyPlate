@@ -14,12 +14,16 @@
 # TODO: init controls in window
 # TODO: set handler to class?
 
-# TODO: move handler class to a seperate file
-# how to get calsses together - without circular reference?
+# TODO: move handler class to a separate file
+# how to get classes together - without circular reference?
 
 # TODO: check for gtk version 3/4
-#   does gi.rtepository have a >= ?
+#   does gi.repository have a >= ?
 #   load ui file based on installed GTK version
+
+# TODO: diff this to gtk3:
+#   gi reqs
+#   builder param is self
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -31,7 +35,7 @@ import os
 import gi
 gi.require_version('Adw', '1')
 gi.require_version('Gtk', '4.0')
-from gi.repository import Adw, Gtk  # noqa: E402 (module import not at top of file)
+from gi.repository import Adw, Gtk  # noqa: E402 (import not at top of file)
 
 
 # ------------------------------------------------------------------------------
@@ -142,11 +146,11 @@ def _parse_args():
     # if we made it this far, cmd line is ok so print usage
     argparser.print_usage()
 
-    # convert agrs to dict
-    arg_dict = vars(args)
+    # convert args to dict
+    dict_args = vars(args)
 
     # return the object for inspection
-    return arg_dict
+    return dict_args
 
 
 # ------------------------------------------------------------------------------

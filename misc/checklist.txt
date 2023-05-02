@@ -21,7 +21,8 @@ Initialize
 
 Release
 
-    update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
+    [] Diff main PyPlate dir with template (before metadata)
+    [] Update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
 
     Glade
         [] Toolkit version matches gi.repository number
@@ -35,7 +36,7 @@ Release
     VSCodium
 
         All
-            [] Do styleguide for all files in tree (misc/style.txt)
+            [] Do style guide for all files in tree (misc/style.txt)
             [] Screenshot in misc/README
             [] TODO tree
             [] todo.txt file

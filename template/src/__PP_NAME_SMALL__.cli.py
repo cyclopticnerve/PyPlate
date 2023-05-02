@@ -99,7 +99,7 @@ def _parse_args():
             [dict]: the dict of commands passed on the command line
 
         This function gets the command line passed to the program, parses it,
-        and returns the command line options as a list.
+        and returns the command line options as a dict.
     """
 
     # create the parser
@@ -110,7 +110,7 @@ def _parse_args():
     # always print prog name/version
     print('__PP_NAME_BIG__ version PP_VERSION')
 
-    # add arguments here
+    # add arguments from the function above
     add_args(argparser)
 
     # parse the arg list into a Namespace object (similar to dict)
@@ -124,10 +124,10 @@ def _parse_args():
     argparser.print_usage()
 
     # convert agrs to dict
-    arg_dict = vars(args)
+    dict_args = vars(args)
 
     # return the object for inspection
-    return arg_dict
+    return dict_args
 
 
 # ------------------------------------------------------------------------------
@@ -141,6 +141,7 @@ if __name__ == '__main__':
         is invoked from the command line.
     """
 
+    # run main function
     main()
 
 # -)

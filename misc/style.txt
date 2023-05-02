@@ -1,0 +1,34 @@
+[] update tree - $ tree --dirsfirst -a --noreport -o 'misc/tree.txt'
+
+[] 2 part vars: \b[a-zA-Z]+_[a-zA-Z]+\b
+    check for _path, _file, _dir, _str, _lst and swap
+    check for path_, file_, dir_, str_, lst_
+    check for _proj and make _prj
+    check for proj_ and make prj_
+    check for _prj and swap
+    check for prj_
+    path - whole thing
+    file - name only
+    dir - up to name or if a folder
+[] >2part vars: \b[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]+
+
+[] all globals lowercase starting with g_
+[] all constants UPPERCASE
+[] no += for strings
+[] Headers/footers
+[] spellcheck
+[] separators ------
+[] over 80 cols
+[] use list/dict comprehensions (look for for loops)
+[] reduce re flags/groups
+
+[] cli/gui: function/method not called from main: start with underscore
+[] mod/pkg: Private functions/methods start with underscore
+
+[] Docstrings    
+    Check that short desc matches comment block
+    Check that last line of long desc ends w/ a period
+    docstring types have params wrapped in parens, not brackets
+    where do we use brackets?
+    'method' in a class
+    'function' not in a class

@@ -124,10 +124,10 @@ def _parse_args():
     argparser.print_usage()
 
     # convert agrs to dict
-    arg_dict = vars(args)
+    dict_args = vars(args)
 
     # return the object for inspection
-    return arg_dict
+    return dict_args
 
 
 # ------------------------------------------------------------------------------

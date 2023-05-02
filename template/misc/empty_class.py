@@ -26,16 +26,16 @@
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
-class Main:
+class Main(object):
     """
         Short description
 
         Properties:
-            foo [string]: a string to hold the foo value
+            foo [type]: a type to hold the foo value
 
         Methods:
-            set_foo(foo [str]): sets the new value of foo
-            [str] get_foo(): gets the current value of foo
+            set_foo(foo [type]): sets the new value of foo
+            [type] get_foo(): gets the current value of foo
 
         Long description.
     """
@@ -52,7 +52,7 @@ class Main:
             Sets the new value of foo
 
             Paramaters:
-                foo [str]: the new value of foo
+                foo [type]: the new value of foo
 
             Long description.
         """
@@ -68,7 +68,7 @@ class Main:
             Gets the current value of foo
 
             Returns:
-                [str]: the current value of foo
+                [type]: the current value of foo
 
             Long description.
         """
@@ -91,6 +91,10 @@ class Main:
             of its properties, and any other code that needs to run to create a
             new object.
         """
+
+        # call super init to initialize the base class
+        super().__init__()
+
         # NB: do not call setter functions in constructor
         # (do everything manually)
 

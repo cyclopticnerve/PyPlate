@@ -59,6 +59,7 @@ Then run the 'install.py' file from there:
 foo@bar:~$ cd ~/Downloads/__PP_NAME_BIG__-PP_VERSION
 foo@bar:~/Downloads/__PP_NAME_BIG__-PP_VERSION$ ./install.py
 ```
+
 Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:
 ```bash

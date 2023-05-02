@@ -23,9 +23,9 @@ g_dict_install = {
     },
     'preflight': [
     ],
-    'py_deps': [
+    'deps_py': [
     ],
-    'sys_deps': [
+    'deps_sys': [
     ],
     'dirs': [
         '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'

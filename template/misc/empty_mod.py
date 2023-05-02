@@ -42,6 +42,7 @@ def func():
         Long description.
     """
 
+    print('this is func')
     return _func()
 
 
@@ -68,6 +69,6 @@ def _func():
         Long description.
     """
 
-    return ('this is a test')
+    return ('this is _func')
 
 # -)
