@@ -45,7 +45,6 @@ hdr txt path
 1   1   0       skip_path
 1   1   1
 
-
 TODO: put version num in PyPlate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
