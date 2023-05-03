@@ -46,9 +46,7 @@ hdr txt path
 1   1   1
 
 
-TODO: put version num in PyPlate readme/update value in misc/settings.json
-should we also put other stuff there? or is that getting too close to a "make PyPlate
-using PyPlate" thing?
+
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
 check readme for install instructions 
@@ -93,6 +91,9 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: put version num in PyPlate readme/update value in misc/settings.json
+should we also put other stuff there? or is that getting too close to a "make PyPlate
+using PyPlate" thing?
 DONE: spellcheck
 DONE: diff main PyPlate dir with template (before metadata)
 DONE: add reqs/docs/changelog to metadata.py

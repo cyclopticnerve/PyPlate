@@ -17,7 +17,7 @@
 [] no += for strings
 [] Headers/footers
 [] spellcheck
-[] seperators ------
+[] separators ------
 [] over 80 cols
 [] use list/dict comprehensions (look for for loops)
 [] reduce re flags/groups

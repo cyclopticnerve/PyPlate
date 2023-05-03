@@ -27,7 +27,7 @@ You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
 from the main branch.<br>
 Download either the 'tar.gz' or 'zip' file and extract it.<br>
-Rename the folder 'PyPlate' (without the version number).
+Rename the folder without the version, e.g. 'PyPlate-0.1.0' to 'PyPlate'.
 
 Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:

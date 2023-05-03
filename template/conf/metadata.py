@@ -290,7 +290,7 @@ def fix_pyproject():
         # convert dict to string (only using keys)
         PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
 
-        # NB: this is not codusive to a dict (we don't need links, only names)
+        # NB: this is not conducive to a dict (we don't need links, only names)
         # so don't do what we did in README, keep it simple
         str_py_deps = ','.join(PP_PY_DEPS.keys())
 
@@ -633,7 +633,7 @@ def recurse(dir):
     """
         Recurse through the folder structure looking for errors
 
-        Paramaters:
+        Parameters:
             dir [string]: the directory to start looking for errors
 
         This function recurses through the project directory, looking for errors
@@ -744,7 +744,7 @@ def _check_header(path_item, lines):
     """
         Checks header values for dunders
 
-        Paramaters:
+        Parameters:
             path_item [string]: the full path to file to be checked for header
             lines [array]: the contents of the file to be checked
 
@@ -834,7 +834,7 @@ def _check_text(path_item, lines):
     """
         Checks file contents for replacements
 
-        Paramaters:
+        Parameters:
             path_item [string]: the full path to file to be checked for text
             lines [array]: the contents of the file to be checked
 
@@ -868,7 +868,7 @@ def _check_path(path_item):
     """
         Checks file paths for dunders
 
-        Paramaters:
+        Parameters:
             path_item [string]: the full path to file to be checked for path
 
         This function checks that none of the files paths contains an unreplaced
@@ -893,11 +893,11 @@ def _split_quote(str_in, split=',', quote='', lead='', join=',', tail=''):
     """
         A helper function to split and reformat keywords and dependencies
 
-        Paramaters:
+        Parameters:
             str_in [string]: the string to split
             split [string]: the character to split on
             quote [string]: the character to use to quote each entry (or empty)
-            lead [string]: the string to preceed the formatted string (or empty)
+            lead [string]: the string to precede the formatted string (or empty)
             join [string]: the string to join each line in the output (or empty)
             tail [string]: the string to follow the formatted string (or empty)
 

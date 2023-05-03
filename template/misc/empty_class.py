@@ -51,7 +51,7 @@ class Main(object):
         """
             Sets the new value of foo
 
-            Paramaters:
+            Parameters:
                 foo [type]: the new value of foo
 
             Long description.

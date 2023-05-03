@@ -13,11 +13,11 @@
 # TODO: init controls in window
 # TODO: set handler to class?
 
-# TODO: move handler class to seperate file
+# TODO: move handler class to separate file
 #     how to avoid circular imports?
 
 # TODO: check for gtk version 3/4
-#   does gi.rtepository have a >= ?
+#   does gi.repository have a >= ?
 #   load ui file based on installed GTK version
 
 # ------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ class __PP_NAME_BIG__App(Gtk.Application):
         """
             Called when the main window is shown
 
-            Paramaters:
+            Parameters:
                 self [Class]: the Class object
                 app [Gtk.Application]: the Application object
 
@@ -93,7 +93,7 @@ class __PP_NAME_BIG__App(Gtk.Application):
         """
             Called when a button is clicked
 
-            Paramaters:
+            Parameters:
                 self [Class]: the __PP_NAME_BIG_App class object
                 obj [object]: the Gtk object that was clicked
 
@@ -106,13 +106,13 @@ class __PP_NAME_BIG__App(Gtk.Application):
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Initialize the class to an obect/instance
+    # Initialize the class to an object/instance
     # --------------------------------------------------------------------------
     def __init__(self, **kwargs):
         """
-            Initialize the class to an obect/instance
+            Initialize the class to an object/instance
 
-            Paramaters:
+            Parameters:
                 self [Class]: the __PP_NAME_BIG_App class object
                 **kwargs [dict]: the dict of parameters passes to the __init__
                 function

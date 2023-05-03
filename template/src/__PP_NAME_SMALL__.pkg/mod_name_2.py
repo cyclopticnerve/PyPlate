@@ -30,7 +30,7 @@ def func_2():
     """
         Short description
 
-        Paramaters:
+        Parameters:
             var_name [type]: description
 
         Returns:
@@ -57,7 +57,7 @@ def _func_2():
     """
         Short description
 
-        Paramaters:
+        Parameters:
             var_name [type]: description
 
         Returns:
