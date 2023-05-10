@@ -24,8 +24,8 @@ import subprocess
 
 # this is the dir above where the script is being run from
 # (e.g. ~/Documents/Projects/Python/PyPlate/src/)
-dir = os.path.dirname(__file__)
-dir_pyplate = os.path.join(dir, '..')
+dir_src = os.path.dirname(__file__)
+dir_pyplate = os.path.join(dir_src, '..')
 DIR_PYPLATE = os.path.abspath(dir_pyplate)
 
 # this is the dir where the template files are located rel to the script
@@ -37,51 +37,8 @@ DIR_TEMPLATE = os.path.join(DIR_PYPLATE, 'template')
 dir_base = os.path.join(DIR_PYPLATE, '..')
 DIR_BASE = os.path.abspath(dir_base)
 
-# date format
+# date format (stupid americans)
 DICT_DATE = '%m/%d/%Y'
-
-# files to include in project
-# paths are relative to DIR_TEMPLATE
-DICT_FILES = {
-
-    # common to all projects
-    'common': [
-        'conf',
-        'docs',
-        'misc',
-        'tests',
-        '.gitignore',
-        'CHANGELOG.md',
-        'LICENSE.txt',
-        'README.md',
-        'requirements.txt',
-    ],
-
-    # for module projects
-    'm': [
-        'src/__PP_NAME_SMALL__.mod.py',
-        'MANIFEST.in',
-        'pyproject.toml',
-    ],
-
-    # for package projects
-    'p': [
-        'src/__PP_NAME_SMALL__.pkg',
-        'MANIFEST.in',
-        'pyproject.toml',
-    ],
-
-    # for cli projects
-    'c': [
-        'src/__PP_NAME_SMALL__.cli.py',
-    ],
-
-    # for gui projects
-    'g': [
-        'src/gui',
-        'src/__PP_NAME_SMALL__.gui.py',
-    ],
-}
 
 # folders/files to ignore when doing replacements
 DICT_BLACKLIST = {
@@ -98,7 +55,7 @@ DICT_BLACKLIST = {
         'PKG-INFO',
     ],
 
-    # dont't fix internals, but path is ok
+    # dont't fix/check internals, but do fix path
     'skip_file': [
         '__PP_NAME_SMALL__.png',
     ],
@@ -176,11 +133,11 @@ def main():
         program, and performing its steps.
     """
 
-    # call each step to create project
+    # get info and copy template
     get_project_info()
     copy_template()
 
-    # call recurse to do replacements in final project location
+    # call recurse to do replacements in final project locationm
     dir = g_dict_settings['project']['dir']
     recurse(dir)
 
@@ -270,38 +227,66 @@ def copy_template():
         folder.
     """
 
-    # get project type
-    type_prj = g_dict_settings['project']['type']
-
     # create target folder
     dir_prj = g_dict_settings['project']['dir']
     os.makedirs(dir_prj)
 
-    # the group of files, common and type
-    groups = [
-        DICT_FILES['common'],
-        DICT_FILES[type_prj]
-    ]
+    # create list of long dirs
+    # add common
+    lst_src = ['common']
 
-    # for each group, common and type, remove leading/trailing slashes
-    items = [item.strip(os.sep) for group in groups for item in group]
-    for item in items:
+    # add long project type
+    dict_type = {
+        'm': 'mod',
+        'p': 'pkg',
+        'c': 'cli',
+        'g': 'gui'
+    }
+    type_prj = g_dict_settings['project']['type']
+    type_prj_long = dict_type[type_prj]
+    lst_src.append(type_prj_long)
 
-        # build old path/new path
-        path_old = os.path.join(DIR_TEMPLATE, item)
-        path_new = os.path.join(dir_prj, item)
+    # NB: I tried this both ways:
 
-        # if it's a dir, copy dir
-        if os.path.isdir(path_old):
-            shutil.copytree(path_old, path_new)
-        else:
+    # 1. template/src/type/file
+    # this made a cleaner tree, but an uglier code base
+    # also i had to add an 'extras' folder for MANIFEST/pyproject to reduce
+    # recursion/manually adding them
+    # this also negated the option of combining them into a sigle loop
 
-            # if it's a file, get the file's dir and create
-            dir_new = os.path.dirname(path_new)
-            os.makedirs(dir_new, exist_ok=True)
+    # 2. template/type/src/file
+    # this made the tree a little uglier, but made a cleaner code base
+    # also the tree ends up reflecting the final project tree better, as
+    # everything under the common folder ends up at the root level of the
+    # project, and everything under the type dir ends up at the root level of
+    # the project
+    # this was also able to add everything into a single loop
 
-            # then copy file
-            shutil.copy2(path_old, path_new)
+    # lst_src is now ['common', 'type_long']
+    for item in lst_src:
+
+        path_in = os.path.join(DIR_TEMPLATE, item)
+        items = os.listdir(path_in)
+
+        # for item in lst_files:
+        items = [item.strip(os.sep) for item in items]
+        for item in items:
+
+            # build old path/new path
+            path_from = os.path.join(path_in, item)
+            path_to = os.path.join(dir_prj, item)
+
+            # if it's a dir
+            if os.path.isdir(path_from):
+
+                # copy dir
+                shutil.copytree(path_from, path_to)
+
+            # if its not a dir
+            else:
+
+                # then copy file
+                shutil.copy2(path_from, path_to)
 
     # copy the 'starter kit' of requirements
     # NB: this is all the reqs collected while developing PyPlate
@@ -310,19 +295,22 @@ def copy_template():
     # will get updated every time the PyPlate project file is updated, making
     # it future-proof*
     # (* not guaranteed to be future-proof)
-    path_old = os.path.join(DIR_PYPLATE, 'requirements.txt')
-    path_new = os.path.join(dir_prj, 'requirements.txt')
-    shutil.copy2(path_old, path_new)
+    # this is a file-to-file copy
+    path_from = os.path.join(DIR_PYPLATE, 'requirements.txt')
+    path_to = os.path.join(dir_prj, 'requirements.txt')
+    shutil.copy2(path_from, path_to)
 
+    # copying a dict in this file to a file
     # write DICT_BLACKLIST to conf file
-    path_blacklist = os.path.join(dir_prj, 'conf', 'blacklist.json')
-    with open(path_blacklist, 'w', encoding='utf-8') as f:
+    path_to = os.path.join(dir_prj, 'conf', 'blacklist.json')
+    with open(path_to, 'w', encoding='utf-8') as f:
         dict_blacklist = json.dumps(DICT_BLACKLIST, indent=4)
         f.write(dict_blacklist)
 
+    # copying a dict in this file to a file
     # write g_dict_settings to conf file
-    path_settings = os.path.join(dir_prj, 'conf', 'settings.json')
-    with open(path_settings, 'w', encoding='utf-8') as f:
+    path_to = os.path.join(dir_prj, 'conf', 'settings.json')
+    with open(path_to, 'w', encoding='utf-8') as f:
         dict_settings = json.dumps(g_dict_settings, indent=4)
         f.write(dict_settings)
 
@@ -352,7 +340,8 @@ def recurse(dir):
     # remove all leading/trailing slashes
     skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_all']]
     skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_file']]
-    skip_header = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_header']]
+    skip_header = [item.strip(os.sep)
+                   for item in DICT_BLACKLIST['skip_header']]
     skip_text = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_text']]
     skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_path']]
 
@@ -430,15 +419,14 @@ def do_extras():
 
     # add venv dir
     # NB: use '.venv' to be compatible with VSCodium
-    cmd = 'python -m venv .venv'
-    cmd_array = shlex.split(cmd)
-    subprocess.run(cmd_array)
+    # cmd = ['python', '-m', 'venv', 'venv']
+    # cmd_array = shlex.split(cmd)
+    # subprocess.run(cmd)
 
     # create tree
     path_tree = os.path.join(dir_prj, 'misc', 'tree.txt')
     with open(path_tree, 'w', encoding='utf-8') as f:
-
-        cmd = 'tree --dirsfirst --noreport --gitignore'
+        cmd = 'tree --dirsfirst --noreport'
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
 
@@ -578,7 +566,9 @@ def _fix_readme(lines):
     """
 
     # NB: the strategy here is to go through the full README and only copy lines
-    # that are 1) not in any block or 2) in the block we want
+    # that are
+    # 1) not in any block or
+    # 2) in the block we want
     # the most efficient way to do this is to have an array that receives wanted
     # lines, then return that array
     # we use a new array vs. in-situ replacement here b/c we are removing
@@ -642,17 +632,7 @@ def _fix_path(path):
 
         This is a function to rename folders/files. Given a path to a
         folder/file, it renames the path by replacing items in the
-        g_dict_settings keys with their appropriate replacements, and also
-        removes any extraneous exts. This allows us to have different files and
-        folders with the same name/ext, but qualifiers in between, thus:
-        __PP_NAME_SMALL__.gui.py
-        __PP_NAME_SMALL__.cli.py
-        can coexist in template/src, but will both end up as:
-        project.gui.py
-        project.cli.py
-        after __PP_NAME_SMALL__ replacement, and then:
-        project.py
-        after ext replacement.
+        g_dict_settings keys with their appropriate replacements.
     """
 
     # the array of dunder replacements we will use
@@ -664,23 +644,6 @@ def _fix_path(path):
     # replace dunders in last path component
     for key in info.keys():
         file_old = file_old.replace(key, info[key])
-
-    # split last part by dot
-    dot_array = file_old.split('.')
-
-    # if there are two or more dots
-    # foo.bar.py
-    if len(dot_array) > 2:
-
-        # put back together using main name and last ext
-        file_old = dot_array[0] + '.' + dot_array[-1]
-
-    # if there is only one dot, and it's a folder
-    # foo.bar/
-    elif len(dot_array) > 1 and os.path.isdir(path):
-
-        # just use main name
-        file_old = dot_array[0]
 
     # put new name back with the 'up to last' part
     path_new = os.path.join(dir_old, file_old)
@@ -703,7 +666,7 @@ def _fix_name(name):
             [bool]: whether the name is valid to use
 
         This function checks the passed name for four criteria:
-        1. blank name
+        1. non-blank name
         2. starts with an alpha char
         3. ends with an alphanumeric char
         4. contains only alphanumeric chars

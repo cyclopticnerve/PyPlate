@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__.py                                  |     ()     |
+# Filename: __PP_NAME_SMALL__handler.py                           |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /

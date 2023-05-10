@@ -31,21 +31,33 @@ DICT_BLACKLIST = []
 path_blacklist = os.path.join(DIR_PRJ, 'conf', 'blacklist.json')
 if os.path.exists(path_blacklist):
     with open(path_blacklist, 'r', encoding='utf-8') as f:
-        DICT_BLACKLIST = json.load(f)
+        try:
+            DICT_BLACKLIST = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
 
 # load metadata file
 DICT_METADATA = []
 path_metadata = os.path.join(DIR_PRJ, 'conf', 'metadata.json')
 if os.path.exists(path_metadata):
     with open(path_metadata, 'r', encoding='utf-8') as f:
-        DICT_METADATA = json.load(f)
+        try:
+            DICT_METADATA = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
 
 # load settings file
 DICT_SETTINGS = []
 path_settings = os.path.join(DIR_PRJ, 'conf', 'settings.json')
 if os.path.exists(path_settings):
     with open(path_settings, 'r', encoding='utf-8') as f:
-        DICT_SETTINGS = json.load(f)
+        try:
+            DICT_SETTINGS = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -125,8 +137,12 @@ def fix_readme():
             r'(.*?)'
             r'(<!--[\t ]*__RM_SHORT_DESC_END__[\t ]*-->)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\n{PP_SHORT_DESC}\n\g<3>'
+
+        # get short description
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+
+        # replace text
+        str_rep = rf'\g<1>\n{pp_short_desc}\n\g<3>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace dependencies array
@@ -137,21 +153,12 @@ def fix_readme():
         )
 
         # build a string from the dict (markdown link)
-        PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
-
-        # NB: this is a sample of how to handle dict comprehensions
-        lst_py_deps = [f'[{key}]({val})' for (key, val) in PP_PY_DEPS.items()]
+        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
+        lst_py_deps = [f'[{key}]({val})' for (key, val) in pp_py_deps.items()]
         str_py_deps = ','.join(lst_py_deps)
-
-        # NB: this was the old way
-        # str_py_deps = ''
-        # for (key, val) in PP_PY_DEPS.items():
-        #     str_py_deps += f'[{key}]({val}),'
 
         # split the string for README
         str_split = _split_quote(str_py_deps, join='<br>\n', tail='\n')
-
-        # no split str, use default
         if str_split == '':
             str_split = 'None\n'
 
@@ -160,7 +167,9 @@ def fix_readme():
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace version
-        PP_VERSION = DICT_METADATA['PP_VERSION']
+        pp_version = DICT_METADATA['PP_VERSION']
+        if pp_version == '':
+            pp_version = 'PP_VERSION'
 
         str_pattern = (
             r'(\s*foo@bar:~/Downloads\$ python -m pip install )'
@@ -168,7 +177,7 @@ def fix_readme():
             r'(.*?)'
             r'(\.tar\.gz)'
         )
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+        str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text)
 
         str_pattern = (
@@ -179,7 +188,7 @@ def fix_readme():
             r'(.*?)'
             r'(\.tar\.gz)'
         )
-        str_rep = rf'\g<1>\g<2>\g<3>\g<4>{PP_VERSION}\g<6>'
+        str_rep = rf'\g<1>\g<2>\g<3>\g<4>{pp_version}\g<6>'
         text = re.sub(str_pattern, str_rep, text)
 
         str_pattern = (
@@ -187,7 +196,7 @@ def fix_readme():
             r'(.*-)'
             r'(.*)'
         )
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}'
+        str_rep = rf'\g<1>\g<2>{pp_version}'
         text = re.sub(str_pattern, str_rep, text)
 
         str_pattern = (
@@ -196,7 +205,7 @@ def fix_readme():
             r'(.*)'
             r'(\$ \./install.py)'
         )
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+        str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text)
 
     # save file
@@ -234,8 +243,8 @@ def fix_pyproject():
             r'(^\s*name[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        PP_NAME = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
-        str_rep = rf'\g<1>\g<2>\g<3>"{PP_NAME}"'
+        pp_name = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_name}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace version
@@ -245,10 +254,10 @@ def fix_pyproject():
             r'(^\s*version[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        PP_VERSION = DICT_METADATA['PP_VERSION']
-        if PP_VERSION == '':
-            PP_VERSION = '0.0.0'
-        str_rep = rf'\g<1>\g<2>\g<3>"{PP_VERSION}"'
+        pp_version = DICT_METADATA['PP_VERSION']
+        if pp_version == '':
+            pp_version = '0.0.0'
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace short description
@@ -258,8 +267,8 @@ def fix_pyproject():
             r'(^\s*description[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\g<2>\g<3>"{PP_SHORT_DESC}"'
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # # replace keywords array
@@ -271,8 +280,8 @@ def fix_pyproject():
         )
 
         # convert dict to string
-        PP_KEYWORDS = DICT_METADATA['PP_KEYWORDS']
-        str_split = _split_quote(PP_KEYWORDS, quote='"', lead='\t',
+        pp_keywords = DICT_METADATA['PP_KEYWORDS']
+        str_split = _split_quote(pp_keywords, quote='"', lead='\t',
                                  join=',\n\t', tail='\n')
 
         # replace string
@@ -288,11 +297,11 @@ def fix_pyproject():
         )
 
         # convert dict to string (only using keys)
-        PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
+        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
 
         # NB: this is not conducive to a dict (we don't need links, only names)
         # so don't do what we did in README, keep it simple
-        str_py_deps = ','.join(PP_PY_DEPS.keys())
+        str_py_deps = ','.join(pp_py_deps.keys())
 
         # split the string for pyproject
         str_split = _split_quote(str_py_deps, quote='"', lead='\t',
@@ -714,23 +723,38 @@ def do_extras():
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
 
-    # update docs
-    cmd = 'python -m pdoc --html -f -o docs'
-    cmd_array = shlex.split(cmd)
-    glob_py = glob('src/*.py')
-    cmd_array = cmd_array + glob_py
-    subprocess.run(cmd_array)
-
     # update CHANGELOG
     path_chg = os.path.join(DIR_PRJ, 'CHANGELOG.md')
     with open(path_chg, 'w', encoding='utf-8') as f:
 
-        cmd = 'git log --pretty=" - %s"'
+        cmd = 'git log --pretty="%ad - %s"'
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
 
     # go back to old dir
     os.chdir(dir_curr)
+
+# ------------------------------------------------------------------------------
+
+    type_prj = DICT_SETTINGS['project']['type']
+
+    # update docs
+    cmd = 'python -m pdoc --html -f -o docs'
+    cmd_array = shlex.split(cmd)
+
+    # docs for module/cli
+    if type_prj in 'mc':
+        glob_py = glob(f'src{os.sep}*.py')
+        cmd_array += glob_py
+
+    # docs for package
+    elif type_prj == 'p':
+        prj_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+        cmd_array += [f'src{os.sep}{prj_small}']
+
+    subprocess.run(cmd_array)
+
+# ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------

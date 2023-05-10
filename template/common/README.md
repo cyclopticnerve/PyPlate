@@ -19,7 +19,7 @@ PP_SHORT_DESC
 
 ## Requirements
 <!-- __RM_PY_DEPS_START__ -->
-None
+PP_PY_DEPS
 <!-- __RM_PY_DEPS_END__ -->
 
 ## Installing

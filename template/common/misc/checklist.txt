@@ -2,6 +2,8 @@
 Initialize
 
     VSCodium
+        [] Create venv - $ python -m venv .venv
+        [] Activate venv - $ source .venv/bin/activate
         [] Install reqs - $ python -m pip install -r requirements.txt
 
         Mod/Pkg
@@ -21,8 +23,6 @@ Initialize
 
 Release
 
-    update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
-
     Glade
         [] Toolkit version matches gi.repository number
         [] All I18N strings
@@ -35,6 +35,7 @@ Release
     VSCodium
 
         All
+            [] Update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
             [] Do styleguide for all files in tree (misc/style.txt)
             [] Screenshot in misc/README
             [] TODO tree
@@ -45,11 +46,12 @@ Release
             [] README usage/notes
             [] Change version number in conf/metadata.json
 
-            [] Do reqs - $ python -m pip freeze > requirements.txt
-            [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
-            [] Generate docs - $ python -m pdoc --html -f -o docs src
+            -- Do reqs - $ python -m pip freeze > requirements.txt
+            -- Changelog - $ git log --pretty='- %s' > CHANGELOG.md
+            -- Generate docs - $ python -m pdoc --html -f -o docs src
             [] Run conf/metadata.py
 
+            [] Update VSCodeCounter
             [] Commit/push 'dev' for 'next release'
 
         Branch 'dev'

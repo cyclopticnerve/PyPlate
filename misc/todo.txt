@@ -46,11 +46,8 @@ hdr txt path
 1   1   1
 
 
-
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
-check readme for install instructions 
-one has big name, one has small name for tar.gz
 TODO: metadata.py: get freedesktop format locations for exec/icon
 
 

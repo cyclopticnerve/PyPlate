@@ -15,9 +15,11 @@ pandas==1.5.3
 pdoc3==0.10.0
 platformdirs==3.1.0
 pyarrow==11.0.0
+pycairo==1.23.0
 pycodestyle==2.10.0
 pydocstyle==6.3.0
 pyflakes==3.0.1
+PyGObject==3.44.1
 pylama==8.4.1
 pylance==0.3.10
 pylint==2.16.3

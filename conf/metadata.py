@@ -31,21 +31,33 @@ DICT_BLACKLIST = []
 path_blacklist = os.path.join(DIR_PRJ, 'conf', 'blacklist.json')
 if os.path.exists(path_blacklist):
     with open(path_blacklist, 'r', encoding='utf-8') as f:
-        DICT_BLACKLIST = json.load(f)
+        try:
+            DICT_BLACKLIST = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
 
 # load metadata file
 DICT_METADATA = []
 path_metadata = os.path.join(DIR_PRJ, 'conf', 'metadata.json')
 if os.path.exists(path_metadata):
     with open(path_metadata, 'r', encoding='utf-8') as f:
-        DICT_METADATA = json.load(f)
+        try:
+            DICT_METADATA = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
 
 # load settings file
 DICT_SETTINGS = []
 path_settings = os.path.join(DIR_PRJ, 'conf', 'settings.json')
 if os.path.exists(path_settings):
     with open(path_settings, 'r', encoding='utf-8') as f:
-        DICT_SETTINGS = json.load(f)
+        try:
+            DICT_SETTINGS = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
 
 # ------------------------------------------------------------------------------
 # Globals
