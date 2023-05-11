@@ -75,7 +75,7 @@ def func():
         Raises:
             exception_type(vars): description
 
-        Long description.
+        Long description (including HTML).
     """
 
     return ('this is a test')

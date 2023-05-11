@@ -51,6 +51,7 @@ TODO: test README instructions for all - latest/clone/uninstall
 TODO: metadata.py: get freedesktop format locations for exec/icon
 
 
+NEXT: check for metadata empty fields that are essential(desc,ver,)
 NEXT: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
 also look at official python docs or autoDocstring ext
 check for docstrings linter? pydocstyle?
@@ -94,7 +95,7 @@ using PyPlate" thing?
 DONE: spellcheck
 DONE: diff main PyPlate dir with template (before metadata)
 DONE: add reqs/docs/changelog to metadata.py
-DONE: Move all style entries from todo and checklist into separate style guide
+DONE: Move all style entries from to-do and checklist into separate style guide
 DONE: copy project reqs from PyPlate reqs, which are pulled from .venv
 DONE: check for _path, _file, _dir, _str, _lst and swap
 DONE: check for path_, file_, dir_, str_, lst_

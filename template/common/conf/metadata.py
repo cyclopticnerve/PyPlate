@@ -168,8 +168,6 @@ def fix_readme():
 
         # replace version
         pp_version = DICT_METADATA['PP_VERSION']
-        if pp_version == '':
-            pp_version = 'PP_VERSION'
 
         str_pattern = (
             r'(\s*foo@bar:~/Downloads\$ python -m pip install )'
@@ -255,8 +253,6 @@ def fix_pyproject():
             r'(.*?$)'
         )
         pp_version = DICT_METADATA['PP_VERSION']
-        if pp_version == '':
-            pp_version = '0.0.0'
         str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -753,8 +749,6 @@ def do_extras():
         cmd_array += [f'src{os.sep}{prj_small}']
 
     subprocess.run(cmd_array)
-
-# ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------

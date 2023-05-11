@@ -37,7 +37,7 @@ class Main(object):
             set_foo(foo [type]): sets the new value of foo
             [type] get_foo(): gets the current value of foo
 
-        Long description.
+        Long description (including HTML).
     """
 
     # --------------------------------------------------------------------------
@@ -54,7 +54,7 @@ class Main(object):
             Parameters:
                 foo [type]: the new value of foo
 
-            Long description.
+            Long description (including HTML).
         """
 
         # set the new value of foo
@@ -70,7 +70,7 @@ class Main(object):
             Returns:
                 [type]: the current value of foo
 
-            Long description.
+            Long description (including HTML).
         """
 
         # return the current value of foo

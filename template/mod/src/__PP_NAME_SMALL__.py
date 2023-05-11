@@ -39,7 +39,7 @@ def func():
         Raises:
             exception_type(vars): description
 
-        Long description.
+        Long description (including HTML).
     """
 
     print('this is func')
@@ -66,7 +66,7 @@ def _func():
         Raises:
             exception_type(vars): description
 
-        Long description.
+        Long description (including HTML).
     """
 
     return ('this is _func')
