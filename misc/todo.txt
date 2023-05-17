@@ -46,11 +46,20 @@ hdr txt path
 1   1   1
 
 
+TODO: how to document file formats that don't support comments? json,toml
+TODO: remove all brackets from docstrings
+TODO: venv doesn't work
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
-TODO: metadata.py: get freedesktop format locations for exec/icon
 
 
+NEXT: metadata get all dunders from dict? i.e. metadata.json uses __PP_XXX__
+NEXT: check for gtk version 3/4
+   does gi.repository have a >= ?
+   load ui file based on installed GTK version
+NEXT: icons of diff sizes? for desktop/ui
+NEXT: need a better way to do headers that doesn't rely on dunders
+something like anything more that 2 spaces is formated to 80?
 NEXT: check for metadata empty fields that are essential(desc,ver,)
 NEXT: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
 also look at official python docs or autoDocstring ext
@@ -89,6 +98,7 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: metadata.py: get freedesktop format locations for exec/icon
 DONE: put version num in PyPlate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
@@ -136,7 +146,9 @@ Use PyPlate to make a project called PyMaker
 Install PyMaker like a CLI
 
 move PyPlate/PyMaker to /usr/bin so we can call it from anywhere
-add param to set location of project
+add params for the questions
+pymaker -t/--type m|p|c|g -n/--name ModTest
+no default, each is required
 
 CLI/GUI: what files to add to install.py when copying
 (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and ~/.cyclopticnerve/proj/app/gui)
@@ -172,49 +184,3 @@ requirements? pip install -r requirements.txt
 
 python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git#egg=__PP_NAME_BIG__         # from default branch
 python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git@maine#egg=__PP_NAME_BIG__   # from specific branch
-
-
-# TODO: what to do about descs? toml? or help file?
-# 'metadata' will be edited by the user through 'conf/metadata.json'
-
-# the following caveats apply to 'metadata':
-
-# PP_VERSION
-# this is the canonical (only and absolute) version number string for this
-# project
-# this should provide the absolute version number string (in semantic notation)
-# of this project, and all other version numbers should be superseded by this
-# string
-
-# PP_SHORT_DESC
-# this is the short description of the project, used in README.md and
-# # pyproject.toml
-
-# PP_KEYWORDS
-# these are the keywords for the project, for use in pyproject.toml for the PyPI
-# listing, and should also be used in the GitHub project page
-# delimiters for all entries MUST be common
-
-# PP_PY_DEPS
-# these are the python dependencies for the project
-# they are stored here for install.py, pyproject.toml, and README.md
-# it is a dictionary where the key is the dep name, and the value is a link to
-# the download page (for README)
-# when used in pyproject.toml or install.py, it will be automatically downloaded
-# from PyPI by pip using just the name
-
-# PP_SYS_DEPS
-# these are the system dependencies for the project
-# they are stored here for install.py
-# delimiters for all entries MUST be comma
-
-# PP_GUI_CATEGORIES = ''
-# PP_GUI_EXEC = ''
-# PP_GUI_ICON = ''
-# this is mostly for desktops that use a windows-style menu/submenu, not for
-# Ubuntu-style overviews, and will be used in the __PP_NAME_BIG__.desktop file
-# gui categories MUST be separated by a comma
-# if exec/icon paths are not absolute, they will be found in standard paths
-# these paths vary, but I will add them here in the comments when I figure them
-# out
-

@@ -7,24 +7,6 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# TODO: flesh this out more once we use it for a gui app
-# this is a hot mess
-# what level indenting???
-
-# TODO: init controls in window
-# TODO: set handler to class?
-
-# TODO: move handler class to a separate file
-# how to get classes together - without circular reference?
-
-# TODO: check for gtk version 3/4
-#   does gi.repository have a >= ?
-#   load ui file based on installed GTK version
-
-# TODO: diff this to gtk3:
-#   gi reqs
-#   builder param is self
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------

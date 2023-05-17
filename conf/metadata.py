@@ -562,7 +562,6 @@ def fix_desktop():
             r'(^\s*Exec[\t ]*=)'
             r'(.*?$)'
         )
-        # TODO: look in $PATH
         PP_GUI_EXEC = DICT_METADATA['PP_GUI_EXEC']
         str_rep = rf'\g<1>\g<2>\g<3>{PP_GUI_EXEC}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
@@ -574,7 +573,6 @@ def fix_desktop():
             r'(^\s*Icon[\t ]*=)'
             r'(.*?$)'
         )
-        # TODO: look in $PATH
         PP_GUI_ICON = DICT_METADATA['PP_GUI_ICON']
         str_rep = rf'\g<1>\g<2>\g<3>{PP_GUI_ICON}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
@@ -582,8 +580,6 @@ def fix_desktop():
     # save file
     with open(path_desk, 'w', encoding='utf-8') as f:
         f.write(text)
-
-# TODO: set desktop path entry to prog dir???
 
 
 # ------------------------------------------------------------------------------

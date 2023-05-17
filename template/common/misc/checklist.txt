@@ -24,10 +24,11 @@ Initialize
 Release
 
     Glade
+        [] icon in src is 128x128 png
         [] Toolkit version matches gi.repository number
         [] All I18N strings
         [] About dialog icon path
-        [] File properties in Glade - errors, 
+        [] File properties in Glade - errors, load images from rel,
 
     I18N
         [] Do I18N for .po/.pot in src/gui/locale

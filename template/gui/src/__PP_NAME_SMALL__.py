@@ -11,21 +11,7 @@
 # Imports
 # ------------------------------------------------------------------------------
 import argparse
-import os
-import sys
-
-# this is the dir where the script is being run from
-# # (e.g. ~/Documents/Projects/Python/Apps/__PP_NAME_BIG__)
-dir_curr = os.path.dirname(__file__)
-
-# this is the dir where the gui files are located relative to the script
-# (e.g. ~/Documents/Projects/Python/Apps/__PP_NAME_BIG__/gui)
-dir_gui = os.path.join(dir_curr, 'gui')
-
-# add gui path to sys path to import handler
-sys.path.insert(0, dir_gui)
-
-import __PP_NAME_BIG__Handler as handler  # noqa: E402 (import not at top of file)
+import __PP_NAME_SMALL___gtk3 as gui # noqa: E402 (import not at top of file)
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -54,9 +40,23 @@ def main():
     # NB: uncomment this line and add args to _add_args()
     # args = _parse_args()
 
+    # call the steps in order
+    print(func())
+
     # show the window
-    __PP_NAME_SMALL__App = __PP_NAME_BIG__handler.__PP_NAME_BIG__App()  # noqa: E602 (undefined name)
-    __PP_NAME_SMALL__App.run()
+    app = gui.App()
+    app.run()
+
+    # NB: so this is odd... app.run() starts the gtk gui thread and blocks as
+    # long as the window is showm. you would think when the window is closed,
+    # the gtk gui thread would exit. but it doesn't. the run() method returns,
+    # which continues this file here, but this program does not exit when it
+    # reaches the end of this method. the run method is done, but the gtk thread
+    # is still alive somewhere, abandoned. the easiest way to solve this with a
+    # single thread is just to call exit() here, forcing the parent (this file)
+    # and all children (i.e. the gtk thread) to die. this is only obvious in a
+    # debugger, which is why you ALWAYS debug, kids.
+    exit()
 
 
 # ------------------------------------------------------------------------------

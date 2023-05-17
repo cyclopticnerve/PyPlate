@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: empty_main.py                                         |     ()     |
+# Filename: default_main.py                                       |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /

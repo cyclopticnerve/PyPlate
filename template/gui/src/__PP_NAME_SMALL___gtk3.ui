@@ -2,7 +2,7 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.0"/>
-  <object class="GtkAboutDialog" id="__PP_NAME_SMALL__.dlgAbout">
+  <object class="GtkAboutDialog" id="dlgAbout">
     <property name="can-focus">False</property>
     <property name="type-hint">dialog</property>
     <property name="program-name">__PP_NAME_BIG__</property>
@@ -43,17 +43,18 @@ http://www.wtfpl.net/</property>
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="__PP_NAME_SMALL__.winMain">
+  <object class="GtkWindow" id="winMain">
     <property name="can-focus">False</property>
     <property name="title">__PP_NAME_BIG__</property>
+    <property name="default-width">500</property>
+    <property name="default-height">500</property>
     <child>
-      <object class="GtkButton" id="__PP_NAME_SMALL__.winMain.btnAbout">
-        <property name="label" translatable="yes">About
-</property>
+      <object class="GtkButton" id="winMain_btnAbout">
+        <property name="label" translatable="yes">About</property>
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="receives-default">True</property>
-        <signal name="clicked" handler="__PP_NAME_SMALL__.winMain.btnAbout.clicked" swapped="no"/>
+        <signal name="clicked" handler="winMain_btnAbout_evt_clicked" swapped="no"/>
       </object>
     </child>
   </object>

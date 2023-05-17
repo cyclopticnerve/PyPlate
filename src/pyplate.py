@@ -419,7 +419,7 @@ def do_extras():
 
     # add venv dir
     # NB: use '.venv' to be compatible with VSCodium
-    # cmd = ['python', '-m', 'venv', 'venv']
+    # cmd = ['python', '-m', 'venv', '.venv']
     # cmd_array = shlex.split(cmd)
     # subprocess.run(cmd)
 

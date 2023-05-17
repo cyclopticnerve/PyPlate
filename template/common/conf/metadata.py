@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-from glob import glob
 import json
 import os
 import re
@@ -90,24 +89,24 @@ def main():
     # mod/pkg
     fix_pyproject()
 
-    # pkg
+    # # pkg
     fix_init()
 
-    # cli/gui
+    # # cli/gui
     fix_argparse()
     fix_install()
 
-    # gui
+    # # gui
     fix_desktop()
-    fix_ui()
+    fix_gtk3()
 
-    # check for __PP_ /PP_ stuff left over or we missed
+    # # check for __PP_ /PP_ stuff left over or we missed
     recurse(DIR_PRJ)
 
-    # do housekeeping
+    # # do housekeeping
     do_extras()
 
-    # print error count (__PP_/PP_ stuff found)
+    # # print error count (__PP_/PP_ stuff found)
     print(f'Errors: {g_err_cnt}')
 
 
@@ -241,8 +240,8 @@ def fix_pyproject():
             r'(^\s*name[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        pp_name = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
-        str_rep = rf'\g<1>\g<2>\g<3>"{pp_name}"'
+        pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_name_small}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace version
@@ -324,7 +323,8 @@ def fix_init():
     """
 
     # first check if there is a pkg dir
-    dir_pkg = os.path.join(DIR_PRJ, 'src', '__PP_NAME_SMALL__')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    dir_pkg = os.path.join(DIR_PRJ, 'src', pp_name_small)
     if not os.path.exists(dir_pkg) or not os.path.isdir(dir_pkg):
         return
 
@@ -422,8 +422,8 @@ def fix_argparse():
                 r'(.*?)'
                 r'(\'.*)'
             )
-            PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-            str_rep = rf'\g<1>\g<2>{PP_SHORT_DESC}\g<4>'
+            pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+            str_rep = rf'\g<1>\g<2>{pp_short_desc}\g<4>'
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
             # replace version
@@ -433,8 +433,8 @@ def fix_argparse():
                 r'(.*?)'
                 r'(\'.*)'
             )
-            PP_VERSION = DICT_METADATA['PP_VERSION']
-            str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+            pp_version = DICT_METADATA['PP_VERSION']
+            str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # save file
@@ -470,8 +470,8 @@ def fix_install():
         )
 
         # convert dict keys to string
-        PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
-        str_py_deps = ','.join(PP_PY_DEPS.keys())
+        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
+        str_py_deps = ','.join(pp_py_deps.keys())
         str_split = _split_quote(str_py_deps, quote='"', lead='\t\t',
                                  join=',\n\t\t')
 
@@ -488,8 +488,8 @@ def fix_install():
         )
 
         # convert dict to string
-        PP_SYS_DEPS = DICT_METADATA['PP_SYS_DEPS']
-        str_split = _split_quote(PP_SYS_DEPS, quote='"', lead='\t\t',
+        pp_sys_deps = DICT_METADATA['PP_SYS_DEPS']
+        str_split = _split_quote(pp_sys_deps, quote='"', lead='\t\t',
                                  join=',\n\t\t')
 
         # replace string
@@ -508,18 +508,42 @@ def fix_desktop():
     """
         Replace text in the desktop file
 
-        Replaces the icon, executable, and category text in a .desktop file for
-        programs that use this.
+        Replaces the desc, exec, icon, path, and category text in a .desktop
+        file for programs that use this.
     """
 
     # check if the file exists
-    path_desk = os.path.join(DIR_PRJ, 'src', 'gui', '__PP_NAME_BIG__.desktop')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    path_desk = os.path.join(DIR_PRJ, 'src', f'{pp_name_small}.desktop')
     if not os.path.exists(path_desk):
         return
 
     # open file and get contents
     with open(path_desk, 'r', encoding='utf-8') as f:
         text = f.read()
+
+# ------------------------------------------------------------------------------
+
+        # TODO: need to validate cats? with who? maybe just skip/ignore cus FTW
+        # need to validate against FreeDesktop or else add X-
+
+        # # replace categories
+        # str_pattern = (
+        #     r'(^\s*\[Desktop Entry\]\s*$)'
+        #     r'(.*?)'
+        #     r'(^\s*Categories[\t ]*=)'
+        #     r'(.*?$)'
+        # )
+
+        # # convert dict to string
+        # pp_gui_categories = DICT_METADATA['PP_GUI_CATEGORIES']
+        # str_split = _split_quote(pp_gui_categories, join=';', tail=';')
+
+        # # replace text
+        # str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
+        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+# ------------------------------------------------------------------------------
 
         # replace short description
         str_pattern = (
@@ -528,25 +552,15 @@ def fix_desktop():
             r'(^\s*Comment[\t ]*=)'
             r'(.*?$)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\g<2>\g<3>{PP_SHORT_DESC}'
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        str_rep = rf'\g<1>\g<2>\g<3>{pp_short_desc}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # replace categories
-        str_pattern = (
-            r'(^\s*\[Desktop Entry\]\s*$)'
-            r'(.*?)'
-            r'(^\s*Categories[\t ]*=)'
-            r'(.*?$)'
-        )
-
-        # convert dict to string
-        PP_GUI_CATEGORIES = DICT_METADATA['PP_GUI_CATEGORIES']
-        str_split = _split_quote(PP_GUI_CATEGORIES, join=';', tail=';')
-
-        # replace text
-        str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        # get paths to big/small
+        path_home = os.path.expanduser('~')
+        pp_name_big = DICT_SETTINGS['info']['__PP_NAME_BIG__']
+        path_src = os.path.join(path_home, '.cyclopticnerve', pp_name_big,
+                                'src')
 
         # replace exec
         str_pattern = (
@@ -555,9 +569,8 @@ def fix_desktop():
             r'(^\s*Exec[\t ]*=)'
             r'(.*?$)'
         )
-        # TODO: look in $PATH
-        PP_GUI_EXEC = DICT_METADATA['PP_GUI_EXEC']
-        str_rep = rf'\g<1>\g<2>\g<3>{PP_GUI_EXEC}'
+        path_exec = os.path.join(path_src, f'{pp_name_small}.py')
+        str_rep = rf'\g<1>\g<2>\g<3>{path_exec}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace icon
@@ -567,53 +580,44 @@ def fix_desktop():
             r'(^\s*Icon[\t ]*=)'
             r'(.*?$)'
         )
-        # TODO: look in $PATH
-        PP_GUI_ICON = DICT_METADATA['PP_GUI_ICON']
-        str_rep = rf'\g<1>\g<2>\g<3>{PP_GUI_ICON}'
+        path_icon = os.path.join(path_src, f'{pp_name_small}.png')
+        str_rep = rf'\g<1>\g<2>\g<3>{path_icon}'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace path
+        str_pattern = (
+            r'(^\s*\[Desktop Entry\]\s*$)'
+            r'(.*?)'
+            r'(^\s*Path[\t ]*=)'
+            r'(.*?$)'
+        )
+        str_rep = rf'\g<1>\g<2>\g<3>{path_src}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
     with open(path_desk, 'w', encoding='utf-8') as f:
         f.write(text)
 
-# TODO: set desktop path entry to prog dir???
-
 
 # ------------------------------------------------------------------------------
 # Replace text in the UI file
 # ------------------------------------------------------------------------------
-def fix_ui():
+def fix_gtk3():
     """
         Replace text in the UI file
 
-        Replace short description, program name, and version number in the
-        UI file.
+        Replace description and version number in the UI file.
     """
 
-    # first get gui dir
-    dir_gui = os.path.join(DIR_PRJ, 'src', 'gui')
-    if not os.path.exists(dir_gui) or not os.path.isdir(dir_gui):
-        return
-
     # check if there is a .ui file
-    path_ui = os.path.join(dir_gui, '__PP_NAME_SMALL_-gtk3.ui')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    path_ui = os.path.join(DIR_PRJ, 'src', f'{pp_name_small}_gtk3.ui')
     if not os.path.exists(path_ui):
         return
 
     # open file and get contents
     with open(path_ui, 'r', encoding='utf-8') as f:
         text = f.read()
-
-        # replace version
-        str_pattern = (
-            r'(<object class=\"GtkAboutDialog\".*?)'
-            r'(<property name=\"version\">)'
-            r'(.*?)'
-            r'(</property>.*)'
-        )
-        PP_VERSION = DICT_METADATA['PP_VERSION']
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace short description
         str_pattern = (
@@ -622,8 +626,19 @@ def fix_ui():
             r'(.*?)'
             r'(</property>)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\g<2>{PP_SHORT_DESC}\g<4>'
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        str_rep = rf'\g<1>\g<2>{pp_short_desc}\g<4>'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace version
+        str_pattern = (
+            r'(<object class=\"GtkAboutDialog\".*?)'
+            r'(<property name=\"version\">)'
+            r'(.*?)'
+            r'(</property>.*)'
+        )
+        pp_version = DICT_METADATA['PP_VERSION']
+        str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
@@ -705,7 +720,7 @@ def do_extras():
         the CHANGELOG file for the current project.
     """
 
-    # get pyplate/src dir
+    # get current dir
     dir_curr = os.getcwd()
 
     # make sure we are in project path
@@ -727,28 +742,24 @@ def do_extras():
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
 
+    # update docs
+    # NB: this is ugly and stupid, but it's the only way to get pdoc3 to work
+
+    # move into src dir
+    dir_src = os.path.join(DIR_PRJ, 'src')
+    os.chdir(dir_src)
+
+    # get docs dir
+    path_docs = os.path.join('..', 'docs')
+    path_docs = os.path.abspath(path_docs)
+
+    # # update docs
+    cmd = f'python -m pdoc --html -f -o {path_docs} .'
+    cmd_array = shlex.split(cmd)
+    subprocess.run(cmd_array)
+
     # go back to old dir
     os.chdir(dir_curr)
-
-# ------------------------------------------------------------------------------
-
-    type_prj = DICT_SETTINGS['project']['type']
-
-    # update docs
-    cmd = 'python -m pdoc --html -f -o docs'
-    cmd_array = shlex.split(cmd)
-
-    # docs for module/cli
-    if type_prj in 'mc':
-        glob_py = glob(f'src{os.sep}*.py')
-        cmd_array += glob_py
-
-    # docs for package
-    elif type_prj == 'p':
-        prj_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
-        cmd_array += [f'src{os.sep}{prj_small}']
-
-    subprocess.run(cmd_array)
 
 
 # ------------------------------------------------------------------------------
