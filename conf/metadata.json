@@ -4,7 +4,5 @@
     "PP_KEYWORDS": "python,cli,template,app,package,gui,module,gtk3",
     "PP_PY_DEPS": {},
     "PP_SYS_DEPS": "",
-    "PP_GUI_CATEGORIES": "",
-    "PP_GUI_EXEC": "",
-    "PP_GUI_ICON": ""
+    "PP_GUI_CATEGORIES": ""
 }

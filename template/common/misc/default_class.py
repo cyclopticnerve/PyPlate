@@ -10,9 +10,16 @@
 # Imports
 # ------------------------------------------------------------------------------
 
+# system imports
+import os
+
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
+
+# some useful constants
+DIR_FILE = os.path.dirname(__file__)
+DIR_HOME = os.path.expanduser('~')
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -45,22 +52,6 @@ class Main(object):
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Sets the new value of foo
-    # --------------------------------------------------------------------------
-    def set_foo(self, foo):
-        """
-            Sets the new value of foo
-
-            Parameters:
-                foo [type]: the new value of foo
-
-            Long description (including HTML).
-        """
-
-        # set the new value of foo
-        self.foo = foo
-
-    # --------------------------------------------------------------------------
     # Gets the current value of foo
     # --------------------------------------------------------------------------
     def get_foo(self):
@@ -77,7 +68,33 @@ class Main(object):
         return self.foo
 
     # --------------------------------------------------------------------------
+    # Sets the new value of foo
+    # --------------------------------------------------------------------------
+    def set_foo(self, foo):
+        """
+            Sets the new value of foo
+
+            Parameters:
+                foo [type]: the new value of foo
+
+            Long description (including HTML).
+        """
+
+        # set the new value of foo
+        self.foo = foo
+
+    # --------------------------------------------------------------------------
     # Private methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # foo method
+    # --------------------------------------------------------------------------
+    def _foo():
+        pass
+
+    # --------------------------------------------------------------------------
+    # Class methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -95,8 +112,12 @@ class Main(object):
         # call super init to initialize the base class
         super().__init__()
 
-        # NB: do not call setter functions in constructor
-        # (do everything manually)
+        # NB: something i learned the hard way from c++ coding: you want to do
+        # AS LITTLE coding in the constructor method because the whole class may
+        # not exist at this point! you should definitely not call get/set
+        # methods to init controls. these methods/controls may not exist at the
+        # time you call them. better to use a method that is called when/after
+        # the class is fully constructed.
 
         # set the initial value of foo
         self.foo = 'foo'

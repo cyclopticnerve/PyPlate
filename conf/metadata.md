@@ -38,12 +38,3 @@ PP_GUI_CATEGORIES
 categories must match a set of known values??? 
 https://specifications.freedesktop.org/menu-spec/latest/apa.html
 still working on this, for now categories are ignored
-
-PP_GUI_EXEC
-PP_GUI_ICON
-this is mostly for
-desktops that use a windows-style menu/submenu, not for Ubuntu-style overviews,
-and will be used in the __PP_NAME_BIG__.desktop file gui categories MUST be
-separated by a comma if exec/icon paths are not absolute, they will be found in
-standard paths these paths vary, but I will add them here in the comments when I
-figure them out
