@@ -92,7 +92,7 @@ def func():
 # ------------------------------------------------------------------------------
 # Add command line args to the parser
 # ------------------------------------------------------------------------------
-def add_args(argparser):
+def _add_args(argparser):
     """
         Add command line args to the parser
 
@@ -105,8 +105,11 @@ def add_args(argparser):
 
     # https://docs.python.org/3/library/argparse.html
 
+    # --------------------------------------------------------------------------
+
     # argparser.add_argument('-c', dest=PATH_CONFIG_ARG)
 
+    # --------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -115,6 +118,8 @@ def add_args(argparser):
 # ------------------------------------------------------------------------------
 # Parse command line args and set the global dict
 # ------------------------------------------------------------------------------
+
+
 def _parse_args():
     """
         Parse command line args and set the global dict
@@ -122,6 +127,9 @@ def _parse_args():
         This function gets the command line passed to the program, parses it,
         and sets the command line options as a global dict.
     """
+
+    # the global dict of arguments
+    global g_dict_args
 
     # create the parser
     argparser = argparse.ArgumentParser(
@@ -132,7 +140,7 @@ def _parse_args():
     print('__PP_NAME_BIG__ version PP_VERSION')
 
     # add arguments from the function above
-    add_args(argparser)
+    _add_args(argparser)
 
     # parse the arg list into a Namespace object (similar to dict)
     # NB: if there is an error in the command line, this function will:
@@ -145,7 +153,6 @@ def _parse_args():
     argparser.print_usage()
 
     # convert agrs to dict
-    global g_dict_args
     g_dict_args = vars(args)
 
 
@@ -165,12 +172,12 @@ def _load_config(path):
         Load the global config from a file at the specified location.
     """
 
+    # the dictionary to load to
+    global g_dict_config
+
     # sanity check
     if path is None or not os.path.isfile(path):
         return
-
-    # the dictionary to load to
-    global g_dict_config
 
     # open the file for reading
     try:

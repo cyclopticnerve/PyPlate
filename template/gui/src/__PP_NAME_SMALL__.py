@@ -69,20 +69,14 @@ def main():
     # call the steps in order
     print(func())
 
-    # show the window (with config dict)
-    # NB: app.run() blocks so only put code after this that you want to run
-    # AFTER the window is closed
-    # check if there is a 'gui' sub-dict
-    # if 'gui' in g_dict_config.keys():
-    #     app = gui.App(g_dict_config['gui'])
-    # else:
-    #     app = gui.App()
-    # app.run()
-
+    # show the window
     app = gui.App()
-    app.laod_gui(a_dict)
+    app.set_gui(g_dict_config['gui'])
     app.run()
-    new_dict = app.save_gui()
+    a_dict = app.get_gui()
+    global g_dict_config
+    g_dict_config['gui'] = a_dict
+    print(g_dict_config)
 
 
 # ------------------------------------------------------------------------------
@@ -110,7 +104,7 @@ def func():
 # ------------------------------------------------------------------------------
 # Add command line args to the parser
 # ------------------------------------------------------------------------------
-def add_args(argparser):
+def _add_args(argparser):
     """
         Add command line args to the parser
 
@@ -123,8 +117,11 @@ def add_args(argparser):
 
     # https://docs.python.org/3/library/argparse.html
 
+    # --------------------------------------------------------------------------
+
     # argparser.add_argument('-c', dest=PATH_CONFIG_ARG)
 
+    # --------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -133,6 +130,8 @@ def add_args(argparser):
 # ------------------------------------------------------------------------------
 # Parse command line args and set the global dict
 # ------------------------------------------------------------------------------
+
+
 def _parse_args():
     """
         Parse command line args and set the global dict
@@ -141,6 +140,7 @@ def _parse_args():
         and sets the command line options as a global dict.
     """
 
+    # the global dict of arguments
     global g_dict_args
 
     # create the parser
@@ -152,7 +152,7 @@ def _parse_args():
     print('__PP_NAME_BIG__ version PP_VERSION')
 
     # add arguments from the function above
-    add_args(argparser)
+    _add_args(argparser)
 
     # parse the arg list into a Namespace object (similar to dict)
     # NB: if there is an error in the command line, this function will:
@@ -232,27 +232,6 @@ def _save_config(path):
             json.dump(g_dict_config, f)
     except (Exception):
         raise Exception(f'_save_config: "{path}" cannot be created')
-
-
-# ------------------------------------------------------------------------------
-# Callback from gui to save state
-# ------------------------------------------------------------------------------
-def _save_gui(a_dict):
-    """
-        Callback from gui to save state
-
-        Parameters:
-            a_dict [dict]: the dictionary of gui settings to save
-
-        This function gets the gui state as a dictionary, and saves it to a
-        file.
-    """
-
-    # save gui config to section
-    global g_dict_config
-    g_dict_config['gui'] = a_dict
-
-    # NB: the actual file save is done after app.run() ends
 
 
 # ------------------------------------------------------------------------------

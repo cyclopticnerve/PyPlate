@@ -6,6 +6,7 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# TODO: sample I18N
 # TODO: Set up a dictionary of control names to config entries This will be used
 # to load json into gui, compare current gui to original json, and save gui to
 # json
@@ -14,14 +15,7 @@
 
 # TODO: save window size/pos/state
 
-# TODO: single instance https://python-gtk-3-tutorial.readthedocs.io/en/latest/application.html
-
 # TODO: there's a lot of strings in here for control names and settings keys?
-
-# the options here are:
-# make dict global
-# use cli global
-# make deep copy of dict
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -35,10 +29,6 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk  # noqa E402 - import not at top of file
 
-# local imports
-# import __PP_NAME_SMALL__ as cli  # noqa E402 - import not at top of file
-# from cli import g_dict_config  # noqa E402 - import not at top of file
-
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
@@ -49,6 +39,8 @@ DIR_HOME = os.path.expanduser('~')
 
 # the path to ui file (even if it is in same dir)
 PATH_GUI = os.path.join(DIR_SELF, '__PP_NAME_SMALL___gtk3.ui')
+
+APPLICATION_ID = 'org.cyclopticnerve.__PP_NAME_SMALL__'
 
 # whether to auto-save gui state on close, or abandon all changes (or ask, like
 # through a 'Save' dialog)
@@ -65,10 +57,11 @@ CLOSE_WITHOUT_SAVING = -69  # Nice
 # Class
 # ------------------------------------------------------------------------------
 
-
 # ------------------------------------------------------------------------------
 # The main class of the program
 # -----------------------------------------------------------------------------
+
+
 class App(Gtk.Application):
     """
         The main class of the program
@@ -78,43 +71,104 @@ class App(Gtk.Application):
     """
 
     # --------------------------------------------------------------------------
-    # Public variables
+    # Private variables
     # --------------------------------------------------------------------------
 
-    # the builder to get gtk objects from
-    builder = None
+    # the _builder to get gtk objects from
+    _builder = None
 
     # the one and only window instance
-    winMain = None
-
-    dict_config = None
+    _winMain = None
 
     # the default wndow title (changes on modified)
-    str_default_title = None
+    _str_default_title = ''
+
+    # the dict of gui control values
+    # order of precedence is:
+    # 1. values in .ui file
+    # 2. this dict
+    # 3. dict passed to set_gui()
+    _dict_gui = {'check': 'True'}
 
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
+    # Sets the property value of _dict_gui
+    # --------------------------------------------------------------------------
+    def set_gui(self, a_dict):
+        """
+            Sets the property value of _dict_gui
+
+            Parameters:
+                self [GTK.Class]: the class object
+                a_dict [dict]: the new property dictionary
+
+            This method sets the _dict_gui property. Must be called before
+            run().
+        """
+
+        # add new keys/overwrite existing
+        # NB: self._dict_gui(): defaults from class def
+        #     a_dict:           param passed in above
+        # The idea here is to move k/v pairs sent into this method into the
+        # self._dict_gui dict. To do that, we assign k/v pairs from the
+        # passed-in dict (a_dict) to the existing dict (self._dict_gui). If the
+        # keys overlap, precedence is given to the passed-in dict. otherwise no
+        # action is taken and the self._dict_gui k/v remains.
+
+        # for each valid key
+        for key in a_dict.keys():
+
+            # add/overwrite key/value
+            self._dict_gui[key] = a_dict[key]
+
+    # --------------------------------------------------------------------------
+    # Gets the property value of _dict_gui
+    # --------------------------------------------------------------------------
+
+    def get_gui(self):
+        """
+            Gets the property value of _dict_gui
+
+            Parameters:
+                self [GTK.Class]: the class object
+
+            Returns:
+                [dict]: the current property dictionary
+
+            This method gets the _dict_gui property. Must be called after run().
+        """
+
+        # get the instance property
+        return self._dict_gui
+
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
     # Called when the main window is closed by the 'X' button
     # --------------------------------------------------------------------------
-    def winMain_evt_delete_event(self, obj, event):
+
+    def _winMain_evt_delete_event(self, obj, event):
         """
             Called when the main window is closed by the 'X' button
 
             Parameters:
-                self [Class]: the class object
+                self [Gtk.Class]: the class object
                 obj [Gtk.Object]: the calling object
                 event [Gtk.Event]: not used
 
             Returns:
                 [bool]: opposite of whether we allow the window to close or not
                     Return True to say we handled it (don't close)
-                    Return False to say we didn't hadle it (close)
+                    Return False to say we didn't handle it (close)
 
             The Window is about to close via the 'X' button (or some other
             system event, like closing from the overview).
+
             NB: This method is public so you can do something like an 'Are you
             sure you want to close' or 'Values modified - Save/Close/Cancel'
             dialog.
@@ -126,8 +180,11 @@ class App(Gtk.Application):
 
         # if auto-save, no ask, just save and close
         if SAVE_ON_EXIT:
-            # dict_gui = self.save_gui()
-            # cli._save_gui(dict_gui)
+
+            # save gui to dict
+            self._dict_gui = self._get_gui()
+
+            # and close
             return False
 
         # I18N: translate these strings
@@ -174,156 +231,201 @@ class App(Gtk.Application):
             return True
 
         # if user chooses yes, save and close
-        elif response == Gtk.ResponseType.YES:
-            # dict_gui = self.save_gui()
-            # cli._save_gui(dict_gui)
+        elif response == Gtk.ResponseType.OK:
+
+            # save gui to dict
+            self._dict_gui = self._get_gui()
+
+            # and close
             return False
+
+    def _winMain_evt_destroy(self, obj):
+
+        # winMain = self._builder.get_object('winMain')
+        # print('size', winMain.get_size())
+        print('destroy')
 
     # --------------------------------------------------------------------------
     # Called when the About button is clicked
     # --------------------------------------------------------------------------
-    def winMain_btnAbout_evt_clicked(self, obj):
+    def _winMain_btnAbout_evt_clicked(self, obj):
         """
             Called when the About button is clicked
 
             Parameters:
-                self [Class]: the class object
+                self [Gtk.Class]: the class object
                 obj [GTK.Object]: the calling object
 
             The About button was clicked. Show the About dialog.
         """
 
-        # get about dialog, run, hide (standrad for reusable modal dialogs)
-        dlgAbout = self.builder.get_object('dlgAbout')
+        # get about dialog, run, hide (standard for reusable modal dialogs)
+        dlgAbout = self._builder.get_object('dlgAbout')
         dlgAbout.run()
         dlgAbout.hide()
 
     # --------------------------------------------------------------------------
+    # Called when the Save button is clicked
+    # --------------------------------------------------------------------------
+    def _winMain_btnSave_evt_clicked(self, obj):
+        """
+            Called when the Save button is clicked
+
+            Parameters:
+                self [Gtk.Class]: the class object
+                obj [GTK.Object]: the calling object
+
+            The Save button was clicked.
+        """
+
+        # save gui to dict
+        self._dict_gui = self._get_gui()
+
+        # update modified status (ignore return)
+        self._is_modified()
+
+    # --------------------------------------------------------------------------
     # Called when the Cancel button is clicked
     # --------------------------------------------------------------------------
-    def winMain_btnCancel_evt_clicked(self, obj):
+    def _winMain_btnCancel_evt_clicked(self, obj):
         """
             Called when the Cancel button is clicked
 
             Parameters:
-                self [Class]: the class object
+                self [Gtk.Class]: the class object
                 obj [GTK.Object]: the calling object
 
             The Cancel button was clicked.
         """
 
         # close main wndow
-        self.winMain.destroy()
+        self._winMain.destroy()
 
     # --------------------------------------------------------------------------
     # Called when the OK button is clicked
     # --------------------------------------------------------------------------
-    def winMain_btnOK_evt_clicked(self, obj):
+    def _winMain_btnOK_evt_clicked(self, obj):
         """
             Called when the OK button is clicked
 
             Parameters:
-                self [Class]: the class object
+                self [Gtk.Class]: the class object
                 obj [GTK.Object]: the calling object
 
             The OK button was clicked.
         """
 
-        # save gui state on close
-        if self._is_modified():
-            # dict_gui = self.save_gui()
-            # cli._save_gui(dict_gui)
-            pass
+        # save gui to dict
+        self._dict_gui = self._get_gui()
 
         # close main window
-        self.winMain.destroy()
-
-    # --------------------------------------------------------------------------
-    # Load the state of all gui objects
-    # --------------------------------------------------------------------------
-
-    def load_gui(self):
-        """
-            Load the state of all gui objects
-
-            Parameters:
-                self [Class]: the class object
-
-            Load the state of all gui objects when this method is called.
-        """
-
-        # ----------------------------------------------------------------------
-
-        if 'entry' in self.dict_config.keys():
-            entTest = self.builder.get_object('winMain_entTest')
-            entTest.set_text(self.dict_config['entry'])
-        if 'check' in self.dict_config.keys():
-            chkTest = self.builder.get_object('winMain_chkTest')
-            chkTest.set_active(self.dict_config['check'] == 'True')
-
-        # ----------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Save the state of all gui objects
-    # --------------------------------------------------------------------------
-    def save_gui(self):
-        """
-            Save the state of all gui objects
-
-            Parameters:
-                self [Class]: the class object
-
-            Return:
-                a dict containing the current state of the gui
-
-            Save the state of all gui objects whenever this method is called.
-        """
-
-        # create a new, empty dict for control values
-        dict_gui = {}
-
-        # ----------------------------------------------------------------------
-
-        # set the property value
-        entTest = self.builder.get_object('winMain_entTest')
-        dict_gui['entry'] = entTest.get_text()
-        chkTest = self.builder.get_object('winMain_chkTest')
-        dict_gui['check'] = str(chkTest.get_active())
-
-        # ----------------------------------------------------------------------
-
-        # return the new gui state
-        print('-- saved --')
-        print(dict_gui)
-
-        return dict_gui
-
-    def tmp_save_gui(self, obj):
-        pass
-
-    # --------------------------------------------------------------------------
-    # Private methods
-    # --------------------------------------------------------------------------
+        self._winMain.destroy()
 
     # --------------------------------------------------------------------------
     # Called when any control in the window is modified
     # --------------------------------------------------------------------------
-
     def _winMain_evt_modified(self, obj):
         """
             Called when any control in the window is modified
 
             Parameters:
-                self [Class]: the class object
+                self [Gtk.Class]: the class object
                 obj [GTK.Object]: the calling object
 
             Use this method to update the modified status of a cntrol and change
             the modified status of the window.
         """
 
-        # get modified state and change window title
-        # self._is_modified()
-        pass
+        # get modified state and change window title (ignore return value)
+        self._is_modified()
+
+    # --------------------------------------------------------------------------
+    # Set the state of all gui objects
+    # --------------------------------------------------------------------------
+    def _set_gui(self):
+        """
+            Set the state of all gui objects
+
+            Parameters:
+                self [Gtk.Class]: the class object
+
+            Set the state of all gui objects from self._dict_gui when this
+            method is called. This method is only called once, from _activate().
+        """
+
+        # add any missing gui keys (useful when loading empty gui config)
+        # NB: doing it this way means we can be assured that we will have all
+        # keys present in self._.dict_gui, saving a sanity check line for each
+        # control key (which could add up fast!) as well as having a stable
+        # starting point for _is_modified().
+
+        # first get the current gui (actual current control values)
+        # this gives us a set of needed keys in dict_gui
+        dict_gui = self._get_gui()
+
+        # for each key in the current needed gui
+        for key in dict_gui.keys():
+
+            # check if key is in wanted gui
+            if key in self._dict_gui.keys():
+
+                # if key is present, move it to current ui
+                dict_gui[key] = self._dict_gui[key]
+
+        # clear needed/wanted ui
+        self._dict_gui = {}
+
+        # move required back to property
+        for key in dict_gui.keys():
+            self._dict_gui[key] = dict_gui[key]
+
+        # ----------------------------------------------------------------------
+
+        entTest = self._builder.get_object('winMain_entTest')
+        entTest.set_text(self._dict_gui['entry'])
+        chkTest = self._builder.get_object('winMain_chkTest')
+        chkTest.set_active(self._dict_gui['check'] == 'True')
+
+        # ----------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Get the state of all gui objects
+    # --------------------------------------------------------------------------
+    def _get_gui(self):
+        """
+            Get the state of all gui objects
+
+            Parameters:
+                self [Gtk.Class]: the class object
+
+            Returns:
+                [dict]: A dictionary containing the current state of the gui
+
+            Get the state of all gui objects and return it whenever this method
+            is called. This method is called from several places, both for
+            saving the actual GUI values and also for checking the existance of
+            keys.
+        """
+
+        dict_gui = {}
+
+        # ----------------------------------------------------------------------
+
+        # NB: here you should set a key/value pair for each control you wish to
+        # save/restore
+        # this will become the 'template' which will be checked whenever the gui
+        # is loaded from a dict, to ensure keys exist for each control
+        # values are only important when saving/closing
+
+        # set the property value
+        entTest = self._builder.get_object('winMain_entTest')
+        dict_gui['entry'] = entTest.get_text()
+        chkTest = self._builder.get_object('winMain_chkTest')
+        dict_gui['check'] = str(chkTest.get_active())
+
+        # ----------------------------------------------------------------------
+
+        return dict_gui
 
     # --------------------------------------------------------------------------
     # Called when the Application needs to set if it has been modified
@@ -333,7 +435,7 @@ class App(Gtk.Application):
             Called when the Application needs to set if it has been modified
 
             Parameters:
-                self [Class]: the class object
+                self [GtkClass]: the class object
 
             The Application needs to know if it has been modified. So we create
             a hypothetical save dict, and compare it to the load dict. If there
@@ -345,119 +447,65 @@ class App(Gtk.Application):
         result = False
 
         # the new save dict (the current state of the gui)
-        dict_gui = self.save_gui()
+        dict_gui = self._get_gui()
 
         # enumerate the keys we will save
         for key in dict_gui.keys():
 
-            # if key is also in load dict
-            if key in self.dict_config.keys():
+            # compare current value to load value
+            val_new = dict_gui[key]
+            val_old = self._dict_gui[key]
 
-                # compare current value to load value
-                val_new = dict_gui[key]
-                val_old = self.dict_config[key]
-
-                # if they are different, we are modified
-                if val_new != val_old:
-                    result = True
+            # if they are different, we are modified
+            if val_new != val_old:
+                result = True
 
         # get the new window title
-        str_title = ('*' + self.str_default_title if result
-                     else self.str_default_title)
+        str_title = (f'*{self._str_default_title}' if result
+                     else self._str_default_title)
 
         # change window title
-        self.winMain.set_title(str_title)
+        self._winMain.set_title(str_title)
 
         # now return result for internal stuff
         return result
 
     # --------------------------------------------------------------------------
-    # Called to set up gui loading in the background
-    # --------------------------------------------------------------------------
-    def _load_gui(self):
-
-        # global ref to dict
-        # global g_dict_config
-
-        # create default dict_config
-        # NB: this checks if param passed to constructor is missing or None
-        if self.dict_config is None:
-            self.dict_config = {}
-
-        # add any missing gui keys (useful when loading empty gui config)
-        # NB: doing it this way rather than in the real load means we can be
-        # assured that in the real load, we will have all keys present, saving a
-        # sanity check line for each control key (which could add up fast!)
-
-        # first get the current gui (just what's set in the ui file)
-        dict_gui = self.save_gui()
-
-        # add any missing keys to the incoming dict (using ui vals)
-        for key in dict_gui.keys():
-            if key not in self.dict_config.keys():
-                self.dict_config[key] = dict_gui[key]
-
-    # --------------------------------------------------------------------------
-    # Called to set up gui loading in the background
-    # --------------------------------------------------------------------------
-    # def _save_gui(self, obj):
-
-    #     # # get the current ui status
-    #     dict_gui = self.save_gui()
-
-    #     # save that as our new comparison
-    #     global g_dict_config
-    #     g_dict_config = dict_gui
-
-    #     # check if modified (should always return false)
-    #     self._is_modified()
-    # #     pass
-
-    # --------------------------------------------------------------------------
-    # Called when the Application is activated
+    # Called when the Application is activated (ie first window is shown)
     # --------------------------------------------------------------------------
     def _activate(self, obj):
         """
-            Called when the Application is activated
+            Called when the Application is activated (ie first window is shown)
 
             Parameters:
                 self [GTK.Class]: the class object
                 obj [GTK.Object]: the calling object
 
-            The Application is about to show the Window.
+            The Application is about to show the main Window.
         """
 
         # I18N: do locale stuff here (see gdrive/projects/common)
 
         # the builder for this instance (all gui objects referenced from here)
-        self.builder = Gtk.Builder()
+        self._builder = Gtk.Builder()
 
         # load ui file from path and connect signals
-        self.builder.add_from_file(PATH_GUI)
-        self.builder.connect_signals(self)
+        self._builder.add_from_file(PATH_GUI)
+        self._builder.connect_signals(self)
 
         # create the main window and add to app's window list
-        self.winMain = self.builder.get_object('winMain')
-        self.add_window(self.winMain)
+        self._winMain = self._builder.get_object('winMain')
+        self.add_window(self._winMain)
 
         # get the initial window title (for modified indicator)
-        self.str_default_title = self.winMain.get_title()
+        self._str_default_title = self._winMain.get_title()
 
-        # NB: do load stuff here because controls now defenitely exist
-
-        # this checks if param passed to constructor is missing or None
-        # create default dict_config
-        if self.dict_config is None:
-            self.dict_config = self.save_gui()
-
-        # do private load
-        self._load_gui()
-
-        # load the config into the gui
-        self.load_gui()
+        # set the config into the controls
+        # NB: do set here because controls now defenitely exist
+        self._set_gui()
 
         # show window
-        self.winMain.present()
+        self._winMain.present()
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -466,27 +514,23 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     # Initialize the class to an object/instance
     # --------------------------------------------------------------------------
-    def __init__(self, dict_config=None):
+    def __init__(self):
         """
             Initialize the class to an object/instance
 
             Parameters:
                 self [GTK.Class]: the class object
-                dict_config [dict]: the config dict that holds the current gui
-                state (default: None)
 
             This method is called when a new instance of the class is created,
             i.e 'app = App()'
             NB: You want to do AS LITTLE coding in the init method because the
             whole class my not exist at this point! This is especially important
-            for connections. That is why they are deferred to _activate().
+            for connections and loading the gui. That is why they are deferred
+            to _activate().
         """
 
         # always call super
-        super().__init__(application_id='org.cyclopticnerve.__PP_NAME_SMALL__')
-
-        # save param to class variable
-        self.dict_config = dict_config
+        super().__init__(application_id=APPLICATION_ID)
 
         # connect default operations for a window
         self.connect('activate', self._activate)
@@ -503,19 +547,15 @@ if __name__ == '__main__':
         is invoked from the command line.
 
         NB: this is only here so the gui can be run standalone in the debugger
+        DO NOT call this file directly
     """
 
-    a_dict = {
-        'entry': 'no',
-        'check': 'True'
-    }
-
     # run main function
-    # app = App()
-    # app = App(None)
-    # app = App({})
-    app = App(a_dict)
+    app = App()
+    app.set_gui({'foo': 'c'})
+    app.set_gui({'foo': 'bar'})
     app.run()
-    app.save_gui()
+    a_dict = app.get_gui()
+    print(a_dict)
 
 # -)
