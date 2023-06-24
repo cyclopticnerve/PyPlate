@@ -64,15 +64,19 @@ So Modules/Packages will be generated in
 
 From there you are free to modify the projects in your favorite IDE.
 
+Once your priject is ready for release, run the 'metadata.py' file from the 
+project's 'conf' directory. This will update any metadata you have added/edited 
+in the 'conf' directory.
+
 ## Metadata/Customizing the project
-These files should be edited AFTER the project is generated, but BEFORE 
+These files should be viewed/edited AFTER the project is generated, but BEFORE 
 'metadata.py' is run.
 
 [Click here](README/blacklist.md) to learn more about the conf/blacklist.json 
 file.  
 [Click here](README/metadata.md) to learn more about the conf/metadata.json 
 file.  
-[Click here](sREADME/ettings.md) to learn more about the conf/settings.json 
+[Click here](README/ettings.md) to learn more about the conf/settings.json 
 file.
 
 After these files have been edited appropriately, run 'metadata.py' from the
