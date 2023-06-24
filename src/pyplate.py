@@ -53,6 +53,7 @@ DICT_BLACKLIST = {
         'tests',
         '__pycache__',
         'PKG-INFO',
+        'locale',
     ],
 
     # dont't fix/check internals, but do fix path
@@ -419,9 +420,9 @@ def do_extras():
 
     # add venv dir
     # NB: use '.venv' to be compatible with VSCodium
-    # cmd = ['python', '-m', 'venv', '.venv']
+    # cmd = 'python -m venv .venv'
     # cmd_array = shlex.split(cmd)
-    # subprocess.run(cmd)
+    # subprocess.run(cmd_array)
 
     # create tree
     path_tree = os.path.join(dir_prj, 'misc', 'tree.txt')

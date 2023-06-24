@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
+import datetime
 import json
 import os
 import re
@@ -58,6 +59,154 @@ if os.path.exists(path_settings):
             print(f'{f} is not a valid JSON file')
             exit()
 
+# get list of approved categories
+LIST_CATEGORIES = [
+    'AudioVideo',
+    'Audio',
+    'Video',
+    'Development',
+    'Education',
+    'Game',
+    'Graphics',
+    'Network',
+    'Office',
+    'Science',
+    'Settings',
+    'System',
+    'Utility',
+    'Building',
+    'Debugger',
+    'IDE',
+    'GUIDesigner',
+    'Profiling',
+    'RevisionControl',
+    'Translation',
+    'Calendar',
+    'ContactManagement',
+    'Database',
+    'Dictionary',
+    'Chart',
+    'Email',
+    'Finance',
+    'FlowChart',
+    'PDA',
+    'ProjectManagement',
+    'Presentation',
+    'Spreadsheet',
+    'WordProcessor',
+    '2DGraphics',
+    'VectorGraphics',
+    'RasterGraphics',
+    '3DGraphics',
+    'Scanning',
+    'OCR',
+    'Photography',
+    'Publishing',
+    'Viewer',
+    'TextTools',
+    'DesktopSettings',
+    'HardwareSettings',
+    'Printing',
+    'PackageManager',
+    'Dialup',
+    'InstantMessaging',
+    'Chat',
+    'IRCClient',
+    'Feed',
+    'FileTransfer',
+    'HamRadio',
+    'News',
+    'P2P',
+    'RemoteAccess',
+    'Telephony',
+    'TelephonyTools',
+    'VideoConference',
+    'WebBrowser',
+    'WebDevelopment',
+    'Midi',
+    'Mixer',
+    'Sequencer',
+    'Tuner',
+    'TV',
+    'AudioVideoEditing',
+    'Player',
+    'Recorder',
+    'DiscBurning',
+    'ActionGame',
+    'AdventureGame',
+    'ArcadeGame',
+    'BoardGame',
+    'BlocksGame',
+    'CardGame',
+    'KidsGame',
+    'LogicGame',
+    'RolePlaying',
+    'Shooter',
+    'Simulation',
+    'SportsGame',
+    'StrategyGame',
+    'Art',
+    'Construction',
+    'Music',
+    'Languages',
+    'ArtificialIntelligence',
+    'Astronomy',
+    'Biology',
+    'Chemistry',
+    'ComputerScience',
+    'DataVisualization',
+    'Economy',
+    'Electricity',
+    'Geography',
+    'Geology',
+    'Geoscience',
+    'History',
+    'Humanities',
+    'ImageProcessing',
+    'Literature',
+    'Maps',
+    'Math',
+    'NumericalAnalysis',
+    'MedicalSoftware',
+    'Physics',
+    'Robotics',
+    'Spirituality',
+    'Sports',
+    'ParallelComputing',
+    'Amusement',
+    'Archiving',
+    'Compression',
+    'Electronics',
+    'Emulator',
+    'Engineering',
+    'FileTools',
+    'FileManager',
+    'TerminalEmulator',
+    'Filesystem',
+    'Monitor',
+    'Security',
+    'Accessibility',
+    'Calculator',
+    'Clock',
+    'TextEditor',
+    'Documentation',
+    'Adult',
+    'Core',
+    'KDE',
+    'GNOME',
+    'XFCE',
+    'DDE',
+    'GTK',
+    'Qt',
+    'Motif',
+    'Java',
+    'ConsoleOnly',
+    'Screensaver',
+    'TrayIcon',
+    'Applet',
+    'Shell',
+]
+
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
@@ -89,22 +238,25 @@ def main():
     # mod/pkg
     fix_pyproject()
 
-    # # pkg
+    # pkg
     fix_init()
 
-    # # cli/gui
+    # cli/gui
     fix_argparse()
     fix_install()
 
-    # # gui
+    # gui
     fix_desktop()
     fix_gtk3()
 
     # # check for __PP_ /PP_ stuff left over or we missed
-    recurse(DIR_PRJ)
+    recurse_and_check(DIR_PRJ)
 
-    # # do housekeeping
+    # do housekeeping
     do_extras()
+
+    # do gettext stuff
+    do_gettext()
 
     # # print error count (__PP_/PP_ stuff found)
     print(f'Errors: {g_err_cnt}')
@@ -158,6 +310,8 @@ def fix_readme():
 
         # split the string for README
         str_split = _split_quote(str_py_deps, join='<br>\n', tail='\n')
+
+        # no split str, use default
         if str_split == '':
             str_split = 'None\n'
 
@@ -252,6 +406,8 @@ def fix_pyproject():
             r'(.*?$)'
         )
         pp_version = DICT_METADATA['PP_VERSION']
+        if pp_version == '':
+            pp_version = '0.0.0'
         str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -518,32 +674,31 @@ def fix_desktop():
     if not os.path.exists(path_desk):
         return
 
+    # validate wanted categories into approved categories
+    pp_gui_categories = []
+    wanted_cats = DICT_METADATA['PP_GUI_CATEGORIES']
+    for cat in wanted_cats:
+        if cat in LIST_CATEGORIES:
+            pp_gui_categories.append(cat)
+
     # open file and get contents
     with open(path_desk, 'r', encoding='utf-8') as f:
         text = f.read()
 
-# ------------------------------------------------------------------------------
+        # replace categories
+        str_pattern = (
+            r'(^\s*\[Desktop Entry\]\s*$)'
+            r'(.*?)'
+            r'(^\s*Categories[\t ]*=)'
+            r'(.*?$)'
+        )
 
-        # TODO: need to validate cats? with who? maybe just skip/ignore cus FTW
-        # need to validate against FreeDesktop or else add X-
+        # convert dict to string
+        str_split = _split_quote(pp_gui_categories, join=';', tail=';')
 
-        # # replace categories
-        # str_pattern = (
-        #     r'(^\s*\[Desktop Entry\]\s*$)'
-        #     r'(.*?)'
-        #     r'(^\s*Categories[\t ]*=)'
-        #     r'(.*?$)'
-        # )
-
-        # # convert dict to string
-        # pp_gui_categories = DICT_METADATA['PP_GUI_CATEGORIES']
-        # str_split = _split_quote(pp_gui_categories, join=';', tail=';')
-
-        # # replace text
-        # str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
-        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-# ------------------------------------------------------------------------------
+        # replace text
+        str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace short description
         str_pattern = (
@@ -556,11 +711,8 @@ def fix_desktop():
         str_rep = rf'\g<1>\g<2>\g<3>{pp_short_desc}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # get paths to big/small
-        path_home = os.path.expanduser('~')
-        pp_name_big = DICT_SETTINGS['info']['__PP_NAME_BIG__']
-        path_src = os.path.join(path_home, '.cyclopticnerve', pp_name_big,
-                                'src')
+        # get path to src dir
+        path_src = os.path.join(DIR_PRJ, 'src')
 
         # replace exec
         str_pattern = (
@@ -649,17 +801,17 @@ def fix_gtk3():
 # ------------------------------------------------------------------------------
 # Recurse through the folder structure looking for errors
 # ------------------------------------------------------------------------------
-def recurse(dir):
+def recurse_and_check(dir):
     """
         Recurse through the folder structure looking for errors
 
         Parameters:
             dir [string]: the directory to start looking for errors
 
-        This function recurses through the project directory, looking for errors
-        in each file's headers and content for strings that do not match their
-        intended contents. It checks a header's project, filename, and date
-        values as well as looking for dunder values that should have been
+        This function recurses through the project directory, checking for
+        errors in each file's headers, and content for strings that do not match
+        their intended contents. It checks a header's project, filename, and
+        date values as well as looking for dunder values that should have been
         replaced.
     """
 
@@ -684,7 +836,7 @@ def recurse(dir):
         if os.path.isdir(path_item):
 
             # recurse itself to find more files
-            recurse(path_item)
+            recurse_and_check(path_item)
 
         else:
 
@@ -711,7 +863,6 @@ def recurse(dir):
 # ------------------------------------------------------------------------------
 # Do extra functions to update project dir after recurse
 # ------------------------------------------------------------------------------
-
 def do_extras():
     """
         Do extras functions to update project dir after recurse
@@ -760,6 +911,123 @@ def do_extras():
 
     # go back to old dir
     os.chdir(dir_curr)
+
+
+# ------------------------------------------------------------------------------
+# Run xgettext over files to produce a locale template
+# ------------------------------------------------------------------------------
+def do_gettext():
+    """
+        Run xgettext over files to produce a locale template
+
+        Use xgettext to scan .py and .ui files for I18N strings and collect them
+        int a .pot file in the locale folder. Only applies to gui projects at
+        the moment.
+    """
+
+    # check if we are a gui project
+    is_gui = (DICT_SETTINGS['project']['type'] == 'g')
+    if not is_gui:
+        return
+
+    # get locale folder and pot filename
+    dir_locale = os.path.join(DIR_PRJ, 'src', 'locale')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    path_pot = os.path.join(dir_locale, f'{pp_name_small}.pot')
+    pp_version = DICT_METADATA['PP_VERSION']
+
+    # remove old pot and recreate empty file
+    if os.path.exists(path_pot):
+        os.remove(path_pot)
+    with open(path_pot, 'w', encoding='utf-8') as f:
+        f.write('')
+
+    # build a list of files
+    res = []
+    exts = ['.py', '.ui', '.glade']
+
+    # scan for files in src directory
+    dir_src = os.path.join(DIR_PRJ, 'src')
+    list_files = os.listdir(dir_src)
+
+    # for each file in dir
+    for file in list_files:
+
+        # check for ext
+        for ext in exts:
+            if file.endswith(ext):
+
+                # rebuild complete path and add to list
+                path = os.path.join(dir_src, file)
+                res.append(path)
+
+    # for each file that can be I18N'd, run xgettext
+    for file in res:
+        cmd = (
+            'xgettext '         # the xgettest cmd
+            f'{file} '          # the file name
+            '-j '               # append to current file
+            '-c"I18N:" '        # look for tags in .py files
+            '--no-location '    # don't print filename/line number
+            f'-o {path_pot} '   # location of output file
+            '-F '               # sort output by input file
+            '--copyright-holder=cyclopticnerve '
+            f'--package-name={pp_name_small} '
+            f'--package-version={pp_version} '
+            '--msgid-bugs-address=cyclopticnerve@gmail.com'
+        )
+        cmd_array = shlex.split(cmd)
+        subprocess.run(cmd_array)
+
+    # now lets do some text replacements to make it look nice
+
+    # open file and get contents
+    with open(path_pot, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+        # replace short description
+        str_pattern = (
+            r'(# SOME DESCRIPTIVE TITLE.)'
+        )
+        pp_name_big = DICT_SETTINGS['info']['__PP_NAME_BIG__']
+        str_rep = f'# {pp_name_big} translation template'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace copyright
+        str_pattern = (
+            r'(# Copyright \(C\) )'
+            r'(.*?)'
+            r'( cyclopticnerve)'
+        )
+        year = datetime.date.today().year
+        str_rep = rf'\g<1>{year}\g<3>'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace author
+        str_pattern = (
+            r'(# FIRST AUTHOR )'
+            r'(<EMAIL@ADDRESS>)'
+            r'(, )'
+            r'(YEAR)'
+        )
+        author = 'cyclopticnerve@gmail.com'
+        year = datetime.date.today().year
+        str_rep = rf'\g<1>{author}\g<3>{year}'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace charset
+        str_pattern = (
+            r'("Content-Type: text/plain; charset=)'
+            r'(CHARSET)'
+            r'(\\n")'
+        )
+        charset = 'UTF-8'
+        str_rep = rf'\g<1>{charset}\g<3>'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # save file
+    with open(path_pot, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 # ------------------------------------------------------------------------------

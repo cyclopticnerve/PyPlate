@@ -6,26 +6,34 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# TODO: sample I18N
 # TODO: Set up a dictionary of control names to config entries This will be used
 # to load json into gui, compare current gui to original json, and save gui to
 # json
 # User data for each control in Glade could be the dictionary key for that
 # value
-
-# TODO: save window size/pos/state
-
 # TODO: there's a lot of strings in here for control names and settings keys?
+
+
+"""
+1. run metadata.py to do xgettext and make .pot file
+2. copy .pot file to locale/<lang>/LC_MESSAGES and rename .po
+3. edit .po file
+4. run msgfmt -o __PP_NAME_SMALL__.mo __PP_NAME_SMALL__.po in
+    locale/<lang>/LC_MESSAGES dir
+
+"""
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
+import gettext
+import gi
+import locale
 import os
 
 # complicated imports
-import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk  # noqa E402 - import not at top of file
 
@@ -33,14 +41,18 @@ from gi.repository import Gtk  # noqa E402 - import not at top of file
 # Constants
 # ------------------------------------------------------------------------------
 
+# the application id to use for GTK
+APPLICATION_ID = 'org.cyclopticnerve.__PP_NAME_SMALL__'
+
 # some useful constants
-DIR_SELF = os.path.dirname(__file__)
 DIR_HOME = os.path.expanduser('~')
+DIR_SELF = os.path.dirname(__file__)
+
+# the path to the locale dir
+DIR_LOCALE = os.path.join(DIR_SELF, 'locale')
 
 # the path to ui file (even if it is in same dir)
 PATH_GUI = os.path.join(DIR_SELF, '__PP_NAME_SMALL___gtk3.ui')
-
-APPLICATION_ID = 'org.cyclopticnerve.__PP_NAME_SMALL__'
 
 # whether to auto-save gui state on close, or abandon all changes (or ask, like
 # through a 'Save' dialog)
@@ -52,6 +64,11 @@ CLOSE_WITHOUT_SAVING = -69  # Nice
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
+
+# get gettext class object and set macro
+translator = gettext.translation(
+    '__PP_NAME_SMALL__', DIR_LOCALE, fallback=True)
+_ = translator.gettext
 
 # ------------------------------------------------------------------------------
 # Class
@@ -88,7 +105,7 @@ class App(Gtk.Application):
     # 1. values in .ui file
     # 2. this dict
     # 3. dict passed to set_gui()
-    _dict_gui = {'check': 'True'}
+    _dict_gui = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -115,7 +132,7 @@ class App(Gtk.Application):
         # The idea here is to move k/v pairs sent into this method into the
         # self._dict_gui dict. To do that, we assign k/v pairs from the
         # passed-in dict (a_dict) to the existing dict (self._dict_gui). If the
-        # keys overlap, precedence is given to the passed-in dict. otherwise no
+        # keys overlap, precedence is given to the passed-in dict. Otherwise no
         # action is taken and the self._dict_gui k/v remains.
 
         # for each valid key
@@ -151,7 +168,6 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     # Called when the main window is closed by the 'X' button
     # --------------------------------------------------------------------------
-
     def _winMain_evt_delete_event(self, obj, event):
         """
             Called when the main window is closed by the 'X' button
@@ -174,49 +190,27 @@ class App(Gtk.Application):
             dialog.
         """
 
-        # if not modified, no save, just close
+        # if not modified
         if not self._is_modified():
+
+            # can't save state before _is_modified
+            self._save_state()
+
+            # no save, just close
             return False
 
         # if auto-save, no ask, just save and close
         if SAVE_ON_EXIT:
 
-            # save gui to dict
+            # save gui to dict and then save state
             self._dict_gui = self._get_gui()
+            self._save_state()
 
             # and close
             return False
 
-        # I18N: translate these strings
-        str_main = 'Save changes before closing?'
-        str_sec = 'If you don\'t save, changes will be permanently lost.'
-        str_close = 'Close without saving'
-        str_cancel = 'Cancel'
-        str_save = 'Save'
-
-        # create a new message box
-        msgBox = Gtk.MessageDialog(text=str_main, secondary_text=str_sec,
-                                   message_type=Gtk.MessageType.QUESTION)
-
-        # add buttons to message box
-        msgBox.add_buttons(
-            str_close, CLOSE_WITHOUT_SAVING,
-            str_cancel, Gtk.ResponseType.CANCEL,
-            str_save, Gtk.ResponseType.OK
-        )
-
-        # make all buttons stretch
-        msgBox.action_area.set_homogeneous(True)
-
-        # set the bad-nono button as red
-        btnRed = msgBox.get_widget_for_response(
-            response_id=CLOSE_WITHOUT_SAVING)
-        btnRed_style_context = btnRed.get_style_context()
-        btnRed_style_context.add_class('destructive-action')
-
-        # set default button and spacing (neither work)
-        msgBox.set_default_response(Gtk.ResponseType.OK)
-        msgBox.action_area.set_spacing(0)
+        # create a message dialog
+        msgBox = self._get_dialog()
 
         # show message box and get result
         response = msgBox.run()
@@ -224,6 +218,7 @@ class App(Gtk.Application):
 
         # if user chooses close, just close
         if response == CLOSE_WITHOUT_SAVING:
+            self._save_state()
             return False
 
         # if user chooses cancel, don't close
@@ -231,19 +226,14 @@ class App(Gtk.Application):
             return True
 
         # if user chooses yes, save and close
-        elif response == Gtk.ResponseType.OK:
+        else:  # response == Gtk.ResponseType.OK:
 
-            # save gui to dict
+            # save gui to dict and then save state
             self._dict_gui = self._get_gui()
+            self._save_state()
 
             # and close
             return False
-
-    def _winMain_evt_destroy(self, obj):
-
-        # winMain = self._builder.get_object('winMain')
-        # print('size', winMain.get_size())
-        print('destroy')
 
     # --------------------------------------------------------------------------
     # Called when the About button is clicked
@@ -298,6 +288,9 @@ class App(Gtk.Application):
             The Cancel button was clicked.
         """
 
+        # save state before destroy
+        self._save_state()
+
         # close main wndow
         self._winMain.destroy()
 
@@ -317,6 +310,9 @@ class App(Gtk.Application):
 
         # save gui to dict
         self._dict_gui = self._get_gui()
+
+        # save state before destroy
+        self._save_state()
 
         # close main window
         self._winMain.destroy()
@@ -428,8 +424,136 @@ class App(Gtk.Application):
         return dict_gui
 
     # --------------------------------------------------------------------------
+    # Create a save dialog for when the window is closed by the 'X' button
+    # --------------------------------------------------------------------------
+    def _get_dialog(self):
+        """
+            Create a save dialog for when the window is closed by the 'X' button
+
+            Parameters:
+                self [Gtk.Class]: the class object
+
+            Returns:
+                [Gtk.MessageDialog]: The dialog to show when the user presses
+                the 'X' button
+
+            Create a dialog that has 3 buttons, set their labels/colors, and
+            various text labels.
+        """
+
+        # before (does not appear in pot)
+        # I18N: the main message of the save dialog
+        # after
+        str_main = _('Save changes before closing?')
+        # I18N: the submessage of the save dialog
+        str_sec = _('If you don\'t save, changes will be permanently lost.')
+        # I18N: the destructive button label (to close without saving)
+        str_close = _('Close without saving')
+        # I18N: the cancel button label (to do nothing)
+        str_cancel = _('Cancel')
+        # I18N: the save button label (to save and close)
+        str_save = _('Save')
+
+        # create a new message box
+        msgBox = Gtk.MessageDialog(text=str_main, secondary_text=str_sec,
+                                   message_type=Gtk.MessageType.QUESTION)
+
+        # add buttons to message box
+        msgBox.add_buttons(
+            str_close, CLOSE_WITHOUT_SAVING,
+            str_cancel, Gtk.ResponseType.CANCEL,
+            str_save, Gtk.ResponseType.OK
+        )
+
+        # make all buttons stretch
+        msgBox.action_area.set_homogeneous(True)
+
+        # set the bad-nono button as red
+        btnRed = msgBox.get_widget_for_response(
+            response_id=CLOSE_WITHOUT_SAVING)
+        btnRed_style_context = btnRed.get_style_context()
+        btnRed_style_context.add_class('destructive-action')
+
+        # set default button and spacing (neither work)
+        msgBox.set_default_response(Gtk.ResponseType.OK)
+
+        # return the dialog
+        return msgBox
+
+    # --------------------------------------------------------------------------
+    # Saves the window size/state whenever it is closed
+    # --------------------------------------------------------------------------
+    def _save_state(self):
+        """
+            Saves the window size/state whenever it is closed
+
+            Parameters:
+                self [Gtk.Class]: the class object
+
+            Saves the window size/state to _dict_gui whenever it is closed.
+        """
+
+        # get the window
+        winMain = self._builder.get_object('winMain')
+
+        # get size from ui file (not actual window, in case we are maximized)
+        size = winMain.get_default_size()
+
+        # check if we are maximized
+        max = winMain.is_maximized()
+
+        # if not maximized, use current size
+        if not max:
+            size = winMain.get_size()
+
+        # create a dictionary to hold the size/state
+        dict_win_props = {
+            'width': f'{size.width}',
+            'height': f'{size.height}',
+            'max': f'{max}'
+        }
+
+        # set the state dict into the gui dict
+        self._dict_gui['state'] = dict_win_props
+
+    # --------------------------------------------------------------------------
+    # Loads the window size/state whenever it is shown
+    # --------------------------------------------------------------------------
+    def _load_state(self):
+        """
+            Loads the window size/state whenever it is shown
+
+            Parameters:
+                self [Gtk.Class]: the class object
+
+            Sets the window size/state to _dict_gui whenever it is opened.
+        """
+
+        # check for key/sub-dict
+        if 'state' in self._dict_gui.keys():
+
+            # get window state if it present
+            dict_state = self._dict_gui['state']
+
+            #  get props from dict
+            w = dict_state['width']
+            h = dict_state['height']
+            m = dict_state['max']
+
+            # get the window
+            winMain = self._builder.get_object('winMain')
+
+            # set size
+            winMain.set_default_size(int(w), int(h))
+
+            # set state
+            if m == 'True':
+                winMain.maximize()
+
+    # --------------------------------------------------------------------------
     # Called when the Application needs to set if it has been modified
     # --------------------------------------------------------------------------
+
     def _is_modified(self):
         """
             Called when the Application needs to set if it has been modified
@@ -484,10 +608,14 @@ class App(Gtk.Application):
             The Application is about to show the main Window.
         """
 
-        # I18N: do locale stuff here (see gdrive/projects/common)
+        # set the locale to point to the dir
+        locale.bindtextdomain('guitest', DIR_LOCALE)
 
         # the builder for this instance (all gui objects referenced from here)
         self._builder = Gtk.Builder()
+
+        # set the builder to point to domain
+        self._builder.set_translation_domain('guitest')
 
         # load ui file from path and connect signals
         self._builder.add_from_file(PATH_GUI)
@@ -499,6 +627,9 @@ class App(Gtk.Application):
 
         # get the initial window title (for modified indicator)
         self._str_default_title = self._winMain.get_title()
+
+        # load size/state
+        self._load_state()
 
         # set the config into the controls
         # NB: do set here because controls now defenitely exist
@@ -552,10 +683,6 @@ if __name__ == '__main__':
 
     # run main function
     app = App()
-    app.set_gui({'foo': 'c'})
-    app.set_gui({'foo': 'bar'})
     app.run()
-    a_dict = app.get_gui()
-    print(a_dict)
 
 # -)

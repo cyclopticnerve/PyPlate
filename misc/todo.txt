@@ -46,6 +46,7 @@ hdr txt path
 1   1   1
 
 
+TODO: combine metadata.json/blacklist.json
 TODO: how to document file formats that don't support comments? json,toml
 TODO: remove all brackets from docstrings
 TODO: venv doesn't work

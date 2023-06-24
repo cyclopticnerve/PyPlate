@@ -26,11 +26,14 @@ Release
     Glade
         [] icon in src is 128x128 png
         [] Toolkit version matches gi.repository number
-        [] All I18N strings
+        [] All I18N strings must have comments
         [] About dialog icon path
         [] File properties in Glade - errors, load images from rel,
 
     I18N
+        [] Use gettext _ for all user-facing strings
+        [] Format numbers/dates/currency 
+            https://phrase.com/blog/posts/beginners-guide-to-locale-in-python/
         [] Do I18N for .po/.pot in src/gui/locale
                 
     VSCodium

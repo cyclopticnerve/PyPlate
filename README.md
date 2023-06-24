@@ -64,6 +64,27 @@ So Modules/Packages will be generated in
 
 From there you are free to modify the projects in your favorite IDE.
 
+## Metadata/Customizing the project
+These files should be edited AFTER the project is generated, but BEFORE 
+'metadata.py' is run.
+
+[Click here](README/blacklist.md) to learn more about the conf/blacklist.json 
+file.  
+[Click here](README/metadata.md) to learn more about the conf/metadata.json 
+file.  
+[Click here](sREADME/ettings.md) to learn more about the conf/settings.json 
+file.
+
+After these files have been edited appropriately, run 'metadata.py' from the
+'conf' directory to update the metadata in the project. This module can be run
+any time AFTER the project has been created to update the metadata in the
+project. Here is an example for a project of type 'm' (module) named 'ModTest':
+
+``` bash
+foo@bar:~$ cd ~/Documents/Projects/Python/Libs/ModTest/conf
+foo@bar:~/Documents/Projects/Python/Libs/ModTest/conf$ ./metadata.py
+```
+
 ## Notes
 If you make any changes to this template to better suit your own style/setup, 
 please let me know or send a pull request. I will take a look and see if I can 

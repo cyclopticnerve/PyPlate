@@ -107,7 +107,7 @@ def _add_args(argparser):
 
     # --------------------------------------------------------------------------
 
-    # argparser.add_argument('-c', dest=PATH_CONFIG_ARG)
+    argparser.add_argument('-c', dest=PATH_CONFIG_ARG)
 
     # --------------------------------------------------------------------------
 

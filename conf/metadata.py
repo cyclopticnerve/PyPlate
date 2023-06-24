@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-from glob import glob
+import datetime
 import json
 import os
 import re
@@ -99,15 +99,18 @@ def main():
 
     # gui
     fix_desktop()
-    fix_ui()
+    fix_gtk3()
 
-    # check for __PP_ /PP_ stuff left over or we missed
-    recurse(DIR_PRJ)
+    # # check for __PP_ /PP_ stuff left over or we missed
+    recurse_and_check(DIR_PRJ)
 
     # do housekeeping
     do_extras()
 
-    # print error count (__PP_/PP_ stuff found)
+    # do gettext stuff
+    do_gettext()
+
+    # # print error count (__PP_/PP_ stuff found)
     print(f'Errors: {g_err_cnt}')
 
 
@@ -137,8 +140,12 @@ def fix_readme():
             r'(.*?)'
             r'(<!--[\t ]*__RM_SHORT_DESC_END__[\t ]*-->)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\n{PP_SHORT_DESC}\n\g<3>'
+
+        # get short description
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+
+        # replace text
+        str_rep = rf'\g<1>\n{pp_short_desc}\n\g<3>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace dependencies array
@@ -148,17 +155,10 @@ def fix_readme():
             r'(<!--[\t ]*__RM_PY_DEPS_END__[\t ]*-->)'
         )
 
-        # build a string from the dict (markdown link)
-        PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
-
-        # NB: this is a sample of how to handle dict comprehensions
-        lst_py_deps = [f'[{key}]({val})' for (key, val) in PP_PY_DEPS.items()]
+        # build a string from the dict (markdown links)
+        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
+        lst_py_deps = [f'[{key}]({val})' for (key, val) in pp_py_deps.items()]
         str_py_deps = ','.join(lst_py_deps)
-
-        # NB: this was the old way
-        # str_py_deps = ''
-        # for (key, val) in PP_PY_DEPS.items():
-        #     str_py_deps += f'[{key}]({val}),'
 
         # split the string for README
         str_split = _split_quote(str_py_deps, join='<br>\n', tail='\n')
@@ -172,7 +172,7 @@ def fix_readme():
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace version
-        PP_VERSION = DICT_METADATA['PP_VERSION']
+        pp_version = DICT_METADATA['PP_VERSION']
 
         str_pattern = (
             r'(\s*foo@bar:~/Downloads\$ python -m pip install )'
@@ -180,7 +180,7 @@ def fix_readme():
             r'(.*?)'
             r'(\.tar\.gz)'
         )
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+        str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text)
 
         str_pattern = (
@@ -191,7 +191,7 @@ def fix_readme():
             r'(.*?)'
             r'(\.tar\.gz)'
         )
-        str_rep = rf'\g<1>\g<2>\g<3>\g<4>{PP_VERSION}\g<6>'
+        str_rep = rf'\g<1>\g<2>\g<3>\g<4>{pp_version}\g<6>'
         text = re.sub(str_pattern, str_rep, text)
 
         str_pattern = (
@@ -199,7 +199,7 @@ def fix_readme():
             r'(.*-)'
             r'(.*)'
         )
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}'
+        str_rep = rf'\g<1>\g<2>{pp_version}'
         text = re.sub(str_pattern, str_rep, text)
 
         str_pattern = (
@@ -208,7 +208,7 @@ def fix_readme():
             r'(.*)'
             r'(\$ \./install.py)'
         )
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+        str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text)
 
     # save file
@@ -246,8 +246,8 @@ def fix_pyproject():
             r'(^\s*name[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        PP_NAME = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
-        str_rep = rf'\g<1>\g<2>\g<3>"{PP_NAME}"'
+        pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_name_small}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace version
@@ -257,10 +257,10 @@ def fix_pyproject():
             r'(^\s*version[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        PP_VERSION = DICT_METADATA['PP_VERSION']
-        if PP_VERSION == '':
-            PP_VERSION = '0.0.0'
-        str_rep = rf'\g<1>\g<2>\g<3>"{PP_VERSION}"'
+        pp_version = DICT_METADATA['PP_VERSION']
+        if pp_version == '':
+            pp_version = '0.0.0'
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace short description
@@ -270,8 +270,8 @@ def fix_pyproject():
             r'(^\s*description[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\g<2>\g<3>"{PP_SHORT_DESC}"'
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # # replace keywords array
@@ -283,8 +283,8 @@ def fix_pyproject():
         )
 
         # convert dict to string
-        PP_KEYWORDS = DICT_METADATA['PP_KEYWORDS']
-        str_split = _split_quote(PP_KEYWORDS, quote='"', lead='\t',
+        pp_keywords = DICT_METADATA['PP_KEYWORDS']
+        str_split = _split_quote(pp_keywords, quote='"', lead='\t',
                                  join=',\n\t', tail='\n')
 
         # replace string
@@ -300,11 +300,11 @@ def fix_pyproject():
         )
 
         # convert dict to string (only using keys)
-        PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
+        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
 
         # NB: this is not conducive to a dict (we don't need links, only names)
         # so don't do what we did in README, keep it simple
-        str_py_deps = ','.join(PP_PY_DEPS.keys())
+        str_py_deps = ','.join(pp_py_deps.keys())
 
         # split the string for pyproject
         str_split = _split_quote(str_py_deps, quote='"', lead='\t',
@@ -331,7 +331,8 @@ def fix_init():
     """
 
     # first check if there is a pkg dir
-    dir_pkg = os.path.join(DIR_PRJ, 'src', '__PP_NAME_SMALL__')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    dir_pkg = os.path.join(DIR_PRJ, 'src', pp_name_small)
     if not os.path.exists(dir_pkg) or not os.path.isdir(dir_pkg):
         return
 
@@ -429,8 +430,8 @@ def fix_argparse():
                 r'(.*?)'
                 r'(\'.*)'
             )
-            PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-            str_rep = rf'\g<1>\g<2>{PP_SHORT_DESC}\g<4>'
+            pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+            str_rep = rf'\g<1>\g<2>{pp_short_desc}\g<4>'
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
             # replace version
@@ -440,8 +441,8 @@ def fix_argparse():
                 r'(.*?)'
                 r'(\'.*)'
             )
-            PP_VERSION = DICT_METADATA['PP_VERSION']
-            str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
+            pp_version = DICT_METADATA['PP_VERSION']
+            str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # save file
@@ -477,8 +478,8 @@ def fix_install():
         )
 
         # convert dict keys to string
-        PP_PY_DEPS = DICT_METADATA['PP_PY_DEPS']
-        str_py_deps = ','.join(PP_PY_DEPS.keys())
+        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
+        str_py_deps = ','.join(pp_py_deps.keys())
         str_split = _split_quote(str_py_deps, quote='"', lead='\t\t',
                                  join=',\n\t\t')
 
@@ -495,8 +496,8 @@ def fix_install():
         )
 
         # convert dict to string
-        PP_SYS_DEPS = DICT_METADATA['PP_SYS_DEPS']
-        str_split = _split_quote(PP_SYS_DEPS, quote='"', lead='\t\t',
+        pp_sys_deps = DICT_METADATA['PP_SYS_DEPS']
+        str_split = _split_quote(pp_sys_deps, quote='"', lead='\t\t',
                                  join=',\n\t\t')
 
         # replace string
@@ -515,18 +516,42 @@ def fix_desktop():
     """
         Replace text in the desktop file
 
-        Replaces the icon, executable, and category text in a .desktop file for
-        programs that use this.
+        Replaces the desc, exec, icon, path, and category text in a .desktop
+        file for programs that use this.
     """
 
     # check if the file exists
-    path_desk = os.path.join(DIR_PRJ, 'src', 'gui', '__PP_NAME_BIG__.desktop')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    path_desk = os.path.join(DIR_PRJ, 'src', f'{pp_name_small}.desktop')
     if not os.path.exists(path_desk):
         return
 
     # open file and get contents
     with open(path_desk, 'r', encoding='utf-8') as f:
         text = f.read()
+
+# ------------------------------------------------------------------------------
+
+        # TODO: need to validate cats? with who? maybe just skip/ignore cus FTW
+        # need to validate against FreeDesktop or else add X-
+
+        # # replace categories
+        # str_pattern = (
+        #     r'(^\s*\[Desktop Entry\]\s*$)'
+        #     r'(.*?)'
+        #     r'(^\s*Categories[\t ]*=)'
+        #     r'(.*?$)'
+        # )
+
+        # # convert dict to string
+        # pp_gui_categories = DICT_METADATA['PP_GUI_CATEGORIES']
+        # str_split = _split_quote(pp_gui_categories, join=';', tail=';')
+
+        # # replace text
+        # str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
+        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+# ------------------------------------------------------------------------------
 
         # replace short description
         str_pattern = (
@@ -535,25 +560,15 @@ def fix_desktop():
             r'(^\s*Comment[\t ]*=)'
             r'(.*?$)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\g<2>\g<3>{PP_SHORT_DESC}'
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        str_rep = rf'\g<1>\g<2>\g<3>{pp_short_desc}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # replace categories
-        str_pattern = (
-            r'(^\s*\[Desktop Entry\]\s*$)'
-            r'(.*?)'
-            r'(^\s*Categories[\t ]*=)'
-            r'(.*?$)'
-        )
-
-        # convert dict to string
-        PP_GUI_CATEGORIES = DICT_METADATA['PP_GUI_CATEGORIES']
-        str_split = _split_quote(PP_GUI_CATEGORIES, join=';', tail=';')
-
-        # replace text
-        str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        # get paths to big/small
+        path_home = os.path.expanduser('~')
+        pp_name_big = DICT_SETTINGS['info']['__PP_NAME_BIG__']
+        path_src = os.path.join(path_home, '.cyclopticnerve', pp_name_big,
+                                'src')
 
         # replace exec
         str_pattern = (
@@ -562,8 +577,8 @@ def fix_desktop():
             r'(^\s*Exec[\t ]*=)'
             r'(.*?$)'
         )
-        PP_GUI_EXEC = DICT_METADATA['PP_GUI_EXEC']
-        str_rep = rf'\g<1>\g<2>\g<3>{PP_GUI_EXEC}'
+        path_exec = os.path.join(path_src, f'{pp_name_small}.py')
+        str_rep = rf'\g<1>\g<2>\g<3>{path_exec}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace icon
@@ -573,8 +588,18 @@ def fix_desktop():
             r'(^\s*Icon[\t ]*=)'
             r'(.*?$)'
         )
-        PP_GUI_ICON = DICT_METADATA['PP_GUI_ICON']
-        str_rep = rf'\g<1>\g<2>\g<3>{PP_GUI_ICON}'
+        path_icon = os.path.join(path_src, f'{pp_name_small}.png')
+        str_rep = rf'\g<1>\g<2>\g<3>{path_icon}'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace path
+        str_pattern = (
+            r'(^\s*\[Desktop Entry\]\s*$)'
+            r'(.*?)'
+            r'(^\s*Path[\t ]*=)'
+            r'(.*?$)'
+        )
+        str_rep = rf'\g<1>\g<2>\g<3>{path_src}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
@@ -585,38 +610,22 @@ def fix_desktop():
 # ------------------------------------------------------------------------------
 # Replace text in the UI file
 # ------------------------------------------------------------------------------
-def fix_ui():
+def fix_gtk3():
     """
         Replace text in the UI file
 
-        Replace short description, program name, and version number in the
-        UI file.
+        Replace description and version number in the UI file.
     """
 
-    # first get gui dir
-    dir_gui = os.path.join(DIR_PRJ, 'src', 'gui')
-    if not os.path.exists(dir_gui) or not os.path.isdir(dir_gui):
-        return
-
     # check if there is a .ui file
-    path_ui = os.path.join(dir_gui, '__PP_NAME_SMALL_-gtk3.ui')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    path_ui = os.path.join(DIR_PRJ, 'src', f'{pp_name_small}_gtk3.ui')
     if not os.path.exists(path_ui):
         return
 
     # open file and get contents
     with open(path_ui, 'r', encoding='utf-8') as f:
         text = f.read()
-
-        # replace version
-        str_pattern = (
-            r'(<object class=\"GtkAboutDialog\".*?)'
-            r'(<property name=\"version\">)'
-            r'(.*?)'
-            r'(</property>.*)'
-        )
-        PP_VERSION = DICT_METADATA['PP_VERSION']
-        str_rep = rf'\g<1>\g<2>{PP_VERSION}\g<4>'
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace short description
         str_pattern = (
@@ -625,8 +634,19 @@ def fix_ui():
             r'(.*?)'
             r'(</property>)'
         )
-        PP_SHORT_DESC = DICT_METADATA['PP_SHORT_DESC']
-        str_rep = rf'\g<1>\g<2>{PP_SHORT_DESC}\g<4>'
+        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        str_rep = rf'\g<1>\g<2>{pp_short_desc}\g<4>'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace version
+        str_pattern = (
+            r'(<object class=\"GtkAboutDialog\".*?)'
+            r'(<property name=\"version\">)'
+            r'(.*?)'
+            r'(</property>.*)'
+        )
+        pp_version = DICT_METADATA['PP_VERSION']
+        str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
@@ -637,17 +657,17 @@ def fix_ui():
 # ------------------------------------------------------------------------------
 # Recurse through the folder structure looking for errors
 # ------------------------------------------------------------------------------
-def recurse(dir):
+def recurse_and_check(dir):
     """
         Recurse through the folder structure looking for errors
 
         Parameters:
             dir [string]: the directory to start looking for errors
 
-        This function recurses through the project directory, looking for errors
-        in each file's headers and content for strings that do not match their
-        intended contents. It checks a header's project, filename, and date
-        values as well as looking for dunder values that should have been
+        This function recurses through the project directory, checking for
+        errors in each file's headers, and content for strings that do not match
+        their intended contents. It checks a header's project, filename, and
+        date values as well as looking for dunder values that should have been
         replaced.
     """
 
@@ -672,7 +692,7 @@ def recurse(dir):
         if os.path.isdir(path_item):
 
             # recurse itself to find more files
-            recurse(path_item)
+            recurse_and_check(path_item)
 
         else:
 
@@ -699,7 +719,6 @@ def recurse(dir):
 # ------------------------------------------------------------------------------
 # Do extra functions to update project dir after recurse
 # ------------------------------------------------------------------------------
-
 def do_extras():
     """
         Do extras functions to update project dir after recurse
@@ -708,7 +727,7 @@ def do_extras():
         the CHANGELOG file for the current project.
     """
 
-    # get pyplate/src dir
+    # get current dir
     dir_curr = os.getcwd()
 
     # make sure we are in project path
@@ -722,23 +741,149 @@ def do_extras():
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
 
-    # update docs
-    cmd = 'python -m pdoc --html -f -o docs'
-    cmd_array = shlex.split(cmd)
-    glob_py = glob('src/*.py')
-    cmd_array = cmd_array + glob_py
-    subprocess.run(cmd_array)
-
     # update CHANGELOG
     path_chg = os.path.join(DIR_PRJ, 'CHANGELOG.md')
     with open(path_chg, 'w', encoding='utf-8') as f:
 
-        cmd = 'git log --pretty=" - %s"'
+        cmd = 'git log --pretty="%ad - %s"'
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
 
+    # update docs
+    # NB: this is ugly and stupid, but it's the only way to get pdoc3 to work
+
+    # move into src dir
+    dir_src = os.path.join(DIR_PRJ, 'src')
+    os.chdir(dir_src)
+
+    # get docs dir
+    path_docs = os.path.join('..', 'docs')
+    path_docs = os.path.abspath(path_docs)
+
+    # # update docs
+    cmd = f'python -m pdoc --html -f -o {path_docs} .'
+    cmd_array = shlex.split(cmd)
+    subprocess.run(cmd_array)
+
     # go back to old dir
     os.chdir(dir_curr)
+
+
+# ------------------------------------------------------------------------------
+# Run xgettext over files to produce a locale template
+# ------------------------------------------------------------------------------
+def do_gettext():
+    """
+        Run xgettext over files to produce a locale template
+
+        Use xgettext to scan .py and .ui files for I18N strings and collect them
+        int a .pot file in the locale folder. Only applies to gui projects at
+        the moment.
+    """
+
+    # check if we are a gui project
+    is_gui = (DICT_SETTINGS['project']['type'] == 'g')
+    if not is_gui:
+        return
+
+    # get locale folder and pot filename
+    dir_locale = os.path.join(DIR_PRJ, 'src', 'locale')
+    pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
+    path_pot = os.path.join(dir_locale, f'{pp_name_small}.pot')
+    pp_version = DICT_METADATA['PP_VERSION']
+
+    # remove old pot and recreate empty file
+    if os.path.exists(path_pot):
+        os.remove(path_pot)
+    with open(path_pot, 'w', encoding='utf-8') as f:
+        f.write('')
+
+    # build a list of files
+    res = []
+    exts = ['.py', '.ui', '.glade']
+
+    # scan for files in src directory
+    dir_src = os.path.join(DIR_PRJ, 'src')
+    list_files = os.listdir(dir_src)
+
+    # for each file in dir
+    for file in list_files:
+
+        # check for ext
+        for ext in exts:
+            if file.endswith(ext):
+
+                # rebuild complete path and add to list
+                path = os.path.join(dir_src, file)
+                res.append(path)
+
+    # for each file that can be I18N'd, run xgettext
+    for file in res:
+        cmd = (
+            'xgettext '         # the xgettest cmd
+            f'{file} '          # the file name
+            '-j '               # append to current file
+            '-c"I18N:" '        # look for tags in .py files
+            '--no-location '    # don't print filename/line number
+            f'-o {path_pot} '   # location of output file
+            '-F '               # sort output by input file
+            '--copyright-holder=cyclopticnerve '
+            f'--package-name={pp_name_small} '
+            f'--package-version={pp_version} '
+            '--msgid-bugs-address=cyclopticnerve@gmail.com'
+        )
+        cmd_array = shlex.split(cmd)
+        subprocess.run(cmd_array)
+
+    # now lets do some text replacements to make it look nice
+
+    # open file and get contents
+    with open(path_pot, 'r', encoding='utf-8') as f:
+        text = f.read()
+
+        # replace short description
+        str_pattern = (
+            r'(# SOME DESCRIPTIVE TITLE.)'
+        )
+        pp_name_big = DICT_SETTINGS['info']['__PP_NAME_BIG__']
+        str_rep = f'# {pp_name_big} translation template'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace copyright
+        str_pattern = (
+            r'(# Copyright \(C\) )'
+            r'(.*?)'
+            r'( cyclopticnerve)'
+        )
+        year = datetime.date.today().year
+        str_rep = rf'\g<1>{year}\g<3>'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace author
+        str_pattern = (
+            r'(# FIRST AUTHOR )'
+            r'(<EMAIL@ADDRESS>)'
+            r'(, )'
+            r'(YEAR)'
+        )
+        author = 'cyclopticnerve@gmail.com'
+        year = datetime.date.today().year
+        str_rep = rf'\g<1>{author}\g<3>{year}'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace charset
+        str_pattern = (
+            r'("Content-Type: text/plain; charset=)'
+            r'(CHARSET)'
+            r'(\\n")'
+        )
+        charset = 'UTF-8'
+        str_rep = rf'\g<1>{charset}\g<3>'
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # save file
+    with open(path_pot, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 # ------------------------------------------------------------------------------

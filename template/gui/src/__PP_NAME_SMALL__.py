@@ -69,14 +69,24 @@ def main():
     # call the steps in order
     print(func())
 
-    # show the window
-    app = gui.App()
-    app.set_gui(g_dict_config['gui'])
-    app.run()
-    a_dict = app.get_gui()
+    # declare config dict global BEFORE using it (even before reading?)
     global g_dict_config
+
+    # create the app object
+    app = gui.App()
+
+    # get gui config dict and pass it to the app object
+    if 'gui' in g_dict_config.keys():
+        app.set_gui(g_dict_config['gui'])
+
+    # show the window
+    app.run()
+
+    # get gui values/window state
+    a_dict = app.get_gui()
+
+    # set the gui stuff into the config dict
     g_dict_config['gui'] = a_dict
-    print(g_dict_config)
 
 
 # ------------------------------------------------------------------------------
@@ -119,7 +129,7 @@ def _add_args(argparser):
 
     # --------------------------------------------------------------------------
 
-    # argparser.add_argument('-c', dest=PATH_CONFIG_ARG)
+    argparser.add_argument('-c', dest=PATH_CONFIG_ARG)
 
     # --------------------------------------------------------------------------
 
@@ -229,7 +239,7 @@ def _save_config(path):
 
         # then write to file
         with open(path, 'w', encoding='utf8') as f:
-            json.dump(g_dict_config, f)
+            json.dump(g_dict_config, f, indent=4)
     except (Exception):
         raise Exception(f'_save_config: "{path}" cannot be created')
 
