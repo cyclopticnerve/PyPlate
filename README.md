@@ -76,7 +76,7 @@ These files should be viewed/edited AFTER the project is generated, but BEFORE
 file.  
 [Click here](README/metadata.md) to learn more about the conf/metadata.json 
 file.  
-[Click here](README/ettings.md) to learn more about the conf/settings.json 
+[Click here](README/settings.md) to learn more about the conf/settings.json 
 file.
 
 After these files have been edited appropriately, run 'metadata.py' from the
