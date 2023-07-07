@@ -2,8 +2,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: mod_name_2.py                                         |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -31,13 +31,13 @@ def func_2():
         Short description
 
         Parameters:
-            var_name [type]: description
+            var_name: Description
 
         Returns:
-            [type]: description
+            Description
 
         Raises:
-            exception_type(vars): description
+            exception_type(vars): Description
 
         Long description (including HTML).
     """
@@ -58,13 +58,13 @@ def _func_2():
         Short description
 
         Parameters:
-            var_name [type]: description
+            var_name: Description
 
         Returns:
-            [type]: description
+            Description
 
         Raises:
-            exception_type(vars): description
+            exception_type(vars): Description
 
         Long description (including HTML).
     """

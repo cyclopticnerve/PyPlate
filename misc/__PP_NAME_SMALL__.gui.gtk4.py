@@ -3,8 +3,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: __PP_NAME_SMALL__.py                                  |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -75,10 +75,10 @@ def main():
 # ------------------------------------------------------------------------------
 def add_args(argparser):
     """
-        Add command line args to the parser
+        Adds command line args to the parser
 
         Parameters:
-            argparser [ArgumentParser]: the argparse object to add args to
+            argparser: The argparse object to add args to
 
         This function adds arguments to the parser. It is teased out to make
         editing command line parameters easier.
@@ -98,10 +98,10 @@ def add_args(argparser):
 # ------------------------------------------------------------------------------
 def _parse_args():
     """
-        Parse command line args and return the dict
+        Parses command line args and return the dict
 
         Returns:
-            [dict]: the dict of commands passed on the command line
+            The dict of commands passed on the command line
 
         This function gets the command line passed to the program, parses it,
         and returns the command line options as a list.

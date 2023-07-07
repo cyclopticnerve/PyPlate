@@ -2,8 +2,8 @@
 <!-- Project : __PP_NAME_BIG__                                 /          \  -->
 <!-- Filename: README.md                                      |     ()     | -->
 <!-- Date    : __PP_DATE__                                    |            | -->
-<!-- Author  : cyclopticnerve                                 |   \____/   | -->
-<!-- License : WTFPLv2                                         \          /  -->
+<!-- Author  : __PP_AUTHOR__                                  |   \____/   | -->
+<!-- License : __PP_LICENSE__                                  \          /  -->
 <!----------------------------------------------------------------------------->
 
 # __PP_NAME_BIG__
@@ -15,7 +15,7 @@
 PP_SHORT_DESC
 <!-- __RM_SHORT_DESC_END__ -->
 
-<!-- ![Screenshot](misc/screenshot.jpg) -->
+<!-- ![Screenshot](README/screenshot.jpg) -->
 
 ## Requirements
 <!-- __RM_PY_DEPS_START__ -->
@@ -25,7 +25,7 @@ PP_PY_DEPS
 ## Installing
 <!-- __RM_MOD_START__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/__PP_NAME_BIG__/releases/latest)
+[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__/releases/latest)
 from the main branch.<br>
 Download the 'Source Code (tar.gz)' file.
 
@@ -38,7 +38,7 @@ Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:
 ```bash
 foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__PP_NAME_BIG__
+foo@bar:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__
 foo@bar:~/Downloads$ cd __PP_NAME_BIG__
 ```
 Then build and install:
@@ -50,7 +50,7 @@ foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install ./dist/__PP_NAME_SMAL
 <!-- __RM_MOD_END__ -->
 <!-- __RM_APP_START__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/__PP_NAME_BIG__/releases/latest)
+[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__/releases/latest)
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.
 
@@ -64,7 +64,7 @@ Or you can clone the git repo to get the latest (and often broken) code from the
 dev branch:
 ```bash
 foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/__PP_NAME_BIG__
+foo@bar:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__
 foo@bar:~/Downloads$ cd __PP_NAME_BIG__
 foo@bar:~/Downloads/__PP_NAME_BIG__$ ./install.py
 ```
@@ -78,8 +78,8 @@ foo@bar:~$ python -m pip uninstall __PP_NAME_SMALL__
 <!-- __RM_MOD_END__ -->
 <!-- __RM_APP_START__ -->
 ```bash
-foo@bar:~$ cd ~/.cyclopticnerve/__PP_NAME_SMALL__
-foo@bar:~/.cyclopticnerve/__PP_NAME_SMALL__$ ./uninstall.py
+foo@bar:~$ cd ~/.__PP_AUTHOR__/__PP_NAME_SMALL__
+foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
 ```
 <!-- __RM_APP_END__ -->
 

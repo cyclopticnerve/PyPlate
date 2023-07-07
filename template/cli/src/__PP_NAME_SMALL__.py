@@ -3,8 +3,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: __PP_NAME_SMALL__.py                                  |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -75,13 +75,13 @@ def func():
         Short description
 
         Parameters:
-            var_name [type]: description
+            var_name: Description
 
         Returns:
-            [type]: description
+            Description
 
         Raises:
-            exception_type(vars): description
+            exception_type(vars): Description
 
         Long description (including HTML).
     """
@@ -94,10 +94,10 @@ def func():
 # ------------------------------------------------------------------------------
 def _add_args(argparser):
     """
-        Add command line args to the parser
+        Adds command line args to the parser
 
         Parameters:
-            argparser [ArgumentParser]: the argparse object to add args to
+            argparser: The argparse object to add args to
 
         This function adds arguments to the parser. It is teased out to make
         editing command line parameters easier.
@@ -161,13 +161,13 @@ def _parse_args():
 # ------------------------------------------------------------------------------
 def _load_config(path):
     """
-        Load config file from specified path
+        Loads config file from specified path
 
         Parameters:
-            path [string]: the path to the config file to load from
+            path: The path to the config file to load from
 
         Raises:
-            Exception(str): if the file is not valid JSON
+            Exception(str): If the file is not valid JSON
 
         Load the global config from a file at the specified location.
     """
@@ -181,7 +181,7 @@ def _load_config(path):
 
     # open the file for reading
     try:
-        with open(path, 'r', encoding='utf8') as f:
+        with open(path, 'r') as f:
             g_dict_config = json.load(f)
     except (Exception):
         raise Exception(f'_load_config: "{path}" is not a valid JSON file')
@@ -192,10 +192,10 @@ def _load_config(path):
 # ------------------------------------------------------------------------------
 def _save_config(path):
     """
-        Save config file to specified path
+        Saves config file to specified path
 
         Parameters:
-            path [string]: the path to the config file to save to
+            path: the path to the config file to save to
 
         Raises:
             Exception(str): if the file does not exist and can't be created
@@ -216,7 +216,7 @@ def _save_config(path):
             os.makedirs(dir_config, exist_ok=True)
 
         # then write to file
-        with open(path, 'w', encoding='utf8') as f:
+        with open(path, 'w') as f:
             json.dump(g_dict_config, f)
     except (Exception):
         raise Exception(f'_save_config: "{path}" cannot be created')
@@ -235,8 +235,6 @@ if __name__ == '__main__':
 
     # create our one set of args
     _parse_args()
-
-    # TODO: we could try to make a rock-solid path (or None) here
 
     # set defualt path
     path = PATH_CONFIG_DEF

@@ -2,8 +2,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: __PP_NAME_SMALL___gtk3.py                             |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR                                           |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # TODO: Set up a dictionary of control names to config entries This will be used
@@ -42,7 +42,7 @@ from gi.repository import Gtk  # noqa E402 - import not at top of file
 # ------------------------------------------------------------------------------
 
 # the application id to use for GTK
-APPLICATION_ID = 'org.cyclopticnerve.__PP_NAME_SMALL__'
+APPLICATION_ID = 'org.__PP_AUTHOR__.__PP_NAME_SMALL__'
 
 # some useful constants
 DIR_HOME = os.path.expanduser('~')
@@ -119,8 +119,8 @@ class App(Gtk.Application):
             Sets the property value of _dict_gui
 
             Parameters:
-                self [GTK.Class]: the class object
-                a_dict [dict]: the new property dictionary
+                self: The class object
+                a_dict: The new property dictionary
 
             This method sets the _dict_gui property. Must be called before
             run().
@@ -150,10 +150,10 @@ class App(Gtk.Application):
             Gets the property value of _dict_gui
 
             Parameters:
-                self [GTK.Class]: the class object
+                self: The class object
 
             Returns:
-                [dict]: the current property dictionary
+                The current property dictionary
 
             This method gets the _dict_gui property. Must be called after run().
         """
@@ -170,15 +170,15 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _winMain_evt_delete_event(self, obj, event):
         """
-            Called when the main window is closed by the 'X' button
+            Handles when the main window is closed by the 'X' button
 
             Parameters:
-                self [Gtk.Class]: the class object
-                obj [Gtk.Object]: the calling object
-                event [Gtk.Event]: not used
+                self: The class object
+                obj: The calling object
+                event: Not used
 
             Returns:
-                [bool]: opposite of whether we allow the window to close or not
+                The opposite of whether we allow the window to close or not
                     Return True to say we handled it (don't close)
                     Return False to say we didn't handle it (close)
 
@@ -240,11 +240,11 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _winMain_btnAbout_evt_clicked(self, obj):
         """
-            Called when the About button is clicked
+            Handles when the About button is clicked
 
             Parameters:
-                self [Gtk.Class]: the class object
-                obj [GTK.Object]: the calling object
+                self: The class object
+                obj: The calling object
 
             The About button was clicked. Show the About dialog.
         """
@@ -259,11 +259,11 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _winMain_btnSave_evt_clicked(self, obj):
         """
-            Called when the Save button is clicked
+            Handles when the Save button is clicked
 
             Parameters:
-                self [Gtk.Class]: the class object
-                obj [GTK.Object]: the calling object
+                self: The class object
+                obj: The calling object
 
             The Save button was clicked.
         """
@@ -279,11 +279,11 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _winMain_btnCancel_evt_clicked(self, obj):
         """
-            Called when the Cancel button is clicked
+            Handles when the Cancel button is clicked
 
             Parameters:
-                self [Gtk.Class]: the class object
-                obj [GTK.Object]: the calling object
+                self: The class object
+                obj: The calling object
 
             The Cancel button was clicked.
         """
@@ -299,11 +299,11 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _winMain_btnOK_evt_clicked(self, obj):
         """
-            Called when the OK button is clicked
+            Handles when the OK button is clicked
 
             Parameters:
-                self [Gtk.Class]: the class object
-                obj [GTK.Object]: the calling object
+                self: The class object
+                obj: The calling object
 
             The OK button was clicked.
         """
@@ -322,11 +322,11 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _winMain_evt_modified(self, obj):
         """
-            Called when any control in the window is modified
+            Handles when any control in the window is modified
 
             Parameters:
-                self [Gtk.Class]: the class object
-                obj [GTK.Object]: the calling object
+                self: The class object
+                obj: The calling object
 
             Use this method to update the modified status of a cntrol and change
             the modified status of the window.
@@ -340,10 +340,10 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _set_gui(self):
         """
-            Set the state of all gui objects
+            Sets the state of all gui objects
 
             Parameters:
-                self [Gtk.Class]: the class object
+                self: The class object
 
             Set the state of all gui objects from self._dict_gui when this
             method is called. This method is only called once, from _activate().
@@ -389,13 +389,13 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _get_gui(self):
         """
-            Get the state of all gui objects
+            Gets the state of all gui objects
 
             Parameters:
-                self [Gtk.Class]: the class object
+                self: The class object
 
             Returns:
-                [dict]: A dictionary containing the current state of the gui
+                A dictionary containing the current state of the gui
 
             Get the state of all gui objects and return it whenever this method
             is called. This method is called from several places, both for
@@ -428,14 +428,14 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _get_dialog(self):
         """
-            Create a save dialog for when the window is closed by the 'X' button
+            Creates a save dialog for when the window is closed by the 'X' 
+            button
 
             Parameters:
-                self [Gtk.Class]: the class object
+                self: The class object
 
             Returns:
-                [Gtk.MessageDialog]: The dialog to show when the user presses
-                the 'X' button
+                The dialog to show when the user presses the 'X' button
 
             Create a dialog that has 3 buttons, set their labels/colors, and
             various text labels.
@@ -488,7 +488,7 @@ class App(Gtk.Application):
             Saves the window size/state whenever it is closed
 
             Parameters:
-                self [Gtk.Class]: the class object
+                self: The class object
 
             Saves the window size/state to _dict_gui whenever it is closed.
         """
@@ -524,7 +524,7 @@ class App(Gtk.Application):
             Loads the window size/state whenever it is shown
 
             Parameters:
-                self [Gtk.Class]: the class object
+                self: The class object
 
             Sets the window size/state to _dict_gui whenever it is opened.
         """
@@ -556,10 +556,10 @@ class App(Gtk.Application):
 
     def _is_modified(self):
         """
-            Called when the Application needs to set if it has been modified
+            Handles when the Application needs to set if it has been modified
 
             Parameters:
-                self [GtkClass]: the class object
+                self : The class object
 
             The Application needs to know if it has been modified. So we create
             a hypothetical save dict, and compare it to the load dict. If there
@@ -599,11 +599,11 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _activate(self, obj):
         """
-            Called when the Application is activated (ie first window is shown)
+            Handles when the Application is activated (ie first window is shown)
 
             Parameters:
-                self [GTK.Class]: the class object
-                obj [GTK.Object]: the calling object
+                self: The class object
+                obj: The calling object
 
             The Application is about to show the main Window.
         """
@@ -647,10 +647,10 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def __init__(self):
         """
-            Initialize the class to an object/instance
+            Initializes the class to an object/instance
 
             Parameters:
-                self [GTK.Class]: the class object
+                self : The class object
 
             This method is called when a new instance of the class is created,
             i.e 'app = App()'

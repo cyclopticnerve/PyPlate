@@ -22,10 +22,13 @@ import subprocess
 # Constants
 # ------------------------------------------------------------------------------
 
+# some useful constants
+DIR_FILE = os.path.dirname(__file__)
+DIR_HOME = os.path.expanduser('~')
+
 # this is the dir above where the script is being run from
-# (e.g. ~/Documents/Projects/Python/PyPlate/src/)
-dir_src = os.path.dirname(__file__)
-dir_pyplate = os.path.join(dir_src, '..')
+# (e.g. ~/Documents/Projects/Python/PyPlate/)
+dir_pyplate = os.path.join(DIR_FILE, '..')
 DIR_PYPLATE = os.path.abspath(dir_pyplate)
 
 # this is the dir where the template files are located rel to the script
@@ -37,10 +40,72 @@ DIR_TEMPLATE = os.path.join(DIR_PYPLATE, 'template')
 dir_base = os.path.join(DIR_PYPLATE, '..')
 DIR_BASE = os.path.abspath(dir_base)
 
-# date format (stupid americans)
-DICT_DATE = '%m/%d/%Y'
+# ------------------------------------------------------------------------------
+
+# TODO: document that this should be changed (or put it in a file somewhere)
+
+# for now, these values should be edited once before pyplate.py is run for the
+# first time (this is a work in progress)
+# STR_AUTHOR = 'foobar'
+# STR_EMAIL = 'foobar@gmail.com'
+# STR_LICENCE = 'WTFPLv2'
+
+# # NB: the struggle here is that using the fixed format results in a four-digit
+# # year, but using the locale format ('%x') results in a two-digit year (at least
+# # for my locale, which in 'en_US'). so what to do? what i really want is a
+# # locale format that uses four-digit years everywhere. so i am faced with a
+# # 'cake and eat it too' situation. not sure how to proceed but i think for now
+# # i will leave this as a user-editable string and place it in the realm of
+# # 'edit it before you run' along with author and email...
+# FMT_DATE = '%m/%d/%Y'
+
+# TODO: remove this
+DEBUG = True
+
+# check if debug is active
+# NB: with this block of code, you can set DEDBUG to True or False, or comment
+# it out (same as False)
+try:
+    if DEBUG:
+        path_user = os.path.join(DIR_PYPLATE, 'conf', 'user_pyplate.json')
+    else:
+        path_user = os.path.join(DIR_PYPLATE, 'conf', 'user.json')
+except (NameError):
+    path_user = os.path.join(DIR_PYPLATE, 'conf', 'user.json')
+
+# load user info
+DICT_USER = {}
+if os.path.exists(path_user):
+    with open(path_user, 'r') as f:
+        try:
+            DICT_USER = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
+
+# check for empty strings
+for val in DICT_USER.values():
+    if val == '':
+        print(f'Values in {path_user} must not be empty')
+        print('for date format, see https://strftime.org/')
+        exit()
+
+# ------------------------------------------------------------------------------
+
+# the array of names for each project type
+# NB: key is short type (displayed in get_project_info())
+# val[0] is long type name (displayed in get_project_info())
+# val[1] is subdirectory where project will be created
+# val[2] is directory under template where project files come from
+DICT_TYPE = {
+    'm': ['Module',     'Modules',  'mod'],
+    'p': ['Package',    'Packages', 'pkg'],
+    'c': ['CLI',        'CLIs',     'cli'],
+    'g': ['GUI',        'GUIs',     'gui'],
+}
 
 # folders/files to ignore when doing replacements
+# NB: thes lists are explained in detail in the README file
 DICT_BLACKLIST = {
 
     # don't do anything with these files/folders
@@ -67,9 +132,9 @@ DICT_BLACKLIST = {
 
     # don't fix/check text
     'skip_text': [
-        'metadata.json',
+        'strings.json',
         'metadata.py',
-        "settings.json",
+        "settings.json"
     ],
 
     # don't fix/check path
@@ -77,24 +142,36 @@ DICT_BLACKLIST = {
     ],
 }
 
-# the array of header strings to match for replacement
-LIST_HEADER = [
-    ['Project',  '__PP_NAME_BIG__'],
-    ['Filename', '__PP_NAME_SMALL__'],
-    ['Date',     '__PP_DATE__'],
-]
+# the dict of header strings to match for replacement
+DICT_HEADER = {
+    'Project':  '__PP_NAME_BIG__',
+    'Filename': '__PP_NAME_SMALL__',
+    'Date':     '__PP_DATE__',
+    "License":  '__PP_LICENSE__',
+}
 
 # the dict of README sections/tags to remove
+# NB: we use __RM_ instead of __PP_ because some of these tags will stay in the
+# README.md file and that would trigger an error in metadata.py
+# we also don't want to ignore README.md becuse there ARE __PP_ tags in there
+# that we want to replace
+# NB: key is short project type(s)
+# subkey is the command for fix_readme()
+# subval is the comment to find in the README file
+# anything between 'rm_delete_start' and 'rm_delete_end' will be deleted
+# (including the tags themselves)
+# any tag that starts with 'rm_delete_tag' will be deleted, but the contents
+# will remain
 DICT_README = {
     'mp': {
-        'rm_delete_start': '<!-- __RM_APP_START__ -->',
-        'rm_delete_end':   '<!-- __RM_APP_END__ -->',
-        'rm_delete_tag':   '<!-- __RM_MOD_',
+        'rm_delete_start':  '<!-- __RM_APP_START__ -->',
+        'rm_delete_end':    '<!-- __RM_APP_END__ -->',
+        'rm_delete_tag':    '<!-- __RM_MOD_',
     },
     'cg': {
-        'rm_delete_start': '<!-- __RM_MOD_START__ -->',
-        'rm_delete_end':   '<!-- __RM_MOD_END__ -->',
-        'rm_delete_tag':   '<!-- __RM_APP_',
+        'rm_delete_start':  '<!-- __RM_MOD_START__ -->',
+        'rm_delete_end':    '<!-- __RM_MOD_END__ -->',
+        'rm_delete_tag':    '<!-- __RM_APP_',
     },
 }
 
@@ -104,19 +181,24 @@ DICT_README = {
 
 # the default settings to use to create the project
 # these can be used later by metadata.py (from misc/settings.json)
+# NB: these are one-time seetings created by pyplate and should not be edited
 g_dict_settings = {
-    'project': {
-        # m (Module), p (Package), c (CLI), g (GUI)
-        'type':                 '',
-        # path to project (DIR_BASE/dir_type/MyProject)
-        'dir':                  '',
-    },
-    'info': {
-        '__PP_NAME_BIG__':      '',     # MyProject
-        '__PP_NAME_SMALL__':    '',     # myproject
-        '__PP_DATE__':          '',     # 12/08/2022
-    },
+    '__PP_NAME_BIG__':      '',  # PyPlate
+    '__PP_NAME_SMALL__':    '',  # pyplate
+    '__PP_AUTHOR__':        '',  # cyclopticnerve
+    '__PP_EMAIL__':         '',  # cyclopticnerve@gmail.com
+    '__PP_DATE__':          '',  # 12/08/2022
 }
+
+# settings that are only needed between functions in the current file
+
+# the path to the project directory (no need to hold over for metadata.py)
+# NB: the main reason we don't put this in g_dict_settings is that it will
+# contain your home dir name
+g_prj_dir = ''
+
+# this setting is not needed for metadata so lets take it out
+g_prj_type = ''
 
 
 # ------------------------------------------------------------------------------
@@ -138,9 +220,8 @@ def main():
     get_project_info()
     copy_template()
 
-    # call recurse to do replacements in final project locationm
-    dir = g_dict_settings['project']['dir']
-    recurse(dir)
+    # call recurse to do replacements in final project location
+    recurse_and_fix(g_prj_dir)
 
     # do stuff to final dir after recurse
     do_extras()
@@ -154,38 +235,55 @@ def get_project_info():
         Get project info
 
         Asks the user for project info, such as type and name, to be saved to
-        g_dict_settings.
+        g_dict_settings and g_prj_dir.
     """
 
     # the settings dict (global b/c we will modify here)
     global g_dict_settings
 
-    # loop forever until we get a valid type
+    # the project dict (global b/c we will modify here)
+    global g_prj_dir
+
+    # the project dict (global b/c we will modify here)
+    global g_prj_type
+
+    # first get question
+    str_prj = 'Projet type'
+
+    # then get types
+    arr_type = [f'({key}) {val[0]}' for (key, val) in DICT_TYPE.items()]
+    str_type = ' | '.join(arr_type)
+    str_in = f'{str_prj} [{str_type}]: '
+
+    # sanity check
+    type_prj = ''
+
+    # loop forever until we get a valid type (or user presses Ctrl+C)
     while True:
 
-        # ask what type of project
-        type_prj = input(
-            'Project type: [m]odule | [p]ackage | [c]li | [g]ui: '
-        )
+        # build a project type string and ask what type of project
+        type_prj = input(str_in)
 
         # check project type
-        pattern = r'(^(m|p|c|g{1})$)'
-        res = re.search(pattern, type_prj, re.I)
-        if res:
+        # first, is there an entry?
+        if len(type_prj) > 0:
+
+            # get first (or only) char and lowercase it
+            type_prj = type_prj[0]
+            type_prj = type_prj.lower()
+
+            # get array of acceptable lowercase types
+            arr_type_lower = [item.lower() for item in DICT_TYPE.keys()]
 
             # we got a valid type
-            type_prj = type_prj.lower()
-            g_dict_settings['project']['type'] = type_prj
-            break
+            if type_prj in arr_type_lower:
+                g_prj_type = type_prj
+                break
 
-    # configure subdir
-    dir_type = ''
-    if type_prj in 'mp':
-        dir_type = 'Libs'
-    else:
-        dir_type = 'Apps'
+    # sanity check
+    dir_type = DICT_TYPE[type_prj][1]
 
-    # loop forever until we get a valid name and path
+    # loop forever until we get a valid name and path (or user presses Ctrl+C)
     while True:
 
         # ask for project name
@@ -203,18 +301,24 @@ def get_project_info():
             print(f'Project {dir_prj} already exists')
             continue
 
-        # if name is valid, move on
-        g_dict_settings['info']['__PP_NAME_BIG__'] = info_name_big
-        g_dict_settings['project']['dir'] = dir_prj
+        # if name is valid, store name
+        g_dict_settings['__PP_NAME_BIG__'] = info_name_big
+
+        # then store path
+        g_prj_dir = dir_prj
         break
 
     # calculate small name
     info_name_small = info_name_big.lower()
-    g_dict_settings['info']['__PP_NAME_SMALL__'] = info_name_small
+    g_dict_settings['__PP_NAME_SMALL__'] = info_name_small
 
-    # calculate current date
-    info_date = datetime.now().strftime(DICT_DATE)
-    g_dict_settings['info']['__PP_DATE__'] = info_date
+    # set author/email (assumed from constants above)
+    g_dict_settings['__PP_AUTHOR__'] = DICT_USER['PP_AUTHOR']
+    g_dict_settings['__PP_EMAIL__'] = DICT_USER['PP_EMAIL']
+
+    # calculate current date (format assumed from constants above)
+    info_date = datetime.now().strftime(DICT_USER['PP_DATE_FMT'])
+    g_dict_settings['__PP_DATE__'] = info_date
 
 
 # ------------------------------------------------------------------------------
@@ -224,28 +328,19 @@ def copy_template():
     """
         Copy template files to final location
 
-        Get file paths/names from DICT_FILES and copy them to the project
-        folder.
+        Get files/folders from template and copy them to the project folder.
     """
 
     # create target folder
-    dir_prj = g_dict_settings['project']['dir']
-    os.makedirs(dir_prj)
+    os.makedirs(g_prj_dir)
 
     # create list of long dirs
     # add common
     lst_src = ['common']
 
-    # add long project type
-    dict_type = {
-        'm': 'mod',
-        'p': 'pkg',
-        'c': 'cli',
-        'g': 'gui'
-    }
-    type_prj = g_dict_settings['project']['type']
-    type_prj_long = dict_type[type_prj]
-    lst_src.append(type_prj_long)
+    # add project type source
+    dir_src = DICT_TYPE[g_prj_type][2]
+    lst_src.append(dir_src)
 
     # NB: I tried this both ways:
 
@@ -259,23 +354,23 @@ def copy_template():
     # this made the tree a little uglier, but made a cleaner code base
     # also the tree ends up reflecting the final project tree better, as
     # everything under the common folder ends up at the root level of the
-    # project, and everything under the type dir ends up at the root level of
-    # the project
+    # project, and everything under the type dir alos ends up at the root level
+    # of the project
     # this was also able to add everything into a single loop
 
-    # lst_src is now ['common', 'type_long']
+    # lst_src is now ['common', project type src]
     for item in lst_src:
 
+        # list each item in each folder in list_src
         path_in = os.path.join(DIR_TEMPLATE, item)
         items = os.listdir(path_in)
 
-        # for item in lst_files:
-        items = [item.strip(os.sep) for item in items]
+        # for each item in each folder
         for item in items:
 
             # build old path/new path
             path_from = os.path.join(path_in, item)
-            path_to = os.path.join(dir_prj, item)
+            path_to = os.path.join(g_prj_dir, item)
 
             # if it's a dir
             if os.path.isdir(path_from):
@@ -289,6 +384,10 @@ def copy_template():
                 # then copy file
                 shutil.copy2(path_from, path_to)
 
+# NB: the following commands are included in copy_template because their
+# resulting files are part of the project, they are just empty to start
+# whereas the stuff in do_extras MUST be initialzed AFTER the project exists
+
     # copy the 'starter kit' of requirements
     # NB: this is all the reqs collected while developing PyPlate
     # should be a good place to start developing a project in VSCode
@@ -297,21 +396,22 @@ def copy_template():
     # it future-proof*
     # (* not guaranteed to be future-proof)
     # this is a file-to-file copy
+    # NB: also note that these are the requirements for the venv, NOT the
+    # requirements for running the resulting project (that's a task for another
+    # day...)
     path_from = os.path.join(DIR_PYPLATE, 'requirements.txt')
-    path_to = os.path.join(dir_prj, 'requirements.txt')
+    path_to = os.path.join(g_prj_dir, 'requirements.txt')
     shutil.copy2(path_from, path_to)
 
-    # copying a dict in this file to a file
     # write DICT_BLACKLIST to conf file
-    path_to = os.path.join(dir_prj, 'conf', 'blacklist.json')
-    with open(path_to, 'w', encoding='utf-8') as f:
+    path_to = os.path.join(g_prj_dir, 'conf', 'blacklist.json')
+    with open(path_to, 'w') as f:
         dict_blacklist = json.dumps(DICT_BLACKLIST, indent=4)
         f.write(dict_blacklist)
 
-    # copying a dict in this file to a file
     # write g_dict_settings to conf file
-    path_to = os.path.join(dir_prj, 'conf', 'settings.json')
-    with open(path_to, 'w', encoding='utf-8') as f:
+    path_to = os.path.join(g_prj_dir, 'conf', 'settings.json')
+    with open(path_to, 'w') as f:
         dict_settings = json.dumps(g_dict_settings, indent=4)
         f.write(dict_settings)
 
@@ -319,26 +419,26 @@ def copy_template():
 # ------------------------------------------------------------------------------
 # Recursively scan folders/files for replace/rename functions
 # ------------------------------------------------------------------------------
-def recurse(dir):
+def recurse_and_fix(dir):
     """
-        Recursively scan folders/files for replace/rename functions
+        Recursively scans folders/files for replace/rename functions
 
         Parameters:
-            dir [string]: the directory to start recursively scanning from
+            dir: The directory to start recursively scanning from
 
         This is a recursive function to scan for folders/files under a given
-        folder. It iterates over the contents of the 'path' folder, checking if
+        folder. It iterates over the contents of the 'dir' folder, checking if
         each item is a file or a folder. If it encounters a folder, it calls
         itself recursively, passing that folder as the parameter. If it
         encounters a file, it calls methods to do text replacement of headers,
-        then other text. Finally it renames the file if the name contains a
-        replacement key. Once all files are renamed, it will then bubble up to
-        rename all folders.
+        then other text. Finally it renames the file if the path contains a
+        replacement key. Once all files are fixed, it will then bubble up to
+        fix all folders.
     """
 
     # blacklist
-    # don't check everything, headers, text, or path names for these items
     # remove all leading/trailing slashes
+    # NB: these lists are explained in detail in the README file
     skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_all']]
     skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_file']]
     skip_header = [item.strip(os.sep)
@@ -346,7 +446,7 @@ def recurse(dir):
     skip_text = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_text']]
     skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST['skip_path']]
 
-    # get list of file names in dest dir
+    # get list of file names in dest dir (excluding skip_all)
     items = [item for item in os.listdir(dir) if item not in skip_all]
     for item in items:
 
@@ -357,7 +457,7 @@ def recurse(dir):
         if os.path.isdir(path_item):
 
             # recurse itself to find more files
-            recurse(path_item)
+            recurse_and_fix(path_item)
 
         else:
 
@@ -365,7 +465,7 @@ def recurse(dir):
             if item not in skip_file:
 
                 # open file and get lines
-                with open(path_item, 'r', encoding='utf-8') as f:
+                with open(path_item, 'r') as f:
                     lines = f.readlines()
 
                     # replace headers from lines
@@ -381,7 +481,7 @@ def recurse(dir):
                         lines = _fix_readme(lines)
 
                 # save lines
-                with open(path_item, 'w', encoding='utf-8') as f:
+                with open(path_item, 'w') as f:
                     f.writelines(lines)
 
         # fix path/ext
@@ -410,14 +510,14 @@ def do_extras():
     dir_curr = os.getcwd()
 
     # make sure we are in project path
-    dir_prj = g_dict_settings['project']['dir']
-    os.chdir(dir_prj)
+    os.chdir(g_prj_dir)
 
     # add git folder
     cmd = 'git init'
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array)
 
+    # FIXME: no longer works
     # add venv dir
     # NB: use '.venv' to be compatible with VSCodium
     # cmd = 'python -m venv .venv'
@@ -425,8 +525,8 @@ def do_extras():
     # subprocess.run(cmd_array)
 
     # create tree
-    path_tree = os.path.join(dir_prj, 'misc', 'tree.txt')
-    with open(path_tree, 'w', encoding='utf-8') as f:
+    path_tree = os.path.join(g_prj_dir, 'misc', 'tree.txt')
+    with open(path_tree, 'w') as f:
         cmd = 'tree --dirsfirst --noreport'
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array, stdout=f)
@@ -444,35 +544,37 @@ def do_extras():
 # ------------------------------------------------------------------------------
 def _fix_header(lines):
     """
-        Replace header text inside files
+        Replaces header text inside files
 
         Parameters:
-            lines [list]: the list of file lines for replacing header text
+            lines: The list of file lines for replacing header text
 
         Returns:
-            [list]: the list of replaced lines in the file
+            The list of replaced lines in the file
 
         This is a function to replace header text inside a file. Given a list of
         file lines, it iterates the list line by line, replacing header text as
         it goes. When it is done, it returns lhe list of lines. This replaces
         the __PP_.. stuff inside headers.
+        Using this method, we preserve any right-aligned text in each header
+        row. See the headers in my files for an example. Adapting this function
+        to your style of header should be easy using the regex, and modifying
+        DICT_HEADER to suit. You can use any key in g_dict_settings as a
+        replacement.
     """
-
-    # the array of dunder replacements we will use
-    info = g_dict_settings['info']
 
     # for each line in array
     for i in range(0, len(lines)):
 
         # for each repl line
-        for hdr_pair in LIST_HEADER:
+        for key, val in DICT_HEADER.items():
 
             # pattern
             pattern = (
                 r'(# |<!-- )'
-                rf'({hdr_pair[0]})'
+                rf'({key})'
                 r'( *: )'
-                rf'({hdr_pair[1]})'
+                rf'({val})'
                 r'([^ ]*)'
                 r'( *)'
                 r'(.*)'
@@ -482,7 +584,7 @@ def _fix_header(lines):
             if res:
 
                 # get the new value from settings
-                rep = info[hdr_pair[1]]
+                rep = g_dict_settings[val]
 
                 # count what we will need without spaces
                 key_cnt = (
@@ -518,13 +620,13 @@ def _fix_header(lines):
 # ------------------------------------------------------------------------------
 def _fix_text(lines):
     """
-        Replace text inside files
+        Replaces text inside files
 
         Parameters:
-            lines [list]: the list of file lines for replacing text
+            lines: The list of file lines for replacing text
 
         Returns:
-            [list]: the list of replaced lines in the file
+            The list of replaced lines in the file
 
         This is a function to replace text inside a file. Given a list of file
         lines, it iterates the list line by line, replacing text as it goes.
@@ -533,16 +635,13 @@ def _fix_text(lines):
         handled).
     """
 
-    # the array of dunder replacements we will use
-    info = g_dict_settings['info']
-
     # for each line in array
     for i in range(0, len(lines)):
 
         # replace text in line
-        for key in info.keys():
+        for key in g_dict_settings.keys():
             if key in lines[i]:
-                lines[i] = lines[i].replace(key, info[key])
+                lines[i] = lines[i].replace(key, g_dict_settings[key])
 
     # save file with replacements
     return lines
@@ -553,13 +652,13 @@ def _fix_text(lines):
 # ------------------------------------------------------------------------------
 def _fix_readme(lines):
     """
-        Remove unnecessary parts of the README file
+        Removes unnecessary parts of the README file
 
         Parameters:
-            lines [list]: the list of file lines for removing README text
+            lines: The list of file lines for removing README text
 
         Returns:
-            [list]: the list of replaced lines in the file
+            The list of replaced lines in the file
 
         This function removes sections of the README file that are not
         appropriate to the specified type of project, such as Module/Package or
@@ -584,12 +683,9 @@ def _fix_readme(lines):
     # where to put the needed lines
     new_lines = []
 
-    # what type of project are we creating?
-    type_prj = g_dict_settings['project']['type']
-
     # what to ignore in the text
     for key in DICT_README.keys():
-        if type_prj in key:
+        if g_prj_type in key:
 
             # get values for keys
             rm_delete_start = DICT_README[key]['rm_delete_start']
@@ -623,28 +719,25 @@ def _fix_readme(lines):
 # ------------------------------------------------------------------------------
 def _fix_path(path):
     """
-        Function for renaming folders/files
+        Renames folders/files in the project
 
         Parameters:
-            path [string]: the path to the folder/file for renaming
+            path: The path to the folder/file for renaming
 
         Returns:
-            [string]: the new path for the specified folder/file
+            The new path for the specified folder/file
 
         This is a function to rename folders/files. Given a path to a
         folder/file, it renames the path by replacing items in the
         g_dict_settings keys with their appropriate replacements.
     """
 
-    # the array of dunder replacements we will use
-    info = g_dict_settings['info']
-
     # split the path into everything up to last part, and last part itself
     dir_old, file_old = os.path.split(path)
 
     # replace dunders in last path component
-    for key in info.keys():
-        file_old = file_old.replace(key, info[key])
+    for key in g_dict_settings.keys():
+        file_old = file_old.replace(key, g_dict_settings[key])
 
     # put new name back with the 'up to last' part
     path_new = os.path.join(dir_old, file_old)
@@ -658,13 +751,13 @@ def _fix_path(path):
 # ------------------------------------------------------------------------------
 def _fix_name(name):
     """
-        Check project name for allowed characters
+        Checks project name for allowed characters
 
         Parameters:
-            name [string]: the name to check for allowed characters
+            name: The name to check for allowed characters
 
         Returns:
-            [bool]: whether the name is valid to use
+            Whether the name is valid to use
 
         This function checks the passed name for four criteria:
         1. non-blank name

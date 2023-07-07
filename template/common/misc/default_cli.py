@@ -1,20 +1,25 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: default_main.py                                       |     ()     |
+# Filename: default_cli.py                                        |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 import argparse
+import os
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
+
+# some useful constants
+DIR_FILE = os.path.dirname(__file__)
+DIR_HOME = os.path.expanduser('~')
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -51,13 +56,13 @@ def func():
         Short description
 
         Parameters:
-            var_name [type]: description
+            var_name: Description
 
         Returns:
-            [type]: description
+            Description
 
         Raises:
-            exception_type(vars): description
+            exception_type(vars): Description
 
         Long description (including HTML).
     """
@@ -70,10 +75,10 @@ def func():
 # ------------------------------------------------------------------------------
 def add_args(argparser):
     """
-        Add command line args to the parser
+        Adds command line args to the parser
 
         Parameters:
-            argparser [ArgumentParser]: the argparse object to add args to
+            argparser: The argparse object to add args to
 
         This function adds arguments to the parser. It is teased out to make
         editing command line parameters easier.
@@ -82,7 +87,7 @@ def add_args(argparser):
     # https://docs.python.org/3/library/argparse.html
 
     # argparser.add_argument('-f')
-
+    pass
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -91,12 +96,14 @@ def add_args(argparser):
 # ------------------------------------------------------------------------------
 # Parse command line args and return the dict
 # ------------------------------------------------------------------------------
+
+
 def _parse_args():
     """
-        Parse command line args and return the dict
+        Parses command line args and return the dict
 
         Returns:
-            [dict]: the dict of commands passed on the command line
+            The dict of commands passed on the command line
 
         This function gets the command line passed to the program, parses it,
         and returns the command line options as a dict.

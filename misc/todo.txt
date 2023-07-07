@@ -1,59 +1,25 @@
-testing
-  module
-    reqs - 
-    pre - 
-    blank - 
-    full - 
-    inst release - 
-    inst latest - 
-  package
-    reqs - 
-    pre - 
-    blank - 
-    full - 
-    inst release - 
-    inst latest - 
-  cli
-    reqs - 
-    pre - 
-    blank - 
-    full - 
-    inst release - 
-    inst latest - 
-  gui
-    reqs - 
-    pre - 
-    blank - 
-    full - 
-    inst release - 
-    inst latest - 
-
-empty_class - 
-empty_cli   - __PP_NAME_SMALL__.cli.py
-empty_mod   - __PP_NAME_SMALL__.mod.py
-empty_mod   - mod_name_1.py
-empty_mod   - mod_name_2.py
-empty_cli   - __PP_NAME_SMALL__.gui.py
-
-hdr txt path
-0   0   0       skip_all
-0   0   1       skip_headers/skip_text (skip_file)
-0   1   0       skip_headers/skip_path
-0   1   1       skip_headers
-1   0   0       skip_text/skip_path
-1   0   1       skip_text
-1   1   0       skip_path
-1   1   1
 
 
-TODO: combine metadata.json/blacklist.json
-TODO: how to document file formats that don't support comments? json,toml
-TODO: remove all brackets from docstrings
+TODO: check for empty strings in user.json
+TODO: replace header in each template file
 TODO: venv doesn't work
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
 
 
+NEXT: rename pyplate.py to pymaker.py and metadata.py to pybaker.py
+NEXT: test if MODTEST == ModTest == modtest (for project name)
+NEXT: ask for author/email first time, then store
+NEXT: set project info by cmd line (-t,--type, -n,--name, -a,--author, -e,--email)
+NEXT: use globs in blacklist (for skip header images)
+NEXT: Add author and license somewhere in pyplate so users don't have to do 
+find/replace everywhere in template
+but these are hardcoded in SO MANY PLACES
+these values would only have to be changed once, so make it a script ins install?
+NEXT: how to add new items to be replaced? 
+all current keywords use a fixed regex but what if we want to do simple text replacement?
+like just replace 'PP_SOMETHING' with 'foobar'?
+NEXT: combine metadata.json/blacklist.json
 NEXT: metadata get all dunders from dict? i.e. metadata.json uses __PP_XXX__
 NEXT: check for gtk version 3/4
    does gi.repository have a >= ?
@@ -99,6 +65,19 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: what settings do we need in metadaa?
+DONE: get rid of project type in settings.json
+DONE: remove my name from conf/settings.json
+DONE: if link is blank in strings.json, don't make link in readme 
+DONE: check that cats end in semiquote
+DONE: put all readme in same doc
+DONE: metadata.json PP_PY_DEPS/PP_SYSDEPS/PP_GUI_CATEGORIES is array
+DONE: do we really need the _split_str function? (change readme for arrays instead of string)
+DONE: test category mismatch in GUI
+DONE: remove all brackets from docstrings
+DONE: other readme headers/footers
+DONE: how to document file formats that don't support comments? json,toml
+done in PyPlate README
 DONE: metadata.py: get freedesktop format locations for exec/icon
 DONE: put version num in PyPlate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate

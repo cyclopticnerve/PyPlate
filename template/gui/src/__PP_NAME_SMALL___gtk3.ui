@@ -8,11 +8,11 @@
     <property name="program-name">__PP_NAME_BIG__</property>
     <property name="version">PP_VERSION</property>
     <property name="comments" translatable="yes" comments="Program description translation">PP_SHORT_DESC</property>
-    <property name="website">https://github.com/cyclopticnerve/__PP_NAME_BIG__</property>
+    <property name="website">https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__</property>
     <property name="website-label" translatable="yes" comments="Github repository translation">GitHub repository</property>
-    <property name="license">WTFPLv2
+    <property name="license">__PP_LICENCE__
 http://www.wtfpl.net/</property>
-    <property name="authors">cyclopticnerve &lt;cyclopticnerve@gmail.com&gt;</property>
+    <property name="authors">PP_AUTHOR__ &lt;__PP_EMAIL__&gt;</property>
     <property name="logo">__PP_NAME_SMALL__.png</property>
     <property name="license-type">custom</property>
     <child internal-child="vbox">

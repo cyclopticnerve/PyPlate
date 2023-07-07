@@ -3,8 +3,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: metadata.py                                           |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENCE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -21,45 +21,49 @@ import subprocess
 # Constants
 # ------------------------------------------------------------------------------
 
+# some useful constants
+DIR_FILE = os.path.dirname(__file__)
+DIR_HOME = os.path.expanduser('~')
+
 # this is the project dir
-dir = os.path.dirname(__file__)
-dir_prj = os.path.join(dir, '..')
+dir_prj = os.path.join(DIR_FILE, '..')
 DIR_PRJ = os.path.abspath(dir_prj)
 
 # load blacklist file
-DICT_BLACKLIST = []
+DICT_BLACKLIST = {}
 path_blacklist = os.path.join(DIR_PRJ, 'conf', 'blacklist.json')
 if os.path.exists(path_blacklist):
-    with open(path_blacklist, 'r', encoding='utf-8') as f:
+    with open(path_blacklist, 'r') as f:
         try:
             DICT_BLACKLIST = json.load(f)
         except (Exception):
             print(f'{f} is not a valid JSON file')
             exit()
 
-# load metadata file
-DICT_METADATA = []
-path_metadata = os.path.join(DIR_PRJ, 'conf', 'metadata.json')
-if os.path.exists(path_metadata):
-    with open(path_metadata, 'r', encoding='utf-8') as f:
-        try:
-            DICT_METADATA = json.load(f)
-        except (Exception):
-            print(f'{f} is not a valid JSON file')
-            exit()
-
 # load settings file
-DICT_SETTINGS = []
+DICT_SETTINGS = {}
 path_settings = os.path.join(DIR_PRJ, 'conf', 'settings.json')
 if os.path.exists(path_settings):
-    with open(path_settings, 'r', encoding='utf-8') as f:
+    with open(path_settings, 'r') as f:
         try:
             DICT_SETTINGS = json.load(f)
         except (Exception):
             print(f'{f} is not a valid JSON file')
             exit()
 
+# load strings file
+DICT_STRINGS = {}
+path_strings = os.path.join(DIR_PRJ, 'conf', 'strings.json')
+if os.path.exists(path_strings):
+    with open(path_strings, 'r') as f:
+        try:
+            DICT_STRINGS = json.load(f)
+        except (Exception):
+            print(f'{f} is not a valid JSON file')
+            exit()
+
 # get list of approved categories
+# https://specifications.freedesktop.org/menu-spec/latest/apa.html
 LIST_CATEGORIES = [
     'AudioVideo',
     'Audio',
@@ -233,6 +237,7 @@ def main():
     # do proactive replacements in specific files (replaces needed text)
 
     # common
+    fix_blacklist()
     fix_readme()
 
     # mod/pkg
@@ -263,8 +268,40 @@ def main():
 
 
 # ------------------------------------------------------------------------------
+# Replace text in the blacklist.json file
+# ------------------------------------------------------------------------------
+def fix_blacklist():
+    """
+        Replace text in the blacklist.json file
+
+        Replace any __PP_ stuff in blacklist file.
+        This is here as a convenience, since you have all the dunders in
+        settings.json by the time the blacklist.json file is created.
+    """
+
+    # check if the file exists
+    path_blacklist = os.path.join(DIR_PRJ, 'conf', 'blacklist.json')
+    if not os.path.exists(path_blacklist):
+        return
+
+    # open file and get contents
+    with open(path_blacklist, 'r') as f:
+        text = f.read()
+
+        # replace text
+        settings = DICT_SETTINGS['info']
+        for key, val in settings.items():
+            text = text.replace(key, val)
+
+    # save file
+    with open(path_blacklist, 'w') as f:
+        f.write(text)
+
+# ------------------------------------------------------------------------------
 # Replace text in the README file
 # ------------------------------------------------------------------------------
+
+
 def fix_readme():
     """
         Replace text in the README file
@@ -279,7 +316,7 @@ def fix_readme():
         return
 
     # open file and get contents
-    with open(path_readme, 'r', encoding='utf-8') as f:
+    with open(path_readme, 'r') as f:
         text = f.read()
 
         # replace short description
@@ -289,10 +326,8 @@ def fix_readme():
             r'(<!--[\t ]*__RM_SHORT_DESC_END__[\t ]*-->)'
         )
 
-        # get short description
-        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
-
         # replace text
+        pp_short_desc = DICT_STRINGS['PP_SHORT_DESC']
         str_rep = rf'\g<1>\n{pp_short_desc}\n\g<3>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -303,24 +338,28 @@ def fix_readme():
             r'(<!--[\t ]*__RM_PY_DEPS_END__[\t ]*-->)'
         )
 
-        # build a string from the dict (markdown link)
-        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
-        lst_py_deps = [f'[{key}]({val})' for (key, val) in pp_py_deps.items()]
-        str_py_deps = ','.join(lst_py_deps)
+        # build a string from the dict (markdown links)
+        # only format links if value is not empty
+        pp_py_deps = DICT_STRINGS['PP_PY_DEPS']
+        kv_py_deps = []
+        for key, val in pp_py_deps.items():
+            if val == '':
+                kv_py_deps.append(key)
+            else:
+                kv_py_deps.append(f'[{key}]({val})')
 
-        # split the string for README
-        str_split = _split_quote(str_py_deps, join='<br>\n', tail='\n')
-
-        # no split str, use default
-        if str_split == '':
-            str_split = 'None\n'
+        # build a string (or none) for the deps
+        if len(kv_py_deps) == 0:
+            str_py_deps = 'None'
+        else:
+            str_py_deps = '<br>\n'.join(kv_py_deps)
 
         # replace text
-        str_rep = rf'\g<1>\n{str_split}\g<3>'
+        str_rep = rf'\g<1>\n{str_py_deps}\n\g<3>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace version
-        pp_version = DICT_METADATA['PP_VERSION']
+        pp_version = DICT_STRINGS['PP_VERSION']
 
         str_pattern = (
             r'(\s*foo@bar:~/Downloads\$ python -m pip install )'
@@ -360,7 +399,7 @@ def fix_readme():
         text = re.sub(str_pattern, str_rep, text)
 
     # save file
-    with open(path_readme, 'w', encoding='utf-8') as f:
+    with open(path_readme, 'w') as f:
         f.write(text)
 
 
@@ -380,7 +419,7 @@ def fix_pyproject():
         return
 
     # open file and get contents
-    with open(path_toml, 'r', encoding='utf-8') as f:
+    with open(path_toml, 'r') as f:
         text = f.read()
 
         # NB: we do a dunder replace here because putting a dunder as the
@@ -405,7 +444,7 @@ def fix_pyproject():
             r'(^\s*version[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        pp_version = DICT_METADATA['PP_VERSION']
+        pp_version = DICT_STRINGS['PP_VERSION']
         if pp_version == '':
             pp_version = '0.0.0'
         str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
@@ -418,7 +457,7 @@ def fix_pyproject():
             r'(^\s*description[\t ]*=[\t ]*)'
             r'(.*?$)'
         )
-        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        pp_short_desc = DICT_STRINGS['PP_SHORT_DESC']
         str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -431,12 +470,12 @@ def fix_pyproject():
         )
 
         # convert dict to string
-        pp_keywords = DICT_METADATA['PP_KEYWORDS']
-        str_split = _split_quote(pp_keywords, quote='"', lead='\t',
-                                 join=',\n\t', tail='\n')
+        pp_keywords = DICT_STRINGS['PP_KEYWORDS']
+        str_pp_keywords = [f'"{item}"' for item in pp_keywords]
+        str_pp_keywords = ', '.join(str_pp_keywords)
 
         # replace string
-        str_rep = rf'\g<1>\g<2>\g<3>[\n{str_split}]'
+        str_rep = rf'\g<1>\g<2>\g<3>[{str_pp_keywords}]'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace dependencies array
@@ -448,22 +487,20 @@ def fix_pyproject():
         )
 
         # convert dict to string (only using keys)
-        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
+        pp_py_deps = DICT_STRINGS['PP_PY_DEPS']
 
         # NB: this is not conducive to a dict (we don't need links, only names)
         # so don't do what we did in README, keep it simple
-        str_py_deps = ','.join(pp_py_deps.keys())
-
-        # split the string for pyproject
-        str_split = _split_quote(str_py_deps, quote='"', lead='\t',
-                                 join=',\n\t', tail='\n')
+        list_py_deps = [item for item in pp_py_deps.keys()]
+        str_pp_py_deps = [f'"{item}"' for item in list_py_deps]
+        str_pp_py_deps = ', '.join(str_pp_py_deps)
 
         # replace text
-        str_rep = rf'\g<1>\g<2>\g<3>[\n{str_split}]'
+        str_rep = rf'\g<1>\g<2>\g<3>[{str_pp_py_deps}]'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path_toml, 'w', encoding='utf-8') as f:
+    with open(path_toml, 'w') as f:
         f.write(text)
 
 
@@ -517,7 +554,7 @@ def fix_init():
     str_all = f'__all__ = [{str_all_join}]'
 
     # open file and get contents
-    with open(path_init, 'r', encoding='utf-8') as f:
+    with open(path_init, 'r') as f:
         text = f.read()
 
         # replace imports block
@@ -530,7 +567,7 @@ def fix_init():
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path_init, 'w', encoding='utf-8') as f:
+    with open(path_init, 'w') as f:
         f.write(text)
 
 
@@ -568,7 +605,7 @@ def fix_argparse():
             continue
 
         # open file and get contents
-        with open(path_item, 'r', encoding='utf-8') as f:
+        with open(path_item, 'r') as f:
             text = f.read()
 
             # replace short description
@@ -578,7 +615,7 @@ def fix_argparse():
                 r'(.*?)'
                 r'(\'.*)'
             )
-            pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+            pp_short_desc = DICT_STRINGS['PP_SHORT_DESC']
             str_rep = rf'\g<1>\g<2>{pp_short_desc}\g<4>'
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -589,12 +626,12 @@ def fix_argparse():
                 r'(.*?)'
                 r'(\'.*)'
             )
-            pp_version = DICT_METADATA['PP_VERSION']
+            pp_version = DICT_STRINGS['PP_VERSION']
             str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # save file
-        with open(path_item, 'w', encoding='utf-8') as f:
+        with open(path_item, 'w') as f:
             f.write(text)
 
 
@@ -614,7 +651,7 @@ def fix_install():
         return
 
     # open file and get content
-    with open(path_install, 'r', encoding='utf-8') as f:
+    with open(path_install, 'r') as f:
         text = f.read()
 
         # replace python dependencies array
@@ -626,13 +663,11 @@ def fix_install():
         )
 
         # convert dict keys to string
-        pp_py_deps = DICT_METADATA['PP_PY_DEPS']
-        str_py_deps = ','.join(pp_py_deps.keys())
-        str_split = _split_quote(str_py_deps, quote='"', lead='\t\t',
-                                 join=',\n\t\t')
+        pp_py_deps = DICT_STRINGS['PP_PY_DEPS']
+        str_pp_py_deps = ','.join(pp_py_deps.keys())
 
         # replace text
-        str_rep = rf'\g<1>\g<2>\g<3> [\n{str_split}\n\t]'
+        str_rep = rf'\g<1>\g<2>\g<3> [\n\t\t{str_pp_py_deps}\n\t]'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace system dependencies array
@@ -644,16 +679,15 @@ def fix_install():
         )
 
         # convert dict to string
-        pp_sys_deps = DICT_METADATA['PP_SYS_DEPS']
-        str_split = _split_quote(pp_sys_deps, quote='"', lead='\t\t',
-                                 join=',\n\t\t')
+        pp_sys_deps = DICT_STRINGS['PP_SYS_DEPS']
+        str_pp_sys_deps = ','.join(pp_sys_deps)
 
         # replace string
-        str_rep = rf'\g<1>\g<2>\g<3> [\n{str_split}\n\t]'
+        str_rep = rf'\g<1>\g<2>\g<3> [\n\t\t{str_pp_sys_deps}\n\t]'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path_install, 'w', encoding='utf-8') as f:
+    with open(path_install, 'w') as f:
         f.write(text)
 
 
@@ -668,6 +702,9 @@ def fix_desktop():
         file for programs that use this.
     """
 
+    # global error count
+    global g_err_cnt
+
     # check if the file exists
     pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
     path_desk = os.path.join(DIR_PRJ, 'src', f'{pp_name_small}.desktop')
@@ -676,13 +713,25 @@ def fix_desktop():
 
     # validate wanted categories into approved categories
     pp_gui_categories = []
-    wanted_cats = DICT_METADATA['PP_GUI_CATEGORIES']
+    wanted_cats = DICT_STRINGS['PP_GUI_CATEGORIES']
     for cat in wanted_cats:
+
+        # category is valid
         if cat in LIST_CATEGORIES:
+
+            # add to final list
             pp_gui_categories.append(cat)
+        else:
+
+            # category is not valid, print erro and increase erro count
+            print(
+                f'In PP_GUI_CATEGORIES, "{cat}" is not valid, see \n'
+                'https://specifications.freedesktop.org/menu-spec/latest/apa.html'
+            )
+            g_err_cnt += 1
 
     # open file and get contents
-    with open(path_desk, 'r', encoding='utf-8') as f:
+    with open(path_desk, 'r') as f:
         text = f.read()
 
         # replace categories
@@ -694,10 +743,11 @@ def fix_desktop():
         )
 
         # convert dict to string
-        str_split = _split_quote(pp_gui_categories, join=';', tail=';')
+        str_cat = ';'.join(pp_gui_categories)
+        str_cat += ';'
 
         # replace text
-        str_rep = rf'\g<1>\g<2>\g<3>{str_split}'
+        str_rep = rf'\g<1>\g<2>\g<3>{str_cat}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace short description
@@ -707,12 +757,16 @@ def fix_desktop():
             r'(^\s*Comment[\t ]*=)'
             r'(.*?$)'
         )
-        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        pp_short_desc = DICT_STRINGS['PP_SHORT_DESC']
         str_rep = rf'\g<1>\g<2>\g<3>{pp_short_desc}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # get path to src dir
-        path_src = os.path.join(DIR_PRJ, 'src')
+        # get path to install dir
+        path_home = os.path.expanduser('~')
+        author = DICT_SETTINGS['info']['__PP_AUTHOR__']
+        pp_name_big = DICT_SETTINGS['info']['__PP_NAME_BIG__']
+        path_inst = os.path.join(path_home, f'.{author}', pp_name_big,
+                                 'src')
 
         # replace exec
         str_pattern = (
@@ -721,7 +775,7 @@ def fix_desktop():
             r'(^\s*Exec[\t ]*=)'
             r'(.*?$)'
         )
-        path_exec = os.path.join(path_src, f'{pp_name_small}.py')
+        path_exec = os.path.join(path_inst, f'{pp_name_small}.py')
         str_rep = rf'\g<1>\g<2>\g<3>{path_exec}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -732,7 +786,7 @@ def fix_desktop():
             r'(^\s*Icon[\t ]*=)'
             r'(.*?$)'
         )
-        path_icon = os.path.join(path_src, f'{pp_name_small}.png')
+        path_icon = os.path.join(path_inst, f'{pp_name_small}.png')
         str_rep = rf'\g<1>\g<2>\g<3>{path_icon}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -743,11 +797,11 @@ def fix_desktop():
             r'(^\s*Path[\t ]*=)'
             r'(.*?$)'
         )
-        str_rep = rf'\g<1>\g<2>\g<3>{path_src}'
+        str_rep = rf'\g<1>\g<2>\g<3>{path_inst}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path_desk, 'w', encoding='utf-8') as f:
+    with open(path_desk, 'w') as f:
         f.write(text)
 
 
@@ -768,7 +822,7 @@ def fix_gtk3():
         return
 
     # open file and get contents
-    with open(path_ui, 'r', encoding='utf-8') as f:
+    with open(path_ui, 'r') as f:
         text = f.read()
 
         # replace short description
@@ -778,7 +832,7 @@ def fix_gtk3():
             r'(.*?)'
             r'(</property>)'
         )
-        pp_short_desc = DICT_METADATA['PP_SHORT_DESC']
+        pp_short_desc = DICT_STRINGS['PP_SHORT_DESC']
         str_rep = rf'\g<1>\g<2>{pp_short_desc}\g<4>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -789,12 +843,12 @@ def fix_gtk3():
             r'(.*?)'
             r'(</property>.*)'
         )
-        pp_version = DICT_METADATA['PP_VERSION']
+        pp_version = DICT_STRINGS['PP_VERSION']
         str_rep = rf'\g<1>\g<2>{pp_version}\g<4>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path_ui, 'w', encoding='utf-8') as f:
+    with open(path_ui, 'w') as f:
         f.write(text)
 
 
@@ -803,10 +857,10 @@ def fix_gtk3():
 # ------------------------------------------------------------------------------
 def recurse_and_check(dir):
     """
-        Recurse through the folder structure looking for errors
+        Recurses through the folder structure looking for errors
 
         Parameters:
-            dir [string]: the directory to start looking for errors
+            dir: The directory to start looking for errors
 
         This function recurses through the project directory, checking for
         errors in each file's headers, and content for strings that do not match
@@ -844,7 +898,7 @@ def recurse_and_check(dir):
             if item not in skip_file:
 
                 # open file and get lines
-                with open(path_item, 'r', encoding='utf-8') as f:
+                with open(path_item, 'r') as f:
                     lines = f.readlines()
 
                     # check headers of most files
@@ -879,7 +933,7 @@ def do_extras():
 
     # add requirements
     path_req = os.path.join(DIR_PRJ, 'requirements.txt')
-    with open(path_req, 'w', encoding='utf-8') as f:
+    with open(path_req, 'w') as f:
 
         cmd = 'python -m pip freeze -l --exclude-editable --require-virtualenv'
         cmd_array = shlex.split(cmd)
@@ -887,7 +941,7 @@ def do_extras():
 
     # update CHANGELOG
     path_chg = os.path.join(DIR_PRJ, 'CHANGELOG.md')
-    with open(path_chg, 'w', encoding='utf-8') as f:
+    with open(path_chg, 'w') as f:
 
         cmd = 'git log --pretty="%ad - %s"'
         cmd_array = shlex.split(cmd)
@@ -934,12 +988,12 @@ def do_gettext():
     dir_locale = os.path.join(DIR_PRJ, 'src', 'locale')
     pp_name_small = DICT_SETTINGS['info']['__PP_NAME_SMALL__']
     path_pot = os.path.join(dir_locale, f'{pp_name_small}.pot')
-    pp_version = DICT_METADATA['PP_VERSION']
+    pp_version = DICT_STRINGS['PP_VERSION']
 
     # remove old pot and recreate empty file
     if os.path.exists(path_pot):
         os.remove(path_pot)
-    with open(path_pot, 'w', encoding='utf-8') as f:
+    with open(path_pot, 'w') as f:
         f.write('')
 
     # build a list of files
@@ -962,6 +1016,8 @@ def do_gettext():
                 res.append(path)
 
     # for each file that can be I18N'd, run xgettext
+    author = DICT_SETTINGS['info']['__PP_AUTHOR__']
+    email = DICT_SETTINGS['info']['__PP_EMAIL__']
     for file in res:
         cmd = (
             'xgettext '         # the xgettest cmd
@@ -971,10 +1027,10 @@ def do_gettext():
             '--no-location '    # don't print filename/line number
             f'-o {path_pot} '   # location of output file
             '-F '               # sort output by input file
-            '--copyright-holder=cyclopticnerve '
+            f'--copyright-holder={author} '
             f'--package-name={pp_name_small} '
             f'--package-version={pp_version} '
-            '--msgid-bugs-address=cyclopticnerve@gmail.com'
+            f'--msgid-bugs-address={email}'
         )
         cmd_array = shlex.split(cmd)
         subprocess.run(cmd_array)
@@ -982,7 +1038,7 @@ def do_gettext():
     # now lets do some text replacements to make it look nice
 
     # open file and get contents
-    with open(path_pot, 'r', encoding='utf-8') as f:
+    with open(path_pot, 'r') as f:
         text = f.read()
 
         # replace short description
@@ -994,25 +1050,26 @@ def do_gettext():
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace copyright
+        author = DICT_SETTINGS['info']['__PP_AUTHOR__']
         str_pattern = (
             r'(# Copyright \(C\) )'
             r'(.*?)'
-            r'( cyclopticnerve)'
+            rf'( {author})'
         )
         year = datetime.date.today().year
         str_rep = rf'\g<1>{year}\g<3>'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # replace author
+        # replace author's email
         str_pattern = (
             r'(# FIRST AUTHOR )'
             r'(<EMAIL@ADDRESS>)'
             r'(, )'
             r'(YEAR)'
         )
-        author = 'cyclopticnerve@gmail.com'
+        email = DICT_SETTINGS['info']['__PP_EMAIL__']
         year = datetime.date.today().year
-        str_rep = rf'\g<1>{author}\g<3>{year}'
+        str_rep = rf'\g<1>{email}\g<3>{year}'
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # replace charset
@@ -1026,7 +1083,7 @@ def do_gettext():
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path_pot, 'w', encoding='utf-8') as f:
+    with open(path_pot, 'w',) as f:
         f.write(text)
 
 
@@ -1042,11 +1099,13 @@ def _check_header(path_item, lines):
         Checks header values for dunders
 
         Parameters:
-            path_item [string]: the full path to file to be checked for header
-            lines [array]: the contents of the file to be checked
+            path_item: The full path to file to be checked for header
+            lines: The contents of the file to be checked
 
         This function checks the files headers for values that either do not
         match the file's project/file name, or do not have a date set.
+        This method is private because it is only called from inside
+        recurse_and_check().
     """
 
     # global error count
@@ -1132,11 +1191,13 @@ def _check_text(path_item, lines):
         Checks file contents for replacements
 
         Parameters:
-            path_item [string]: the full path to file to be checked for text
-            lines [array]: the contents of the file to be checked
+            path_item: The full path to file to be checked for text
+            lines: The contents of the file to be checked
 
         This function checks that none of the files contains an unreplaced
         replacement variable from the initial project info.
+        This method is private because it is only called from inside
+        recurse_and_check().
     """
 
     # global error count
@@ -1147,7 +1208,7 @@ def _check_text(path_item, lines):
         line = lines[i]
 
         # the dunders to look for
-        reps = [rep for rep in DICT_SETTINGS['info'] and DICT_METADATA]
+        reps = [rep for rep in DICT_SETTINGS['info'] and DICT_STRINGS]
 
         # check for dunders in text
         for rep in reps:
@@ -1166,10 +1227,12 @@ def _check_path(path_item):
         Checks file paths for dunders
 
         Parameters:
-            path_item [string]: the full path to file to be checked for path
+            path_item: The full path to file to be checked for path
 
         This function checks that none of the files paths contains an unreplaced
         dunder variable from the initial project info.
+        This method is private because it is only called from inside
+        recurse_and_check().
     """
 
     # global error count
@@ -1181,54 +1244,6 @@ def _check_path(path_item):
 
         # inc error count
         g_err_cnt += 1
-
-
-# ------------------------------------------------------------------------------
-# A helper function to split keywords and dependencies
-# ------------------------------------------------------------------------------
-def _split_quote(str_in, split=',', quote='', lead='', join=',', tail=''):
-    """
-        A helper function to split and reformat keywords and dependencies
-
-        Parameters:
-            str_in [string]: the string to split
-            split [string]: the character to split on
-            quote [string]: the character to use to quote each entry (or empty)
-            lead [string]: the string to precede the formatted string (or empty)
-            join [string]: the string to join each line in the output (or empty)
-            tail [string]: the string to follow the formatted string (or empty)
-
-        Returns:
-            [string]: a new string which is split, quoted, joined, and
-            surrounded by the lead and tail strings
-
-        This function takes a string and splits it using the split param, then
-        quotes each item using the quote param, then joins the items using the
-        join param, and surrounds it using the lead and tail params to create a
-        nice-looking list.
-    """
-
-    # first split the list using the split char
-    lst_split = [item.strip() for item in str_in.split(split)]
-
-    # blank strings, when split w/param, still contain 1 entry
-    # https://stackoverflow.com/questions/16645083/when-splitting-an-empty-string-in-python-why-does-split-return-an-empty-list
-    # so we do the list comprehension BEFORE testing the list length
-    # quote items and put into new list
-    lst_split = [f'{quote}{item}{quote}' for item in lst_split if item != '']
-
-    # if the list is empty, return empty result
-    if len(lst_split) == 0:
-        return ''
-
-    # join list using join string
-    str_split = f'{join}'.join(lst_split)
-
-    # surround list with lead and tail
-    str_split = f'{lead}{str_split}{tail}'
-
-    # return the final string
-    return str_split
 
 
 # ------------------------------------------------------------------------------

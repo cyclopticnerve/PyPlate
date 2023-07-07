@@ -2,8 +2,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: pyproject.toml                                        |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTJOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 [build-system]
@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 name = "NAME"
 version = "0.0.0"
 description = ""
-authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
+authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 classifiers = [
@@ -28,6 +28,6 @@ dependencies = []
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/__PP_NAME_BIG__"
+Homepage = "https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__"
 
 # -)

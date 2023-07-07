@@ -2,17 +2,22 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: __PP_NAME_SMALL__.py                                  |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
+import os
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
+
+# some useful constants
+DIR_FILE = os.path.dirname(__file__)
+DIR_HOME = os.path.expanduser('~')
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -31,13 +36,13 @@ def func():
         Short description
 
         Parameters:
-            var_name [type]: description
+            var_name: Description
 
         Returns:
-            [type]: description
+            Description
 
         Raises:
-            exception_type(vars): description
+            exception_type(vars): Description
 
         Long description (including HTML).
     """
@@ -58,13 +63,13 @@ def _func():
         Short description
 
         Parameters:
-            var_name [type]: description
+            var_name: Description
 
         Returns:
-            [type]: description
+            Description
 
         Raises:
-            exception_type(vars): description
+            exception_type(vars): Description
 
         Long description (including HTML).
     """

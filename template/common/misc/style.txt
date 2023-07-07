@@ -8,7 +8,7 @@
     check for _prj and swap
     check for prj_
     path - whole thing
-    file - name only
+    file - name/ext only
     dir - up to name or if a folder
 [] >2part vars: \b[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]+
 
@@ -19,7 +19,7 @@
 [] spellcheck
 [] separators ------
 [] over 80 cols
-[] use list/dict comprehensions (look for for loops)
+[] use list/dict comprehensions (look for 'for' loops)
 [] reduce re flags/groups
 
 [] cli/gui: function/method not called from main: start with underscore

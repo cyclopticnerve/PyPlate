@@ -2,8 +2,8 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: default_class.py                                      |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -38,11 +38,11 @@ class Main(object):
         Short description
 
         Properties:
-            foo [type]: a type to hold the foo value
+            foo: A type to hold the foo value
 
         Methods:
-            set_foo(foo [type]): sets the new value of foo
-            [type] get_foo(): gets the current value of foo
+            set_foo(new_foo): Sets the new value of foo
+            get_foo(): Gets the current value of foo
 
         Long description (including HTML).
     """
@@ -59,7 +59,7 @@ class Main(object):
             Gets the current value of foo
 
             Returns:
-                [type]: the current value of foo
+                The current value of foo
 
             Long description (including HTML).
         """
@@ -70,28 +70,43 @@ class Main(object):
     # --------------------------------------------------------------------------
     # Sets the new value of foo
     # --------------------------------------------------------------------------
-    def set_foo(self, foo):
+    def set_foo(self, new_foo):
         """
             Sets the new value of foo
 
             Parameters:
-                foo [type]: the new value of foo
+                new_foo: The new value of foo
 
             Long description (including HTML).
         """
 
         # set the new value of foo
-        self.foo = foo
+        self.foo = new_foo
 
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # foo method
+    # Short description
     # --------------------------------------------------------------------------
     def _foo():
-        pass
+        """
+            Short description
+
+            Parameters:
+                var_name: Description
+
+            Returns:
+                Description
+
+            Raises:
+                exception_type(vars): Description
+
+            Long description (including HTML).
+        """
+
+        return ('this is _foo')
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -116,8 +131,8 @@ class Main(object):
         # AS LITTLE coding in the constructor method because the whole class may
         # not exist at this point! you should definitely not call get/set
         # methods to init controls. these methods/controls may not exist at the
-        # time you call them. better to use a method that is called when/after
-        # the class is fully constructed.
+        # time you call them. so to initilize scalar properties, set them
+        # empirically rather than using setter methods.
 
         # set the initial value of foo
         self.foo = 'foo'
