@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL___gtk3.py                             |     ()     |
+# Filename: __PP_NAME_SMALL___-gtk3.py                            |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR                                           |   \____/   |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@
 
 
 """
-1. run metadata.py to do xgettext and make .pot file
+1. run pybaker.py to do xgettext and make .pot file
 2. copy .pot file to locale/<lang>/LC_MESSAGES and rename .po
 3. edit .po file
 4. run msgfmt -o __PP_NAME_SMALL__.mo __PP_NAME_SMALL__.po in
@@ -52,7 +52,7 @@ DIR_SELF = os.path.dirname(__file__)
 DIR_LOCALE = os.path.join(DIR_SELF, 'locale')
 
 # the path to ui file (even if it is in same dir)
-PATH_GUI = os.path.join(DIR_SELF, '__PP_NAME_SMALL___gtk3.ui')
+PATH_GUI = os.path.join(DIR_SELF, '__PP_NAME_SMALL__-gtk3.ui')
 
 # whether to auto-save gui state on close, or abandon all changes (or ask, like
 # through a 'Save' dialog)
@@ -399,7 +399,7 @@ class App(Gtk.Application):
 
             Get the state of all gui objects and return it whenever this method
             is called. This method is called from several places, both for
-            saving the actual GUI values and also for checking the existance of
+            saving the actual GUI values and also for checking the existence of
             keys.
         """
 
@@ -428,7 +428,7 @@ class App(Gtk.Application):
     # --------------------------------------------------------------------------
     def _get_dialog(self):
         """
-            Creates a save dialog for when the window is closed by the 'X' 
+            Creates a save dialog for when the window is closed by the 'X'
             button
 
             Parameters:
@@ -445,7 +445,7 @@ class App(Gtk.Application):
         # I18N: the main message of the save dialog
         # after
         str_main = _('Save changes before closing?')
-        # I18N: the submessage of the save dialog
+        # I18N: the sub message of the save dialog
         str_sec = _('If you don\'t save, changes will be permanently lost.')
         # I18N: the destructive button label (to close without saving)
         str_close = _('Close without saving')
@@ -567,7 +567,7 @@ class App(Gtk.Application):
             frequently and is not stored in a variable to prevent caching.
         """
 
-        # defult result
+        # default result
         result = False
 
         # the new save dict (the current state of the gui)
@@ -632,7 +632,7 @@ class App(Gtk.Application):
         self._load_state()
 
         # set the config into the controls
-        # NB: do set here because controls now defenitely exist
+        # NB: do set here because controls now definitely exist
         self._set_gui()
 
         # show window

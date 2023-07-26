@@ -52,7 +52,7 @@ Release
             [] Do reqs - $ python -m pip freeze > requirements.txt
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
             [] Generate docs - $ python -m pdoc --html -f -o docs src
-            [] Run conf/metadata.py
+            [] Run conf/pybaker.py
             [] Update VSCodeCounter
             [] Commit/push 'dev' for 'next release'
 

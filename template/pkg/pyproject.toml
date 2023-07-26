@@ -2,7 +2,7 @@
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: pyproject.toml                                        |     ()     |
 # Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTJOR__                                         |   \____/   |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
@@ -11,8 +11,10 @@ requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "NAME"
-version = "0.0.0"
+# some of these values will be replaced by either pymaker.py or pybaker.py
+# they are only here to satisfy the linter
+name = "__PP_NAME_BIG__"
+version = "__PP_VERSION__"
 description = ""
 authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
 readme = "README.md"

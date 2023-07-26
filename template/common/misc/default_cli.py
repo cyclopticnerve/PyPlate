@@ -89,6 +89,7 @@ def add_args(argparser):
     # argparser.add_argument('-f')
     pass
 
+
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
@@ -96,8 +97,6 @@ def add_args(argparser):
 # ------------------------------------------------------------------------------
 # Parse command line args and return the dict
 # ------------------------------------------------------------------------------
-
-
 def _parse_args():
     """
         Parses command line args and return the dict
@@ -111,11 +110,11 @@ def _parse_args():
 
     # create the parser
     argparser = argparse.ArgumentParser(
-        description='PP_SHORT_DESC'
+        description='__PP_SHORT_DESC__'
     )
 
     # always print prog name/version
-    print('__PP_NAME_BIG__ version PP_VERSION')
+    print('__PP_NAME_BIG__ version __PP_VERSION__')
 
     # add arguments from the function above
     add_args(argparser)
@@ -130,7 +129,7 @@ def _parse_args():
     # if we made it this far, cmd line is ok so print usage
     argparser.print_usage()
 
-    # convert agrs to dict
+    # convert args to dict
     dict_args = vars(args)
 
     # return the object for inspection

@@ -1,8 +1,8 @@
 .
 ├── conf
 │   ├── blacklist.json
-│   ├── metadata.json
-│   ├── metadata.py
+│   ├── strings.json
+│   ├── pybaker.py
 │   └── settings.json
 ├── docs
 │   └── ABOUT
@@ -19,12 +19,12 @@
 │   ├── tree.txt
 │   └── uninstall.py
 ├── src
-│   └── pyplate.py
+│   └── pymaker.py
 ├── template
 │   ├── conf
 │   │   ├── blacklist.json
-│   │   ├── metadata.json
-│   │   ├── metadata.py
+│   │   ├── strings.json
+│   │   ├── pybaker.py
 │   │   └── settings.json
 │   ├── docs
 │   │   └── ABOUT

@@ -9,17 +9,24 @@
 # __PP_NAME_BIG__
 
 ## "It mostly works™"
-[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
+
+<!-- __RM_LICENSE_BADGE_START__ -->
+__PP_LICENSE_BADGE__
+<!-- [![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/) -->
+<!-- __RM_LICENSE_BADGE_END__ -->
 
 <!-- __RM_SHORT_DESC_START__ -->
-PP_SHORT_DESC
+__PP_SHORT_DESC__
 <!-- __RM_SHORT_DESC_END__ -->
 
+<!-- __RM_SCREENSHOT_START__ -->
+__PP_SCREENSHOT__
 <!-- ![Screenshot](README/screenshot.jpg) -->
+<!-- __RM_SCREENSHOT_END__ -->
 
 ## Requirements
 <!-- __RM_PY_DEPS_START__ -->
-PP_PY_DEPS
+__PP_PY_DEPS__
 <!-- __RM_PY_DEPS_END__ -->
 
 ## Installing
@@ -32,7 +39,7 @@ Download the 'Source Code (tar.gz)' file.
 Then install it using:
 ```bash
 foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ python -m pip install __PP_NAME_BIG__-PP_VERSION.tar.gz
+foo@bar:~/Downloads$ python -m pip install __PP_NAME_BIG__-__PP_VERSION__.tar.gz
 ```
 Or you can clone the git repo to get the latest (and often broken) code from the 
 dev branch:
@@ -45,7 +52,7 @@ Then build and install:
 ```bash
 foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install build
 foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m build
-foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install ./dist/__PP_NAME_SMALL__-PP_VERSION.tar.gz
+foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install ./dist/__PP_NAME_SMALL__-__PP_VERSION__.tar.gz
 ```
 <!-- __RM_MOD_END__ -->
 <!-- __RM_APP_START__ -->
@@ -56,8 +63,8 @@ Download either the 'tar.gz' or '.zip' file and extract it.
 
 Then run the 'install.py' file from there:
 ```bash
-foo@bar:~$ cd ~/Downloads/__PP_NAME_BIG__-PP_VERSION
-foo@bar:~/Downloads/__PP_NAME_BIG__-PP_VERSION$ ./install.py
+foo@bar:~$ cd ~/Downloads/__PP_NAME_BIG__-__PP_VERSION__
+foo@bar:~/Downloads/__PP_NAME_BIG__-__PP_VERSION__$ ./install.py
 ```
 
 Or you can clone the git repo to get the latest (and often broken) code from the

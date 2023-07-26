@@ -44,12 +44,12 @@ Release
             [] Check dependencies in pyproject.toml and install.py
             [] Update extra files in MANIFEST.in
             [] README usage/notes
-            [] Change version number in conf/metadata.json
+            [] Change version number in conf/strings.json
 
             [] Do reqs - $ python -m pip freeze > requirements.txt
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
             [] Generate docs - $ python -m pdoc --html -f -o docs src
-            [] Run conf/metadata.py
+            [] Run conf/pybaker.py
 
             [] Commit/push 'dev' for 'next release'
 

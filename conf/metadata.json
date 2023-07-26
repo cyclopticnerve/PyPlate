@@ -1,0 +1,17 @@
+{
+    "__PP_VERSION__": "0.1.0",
+    "__PP_SHORT_DESC__": "A program for creating module/package/CLI/GUI projects in Python from a template",
+    "__PP_KEYWORDS__": [
+        "python",
+        "cli",
+        "template,",
+        "app",
+        "package",
+        "gui",
+        "module",
+        "gtk3"
+    ],
+    "__PP_PY_DEPS__": {},
+    "__PP_SYS_DEPS__": [],
+    "__PP_GUI_CATEGORIES__": []
+}

@@ -1,47 +1,56 @@
 
 
-TODO: check for empty strings in user.json
-TODO: replace header in each template file
+TODO: fix blacklist.json should be done in pymaker.py
+right now fix blacklist is in pybaker.py
+does it not do this as part of fix_text(conf)?
+but pymaker does not fix anything in conf
+
 TODO: venv doesn't work
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
+TODO: how to handle screenshot in readme? should be done by pybaker (after we get a screenshot obvs)
+TODO: make pybaker check for empty entries in header (not just dunders)
 
 
-NEXT: rename pyplate.py to pymaker.py and metadata.py to pybaker.py
-NEXT: test if MODTEST == ModTest == modtest (for project name)
+NEXT: put ALL dicts from pymaker into conf file
+NEXT: replace project name in misc file headers
+NEXT: move license stuff to pybaker, will need to be done once at first run
+can be changed later? would need a lot more regex
+NEXT: make BASE_DIR configurable
+NEXT: remove json in favor of toml for config files (so we can use comments)
+NEXT: add email and version to headers
+NEXT: test if MODTEST == ModTest == modtest (for project name)(done in _check_name)
 NEXT: ask for author/email first time, then store
 NEXT: set project info by cmd line (-t,--type, -n,--name, -a,--author, -e,--email)
 NEXT: use globs in blacklist (for skip header images)
-NEXT: Add author and license somewhere in pyplate so users don't have to do 
-find/replace everywhere in template
 but these are hardcoded in SO MANY PLACES
-these values would only have to be changed once, so make it a script ins install?
+these values would only have to be changed once, so make it a script in install?
 NEXT: how to add new items to be replaced? 
 all current keywords use a fixed regex but what if we want to do simple text replacement?
 like just replace 'PP_SOMETHING' with 'foobar'?
-NEXT: combine metadata.json/blacklist.json
-NEXT: metadata get all dunders from dict? i.e. metadata.json uses __PP_XXX__
+NEXT: combine strings.json/blacklist.json
+NEXT: pybaker.py get all dunders from dict? i.e. strings.json uses __PP_XXX__
 NEXT: check for gtk version 3/4
    does gi.repository have a >= ?
    load ui file based on installed GTK version
 NEXT: icons of diff sizes? for desktop/ui
 NEXT: need a better way to do headers that doesn't rely on dunders
 something like anything more that 2 spaces is formated to 80?
-NEXT: check for metadata empty fields that are essential(desc,ver,)
+NEXT: check for string empty fields that are essential(desc,ver,)
 NEXT: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
 also look at official python docs or autoDocstring ext
 check for docstrings linter? pydocstyle?
 how to document text/json files in docs? add files? and how to add LOONG documentation
 to docs? i.e. long descs of each param?
-NEXT: metadata should do replacements first, then do checks
-NEXT: metadata.py: consts to dunders - use find/replace
+NEXT: pybaker.py should do replacements first, then do checks
+NEXT: pybaker.py: consts to dunders - use find/replace
 NEXT: add version number as a heading to README
 NEXT: add changelog to README
-NEXT: PyPlate should only do dunders in source folder and top level files
-Same with metadata
+NEXT: pymaker should only do dunders in source folder and top level files
+Same with pybaker.py
 Blacklist is too messy - whitelist is easier?
 NEXT: document the template structure in README
-NEXT: convert PyPlate recurse stuff from lines[] to text()
+NEXT: convert pyplate.py recurse stuff from lines[] to text() (or vice versa)
 NEXT: move all string-based constants to files in conf
 NEXT: releases in GItHub have version number in file/folder name
 Makes it hard to overwrite older versions when copy/paste
@@ -56,7 +65,7 @@ NEXT: conf files from json to toml, add comments
 NEXT: README: need to figure out if Installerator/Configurator are actually deps
 NEXT: README: if there is a file in misc starting with 'screenshot', uncomment that line in README
 what to do about placeholder file? and file ext?
-NEXT: recurse code in PyPlate/metadata similar... can we combine?
+NEXT: recurse code in pymaker/pybaker similar... can we combine?
 NEXT: make checklist as html/interactive
 NEXT: make tree.txt/style.txt as html w/checkboxes
 NEXT: change all header date to version ???
@@ -65,26 +74,35 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: check all keys in pymaker.py dicts (all caps, some dunders)
+DONE: pymaker doesn't replace PP_AUTHOR in README
+DONE: check if pymaker handles empty values in header (blanks remain blank)
+DONE: don't replace conf/settings.json keys
+DONE: filename entry in header has wrong spacing (modtest/src/modtest.py)
+DONE: pymaker doesn't replace PP_AUTHOR_or PP_LICENSE in headers
+DONE: rename pyplate.py to pymaker.py and pybaker.py to pybaker.py
+DONE: Add author and license somewhere in pymaker so users don't have to do 
+find/replace everywhere in template
 DONE: what settings do we need in metadaa?
 DONE: get rid of project type in settings.json
 DONE: remove my name from conf/settings.json
 DONE: if link is blank in strings.json, don't make link in readme 
 DONE: check that cats end in semiquote
 DONE: put all readme in same doc
-DONE: metadata.json PP_PY_DEPS/PP_SYSDEPS/PP_GUI_CATEGORIES is array
+DONE: strings.json PP_PY_DEPS/PP_SYSDEPS/PP_GUI_CATEGORIES is array
 DONE: do we really need the _split_str function? (change readme for arrays instead of string)
 DONE: test category mismatch in GUI
 DONE: remove all brackets from docstrings
 DONE: other readme headers/footers
-DONE: how to document file formats that don't support comments? json,toml
+DONE: how to document file formats that don't support comments? json!
 done in PyPlate README
-DONE: metadata.py: get freedesktop format locations for exec/icon
+DONE: pybaker.py: get freedesktop format locations for exec/icon
 DONE: put version num in PyPlate readme/update value in misc/settings.json
 should we also put other stuff there? or is that getting too close to a "make PyPlate
 using PyPlate" thing?
 DONE: spellcheck
 DONE: diff main PyPlate dir with template (before metadata)
-DONE: add reqs/docs/changelog to metadata.py
+DONE: add reqs/docs/changelog to pybaker.py
 DONE: Move all style entries from to-do and checklist into separate style guide
 DONE: copy project reqs from PyPlate reqs, which are pulled from .venv
 DONE: check for _path, _file, _dir, _str, _lst and swap
@@ -100,14 +118,14 @@ DONE: run pip freeze into template during copy
 DONE: docs folder is empty in template, so doesn't get into GitHub
 DONE: why does PP_SHORT_DESC/PP_VERSION change in misc/empty_main.py?
 DONE: __PP_NAME_BIG__ in empty_main.py? can we live with one error?
-DONE: in metadata.json, make py deps into dict and add links for README
+DONE: in strings.json, make py deps into dict and add links for README
 DONE: check _split_quote in toml/install
 DONE: gui categories have commas in file, split on comma and join with semicolon
 DONE: finish argparse test to see if we can count args needed vs. args given
 DONE: put recursion blacklist of project in settings.json (will need default in PyPlate)
 DONE: Module/Package: get rid of import tests after ensuring __init__.py works as expected
-DONE: metadata.py: metadata's own headers not replaced as it is in misc/
-DONE: metadata.py shows tags in README that are ok (__PP_MOD_START etc)
+DONE: pybaker.py: pybaker's own headers not replaced as it is in misc/
+DONE: pybaker.py shows tags in README that are ok (__PP_MOD_START etc)
 DONE: put blacklist back in for recursing (easier to maintain/move to agnostic)
 DONE: versionator script 
 DONE: add argparse to empty_exe.py
@@ -122,10 +140,10 @@ DONE: for pkg type, make sure all submodule names are in __init__.py
 remove .py exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
 
-Use PyPlate to make a project called PyMaker
+Use PyPlate to make a project called PyPlate
 Install PyMaker like a CLI
 
-move PyPlate/PyMaker to /usr/bin so we can call it from anywhere
+move PyPlate/pymaker.py to /usr/bin so we can call it from anywhere
 add params for the questions
 pymaker -t/--type m|p|c|g -n/--name ModTest
 no default, each is required

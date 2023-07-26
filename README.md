@@ -9,7 +9,7 @@
 # PyPlate
 
 ## "It mostly works™"
-[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
+[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
 <!-- __RM_SHORT_DESC_START__ -->
 A program for creating module/package/CLI/GUI projects in Python from a template
@@ -23,9 +23,9 @@ None
 <!-- __RM_PY_DEPS_END__ -->
 
 ## Installing
-You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest) 
-from the main branch.<br>
+You can download the (hopefully stable) [latest
+release](https://github.com/cyclopticnerve/PyPlate/releases/latest) from the
+main branch.<br>
 Download either the 'tar.gz' or 'zip' file and extract it.<br>
 Rename the folder without the version, e.g. 'PyPlate-0.1.0' to 'PyPlate'.
 
@@ -48,71 +48,123 @@ Lastly, you can delete the downloaded folder, if you copied it.
 Just delete the 'PyPlate' folder from wherever you put it in the install step.
 
 ## Usage
-PyPlate consists of two scripts, 'pyplate.py' and 'metadata.py'. The first is 
-used to create the project, and the second is used to update an existing project 
-as its development continues.
+PyPlate consists of two main scripts, 'pymaker.py' and 'pybaker.py'. The first
+is used to create the project, and the second is used to update an existing
+project as its development continues.
 
-Let us start with 'pyplate.py'.
+Let us start with 'pymaker.py'.
 <hr>
 
-## PyPlate.py
-Before you do anything, you should edit the 'user.json' file in 'PyPlate/conf'. 
-This file contains your personal information that is used when creating a new 
-project. The fields should be pretty self-explanatory, but here is a brief 
-description of each:
+## PyMaker.py
+Before you do anything, you should edit the 'user.json' file in 'PyPlate/conf'.
+This file contains your personal information that is used when creating a new
+project. These are one-time-only values and will not be updated automatically
+later.  
 
-### PP_DATE_FMT
-The date format to use in headers
+The fields should be pretty self-explanatory, but here is a brief description of
+each:
 
 ### PP_AUTHOR
 The name to use for 'Author' in headers and pyproject.toml
 
+### PP_DATE_FMT
+The date format to use in headers
+
 ### PP_EMAIL
-The email address to use in headers and pyproject.toml
+The email address to use in pyproject.toml
 
 ### PP_LICENSE
-The license to use in headers and pyproject.toml
+The license to use in headers
 
-To create a project, cd into the 'PyPlate/src/' directory, and run 'pyplate.py':
+You may also want to edit the 'types.json' file in 'PyPlate/conf'. The default
+file looks like this:
+```
+{
+    "m": [
+        "Module",
+        "Modules",
+        "mod"
+    ],
+    "p": [
+        "Package",
+        "Packages",
+        "pkg"
+    ],
+    "c": [
+        "CLI",
+        "CLIs",
+        "cli"
+    ],
+    "g": [
+        "GUI",
+        "GUIs",
+        "gui"
+    ]
+}
+```
+The structure looks like this:
+```
+{
+    'short_type_name': {
+        ['long_type_name', 'destination_folder', 'source_folder']
+    }
+}
+```
+where:
+
+### short_type_name
+A single letter (like 'm' for module projects)
+
+### long_type_name
+Tthe name to display when asking for a project type (ie. 'Module')
+
+### destination_folder
+The name of the folder under 'DIR_BASE' (explained below) to put the project in  
+
+### source_folder
+The folder under 'PyPlate/template' that the source files reside
+
+This allows you to add/edit/delete project types, as well as their displayed
+names and source\destination folders.
+
+Next, to create a project, cd into the 'PyPlate/src' directory, and run
+'pymaker.py':
 ``` bash
 foo@bar:~$ cd ~/Documents/Projects/Python/PyPlate/src
-foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pyplate.py
+foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pymaker.py
 ```
 
-Enter the required information, and 'pyplate.py' will create the required files
+Enter the required information, and 'pymaker.py' will create the required files
 and folders in a subdirectory of 'DIR_BASE', where 'DIR_BASE' is the directory
 above 'PyPlate'. In our example, 'DIR_BASE' is '~/Documents/Projects/Python'.
 
-Modules/Packages will be generated in '~/Documents/Projects/Python/Libs', and
-CLI/GUI apps will be generated in '~/Documents/Projects/Python/Apps'.
+So, from all of our assumptions above, if the project type is 'm', and the
+project name is 'ModTest', then the project will be created in
+'~/Documents/Projects/Python/Modules/ModTest'.
 
-From there you are free to modify the projects in your favorite IDE.
-
-Once your project is ready for release, run the 'metadata.py' file from the 
-project's 'conf' directory. This will update any metadata you have added/edited 
-in the 'conf' directory.
+That's it! From there you are free to modify the projects in your favorite IDE.
 
 <hr>
 
-## Metadata.py / Customizing the project
-Once you have created a project, you can use 'metadata.py' in the project's 
+## PyBaker.py / Updating the project
+Once you have created a project, you can use 'pybaker.py' in the project's
 'conf' directory to update metada in the project's files.
 
-'metadata.py' is a script which will replace certain keywords in the project 
-directory. These keywords are placed in files in the 'conf' directory of your 
+'pybaker.py' is a script which will replace certain keywords in the project
+directory. These keywords are placed in files in the 'conf' directory of your
 project. These files are explained below.
 
-The files in the 'conf' directory can be edited at any time (except 
-'settings.json'), followed by re-running 'metadata.py'. The script uses 
-regular expressions to search for context (i.e. text before and after the 
-replacement) so as long as the context does not change, 'metadata.py' can 
-replace text at any time. 
+The files in the 'conf' directory can be edited at any time (except
+'settings.json'), followed by re-running 'pybaker.py'. The script uses regular
+expressions to search for context (i.e. text before and after the replacement)
+so as long as the context does not change, 'pybaker.py' can replace text at any
+time. 
 
 
 ## Blacklist.json
-You should edit this file by hand before running 'metadata.py'. This file is
-used by 'metadata.py' to determine which files/folders it can (or rather, 
-*can't*) operate on.
+You should edit this file by hand before running 'pybaker.py'. This file is used
+by 'pybaker.py' to determine which files/folders it can (or rather, *can't*)
+operate on.
 
 Files in the new project are divided, internally, into four cateigories:
 1. the file's COMPLETE contents
@@ -140,7 +192,7 @@ The default 'blacklist.json' file should look something like this:
     ],
     "skip_header": [],
     "skip_text": [
-        "metadata.py",
+        "pybaker.py",
         "settings.json",
         "strings.json"
     ],
@@ -151,49 +203,48 @@ The default 'blacklist.json' file should look something like this:
 The individual entries are:
 
 ### skip_all
-A list of folders/files for which NOTHING should be done. Don't fix headers, 
+A list of folders/files for which NOTHING should be done. Don't fix headers,
 text, or path. Leave them untouched.
 
-This section is usually used for files/folders which DO NOT belong to you, or 
+This section is usually used for files/folders which DO NOT belong to you, or
 are auto-generated outside your project.
 
 ### skip_file
-'metadata.py' may fix the path, but not the internal contents of the file.
+'pybaker.py' may fix the path, but not the internal contents of the file.
 
-This is equivalent to placing the same file in both 
-'skip_header' and 'skip_text'.
+This is equivalent to placing the same file in both 'skip_header' and
+'skip_text'.
 
-This section is used for things like images, where the contents of the file are 
+This section is used for things like images, where the contents of the file are
 not text.
 
 ##### skip_header
-'metadata.py' may fix the contents of the file, as well as the path, but not the 
+'pybaker.py' may fix the contents of the file, as well as the path, but not the
 header contents.
 
 This section is rarely used.
 
 ### skip_text
-'metadata.py' may fix the header, as well as the path, but not the other
-contents of the file.
+'pybaker.py' may fix the header, as well as the path, but not the other contents
+of the file.
 
-This section is commonly used for config files where the
-header should match the project, but the contents should not be altered. 
+This section is commonly used for config files where the header should match the
+project, but the contents should not be altered. 
 
-*Note that 'skip_text' should ALWAYS include 'metadata.py', 'settings.json', 
-and 'strings.json', and should NEVER include 'blacklist.json'. This is because 
-these files have certain keywords which need to be replaced (or not replaced) 
-in order for 'metadata.py'. function correctly.*
+*Note that 'skip_text' should ALWAYS include 'pybaker.py', 'settings.json', and
+'strings.json', and should NEVER include 'blacklist.json'. This is because these
+files have certain keywords which need to be replaced (or not replaced) in order
+for 'pybaker.py'. function correctly.*
 
 ### skip_path
-'metadata.py' may fix the header, as well as the contents, but not the path of 
+'pybaker.py' may fix the header, as well as the contents, but not the path of
 the file.
 
 This section is rarely used.
 
 ## Strings.json
-You should edit this file by hand before running 'metadata.py'. This file is
-used by 'metadata.py' to determine what strings should be replaced in the
-project.
+You should edit this file by hand before running 'pybaker.py'. This file is used
+by 'pybaker.py' to determine what strings should be replaced in the project.
 
 This is a sample structure of 'strings.json':
 
@@ -219,8 +270,8 @@ notation](https://semver.org/)) of this project, and all other version numbers
 should be superseded by this string. Value is a string.
 
 ### PP_SHORT_DESC
-This is the short description of the project, used in 'README.md'
-and 'pyproject.toml', as well as the GUI "About" dialog. Value is a string.
+This is the short description of the project, used in 'README.md' and
+'pyproject.toml', as well as the GUI "About" dialog. Value is a string.
 
 ### PP_KEYWORDS
 This is an array of keywords for the project, for use in 'pyproject.toml' for
@@ -399,9 +450,9 @@ If the entry does not match, it will be ignored, and an error will be printed.
 
 ## Settings.json
 
-You should NOT edit this file by hand. It is created when PyPlate creates a new 
-project, and the dictionary is filled automatically. This file is used by 
-'metadata.py' to get the initial project settings.
+You should NOT edit this file by hand. It is created when PyPlate creates a new
+project, and the dictionary is filled automatically. This file is used by
+'pybaker.py' to get the initial project settings.
 
 It is explained here only to show what it contains.
 
@@ -424,44 +475,44 @@ This the basic structure of 'settings.json':
 
 ### Type
 
-Indicates the type of project, "m" for module, "p" for package, "c" for CLI, 
-and "g" for GTK GUI.
+Indicates the type of project, "m" for module, "p" for package, "c" for CLI, and
+"g" for GTK GUI.
 
  ## Info
 
  ### \_\_PP_NAME_BIG__
 
- The properly capitalized name of the project, for use in strings displayed to 
+ The properly capitalized name of the project, for use in strings displayed to
  the user.
 
  ### \_\_PP_NAME_SMALL__
 
- The lowecase version of the project name, used internally by PyPlate and 
- metadata.py.
+ The lowecase version of the project name, used internally by pymaker.py and
+ pybaker.py.
 
   ### \_\_PP_DATE__
 
-  The date the project was created, used internally by PyPlate and metada.py.
+  The date the project was created, used internally by pymaker.py and metada.py.
 
 <hr>
 
-After these files have been edited appropriately, run 'metadata.py' from the
+After these files have been edited appropriately, run 'pybaker.py' from the
 'conf' directory to update the metadata in the project. This module can be run
 any time AFTER the project has been created to update the metadata in the
 project. Here is an example for a project of type 'm' (module) named 'ModTest':
 
 ``` bash
 foo@bar:~$ cd ~/Documents/Projects/Python/Libs/ModTest/conf
-foo@bar:~/Documents/Projects/Python/Libs/ModTest/conf$ ./metadata.py
+foo@bar:~/Documents/Projects/Python/Libs/ModTest/conf$ ./pybaker.py
 ```
 
-'modtext.py' will print any errors it finds, along with the filename and line 
+'modtext.py' will print any errors it finds, along with the filename and line
 number, so you can correct them.
 
 ## Notes
-If you make any changes to this template to better suit your own style/setup, 
-please let me know or send a pull request. I will take a look and see if I can 
-incorporate your changes to make them user-agnostic. This way the template can 
+If you make any changes to this template to better suit your own style/setup,
+please let me know or send a pull request. I will take a look and see if I can
+incorporate your changes to make them user-agnostic. This way the template can
 hopefully become more customizable to suit everyone's needs.
 
 ## -)

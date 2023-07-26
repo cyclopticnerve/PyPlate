@@ -12,6 +12,8 @@
     dir - up to name or if a folder
 [] >2part vars: \b[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]+
 
+[] check for single quotes: (?<!")"(?!") (skips triple-doubles in docstrings)
+[] also check for empty double quotes: (?<!")""(?!")
 [] all globals lowercase starting with g_
 [] all constants UPPERCASE
 [] no += for strings

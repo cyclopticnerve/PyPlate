@@ -131,7 +131,7 @@ class Main(object):
         # AS LITTLE coding in the constructor method because the whole class may
         # not exist at this point! you should definitely not call get/set
         # methods to init controls. these methods/controls may not exist at the
-        # time you call them. so to initilize scalar properties, set them
+        # time you call them. so to initialize scalar properties, set them
         # empirically rather than using setter methods.
 
         # set the initial value of foo
