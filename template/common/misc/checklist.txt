@@ -23,6 +23,8 @@ Initialize
 
 Release
 
+    [] Update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
+
     Glade
         [] icon in src is 128x128 png
         [] Toolkit version matches gi.repository number
@@ -39,9 +41,8 @@ Release
     VSCodium
 
         All
-            [] Update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
-            [] Do styleguide for all files in tree (misc/style.txt)
-            [] Screenshot in README folder
+            [] Do style guide for all files in tree (misc/style.txt)
+            [] Screenshot in misc/README
             [] TODO tree
             [] todo.txt file
             [] Check all noqa for good use

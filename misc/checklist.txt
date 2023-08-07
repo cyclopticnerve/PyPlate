@@ -2,6 +2,8 @@
 Initialize
 
     VSCodium
+        [] Create venv - $ python -m venv .venv
+        [] Activate venv - $ source .venv/bin/activate
         [] Install reqs - $ python -m pip install -r requirements.txt
 
         Mod/Pkg
@@ -25,12 +27,16 @@ Release
     [] Update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
 
     Glade
+        [] icon in src is 128x128 png
         [] Toolkit version matches gi.repository number
-        [] All I18N strings
+        [] All I18N strings must have comments
         [] About dialog icon path
-        [] File properties in Glade - errors, 
+        [] File properties in Glade - errors, load images from rel,
 
     I18N
+        [] Use gettext _ for all user-facing strings
+        [] Format numbers/dates/currency 
+            https://phrase.com/blog/posts/beginners-guide-to-locale-in-python/
         [] Do I18N for .po/.pot in src/gui/locale
                 
     VSCodium
@@ -45,12 +51,11 @@ Release
             [] Update extra files in MANIFEST.in
             [] README usage/notes
             [] Change version number in conf/strings.json
-
             [] Do reqs - $ python -m pip freeze > requirements.txt
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
             [] Generate docs - $ python -m pdoc --html -f -o docs src
             [] Run conf/pybaker.py
-
+            [] Update VSCodeCounter
             [] Commit/push 'dev' for 'next release'
 
         Branch 'dev'

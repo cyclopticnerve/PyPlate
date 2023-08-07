@@ -48,6 +48,35 @@ class Main(object):
     """
 
     # --------------------------------------------------------------------------
+    # Class methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
+    def __init__(self):
+        """
+            Initialize the new object
+
+            Initializes a new instance of the class, setting the default values
+            of its properties, and any other code that needs to run to create a
+            new object.
+        """
+
+        # call super init to initialize the base class
+        super().__init__()
+
+        # NB: something i learned the hard way from c++ coding: you want to do
+        # AS LITTLE coding in the constructor method because the whole class may
+        # not exist at this point! you should definitely not call get/set
+        # methods to init controls. these methods/controls may not exist at the
+        # time you call them. so to initialize scalar properties, set them
+        # empirically rather than using setter methods.
+
+        # set the initial value of class
+        self.foo = 'foo'
+
+    # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
@@ -107,34 +136,5 @@ class Main(object):
         """
 
         return ('this is _foo')
-
-    # --------------------------------------------------------------------------
-    # Class methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Initialize the new object
-    # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-            Initialize the new object
-
-            Initializes a new instance of the class, setting the default values
-            of its properties, and any other code that needs to run to create a
-            new object.
-        """
-
-        # call super init to initialize the base class
-        super().__init__()
-
-        # NB: something i learned the hard way from c++ coding: you want to do
-        # AS LITTLE coding in the constructor method because the whole class may
-        # not exist at this point! you should definitely not call get/set
-        # methods to init controls. these methods/controls may not exist at the
-        # time you call them. so to initialize scalar properties, set them
-        # empirically rather than using setter methods.
-
-        # set the initial value of foo
-        self.foo = 'foo'
 
 # -)

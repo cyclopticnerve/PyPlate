@@ -236,7 +236,7 @@ if __name__ == '__main__':
     # create our one set of args
     _parse_args()
 
-    # set defualt path
+    # set default path
     path = PATH_CONFIG_DEF
 
     # check if there is an arg for config path

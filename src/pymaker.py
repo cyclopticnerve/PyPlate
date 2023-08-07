@@ -63,7 +63,7 @@ DICT_USER = {
     # but i think for now i will leave this as a user-editable string and place
     # it in the realm of 'edit it before you run' along with
     # author/email/license...
-    '__PP_DATE_FMT__':      '%m/%d/%Y',
+    '__PP_DATE_FMT__':      '%m/%d/%Y'
 }
 
 # the types of projects this script can create
@@ -72,10 +72,10 @@ DICT_USER = {
 # val[1] is the subdir name under DIR_BASE where the project will be created
 # val[2] is the dir under 'template' to get the files from
 DICT_TYPES = {
-    'm': ['Module',     'Modules',  'mod'],
-    'p': ['Package',    'Packages', 'pkg'],
     'c': ['CLI',        'CLIs',     'cli'],
-    'g': ['GUI',        'GUIs',     'gui']
+    'g': ['GUI',        'GUIs',     'gui'],
+    'm': ['Module',     'Modules',  'mod'],
+    'p': ['Package',    'Packages', 'pkg']
 }
 
 # the list of keys to replace in the header of each file
@@ -136,22 +136,22 @@ DICT_BLACKLIST = {
         'requirements.txt'
     ],
 
-    # skip headers, skip text, fix path
+    # skip header, skip text, fix path
     'PP_SKIP_FILE': [
         '__PP_NAME_SMALL__.png'
     ],
 
-    # skip headers, fix text, fix path
+    # skip header, fix text, fix path
     'PP_SKIP_HEADER': [],
 
-    # fix headers, skip text, fix path
+    # fix header, skip text, fix path
     'PP_SKIP_TEXT': [
         'conf',
         'MANIFEST.in',
         '.gitignore'
     ],
 
-    # fix headers, fix text, skip path
+    # fix header, fix text, skip path
     'PP_SKIP_PATH': []
 }
 
@@ -195,7 +195,6 @@ g_dict_settings = {
     '__PP_EMAIL__':      DICT_USER['__PP_EMAIL__'],
     '__PP_LICENSE__':    DICT_USER['__PP_LICENSE__'],
     '__PP_DATE_FMT__':   DICT_USER['__PP_DATE_FMT__']
-
 }
 
 # this dict is only used internally by pymaker.py
@@ -343,20 +342,11 @@ def copy_template():
     dir_prj = g_dict_project['PP_DIR_PRJ']
     os.makedirs(dir_prj)
 
-    # create list of source dirs
-    # add common
-    list_src = ['common']
-
-    # add project type source
-    type_prj = g_dict_project['PP_TYPE_PRJ']
-    dir_src = DICT_TYPES[type_prj][2]
-    list_src.append(dir_src)
-
     # NB: I tried this both ways:
 
     # 1. template/src/type/file
     # this made a cleaner tree, but an uglier code base
-    # also i had to add an 'extras' folder for MANIFEST/pyproject to reduce
+    # also i had to add an 'extras' folder for MANIFEST/pyproject to avoid
     # recursion/manually adding them
     # this also negated the option of combining them into a single loop
 
@@ -367,6 +357,15 @@ def copy_template():
     # project, and everything under the type dir also ends up at the root level
     # of the project
     # this was also able to add everything into a single loop
+
+    # create list of source dirs
+    # add common
+    list_src = ['common']
+
+    # add project type source
+    type_prj = g_dict_project['PP_TYPE_PRJ']
+    dir_src = DICT_TYPES[type_prj][2]
+    list_src.append(dir_src)
 
     # list_src is now ['common', project type src]
     for item in list_src:
@@ -398,7 +397,7 @@ def copy_template():
     # resulting files are part of the project, they are just empty to start
     # whereas the stuff in do_extras MUST be initialized AFTER the project
     # exists
-    # also we may want to modify them during _recurse_and_fix()
+    # also we may want to modify them during _walk_and_fix()
 
     # write DICT_BLACKLIST to conf file
     path_to = os.path.join(dir_prj, 'conf', 'blacklist.json')
@@ -419,23 +418,20 @@ def copy_template():
         f.write(dict_settings)
 
 # ------------------------------------------------------------------------------
-# Recursively scan folders/files in the project for replace/rename
+# Scan folders/files in the project for replace/rename
 # ------------------------------------------------------------------------------
-def walk_and_fix(dir):
+def walk_and_fix(path):
     """
-        Recursively scan folders/files in the project for replace/rename
+        Scan folders/files in the project for replace/rename
 
         Parameters:
             dir: The directory to start recursively scanning from
 
-        This is a recursive function to scan for folders/files under a given
-        folder. It iterates over the contents of the 'dir' folder, starting at
-        the project's location. It checks if each item is a file or a folder. If
-        it encounters a folder, it calls itself recursively, passing that folder
-        as the parameter. If it encounters a file, it calls methods to do text
-        replacement of headers, then other text. Finally it renames the file if
-        the path contains a replacement key. Once all files are fixed, it will
-        then bubble up to fix all folders.
+        This function scans for folders/files under a given folder. It iterates
+        over the contents of the 'dir' folder, starting at the project's
+        location. For each file/folder it encounters, it passes the path to a
+        filter to determine if the file needs fixing based on its appearance in
+        the blacklist.
     """
 
     # get the lists of excluded files/folders
@@ -447,27 +443,27 @@ def walk_and_fix(dir):
     skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST['PP_SKIP_PATH']]
 
     # walk from project dir
-    for root, dirs, files in os.walk(dir):
+    for root, dirs, files in os.walk(path):
 
         # readme (fix before any path changes)
         for f in files:
             if f == 'README.md':
-                path = os.path.join(root, f)
-                _fix_readme(path)
+                path_rm = os.path.join(root, f)
+                _fix_readme(path_rm)
 
         # remove any dirs/files in skip_all for next iteration
         dirs[:] = [d for d in dirs if d not in skip_all]
         files[:] = [f for f in files if f not in skip_all]
 
-        # # header
+        # header
         exclude = skip_all + skip_file + skip_header
         _filter_header(root, files, exclude)
 
-        # # text
+        # text
         exclude = skip_all + skip_file + skip_text
         _filter_text(root, files, exclude)
 
-        # # path
+        # path
         exclude = skip_all + skip_path
         _filter_path(root, files, exclude)
 
@@ -651,7 +647,7 @@ def _fix_readme(path):
     """
 
     # open file
-    with open(path, 'r') as f:
+    with open(path, 'r+') as f:
         lines = f.readlines()
 
         # NB: the strategy here is to go through the full README and only copy
@@ -702,8 +698,7 @@ def _fix_readme(path):
             if RM_DELETE_END in line:
                 ignore = False
         
-    # save lines to README.md
-    with open(path, 'w') as f:
+        # save lines to README.md
         f.writelines(new_lines)
 
 # ------------------------------------------------------------------------------
@@ -725,7 +720,7 @@ def _fix_header(path):
         to your style of header should be easy using the regex, and modifying
         DICT_HEADER to suit.
     """
-    with open(path, 'r') as f:
+    with open(path, 'r+') as f:
         lines = f.readlines()
 
         # for each line in array
@@ -791,8 +786,7 @@ def _fix_header(path):
                 str_rep = rf'\g<1>\g<2>\g<3>{val}\g<5>{str_spaces}\g<7>'
                 lines[i] = re.sub(pattern, str_rep, lines[i])
 
-     # save lines to README.md
-    with open(path, 'w') as f:
+        # save lines to README.md
         f.writelines(lines)
 
 # ------------------------------------------------------------------------------
@@ -810,7 +804,7 @@ def _fix_text(path):
         __PP_...  stuff inside the file, excluding headers (which are
         already handled).
     """
-    with open(path, 'r') as f:
+    with open(path, 'r+') as f:
         lines = f.readlines()
 
         # for each line in array
@@ -824,8 +818,7 @@ def _fix_text(path):
                     # replace text with new value
                     lines[i] = lines[i].replace(key, val)
 
-    # save lines to file
-    with open(path, 'w') as f:
+        # save lines to file
         f.writelines(lines)
 
 # ------------------------------------------------------------------------------
@@ -843,28 +836,24 @@ def _fix_path(path):
         g_dict_settings keys with their appropriate replacements.
     """
 
-    # make sure there are no slashes
-    # path_old = path.strip(os.sep)
+    # first take the path apart (we only want to change the last component)
+    split = os.path.split(path)
+    path_dir = split[0]
+    file_name = split[1]
 
-    # # split the path into everything up to last part, and last part itself
-    # head, tail = os.path.split(path_old)
-
-    # # replace dunders in last path component
-    # for key in g_dict_settings.keys():
-    #     tail = tail.replace(key, g_dict_settings[key])
-
-    # # put new name back with the 'up to last' part
-    # path_new = os.path.join(head, tail)
-
-    # # do the rename
-    # os.rename(path_old, path_new)
-
-    path_new = path
+    # replace dunders in last path component
     for key in g_dict_settings.keys():
-        path_new = path_new.replace(key, g_dict_settings[key])
+        file_name = file_name.replace(key, g_dict_settings[key])
 
+    # put the new path back together
+    path_new = os.path.join(path_dir, file_name)
+
+    # if it hasn't changed, skip to avoid overhead
+    if path_new == path:
+        return
+
+    # do rename
     os.rename(path, path_new)
-
 
 # ------------------------------------------------------------------------------
 # Check project name for allowed characters
@@ -916,12 +905,12 @@ def _check_name(name):
     pattern = r'(^[a-zA-Z\d\-_]*$)'
     res = re.search(pattern, name)
     if not res:
-        print('Project names must contain only letters, numbers, dashes (-), or  underscores (_)')
+        print('Project names must contain only letters, numbers, dashes (-), \
+            or underscores (_)')
         return False
 
     # if we made it this far, return true
     return True
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
