@@ -1,7 +1,4 @@
 
-
-TODO remove .py ect from executsble files
-i.e. timeshift, timeshift-gtk
 TODO: fix blacklist.json should be done in pymaker.py
 right now fix blacklist is in pybaker.py
 does it not do this as part of fix_text(conf)?
@@ -14,6 +11,8 @@ TODO: how to handle screenshot in readme? should be done by pybaker (after we ge
 TODO: make pybaker check for empty entries in header (not just dunders)
 
 
+NEXT remove .py ext from executable files
+i.e. timeshift, timeshift-gtk
 NEXT: add logging to all templates
 NEXT: put ALL dicts from pymaker into conf file
 NEXT: replace project name in misc file headers
