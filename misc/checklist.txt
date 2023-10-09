@@ -5,6 +5,7 @@ Initialize
         [] Create venv - $ python -m venv .venv
         [] Activate venv - $ source .venv/bin/activate
         [] Install reqs - $ python -m pip install -r requirements.txt
+        [] Install pylama - $ python -m pip install pylama
 
         Mod/Pkg
             [] Install in venv - $ python -m pip install -e .  
@@ -23,8 +24,7 @@ Initialize
 
 Release
 
-    [] Diff main PyPlate dir with template (before metadata)
-    [] Update tree - $ tree --dirsfirst --noreport -n --gitignore -o misc/tree.txt 
+    [] Update tree (should be done in pybaker.py)
 
     Glade
         [] icon in src is 128x128 png
@@ -46,14 +46,15 @@ Release
             [] Screenshot in misc/README
             [] TODO tree
             [] todo.txt file
-            [] Check all noqa for good use
             [] Check dependencies in pyproject.toml and install.py
             [] Update extra files in MANIFEST.in
             [] README usage/notes
             [] Change version number in conf/strings.json
             [] Do reqs - $ python -m pip freeze > requirements.txt
             [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
-            [] Generate docs - $ python -m pdoc --html -f -o docs src
+            [] Generate docs
+            cd <pkg name>
+            python -m pdoc -o ../docs -d google --favicon "https://github.com/cyclopticnerve.png" --footer-text "\"In the kingdom of the blind, the man with one eye is King.\"" --logo "https://github.com/cyclopticnerve.png?size=64" *.py
             [] Run conf/pybaker.py
             [] Update VSCodeCounter
             [] Commit/push 'dev' for 'next release'

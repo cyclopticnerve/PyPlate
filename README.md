@@ -9,18 +9,13 @@
 # PyPlate
 
 ## "It mostly works™"
+
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
-<!-- __RM_SHORT_DESC_START__ -->
-A program for creating module/package/CLI/GUI projects in Python from a template
-<!-- __RM_SHORT_DESC_END__ -->
-
-<!-- ![Screenshot](README/screenshot.jpg) -->
+A program for creating CLI/GUI/module/package projects in Python from a template
 
 ## Requirements
-<!-- __RM_PY_DEPS_START__ -->
 None
-<!-- __RM_PY_DEPS_END__ -->
 
 ## Installing
 You can download the (hopefully stable) [latest
@@ -45,7 +40,8 @@ foo@bar:~/Downloads$ mv PyPlate ~/Documents/Projects/Python
 Lastly, you can delete the downloaded folder, if you copied it.
 
 ## Uninstalling
-Just delete the 'PyPlate' folder from wherever you put it in the install step.
+Just delete the 'PyPlate' folder from wherever you put it in the install step. 
+PyPlate does not install anything on your system.
 
 ## Usage
 PyPlate consists of two main scripts, 'pymaker.py' and 'pybaker.py'. The first
@@ -53,7 +49,6 @@ is used to create the project, and the second is used to update an existing
 project as its development continues.
 
 Let us start with 'pymaker.py'.
-<hr>
 
 ## PyMaker.py
 Before you do anything, you should edit the 'user.json' file in 'PyPlate/conf'.
@@ -116,7 +111,7 @@ where:
 A single letter (like 'm' for module projects)
 
 ### long_type_name
-Tthe name to display when asking for a project type (ie. 'Module')
+The name to display when asking for a project type (ie. 'Module')
 
 ### destination_folder
 The name of the folder under 'DIR_BASE' (explained below) to put the project in  
@@ -148,7 +143,7 @@ That's it! From there you are free to modify the projects in your favorite IDE.
 
 ## PyBaker.py / Updating the project
 Once you have created a project, you can use 'pybaker.py' in the project's
-'conf' directory to update metada in the project's files.
+'conf' directory to update metadata in the project's files.
 
 'pybaker.py' is a script which will replace certain keywords in the project
 directory. These keywords are placed in files in the 'conf' directory of your
@@ -166,7 +161,7 @@ You should edit this file by hand before running 'pybaker.py'. This file is used
 by 'pybaker.py' to determine which files/folders it can (or rather, *can't*)
 operate on.
 
-Files in the new project are divided, internally, into four cateigories:
+Files in the new project are divided, internally, into four categories:
 1. the file's COMPLETE contents
 2. the file's headers
 3. the file's text (other that the header)
@@ -293,7 +288,8 @@ each value quoted, and separated by a comma.
 ### PP_GUI_CATEGORIES
 This is an array of categories used in the '.desktop' file of a GUI program, to
 present in a menu-based Desktop UI (think windows start menu grouping). Value is
-an array, with each value separated by a semiquote, and must end with semiquote.  
+an array, with each value separated by a semicolon, and must end with a 
+semicolon.  
 
 Each entry must match an entry in the following list:
 
@@ -487,12 +483,12 @@ Indicates the type of project, "m" for module, "p" for package, "c" for CLI, and
 
  ### \_\_PP_NAME_SMALL__
 
- The lowecase version of the project name, used internally by pymaker.py and
+ The lowercase version of the project name, used internally by pymaker.py and
  pybaker.py.
 
   ### \_\_PP_DATE__
 
-  The date the project was created, used internally by pymaker.py and metada.py.
+  The date the project was created, used internally by pymaker.py and pybaker.py.
 
 <hr>
 
@@ -506,7 +502,7 @@ foo@bar:~$ cd ~/Documents/Projects/Python/Libs/ModTest/conf
 foo@bar:~/Documents/Projects/Python/Libs/ModTest/conf$ ./pybaker.py
 ```
 
-'modtext.py' will print any errors it finds, along with the filename and line
+'modtest.py' will print any errors it finds, along with the filename and line
 number, so you can correct them.
 
 ## Notes

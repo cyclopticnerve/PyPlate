@@ -1,16 +1,32 @@
 
-TODO: fix blacklist.json should be done in pymaker.py
-right now fix blacklist is in pybaker.py
-does it not do this as part of fix_text(conf)?
-but pymaker does not fix anything in conf
 
-TODO: venv doesn't work
+
+TODO: move all strings to G_STR section in pybaker
+TODO: make tree happen in pybaker
+
+TODO: use cli from cntree for pymaker
+TODO: update metadata in cli (desc, name, version)(may need context)
+
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
-TODO: how to handle screenshot in readme? should be done by pybaker (after we get a screenshot obvs)
+TODO: how to handle screenshot in readme? should be done by pybaker
+(after we get a screenshot obviously)
 TODO: make pybaker check for empty entries in header (not just dunders)
 
 
+NEXT: convert all with open() to with path.open()
+NEXT: format license name in fix_readme to account for missing values
+see license_text.py and google doc
+NEXT: show output progress in pymaker
+NEXT: move all config shit to config.py and load into g_dict_setting
+NEXT: make base relocatable
+NEXT: figure out a regex to reset checklist
+NEXT: make pytree accept cmd line
+NEXT: think of better name for pytree
+NEXT: pytree as separate project
+NEXT: pytree accept format string for names ('[] $NAME')
+NEXT: combine default cli and default cli_config
+NEXT: convert all paths to pathlib
 NEXT remove .py ext from executable files
 i.e. timeshift, timeshift-gtk
 NEXT: add logging to all templates
@@ -37,15 +53,15 @@ NEXT: check for gtk version 3/4
    load ui file based on installed GTK version
 NEXT: icons of diff sizes? for desktop/ui
 NEXT: need a better way to do headers that doesn't rely on dunders
-something like anything more that 2 spaces is formated to 80?
+something like anything more that 2 spaces is formatted to 80?
 NEXT: check for string empty fields that are essential(desc,ver,)
 NEXT: restructure docstrings - https://www.datacamp.com/tutorial/docstrings-python
 also look at official python docs or autoDocstring ext
 check for docstrings linter? pydocstyle?
-how to document text/json files in docs? add files? and how to add LOONG documentation
-to docs? i.e. long descs of each param?
+how to document text/json files in docs? add files? and how to add LONG documentation
+to docs? i.e. long descriptions of each param?
 NEXT: pybaker.py should do replacements first, then do checks
-NEXT: pybaker.py: consts to dunders - use find/replace
+NEXT: pybaker.py: constants to dunders - use find/replace
 NEXT: add version number as a heading to README
 NEXT: add changelog to README
 NEXT: pymaker should only do dunders in source folder and top level files
@@ -76,6 +92,13 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: fix blacklist.json before pymaker.py
+DONE: see what path constants show up in docs with my name in them,
+ and make them hidden (start with underscore)
+DONE: venv doesn't work
+works, but throws ugly 'frozen modules' text when run from debug
+does not happen when run from terminal
+DONE: add globs for blacklist
 DONE: check all keys in pymaker.py dicts (all caps, some dunders)
 DONE: pymaker doesn't replace PP_AUTHOR in README
 DONE: check if pymaker handles empty values in header (blanks remain blank)
@@ -85,11 +108,11 @@ DONE: pymaker doesn't replace PP_AUTHOR_or PP_LICENSE in headers
 DONE: rename pyplate.py to pymaker.py and pybaker.py to pybaker.py
 DONE: Add author and license somewhere in pymaker so users don't have to do 
 find/replace everywhere in template
-DONE: what settings do we need in metadaa?
+DONE: what settings do we need in metadata?
 DONE: get rid of project type in settings.json
 DONE: remove my name from conf/settings.json
 DONE: if link is blank in strings.json, don't make link in readme 
-DONE: check that cats end in semiquote
+DONE: check that cats end in semicolon
 DONE: put all readme in same doc
 DONE: strings.json PP_PY_DEPS/PP_SYSDEPS/PP_GUI_CATEGORIES is array
 DONE: do we really need the _split_str function? (change readme for arrays instead of string)
@@ -159,9 +182,9 @@ Still working on this - need to compare tags but no tags in dev
 Can't compare tags in main as changelog will be modified after tag is added
 
 when creating a CLI or GUI app, after creating venv, download and install 
-installerator and configurator and build and pylama
+installerator and configurator and build and pylinter
 default install script should be modified by PyPlate to download and install 
-installator and configurator in the prerequisites
+installerator and configurator in the prerequisites
 Add pip install from GitHub instructions to readme
 How to know if we are using the latest version of PyPlate, installer and 
 configurator

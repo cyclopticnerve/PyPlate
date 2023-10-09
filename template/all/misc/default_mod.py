@@ -1,42 +1,28 @@
-#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: uninstall.py                                          |     ()     |
+# Filename: default_mod.py                                        |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
-
-"""
-    This module defines the options for Uninstallerator and runs it
-"""
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
-import installerator
+import os
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
+# some useful constants
+DIR_SELF = os.path.dirname(__file__)
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
-
-# define the uninstall settings
-g_dict_uninstall = {
-    'general': {
-        'name': '__PP_NAME_BIG__'
-    },
-    'preflight': [
-    ],
-    'dirs': [
-        '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
-    ],
-    'files': {
-    },
-    'postflight': [
-    ]
-}
 
 
 # ------------------------------------------------------------------------------
@@ -44,36 +30,51 @@ g_dict_uninstall = {
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Run the Uninstaller module
+# Short description
 # ------------------------------------------------------------------------------
-def main():
+def func():
     """
-        Run the Uninstaller module
+        Short description
 
-        This is the main uninstaller function, which creates an instance of the
-        Uninstaller class and runs it's main function, with the global
-        dictionary created above.
+        Arguments:
+            var_name: Description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
     """
 
-    # instantiate uninstallerator class
-    # package.module.class
-    uninstaller = installerator.uninstallerator.Uninstallerator()
-
-    # # run the instance
-    # class.method
-    uninstaller.run(g_dict_uninstall)
+    print('this is func')
+    return _func()
 
 
 # ------------------------------------------------------------------------------
-# Code to run when called from command line
+# Private functions
 # ------------------------------------------------------------------------------
-if __name__ == '__main__':
 
-    #     Code to run when called from command line
+# ------------------------------------------------------------------------------
+# Short description
+# ------------------------------------------------------------------------------
+def _func():
+    """
+        Short description
 
-    #     This is the top level code of the program, called when the Python file
-    #     is invoked from the command line.
+        Parameters:
+            var_name: Description
 
-    main()
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+    """
+
+    return ('this is _func')
 
 # -)

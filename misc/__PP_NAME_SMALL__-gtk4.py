@@ -4,21 +4,26 @@
 # Filename: __PP_NAME_SMALL__-gtk4.py                             |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE__                                         \          /
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
+
+""" 
+    This is a module to present a GUI interface using GTK4
+"""
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
+# system imports
 import argparse
 import os
 
+# PyGObject imports
 import gi
 gi.require_version('Adw', '1')
 gi.require_version('Gtk', '4.0')
-from gi.repository import Adw, Gtk  # noqa: E402 (import not at top of file)
-
+from gi.repository import Adw, Gtk  # pylint: disable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -44,12 +49,22 @@ def main():
     gui_path = os.path.join(curr_dir, 'gui', '__PP_NAME_SMALL__-gtk4.ui')
 
     class MyApp(Adw.Application):
+        '''
+            class docstring
+        '''
 
         def __init__(self, **kwargs):
+            ''' 
+                func docstring
+            '''
+
             super().__init__(**kwargs)
             self.connect('activate', self.on_activate)
 
-        def on_activate(self, app):
+        def on_activate(self, _app):
+            ''' 
+                func docstring
+            '''
 
             # load file from abs path
             builder = Gtk.Builder(self)
@@ -60,7 +75,11 @@ def main():
             self.add_window(win)
             win.present()
 
-        def clicked(self, obj):
+        def clicked(self, _obj):
+            ''' 
+                func docstring
+            '''
+
             print('click')
 
     # show the window
@@ -73,11 +92,11 @@ def main():
 # ------------------------------------------------------------------------------
 # Add command line args to the parser
 # ------------------------------------------------------------------------------
-def add_args(argparser):
+def add_args(_argparser):
     """
         Adds command line args to the parser
 
-        Parameters:
+        Arguments:
             argparser: The argparse object to add args to
 
         This function adds arguments to the parser. It is teased out to make
@@ -86,7 +105,7 @@ def add_args(argparser):
 
     # https://docs.python.org/3/library/argparse.html
 
-    # argparser.add_argument('-f')
+    # _argparser.add_argument('-f')
 
 
 # ------------------------------------------------------------------------------
@@ -139,13 +158,8 @@ def _parse_args():
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    """
-        Code to run when called from command line
 
-        This is the top level code of the program, called when the Python file
-        is invoked from the command line.
-    """
-
+    # run the main function
     main()
 
 # -)
