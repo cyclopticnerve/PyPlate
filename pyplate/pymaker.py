@@ -66,7 +66,9 @@ DICT_USER = {
     "__PP_LICENSE_IMG__": "https://img.shields.io/badge/License-WTFPL-brightgreen.svg",
     # the url for license image click
     "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
-    # the screenshot to use in the README
+    # the license file to use
+    "__PP_LICENSE_FILE__": "LICENSE.txt",
+    # the screenshot to use in  README.md
     "__PP_SCREENSHOT__": "",
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a two-digit
@@ -97,12 +99,10 @@ DICT_TYPES = {
 # the file header line should contain lines that match the pattern:
 # '# <Key>: <val> ...'
 # or
-# '<!-- <key>:<val> ...'
+# '<!-- <key>: <val> ...'
 # where <key> is one of the items here, and <val> is one of the keys from
 # G_DICT_SETTINGS
-# if <key> does not match one of these items or <val> does not match one of the
-# keys from G_DICT_SETTINGS, it is left untouched
-# see the source of template/all/README.md for an example
+# if <key> does not match one of these items, the line is left untouched
 # an example header:
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
@@ -111,14 +111,31 @@ DICT_TYPES = {
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
-# spaces don't matter, but the colon does. also, right aligned text at the end
-# of each line will be preserved.
+# spaces don't matter, but the colon does
+# right aligned text at the end of each line will be preserved
+# the first entry in each sub-list is the key to look for, and the second entry
+# is the default G_DICT_SETTINGS key to use if the value is empty
 LIST_HEADER = [
-    "Project",  # PyPlate
-    "Filename",  # pyplate.py
-    "Date",  # 12/08/2022
-    "Author",  # cyclopticnerve
-    "License",  # WTFPLv2
+    [
+        "Project",
+        "__PP_NAME_BIG__",
+    ],  # PyPlate
+    [
+        "Filename",
+        "__PP_NAME_SMALL__",
+    ],  # pyplate.py
+    [
+        "Date",
+        "__PP_DATE__",
+    ],  # 12/08/2022
+    [
+        "Author",
+        "__PP_AUTHOR__",
+    ],  # cyclopticnerve
+    [
+        "License",
+        "__PP_LICENSE_NAME__",
+    ],  # WTFPLv2
 ]
 
 # the dict of sections to remove in the README file
@@ -130,14 +147,19 @@ LIST_HEADER = [
 # remain in the file, and we don't want pybaker to report their presence as an
 # error
 # this way you can have different sections in the readme for things like
-# installation instructions, depending on whether your project is a python
-# package or a cli/gui app
+# installation instructions, depending on whether your project is a package or a
+# cli/gui app
 DICT_README = {
+    "file": "README.md",
     "license": {
         "RM_LICENSE_START": "<!-- __RM_LICENSE_START__ -->",
         "RM_LICENSE_END": "<!-- __RM_LICENSE_END__ -->",
     },
-    "cg": {
+    "c": {
+        "RM_DELETE_START": "<!-- __RM_PKG_START__ -->",
+        "RM_DELETE_END": "<!-- __RM_PKG_END__ -->",
+    },
+    "g": {
         "RM_DELETE_START": "<!-- __RM_PKG_START__ -->",
         "RM_DELETE_END": "<!-- __RM_PKG_END__ -->",
     },
@@ -149,6 +171,7 @@ DICT_README = {
 
 # this is the set of dirs/files we don't mess with in the final project
 # each item can be a full path , relative to the project directory, or glob
+# see https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
 # NB: you can use dunders here since the path is the last thing to get fixed
 # these dir/file names should match what's in the template dir (before any
 # modifications, hence using dunder keys)
@@ -163,7 +186,7 @@ DICT_BLACKLIST = {
         "misc",
         "README",
         "tests",
-        "locale",
+        "**/locale",
         "CHANGELOG.md",
         "LICENSE.txt",
         "requirements.txt",
@@ -172,7 +195,7 @@ DICT_BLACKLIST = {
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
     "PP_SKIP_CONTENTS": [
-        "__PP_NAME_SMALL__.png",
+        "**/__PP_NAME_SMALL__.png",
     ],
     # skip header, fix text, fix path (0 1 1)
     # NB: not sure what this is useful for, but here it is
@@ -181,13 +204,24 @@ DICT_BLACKLIST = {
     # NB: mostly used for files that contain dunders that will be replaced later
     # or files we only want to replace headers in
     "PP_SKIP_TEXT": [
-        "conf",
+        "conf/*",
         "MANIFEST.in",
         "**/.gitignore",
     ],
     # fix header, fix text, skip path (1 1 0)
-    # not really useful, since we always want to fix paths with dunders
+    # NB: not really useful, since we always want to fix paths with dunders, but
+    # included for completeness
     "PP_SKIP_PATH": [],
+    # list of dirs/files to ignore in output dir when creating the initial tree
+    # NB: each item can be a partial path relative to the project directory, or
+    # a glob
+    "PP_SKIP_TREE": [
+        ".git",
+        ".venv",
+        ".vscode",
+        ".VSCodeCounter",
+        "**/__pycache__",
+    ],
 }
 
 # the metadata that the final project will use for pybaker.py
@@ -208,13 +242,14 @@ DICT_METADATA = {
     "__PP_GUI_CATEGORIES__": [],
 }
 
+# TODO: use globs
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
 # this is so that when you update a file in the PyPlate project, it gets copied
 # to the project, and cuts down on duplicate files
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
-DICT_LINKS = {
+DICT_COPY = {
     ".gitignore": ".gitignore",
     "misc/checklist.txt": "misc/checklist.txt",
     "misc/snippets.txt": "misc/snippets.txt",
@@ -223,20 +258,9 @@ DICT_LINKS = {
     "pyplate/cntree.py": "conf/cntree.py",
 }
 
-# list of dirs/files to ignore in output dir when creating the initial tree
-# each item can be a partial path relative to the project directory, or a glob
-# see https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
-LIST_TREE_IGNORE = [
-    ".git",
-    ".venv",
-    ".vscode",
-    ".VSCodeCounter",
-    "**/__pycache__",
-]
-
-# in case we decide to switch to, eg., .rst or LaTeX
+# in case we decide to switch to, eg., rst or LaTeX
 # NB: this file will only be fixed if it is in the top-level dir of the project
-README_NAME = "README.md"
+# README_NAME = "README.md"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -252,17 +276,18 @@ G_DICT_SETTINGS = {
     "__PP_AUTHOR__": DICT_USER["__PP_AUTHOR__"],
     "__PP_EMAIL__": DICT_USER["__PP_EMAIL__"],
     "__PP_LICENSE_NAME__": DICT_USER["__PP_LICENSE_NAME__"],
+    "__PP_LICENSE_FILE__": DICT_USER["__PP_LICENSE_FILE__"],
     "__PP_DATE_FMT__": DICT_USER["__PP_DATE_FMT__"],
+    "__PP_README_FILE__": DICT_README["file"],
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_DIR_PRJ__": "",  # '~/Documents/Projects/Python/CLIs/PyPlate'
     "__PP_NAME_BIG__": "",  # PyPlate
     "__PP_NAME_SMALL__": "",  # pyplate
     "__PP_DATE__": "",  # 12/08/2022
-    "__PP_TREE_IGNORE__": LIST_TREE_IGNORE,
 }
 
 # the output project directory as a Path object (we use this A LOT)
-G_DIR_PRJ = Path('')
+G_DIR_PRJ = Path("")
 
 # ------------------------------------------------------------------------------
 # Strings
@@ -271,13 +296,14 @@ G_DIR_PRJ = Path('')
 G_STRINGS = {
     "S_PRJ_TYPE": "Project type",
     "S_PRJ_NAME": "Project name",
-    "S_NAME_ERR": "Project \"{}\" already exists in \"{}\"",
+    "S_NAME_ERR": 'Project "{}" already exists in "{}"',
     "S_DIR_FORMAT": " [] $NAME/",
     "S_FILE_FORMAT": " [] $NAME",
-    "S_PRJ_LEN": "Project names must be more than 1 character",
-    "S_PRJ_START": "Project names must start with a letter",
-    "S_PRJ_END": "Project names must end with a letter or number",
-    "S_PRJ_CONTAIN": (
+    "S_PRJ_TYPE": "Please enter a valid project type",
+    "S_PRJ_NAME_LEN": "Project names must be more than 1 character",
+    "S_PRJ_NAME_START": "Project names must start with a letter",
+    "S_PRJ_NAME_END": "Project names must end with a letter or number",
+    "S_PRJ_NAME_CONTAIN": (
         "Project names must contain only letters, numbers,"
         "dashes (-), or underscores (_)"
     ),
@@ -326,7 +352,7 @@ def get_project_info():
     G_DICT_SETTINGS.
     """
 
-    # ---------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     # first question is type
     # NB: keep asking until we get a response that is one of the types
@@ -355,7 +381,7 @@ def get_project_info():
     # get output subdir
     dir_type = DICT_TYPES[type_prj][1]
 
-    # ---------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     # next question is name
     # NB: keep asking until we get a response that is a valid name and does not
@@ -385,7 +411,7 @@ def get_project_info():
 
             # check if project already exists
             if tmp_dir.exists():
-                print(G_STRINGS['S_NAME_ERR'].format(name_prj, dir_type))
+                print(G_STRINGS["S_NAME_ERR"].format(name_prj, dir_type))
             else:
                 break
 
@@ -454,26 +480,39 @@ def do_before_fix():
     Adds dirs/files to the project before running the fix function.
     """
 
+    # NB: we write the blacklist to ensure it is the same as what's in this file
+    # before any modifications
+
+    def _write_file(a_dict, a_file):
+        with open(path_to, "w", encoding="UTF8") as a_file:
+            json.dump(a_dict, a_file, indent=4)
+
     # write DICT_BLACKLIST to conf file
     path_to = G_DIR_PRJ / "conf" / "blacklist.json"
-    with open(path_to, "w", encoding="UTF8") as a_file:
-        dict_blacklist = json.dumps(DICT_BLACKLIST, indent=4)
-        a_file.write(dict_blacklist)
+    _write_file(DICT_BLACKLIST, path_to)
+
+    # default blacklist
+    path_to = G_DIR_PRJ / "conf" / "defaults" / "blacklist_default.json"
+    _write_file(DICT_BLACKLIST, path_to)
 
     # write DICT_METADATA to conf file
     path_to = G_DIR_PRJ / "conf" / "metadata.json"
-    with open(path_to, "w", encoding="UTF8") as a_file:
-        dict_metadata = json.dumps(DICT_METADATA, indent=4)
-        a_file.write(dict_metadata)
+    _write_file(DICT_METADATA, path_to)
+
+    # default metadata
+    path_to = G_DIR_PRJ / "conf" / "defaults" / "metadata_default.json"
+    _write_file(DICT_METADATA, path_to)
 
     # write G_DICT_SETTINGS to conf file
     path_to = G_DIR_PRJ / "conf" / "settings.json"
-    with open(path_to, "w", encoding="UTF8") as a_file:
-        dict_settings = json.dumps(G_DICT_SETTINGS, indent=4)
-        a_file.write(dict_settings)
+    _write_file(G_DICT_SETTINGS, path_to)
+
+    # default settings
+    path_to = G_DIR_PRJ / "conf" / "defaults" / "settings_default.json"
+    _write_file(G_DICT_SETTINGS, path_to)
 
     # copy linked files
-    for key, val in DICT_LINKS.items():
+    for key, val in DICT_COPY.items():
         # first get full source path
         path_in = _DIR_PYPLATE / key
 
@@ -497,7 +536,7 @@ def do_fix():
     """
 
     # fix uo the blacklist and convert to absolute Path objects
-    _fix_blacklist()
+    _fix_blacklist_paths()
 
     # just shorten the names
     skip_all = DICT_BLACKLIST["PP_SKIP_ALL"]
@@ -526,14 +565,13 @@ def do_fix():
 
         # for each file item (not dirs, they will be handled on the next iter)
         for item in files:
-
             # skip file if in skip_all
             if item in skip_all:
                 continue
 
             # fix README if it is the top-level README.md
             # NB: need to do before any other stuff, requires special treatment
-            if root == G_DIR_PRJ and item.name == README_NAME:
+            if root == G_DIR_PRJ and item.name == DICT_README["file"]:
                 _fix_readme(item)
 
             # if we shouldn't skip contents
@@ -553,6 +591,9 @@ def do_fix():
         # fix current dir path
         if root not in skip_path:
             _fix_path(root)
+
+    # replace any dunders in blacklist before writing
+    _fix_blacklist_dunders()
 
 
 # ------------------------------------------------------------------------------
@@ -591,9 +632,9 @@ def do_after_fix():
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 str(G_DIR_PRJ),
-                filter_list=LIST_TREE_IGNORE,
-                dir_format=G_STRINGS['S_DIR_FORMAT'],
-                file_format=G_STRINGS['S_FILE_FORMAT'],
+                filter_list=DICT_BLACKLIST["PP_SKIP_TREE"],
+                dir_format=" [] $NAME",
+                file_format=" h[] t[] p[] $NAME",
             )
 
             # write to file
@@ -605,13 +646,17 @@ def do_after_fix():
     # get path to tree
     path_tree = G_DIR_PRJ / "misc" / "tree.txt"
 
+    # create the file so it includes itself
+    with open(path_tree, "w") as a_file:
+        a_file.write("")
+
     # create tree object and call
     tree_obj = CNTree()
     tree_str = tree_obj.build_tree(
         str(G_DIR_PRJ),
-        filter_list=LIST_TREE_IGNORE,
-        dir_format=G_STRINGS['S_DIR_FORMAT'],
-        file_format=G_STRINGS['S_FILE_FORMAT'],
+        filter_list=DICT_BLACKLIST["PP_SKIP_TREE"],
+        dir_format=G_STRINGS["S_DIR_FORMAT"],
+        file_format=G_STRINGS["S_FILE_FORMAT"],
     )
 
     # write to file
@@ -635,11 +680,11 @@ def do_after_fix():
 
 
 # ------------------------------------------------------------------------------
-# Clean up the blacklist and get absolute paths as Path objects
+# Convert items in blacklist to absolute Path objects
 # ------------------------------------------------------------------------------
-def _fix_blacklist():
+def _fix_blacklist_paths():
     """
-    Clean up the blacklist and convert entries to Path objects
+    Convert items in blacklist to absolute Path objects
 
     Strip any path separators and get absolute paths for all entries in the
     blacklist.
@@ -756,12 +801,14 @@ def _fix_readme(path):
     # if True, we are in a block we don't want to copy
     # assume False to say we want to copy
     ignore = False
+    rm_delete_start = ""
+    rm_delete_end = ""
 
     # what to ignore in the text
     # first get type of project
     type_prj = G_DICT_SETTINGS["__PP_TYPE_PRJ__"]
     for key, val in DICT_README.items():
-        if type_prj in key:
+        if type_prj == key:
             # get values for keys
             rm_delete_start = val["RM_DELETE_START"]
             rm_delete_end = val["RM_DELETE_END"]
@@ -769,8 +816,6 @@ def _fix_readme(path):
 
     # where to put the needed lines
     new_lines = []
-    rm_delete_start = ''
-    rm_delete_end = ''
 
     # open and read file
     with open(path, "r", encoding="UTF8") as a_file:
@@ -807,24 +852,24 @@ def _fix_header(path):
         path: Path for replacing header text
 
     Replaces header text inside a file. Given a Path object, it iterates the
-    lines one by one, replacing header text as it goes. When it is done, it
-    saves the new lines as the old file. This replaces the __PP_.. stuff inside
-    headers. Using this method, we preserve any right-aligned text in each
-    header row (See the header in this file for an example). Adapting this
-    function to your style of header should be easy using the regex pattern, and
-    modifying DICT_HEADER to suit.
-    NOTE: This method relies HEAVILY on the fact that the value exists, and that
-    there is AT LEAST one space before and after the value, to work.
-    Example (Dashes show required spaces):
-    # --------------------------------------------------------------------------
-    # Project:-__PP_NAME_BIG__-...
-    # --------------------------------------------------------------------------
-    This function will also preserve file extensions:
-    # --------------------------------------------------------------------------
-    # Filename:-__PP_NAME_SMALL__.py-...
-    # --------------------------------------------------------------------------
-    If your files do not use any right-aligned text, then the value can be empty
-    and the space after the value is not necessary.
+    lines one by one, replacing the value found in the form of a key in the
+    G_DICT_SETTINGS dictionary as it goes. When it is done, it saves the new
+    lines back to the file. This replaces the __PP_.. stuff inside headers.
+    Using this method, we preserve any right-aligned text in each header row
+    (see the header in this file for an example). Adapting this function to your
+    style of header should be easy by modifying the regex pattern, and modifying
+    DICT_HEADER to suit.
+
+    NOTE: This method relies HEAVILY on the fact that the value exists, if using
+    right-aligned text.
+
+    This function will also preserve file extensions in the replaced text.
+
+    If your files do not use any right-aligned text, then the value can be
+    empty. If the value contains text which is NOT a key in G_DICT_SETTINGS, it
+    will remain unchanged. This is mostly useful for the files in the DICT_COPY
+    dictionary, where you want to change other header values but leave the
+    filename unchanged.
     """
 
     # default lines
@@ -839,44 +884,72 @@ def _fix_header(path):
         # for each header key
         for item in LIST_HEADER:
             # look for a header key
+            key = item[0]
             pattern = (
-                r"(\s*[#|<!--]\s*)"  # group 1: opening comment char(s)
-                rf"({item})"  # group 2:key from LIST_HEADER
-                r"f(\s*:\s+)"  # group 3:spaces, colon and spaces (at least 1)
-                r"([^\s\.]*)"  # group 4: all not spaces and not dot (dunder)
-                r"(\S*)"  # group 5: all not spaces (file ext)
-                r"(\s*)"  # group 6: all spaces (padding)
-                r"(.*)"  # group 7: all other chars (right-aligned text)
+                r"("  # group 1
+                r"("  # group 2
+                r"\s*"  # group 2
+                r"(#|<!--)"  # group 3 (comment marker)
+                r"\s*"  # group 2
+                r")"  # group 2
+                rf"({key})"  # group 4 (key)
+                r"(\s*:\s*)"  # group 5
+                r")"  # group 1
+                r"("  # group 6
+                r"([^\.\s]*)"  # group 7 (value)
+                r"([\.\S]*)"  # group 8 (file extension, if present)
+                r"(\s*)"  # group 9 (padding for right-aligned text)
+                r"([^\n]*)"  # group 10 (right aligned text)
+                r")"  # group 6
             )
 
-            # find first instance of header key
+            # find first instance of header pattern
             res = re.search(pattern, line)
 
             # no res, keep going
             if not res:
                 continue
 
-            # value is group 4
-            val = res.group(4)
+            # value is group 7
+            val = res.group(7)
 
-            # try to find key in dict_values
-            # if no value or not in G_DICT_SETTINGS, leave it alone and keep
-            # going
-            if len(val) == 0 or val not in G_DICT_SETTINGS:
-                continue
+            # ext (or files that start wit ha dot) is group 8
+            ext = res.group(8)
 
-            # get the value by backtracking into G_DICT_SETTINGS
-            val = G_DICT_SETTINGS[val]
+            # if val is a key in G_DICT_SETTINGS
+            if val in G_DICT_SETTINGS:
+                # get val's val (does that make sense?)
+                # so if val == '__PP_NAME_BIG__", we get the G_DICT_SETTINGS
+                # value of the key "__PP_NAME_BIG__" regardless of the key
+                # ("Project") we found
+                # that way keys ("Project") aren't tied to the values
+                # "__PP_NAME_BIG__"
+                repl = G_DICT_SETTINGS[val]
+
+            # val is not in G_DICT_SETTINGS
+            else:
+                # the text to replace should be the default dunder set in
+                # LIST_HEADER
+                repl = G_DICT_SETTINGS[item[1]]
+
+                # if we're looking at the Filename key
+                if key == "Filename":
+                    # if it's blank
+                    if len(val) == 0 and len(ext) == 0:
+                        # use the filename of the file
+                        repl = path.name
+                    else:
+                        # if it's not blank and not a dunder, it was probably
+                        # set intentionally
+                        continue
 
             # count what we will need without spaces
             len_res = (
                 len(res.group(1))
-                + len(res.group(2))
-                + len(res.group(3))
-                + len(val)  # group 4 is val
-                + len(res.group(5))
-                # group 6 will be str_spaces
-                + len(res.group(7))
+                + len(repl)
+                + len(res.group(8))
+                + len("")
+                + len(res.group(10))
             )
 
             # make spaces
@@ -885,11 +958,11 @@ def _fix_header(path):
             # have trailing spaces)
             # 2. subtract 1 for newline
             # 3. subtract the other match lengths
-            len_spaces = len(line) - 1 - len_res
-            str_spaces = " " * len_spaces
+            len_padding = len(line) - 1 - len_res
+            padding = " " * len_padding
 
             # replace text in the line
-            str_rep = rf"\g<1>\g<2>\g<3>{val}\g<5>{str_spaces}\g<7>"
+            str_rep = rf"\g<1>{repl}\g<8>{padding}\g<10>"
             lines[index] = re.sub(pattern, str_rep, line)
 
     # save lines to file
@@ -922,11 +995,15 @@ def _fix_text(path):
 
     # for each line in array
     for index, line in enumerate(lines):
-        # replace text in line
+        # replace all text in line
         for key, val in G_DICT_SETTINGS.items():
-            if isinstance(val, str) and key in line:
+            # find every match in line (for authors/emails in pyproject.toml)
+            if key in line:
                 # replace text with new value
-                lines[index] = line.replace(key, val)
+                line = line.replace(key, val)
+
+        # set new line with all replacements
+        lines[index] = line
 
     # save lines to file
     with open(path, "w", encoding="UTF8") as a_file:
@@ -953,8 +1030,8 @@ def _fix_path(path):
 
     # replace dunders in last path component
     for key, val in G_DICT_SETTINGS.items():
-        # G_DICT_SETTINGS may contain other info, only use strings
-        if isinstance(val, str):
+        if key in last_part:
+            # replace last part with val
             last_part = last_part.replace(key, val)
 
     # replace the name
@@ -966,6 +1043,51 @@ def _fix_path(path):
 
     # do rename
     path.rename(path_new)
+
+
+# ------------------------------------------------------------------------------
+# Replace any dunders in blacklist after writing them to the project folder
+# ------------------------------------------------------------------------------
+def _fix_blacklist_dunders():
+    """
+    Replace any dunders in blacklist after writing them to the project folder
+
+    Check the blacklist files for any items that contain dunders, and replace
+    them, since no files in the project should have dunders in the name.
+    """
+
+    def _fix_file(path_to):
+        # new dict
+        dict_bl = {}
+
+        # open blacklist file
+        with open(path_to, "r", encoding="UTF8") as a_file:
+            # load file
+            dict_bl = json.load(a_file)
+
+            # for each section of blacklist
+            for key1, val1 in dict_bl.items():
+                # enumerate over the list items in blacklist section
+                for index, item in enumerate(val1):
+                    # get kv of replacements
+                    for key2, val2 in G_DICT_SETTINGS.items():
+                        # if settings key is in list item
+                        if key2 in item:
+                            # replace dunder with value
+                            val1[index] = item.replace(key2, val2)
+
+        # open blacklist file
+        with open(path_to, "w", encoding="UTF8") as a_file:
+            # write file
+            json.dump(dict_bl, a_file, indent=4)
+
+    # replace stuff in regular file
+    path_to = G_DIR_PRJ / "conf" / "blacklist.json"
+    _fix_file(path_to)
+
+    # replace stuff in backup file
+    path_to = G_DIR_PRJ / "conf" / "defaults" / "blacklist_default.json"
+    _fix_file(path_to)
 
 
 # ------------------------------------------------------------------------------
@@ -995,6 +1117,7 @@ def _check_type(type_prj):
             return True
 
     # nope, fail
+    print(G_STRINGS["S_PRJ_TYPE"])
     return False
 
 
@@ -1031,28 +1154,28 @@ def _check_name(name_prj):
         return False
 
     if len(name_prj) == 1:
-        print(G_STRINGS['S_PRJ_LEN)'])
+        print(G_STRINGS["S_PRJ_NAME_LEN)"])
         return False
 
     # match start or return false
     pattern = r"(^[a-zA-Z])"
     res = re.search(pattern, name_prj)
     if not res:
-        print(G_STRINGS['S_PRJ_START'])
+        print(G_STRINGS["S_PRJ_NAME_START"])
         return False
 
     # match end or return false
     pattern = r"([a-zA-Z\d]$)"
     res = re.search(pattern, name_prj)
     if not res:
-        print(G_STRINGS['S_PRJ_END'])
+        print(G_STRINGS["S_PRJ_NAME_END"])
         return False
 
     # match middle or return false
     pattern = r"(^[a-zA-Z\d\-_]*$)"
     res = re.search(pattern, name_prj)
     if not res:
-        print(G_STRINGS['S_PRJ_CONTAIN'])
+        print(G_STRINGS["S_PRJ_NAME_CONTAIN"])
         return False
 
     # if we made it this far, return true

@@ -10,8 +10,7 @@
 # https://github.com/github/gitignore/blob/main/Python.gitignore
 # (and reformatted)
 
-
-# mhy stuff
+# my stuff
 .vscode
 .VSCodeCounter
 

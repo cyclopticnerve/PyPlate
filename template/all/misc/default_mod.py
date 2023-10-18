@@ -6,49 +6,49 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+"""
+docstring
+"""
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
-import os
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-# some useful constants
-DIR_SELF = os.path.dirname(__file__)
-
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-
 # ------------------------------------------------------------------------------
 # Public functions
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
 def func():
     """
-        Short description
+    Short description
 
-        Arguments:
-            var_name: Description
+    Arguments:
+        var_name: Description
 
-        Returns:
-            Description
+    Returns:
+        Description
 
-        Raises:
-            exception_type(vars): Description
+    Raises:
+        exception_type(vars): Description
 
-        Long description (including HTML).
+    Long description (including HTML).
     """
 
-    print('this is func')
+    print("this is func")
     return _func()
 
 
@@ -56,25 +56,27 @@ def func():
 # Private functions
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
 def _func():
     """
-        Short description
+    Short description
 
-        Parameters:
-            var_name: Description
+    Arguments:
+        var_name: Description
 
-        Returns:
-            Description
+    Returns:
+        Description
 
-        Raises:
-            exception_type(vars): Description
+    Raises:
+        exception_type(vars): Description
 
-        Long description (including HTML).
+    Long description (including HTML).
     """
 
-    return ('this is _func')
+    return "this is _func"
+
 
 # -)

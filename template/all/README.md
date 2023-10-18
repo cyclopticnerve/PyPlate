@@ -11,7 +11,7 @@
 ## "It mostly works™"
 
 <!-- __RM_LICENSE_START__ -->
-__PP_LICENSE_NAME__
+License: None
 <!-- __RM_LICENSE_END__ -->
 
 __PP_SHORT_DESC__
@@ -22,7 +22,7 @@ __PP_SHORT_DESC__
 
 ## Requirements
 <!-- __RM_PY_DEPS_START__ -->
-__PP_PY_DEPS__
+None
 <!-- __RM_PY_DEPS_END__ -->
 
 ## Installing
@@ -73,6 +73,9 @@ foo@bar:~/Downloads/__PP_NAME_BIG__$ ./install.py
 ```
 <!-- __RM_APP_END__ -->
 
+## Usage
+blah blah blah
+
 ## Uninstalling
 <!-- __RM_PKG_START__ -->
 ```bash
@@ -86,11 +89,7 @@ foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
 ```
 <!-- __RM_APP_END__ -->
 
-## Usage
-blah blah blah
-
 ## Notes
 blah blah blah
 
-## -)
-<!-- -) -->
+-)

@@ -41,11 +41,11 @@ _DIR_PRJ = _DIR_SELF.parent
 # default blacklist dict
 DICT_BLACKLIST = {}
 
+# default metadata dict
+DICT_METADATA = {}
+
 # default settings dict
 DICT_SETTINGS = {}
-
-# default strings dict
-DICT_STRINGS = {}
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -209,7 +209,10 @@ G_ERROR_COUNT = 0
 
 G_STRINGS = {
     "S_ERR_COUNT": "Errors: {}",
-    "S_JSON_ERR": "{} is not a valid JSON file"
+    "S_ERR_UFNF": "ERROR: File {} could not be found, trying default",
+    "S_ERR_UJSON": "ERROR: FIle {} is not a valid JSON file, trying default",
+    "S_ERR_DFNF": "ERROR: Default file {} could not be found",
+    "S_ERR_DJSON": "ERROR: Default file {} is not a valid JSON file",
 }
 
 # ------------------------------------------------------------------------------
@@ -230,7 +233,7 @@ def main():
 
     # common
     load_config_files()
-    # fix_blacklist()
+    fix_blacklist()
     fix_readme()
 
     # pkg
@@ -255,7 +258,7 @@ def main():
     do_gettext()
 
     # # print error count (__PP_/PP_ stuff found)
-    s = G_STRINGS['S_ERR_COUNT']
+    s = G_STRINGS["S_ERR_COUNT"]
     print(s.format(G_ERROR_COUNT))
 
 
@@ -268,88 +271,123 @@ def load_config_files():
 
     Get required config files and load them into the dictionaries required
     by the program. These files may sometimes be edited by users, so we need to
-    check that they (1. exist) and (2. are valid JSON).
+    check that they:
+    (1. exist)
+    or
+    (2. get backup)
+    and
+    (3. are valid JSON).
     """
 
-    # default blacklist dict
-    global DICT_BLACKLIST
+    try:
+        a_dict = DICT_BLACKLIST
+        a_user = _DIR_PRJ / "conf" / "blacklist.json"
+        a_default = _DIR_PRJ / "conf" / "default" / "blacklist_default.json"
+        _load_user_or_default(a_dict, a_user, a_default)
+    except:
+        # if we can't load user or default, exit the program
+        exit()
+
+    try:
+        a_dict = DICT_METADATA
+        a_user = _DIR_PRJ / "conf" / "metadata.json"
+        a_default = _DIR_PRJ / "conf" / "default" / "metadata_default.json"
+        _load_user_or_default(a_dict, a_user, a_default)
+    except:
+        # if we can't load user or default, exit the program
+        exit()
+
+    try:
+        a_dict = DICT_SETTINGS
+        a_user = _DIR_PRJ / "conf" / "metadata.json"
+        a_default = _DIR_PRJ / "conf" / "default" / "settings_default.json"
+        _load_user_or_default(a_dict, a_user, a_default)
+    except:
+        # if we can't load user or default, exit the program
+        exit()
+
+    # # default blacklist dict
+    # global DICT_BLACKLIST
+
+    # # get user file or default
+    # path_blacklist = _DIR_PRJ / "conf" / "blacklist.json"
+    # if not path_blacklist.exists():
+    #     path_blacklist = (
+    #         _DIR_PRJ / "conf" / "defaults" / "blacklist_default.json"
+    #     )
+    #     if not path_blacklist.exists():
+    #         raise Exception(G_STRINGS["S_ERR_FNF"].format(path_blacklist))
+
+    # # load file
+    # with open(path_blacklist, "r", encoding="UTF8") as a_file:
+    #     DICT_BLACKLIST = json.load(a_file)
+    #     try:
+    #         DICT_BLACKLIST = json.load(a_file)
+    #     except json.JSONDecodeError:
+    #         raise Exception(G_STRINGS["S_ERR_JSON"].format(a_file))
+
+    # # default settings dict
+    # global DICT_SETTINGS
+    # path_settings = _DIR_PRJ / "conf" / "settings.json"
+    # if path_settings.exists():
+    #     with open(path_settings, "r", encoding="UTF8") as a_file:
+    #         try:
+    #             DICT_SETTINGS = json.load(a_file)
+    #         except json.JSONDecodeError:
+    #             print(G_STRINGS["S_ERR_JSON"].format(a_file))
+    #             return
+
+    # # default strings dict
+    # global DICT_METADATA
+    # path_strings = _DIR_PRJ / "conf" / "strings.json"
+    # if path_strings.exists():
+    #     with open(path_strings, "r", encoding="UTF8") as a_file:
+    #         try:
+    #             DICT_METADATA = json.load(a_file)
+    #         except json.JSONDecodeError:
+    #             print(G_STRINGS["S_ERR_JSON"].format(a_file))
+    #             return
+
+
+# ------------------------------------------------------------------------------
+# Replace values in the blacklist file
+# ------------------------------------------------------------------------------
+def fix_blacklist():
+    """
+    Replace values in the blacklist file
+
+    Replace any __PP_ stuff in blacklist file. This allows you to use file
+    names/paths in blacklist.json that have dunders in their value. This is
+    really only useful if you use dunders in the user blacklist, since
+    they get replaced each time you run pybaker.py, and at that time you
+    know what the replacement values will be.
+    """
+
+    # get path to blacklist file
     path_blacklist = _DIR_PRJ / "conf" / "blacklist.json"
 
-    if not path_blacklist.exists():
-        # create default?
-        pass
-    
+    # open file and get contents
+    with open(path_blacklist, "r", encoding="UTF8") as a_file:
+        text = a_file.read()
+
+        # replace text
+        for key, val in DICT_BLACKLIST.items():
+            text = text.replace(key, val)
+
+    # save file
+    with open(path_blacklist, "w", encoding="UTF8") as a_file:
+        a_file.write(text)
+
+    # now that the blacklist file is fixed, reload it
+    global DICT_BLACKLIST
+    path_blacklist = _DIR_PRJ / "conf" / "blacklist.json"
     if path_blacklist.exists():
         with open(path_blacklist, "r", encoding="UTF8") as a_file:
-            DICT_BLACKLIST = json.load(a_file)
             try:
                 DICT_BLACKLIST = json.load(a_file)
             except json.JSONDecodeError:
-                print(G_STRINGS["S_JSON_ERR"].format(a_file))
+                print(G_STRINGS["S_ERR_JSON"].format(a_file))
                 return
-
-    # default settings dict
-    global DICT_SETTINGS
-    path_settings = _DIR_PRJ / "conf" / "settings.json"
-    if path_settings.exists():
-        with open(path_settings, "r", encoding="UTF8") as a_file:
-            try:
-                DICT_SETTINGS = json.load(a_file)
-            except json.JSONDecodeError:
-                print(G_STRINGS["S_JSON_ERR"].format(a_file))
-                return
-
-    # default strings dict
-    global DICT_STRINGS
-    path_strings = _DIR_PRJ / "conf" / "strings.json"
-    if path_strings.exists():
-        with open(path_strings, "r", encoding="UTF8") as a_file:
-            try:
-                DICT_STRINGS = json.load(a_file)
-            except json.JSONDecodeError:
-                print(G_STRINGS["S_JSON_ERR"].format(a_file))
-                return
-
-
-# ------------------------------------------------------------------------------
-# Replace text in the blacklist.json file
-# ------------------------------------------------------------------------------
-# def fix_blacklist():
-#     """
-#     Replace text in the blacklist.json file
-
-#     Replace any __PP_ stuff in blacklist file. This allows you to use file
-#     names/paths in blacklist.json that have dunders in their name. This is
-#     really only useful if you use dunders in the default blacklist, since
-#     they get replaced each time you run pybaker.py, and at that time you
-#     know what the replacement values will be.
-#     """
-
-    # get path to blacklist file
-    # path_blacklist = _DIR_PRJ / "conf" / "blacklist.json"
-
-    # # open file and get contents
-    # with open(path_blacklist, "r", encoding="UTF8") as a_file:
-    #     text = a_file.read()
-
-    #     # replace text
-    #     for key, val in DICT_BLACKLIST.items():
-    #         text = text.replace(key, val)
-
-    # # save file
-    # with open(path_blacklist, "w", encoding="UTF8") as a_file:
-    #     a_file.write(text)
-
-    # now that the blacklist file is fixed, reload it
-    # global DICT_BLACKLIST
-    # path_blacklist = _DIR_PRJ / "conf" / "blacklist.json"
-    # if path_blacklist.exists():
-    #     with open(path_blacklist, "r", encoding="UTF8") as a_file:
-    #         try:
-    #             DICT_BLACKLIST = json.load(a_file)
-    #         except json.JSONDecodeError:
-    #             print(G_STRINGS["S_JSON_ERR"].format(a_file))
-    #             return
 
 
 # ------------------------------------------------------------------------------
@@ -364,8 +402,8 @@ def fix_readme():
     """
 
     # check if the file exists
-    path_readme = os.path.join(_DIR_PRJ, "README.md")
-    if not os.path.exists(path_readme):
+    path_readme = _DIR_PRJ / "README.md"
+    if not path_readme.exists():
         return
 
     # default text if we can't open file
@@ -383,7 +421,7 @@ def fix_readme():
     )
 
     # replace short_desc
-    pp_short_desc = DICT_STRINGS["PP_SHORT_DESC"]
+    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
 
     # replace text
     str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
@@ -398,7 +436,7 @@ def fix_readme():
 
     # build a string from the dict (markdown links)
     # only format links if value is not empty
-    pp_py_deps = DICT_STRINGS["PP_PY_DEPS"]
+    pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
     kv_py_deps = []
     for key, val in pp_py_deps.items():
         if val == "":
@@ -417,7 +455,7 @@ def fix_readme():
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace version
-    pp_version = DICT_STRINGS["PP_VERSION"]
+    pp_version = DICT_METADATA["__PP_VERSION__"]
 
     str_pattern = (
         r"(\s*foo@bar:~/Downloads\$ python -m pip install )"
@@ -465,8 +503,8 @@ def fix_pyproject():
     """
 
     # check if the file exists
-    path_toml = os.path.join(_DIR_PRJ, "pyproject.toml")
-    if not os.path.exists(path_toml):
+    path_toml = _DIR_PRJ / "pyproject.toml"
+    if not path_toml.exists():
         return
 
     # default text if we can't open file
@@ -495,7 +533,7 @@ def fix_pyproject():
         r"(^\s*version[\t ]*=[\t ]*)"
         r"(.*?$)"
     )
-    pp_version = DICT_STRINGS["PP_VERSION"]
+    pp_version = DICT_METADATA["__PP_VERSION__"]
     if pp_version == "":
         pp_version = "0.0.0"
     str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
@@ -508,7 +546,7 @@ def fix_pyproject():
         r"(^\s*description[\t ]*=[\t ]*)"
         r"(.*?$)"
     )
-    pp_short_desc = DICT_STRINGS["PP_SHORT_DESC"]
+    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
     str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -521,7 +559,7 @@ def fix_pyproject():
     )
 
     # convert dict to string
-    pp_keywords = DICT_STRINGS["PP_KEYWORDS"]
+    pp_keywords = DICT_METADATA["__PP_KEYWORDS__"]
     str_pp_keywords = [f'"{item}"' for item in pp_keywords]
     str_pp_keywords = ", ".join(str_pp_keywords)
 
@@ -538,7 +576,7 @@ def fix_pyproject():
     )
 
     # convert dict to string (only using keys)
-    pp_py_deps = DICT_STRINGS["PP_PY_DEPS"]
+    pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
 
     # NB: this is not conducive to a dict (we don't need links, only names)
     # so don't do what we did in README, keep it simple
@@ -568,29 +606,27 @@ def fix_init():
 
     # first check if there is a pkg dir
     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
-    dir_pkg = os.path.join(_DIR_PRJ, "src", pp_name_small)
-    if not os.path.exists(dir_pkg) or not os.path.isdir(dir_pkg):
+    dir_pkg = _DIR_PRJ / "src" / pp_name_small
+    if not dir_pkg.exists() or not dir_pkg.is_dir():
         return
 
     # the file name of the init
     file_init = "__init__.py"
 
     # check if there is an __init__.py file
-    path_init = os.path.join(dir_pkg, file_init)
-    if not os.path.exists(path_init):
+    path_init = dir_pkg / file_init
+    if not path_init.exists():
         return
 
     # check if there are any .py files in package dir that are not init file
     lst_modules = [
-        item
-        for item in os.listdir(dir_pkg)
-        if item != file_init and os.path.splitext(item)[1] == "py"
+        item for item in os.listdir(dir_pkg) if item != file_init and item.suffix == "py"
     ]
     if len(lst_modules) == 0:
         return
 
     # strip ext and add to list
-    lst_files = [os.path.splitext(item)[0] for item in lst_modules]
+    lst_files = [item.with_suffix("") for item in lst_modules]
 
     # sort file list to look pretty (listdir is not sorted)
     lst_files.sort()
@@ -637,27 +673,24 @@ def fix_argparse():
     """
 
     # get src dir
-    dir_src = os.path.join(_DIR_PRJ, "src")
 
     # get all paths
-    lst_paths = [os.path.join(dir_src, item) for item in os.listdir(dir_src)]
+    lst_paths = [dir_src / item for item in os.listdir(dir_src)]
     if len(lst_paths) == 0:
         return
 
     # get all files
     lst_files = [
-        item
-        for item in lst_paths
-        if os.path.isfile(item) and os.path.splitext(item)[1] == ".py"
+        item for item in lst_paths if item.is_file() and item.suffix == ".py"
     ]
 
     # for each file
     for item in lst_files:
         # get the whole path
-        path_item = os.path.join(dir_src, item)
+        path_item = dir_src / item
 
         # check if file exists
-        if not os.path.exists(path_item) or os.path.isdir(path_item):
+        if not path_item.exists() or path_item.is_dir():
             continue
 
         # default text if we can't open file
@@ -674,7 +707,7 @@ def fix_argparse():
             r"(.*?)"
             r"(\'.*)"
         )
-        pp_short_desc = DICT_STRINGS["PP_SHORT_DESC"]
+        pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
         str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -685,7 +718,7 @@ def fix_argparse():
             r"(.*?)"
             r"(\'.*)"
         )
-        pp_version = DICT_STRINGS["PP_VERSION"]
+        pp_version = DICT_METADATA["__PP_VERSION__"]
         str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -705,8 +738,8 @@ def fix_install():
     """
 
     # check if the file exists
-    path_install = os.path.join(_DIR_PRJ, "install.py")
-    if not os.path.exists(path_install):
+    path_install = _DIR_PRJ / "install.py"
+    if not path_install.exists():
         return
 
     # default text if we can't open file
@@ -725,7 +758,7 @@ def fix_install():
     )
 
     # convert dict keys to string
-    pp_py_deps = DICT_STRINGS["PP_PY_DEPS"]
+    pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
     str_pp_py_deps = ",".join(pp_py_deps.keys())
 
     # replace text
@@ -741,7 +774,7 @@ def fix_install():
     )
 
     # convert dict to string
-    pp_sys_deps = DICT_STRINGS["PP_SYS_DEPS"]
+    pp_sys_deps = DICT_METADATA["__PP_SYS_DEPS__"]
     str_pp_sys_deps = ",".join(pp_sys_deps)
 
     # replace string
@@ -775,7 +808,7 @@ def fix_desktop():
 
     # validate wanted categories into approved categories
     pp_gui_categories = []
-    wanted_cats = DICT_STRINGS["PP_GUI_CATEGORIES"]
+    wanted_cats = DICT_METADATA["__PP_GUI_CATEGORIES__"]
     for cat in wanted_cats:
         # category is valid
         if cat in LIST_CATEGORIES:
@@ -819,7 +852,7 @@ def fix_desktop():
         r"(^\s*Comment[\t ]*=)"
         r"(.*?$)"
     )
-    pp_short_desc = DICT_STRINGS["PP_SHORT_DESC"]
+    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
     str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -887,7 +920,7 @@ def fix_gtk3():
         r"(.*?)"
         r"(</property>)"
     )
-    pp_short_desc = DICT_STRINGS["PP_SHORT_DESC"]
+    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
     str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -898,7 +931,7 @@ def fix_gtk3():
         r"(.*?)"
         r"(</property>.*)"
     )
-    pp_version = DICT_STRINGS["PP_VERSION"]
+    pp_version = DICT_METADATA["__PP_VERSION__"]
     str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -929,8 +962,7 @@ def recurse_and_check(path):
     # strip trailing slashes to match path component
     skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_all"]]
     skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_file"]]
-    skip_header = [item.strip(os.sep)
-                   for item in DICT_BLACKLIST["skip_header"]]
+    skip_header = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_header"]]
     skip_text = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_text"]]
     skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_path"]]
 
@@ -1054,7 +1086,7 @@ def do_gettext():
     dir_locale = os.path.join(_DIR_PRJ, "src", "locale")
     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
     path_pot = os.path.join(dir_locale, f"{pp_name_small}.pot")
-    pp_version = DICT_STRINGS["PP_VERSION"]
+    pp_version = DICT_METADATA["__PP_VERSION__"]
 
     # remove old pot and recreate empty file
     if os.path.exists(path_pot):
@@ -1145,6 +1177,68 @@ def do_gettext():
 # Private functions
 # ------------------------------------------------------------------------------
 
+
+# ------------------------------------------------------------------------------
+# Opens the user or default config file, whichever is found first
+# ------------------------------------------------------------------------------
+def _load_user_or_default(a_dict, a_user, a_default):
+    """
+    Opens the user or default config file, whichever is found first
+
+    Arguments:
+        a_dict: Dictionary to load JSON file into
+        a_user: User Path to load dict from
+        a_default: Path to default file if user file is not found
+
+    Raises:
+        Exception: if neither file can be found or if both files are invalid
+        JSON
+
+    This is a convenience function to load a JSON file into a dict. If the user
+    file is not found, it tries to load the default file. If neither file is
+    found or they are both invalid JSON files, an Exception is raised.
+    """
+
+    # check if user file exists
+    if a_user.exists():
+
+        # try to load user file
+        try:
+            a_dict = json.load(a_user)
+            return
+
+        # we can't load it
+        except json.JSONDecodeError:
+            print(G_STRINGS["S_ERR_UJSON"].format(a_user))
+
+    # we can't find it
+    else:
+        print(G_STRINGS["S_ERR_UFNF"].format(a_user))
+
+    # check if default file exists
+    if a_default.exists():
+
+        # try to load default file
+        try:
+            a_dict = json.load(a_default)
+
+            # save default as user
+            with open(a_user, 'w', encoding="UTF-8") as f:
+                f.write(a_dict)
+
+            # done
+            return
+
+        # we can't load it
+        except json.JSONDecodeError:
+            print(G_STRINGS["S_ERR_DJSON"].format(a_default))
+
+    # we can't find it
+    else:
+        print(G_STRINGS["S_ERR_DFNF"].format(a_default))
+
+    # we can't find it or load it
+    raise Exception
 
 # ------------------------------------------------------------------------------
 # Checks header values for dunders
@@ -1245,7 +1339,7 @@ def _check_text(path_item, lines):
     # for each line in file
     for i, line in enumerate(lines):
         # the dunders to look for
-        reps = [rep for rep in DICT_SETTINGS["info"] and DICT_STRINGS]
+        reps = [rep for rep in DICT_SETTINGS["info"] and DICT_METADATA]
 
         # check for dunders in text
         for rep in reps:

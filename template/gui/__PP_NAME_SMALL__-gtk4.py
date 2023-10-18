@@ -23,7 +23,7 @@ import os
 import gi
 gi.require_version('Adw', '1')
 gi.require_version('Gtk', '4.0')
-from gi.repository import Adw, Gtk  # pylint: disable=wrong-import-position
+from gi.repository import Adw, Gtk
 
 # ------------------------------------------------------------------------------
 # Public functions

@@ -6,44 +6,44 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+"""
+docstring
+"""
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
-import os
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-# some useful constants
-DIR_SELF = os.path.dirname(__file__)
-
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-
 # ------------------------------------------------------------------------------
 # Class
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
 class Main(object):
     """
-        Short description
+    Short description
 
-        Properties:
-            foo: A type to hold the foo value
+    Properties:
+        foo: A type to hold the foo value
 
-        Methods:
-            set_foo(new_foo): Sets the new value of foo
-            get_foo(): Gets the current value of foo
+    Methods:
+        set_foo(new_foo): Sets the new value of foo
+        get_foo(): Gets the current value of foo
 
-        Long description (including HTML).
+    Long description (including HTML).
     """
 
     # --------------------------------------------------------------------------
@@ -55,11 +55,11 @@ class Main(object):
     # --------------------------------------------------------------------------
     def __init__(self):
         """
-            Initialize the new object
+        Initialize the new object
 
-            Initializes a new instance of the class, setting the default values
-            of its properties, and any other code that needs to run to create a
-            new object.
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
         """
 
         # call super init to initialize the base class
@@ -73,7 +73,7 @@ class Main(object):
         # empirically rather than using setter methods.
 
         # set the initial value of class
-        self.foo = 'foo'
+        self.foo = "foo"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -84,12 +84,12 @@ class Main(object):
     # --------------------------------------------------------------------------
     def get_foo(self):
         """
-            Gets the current value of foo
+        Gets the current value of foo
 
-            Returns:
-                The current value of foo
+        Returns:
+            The current value of foo
 
-            Long description (including HTML).
+        Long description (including HTML).
         """
 
         # return the current value of foo
@@ -100,12 +100,12 @@ class Main(object):
     # --------------------------------------------------------------------------
     def set_foo(self, new_foo):
         """
-            Sets the new value of foo
+        Sets the new value of foo
 
-            Arguments:
-                new_foo: The new value of foo
+        Arguments:
+            new_foo: The new value of foo
 
-            Long description (including HTML).
+        Long description (including HTML).
         """
 
         # set the new value of foo
@@ -118,22 +118,23 @@ class Main(object):
     # --------------------------------------------------------------------------
     # Short description
     # --------------------------------------------------------------------------
-    def _foo():
+    def _foo(self):
         """
-            Short description
+        Short description
 
-            Arguments:
-                var_name: Description
+        Arguments:
+            var_name: Description
 
-            Returns:
-                Description
+        Returns:
+            Description
 
-            Raises:
-                exception_type(vars): Description
+        Raises:
+            exception_type(vars): Description
 
-            Long description (including HTML).
+        Long description (including HTML).
         """
 
-        return ('this is _foo')
+        return "this is _foo"
+
 
 # -)

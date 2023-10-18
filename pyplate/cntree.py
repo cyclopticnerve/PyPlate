@@ -12,9 +12,6 @@ ignored by the filter list and names being formatted according to the
 specified formats.
 """
 
-# this is a comment that should auto wrap once i get to the editor ruler at 80
-# characters but why does it not auto wrap at the defined level of rising tide
-# for 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -55,10 +52,10 @@ class CNTree:
 
     # these are the preset char sequences for the prefix/connector char sets
     # NB: these must always be equal length
-    _PREFIX_VERT = f"{_CHAR_VERT}{_CHAR_SPACE}"  # next level ('| ')
-    _PREFIX_NONE = f"{_CHAR_SPACE}{_CHAR_SPACE}"  # skip level ('  ')
-    _CONNECTOR_TEE = f"{_CHAR_TEE}{_CHAR_HORZ}"  # next sub item ('T-')
-    _CONNECTOR_ELL = f"{_CHAR_ELL}{_CHAR_HORZ}"  # last sub item ('L-')
+    _PREFIX_VERT = f"{_CHAR_VERT}{_CHAR_SPACE}"  # next level ("| ")
+    _PREFIX_NONE = f"{_CHAR_SPACE}{_CHAR_SPACE}"  # skip level ("  ")
+    _CONNECTOR_TEE = f"{_CHAR_TEE}{_CHAR_HORZ}"  # next sub item ("T-")
+    _CONNECTOR_ELL = f"{_CHAR_ELL}{_CHAR_HORZ}"  # last sub item ("L-")
 
     # the default directory/file name formats
     _FORMAT_NAME = "$NAME"
@@ -66,7 +63,7 @@ class CNTree:
     _FORMAT_FILE = f" {_FORMAT_NAME}"
 
     # custom error strings
-    _ERR_NOT_A_DIR = '"{}" is not a directory'
+    _ERR_NOT_A_DIR = "\"{}\" is not a directory"
 
     # custom sorting order
     _SORT_ORDER = "_."  # sort first char of name in this order (above ord)
@@ -144,26 +141,26 @@ class CNTree:
 
         Example: 
 
-            filter_list = ['Foo/bar.txt', 'Foo']
+            filter_list = ["Foo/bar.txt", "Foo"]
 
-        An entry of 'Foo/bar.txt' will skip a file with the absolute path
-        \\<start dir\\>/Foo/bar.txt'.
+        An entry of "Foo/bar.txt" will skip a file with the absolute path
+        "\\<start dir\\>/Foo/bar.txt".
 
-        An entry of 'Foo' (if it points to a directory) will skip a
-        directory with the absolute path '\\<start dir\\>/Foo/'and
+        An entry of "Foo" (if it points to a directory) will skip a
+        directory with the absolute path "\\<start dir\\>/Foo/" and
         everything under it.
 
         Globs are also acceptable, see 
         https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
 
         The format strings for directory and file names will have the value
-        of 'CNTree._FORMAT_NAME' replaced by the directory or file name.
+        of "CNTree._FORMAT_NAME" replaced by the directory or file name.
 
-        Example: (assuming CNTree._FORMAT_NAME is set to '$NAME')
+        Example: (assuming CNTree._FORMAT_NAME is set to "$NAME")
 
-            dir_format = ' [] $NAME/'
-            item.name = 'Foo'
-            result = ' [] Foo/'
+            dir_format = " [] $NAME/"
+            item.name = "Foo"
+            result = " [] Foo/"
 
         Also, leading spaces in dir_format, when applied to the start_dir
         name, will be left-trimmed to make the tree start at the first
@@ -171,11 +168,11 @@ class CNTree:
 
         Arguments:
             start_dir: String or Path to the root directory of the tree\
-            (default: '')
+            (default: "")
             filter_list: List of directory/file names to filter out (default:\
             None)
-            dir_format: Format to use for directories (default:'$NAME/')
-            file_format: Format to use for files (default: '$NAME')
+            dir_format: Format to use for directories (default:"$NAME/")
+            file_format: Format to use for files (default: "$NAME")
             dirs_only: Only list directories (default: False)
             ignore_case: Sort entries regardless of case. If False, \
             uppercase alpha characters take precedence.
@@ -334,7 +331,7 @@ class CNTree:
         # NB: make sure the user didn't use an incorrect format value, such as:
         # build_tree(... dir_format=None)
         # or
-        # build_tree(..., dir_format='')
+        # build_tree(..., dir_format="")
         # also check that the format string contains CNTree._FORMAT_NAME
         if dir_format and CNTree._FORMAT_NAME in dir_format:
             self._dir_format = dir_format
@@ -391,9 +388,9 @@ class CNTree:
         index is the ordinal of that char (starting at the lowest negative
         ordinal)
         so that:
-        CNTree._SORT_ORDER = '_.'
+        CNTree._SORT_ORDER = "_."
         results in:
-        self._sort_order = {'_': -2, '.': -1}
+        self._sort_order = {"_": -2, ".": -1}
 
         most of this came form:
         https://stackoverflow.com/questions/75301122/how-can-i-change-how-python-sort-deals-with-punctuation
@@ -452,7 +449,7 @@ class CNTree:
 
         # the key function's result is used to determine an item's position
         # based on a bubble sort
-        # NB: the hidden params to the 'key' function are self and the results
+        # NB: the hidden params to the "key" function are self and the results
         # of an iterator of items
         items.sort(key=self._sort_by_name)
 
