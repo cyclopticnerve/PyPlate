@@ -7,12 +7,23 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+"""
+This module provides the main interface to __PP_NAME_SMALL__
+"""
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
 import argparse
+from argparse import RawDescriptionHelpFormatter
+from argparse import RawTextHelpFormatter
+
+# local imports
+# NB: uncomment this if you want to use config files to set defaults for command
+# line options
+# import cli_config as cfg
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -25,6 +36,18 @@ import argparse
 # args are global so we can read them from any function
 # they are only set once, in _parse_args
 G_DICT_ARGS = {}
+
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# string constants
+S_VERSION_DESC = (
+    "__PP_NAME_SMALL__\n"
+    "__PP_SHORT_DESC__\n"
+    "__PP_VERSION__\n"
+    "__PP_EMAIL__"
+)
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -42,9 +65,18 @@ def main():
     program, and performing its steps.
     """
 
+    # load config dict from file (or just keep built-in)
+    # NB: uncomment this if you want to use config files to set defaults for
+    # command line options
+    # cfg.load_config(G_DICT_ARGS)
+
     # call the steps in order
     print(func())
 
+    # save config dict to file
+    # NB: uncomment this if you want to use config files to set defaults for
+    # command line options
+    # cfg.save_config(G_DICT_ARGS)
 
 # ------------------------------------------------------------------------------
 # Adds command line args to the parser
@@ -60,9 +92,13 @@ def add_args(argparser):
     CODE! It is teased out to make editing command line parameters easier.
     """
 
+    # NB: uncomment this if you want to use config files to set defaults for
+    # command line options
+    # cfg.add_args(argparser)
+
+    # add your command line options here
     # NB: https://docs.python.org/3/library/argparse.html
     # argparser.add_argument('-f')
-    pass
 
 
 # ------------------------------------------------------------------------------
@@ -88,6 +124,28 @@ def func():
 
 
 # ------------------------------------------------------------------------------
+# Private classes
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# A dummy class to combine multiple argparse formatters
+# ------------------------------------------------------------------------------
+class _MyFormatter(RawTextHelpFormatter, RawDescriptionHelpFormatter):
+    """
+    A dummy class to combine multiple argparse formatters
+
+    Arguments:
+        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
+        including argument descriptions.
+        RawDescriptionHelpFormatter: Indicates that description and epilog are
+        already correctly formatted and should not be line-wrapped.
+
+    A dummy class to combine multiple argparse formatters.
+    """
+
+
+# ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
 
@@ -103,12 +161,13 @@ def _parse_args():
     and sets the command line options as a global dict.
     """
 
-    # the global dict of arguments
-    global G_DICT_ARGS
+    # the global dict of command line arguments
+    global G_DICT_ARGS  # pylint: disable=global-statement
 
     # create the parser
     argparser = argparse.ArgumentParser(
-        description="__PP_SHORT_DESC__",
+        description=S_VERSION_DESC,
+        formatter_class=_MyFormatter,
     )
 
     # add version argument
@@ -116,7 +175,7 @@ def _parse_args():
         "-v",
         "--version",
         action="version",
-        version="__PP_VERSION__",
+        version=S_VERSION_DESC,
     )
 
     # add arguments from the function above
@@ -124,7 +183,7 @@ def _parse_args():
 
     # parse the arg list into a Namespace object (similar to dict)
     # NB: if there is an error in the command line, this function will:
-    # 1. print usage
+    # 1. print simple usage
     # 2. print the error
     # 3. exit
     args = argparser.parse_args()

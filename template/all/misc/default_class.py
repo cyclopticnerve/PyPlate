@@ -37,11 +37,11 @@ class Main(object):
     Short description
 
     Properties:
-        foo: A type to hold the foo value
+        zaz: A type to hold the zaz value
 
     Methods:
-        set_foo(new_foo): Sets the new value of foo
-        get_foo(): Gets the current value of foo
+        set_zaz(new_zaz): Sets the new value of zaz
+        get_zaz(): Gets the current value of zaz
 
     Long description (including HTML).
     """
@@ -73,43 +73,43 @@ class Main(object):
         # empirically rather than using setter methods.
 
         # set the initial value of class
-        self.foo = "foo"
+        self.zaz = "zaz"
 
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Gets the current value of foo
+    # Gets the current value of zaz
     # --------------------------------------------------------------------------
-    def get_foo(self):
+    def get_zaz(self):
         """
-        Gets the current value of foo
+        Gets the current value of zaz
 
         Returns:
-            The current value of foo
+            The current value of zaz
 
         Long description (including HTML).
         """
 
-        # return the current value of foo
-        return self.foo
+        # return the current value of zaz
+        return f"this is public: {self.zaz}"
 
     # --------------------------------------------------------------------------
-    # Sets the new value of foo
+    # Sets the new value of zaz
     # --------------------------------------------------------------------------
-    def set_foo(self, new_foo):
+    def set_zaz(self, new_zaz):
         """
-        Sets the new value of foo
+        Sets the new value of zaz
 
         Arguments:
-            new_foo: The new value of foo
+            new_zaz: The new value of zaz
 
         Long description (including HTML).
         """
 
-        # set the new value of foo
-        self.foo = new_foo
+        # set the new value of zaz
+        self.zaz = new_zaz
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -118,7 +118,7 @@ class Main(object):
     # --------------------------------------------------------------------------
     # Short description
     # --------------------------------------------------------------------------
-    def _foo(self):
+    def _zaz(self):
         """
         Short description
 
@@ -134,7 +134,7 @@ class Main(object):
         Long description (including HTML).
         """
 
-        return "this is _foo"
+        return f"this is private: {self.zaz}"
 
 
 # -)

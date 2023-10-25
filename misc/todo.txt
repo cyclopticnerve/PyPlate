@@ -1,19 +1,18 @@
 
-
-
 TODO: move all strings to G_STR section in pybaker
 TODO: make tree happen in pybaker
+TODO: make pybaker check for empty entries in header (not just dunders)
+TODO: pybaker update metadata in cli (desc, name, version)(may need context)
 
-TODO: use cli from cntree for pymaker
-TODO: update metadata in cli (desc, name, version)(may need context)
+TODO: finalize template/misc/default_class.py and template/misc/default_mod.py
 
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
 TODO: how to handle screenshot in readme? should be done by pybaker
 (after we get a screenshot obviously)
-TODO: make pybaker check for empty entries in header (not just dunders)
 
 
+NEXT: use globs in pymaker DICT_COPY
 NEXT: convert all with open() to with path.open()
 NEXT: format license name in fix_readme to account for missing values
 see license_text.py and google doc
