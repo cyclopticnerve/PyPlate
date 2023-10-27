@@ -4,8 +4,6 @@ TODO: make tree happen in pybaker
 TODO: make pybaker check for empty entries in header (not just dunders)
 TODO: pybaker update metadata in cli (desc, name, version)(may need context)
 
-TODO: finalize template/misc/default_class.py and template/misc/default_mod.py
-
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
 TODO: how to handle screenshot in readme? should be done by pybaker
@@ -15,15 +13,14 @@ TODO: how to handle screenshot in readme? should be done by pybaker
 NEXT: use globs in pymaker DICT_COPY
 NEXT: convert all with open() to with path.open()
 NEXT: format license name in fix_readme to account for missing values
-see license_text.py and google doc
+see tests/license_test.py and google doc
 NEXT: show output progress in pymaker
-NEXT: move all config shit to config.py and load into g_dict_setting
 NEXT: make base relocatable
 NEXT: figure out a regex to reset checklist
-NEXT: make pytree accept cmd line
-NEXT: think of better name for pytree
-NEXT: pytree as separate project
-NEXT: pytree accept format string for names ('[] $NAME')
+NEXT: make cntree accept cmd line
+NEXT: think of better name for cntree
+NEXT: cntree as separate project
+NEXT: cntree accept format string for names ('[] $NAME')
 NEXT: combine default cli and default cli_config
 NEXT: convert all paths to pathlib
 NEXT remove .py ext from executable files
@@ -91,6 +88,8 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: move all config shit to config.py and load into g_dict_setting
+DONE: finalize template/misc/default_class.py and template/misc/default_mod.py
 DONE: fix blacklist.json before pymaker.py
 DONE: see what path constants show up in docs with my name in them,
  and make them hidden (start with underscore)

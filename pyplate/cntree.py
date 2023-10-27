@@ -63,7 +63,7 @@ class CNTree:
     _FORMAT_FILE = f" {_FORMAT_NAME}"
 
     # custom error strings
-    _ERR_NOT_A_DIR = "\"{}\" is not a directory"
+    _ERR_NOT_A_DIR = "'{}' is not a directory"
 
     # custom sorting order
     _SORT_ORDER = "_."  # sort first char of name in this order (above ord)

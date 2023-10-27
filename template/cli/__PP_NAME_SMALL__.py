@@ -78,10 +78,11 @@ def main():
     # command line options
     # cfg.save_config(G_DICT_ARGS)
 
+
 # ------------------------------------------------------------------------------
 # Adds command line args to the parser
 # ------------------------------------------------------------------------------
-def add_args(argparser):
+def add_args(argparser):  # pylint: disable=unused-argument
     """
     Adds command line args to the parser
 

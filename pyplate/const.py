@@ -186,7 +186,9 @@ DICT_BLACKLIST = {
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
     "PP_SKIP_CONTENTS": [
-        "**/__PP_NAME_SMALL__.png",
+        "**/*.png",
+        "**/*.jpg",
+        "**/*.jpeg",
     ],
     # skip header, fix text, fix path (0 1 1)
     # NB: not sure what this is useful for, but here it is
@@ -197,7 +199,7 @@ DICT_BLACKLIST = {
     "PP_SKIP_TEXT": [
         "conf/*",
         "MANIFEST.in",
-        "**/.gitignore",
+        ".gitignore",
     ],
     # fix header, fix text, skip path (1 1 0)
     # NB: not really useful, since we always want to fix paths with dunders, but

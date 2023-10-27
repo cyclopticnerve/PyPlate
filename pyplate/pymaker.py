@@ -292,7 +292,8 @@ def do_fix():
     needs fixing based on its appearance in the blacklist.
     """
 
-    # fix uo the blacklist and convert to absolute Path objects
+    # fix up blacklist and convert relative or glob paths to absolute Path
+    # objects 
     _fix_blacklist_paths()
 
     # just shorten the names

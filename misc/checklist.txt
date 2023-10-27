@@ -5,7 +5,6 @@ Initialize
         [] Create venv - $ python -m venv .venv
         [] Activate venv - $ source .venv/bin/activate
         [] Install reqs - $ python -m pip install -r requirements.txt
-        [] Install pylama - $ python -m pip install pylama
 
         Mod/Pkg
             [] Install in venv - $ python -m pip install -e .  

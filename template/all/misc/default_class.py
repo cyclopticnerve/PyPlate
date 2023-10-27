@@ -15,6 +15,7 @@ docstring
 # ------------------------------------------------------------------------------
 
 # system imports
+# local imports
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -68,9 +69,9 @@ class Main(object):
         # NB: something i learned the hard way from c++ coding: you want to do
         # AS LITTLE coding in the constructor method because the whole class may
         # not exist at this point! you should definitely not call get/set
-        # methods to init controls. these methods/controls may not exist at the
-        # time you call them. so to initialize scalar properties, set them
-        # empirically rather than using setter methods.
+        # methods to init properties. these methods/properties may not exist at
+        # the time you call them. so to initialize scalar properties, set them
+        # explicitly rather than using setter methods.
 
         # set the initial value of class
         self.zaz = "zaz"

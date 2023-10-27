@@ -37,7 +37,11 @@ ARG_KEY_PATH_CONFIG = "PATH_CONFIG"
 # NB: the underscore hides my home path from docs
 # NB: uncomment this if you want to use config files to set defaults for command
 # line options
-PATH_CONFIG_DEF = Path.home() / ".config" / "__PP_NAME_BIG__" / "config.json"
+PATH_CONFIG_DEF = ""  # Path.home() / ".config" / "__PP_NAME_BIG__" / "config.json"
+
+# if True, show file load/save errors
+# else show nothing
+SHOW_ERRORS = False
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -61,9 +65,9 @@ G_DICT_CONFIG = {}
 
 # string constants
 S_LOAD_CFG_HELP = "load configuration from file"
-S_CFG_NOT_EXIST = "config file '{}' does not exist"
-S_CFG_NOT_VALID = "config file '{}' is not a valid JSON file"
-S_CFG_NO_CREATE = "config file '{}' could not be created"
+S_CFG_NOT_EXIST = "load config: config file '{}' does not exist"
+S_CFG_NOT_VALID = "load config: config file '{}' is not a valid JSON file"
+S_CFG_NO_CREATE = "save config: config file '{}' could not be created"
 S_CFG_OPTION = "-c"
 S_CFG_OPTION_LONG = "--config-file"
 S_CFG_METAVAR = "FILE"
@@ -143,7 +147,8 @@ def load_config(args):
 
                 # make sure path is absolute
                 if not item.is_absolute:
-                    print(S_CFG_NOT_EXIST.format(item))
+                    if SHOW_ERRORS:
+                        print(S_CFG_NOT_EXIST.format(item))
                     continue
 
                 # open the file
@@ -156,11 +161,13 @@ def load_config(args):
 
         # file not found
         except FileNotFoundError:
-            print(S_CFG_NOT_EXIST.format(item))
+            if SHOW_ERRORS:
+                print(S_CFG_NOT_EXIST.format(item))
 
         # file mot JSON
         except json.JSONDecodeError:
-            print(S_CFG_NOT_VALID.format(item))
+            if SHOW_ERRORS:
+                print(S_CFG_NOT_VALID.format(item))
 
 
 # ------------------------------------------------------------------------------
@@ -195,7 +202,8 @@ def save_config(args):
 
                 # make sure path is absolute
                 if not item.is_absolute():
-                    print(S_CFG_NO_CREATE.format(item))
+                    if SHOW_ERRORS:
+                        print(S_CFG_NO_CREATE.format(item))
                     continue
 
                 # first make dirs
@@ -209,7 +217,8 @@ def save_config(args):
                     # yay!
                     return
         except OSError:
-            print(S_CFG_NO_CREATE.format(item))
+            if SHOW_ERRORS:
+                print(S_CFG_NO_CREATE.format(item))
 
 
 # -)
