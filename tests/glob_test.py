@@ -2,10 +2,12 @@
 docstring
 """
 
-from pathlib import Path
+# from pathlib import Path
+import glob
 
-PATH = Path.home() / "Documents/Projects/Python/PyPlate/tests/"
-GLOB = str("glob_test.py")
+# PATH = "/home/dana/Documents/Projects/Python/Packages/Pkg_Test/"
+GLOB = str("**/glob_test_folder*")
 
-lst = list(PATH.glob(GLOB))
+# lst = list(PATH.glob(GLOB))
+lst = glob.glob(GLOB)
 print(lst)

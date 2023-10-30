@@ -1,17 +1,20 @@
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: __init__.py                                           |     ()     |
+# Filename:                                                       |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
-This file tells Python that this is a package, and it should be treated as such.
-This controls how imports are found, ie. 'import __PP_NAME_SMALL__' or 'from
-__PP_NAME_SMALL__ import <module>'.
+make sure right dir in terminal
+make sure right venv activated
+python -m pip install -e .
+change dunders below (test dir skipped in pymaker)
 """
 
-# THIS FILE PURPOSELY LEFT EMPTY
+import __PP_NAME_SMALL__
+
+print(__PP_NAME_SMALL__.func())
 
 # -)

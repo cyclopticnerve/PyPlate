@@ -88,7 +88,7 @@ def add_args(argparser):
         argparser: The argparse object to add args to
 
     This function adds arguments to the parser. IT SHOULD NEVER BE CALLED IN
-    CODE! It is teased out to make editing command line parameters easier.
+    CODE! It is teased out to make editing command line arguments easier.
     """
 
     # NB: https://docs.python.org/3/library/argparse.html

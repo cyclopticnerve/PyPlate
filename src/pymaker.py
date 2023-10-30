@@ -221,7 +221,8 @@ def copy_template():
     dir_in = const.DIR_TEMPLATE / const.DICT_TYPES[prj_type][2]
 
     # create a package dir in project
-    dir_out = G_DIR_PRJ / G_DICT_SETTINGS["__PP_NAME_SMALL__"]
+    # NB: SOURCE DIR MUST BE NAMED 'SRC" FOR INSTALL -E TO WORK!!!
+    dir_out = G_DIR_PRJ / "src"
 
     # copy project type stuff
     shutil.copytree(dir_in, dir_out)
@@ -293,7 +294,7 @@ def do_fix():
     """
 
     # fix up blacklist and convert relative or glob paths to absolute Path
-    # objects 
+    # objects
     _fix_blacklist_paths()
 
     # just shorten the names

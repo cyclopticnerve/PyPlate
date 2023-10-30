@@ -176,7 +176,7 @@ DICT_BLACKLIST = {
         "docs",
         "misc",
         "README",
-        "tests",
+        "test*",
         "**/locale",
         "CHANGELOG.md",
         "LICENSE.txt",
@@ -246,8 +246,8 @@ DICT_COPY = {
     "misc/checklist.txt": "misc/checklist.txt",
     "misc/snippets.txt": "misc/snippets.txt",
     "misc/style.txt": "misc/style.txt",
-    "pyplate/pybaker.py": "conf/pybaker.py",
-    "pyplate/cntree.py": "conf/cntree.py",
+    "src/pybaker.py": "conf/pybaker.py",
+    "src/cntree.py": "conf/cntree.py",
 }
 
 # string constants

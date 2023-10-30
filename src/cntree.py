@@ -313,11 +313,11 @@ class CNTree:
         self._filter_list = result
 
     # --------------------------------------------------------------------------
-    # Sanitizes the dir_format and file_format parameters
+    # Sanitizes the dir_format and file_format arguments
     # ---------------------------------------------------------------------------
     def _sanitize_formats(self, dir_format, file_format):
         """
-        Sanitizes the dir_format and file_format parameters
+        Sanitizes the dir_format and file_format arguments
 
         Arguments:
             dir_format: Format to use for directory names
@@ -573,16 +573,5 @@ class CNTree:
         # in en_US str.printable, YMMV)
         return [self._sort_order.get(char, ord(char)) for char in tmp_item]
 
-
-# ------------------------------------------------------------------------------
-# For debugging purposes, make a tree of current folder
-# ------------------------------------------------------------------------------
-if __name__ == "__main__":
-    tree_obj = CNTree()
-    # DIR_ROOT = Path(__file__).parent
-    DIR_ROOT = ""
-    print(Path(DIR_ROOT).resolve())
-    # S = tree_obj.build_tree(DIR_ROOT)
-    # print(S)
 
 # -)

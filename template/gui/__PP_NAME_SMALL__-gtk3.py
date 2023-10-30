@@ -117,7 +117,7 @@ class App(Gtk.Application):
         """
             Sets the property value of _dict_gui
 
-            Parameters:
+            Arguments:
                 a_dict: The new property dictionary
 
             This method sets the _dict_gui property. Must be called before
@@ -167,7 +167,7 @@ class App(Gtk.Application):
         """
             Handles when the main window is closed by the 'X' button
 
-            Parameters:
+            Arguments:
                 obj: The calling object
                 event: Not used
 
@@ -236,7 +236,7 @@ class App(Gtk.Application):
         """
             Handles when the About button is clicked
 
-            Parameters:
+            Arguments:
                 obj: The calling object
 
             The About button was clicked. Show the About dialog.
@@ -254,7 +254,7 @@ class App(Gtk.Application):
         """
             Handles when the Save button is clicked
 
-            Parameters:
+            Arguments:
                 obj: The calling object
 
             The Save button was clicked.
@@ -273,7 +273,7 @@ class App(Gtk.Application):
         """
             Handles when the Cancel button is clicked
 
-            Parameters:
+            Arguments:
                 obj: The calling object
 
             The Cancel button was clicked.
@@ -292,7 +292,7 @@ class App(Gtk.Application):
         """
             Handles when the OK button is clicked
 
-            Parameters:
+            Arguments:
                 obj: The calling object
 
             The OK button was clicked.
@@ -314,7 +314,7 @@ class App(Gtk.Application):
         """
             Handles when any control in the window is modified
 
-            Parameters:
+            Arguments:
                 obj: The calling object
 
             Use this method to update the modified status of a cntrol and change
@@ -532,7 +532,7 @@ class App(Gtk.Application):
         """
             Handles when the Application needs to set if it has been modified
 
-            Parameters:
+            Arguments:
                 self : The class object
 
             The Application needs to know if it has been modified. So we create
@@ -575,7 +575,7 @@ class App(Gtk.Application):
         """
             Handles when the Application is activated (ie first window is shown)
 
-            Parameters:
+            Arguments:
                 obj: The calling object
 
             The Application is about to show the main Window.
@@ -622,7 +622,7 @@ class App(Gtk.Application):
         """
             Initializes the class to an object/instance
 
-            Parameters:
+            Arguments:
                 self : The class object
 
             This method is called when a new instance of the class is created,

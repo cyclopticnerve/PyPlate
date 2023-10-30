@@ -58,7 +58,7 @@ def func():
     """
         Short description
 
-        Parameters:
+        Arguments:
             var_name: Description
 
         Returns:
@@ -118,11 +118,11 @@ def _add_args(argparser):
     """
         Adds command line args to the parser
 
-        Parameters:
+        Arguments:
             argparser: The argparse object to add args to
 
         This function adds arguments to the parser. IT SHOULD NEVER BE CALLED IN
-        CODE! It is teased out to make editing command line parameters easier.
+        CODE! It is teased out to make editing command line arguments easier.
     """
 
     # NB: https://docs.python.org/3/library/argparse.html
@@ -173,7 +173,7 @@ def _load_config(path):
     """
         Loads config file from specified path
 
-        Parameters:
+        Arguments:
             path: The path to the config file to load from
 
         Raises:
@@ -204,7 +204,7 @@ def _save_config(path):
     """
         Saves config file to specified path
 
-        Parameters:
+        Arguments:
             path: The path to the config file to save to
 
         Raises:

@@ -3,13 +3,25 @@ TODO: move all strings to G_STR section in pybaker
 TODO: make tree happen in pybaker
 TODO: make pybaker check for empty entries in header (not just dunders)
 TODO: pybaker update metadata in cli (desc, name, version)(may need context)
+TODO: pybaker interactive (ask questions for short desc, deps, etc.)
 
 TODO: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
 TODO: how to handle screenshot in readme? should be done by pybaker
 (after we get a screenshot obviously)
 
+TODO: ctrl+shift+i (format) all files
+TODO: lint (CTRL+S) all files
 
+
+NEXT: get .venv python version and fill in pyproject.toml? how to determine min
+req?
+do i have to test against every version?
+NEXT: get rid of big/small names - all small? or only for packages?
+or convert underscores to dashes in small name (or both)
+NEXT: merge top level folders from all and type (to move tests/pkg_test, src/pyproject.toml,
+etc from only 1 project)
+ie. tests/pkg_test and all/pyproject.toml are only for pkg type
 NEXT: use globs in pymaker DICT_COPY
 NEXT: convert all with open() to with path.open()
 NEXT: format license name in fix_readme to account for missing values

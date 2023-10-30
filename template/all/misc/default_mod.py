@@ -49,8 +49,8 @@ def func():
     Long description (including HTML).
     """
 
-    print("this is func")
-    return _func()
+    print("this is public func")
+    _func()
 
 
 # ------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ def _func():
     Long description (including HTML).
     """
 
-    return "this is _func"
+    print("this is private _func")
 
 
 # -)

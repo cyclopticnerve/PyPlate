@@ -33,7 +33,7 @@ docstring
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
-class Main(object):
+class Main():
     """
     Short description
 
@@ -93,8 +93,11 @@ class Main(object):
         Long description (including HTML).
         """
 
+        # print return value
+        print(f"public get_zaz: {self.zaz}")
+
         # return the current value of zaz
-        return f"this is public: {self.zaz}"
+        return self.zaz
 
     # --------------------------------------------------------------------------
     # Sets the new value of zaz
@@ -109,8 +112,12 @@ class Main(object):
         Long description (including HTML).
         """
 
+        # print new value
+        print(f"public set_zaz: {new_zaz}")
+
         # set the new value of zaz
         self.zaz = new_zaz
+
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -135,7 +142,10 @@ class Main(object):
         Long description (including HTML).
         """
 
-        return f"this is private: {self.zaz}"
+        # print return value
+        print(f"private _zaz: {self.zaz}")
 
+        # return the current value of zaz
+        return self.zaz
 
 # -)

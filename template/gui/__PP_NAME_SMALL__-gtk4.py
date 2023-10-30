@@ -100,7 +100,7 @@ def add_args(_argparser):
             argparser: The argparse object to add args to
 
         This function adds arguments to the parser. It is teased out to make
-        editing command line parameters easier.
+        editing command line arguments easier.
     """
 
     # https://docs.python.org/3/library/argparse.html
