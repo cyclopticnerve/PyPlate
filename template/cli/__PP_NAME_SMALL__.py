@@ -21,9 +21,10 @@ from argparse import RawDescriptionHelpFormatter
 from argparse import RawTextHelpFormatter
 
 # local imports
-# NB: uncomment this if you want to use config files to set defaults for command
-# line options
-# import cli_config as cfg
+# NB: uncomment this if you want to use config files to set defaults for
+# command line options
+
+# import arg_config as cfg
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -93,13 +94,13 @@ def add_args(argparser):  # pylint: disable=unused-argument
     CODE! It is teased out to make editing command line arguments easier.
     """
 
-    # NB: uncomment this if you want to use config files to set defaults for
-    # command line options
-    # cfg.add_args(argparser)
-
     # add your command line options here
     # NB: https://docs.python.org/3/library/argparse.html
     # argparser.add_argument('-f')
+
+    # NB: uncomment this if you want to use config files to set defaults for
+    # command line options
+    # cfg.add_args(argparser)
 
 
 # ------------------------------------------------------------------------------

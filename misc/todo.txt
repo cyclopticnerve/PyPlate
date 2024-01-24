@@ -13,6 +13,13 @@ TODO: how to handle screenshot in readme? should be done by pybaker
 TODO: ctrl+shift+i (format) all files
 TODO: lint (CTRL+S) all files
 
+TODO: in gui, what to set to make name change in top bar/dock 
+step 1: remove .py from main file
+step 2: where is it getting __PP_NAME_SMALL__? from main file?
+if so, need to rename main file to __PP_NAME_BIG__?
+how does that affect other stuff
+also why does it try to load png from current dir? (about dlg!)
+
 
 NEXT: get .venv python version and fill in pyproject.toml? how to determine min
 req?

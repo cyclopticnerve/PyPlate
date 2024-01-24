@@ -33,7 +33,7 @@ docstring
 # ------------------------------------------------------------------------------
 # Short description
 # ------------------------------------------------------------------------------
-class Main():
+class Main:
     """
     Short description
 
@@ -74,7 +74,7 @@ class Main():
         # explicitly rather than using setter methods.
 
         # set the initial value of class
-        self.zaz = "zaz"
+        self._zaz = "zaz"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -94,10 +94,10 @@ class Main():
         """
 
         # print return value
-        print(f"public get_zaz: {self.zaz}")
+        print(f"public get_zaz: {self._zaz}")
 
         # return the current value of zaz
-        return self.zaz
+        return self._zaz
 
     # --------------------------------------------------------------------------
     # Sets the new value of zaz
@@ -116,36 +116,6 @@ class Main():
         print(f"public set_zaz: {new_zaz}")
 
         # set the new value of zaz
-        self.zaz = new_zaz
-
-
-    # --------------------------------------------------------------------------
-    # Private methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Short description
-    # --------------------------------------------------------------------------
-    def _zaz(self):
-        """
-        Short description
-
-        Arguments:
-            var_name: Description
-
-        Returns:
-            Description
-
-        Raises:
-            exception_type(vars): Description
-
-        Long description (including HTML).
-        """
-
-        # print return value
-        print(f"private _zaz: {self.zaz}")
-
-        # return the current value of zaz
-        return self.zaz
+        self._zaz = new_zaz
 
 # -)
