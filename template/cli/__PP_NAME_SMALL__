@@ -1,0 +1,448 @@
+#! /usr/bin/env python
+# ------------------------------------------------------------------------------
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: __PP_NAME_SMALL__                                     |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
+# ------------------------------------------------------------------------------
+
+"""
+The main file that runs the program
+
+This file is executable and can be called from the terminal like:
+
+foo@bar:~$ cd [path to directory of this file]
+foo@bar:~[path to directory of this file]$ ./__PP_NAME_SMALL__ [cmd line]
+
+or if installed in a global location:
+
+foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
+
+Typical usage is show in the main() function.
+"""
+
+# ------------------------------------------------------------------------------
+# Imports
+# ------------------------------------------------------------------------------
+
+# system imports
+import argparse
+import json
+from pathlib import Path
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
+# get path to default config file
+# NB: this path is read-only
+C_CFG_PATH_DEF = Path.home() / ".config/__PP_NAME_SMALL__/default.json"
+
+# the default config dict
+C_DICT_CFG = {}
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# debug flag
+G_DEBUG = False
+
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# version string for -h/-v option
+S_HLP_STRING = (
+    "__PP_NAME_SMALL__\n"
+    "__PP_SHORT_DESC__\n"
+    "__PP_VERSION__\n"
+    "__PP_EMAIL__"
+)
+
+# version option strings
+S_VER_OPTION = "v"
+S_VER_OPTION_LONG = "version"
+S_VER_ACTION = "version"
+S_VER_VERSION = S_HLP_STRING
+
+# config option strings
+S_CFG_OPTION = "c"
+S_CFG_OPTION_LONG = "config-file"
+S_CFG_DEST = "CFG_FILE"
+S_CFG_HELP = "load configuration from file"
+S_CFG_METAVAR = "FILE"
+
+# config debug gui strings
+S_DBG_OPTION = "d"
+S_DBG_OPTION_LONG = "debug"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DEBUG"
+S_DBG_HELP = "enable debugging option"
+
+
+# config load/save error strings
+S_CFG_ERR_EXIST = "load config: config file '{}' does not exist"
+S_CFG_ERR_VALID = "load config: config file '{}' is not a valid JSON file"
+S_CFG_ERR_CREATE = "save config: config file '{}' could not be created"
+
+# ------------------------------------------------------------------------------
+# Public classes
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# The main class, responsible for the operation of the program
+# ------------------------------------------------------------------------------
+class __PP_NAME_BIG__:
+    """
+    The main class, responsible for the operation of the program
+
+    Public methods:
+        main: The main function of the program
+    """
+
+    # --------------------------------------------------------------------------
+    # Creates an instance of the class
+    # --------------------------------------------------------------------------
+    def __init__(self):
+        """
+        Creates an instance of the class
+        """
+
+        # create the command line parser
+        parser = argparse.ArgumentParser(
+            # use the string constant for version and the custom formatter class
+            description=S_HLP_STRING,
+            formatter_class=_MyFormatter,
+        )
+
+        # call the add_args subroutine to add args (teased out for easier code
+        # separation)
+        self._add_args(parser)
+
+        # get namespace object
+        ns = parser.parse_args()
+
+        # convert namespace to dict
+        self._dict_args = vars(ns)
+
+        # the global config dict (built-in or loaded from config file)
+        # it is set once in load_config()
+        # order of precedence is:
+        # 1. command line flag -c
+        # 2. file at C_PATH_DEF_USER
+        # 3. this definition
+        # when the app quits, the config dict is saved to a file in this order:
+        # 1. command line flag -c
+        # 2. file at C_PATH_DEF_USER
+        # 3. none
+        self._dict_cfg = C_DICT_CFG
+
+        # check if debug in cmd line
+        global G_DEBUG  # pylint: disable=global-statement
+        G_DEBUG = self._dict_args.get(S_DBG_DEST, False)
+
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # The main function of the program
+    # --------------------------------------------------------------------------
+    def main(self):
+        """
+        The main function of the program
+
+        This function is the main entry point for the program, initializing the
+        program, and performing its steps.
+        """
+
+        # load config dict from file, def, or just keep built-in
+        # Order of precedence is:
+        # 1. The file passed to the command-line stored in S_CFG_DEST
+        # 2. The file set in the C_CFG_PATH_DEF constant
+        # If neither of the above files are valid, the dict_config dictionary
+        # will remain unchanged.
+
+        # get arg if present and convert to Path
+        path_arg = None
+        arg_config = self._dict_args.get(S_CFG_DEST, None)
+        if arg_config is not None:
+            path_arg = Path(arg_config)
+
+        # load from default and arg
+        paths_load = [C_CFG_PATH_DEF, path_arg]
+        self._load_dict(paths_load)
+
+        # call the steps in order
+        print(self._func())
+
+        # save config dict to passed in file, NOT def, or LOSE built-in
+        self._save_dict(path_arg)
+
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Add arguments to argparse parser
+    # --------------------------------------------------------------------------
+    def _add_args(self, parser):
+        """
+        Add arguments to argparse parser
+        """
+
+        # add version option
+        parser.add_argument(
+            f"-{S_VER_OPTION}",
+            f"--{S_VER_OPTION_LONG}",
+            action=S_VER_ACTION,
+            version=S_VER_VERSION,
+        )
+
+        # add config (user dict) option
+        parser.add_argument(
+            f"-{S_CFG_OPTION}",
+            f"--{S_CFG_OPTION_LONG}",
+            dest=S_CFG_DEST,
+            help=S_CFG_HELP,
+            metavar=S_CFG_METAVAR,
+        )
+
+        # add debug option
+        parser.add_argument(
+            f"-{S_DBG_OPTION}",
+            f"--{S_DBG_OPTION_LONG}",
+            action=S_DBG_ACTION,
+            dest=S_DBG_DEST,
+            help=S_DBG_HELP,
+        )
+
+    # --------------------------------------------------------------------------
+    # Loads config file from first found path, or use built-in
+    # --------------------------------------------------------------------------
+    def _load_dict(self, paths):
+        """
+        Loads config file from first found path, or use built-in
+
+        Arguments:
+            paths: the list of file paths to load from
+
+        Raises:
+            FileNotFoundError: If the file does not exist
+            json.JSONDecodeError: If the file is not a valid JSON file
+
+        Load the config file from a file at the found location.
+        Order of precedence is:
+        1. The file passed to the command-line stored in S_CFG_DEST
+        2. The file set in the C_CFG_PATH_DEF constant
+        If neither of the above files are valid, the dict_config dictionary will
+        remain unchanged.
+        """
+
+        # loop through possible files
+        for path in paths:
+
+            # sanity check
+            if path is None:
+                if G_DEBUG:
+                    print(S_CFG_ERR_EXIST.format(path))
+                continue
+
+            # try each option
+            try:
+
+                # make sure path is absolute
+                if not path.is_absolute:
+                    if G_DEBUG:
+                        print(S_CFG_ERR_EXIST.format(path))
+                    continue
+
+                # open the file
+                with open(path, "r", encoding="UTF-8") as a_file:
+                    # load dict from file
+                    temp_dict_cfg = json.load(a_file)
+
+                    if G_DEBUG:
+                        print("load:", temp_dict_cfg)
+                        print("from:", path)
+
+                    self._dict_cfg = self._combine_dicts(
+                        self._dict_cfg, temp_dict_cfg
+                    )
+
+            # file not found
+            except FileNotFoundError:
+                if G_DEBUG:
+                    print(S_CFG_ERR_EXIST.format(path))
+
+            # file mot JSON
+            except json.JSONDecodeError:
+                if G_DEBUG:
+                    print(S_CFG_ERR_VALID.format(path))
+
+        if G_DEBUG:
+            print("final cfg:", self._dict_cfg)
+
+    # --------------------------------------------------------------------------
+    # Saves config file to first found path, or use built-in
+    # --------------------------------------------------------------------------
+    def _save_dict(self, path):
+        """
+        Saves config file to first found path, or use built-in
+
+        Arguments:
+            path: the file path to save to
+
+        Raises:
+            Exception: If the file does not exist and can't be created
+
+        Save the config to a file at the found location.
+        Order of precedence is:
+        1. The file passed to the command-line using the S_CFG_OPTION or
+        S_CFG_OPTION_LONG strings
+        2. The file set in the C_PATH_DEF_CONFIG constant
+        If neither of the above files are valid, the dict_config dictionary will
+        be lost.
+        """
+
+        # sanity check
+        if path is None:
+            if G_DEBUG:
+                print(S_CFG_ERR_EXIST.format(path))
+            return
+
+        # try path
+        try:
+
+            # make sure path is absolute
+            if not path.is_absolute():
+                if G_DEBUG:
+                    print(S_CFG_ERR_CREATE.format(path))
+                return
+
+            # first make dirs
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+            # open the file
+            with open(path, "w", encoding="UTF-8") as a_file:
+                # save dict tp file
+                json.dump(self._dict_cfg, a_file, indent=4)
+
+                if G_DEBUG:
+                    print("save:", self._dict_cfg)
+                    print("to:", path)
+
+        # raise an OS Error
+        except OSError:
+            if G_DEBUG:
+                print(S_CFG_ERR_CREATE.format(path))
+
+    # --------------------------------------------------------------------------
+    # Short description
+    # --------------------------------------------------------------------------
+    def _func(self):
+        """
+        Short description
+
+        Arguments:
+            var_name: Description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+        """
+
+        return "this is func"
+
+    # --------------------------------------------------------------------------
+    # Updates a dictionary with new values and missing key/value pairs from a
+    # second dictionary
+    # --------------------------------------------------------------------------
+    def _combine_dicts(self, dict_old, dict_new):
+        """
+        Updates a dictionary with new values and missing key/value pairs from a
+        second dictionary
+
+        Arguments:
+            dict_old: The dictionary defined as the one to receive updates
+            dict_new: The dictionary containing new keys/values to be updated
+            in the old dictionary
+
+        Returns:
+            The updated dict_old, filled with updates from dict_new
+
+        This function takes keys/values from dict_new and adds/overwrites these
+        keys and values in dict_old, preserving any values that are blank or
+        None in dict_new.
+        """
+
+        # for each k,v pair in dict_new
+        for k, v in dict_new.items():
+            # copy whole value if key is missing
+            if not k in dict_old:
+                dict_old[k] = v
+
+            # if the key is present in both
+            else:
+                # if the value is a dict
+                if isinstance(v, dict):
+                    # start recursing
+                    # recurse using the current key and value
+                    dict_old[k] = self._combine_dicts(dict_old[k], v)
+
+                # if the value is not a dict
+                else:
+                    # just copy value from one dict to the other
+                    dict_old[k] = v
+
+        # return the updated dict_old
+        return dict_old
+
+
+# ------------------------------------------------------------------------------
+# Private classes
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# A dummy class to combine multiple argparse formatters
+# ------------------------------------------------------------------------------
+class _MyFormatter(
+    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
+):
+    """
+    A dummy class to combine multiple argparse formatters
+
+    Arguments:
+        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
+        including argument descriptions.
+        RawDescriptionHelpFormatter: Indicates that description and epilog are
+        already correctly formatted and should not be line-wrapped.
+
+    A dummy class to combine multiple argparse formatters.
+    """
+
+
+# ------------------------------------------------------------------------------
+# Code to run when called from command line
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    # Code to run when called from command line
+
+    # This is the top level code of the program, called when the Python file is
+    # invoked from the command line.
+
+    # create a new instance of the main class
+    inst = __PP_NAME_BIG__()
+
+    # run main function
+    inst.main()
+
+# -)
