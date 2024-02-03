@@ -40,21 +40,18 @@ from pathlib import Path
 C_CFG_PATH_DEF = Path.home() / ".config/__PP_NAME_SMALL__/default.json"
 
 # the default config dict
-C_DICT_CFG = {}
+C_CFG_DICT = {}
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
-
-# debug flag
-G_DEBUG = False
 
 # ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
 
 # version string for -h/-v option
-S_HLP_STRING = (
+S_HELP_VERSION = (
     "__PP_NAME_SMALL__\n"
     "__PP_SHORT_DESC__\n"
     "__PP_VERSION__\n"
@@ -65,12 +62,12 @@ S_HLP_STRING = (
 S_VER_OPTION = "v"
 S_VER_OPTION_LONG = "version"
 S_VER_ACTION = "version"
-S_VER_VERSION = S_HLP_STRING
+S_VER_VERSION = S_HELP_VERSION
 
 # config option strings
 S_CFG_OPTION = "c"
 S_CFG_OPTION_LONG = "config-file"
-S_CFG_DEST = "CFG_FILE"
+S_CFG_DEST = "CFG_DEST"
 S_CFG_HELP = "load configuration from file"
 S_CFG_METAVAR = "FILE"
 
@@ -78,7 +75,7 @@ S_CFG_METAVAR = "FILE"
 S_DBG_OPTION = "d"
 S_DBG_OPTION_LONG = "debug"
 S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DEBUG"
+S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
 
 
@@ -99,53 +96,37 @@ class __PP_NAME_BIG__:
     """
     The main class, responsible for the operation of the program
 
-    Public methods:
+    Public functions:
         main: The main function of the program
+
+    This object does the all the work of a typical CLI program. It parses
+    command line options, loads/saves config files, and performs the operations
+    required for the program.
     """
 
     # --------------------------------------------------------------------------
-    # Creates an instance of the class
+    # Class functions
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the new object
     # --------------------------------------------------------------------------
     def __init__(self):
         """
-        Creates an instance of the class
+        Initialize the new object
+
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
         """
 
-        # create the command line parser
-        parser = argparse.ArgumentParser(
-            # use the string constant for version and the custom formatter class
-            description=S_HLP_STRING,
-            formatter_class=_MyFormatter,
-        )
-
-        # call the add_args subroutine to add args (teased out for easier code
-        # separation)
-        self._add_args(parser)
-
-        # get namespace object
-        ns = parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(ns)
-
-        # the global config dict (built-in or loaded from config file)
-        # it is set once in load_config()
-        # order of precedence is:
-        # 1. command line flag -c
-        # 2. file at C_PATH_DEF_USER
-        # 3. this definition
-        # when the app quits, the config dict is saved to a file in this order:
-        # 1. command line flag -c
-        # 2. file at C_PATH_DEF_USER
-        # 3. none
-        self._dict_cfg = C_DICT_CFG
-
-        # check if debug in cmd line
-        global G_DEBUG  # pylint: disable=global-statement
-        G_DEBUG = self._dict_args.get(S_DBG_DEST, False)
+        # set defaults
+        self._args = argparse.Namespace()
+        self._path_config = None
+        self._dict_cfg = C_CFG_DICT
 
     # --------------------------------------------------------------------------
-    # Public methods
+    # Public functions
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -159,32 +140,105 @@ class __PP_NAME_BIG__:
         program, and performing its steps.
         """
 
+        # ----------------------------------------------------------------------
+        # steps
+
+        # do parser setup
+        self._setup_parser()
+
+        # load config
+        self._load_config()
+
+        # call the steps in order
+        print(self.func())
+
+        # save config dict to passed in file, NOT def, or LOSE built-in
+        self._save_dict(self._path_config, self._dict_cfg)
+
+    # --------------------------------------------------------------------------
+    # Short description
+    # --------------------------------------------------------------------------
+    def func(self):
+        """
+        Short description
+
+        Arguments:
+            var_name: Description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+        """
+
+        return "this is func"
+
+    # --------------------------------------------------------------------------
+    # Private functions
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Sets up the command line parser
+    # --------------------------------------------------------------------------
+    def _setup_parser(self):
+        """
+        Sets up the command line parser
+
+        This function sets up the command line parser to minimize code in
+        main(). 
+        """
+
+        # create the command line parser
+        parser = argparse.ArgumentParser(
+            # use the string constant for help/version and the custom formatter
+            # class
+            description=S_HELP_VERSION,
+            formatter_class=_MyFormatter,
+        )
+
+        # call the _add_args function to add args (teased out for easier code
+        # maintenance)
+        self._add_args(parser)
+
+        # get namespace object
+        self._args = parser.parse_args()
+
+    # --------------------------------------------------------------------------
+    # Loads config file from several sources
+    # --------------------------------------------------------------------------
+    def _load_config(self):
+        """
+        Loads config file from several sources
+
+        This function loads config files from several sources, and is teased
+        out to simplify the code in main().
+        """
+
         # load config dict from file, def, or just keep built-in
         # Order of precedence is:
-        # 1. The file passed to the command-line stored in S_CFG_DEST
+        # 1. The file passed to the command-line stored in CFG_DEST
         # 2. The file set in the C_CFG_PATH_DEF constant
         # If neither of the above files are valid, the dict_config dictionary
         # will remain unchanged.
 
-        # get arg if present and convert to Path
-        path_arg = None
-        arg_config = self._dict_args.get(S_CFG_DEST, None)
+        # load from default
+        paths_load = [C_CFG_PATH_DEF]
+
+        # if arg is present
+        arg_config = self._args.CFG_DEST
         if arg_config is not None:
-            path_arg = Path(arg_config)
 
-        # load from default and arg
-        paths_load = [C_CFG_PATH_DEF, path_arg]
-        self._load_dict(paths_load)
+            # convert to path
+            self._path_config = Path(arg_config)
 
-        # call the steps in order
-        print(self._func())
+            # add to load list
+            paths_load.append(self._path_config)
 
-        # save config dict to passed in file, NOT def, or LOSE built-in
-        self._save_dict(path_arg)
-
-    # --------------------------------------------------------------------------
-    # Private methods
-    # --------------------------------------------------------------------------
+        # load dict(s) from path(s)
+        self._dict_cfg = self._load_dicts(paths_load, self._dict_cfg)
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -192,6 +246,11 @@ class __PP_NAME_BIG__:
     def _add_args(self, parser):
         """
         Add arguments to argparse parser
+
+        Arguments:
+            parser: the parser to add arguments to
+
+        This function is teased out for better code maintenance.
         """
 
         # add version option
@@ -221,33 +280,37 @@ class __PP_NAME_BIG__:
         )
 
     # --------------------------------------------------------------------------
-    # Loads config file from first found path, or use built-in
+    # Loads dictionaries from all found paths, combining each in order
     # --------------------------------------------------------------------------
-    def _load_dict(self, paths):
+    def _load_dicts(self, paths, dict_start=None):
         """
-        Loads config file from first found path, or use built-in
+        Loads dictionaries from all found paths, combining each in order
 
         Arguments:
             paths: the list of file paths to load from
+            dict_start: the final dict that will be returned after combining
+
+        Returns:
+            the combination of dict_start and all loaded dicts in paths
 
         Raises:
             FileNotFoundError: If the file does not exist
             json.JSONDecodeError: If the file is not a valid JSON file
 
-        Load the config file from a file at the found location.
-        Order of precedence is:
-        1. The file passed to the command-line stored in S_CFG_DEST
-        2. The file set in the C_CFG_PATH_DEF constant
-        If neither of the above files are valid, the dict_config dictionary will
-        remain unchanged.
+        Load the dictionaries from all files at all found locations, and
+        combine them.
         """
+
+        # set the default result
+        if dict_start is None:
+            dict_start = {}
 
         # loop through possible files
         for path in paths:
 
             # sanity check
             if path is None:
-                if G_DEBUG:
+                if self._args.DBG_DEST:
                     print(S_CFG_ERR_EXIST.format(path))
                 continue
 
@@ -256,61 +319,60 @@ class __PP_NAME_BIG__:
 
                 # make sure path is absolute
                 if not path.is_absolute:
-                    if G_DEBUG:
+                    if self._args.DBG_DEST:
                         print(S_CFG_ERR_EXIST.format(path))
                     continue
 
                 # open the file
                 with open(path, "r", encoding="UTF-8") as a_file:
                     # load dict from file
-                    temp_dict_cfg = json.load(a_file)
+                    temp_dict = json.load(a_file)
 
-                    if G_DEBUG:
-                        print("load:", temp_dict_cfg)
+                    # debug
+                    if self._args.DBG_DEST:
+                        print("load:", temp_dict)
                         print("from:", path)
 
-                    self._dict_cfg = self._combine_dicts(
-                        self._dict_cfg, temp_dict_cfg
-                    )
+                # combine new dict with previous
+                dict_start = self._combine_dicts(dict_start, temp_dict)
 
             # file not found
             except FileNotFoundError:
-                if G_DEBUG:
+                if self._args.DBG_DEST:
                     print(S_CFG_ERR_EXIST.format(path))
 
             # file mot JSON
             except json.JSONDecodeError:
-                if G_DEBUG:
+                if self._args.DBG_DEST:
                     print(S_CFG_ERR_VALID.format(path))
 
-        if G_DEBUG:
-            print("final cfg:", self._dict_cfg)
+        # debug
+        if self._args.DBG_DEST:
+            print("final cfg:", dict_start)
+
+        # return result
+        return dict_start
 
     # --------------------------------------------------------------------------
-    # Saves config file to first found path, or use built-in
+    # Saves a dictionary to a path
     # --------------------------------------------------------------------------
-    def _save_dict(self, path):
+    def _save_dict(self, path, dict_):
         """
-        Saves config file to first found path, or use built-in
+        Saves a dictionary to a path
 
         Arguments:
             path: the file path to save to
+            dict_: the dictionary to save to the file
 
         Raises:
             Exception: If the file does not exist and can't be created
 
-        Save the config to a file at the found location.
-        Order of precedence is:
-        1. The file passed to the command-line using the S_CFG_OPTION or
-        S_CFG_OPTION_LONG strings
-        2. The file set in the C_PATH_DEF_CONFIG constant
-        If neither of the above files are valid, the dict_config dictionary will
-        be lost.
+        Save the dictionary to a file at the specified location.
         """
 
         # sanity check
         if path is None:
-            if G_DEBUG:
+            if self._args.DBG_DEST:
                 print(S_CFG_ERR_EXIST.format(path))
             return
 
@@ -319,7 +381,7 @@ class __PP_NAME_BIG__:
 
             # make sure path is absolute
             if not path.is_absolute():
-                if G_DEBUG:
+                if self._args.DBG_DEST:
                     print(S_CFG_ERR_CREATE.format(path))
                 return
 
@@ -329,37 +391,17 @@ class __PP_NAME_BIG__:
             # open the file
             with open(path, "w", encoding="UTF-8") as a_file:
                 # save dict tp file
-                json.dump(self._dict_cfg, a_file, indent=4)
+                json.dump(dict_, a_file, indent=4)
 
-                if G_DEBUG:
-                    print("save:", self._dict_cfg)
+                # debug
+                if self._args.DBG_DEST:
+                    print("save:", dict_)
                     print("to:", path)
 
         # raise an OS Error
         except OSError:
-            if G_DEBUG:
+            if self._args.DBG_DEST:
                 print(S_CFG_ERR_CREATE.format(path))
-
-    # --------------------------------------------------------------------------
-    # Short description
-    # --------------------------------------------------------------------------
-    def _func(self):
-        """
-        Short description
-
-        Arguments:
-            var_name: Description
-
-        Returns:
-            Description
-
-        Raises:
-            exception_type(vars): Description
-
-        Long description (including HTML).
-        """
-
-        return "this is func"
 
     # --------------------------------------------------------------------------
     # Updates a dictionary with new values and missing key/value pairs from a
@@ -379,8 +421,7 @@ class __PP_NAME_BIG__:
             The updated dict_old, filled with updates from dict_new
 
         This function takes keys/values from dict_new and adds/overwrites these
-        keys and values in dict_old, preserving any values that are blank or
-        None in dict_new.
+        keys and values in dict_old.
         """
 
         # for each k,v pair in dict_new
