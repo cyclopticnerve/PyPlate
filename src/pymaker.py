@@ -9,8 +9,8 @@
 """
 This module gets the project type, the project's destination dir, copies the
 required dirs/files for the project type from the template to the specified
-destination, and performs some initial fixes/replacements of text and path names
-in the resulting files.
+destination, and performs some initial fixes/replacements of text and path
+names in the resulting files.
 """
 
 # ------------------------------------------------------------------------------
@@ -26,10 +26,30 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 
-# local imports
-from cntree import CNTree
-import const
+# add lib path to import search
+PATH_LIB = Path(__file__).parents[1] / "lib"
+sys.path.append(str(PATH_LIB))
+
+# add conf path to import search
+PATH_CONF = Path(__file__).parents[1]
+sys.path.append(str(PATH_CONF))
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
+
+# my imports
+from cnlib.cntree import CNTree  # type: ignore
+from cnlib.cnpot import CNPotPy  # type: ignore
+from conf import pyplateconstants as C
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=import-error
+# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -45,15 +65,15 @@ DEBUG = True
 # these can be used later by pybaker.py (from misc/settings.json)
 # NB: these are one-time settings created by pymaker and should not be edited
 # dunders will be used for string replacement here, and checking in pybaker
-# also, some entries are moved here from const.DICT_USER for convenience
+# also, some entries are moved here from C.DICT_USER for convenience
 # others are calculated from user entries in the cli
 G_DICT_SETTINGS = {
-    "__PP_AUTHOR__": const.DICT_USER["__PP_AUTHOR__"],
-    "__PP_EMAIL__": const.DICT_USER["__PP_EMAIL__"],
-    "__PP_LICENSE_NAME__": const.DICT_USER["__PP_LICENSE_NAME__"],
-    "__PP_LICENSE_FILE__": const.DICT_USER["__PP_LICENSE_FILE__"],
-    "__PP_DATE_FMT__": const.DICT_USER["__PP_DATE_FMT__"],
-    "__PP_README_FILE__": const.DICT_README["RM_FILENAME"],
+    "__PP_AUTHOR__": C.DICT_USER["__PP_AUTHOR__"],
+    "__PP_EMAIL__": C.DICT_USER["__PP_EMAIL__"],
+    "__PP_LICENSE_NAME__": C.DICT_USER["__PP_LICENSE_NAME__"],
+    "__PP_LICENSE_FILE__": C.DICT_USER["__PP_LICENSE_FILE__"],
+    "__PP_DATE_FMT__": C.DICT_USER["__PP_DATE_FMT__"],
+    "__PP_README_FILE__": C.DICT_README["RM_FILENAME"],
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_DIR_PRJ__": "",  # '~/Documents/Projects/Python/CLIs/PyPlate'
     "__PP_NAME_BIG__": "",  # PyPlate
@@ -86,6 +106,10 @@ def main():
     # copy template
     copy_template()
 
+    # do i18n stuff
+    if G_DICT_SETTINGS["__PP_TYPE_PRJ__"] in C.LIST_I18N:
+        do_i18n()
+
     # copy any files that may need to be fixed
     do_before_fix()
 
@@ -116,11 +140,9 @@ def get_project_info():
     type_prj = ""
 
     # get possible types
-    list_types = [
-        f"{key} ({val[0]})" for (key, val) in const.DICT_TYPES.items()
-    ]
+    list_types = [f"{key} ({val[0]})" for (key, val) in C.DICT_TYPES.items()]
     str_types = " | ".join(list_types)
-    in_type = f"{const.S_PRJ_TYPE} [{str_types}]: "
+    in_type = f"{C.S_PRJ_TYPE} [{str_types}]: "
 
     # loop forever until we get a valid type (or user presses Ctrl+C)
     while True:
@@ -136,7 +158,7 @@ def get_project_info():
     G_DICT_SETTINGS["__PP_TYPE_PRJ__"] = type_prj
 
     # get output subdir
-    dir_type = const.DICT_TYPES[type_prj][1]
+    dir_type = C.DICT_TYPES[type_prj][1]
 
     # --------------------------------------------------------------------------
 
@@ -150,12 +172,12 @@ def get_project_info():
     # loop forever until we get a valid name (or user presses Ctrl+C)
     while True:
         # ask for name of project
-        name_prj = input(f"{const.S_PRJ_NAME}: ")
+        name_prj = input(f"{C.S_PRJ_NAME}: ")
 
         # check for valid name
         if _check_name(name_prj):
             # set up for existence check
-            tmp_dir = const.DIR_BASE / dir_type / name_prj
+            tmp_dir = C.DIR_BASE / dir_type / name_prj
 
             # ------------------------------------------------------------------
 
@@ -168,7 +190,7 @@ def get_project_info():
 
             # check if project already exists
             if tmp_dir.exists():
-                print(const.S_NAME_ERR.format(name_prj, dir_type))
+                print(C.S_NAME_ERR.format(name_prj, dir_type))
             else:
                 break
 
@@ -179,7 +201,7 @@ def get_project_info():
     # actual dict variable, only its contents
     # in this case though, we are assigning to a scalar value, and so must use
     # the 'global' keyword above
-    G_DIR_PRJ = const.DIR_BASE / dir_type / name_prj
+    G_DIR_PRJ = C.DIR_BASE / dir_type / name_prj
 
     # at this point, both dir and name are valid, so store both and exit
     # NB: make sure to store the project dir as a string, so it can be saved
@@ -195,7 +217,7 @@ def get_project_info():
     # NB: this gives us a create date that we cannot get reliably from Linux
     # later this may be changed to modified date
     now = datetime.now()
-    fmt_date = const.DICT_USER["__PP_DATE_FMT__"]
+    fmt_date = C.DICT_USER["__PP_DATE_FMT__"]
     info_date = now.strftime(fmt_date)
     G_DICT_SETTINGS["__PP_DATE__"] = info_date
 
@@ -211,14 +233,14 @@ def copy_template():
     """
 
     # get input dir for common dirs/files
-    dir_in = const.DIR_TEMPLATE / const.S_LOC_ALL
+    dir_in = C.DIR_TEMPLATE / C.S_LOC_ALL
 
     # copy common stuff
     shutil.copytree(dir_in, G_DIR_PRJ)
 
     # get a path to the template dir for this project type
     prj_type = G_DICT_SETTINGS["__PP_TYPE_PRJ__"]
-    dir_in = const.DIR_TEMPLATE / const.DICT_TYPES[prj_type][2]
+    dir_in = C.DIR_TEMPLATE / C.DICT_TYPES[prj_type][2]
 
     # create a package dir in project
     # NB: SOURCE DIR MUST BE NAMED 'SRC" FOR INSTALL -E TO WORK!!!
@@ -226,6 +248,28 @@ def copy_template():
 
     # copy project type stuff
     shutil.copytree(dir_in, dir_out)
+
+
+# ------------------------------------------------------------------------------
+# Do i18n stuff if the project is a GUI
+# ------------------------------------------------------------------------------
+def do_i18n():
+    """
+    Do i18n stuff if the project is a GUI
+    """
+
+    # FIXME: fix this
+    # output dir (where the .pot and locale files will go)
+    # dir_locale = Path(G_DIR_PRJ / C.S_DIR_LOCALE)
+
+    # # create the potpy object
+    # potpy = PotPy(G_DIR_PRJ, dir_locale)
+
+    # # make a .pot file
+    # potpy.make_pot(C.DICT_CLANGS)
+
+    # # update any .po files to .mo files
+    # potpy.make_mos()
 
 
 # ------------------------------------------------------------------------------
@@ -245,34 +289,34 @@ def do_before_fix():
         with open(path_to, "w", encoding="UTF8") as a_file:
             json.dump(a_dict, a_file, indent=4)
 
-    # write const.DICT_BLACKLIST to conf file
-    path_to = G_DIR_PRJ / const.S_BLACKLIST
-    _write_file(const.DICT_BLACKLIST, path_to)
+    # write C.DICT_BLACKLIST to conf file
+    path_to = G_DIR_PRJ / C.S_BLACKLIST
+    _write_file(C.DICT_BLACKLIST, path_to)
 
     # default blacklist
-    path_to = G_DIR_PRJ / const.S_BLACKLIST_DEF
-    _write_file(const.DICT_BLACKLIST, path_to)
+    path_to = G_DIR_PRJ / C.S_BLACKLIST_DEF
+    _write_file(C.DICT_BLACKLIST, path_to)
 
-    # write const.DICT_METADATA to conf file
-    path_to = G_DIR_PRJ / const.S_METADATA
-    _write_file(const.DICT_METADATA, path_to)
+    # write C.DICT_METADATA to conf file
+    path_to = G_DIR_PRJ / C.S_METADATA
+    _write_file(C.DICT_METADATA, path_to)
 
     # default metadata
-    path_to = G_DIR_PRJ / const.S_METADATA_DEF
-    _write_file(const.DICT_METADATA, path_to)
+    path_to = G_DIR_PRJ / C.S_METADATA_DEF
+    _write_file(C.DICT_METADATA, path_to)
 
     # write G_DICT_SETTINGS to conf file
-    path_to = G_DIR_PRJ / const.S_SETTINGS
+    path_to = G_DIR_PRJ / C.S_SETTINGS
     _write_file(G_DICT_SETTINGS, path_to)
 
     # default settings
-    path_to = G_DIR_PRJ / const.S_SETTINGS_DEF
+    path_to = G_DIR_PRJ / C.S_SETTINGS_DEF
     _write_file(G_DICT_SETTINGS, path_to)
 
     # copy linked files
-    for key, val in const.DICT_COPY.items():
+    for key, val in C.DICT_COPY.items():
         # first get full source path
-        path_in = const.DIR_PYPLATE / key
+        path_in = C.DIR_PYPLATE / key
 
         # then get full dest path
         path_out = G_DIR_PRJ / val
@@ -298,17 +342,18 @@ def do_fix():
     _fix_blacklist_paths()
 
     # just shorten the names
-    skip_all = const.DICT_BLACKLIST["PP_SKIP_ALL"]
-    skip_contents = const.DICT_BLACKLIST["PP_SKIP_CONTENTS"]
-    skip_header = const.DICT_BLACKLIST["PP_SKIP_HEADER"]
-    skip_text = const.DICT_BLACKLIST["PP_SKIP_TEXT"]
-    skip_path = const.DICT_BLACKLIST["PP_SKIP_PATH"]
+    skip_all = C.DICT_BLACKLIST["PP_SKIP_ALL"]
+    skip_contents = C.DICT_BLACKLIST["PP_SKIP_CONTENTS"]
+    skip_header = C.DICT_BLACKLIST["PP_SKIP_HEADER"]
+    skip_text = C.DICT_BLACKLIST["PP_SKIP_TEXT"]
+    skip_path = C.DICT_BLACKLIST["PP_SKIP_PATH"]
 
     # walk from project dir
     # NB: topdown=False is required for the renaming, as we don't want to rename
     # (and thus clobber) a directory name before we rename all its child
     # dirs/files
     # it should have no effect on the other fixes
+    # TODO: use Path instead of os
     for root, _dirs, files in os.walk(G_DIR_PRJ, topdown=False):
         # NB: note that root is a full path, dirs and files are relative to root
 
@@ -330,10 +375,7 @@ def do_fix():
 
             # fix README if it is the top-level README.md
             # NB: need to do before any other stuff, requires special treatment
-            if (
-                root == G_DIR_PRJ
-                and item.name == const.DICT_README["RM_FILENAME"]
-            ):
+            if root == G_DIR_PRJ and item.name == C.DICT_README["RM_FILENAME"]:
                 _fix_readme(item)
 
             # if we shouldn't skip contents
@@ -382,8 +424,8 @@ def do_after_fix():
     if DEBUG:
         # get tree path
         prj_type = G_DICT_SETTINGS["__PP_TYPE_PRJ__"]
-        dir_tree = const.DICT_TYPES[prj_type][1]
-        path_tree = const.DIR_BASE / "trees" / dir_tree / "tree.txt"
+        dir_tree = C.DICT_TYPES[prj_type][1]
+        path_tree = C.DIR_BASE / "trees" / dir_tree / "tree.txt"
 
         # make tree path
         path_tree.parent.mkdir(parents=True, exist_ok=True)
@@ -394,7 +436,7 @@ def do_after_fix():
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 str(G_DIR_PRJ),
-                filter_list=const.DICT_BLACKLIST["PP_SKIP_TREE"],
+                filter_list=C.DICT_BLACKLIST["PP_SKIP_TREE"],
                 dir_format=" [] $NAME",
                 file_format=" [] $NAME",
             )
@@ -406,7 +448,7 @@ def do_after_fix():
     # --------------------------------------------------------------------------
 
     # get path to tree
-    path_tree = G_DIR_PRJ / const.S_MISC / const.S_TREE
+    path_tree = G_DIR_PRJ / C.S_MISC / C.S_TREE
 
     # create the file so it includes itself
     with open(path_tree, "w", encoding="UTF8") as a_file:
@@ -416,9 +458,9 @@ def do_after_fix():
     tree_obj = CNTree()
     tree_str = tree_obj.build_tree(
         str(G_DIR_PRJ),
-        filter_list=const.DICT_BLACKLIST["PP_SKIP_TREE"],
-        dir_format=const.S_DIR_FORMAT,
-        file_format=const.S_FILE_FORMAT,
+        filter_list=C.DICT_BLACKLIST["PP_SKIP_TREE"],
+        dir_format=C.S_DIR_FORMAT,
+        file_format=C.S_FILE_FORMAT,
     )
 
     # write to file
@@ -431,7 +473,7 @@ def do_after_fix():
     subprocess.run(cmd_array, check=False)
 
     # # set up venv
-    cmd = f"python -m venv {str(G_DIR_PRJ)}/{const.S_NAME_VENV}"
+    cmd = f"python -m venv {str(G_DIR_PRJ)}/{C.S_NAME_VENV}"
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array, check=False)
 
@@ -455,16 +497,16 @@ def _fix_blacklist_paths():
     # remove path separators
     # NB: this is mostly for glob support, as globs cannot end in path
     # separators
-    for key in const.DICT_BLACKLIST:
-        const.DICT_BLACKLIST[key] = [
-            item.rstrip(os.sep) for item in const.DICT_BLACKLIST[key]
+    for key in C.DICT_BLACKLIST:
+        C.DICT_BLACKLIST[key] = [
+            item.rstrip(os.sep) for item in C.DICT_BLACKLIST[key]
         ]
 
     # support for absolute/relative/glob
     # NB: taken from cntree.py
 
     # for each section of blacklist
-    for key, val in const.DICT_BLACKLIST.items():
+    for key, val in C.DICT_BLACKLIST.items():
         # convert all items in list to Path objects
         paths = [Path(item) for item in val]
 
@@ -489,7 +531,7 @@ def _fix_blacklist_paths():
             result += list(item)
 
         # set the list as the result list
-        const.DICT_BLACKLIST[key] = result
+        C.DICT_BLACKLIST[key] = result
 
 
 # ------------------------------------------------------------------------------
@@ -502,7 +544,7 @@ def _fix_readme(path):
     Arguments:
         path: Path for the README to remove text
 
-    Fixes the license/image according to the const.DICT_USER settings, and also
+    Fixes the license/image according to the C.DICT_USER settings, and also
     removes sections of the README file that are not appropriate to the
     specified type of project, such as Module/Package or CLI/GUI.
     """
@@ -519,9 +561,9 @@ def _fix_readme(path):
         text = a_file.read()
 
     # get replacement value
-    pp_license_name = const.DICT_USER["__PP_LICENSE_NAME__"]
-    pp_license_img = const.DICT_USER["__PP_LICENSE_IMG__"]
-    pp_license_link = const.DICT_USER["__PP_LICENSE_LINK__"]
+    pp_license_name = C.DICT_USER["__PP_LICENSE_NAME__"]
+    pp_license_img = C.DICT_USER["__PP_LICENSE_IMG__"]
+    pp_license_link = C.DICT_USER["__PP_LICENSE_LINK__"]
 
     # the default license value
     pp_license_full = (
@@ -532,8 +574,8 @@ def _fix_readme(path):
     )
 
     # find the license block
-    pattern_start = const.DICT_README["RM_LICENSE"]["RM_LICENSE_START"]
-    pattern_end = const.DICT_README["RM_LICENSE"]["RM_LICENSE_END"]
+    pattern_start = C.DICT_README["RM_LICENSE"]["RM_LICENSE_START"]
+    pattern_end = C.DICT_README["RM_LICENSE"]["RM_LICENSE_END"]
     str_pattern = rf"({pattern_start})(.*?)({pattern_end})"
 
     # replace text
@@ -569,7 +611,7 @@ def _fix_readme(path):
     # what to ignore in the text
     # first get type of project
     type_prj = G_DICT_SETTINGS["__PP_TYPE_PRJ__"]
-    for key, val in const.DICT_README.items():
+    for key, val in C.DICT_README.items():
         if type_prj == key:
             # get values for keys
             rm_delete_start = val["RM_DELETE_START"]
@@ -629,7 +671,7 @@ def _fix_header(path):
 
     If your files do not use any right-aligned text, then the value can be
     empty. If the value contains text which is NOT a key in G_DICT_SETTINGS, it
-    will remain unchanged. This is mostly useful for the files in the const.DICT_COPY
+    will remain unchanged. This is mostly useful for the files in the C.DICT_COPY
     dictionary, where you want to change other header values but leave the
     filename unchanged.
     """
@@ -644,7 +686,7 @@ def _fix_header(path):
     # for each line in header
     for index, line in enumerate(lines):
         # for each header key
-        for item in const.LIST_HEADER:
+        for item in C.LIST_HEADER:
             # look for a header key
             key = item[0]
             pattern = (
@@ -845,11 +887,11 @@ def _fix_blacklist_dunders():
             json.dump(dict_bl, a_file, indent=4)
 
     # replace stuff in regular file
-    path_to = G_DIR_PRJ / const.S_BLACKLIST
+    path_to = G_DIR_PRJ / C.S_BLACKLIST
     _fix_file(path_to)
 
     # replace stuff in backup file
-    path_to = G_DIR_PRJ / const.S_BLACKLIST_DEF
+    path_to = G_DIR_PRJ / C.S_BLACKLIST_DEF
     _fix_file(path_to)
 
 
@@ -876,11 +918,11 @@ def _check_type(type_prj):
         char = char.lower()
 
         # we got a valid type
-        if char in const.DICT_TYPES:
+        if char in C.DICT_TYPES:
             return True
 
     # nope, fail
-    print(const.S_PRJ_TYPE_INVALID)
+    print(C.S_PRJ_TYPE_INVALID)
     return False
 
 
@@ -917,28 +959,28 @@ def _check_name(name_prj):
         return False
 
     if len(name_prj) == 1:
-        print(const.S_PRJ_NAME_LEN)
+        print(C.S_PRJ_NAME_LEN)
         return False
 
     # match start or return false
     pattern = r"(^[a-zA-Z])"
     res = re.search(pattern, name_prj)
     if not res:
-        print(const.S_PRJ_NAME_START)
+        print(C.S_PRJ_NAME_START)
         return False
 
     # match end or return false
     pattern = r"([a-zA-Z\d]$)"
     res = re.search(pattern, name_prj)
     if not res:
-        print(const.S_PRJ_NAME_END)
+        print(C.S_PRJ_NAME_END)
         return False
 
     # match middle or return false
     pattern = r"(^[a-zA-Z\d\-_]*$)"
     res = re.search(pattern, name_prj)
     if not res:
-        print(const.S_PRJ_NAME_CONTAIN)
+        print(C.S_PRJ_NAME_CONTAIN)
         return False
 
     # if we made it this far, return true

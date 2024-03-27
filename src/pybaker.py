@@ -18,13 +18,15 @@ files, according to the data present in the conf files.
 # system imports
 from datetime import date
 import json
+# TODO: get rid of this
+import os
 from pathlib import Path
 import re
 import shlex
 import subprocess
 
 # local imports
-from cntree import CNTree
+from EVERYTHING.cntree import CNTree
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -255,7 +257,7 @@ def main():
     do_extras()
 
     # do gettext stuff
-    do_gettext()
+    # do_gettext()
 
     # # print error count (__PP_/PP_ stuff found)
     s = G_STRINGS["S_ERR_COUNT"]
@@ -1068,109 +1070,109 @@ def do_extras():
 # ------------------------------------------------------------------------------
 # Run xgettext over files to produce a locale template
 # ------------------------------------------------------------------------------
-def do_gettext():
-    """
-    Run xgettext over files to produce a locale template
+# def do_gettext():
+#     """
+#     Run xgettext over files to produce a locale template
 
-    Use xgettext to scan .py and .ui files for I18N strings and collect them
-    int a .pot file in the locale folder. Only applies to gui projects at
-    the moment.
-    """
+#     Use xgettext to scan .py and .ui files for I18N strings and collect them
+#     int a .pot file in the locale folder. Only applies to gui projects at
+#     the moment.
+#     """
 
-    # check if we are a gui project
-    is_gui = DICT_SETTINGS["project"]["type"] == "g"
-    if not is_gui:
-        return
+#     # check if we are a gui project
+#     is_gui = DICT_SETTINGS["project"]["type"] == "g"
+#     if not is_gui:
+#         return
 
-    # get locale folder and pot filename
-    dir_locale = os.path.join(_DIR_PRJ, "src", "locale")
-    pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
-    path_pot = os.path.join(dir_locale, f"{pp_name_small}.pot")
-    pp_version = DICT_METADATA["__PP_VERSION__"]
+#     # get locale folder and pot filename
+#     dir_locale = os.path.join(_DIR_PRJ, "src", "locale")
+#     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+#     path_pot = os.path.join(dir_locale, f"{pp_name_small}.pot")
+#     pp_version = DICT_METADATA["__PP_VERSION__"]
 
-    # remove old pot and recreate empty file
-    if os.path.exists(path_pot):
-        os.remove(path_pot)
-    with open(path_pot, "w", encoding="UTF8") as a_file:
-        a_file.write("")
+#     # remove old pot and recreate empty file
+#     if os.path.exists(path_pot):
+#         os.remove(path_pot)
+#     with open(path_pot, "w", encoding="UTF8") as a_file:
+#         a_file.write("")
 
-    # build a list of files
-    res = []
-    exts = [".py", ".ui", ".glade"]
+#     # build a list of files
+#     res = []
+#     exts = [".py", ".ui", ".glade"]
 
-    # scan for files in src directory
-    dir_src = os.path.join(_DIR_PRJ, "src")
-    list_files = os.listdir(dir_src)
+#     # scan for files in src directory
+#     dir_src = os.path.join(_DIR_PRJ, "src")
+#     list_files = os.listdir(dir_src)
 
-    # for each file in dir
-    for file in list_files:
-        # check for ext
-        for ext in exts:
-            if file.endswith(ext):
-                # rebuild complete path and add to list
-                path = os.path.join(dir_src, file)
-                res.append(path)
+#     # for each file in dir
+#     for file in list_files:
+#         # check for ext
+#         for ext in exts:
+#             if file.endswith(ext):
+#                 # rebuild complete path and add to list
+#                 path = os.path.join(dir_src, file)
+#                 res.append(path)
 
-    # for each file that can be I18N'd, run xgettext
-    author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-    email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
-    for file in res:
-        cmd = (
-            "xgettext "  # the xgettext cmd
-            f"{file} "  # the file name
-            "-j "  # append to current file
-            '-c"I18N:" '  # look for tags in .py files
-            "--no-location "  # don't print filename/line number
-            f"-o {path_pot} "  # location of output file
-            "-F "  # sort output by input file
-            f"--copyright-holder={author} "
-            f"--package-name={pp_name_small} "
-            f"--package-version={pp_version} "
-            f"--msgid-bugs-address={email}"
-        )
-        cmd_array = shlex.split(cmd)
-        subprocess.run(cmd_array, check=False)
+#     # for each file that can be I18N'd, run xgettext
+#     author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
+#     email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
+#     for file in res:
+#         cmd = (
+#             "xgettext "  # the xgettext cmd
+#             f"{file} "  # the file name
+#             "-j "  # append to current file
+#             '-c"I18N:" '  # look for tags in .py files
+#             "--no-location "  # don't print filename/line number
+#             f"-o {path_pot} "  # location of output file
+#             "-F "  # sort output by input file
+#             f"--copyright-holder={author} "
+#             f"--package-name={pp_name_small} "
+#             f"--package-version={pp_version} "
+#             f"--msgid-bugs-address={email}"
+#         )
+#         cmd_array = shlex.split(cmd)
+#         subprocess.run(cmd_array, check=False)
 
-    # now lets do some text replacements to make it look nice
+#     # now lets do some text replacements to make it look nice
 
-    # default text if we can't open file
-    text = ""
+#     # default text if we can't open file
+#     text = ""
 
-    # open file and get contents
-    with open(path_pot, "r", encoding="UTF8") as a_file:
-        text = a_file.read()
+#     # open file and get contents
+#     with open(path_pot, "r", encoding="UTF8") as a_file:
+#         text = a_file.read()
 
-    # replace short description
-    str_pattern = r"(# SOME DESCRIPTIVE TITLE.)"
-    pp_name_big = DICT_SETTINGS["info"]["__PP_NAME_BIG__"]
-    str_rep = f"# {pp_name_big} translation template"
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # replace short description
+#     str_pattern = r"(# SOME DESCRIPTIVE TITLE.)"
+#     pp_name_big = DICT_SETTINGS["info"]["__PP_NAME_BIG__"]
+#     str_rep = f"# {pp_name_big} translation template"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # replace copyright
-    author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-    str_pattern = r"(# Copyright \(C\) )" r"(.*?)" rf"( {author})"
-    year = date.today().year
-    str_rep = rf"\g<1>{year}\g<3>"
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # replace copyright
+#     author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
+#     str_pattern = r"(# Copyright \(C\) )" r"(.*?)" rf"( {author})"
+#     year = date.today().year
+#     str_rep = rf"\g<1>{year}\g<3>"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # replace author's email
-    str_pattern = r"(# FIRST AUTHOR )" r"(<EMAIL@ADDRESS>)" r"(, )" r"(YEAR)"
-    email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
-    year = date.today().year
-    str_rep = rf"\g<1>{email}\g<3>{year}"
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # replace author's email
+#     str_pattern = r"(# FIRST AUTHOR )" r"(<EMAIL@ADDRESS>)" r"(, )" r"(YEAR)"
+#     email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
+#     year = date.today().year
+#     str_rep = rf"\g<1>{email}\g<3>{year}"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # replace charset
-    str_pattern = (
-        r'("Content-Type: text/plain; charset=)' r"(CHARSET)" r'(\\n")'
-    )
-    charset = "UTF-8"
-    str_rep = rf"\g<1>{charset}\g<3>"
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # replace charset
+#     str_pattern = (
+#         r'("Content-Type: text/plain; charset=)' r"(CHARSET)" r'(\\n")'
+#     )
+#     charset = "UTF-8"
+#     str_rep = rf"\g<1>{charset}\g<3>"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # save file
-    with open(path_pot, "w", encoding="UTF8") as a_file:
-        a_file.write(text)
+#     # save file
+#     with open(path_pot, "w", encoding="UTF8") as a_file:
+#         a_file.write(text)
 
 
 # ------------------------------------------------------------------------------

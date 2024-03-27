@@ -1,5 +1,5 @@
 
-TODO: move all strings to G_STR section in pybaker
+TODO: move all strings to S_ section in pybaker
 TODO: make tree happen in pybaker
 TODO: make pybaker check for empty entries in header (not just dunders)
 TODO: pybaker update metadata in cli (desc, name, version)(may need context)

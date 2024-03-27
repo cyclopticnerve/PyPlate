@@ -8,7 +8,7 @@
 # ------------------------------------------------------------------------------
 
 """
-    This module defines the options for Uninstallerator and runs it
+This module defines the options for Uninstallerator and runs it
 """
 
 # ------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 
 [] check for single quotes: (?<!")"(?!") (skips triple-doubles in docstrings)
 [] also check for empty double quotes: (?<!")""(?!")
-[] all globals lowercase starting with g_
+[] all globals starting with G_
 [] all constants UPPERCASE
 [] no += for strings
 [] Headers/footers

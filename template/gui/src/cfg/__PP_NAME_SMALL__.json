@@ -1,0 +1,18 @@
+{
+    "win_main_instance": {
+        "KEY_WIN_SIZE": {
+            "KEY_SIZE_M": false,
+            "KEY_SIZE_W": 800,
+            "KEY_SIZE_H": 500
+        },
+        "KEY_WIN_CTLS": {
+            "entry_test": {
+                "KEY_CTL_VAL": "n"
+            },
+            "check_test": {
+                "KEY_CTL_VAL": false
+            }
+        },
+        "KEY_WIN_CLASS": "win_main_class"
+    }
+}

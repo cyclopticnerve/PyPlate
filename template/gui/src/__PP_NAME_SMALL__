@@ -44,6 +44,7 @@ sys.path.append("__PP_DIR_SRC__")
 # pylint: disable=import-error
 
 # my imports
+from appmain import AppMain
 from cnlib import cnconstants as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
@@ -61,18 +62,23 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 # the domain to use for i18n
 C_DOMAIN = "__PP_NAME_SMALL__"
 
-# these are required to translate strings in PyGObject (.ui/.glade files)
-locale.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
-locale.textdomain(C_DOMAIN)
+# # these are required to translate strings in PyGObject (.ui/.glade files)
+# locale.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
+# locale.textdomain(C_DOMAIN)
 
-# these are required to translate strings in python's print function
-# NB: this could be done with gettext.install(), but it creates a LOT of
-# PyLint/PyLance errors, so fuck it, we'll do it old-skool \m/
-gettext.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
-gettext.textdomain(C_DOMAIN)
+# # these are required to translate strings in python's print function
+# # NB: this could be done with gettext.install(), but it creates a LOT of
+# # PyLint/PyLance errors, so fuck it, we'll do it old-skool \m/
+# gettext.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
+# gettext.textdomain(C_DOMAIN)
 
-# make the macro for I18N
-_ = gettext.gettext
+# # make the macro for I18N
+# _ = gettext.gettext
+
+    # TODO: this is for testing purposes only
+t = gettext.translation(C.DOMAIN, localedir=C_LOCALE_DIR, languages=["es"])
+t.install()
+_ = t.gettext
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -85,6 +91,9 @@ C_PATH_CFG_DEF = (
 
 # the default config dict
 C_DICT_CFG_DEF = {}
+
+# path to the gui dir
+C_GUI_DIR = Path("__PP_NAME_SRC__") / "gtk"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -125,6 +134,13 @@ S_DBG_DEST = "DBG_DEST"
 # I18N: enable debugging option
 S_DBG_HELP = _("enable debugging option")
 
+# config gui strings
+S_GUI_OPTION = "g"
+S_GUI_OPTION_LONG = "gui"
+S_GUI_ACTION = "store_true"
+S_GUI_DEST = "GUI_DEST"
+# I18N: start program using GUI interface
+S_GUI_HELP = _("launch program with gui interface")
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -144,6 +160,9 @@ class __PP_NAME_BIG__:
     This object does the all the work of a typical CLI program. It parses
     command line options, loads/saves config files, and performs the operations
     required for the program.
+
+    It also checks for the GUI option on the command line and, if found,
+    creates an object from another script to handle the GUI.
     """
 
     # --------------------------------------------------------------------------
@@ -196,6 +215,17 @@ class __PP_NAME_BIG__:
 
         # call the steps in order
         print(self.func())
+
+        # ----------------------------------------------------------------------
+        # gui
+
+        # call gui
+        if self._args.GUI_DEST:
+            print("_do_gui")
+            app = AppMain(self._args, self._dict_config)
+            app.main()
+
+        # ----------------------------------------------------------------------
 
         # save config dict to passed in file, NOT def, or LOSE built-in
         self._save_config()
@@ -290,6 +320,15 @@ class __PP_NAME_BIG__:
             help=S_DBG_HELP,
         )
 
+        # add gui option
+        parser.add_argument(
+            f"-{S_GUI_OPTION}",
+            f"--{S_GUI_OPTION_LONG}",
+            action=S_GUI_ACTION,
+            dest=S_GUI_DEST,
+            help=S_GUI_HELP,
+        )
+
     # --------------------------------------------------------------------------
     # Loads config file from several sources
     # --------------------------------------------------------------------------
@@ -365,6 +404,63 @@ if __name__ == "__main__":
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
+
+    # dict of clangs and exts
+    dict_in = {
+        "Python": [
+            "py",
+        ],
+        "Glade": [
+            ".ui",
+            ".glade",
+        ],
+        "Desktop": [".desktop"],
+    }
+
+    # dict of clangs and no exts (ie file names)
+    dict_blank = {
+        "Python": [
+            "__PP_NAME_SMALL__",
+        ],
+    }
+
+    # the list of languages your program has been translated into (can grow
+    # over time, adding languages as they become available)
+    list_wlang = [
+        "es",
+        "xo",
+        "pq",
+    ]
+
+    # path to src dir
+    dir_src = Path(__file__).parent
+
+    pp = CNPotPy(
+        dir_src,
+        str_appname="foo",
+        str_version="0",
+        str_email="foo@bar.com",
+        str_domain=f"{C_DOMAIN}",
+        dict_clangs=dict_in,
+        dict_no_ext=dict_blank,
+        list_wlangs=list_wlang,
+    )
+
+    # I18N: run cnpotpy
+    pp.make_pot()
+    pp.make_pos()
+    pp.make_mos()
+    pp.make_desktop(
+        C_GUI_DIR / "template.desktop",
+        C_GUI_DIR / "__PP_NAME_SMALL__.desktop",
+    )
+
+    # TODO: this is for testing purposes only
+    t = gettext.translation(
+        C.DOMAIN, localedir=C.POT_DEF_DIR_LOCALE, languages=["es"]
+    )
+    t.install()
+    _ = t.gettext
 
     # create a new instance of the main class
     instance = __PP_NAME_BIG__()

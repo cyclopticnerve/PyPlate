@@ -41,12 +41,9 @@ class Main:
     """
     Short description
 
-    Properties:
-        zaz: A type to hold the zaz value
-
-    Methods:
-        set_zaz(new_zaz): Sets the new value of zaz
-        get_zaz(): Gets the current value of zaz
+    Public methods:
+        set_zaz(new_zaz): Sets the new value of _zaz
+        get_zaz(): Gets the current value of _zaz
 
     Long description (including HTML).
     """
@@ -69,13 +66,6 @@ class Main:
 
         # call super init to initialize the base class
         super().__init__()
-
-        # NB: something i learned the hard way from c++ coding: you want to do
-        # AS LITTLE coding in the constructor method because the whole class may
-        # not exist at this point! you should definitely not call get/set
-        # methods to init properties. these methods/properties may not exist at
-        # the time you call them. so to initialize scalar properties, set them
-        # explicitly rather than using setter methods.
 
         # set the initial value of class
         self._zaz = "zaz"

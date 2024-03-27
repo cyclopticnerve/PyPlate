@@ -1,1 +1,0 @@
-[![License](https://img.shields.io/badge/License-WTFPL-brightgreen.svg "http://www.wtfpl.net")](http://www.wtfpl.net)

@@ -8,7 +8,7 @@
 # ------------------------------------------------------------------------------
 
 """
-    This module defines the options for Installerator and runs it
+This module defines the options for Installerator and runs it
 """
 
 # ------------------------------------------------------------------------------

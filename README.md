@@ -75,16 +75,6 @@ You may also want to edit the 'types.json' file in 'PyPlate/conf'. The default
 file looks like this:
 ```
 {
-    "m": [
-        "Module",
-        "Modules",
-        "mod"
-    ],
-    "p": [
-        "Package",
-        "Packages",
-        "pkg"
-    ],
     "c": [
         "CLI",
         "CLIs",
@@ -94,10 +84,15 @@ file looks like this:
         "GUI",
         "GUIs",
         "gui"
+    ],
+    "p": [
+        "Package",
+        "Packages",
+        "pkg"
     ]
 }
 ```
-The structure looks like this:
+The structure of each entry looks like this:
 ```
 {
     'short_type_name': {
@@ -108,10 +103,10 @@ The structure looks like this:
 where:
 
 ### short_type_name
-A single letter (like 'm' for module projects)
+A single letter (like 'c' for CLI projects)
 
 ### long_type_name
-The name to display when asking for a project type (ie. 'Module')
+The name to display when asking for a project type (ie. 'CLI')
 
 ### destination_folder
 The name of the folder under 'DIR_BASE' (explained below) to put the project in  
@@ -133,9 +128,9 @@ Enter the required information, and 'pymaker.py' will create the required files
 and folders in a subdirectory of 'DIR_BASE', where 'DIR_BASE' is the directory
 above 'PyPlate'. In our example, 'DIR_BASE' is '~/Documents/Projects/Python'.
 
-So, from all of our assumptions above, if the project type is 'm', and the
-project name is 'ModTest', then the project will be created in
-'~/Documents/Projects/Python/Modules/ModTest'.
+So, from all of our assumptions above, if the project type is 'c', and the
+project name is 'CLITest', then the project will be created in
+'~/Documents/Projects/Python/CLIs/CLITest'.
 
 That's it! From there you are free to modify the projects in your favorite IDE.
 
@@ -155,7 +150,6 @@ expressions to search for context (i.e. text before and after the replacement)
 so as long as the context does not change, 'pybaker.py' can replace text at any
 time. 
 
-
 ## Blacklist.json
 You should edit this file by hand before running 'pybaker.py'. This file is used
 by 'pybaker.py' to determine which files/folders it can (or rather, *can't*)
@@ -164,7 +158,7 @@ operate on.
 Files in the new project are divided, internally, into four categories:
 1. the file's COMPLETE contents
 2. the file's headers
-3. the file's text (other that the header)
+3. the file's text (other than the header)
 4. the path to the file
 
 The default 'blacklist.json' file should look something like this:
@@ -211,9 +205,9 @@ This is equivalent to placing the same file in both 'skip_header' and
 'skip_text'.
 
 This section is used for things like images, where the contents of the file are
-not text.
+not text, but you may want to fix the filename.
 
-##### skip_header
+### skip_header
 'pybaker.py' may fix the contents of the file, as well as the path, but not the
 header contents.
 
@@ -229,7 +223,7 @@ project, but the contents should not be altered.
 *Note that 'skip_text' should ALWAYS include 'pybaker.py', 'settings.json', and
 'strings.json', and should NEVER include 'blacklist.json'. This is because these
 files have certain keywords which need to be replaced (or not replaced) in order
-for 'pybaker.py'. function correctly.*
+for 'pybaker.py' to function correctly.*
 
 ### skip_path
 'pybaker.py' may fix the header, as well as the contents, but not the path of
@@ -291,157 +285,8 @@ present in a menu-based Desktop UI (think windows start menu grouping). Value is
 an array, with each value separated by a semicolon, and must end with a 
 semicolon.  
 
-Each entry must match an entry in the following list:
-
-```
-LIST_CATEGORIES = [
-    'AudioVideo',
-    'Audio',
-    'Video',
-    'Development',
-    'Education',
-    'Game',
-    'Graphics',
-    'Network',
-    'Office',
-    'Science',
-    'Settings',
-    'System',
-    'Utility',
-    'Building',
-    'Debugger',
-    'IDE',
-    'GUIDesigner',
-    'Profiling',
-    'RevisionControl',
-    'Translation',
-    'Calendar',
-    'ContactManagement',
-    'Database',
-    'Dictionary',
-    'Chart',
-    'Email',
-    'Finance',
-    'FlowChart',
-    'PDA',
-    'ProjectManagement',
-    'Presentation',
-    'Spreadsheet',
-    'WordProcessor',
-    '2DGraphics',
-    'VectorGraphics',
-    'RasterGraphics',
-    '3DGraphics',
-    'Scanning',
-    'OCR',
-    'Photography',
-    'Publishing',
-    'Viewer',
-    'TextTools',
-    'DesktopSettings',
-    'HardwareSettings',
-    'Printing',
-    'PackageManager',
-    'Dialup',
-    'InstantMessaging',
-    'Chat',
-    'IRCClient',
-    'Feed',
-    'FileTransfer',
-    'HamRadio',
-    'News',
-    'P2P',
-    'RemoteAccess',
-    'Telephony',
-    'TelephonyTools',
-    'VideoConference',
-    'WebBrowser',
-    'WebDevelopment',
-    'Midi',
-    'Mixer',
-    'Sequencer',
-    'Tuner',
-    'TV',
-    'AudioVideoEditing',
-    'Player',
-    'Recorder',
-    'DiscBurning',
-    'ActionGame',
-    'AdventureGame',
-    'ArcadeGame',
-    'BoardGame',
-    'BlocksGame',
-    'CardGame',
-    'KidsGame',
-    'LogicGame',
-    'RolePlaying',
-    'Shooter',
-    'Simulation',
-    'SportsGame',
-    'StrategyGame',
-    'Art',
-    'Construction',
-    'Music',
-    'Languages',
-    'ArtificialIntelligence',
-    'Astronomy',
-    'Biology',
-    'Chemistry',
-    'ComputerScience',
-    'DataVisualization',
-    'Economy',
-    'Electricity',
-    'Geography',
-    'Geology',
-    'Geoscience',
-    'History',
-    'Humanities',
-    'ImageProcessing',
-    'Literature',
-    'Maps',
-    'Math',
-    'NumericalAnalysis',
-    'MedicalSoftware',
-    'Physics',
-    'Robotics',
-    'Spirituality',
-    'Sports',
-    'ParallelComputing',
-    'Amusement',
-    'Archiving',
-    'Compression',
-    'Electronics',
-    'Emulator',
-    'Engineering',
-    'FileTools',
-    'FileManager',
-    'TerminalEmulator',
-    'Filesystem',
-    'Monitor',
-    'Security',
-    'Accessibility',
-    'Calculator',
-    'Clock',
-    'TextEditor',
-    'Documentation',
-    'Adult',
-    'Core',
-    'KDE',
-    'GNOME',
-    'XFCE',
-    'DDE',
-    'GTK',
-    'Qt',
-    'Motif',
-    'Java',
-    'ConsoleOnly',
-    'Screensaver',
-    'TrayIcon',
-    'Applet',
-    'Shell',
-]
-```
-
+Each entry must match an entry in the list found
+[here](https://specifications.freedesktop.org/menu-spec/latest/apa.html).
 If the entry does not match, it will be ignored, and an error will be printed.
 
 ## Settings.json
@@ -457,52 +302,54 @@ This the basic structure of 'settings.json':
 ```
 {
     "project": {
-        "type": "m"
+        "type": "c"
     },
     "info": {
-        "__PP_NAME_BIG__": "ModTest",
-        "__PP_NAME_SMALL__": "modtest",
+        "__PP_NAME_BIG__": "CLITest",
+        "__PP_NAME_SMALL__": "clitest",
         "__PP_DATE__": "06/23/2023"
     }
 }
 ```
 
+And here is an explanation of what it contains:
+
 ## Project
 
 ### Type
 
-Indicates the type of project, "m" for module, "p" for package, "c" for CLI, and
-"g" for GTK GUI.
+Indicates the type of project: "c" for CLI, "g" for PyGObject GUI, or "p" for 
+package.
 
- ## Info
+## Info
 
- ### \_\_PP_NAME_BIG__
+### \_\_PP_NAME_BIG__
 
- The properly capitalized name of the project, for use in strings displayed to
- the user.
+The properly capitalized name of the project, for use in strings displayed to
+the user.
 
- ### \_\_PP_NAME_SMALL__
+### \_\_PP_NAME_SMALL__
 
- The lowercase version of the project name, used internally by pymaker.py and
- pybaker.py.
+The lowercase version of the project name, used internally by pymaker.py and
+pybaker.py.
 
-  ### \_\_PP_DATE__
+### \_\_PP_DATE__
 
-  The date the project was created, used internally by pymaker.py and pybaker.py.
+The date the project was created, used internally by pymaker.py and pybaker.py.
 
 <hr>
 
 After these files have been edited appropriately, run 'pybaker.py' from the
 'conf' directory to update the metadata in the project. This module can be run
 any time AFTER the project has been created to update the metadata in the
-project. Here is an example for a project of type 'm' (module) named 'ModTest':
+project. Here is an example for a project of type 'c' (CLI) named 'CLITest':
 
 ``` bash
-foo@bar:~$ cd ~/Documents/Projects/Python/Libs/ModTest/conf
-foo@bar:~/Documents/Projects/Python/Libs/ModTest/conf$ ./pybaker.py
+foo@bar:~$ cd ~/Documents/Projects/Python/CLIs/CLITest/conf
+foo@bar:~/Documents/Projects/Python/CLIs/CLITest/conf$ ./pybaker.py
 ```
 
-'modtest.py' will print any errors it finds, along with the filename and line
+'clitest.py' will print any errors it finds, along with the filename and line
 number, so you can correct them.
 
 ## Notes

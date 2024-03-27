@@ -92,4 +92,4 @@ foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
 ## Notes
 blah blah blah
 
--)
+<!-- -) -->

@@ -13,9 +13,11 @@ build-backend = "setuptools.build_meta"
 [project]
 # some of these values will be replaced by either pymaker.py or pybaker.py
 # they are only here to satisfy the linter
+# NB: this would normally come from the tool, but running the tool on the tool
+# seems redundant (and probably wouldn't work), so we enter it manually
 name = "PyPlate"
 version = "0.0.1"
-description = " A program for creating CLI/GUI/module/package projects in Python from a template"
+description = " A program for creating CLI/GUI/package projects in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
@@ -25,7 +27,24 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = []
+keywords = [
+        "python",
+        "python",
+        "cli",
+        "CLI",
+        "gui",
+        "GUI",
+        "Package",
+        "package",
+        "GTK3",
+        "GTK",
+        "gtk3",
+        "gtk",
+        "PyGObject",
+        "PyGTK",
+        "template,",
+        "app"
+]
 dependencies = []
 requires-python = ">=3.10"
 

@@ -8,7 +8,11 @@
 # ------------------------------------------------------------------------------
 
 """ 
-    This is a module to present a GUI interface using GTK4
+This is a module to present a GUI interface using GTK4
+
+This is a file to present a GTK4 window in a GUI program. It is not ready for
+primetime yet. It should be closely coupled to any gtk3 files that are known to
+work.
 """
 
 # ------------------------------------------------------------------------------
