@@ -78,7 +78,7 @@ G_DICT_SETTINGS = {
     "__PP_DIR_PRJ__": "",  # '~/Documents/Projects/Python/CLIs/PyPlate'
     "__PP_NAME_BIG__": "",  # PyPlate
     "__PP_NAME_SMALL__": "",  # pyplate
-    "__PP_NAME_MOD__": "", # module1.py
+    "__PP_NAME_MOD__": "",  # module1.py
     "__PP_DATE__": "",  # 12/08/2022
 }
 
