@@ -78,11 +78,12 @@ G_DICT_SETTINGS = {
     "__PP_DIR_PRJ__": "",  # '~/Documents/Projects/Python/CLIs/PyPlate'
     "__PP_NAME_BIG__": "",  # PyPlate
     "__PP_NAME_SMALL__": "",  # pyplate
+    "__PP_NAME_MOD__": "", # module1.py
     "__PP_DATE__": "",  # 12/08/2022
 }
 
 # the output project directory as a Path object (we use this A LOT)
-G_DIR_PRJ = Path("")
+# G_DIR_PRJ = Path("")
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -195,23 +196,47 @@ def get_project_info():
                 break
 
     # calculate final project location
-    global G_DIR_PRJ  # pylint: disable=global-statement
+    # global G_DIR_PRJ  # pylint: disable=global-statement
     # NB: weird thing about python and globals: you can use a global dict
     # WITHOUT using the 'global' keyword, as long as you're not assigning to the
     # actual dict variable, only its contents
     # in this case though, we are assigning to a scalar value, and so must use
     # the 'global' keyword above
-    G_DIR_PRJ = C.DIR_BASE / dir_type / name_prj
+    G_DICT_SETTINGS["__PP_DIR_PRJ__"] = str(C.DIR_BASE / dir_type / name_prj)
 
     # at this point, both dir and name are valid, so store both and exit
     # NB: make sure to store the project dir as a string, so it can be saved
     # to file
-    G_DICT_SETTINGS["__PP_DIR_PRJ__"] = str(G_DIR_PRJ)
+    # G_DICT_SETTINGS["__PP_DIR_PRJ__"] = str(G_DIR_PRJ)
     G_DICT_SETTINGS["__PP_NAME_BIG__"] = name_prj
 
     # calculate small name
     info_name_small = name_prj.lower()
     G_DICT_SETTINGS["__PP_NAME_SMALL__"] = info_name_small
+
+    # --------------------------------------------------------------------------
+    # here we figure out the default file name
+
+    # sanity check
+    name_mod = info_name_small
+
+    # if it is a project type that needs a module name, ask for it
+    if G_DICT_SETTINGS["__PP_TYPE_PRJ__"] in C.LIST_PKG:
+
+        # loop forever until we get a valid name (or user presses Ctrl+C)
+        while True:
+
+            # ask for name of module
+            name_mod = input(f"{C.S_MOD_NAME}: ")
+
+            # check for valid name
+            if _check_name(name_mod):
+                break
+
+    # set the property
+    G_DICT_SETTINGS["__PP_NAME_MOD__"] = name_mod
+
+    # --------------------------------------------------------------------------
 
     # calculate current date (format assumed from constants above)
     # NB: this gives us a create date that we cannot get reliably from Linux
@@ -232,11 +257,13 @@ def copy_template():
     Gets dirs/files from template and copies them to the project dir.
     """
 
+    dir_prj = Path(G_DICT_SETTINGS["__PP_DIR_PRJ__"])
+
     # get input dir for common dirs/files
-    dir_in = C.DIR_TEMPLATE / C.S_LOC_ALL
+    dir_in = C.DIR_TEMPLATE / C.S_DIR_ALL
 
     # copy common stuff
-    shutil.copytree(dir_in, G_DIR_PRJ)
+    shutil.copytree(dir_in, dir_prj)
 
     # get a path to the template dir for this project type
     prj_type = G_DICT_SETTINGS["__PP_TYPE_PRJ__"]
@@ -244,7 +271,10 @@ def copy_template():
 
     # create a package dir in project
     # NB: SOURCE DIR MUST BE NAMED 'SRC" FOR INSTALL -E TO WORK!!!
-    dir_out = G_DIR_PRJ / "src"
+    if G_DICT_SETTINGS["__PP_TYPE_PRJ__"] == "p":
+        dir_out = dir_prj / G_DICT_SETTINGS["__PP_NAME_SMALL__"]
+    else:
+        dir_out = dir_prj / "src"
 
     # copy project type stuff
     shutil.copytree(dir_in, dir_out)
@@ -282,47 +312,68 @@ def do_before_fix():
     Adds dirs/files to the project before running the fix function.
     """
 
-    # NB: we write the blacklist to ensure it is the same as what's in this file
-    # before any modifications
+    # project directory
+    path_prj = G_DICT_SETTINGS["__PP_DIR_PRJ__"]
+    path_prj = Path(path_prj)
 
-    def _write_file(a_dict, a_file):
-        with open(path_to, "w", encoding="UTF8") as a_file:
+    # NB: we write the conf files to ensure they are the same before any
+    # modifications
+
+    def _dict_to_file(a_dict, a_file):
+        with open(a_file, "w", encoding="UTF8") as a_file:
             json.dump(a_dict, a_file, indent=4)
 
     # write C.DICT_BLACKLIST to conf file
-    path_to = G_DIR_PRJ / C.S_BLACKLIST
-    _write_file(C.DICT_BLACKLIST, path_to)
+    path_to = path_prj / C.S_PATH_BLACKLIST
+    _dict_to_file(C.DICT_BLACKLIST, path_to)
 
     # default blacklist
-    path_to = G_DIR_PRJ / C.S_BLACKLIST_DEF
-    _write_file(C.DICT_BLACKLIST, path_to)
+    path_to = path_prj / C.S_PATH_BLACKLIST_DEF
+    _dict_to_file(C.DICT_BLACKLIST, path_to)
 
     # write C.DICT_METADATA to conf file
-    path_to = G_DIR_PRJ / C.S_METADATA
-    _write_file(C.DICT_METADATA, path_to)
+    path_to = path_prj / C.S_PATH_METADATA
+    _dict_to_file(C.DICT_METADATA, path_to)
 
     # default metadata
-    path_to = G_DIR_PRJ / C.S_METADATA_DEF
-    _write_file(C.DICT_METADATA, path_to)
+    path_to = path_prj / C.S_PATH_METADATA_DEF
+    _dict_to_file(C.DICT_METADATA, path_to)
 
     # write G_DICT_SETTINGS to conf file
-    path_to = G_DIR_PRJ / C.S_SETTINGS
-    _write_file(G_DICT_SETTINGS, path_to)
+    path_to = path_prj / C.S_PATH_SETTINGS
+    _dict_to_file(G_DICT_SETTINGS, path_to)
 
     # default settings
-    path_to = G_DIR_PRJ / C.S_SETTINGS_DEF
-    _write_file(G_DICT_SETTINGS, path_to)
+    path_to = path_prj / C.S_PATH_SETTINGS_DEF
+    _dict_to_file(G_DICT_SETTINGS, path_to)
 
     # copy linked files
     for key, val in C.DICT_COPY.items():
+
         # first get full source path
         path_in = C.DIR_PYPLATE / key
 
         # then get full dest path
-        path_out = G_DIR_PRJ / val
+        path_out = path_prj / val
 
         # copy file
-        shutil.copy(path_in, path_out)
+        if path_in.is_dir():
+            shutil.copytree(path_in, path_out)
+        else:
+            shutil.copy(path_in, path_out)
+
+    # now do tests
+    # long pkg type
+    prj_type = C.DICT_TYPES[G_DICT_SETTINGS["__PP_TYPE_PRJ__"]][2]
+
+    # get folder from template/tests/<prj type>
+    path_in = C.DIR_TEMPLATE / C.S_DIR_TESTS / prj_type
+
+    # get folder in output test dir
+    path_out = path_prj / C.S_DIR_TESTS
+
+    # copy EVERYTHING!
+    shutil.copytree(path_in, path_out, dirs_exist_ok=True)
 
 
 # ------------------------------------------------------------------------------
@@ -336,6 +387,10 @@ def do_fix():
     encounters, it passes the path to a filter to determine if the file
     needs fixing based on its appearance in the blacklist.
     """
+
+    # project directory
+    path_prj = G_DICT_SETTINGS["__PP_DIR_PRJ__"]
+    path_prj = Path(path_prj)
 
     # fix up blacklist and convert relative or glob paths to absolute Path
     # objects
@@ -354,7 +409,7 @@ def do_fix():
     # dirs/files
     # it should have no effect on the other fixes
     # TODO: use Path instead of os
-    for root, _dirs, files in os.walk(G_DIR_PRJ, topdown=False):
+    for root, _dirs, files in os.walk(path_prj, topdown=False):
         # NB: note that root is a full path, dirs and files are relative to root
 
         # convert root into Path object
@@ -375,7 +430,7 @@ def do_fix():
 
             # fix README if it is the top-level README.md
             # NB: need to do before any other stuff, requires special treatment
-            if root == G_DIR_PRJ and item.name == C.DICT_README["RM_FILENAME"]:
+            if root == path_prj and item.name == C.DICT_README["RM_FILENAME"]:
                 _fix_readme(item)
 
             # if we shouldn't skip contents
@@ -412,6 +467,10 @@ def do_after_fix():
     modified by do_fix, so we do them last.
     """
 
+    # project directory
+    path_prj = G_DICT_SETTINGS["__PP_DIR_PRJ__"]
+    path_prj = Path(path_prj)
+
     # --------------------------------------------------------------------------
 
     # TODO: remove after debugging all project types
@@ -435,7 +494,7 @@ def do_after_fix():
             # create tree object and call
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
-                str(G_DIR_PRJ),
+                str(path_prj),
                 filter_list=C.DICT_BLACKLIST["PP_SKIP_TREE"],
                 dir_format=" [] $NAME",
                 file_format=" [] $NAME",
@@ -448,7 +507,7 @@ def do_after_fix():
     # --------------------------------------------------------------------------
 
     # get path to tree
-    path_tree = G_DIR_PRJ / C.S_MISC / C.S_TREE
+    path_tree = path_prj / C.S_DIR_MISC / C.S_FILE_TREE
 
     # create the file so it includes itself
     with open(path_tree, "w", encoding="UTF8") as a_file:
@@ -457,10 +516,10 @@ def do_after_fix():
     # create tree object and call
     tree_obj = CNTree()
     tree_str = tree_obj.build_tree(
-        str(G_DIR_PRJ),
+        str(path_prj),
         filter_list=C.DICT_BLACKLIST["PP_SKIP_TREE"],
-        dir_format=C.S_DIR_FORMAT,
-        file_format=C.S_FILE_FORMAT,
+        dir_format=C.S_TREE_DIR_FORMAT,
+        file_format=C.S_TREE_FILE_FORMAT,
     )
 
     # write to file
@@ -468,12 +527,12 @@ def do_after_fix():
         a_file.write(tree_str)
 
     # add git dir
-    cmd = f"git init {str(G_DIR_PRJ)} -q"
+    cmd = f"git init {str(path_prj)} -q"
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array, check=False)
 
     # # set up venv
-    cmd = f"python -m venv {str(G_DIR_PRJ)}/{C.S_NAME_VENV}"
+    cmd = f"python -m venv {str(path_prj)}/{C.S_NAME_VENV}"
     cmd_array = shlex.split(cmd)
     subprocess.run(cmd_array, check=False)
 
@@ -493,6 +552,10 @@ def _fix_blacklist_paths():
     Strip any path separators and get absolute paths for all entries in the
     blacklist.
     """
+
+    # project directory
+    path_prj = G_DICT_SETTINGS["__PP_DIR_PRJ__"]
+    path_prj = Path(path_prj)
 
     # remove path separators
     # NB: this is mostly for glob support, as globs cannot end in path
@@ -520,7 +583,7 @@ def _fix_blacklist_paths():
         other_strings = [str(item) for item in other_paths]
 
         # get glob results as generators
-        glob_results = [G_DIR_PRJ.glob(item) for item in other_strings]
+        glob_results = [path_prj.glob(item) for item in other_strings]
 
         # start with absolutes
         result = abs_paths
@@ -861,6 +924,10 @@ def _fix_blacklist_dunders():
     them, since no files in the project should have dunders in the name.
     """
 
+    # project directory as a Path object
+    path_prj = G_DICT_SETTINGS["__PP_DIR_PRJ__"]
+    path_prj = Path(path_prj)
+
     def _fix_file(path_to):
         # new dict
         dict_bl = {}
@@ -887,11 +954,11 @@ def _fix_blacklist_dunders():
             json.dump(dict_bl, a_file, indent=4)
 
     # replace stuff in regular file
-    path_to = G_DIR_PRJ / C.S_BLACKLIST
+    path_to = path_prj / C.S_PATH_BLACKLIST
     _fix_file(path_to)
 
     # replace stuff in backup file
-    path_to = G_DIR_PRJ / C.S_BLACKLIST_DEF
+    path_to = path_prj / C.S_PATH_BLACKLIST_DEF
     _fix_file(path_to)
 
 

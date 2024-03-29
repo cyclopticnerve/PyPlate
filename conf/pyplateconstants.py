@@ -15,14 +15,7 @@ This module separates out the constants from pymaker.py/pybaker.py.
 # ------------------------------------------------------------------------------
 
 # system imports
-import gettext
 from pathlib import Path
-
-# ------------------------------------------------------------------------------
-# Macros
-# ------------------------------------------------------------------------------
-
-_ = gettext.gettext
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -87,6 +80,9 @@ DICT_TYPES = {
 
 # the types of projects that will have i18n applied
 LIST_I18N = ["g"]
+
+# the type of projects that will ask for a module name
+LIST_PKG = ["p"]
 
 # the list of keys to replace in the header of each file
 # these values are used to find matching lines in the file that are assumed to
@@ -186,12 +182,12 @@ DICT_BLACKLIST = {
         "docs",
         "misc",
         "README",
-        "test*",
         "**/locale",
         "CHANGELOG.md",
         "LICENSE.txt",
         "requirements.txt",
         "**/__pycache__",
+        "lib",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -224,6 +220,7 @@ DICT_BLACKLIST = {
         ".vscode",
         ".VSCodeCounter",
         "**/__pycache__",
+        "lib",
     ],
 }
 
@@ -260,19 +257,11 @@ DICT_COPY = {
     "lib/cnlib": "lib/cnlib",
 }
 
-# the dict of computer languages and their extensions
-DICT_CLANGS = {
-    "Python": ["py", ""],
-    "Glade": ["ui", "glade"],
-    "Desktop": ["desktop"],
-}
-
-# string constants
+# string constants for pymaker
 S_PRJ_TYPE = "Project type"
 S_PRJ_NAME = "Project name"
+S_MOD_NAME = "Module name"
 S_NAME_ERR = 'Project "{}" already exists in "{}"'
-S_DIR_FORMAT = " [] $NAME/"
-S_FILE_FORMAT = " [] $NAME"
 S_NAME_VENV = ".venv"
 S_PRJ_TYPE_INVALID = "Please enter a valid project type"
 S_PRJ_NAME_LEN = "Project names must be more than 1 character"
@@ -282,20 +271,34 @@ S_PRJ_NAME_CONTAIN = (
     "Project names must contain only letters, numbers,"
     "dashes (-), or underscores (_)"
 )
-S_LOC_ALL = "all"
 
-S_LOC_CONF = "conf"
-S_LOC_DEFAULTS = "defaults"
+# formats for tree
+S_TREE_DIR_FORMAT = " [] $NAME/"
+S_TREE_FILE_FORMAT = " [] $NAME"
 
-S_BLACKLIST = f"{S_LOC_CONF}/blacklist.json"
-S_BLACKLIST_DEF = f"{S_LOC_CONF}/{S_LOC_DEFAULTS}/blacklist_default.json"
-S_METADATA = f"{S_LOC_CONF}/metadata.json"
-S_METADATA_DEF = f"{S_LOC_CONF}/{S_LOC_DEFAULTS}/metadata_default.json"
-S_SETTINGS = f"{S_LOC_CONF}/settings.json"
-S_SETTINGS_DEF = f"{S_LOC_CONF}/{S_LOC_DEFAULTS}/settings_default.json"
-
-S_MISC = "misc"
-S_TREE = "tree.txt"
+# directory names
+S_DIR_ALL = "all"
+S_DIR_TESTS = "tests"
+S_DIR_CONF = "conf"
+S_DIR_DEFS = "defaults"
+S_DIR_MISC = "misc"
 S_DIR_LOCALE = "locale"
+
+# file names
+S_FILE_TREE = "tree.txt"
+S_FILE_BLACKLIST = "blacklist.json"
+S_FILE_METADATA = "metadata.json"
+S_FILE_SETTINGS = "settings.json"
+S_FILE_BLACKLIST_DEF = "blacklist_default.json"
+S_FILE_METADATA_DEF = "metadata_default.json"
+S_FILE_SETTINGS_DEF = "settings_default.json"
+
+# config file paths
+S_PATH_BLACKLIST = f"{S_DIR_CONF}/{S_FILE_BLACKLIST}"
+S_PATH_BLACKLIST_DEF = f"{S_DIR_CONF}/{S_DIR_DEFS}/{S_FILE_BLACKLIST_DEF}"
+S_PATH_METADATA = f"{S_DIR_CONF}/{S_FILE_METADATA}"
+S_PATH_METADATA_DEF = f"{S_DIR_CONF}/{S_DIR_DEFS}/{S_FILE_METADATA_DEF}"
+S_PATH_SETTINGS = f"{S_DIR_CONF}/{S_FILE_SETTINGS}"
+S_PATH_SETTINGS_DEF = f"{S_DIR_CONF}/{S_DIR_DEFS}/{S_FILE_BLACKLIST_DEF}"
 
 # -)

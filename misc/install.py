@@ -4,7 +4,7 @@
 # Filename: install.py                                            |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 """
