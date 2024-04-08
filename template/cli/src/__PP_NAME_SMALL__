@@ -28,15 +28,8 @@ Typical usage is show in the main() method.
 
 # system imports
 import argparse
-import gettext
-import locale
 from pathlib import Path
 import sys
-
-# add lib path to import search
-sys.path.append("__PP_DIR_LIBS__")
-# add app path to import search
-sys.path.append("__PP_DIR_SRC__")
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -44,47 +37,48 @@ sys.path.append("__PP_DIR_SRC__")
 # pylint: disable=import-error
 
 # my imports
-from cnlib import cnconstants as C  # type: ignore
+# add custom import paths
+
+# add lib path to import search
+DIR_LIB = "__PP_DIR_LIB__"
+sys.path.append(str(DIR_LIB))
+
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
 # pylint: enable=import-error
 # pylint: enable=no-name-in-module
-
 # ------------------------------------------------------------------------------
-# I18N
+# Strings
 # ------------------------------------------------------------------------------
 
-# the domain to use for i18n
-C_DOMAIN = "__PP_NAME_SMALL__"
+# version option strings
+S_VER_OPTION = "v"
+S_VER_OPTION_LONG = "version"
+S_VER_ACTION = "version"
 
-# these are required to translate strings in PyGObject (.ui/.glade files)
-locale.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
-locale.textdomain(C_DOMAIN)
+# config debug strings
+S_DBG_OPTION = "d"
+S_DBG_OPTION_LONG = "debug"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
 
-# these are required to translate strings in python's print function
-# NB: this could be done with gettext.install(), but it creates a LOT of
-# PyLint/PyLance errors, so fuck it, we'll do it old-skool \m/
-gettext.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
-gettext.textdomain(C_DOMAIN)
-
-# make the macro for I18N
-_ = gettext.gettext
+# config update strings
+S_UPD_OPTION = "u"
+S_UPD_OPTION_LONG = "update"
+S_UPD_ACTION = "store_true"
+S_UPD_DEST = "UPD_DEST"
+S_UPD_HELP = "update installed libs"
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-# get path to default config file
-C_PATH_CFG_DEF = (
-    Path.home() / ".config/__PP_NAME_SMALL__/__PP_NAME_SMALL__.json"
-)
-
 # the default config dict
-C_DICT_CFG_DEF = {}
+C_DICT_CFG = {}
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -96,11 +90,10 @@ C_DICT_CFG_DEF = {}
 
 # version string for -h/-v option
 S_HELP_VERSION = (
-    "__PP_NAME_SMALL__\n" +
-    # I18N: application description
-    _("__PP_SHORT_DESC__") + "\n"
-    "__PP_VERSION__\n" +
-    "__PP_EMAIL__"
+    "__PP_NAME_SMALL__\n"
+    + "__PP_SHORT_DESC__\n"
+    + "__PP_VERSION__\n"
+    + "__PP_EMAIL__"
 )
 
 # version option strings
@@ -113,8 +106,7 @@ S_VER_VERSION = S_HELP_VERSION
 S_CFG_OPTION = "c"
 S_CFG_OPTION_LONG = "config-file"
 S_CFG_DEST = "CFG_DEST"
-# I18N: load config file
-S_CFG_HELP = _("load configuration from file")
+S_CFG_HELP = "load configuration from file"
 S_CFG_METAVAR = "FILE"
 
 # config debug strings
@@ -122,8 +114,7 @@ S_DBG_OPTION = "d"
 S_DBG_OPTION_LONG = "debug"
 S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
-# I18N: enable debugging option
-S_DBG_HELP = _("enable debugging option")
+S_DBG_HELP = "enable debugging option"
 
 
 # ------------------------------------------------------------------------------
@@ -134,7 +125,7 @@ S_DBG_HELP = _("enable debugging option")
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_BIG__:
+class __PP_NAME_CLASS__:
     """
     The main class, responsible for the operation of the program
 
@@ -166,9 +157,9 @@ class __PP_NAME_BIG__:
         super().__init__()
 
         # set defaults
-        self._args = argparse.Namespace()
+        self._args = {}
         self._path_config = None
-        self._dict_config = C_DICT_CFG_DEF
+        self._dict_config = C_DICT_CFG
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -219,6 +210,9 @@ class __PP_NAME_BIG__:
         Long description (including HTML).
         """
 
+        if self._args.get(S_DBG_DEST, False):
+            return "this is func (DEBUG)"
+
         return "this is func"
 
     # --------------------------------------------------------------------------
@@ -249,7 +243,10 @@ class __PP_NAME_BIG__:
         self._add_args(parser)
 
         # get namespace object
-        self._args = parser.parse_args()
+        args = parser.parse_args()
+
+        # convert namespace to dict
+        self._args = vars(args)
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -308,21 +305,23 @@ class __PP_NAME_BIG__:
         # If neither of the above files are valid, the dict_config dictionary
         # will remain unchanged.
 
-        # load from default
-        paths_load = [C_PATH_CFG_DEF]
-
         # if arg is present
-        arg_config = self._args.CFG_DEST
+        arg_config = self._args.get(S_CFG_DEST, None)
         if arg_config is not None:
 
             # convert to path
             path_config = Path(arg_config)
 
             # add to load list
-            paths_load.append(path_config)
+            paths_load = [path_config]
 
-        # load dict(s) from path(s)
-        F.load_dicts(paths_load, self._dict_config)
+            # load dict(s) from path(s)
+            F.load_dicts(paths_load, self._dict_config)
+
+        # debug, print config files
+        if self._args.get(S_DBG_DEST, False):
+            print("_load_config:")
+            F.pp(self._dict_config)
 
     # --------------------------------------------------------------------------
     # Saves config file to one of several sources
@@ -341,21 +340,24 @@ class __PP_NAME_BIG__:
         # If neither of the above files are valid, the dict_config dictionary
         # will not be saved.
 
-        # save to default
-        paths_save = [C_PATH_CFG_DEF]
-
         # if arg is present
-        arg_config = self._args.CFG_DEST
+        arg_config = self._args.get(S_CFG_DEST, None)
         if arg_config is not None:
 
             # convert to path
             path_config = Path(arg_config)
 
             # add to load list
-            paths_save.insert(0, path_config)
+            paths_save = [path_config]
 
-        # save dict to path
-        F.save_dict(paths_save, self._dict_config)
+            # save dict to path
+            F.save_dict(paths_save, self._dict_config)
+
+        # debug, print config files
+        if self._args.get(S_DBG_DEST, False):
+            print("_save_config:")
+            F.pp(self._dict_config)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -367,7 +369,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    instance = __PP_NAME_BIG__()
+    instance = __PP_NAME_CLASS__()
 
     # run main method
     instance.main()

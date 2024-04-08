@@ -156,7 +156,7 @@ by 'pybaker.py' to determine which files/folders it can (or rather, *can't*)
 operate on.
 
 Files in the new project are divided, internally, into four categories:
-1. the file's COMPLETE contents
+1. the file or directory's COMPLETE contents
 2. the file's headers
 3. the file's text (other than the header)
 4. the path to the file

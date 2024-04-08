@@ -36,6 +36,9 @@ DIR_TEMPLATE = DIR_PYPLATE / "template"
 # (e.g. ~/Documents/Projects/Python/)
 DIR_BASE = DIR_PYPLATE.parent
 
+# the common user location for the cn libs
+DIR_LIB = str(Path.home() / ".local" / "share" / "cyclopticnerve")
+
 # the dict of user info to be replaced in the headers and text of a new project
 # they are placed here to be easily modified by subsequent users
 # they are then copied to G_DICT_SETTINGS to be used here and copied to the
@@ -188,6 +191,7 @@ DICT_BLACKLIST = {
         "requirements.txt",
         "**/__pycache__",
         "lib",
+        "pyplate",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -203,7 +207,6 @@ DICT_BLACKLIST = {
     # NB: mostly used for files that contain dunders that will be replaced later
     # or files we only want to replace headers in
     "PP_SKIP_TEXT": [
-        "conf/*",
         "MANIFEST.in",
         ".gitignore",
     ],
@@ -253,13 +256,35 @@ DICT_COPY = {
     "misc/checklist.txt": "misc/checklist.txt",
     "misc/snippets.txt": "misc/snippets.txt",
     "misc/style.txt": "misc/style.txt",
-    "src/pybaker.py": "conf/pybaker.py",
-    "lib/cnlib": "lib/cnlib",
+    "src/pybaker.py": "pyplate/pybaker.py",
+    "lib": "lib",
 }
+
+# I18N: computer languages
+DICT_CLANGS = {
+    "Python": [
+        "py",
+    ],
+    "Glade": [
+        ".ui",
+        ".glade",
+    ],
+    "Desktop": [".desktop"],
+}
+
+# I18N: dict of clangs and no exts (ie file names)
+DICT_CLANGS_NO_EXT = {
+    "Python": [
+        "__PP_NAME_SMALL__",
+    ],
+}
+
+# I18N: potpy params
+S_POT_CHARSET_DEF = "UTF-8"
 
 # string constants for pymaker
 S_PRJ_TYPE = "Project type"
-S_PRJ_NAME = "Project name"
+S_PRJ_NAME = "Project/Package name"
 S_MOD_NAME = "Module name"
 S_NAME_ERR = 'Project "{}" already exists in "{}"'
 S_NAME_VENV = ".venv"
@@ -271,21 +296,21 @@ S_PRJ_NAME_CONTAIN = (
     "Project names must contain only letters, numbers,"
     "dashes (-), or underscores (_)"
 )
+S_PRJ_UPDATE = 'Updated libraries in "{}"'
 
 # formats for tree
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
+S_FILE_TREE = "tree.txt"
 
-# directory names
+# copy_template names
 S_DIR_ALL = "all"
-S_DIR_TESTS = "tests"
-S_DIR_CONF = "conf"
-S_DIR_DEFS = "defaults"
-S_DIR_MISC = "misc"
 S_DIR_LOCALE = "locale"
+S_DIR_PO = "po"
+S_DIR_MISC = "misc"
+S_DIR_PP = "pyplate"
 
 # file names
-S_FILE_TREE = "tree.txt"
 S_FILE_BLACKLIST = "blacklist.json"
 S_FILE_METADATA = "metadata.json"
 S_FILE_SETTINGS = "settings.json"
@@ -294,11 +319,12 @@ S_FILE_METADATA_DEF = "metadata_default.json"
 S_FILE_SETTINGS_DEF = "settings_default.json"
 
 # config file paths
-S_PATH_BLACKLIST = f"{S_DIR_CONF}/{S_FILE_BLACKLIST}"
-S_PATH_BLACKLIST_DEF = f"{S_DIR_CONF}/{S_DIR_DEFS}/{S_FILE_BLACKLIST_DEF}"
-S_PATH_METADATA = f"{S_DIR_CONF}/{S_FILE_METADATA}"
-S_PATH_METADATA_DEF = f"{S_DIR_CONF}/{S_DIR_DEFS}/{S_FILE_METADATA_DEF}"
-S_PATH_SETTINGS = f"{S_DIR_CONF}/{S_FILE_SETTINGS}"
-S_PATH_SETTINGS_DEF = f"{S_DIR_CONF}/{S_DIR_DEFS}/{S_FILE_BLACKLIST_DEF}"
+S_DIR_CONF = "conf"
+S_DIR_CONF_DEFS = "defaults"
+
+# pymaker stuff
+S_PP_DIR_CONF = "conf"
+S_PP_FILE_METADATA = "metadata.json"
+S_PP_FILE_TOML = "pyproject.toml"
 
 # -)

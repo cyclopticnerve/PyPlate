@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 
 """
-An empty file to mark this folder as a package
+__PP_SHORT_DESC__
 """
 
 # -)

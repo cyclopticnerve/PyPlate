@@ -11,6 +11,11 @@ This module modifies the current project to replace metadata in each of the
 files, according to the data present in the conf files.
 """
 
+# TODO: pull in a fresh copy of libs on every run
+# we need to get the location of PyPlate from settings (src)
+# we need the name of the "lib" folder from settings (dst)
+# same for global location (copy from PyPlate to ~/.config/cyclopticnerve)
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -240,7 +245,7 @@ def main():
 
     # pkg
     fix_pyproject()
-    fix_init()
+    # fix_init()
 
     # cli/gui
     fix_argparse()
@@ -598,69 +603,70 @@ def fix_pyproject():
 # ------------------------------------------------------------------------------
 # Replace text in the __init__.py file
 # ------------------------------------------------------------------------------
-def fix_init():
-    """
-    Replace text in the __init__.py file
+# TODO: remove this (init files are always empty now)
+# def fix_init():
+#     """
+#     Replace text in the __init__.py file
 
-    Replaces the 'from __PP_NAME_SMALL__ import filename' text in the
-    __init__.py file.
-    """
+#     Replaces the 'from __PP_NAME_SMALL__ import filename' text in the
+#     __init__.py file.
+#     """
 
-    # first check if there is a pkg dir
-    pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
-    dir_pkg = _DIR_PRJ / "src" / pp_name_small
-    if not dir_pkg.exists() or not dir_pkg.is_dir():
-        return
+#     # first check if there is a pkg dir
+#     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+#     dir_pkg = _DIR_PRJ / "src" / pp_name_small
+#     if not dir_pkg.exists() or not dir_pkg.is_dir():
+#         return
 
-    # the file name of the init
-    file_init = "__init__.py"
+#     # the file name of the init
+#     file_init = "__init__.py"
 
-    # check if there is an __init__.py file
-    path_init = dir_pkg / file_init
-    if not path_init.exists():
-        return
+#     # check if there is an __init__.py file
+#     path_init = dir_pkg / file_init
+#     if not path_init.exists():
+#         return
 
-    # check if there are any .py files in package dir that are not init file
-    lst_modules = [
-        item for item in os.listdir(dir_pkg) if item != file_init and item.suffix == "py"
-    ]
-    if len(lst_modules) == 0:
-        return
+#     # check if there are any .py files in package dir that are not init file
+#     lst_modules = [
+#         item for item in os.listdir(dir_pkg) if item != file_init and item.suffix == "py"
+#     ]
+#     if len(lst_modules) == 0:
+#         return
 
-    # strip ext and add to list
-    lst_files = [item.with_suffix("") for item in lst_modules]
+#     # strip ext and add to list
+#     lst_files = [item.with_suffix("") for item in lst_modules]
 
-    # sort file list to look pretty (listdir is not sorted)
-    lst_files.sort()
+#     # sort file list to look pretty (listdir is not sorted)
+#     lst_files.sort()
 
-    # format list for imports section
-    lst_imports = ["from {pp_small} import {item}" "for item in lst_files"]
-    str_imports = "\n".join(lst_imports)
+#     # format list for imports section
+#     lst_imports = ["from {pp_small} import {item}" "for item in lst_files"]
+#     str_imports = "\n".join(lst_imports)
 
-    # format __all__ for completeness
-    lst_all = [f"'{item}'" for item in lst_files]
-    str_all_join = ", ".join(lst_all)
-    str_all = f"__all__ = [{str_all_join}]"
+#     # format __all__ for completeness
+#     lst_all = [f"'{item}'" for item in lst_files]
+#     str_all_join = ", ".join(lst_all)
+#     str_all = f"__all__ = [{str_all_join}]"
 
-    # default text if we can't open file
-    text = ""
+#     # default text if we can't open file
+#     text = ""
 
-    # open file and get contents
-    with open(path_init, "r", encoding="UTF8") as a_file:
-        text = a_file.read()
+#     # open file and get contents
+#     with open(path_init, "r", encoding="UTF8") as a_file:
+#         text = a_file.read()
 
-    # replace imports block
-    str_pattern = (
-        r"(^#[\t ]*__PP_IMPORTS_START__[\t ]*)"
-        r"(.*?)"
-        r"(^#[\t ]*__PP_IMPORTS_END__[\t ]*)"
-    )
-    str_rep = rf"\g<1>\n{str_imports}\n{str_all}\n\g<3>"
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # replace imports block
+#     str_pattern = (
+#         r"(^#[\t ]*__PP_IMPORTS_START__[\t ]*)"
+#         r"(.*?)"
+#         r"(^#[\t ]*__PP_IMPORTS_END__[\t ]*)"
+#     )
+#     str_rep = rf"\g<1>\n{str_imports}\n{str_all}\n\g<3>"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # save file
-    with open(path_init, "w", encoding="UTF8") as a_file:
-        a_file.write(text)
+#     # save file
+#     with open(path_init, "w", encoding="UTF8") as a_file:
+#         a_file.write(text)
 
 
 # ------------------------------------------------------------------------------
