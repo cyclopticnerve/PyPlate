@@ -1,16 +1,40 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "args",
+            "name": "PM",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "src/pymaker.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "PM Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/pymaker.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-d"
+            ]
+        },
+        {
+            "name": "PM Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/pymaker.py",
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
-        }
+        },
+        {
+            "name": "PM Libs",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/pymaker.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-u"
+            ]
+        },
     ]
 }

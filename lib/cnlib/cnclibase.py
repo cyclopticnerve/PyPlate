@@ -1,0 +1,234 @@
+# ------------------------------------------------------------------------------
+# Project : CNLib                                                  /          \
+# Filename: cnclibase.py                                          |     ()     |
+# Date    : 04/14/2024                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+"""
+This is the base class for a CLI program. The template CLI program subclasses
+it. See PyPlate/template/cli/src/__PC_NAME_SMALL__ for an example.
+"""
+
+# ------------------------------------------------------------------------------
+# Imports
+# ------------------------------------------------------------------------------
+
+# system imports
+import argparse
+from pathlib import Path
+
+# pylint: disable=import-error
+
+# my imports
+from .cnformatter import CNFormatter
+from . import cnfunctions as F
+
+# pylint: enable=import-error
+
+# ------------------------------------------------------------------------------
+# Public classes
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# The main class, responsible for the operation of the program
+# ------------------------------------------------------------------------------
+class CNCliBase:
+    """
+    The main class, responsible for the operation of the program
+
+    This object does the most of the work of a typical CLI program. It parses
+    command line options, loads/saves config files, and performs the operations
+    required for the program.
+    """
+
+    # --------------------------------------------------------------------------
+    # Class methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
+    def __init__(self):
+        """
+        Initialize the new object
+
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
+        """
+
+        # set defaults
+        self._d_cfg = {}
+        self._p_cfg = None
+
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Set up and run the command line parser
+    # --------------------------------------------------------------------------
+    def _run_parser(self):
+        """
+        Set up and run the command line parser
+
+        Returns:
+            A dictionary of command line arguments
+
+        This method sets up and runs the command line parser to minimize code
+        in the subclass. It calls the subclass to add it's arguments, then it
+        parses the command line and returns a dictionary.
+        """
+
+        # create the command line parser
+        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+
+        # call the subclass method
+        self._add_args(parser)
+
+        # get namespace object
+        args = parser.parse_args()
+
+        # convert namespace to dict
+        return vars(args)
+
+    # --------------------------------------------------------------------------
+    # This method does nothing, it is for subclassing
+    # --------------------------------------------------------------------------
+    def _add_args(self, parser):
+        """
+        This method does nothing, it is for subclassing
+
+        Arguments:
+            parser: The ArgumentParser to add the args to
+
+        This method is empty, but is declared here because the subclass method
+        is called from _run_parser.
+        """
+        # dummy method to be subclassed
+
+    # --------------------------------------------------------------------------
+    # Load config dict by combining several json files
+    # --------------------------------------------------------------------------
+    def _load_config(self, def_path, arg_path=None, dict_def=None):
+        """
+        Load config dict by combining several json files
+
+        Arguments:
+            def_path: The path to the default file (the one the program usually
+            uses)
+            arg_path: The path passed on the command line (default: None)
+            dict_def: A dictionary of defaults to start with (usually hard
+            coded in the program) (default: None)
+
+        Returns:
+            The combined dictionaries as a dictionary
+
+        This method loads config files from several sources, and combines the
+        resulting dictionaries. The order of precedence is:
+        1. arg_path
+        2. def_path
+        3. dict_def
+        """
+
+        # load config dict from arg file, def file, or just keep built-in
+        # Order of precedence is:
+        # 1. The file passed to the command-line, cfg_arg, as a string
+        # 2. The file set in cfg_def, the default file location
+        # If neither of the above files are valid, the self._d_cfg dictionary
+        # will remain unchanged.
+
+        #  arg set | arg exist | def exist | load  | save
+        # =================================================
+        #     0    |     X     |     0     |   0   | P_CFG
+        #     0    |     X     |     1     | P_CFG | P_CFG
+        #     0    |     X     |     0     |   0   | P_CFG
+        #     0    |     X     |     1     | P_CFG | P_CFG
+        # -------------------------------------------------
+        #     1    |     0     |     0     |   0   |  arg
+        #     1    |     0     |     1     | P_CFG |  arg
+        #     1    |     1     |     0     |  arg  |  arg
+        #     1    |     1     |     1     | both? |  arg
+
+        # set some defaults
+        p_arg = None
+        arg_exists = False
+        p_def = None
+        def_exists = False
+        paths_load = []
+
+        # get the flags for the truth table
+        arg_set = arg_path is not None
+        if arg_set:
+            p_arg = Path(arg_path)
+            arg_exists = p_arg.exists()
+        def_set = def_path is not None
+        if def_set:
+            p_def = Path(def_path)
+            def_exists = p_def.exists()
+
+        # NB: we go from bottom up to avoid having to "not" everything
+
+        # there is an arg file
+        if arg_set:
+            # set the path to save
+            self._p_cfg = p_arg
+            # we got an arg
+            if arg_exists:
+                if def_exists:
+                    # load both
+                    paths_load = [p_def, p_arg]  # 1 1 1
+                else:
+                    # just load arg
+                    paths_load = [p_arg]  # 1 1 0
+            else:
+                if def_exists:
+                    # load def only
+                    paths_load = [p_def]  # 1 0 1
+                else:
+                    # load nothing
+                    paths_load = []  # 1 0 0
+        # there is no arg file
+        else:
+            # set the path to save
+            self._p_cfg = p_def
+            if def_exists:
+                # load def only
+                paths_load = [p_def]  # 0 X 1
+            else:
+                # load nothing
+                paths_load = []  # 0 X 0
+
+        # load dict from path(s)
+        F.load_dicts(paths_load, dict_def)
+
+    # --------------------------------------------------------------------------
+    # Save config file to one of several sources
+    # --------------------------------------------------------------------------
+    def _save_config(self):
+        """
+        Save config file to one of several sources
+
+        Arguments:
+            cfg_arg: The path passed on the command line (if present)
+            cfg_def: The default path to save the dict
+
+        This method saves the config dict to the first found file.
+        """
+
+        # save config dict to file, def, or just lose
+        # Order of precedence is:
+        # 1. The file passed to the command-line, stored in self._p_cfg
+        # 2. The file set in the P_CFG constant, also stored in self._p_cfg
+        # If neither of the above files are valid, the self._d_cfg dictionary
+        # will not be saved.
+
+        # save dict to path
+        if self._p_cfg is not None:
+            F.save_dict([self._p_cfg], self._d_cfg)
+
+
+# -)

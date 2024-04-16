@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : __PC_NAME_BIG__                                        /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -24,18 +24,11 @@ import installerator
 
 # define the uninstall settings
 g_dict_uninstall = {
-    'general': {
-        'name': '__PP_NAME_BIG__'
-    },
-    'preflight': [
-    ],
-    'dirs': [
-        '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
-    ],
-    'files': {
-    },
-    'postflight': [
-    ]
+    "general": {"name": "__PC_NAME_BIG__"},
+    "preflight": [],
+    "dirs": ["${HOME}/.cyclopticnerve/__PC_NAME_SMALL__"],
+    "files": {},
+    "postflight": [],
 }
 
 
@@ -43,16 +36,17 @@ g_dict_uninstall = {
 # Public functions
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Run the Uninstaller module
 # ------------------------------------------------------------------------------
 def main():
     """
-        Run the Uninstaller module
+    Run the Uninstaller module
 
-        This is the main uninstaller function, which creates an instance of the
-        Uninstaller class and runs it's main function, with the global
-        dictionary created above.
+    This is the main uninstaller function, which creates an instance of the
+    Uninstaller class and runs it's main function, with the global
+    dictionary created above.
     """
 
     # instantiate uninstallerator class
@@ -67,7 +61,7 @@ def main():
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     #     Code to run when called from command line
 

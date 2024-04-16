@@ -11,10 +11,57 @@ This module modifies the current project to replace metadata in each of the
 files, according to the data present in the conf files.
 """
 
-# TODO: pull in a fresh copy of libs on every run
+# TODO: this prog should:
+# show current version number
+# ask for new version number
+# read a dict of what to put in dist
+
+# ------------------------------------------------------------------------------
+
+# TODO: pull in a fresh copy of libs on every run and put it in dist
 # we need to get the location of PyPlate from settings (src)
 # we need the name of the "lib" folder from settings (dst)
-# same for global location (copy from PyPlate to ~/.config/cyclopticnerve)
+# TODO: any time pybaker encounters a file with __PC_DATE__ still in the
+# header, make sure to use today's date, not the one stored in a config dict
+# TODO: install script must install libs, src, etc. into proper folders
+# TODO: installer for pkg should move pkg to __PC_USER_LIB__
+# # --------------------------------------------------------------------------
+# # Do i18n stuff if the project is a GUI
+# # --------------------------------------------------------------------------
+# def _do_i18n(self):
+#     """
+#     Do i18n stuff if the project is a GUI
+
+#     If the project type requires i18n, do it now.
+#     """
+
+#     # check kif we need to do this
+#     if self._dict_prj["__PC_TYPE_PRJ__"] not in S.LIST_I18N:
+#         return
+
+#     # get project dir
+#     dir_prj = Path(self._dict_prj["__PC_DIR_PRJ__"])
+
+#     # output dir (where the .pot and locale files will go)
+#     dir_locale = dir_prj / S.S_DIR_LOCALE
+#     dir_po = dir_prj / S.S_DIR_PO
+
+#     # create the potpy object
+#     potpy = CNPotPy(
+#         dir_prj,
+#         self._dict_prj["__PC_NAME_BIG__"],
+#         S.DEF_VERSION,
+#         self._dict_prj["__PD_EMAIL__"],
+#         dir_locale=dir_locale,
+#         dir_po=dir_po,
+#         str_domain=self._dict_prj["__PC_NAME_BIG__"],
+#         dict_clangs=S.DICT_CLANGS,
+#         dict_no_ext=S.DICT_CLANGS_NO_EXT,
+#         charset=S.S_POT_CHARSET_DEF,
+#     )
+
+#     # I18N: run cnpot.py
+#     potpy.main()
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -23,6 +70,7 @@ files, according to the data present in the conf files.
 # system imports
 from datetime import date
 import json
+
 # TODO: get rid of this
 import os
 from pathlib import Path
@@ -31,6 +79,7 @@ import shlex
 import subprocess
 
 # local imports
+from cnlib.cnpot import CNPotPy  # type: ignore
 from EVERYTHING.cntree import CNTree
 
 # ------------------------------------------------------------------------------
@@ -255,7 +304,7 @@ def main():
     fix_desktop()
     fix_gtk3()
 
-    # # check for __PP_ /PP_ stuff left over or we missed
+    # check for dunders left over or we missed
     recurse_and_check(_DIR_PRJ)
 
     # do housekeeping
@@ -264,7 +313,7 @@ def main():
     # do gettext stuff
     # do_gettext()
 
-    # # print error count (__PP_/PP_ stuff found)
+    # # print error count (dunder stuff found)
     s = G_STRINGS["S_ERR_COUNT"]
     print(s.format(G_ERROR_COUNT))
 
@@ -363,7 +412,7 @@ def fix_blacklist():
     """
     Replace values in the blacklist file
 
-    Replace any __PP_ stuff in blacklist file. This allows you to use file
+    Replace any dunders in blacklist file. This allows you to use file
     names/paths in blacklist.json that have dunders in their value. This is
     really only useful if you use dunders in the user blacklist, since
     they get replaced each time you run pybaker.py, and at that time you
@@ -428,7 +477,7 @@ def fix_readme():
     )
 
     # replace short_desc
-    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
+    pp_short_desc = DICT_METADATA["__PM_SHORT_DESC__"]
 
     # replace text
     str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
@@ -443,7 +492,7 @@ def fix_readme():
 
     # build a string from the dict (markdown links)
     # only format links if value is not empty
-    pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
+    pp_py_deps = DICT_METADATA["__PM_PY_DEPS__"]
     kv_py_deps = []
     for key, val in pp_py_deps.items():
         if val == "":
@@ -462,7 +511,7 @@ def fix_readme():
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace version
-    pp_version = DICT_METADATA["__PP_VERSION__"]
+    pp_version = DICT_METADATA["__PM_VERSION__"]
 
     str_pattern = (
         r"(\s*foo@bar:~/Downloads\$ python -m pip install )"
@@ -529,7 +578,7 @@ def fix_pyproject():
     str_pattern = (
         r"(^\s*\[project\]\s*$)" r"(.*?)" r"(^\s*name[\t ]*=[\t ]*)" r"(.*?$)"
     )
-    pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+    pp_name_small = DICT_SETTINGS["info"]["__PC_NAME_SMALL__"]
     str_rep = rf'\g<1>\g<2>\g<3>"{pp_name_small}"'
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -540,9 +589,9 @@ def fix_pyproject():
         r"(^\s*version[\t ]*=[\t ]*)"
         r"(.*?$)"
     )
-    pp_version = DICT_METADATA["__PP_VERSION__"]
+    pp_version = DICT_METADATA["__PM_VERSION__"]
     if pp_version == "":
-        pp_version = "0.0.0"
+        pp_version = S.DEF_VERSION
     str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -553,7 +602,7 @@ def fix_pyproject():
         r"(^\s*description[\t ]*=[\t ]*)"
         r"(.*?$)"
     )
-    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
+    pp_short_desc = DICT_METADATA["__PM_SHORT_DESC__"]
     str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -566,7 +615,7 @@ def fix_pyproject():
     )
 
     # convert dict to string
-    pp_keywords = DICT_METADATA["__PP_KEYWORDS__"]
+    pp_keywords = DICT_METADATA["__PM_KEYWORDS__"]
     str_pp_keywords = [f'"{item}"' for item in pp_keywords]
     str_pp_keywords = ", ".join(str_pp_keywords)
 
@@ -583,7 +632,7 @@ def fix_pyproject():
     )
 
     # convert dict to string (only using keys)
-    pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
+    pp_py_deps = DICT_METADATA["__PM_PY_DEPS__"]
 
     # NB: this is not conducive to a dict (we don't need links, only names)
     # so don't do what we did in README, keep it simple
@@ -608,12 +657,12 @@ def fix_pyproject():
 #     """
 #     Replace text in the __init__.py file
 
-#     Replaces the 'from __PP_NAME_SMALL__ import filename' text in the
+#     Replaces the 'from __PC_NAME_SMALL__ import filename' text in the
 #     __init__.py file.
 #     """
 
 #     # first check if there is a pkg dir
-#     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+#     pp_name_small = DICT_SETTINGS["info"]["__PC_NAME_SMALL__"]
 #     dir_pkg = _DIR_PRJ / "src" / pp_name_small
 #     if not dir_pkg.exists() or not dir_pkg.is_dir():
 #         return
@@ -715,7 +764,7 @@ def fix_argparse():
             r"(.*?)"
             r"(\'.*)"
         )
-        pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
+        pp_short_desc = DICT_METADATA["__PM_SHORT_DESC__"]
         str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -726,7 +775,7 @@ def fix_argparse():
             r"(.*?)"
             r"(\'.*)"
         )
-        pp_version = DICT_METADATA["__PP_VERSION__"]
+        pp_version = DICT_METADATA["__PM_VERSION__"]
         str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -766,7 +815,7 @@ def fix_install():
     )
 
     # convert dict keys to string
-    pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
+    pp_py_deps = DICT_METADATA["__PM_PY_DEPS__"]
     str_pp_py_deps = ",".join(pp_py_deps.keys())
 
     # replace text
@@ -782,7 +831,7 @@ def fix_install():
     )
 
     # convert dict to string
-    pp_sys_deps = DICT_METADATA["__PP_SYS_DEPS__"]
+    pp_sys_deps = DICT_METADATA["__PM_SYS_DEPS__"]
     str_pp_sys_deps = ",".join(pp_sys_deps)
 
     # replace string
@@ -809,14 +858,14 @@ def fix_desktop():
     global G_ERROR_COUNT
 
     # check if the file exists
-    pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+    pp_name_small = DICT_SETTINGS["info"]["__PC_NAME_SMALL__"]
     path_desk = os.path.join(_DIR_PRJ, "src", f"{pp_name_small}.desktop")
     if not os.path.exists(path_desk):
         return
 
     # validate wanted categories into approved categories
     pp_gui_categories = []
-    wanted_cats = DICT_METADATA["__PP_GUI_CATEGORIES__"]
+    wanted_cats = DICT_METADATA["__PM_GUI_CATS__"]
     for cat in wanted_cats:
         # category is valid
         if cat in LIST_CATEGORIES:
@@ -860,14 +909,14 @@ def fix_desktop():
         r"(^\s*Comment[\t ]*=)"
         r"(.*?$)"
     )
-    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
+    pp_short_desc = DICT_METADATA["__PM_SHORT_DESC__"]
     str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # get path to install dir
     path_home = os.path.expanduser("~")
-    author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-    pp_name_big = DICT_SETTINGS["info"]["__PP_NAME_BIG__"]
+    author = DICT_SETTINGS["info"]["__PD_AUTHOR__"]
+    pp_name_big = DICT_SETTINGS["info"]["__PC_NAME_BIG__"]
     path_inst = os.path.join(path_home, f".{author}", pp_name_big, "src")
 
     # replace exec
@@ -909,7 +958,7 @@ def fix_gtk3():
     """
 
     # check if there is a .ui file
-    pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+    pp_name_small = DICT_SETTINGS["info"]["__PC_NAME_SMALL__"]
     path_ui = os.path.join(_DIR_PRJ, "src", f"{pp_name_small}_gtk3.ui")
     if not os.path.exists(path_ui):
         return
@@ -928,7 +977,7 @@ def fix_gtk3():
         r"(.*?)"
         r"(</property>)"
     )
-    pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
+    pp_short_desc = DICT_METADATA["__PM_SHORT_DESC__"]
     str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -939,7 +988,7 @@ def fix_gtk3():
         r"(.*?)"
         r"(</property>.*)"
     )
-    pp_version = DICT_METADATA["__PP_VERSION__"]
+    pp_version = DICT_METADATA["__PM_VERSION__"]
     str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -970,7 +1019,9 @@ def recurse_and_check(path):
     # strip trailing slashes to match path component
     skip_all = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_all"]]
     skip_file = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_file"]]
-    skip_header = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_header"]]
+    skip_header = [
+        item.strip(os.sep) for item in DICT_BLACKLIST["skip_header"]
+    ]
     skip_text = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_text"]]
     skip_path = [item.strip(os.sep) for item in DICT_BLACKLIST["skip_path"]]
 
@@ -1092,9 +1143,9 @@ def do_extras():
 
 #     # get locale folder and pot filename
 #     dir_locale = os.path.join(_DIR_PRJ, "src", "locale")
-#     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+#     pp_name_small = DICT_SETTINGS["info"]["__PC_NAME_SMALL__"]
 #     path_pot = os.path.join(dir_locale, f"{pp_name_small}.pot")
-#     pp_version = DICT_METADATA["__PP_VERSION__"]
+#     pp_version = DICT_METADATA["__PM_VERSION__"]
 
 #     # remove old pot and recreate empty file
 #     if os.path.exists(path_pot):
@@ -1120,8 +1171,8 @@ def do_extras():
 #                 res.append(path)
 
 #     # for each file that can be I18N'd, run xgettext
-#     author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-#     email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
+#     author = DICT_SETTINGS["info"]["__PD_AUTHOR__"]
+#     email = DICT_SETTINGS["info"]["__PD_EMAIL__"]
 #     for file in res:
 #         cmd = (
 #             "xgettext "  # the xgettext cmd
@@ -1150,12 +1201,12 @@ def do_extras():
 
 #     # replace short description
 #     str_pattern = r"(# SOME DESCRIPTIVE TITLE.)"
-#     pp_name_big = DICT_SETTINGS["info"]["__PP_NAME_BIG__"]
+#     pp_name_big = DICT_SETTINGS["info"]["__PC_NAME_BIG__"]
 #     str_rep = f"# {pp_name_big} translation template"
 #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
 #     # replace copyright
-#     author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
+#     author = DICT_SETTINGS["info"]["__PD_AUTHOR__"]
 #     str_pattern = r"(# Copyright \(C\) )" r"(.*?)" rf"( {author})"
 #     year = date.today().year
 #     str_rep = rf"\g<1>{year}\g<3>"
@@ -1163,7 +1214,7 @@ def do_extras():
 
 #     # replace author's email
 #     str_pattern = r"(# FIRST AUTHOR )" r"(<EMAIL@ADDRESS>)" r"(, )" r"(YEAR)"
-#     email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
+#     email = DICT_SETTINGS["info"]["__PD_EMAIL__"]
 #     year = date.today().year
 #     str_rep = rf"\g<1>{email}\g<3>{year}"
 #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
@@ -1231,7 +1282,7 @@ def _load_user_or_default(a_dict, a_user, a_default):
             a_dict = json.load(a_default)
 
             # save default as user
-            with open(a_user, 'w', encoding="UTF-8") as f:
+            with open(a_user, "w", encoding="UTF-8") as f:
                 f.write(a_dict)
 
             # done
@@ -1247,6 +1298,7 @@ def _load_user_or_default(a_dict, a_user, a_default):
 
     # we can't find it or load it
     raise Exception
+
 
 # ------------------------------------------------------------------------------
 # Checks header values for dunders

@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__                                     |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : __PC_NAME_BIG__                                        /          \
+# Filename: __PC_NAME_SMALL__                                     |     ()     |
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -13,11 +13,11 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PP_NAME_SMALL__ [cmd line]
+foo@bar:~[path to directory of this file]$ ./__PC_NAME_SMALL__ [cmd line]
 
 or if installed in a global location:
 
-foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
+foo@bar:~$ __PC_NAME_SMALL__ [cmd line]
 
 Typical usage is show in the main() method.
 """
@@ -34,9 +34,9 @@ from pathlib import Path
 import sys
 
 # add lib path to import search
-sys.path.append("__PP_DIR_LIBS__")
+sys.path.append("__PC_USR_LIB__")
 # add app path to import search
-sys.path.append("__PP_DIR_SRC__")
+sys.path.append("__PC_USR_SRC__")
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -52,15 +52,15 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
-# pylint: enable=import-error
 # pylint: enable=no-name-in-module
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # I18N
 # ------------------------------------------------------------------------------
 
 # the domain to use for i18n
-C_DOMAIN = "__PP_NAME_SMALL__"
+C_DOMAIN = "__PC_NAME_SMALL__"
 
 # # these are required to translate strings in PyGObject (.ui/.glade files)
 # locale.bindtextdomain(C_DOMAIN, C.POT_DEF_DIR_LOCALE)
@@ -75,7 +75,7 @@ C_DOMAIN = "__PP_NAME_SMALL__"
 # # make the macro for I18N
 # _ = gettext.gettext
 
-    # TODO: this is for testing purposes only
+# TODO: this is for testing purposes only
 t = gettext.translation(C.DOMAIN, localedir=C_LOCALE_DIR, languages=["es"])
 t.install()
 _ = t.gettext
@@ -86,14 +86,14 @@ _ = t.gettext
 
 # get path to default config file
 C_PATH_CFG_DEF = (
-    Path.home() / ".config/__PP_NAME_SMALL__/__PP_NAME_SMALL__.json"
+    Path.home() / ".config/__PC_NAME_SMALL__/__PC_NAME_SMALL__.json"
 )
 
 # the default config dict
 C_DICT_CFG_DEF = {}
 
 # path to the gui dir
-C_GUI_DIR = Path("__PP_NAME_SRC__") / "gtk"
+C_GUI_DIR = Path("__PC_USR_SRC__") / "gtk"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -105,11 +105,10 @@ C_GUI_DIR = Path("__PP_NAME_SRC__") / "gtk"
 
 # version string for -h/-v option
 S_HELP_VERSION = (
-    "__PP_NAME_SMALL__\n" +
+    "__PC_NAME_SMALL__\n" +
     # I18N: application description
-    _("__PP_SHORT_DESC__") + "\n"
-    "__PP_VERSION__\n" +
-    "__PP_EMAIL__"
+    _("__PM_SHORT_DESC__") + "\n"
+    "Version __PM_VERSION__\n" + "__PD_URL__/__PC_NAME_BIG__"
 )
 
 # version option strings
@@ -150,7 +149,7 @@ S_GUI_HELP = _("launch program with gui interface")
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_BIG__:
+class __PC_NAME_BIG__:
     """
     The main class, responsible for the operation of the program
 
@@ -396,6 +395,7 @@ class __PP_NAME_BIG__:
         # save dict to path
         F.save_dict(paths_save, self._dict_config)
 
+
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
@@ -420,7 +420,7 @@ if __name__ == "__main__":
     # dict of clangs and no exts (ie file names)
     dict_blank = {
         "Python": [
-            "__PP_NAME_SMALL__",
+            "__PC_NAME_SMALL__",
         ],
     }
 
@@ -432,6 +432,8 @@ if __name__ == "__main__":
         "pq",
     ]
 
+    # ------------------------------------------------------------------------------
+    # move this to pybaker
     # path to src dir
     dir_src = Path(__file__).parent
 
@@ -450,10 +452,13 @@ if __name__ == "__main__":
     pp.make_pot()
     pp.make_pos()
     pp.make_mos()
+    # TODO: does the output file need to exist? if not, delete from template
     pp.make_desktop(
         C_GUI_DIR / "template.desktop",
-        C_GUI_DIR / "__PP_NAME_SMALL__.desktop",
+        C_GUI_DIR / "__PC_NAME_SMALL__.desktop",
     )
+
+    # ------------------------------------------------------------------------------
 
     # TODO: this is for testing purposes only
     t = gettext.translation(
@@ -463,7 +468,7 @@ if __name__ == "__main__":
     _ = t.gettext
 
     # create a new instance of the main class
-    instance = __PP_NAME_BIG__()
+    instance = __PC_NAME_BIG__()
 
     # run main method
     instance.main()

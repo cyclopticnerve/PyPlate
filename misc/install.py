@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : __PC_NAME_BIG__                                        /          \
 # Filename: install.py                                            |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE__                                         \          /
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -24,24 +24,16 @@ import installerator
 
 # define the install settings
 g_dict_install = {
-    'general': {
-        'name': '__PP_NAME_BIG__'
+    "general": {"name": "__PC_NAME_BIG__"},
+    "preflight": [],
+    "deps_py": [],
+    "deps_sys": [],
+    "dirs": ["${HOME}/.cyclopticnerve/__PC_NAME_SMALL__"],
+    "files": {
+        "LICENSE.txt": "${HOME}/.cyclopticnerve/__PC_NAME_SMALL__",
+        "uninstall.py": "${HOME}/.cyclopticnerve/__PC_NAME_SMALL__",
     },
-    'preflight': [
-    ],
-    'deps_py': [
-    ],
-    'deps_sys': [
-    ],
-    'dirs': [
-        '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
-    ],
-    'files': {
-        'LICENSE.txt': '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__',
-        'uninstall.py': '${HOME}/.cyclopticnerve/__PP_NAME_SMALL__'
-    },
-    'postflight': [
-    ]
+    "postflight": [],
 }
 
 
@@ -49,16 +41,17 @@ g_dict_install = {
 # Public functions
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Run the Installer module
 # ------------------------------------------------------------------------------
 def main():
     """
-        Run the Installer module
+    Run the Installer module
 
-        This is the main installer function, which creates an instance of the
-        Installer class and runs its main function, with the global
-        dictionary created above.
+    This is the main installer function, which creates an instance of the
+    Installer class and runs its main function, with the global
+    dictionary created above.
     """
 
     # instantiate installerator class
@@ -73,7 +66,7 @@ def main():
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # call the main function
     main()

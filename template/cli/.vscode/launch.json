@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Current File with Args",
+            "name": "Args",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",

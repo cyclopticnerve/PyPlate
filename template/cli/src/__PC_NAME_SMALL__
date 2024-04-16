@@ -1,0 +1,310 @@
+#! /usr/bin/env python
+# ------------------------------------------------------------------------------
+# Project : __PC_NAME_BIG__                                        /          \
+# Filename: __PC_NAME_SMALL__                                     |     ()     |
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
+# ------------------------------------------------------------------------------
+
+"""
+The main file that runs the program
+
+This file is executable and can be called from the terminal like:
+
+foo@bar:~$ cd [path to directory of this file]
+foo@bar:~[path to directory of this file]$ ./__PC_NAME_SMALL__ [cmd line]
+
+or if installed in a global location:
+
+foo@bar:~$ __PC_NAME_SMALL__ [cmd line]
+
+Typical usage is show in the main() method.
+"""
+
+# ------------------------------------------------------------------------------
+# Imports
+# ------------------------------------------------------------------------------
+
+# system imports
+from pathlib import Path
+import sys
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
+
+# my imports
+# add custom import paths
+
+# find paths to dev or user
+DIR_PARENT = Path(__file__).parent
+if DIR_PARENT.name == "__PD_DEV_SRC__":
+    DIR_PRJ = DIR_PARENT.parent
+    DIR_CFG = DIR_PRJ / "__PD_DEV_CONF__"
+    DIR_LIB = "__PD_DEV_LIB__"
+    DIR_SRC = DIR_PRJ / "__PD_DEV_SRC__"
+else:
+    DIR_HOME = Path.home()
+    DIR_CFG = DIR_HOME / "__PC_USR_CONF__"
+    DIR_LIB = DIR_HOME / "__PC_USR_LIB__"
+    DIR_SRC = DIR_HOME / "__PC_USR_SRC__"
+
+# add lib path to import search
+sys.path.append(str(DIR_LIB))
+sys.path.append(str(DIR_SRC))
+
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnclibase import CNCliBase  # type: ignore
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=no-name-in-module
+# pylint: enable=import-error
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# the default config dict
+D_CFG = {}
+
+# the default config path (if you want to load/save a default file)
+# NB: a default file isn't really necessary:
+# 1. defaults that can never change should be put in the above D_CFG
+# 2. if using the -c option to load a config, the full path is given anyway and
+#    C_DICT_CFG will only be loaded/saved using that path
+# use this only if your program needs to save modified values between runs
+# dicts loaded from either file will be combined with C_DICT_CFG
+P_CFG = DIR_CFG / "__PC_NAME_SMALL__.json"
+
+# version option strings
+S_VER_OPTION = "v"
+S_VER_ACTION = "version"
+S_VER_HELP = (
+    "__PC_NAME_SMALL__\n"
+    + "__PM_SHORT_DESC__\n"
+    + __PD_VER_FMT__.format("__PM_VERSION__") + "\n"
+    + "__PD_URL__/__PC_NAME_BIG__"
+)
+
+# config option strings
+S_CFG_OPTION = "c"
+S_CFG_DEST = "CFG_DEST"
+S_CFG_HELP = "load configuration from file"
+S_CFG_METAVAR = "FILE"
+
+# debug option strings
+S_DBG_OPTION = "d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
+
+# ------------------------------------------------------------------------------
+# Public classes
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# The main class, responsible for the operation of the program
+# ------------------------------------------------------------------------------
+class __PC_NAME_CLASS__(CNCliBase):
+    """
+    The main class, responsible for the operation of the program
+
+    Public methods:
+        main: The main method of the program
+
+    This class does the most of the work of a typical CLI program. It parses
+    command line options, loads/saves config files, and performs the operations
+    required for the program.
+    """
+
+    # --------------------------------------------------------------------------
+    # Class methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
+    def __init__(self):
+        """
+        Initialize the new object
+
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
+        """
+
+        # call super init to initialize the base class
+        super().__init__()
+
+        # set default property values
+        self._d_cfg = D_CFG
+        self._debug = False
+
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # The main method of the program
+    # --------------------------------------------------------------------------
+    def main(self):
+        """
+        The main method of the program
+
+        This method is the main entry point for the program, initializing the
+        program, and performing its steps.
+        """
+
+        # call boilerplate code
+        self._setup()
+
+        # do the thing with the thing
+        print(self._func())
+
+        # call boilerplate code
+        self._teardown()
+
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Short description
+    # --------------------------------------------------------------------------
+    def _func(self):
+        """
+        Short description
+
+        Arguments:
+            var_name: Short description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+        """
+
+        # change a value in the config dict
+        self._d_cfg["inside"] = "bar"
+
+        # check for debug flag
+        if self._debug:
+            return "this is func (DEBUG)"
+
+        # no debug, return normal result
+        return "this is func"
+
+    # --------------------------------------------------------------------------
+    # Add arguments to argparse parser
+    # --------------------------------------------------------------------------
+    def _add_args(self, parser):
+        """
+        Add arguments to argparse parser
+
+        Arguments:
+            parser: The ArgumentParser to add the args to
+
+        This method is teased out for better code maintenance.
+        """
+
+        # set text for -h
+        parser.description = S_VER_HELP
+
+        # add version option
+        parser.add_argument(
+            f"-{S_VER_OPTION}",
+            action=S_VER_ACTION,
+            version=S_VER_HELP
+        )
+
+        # add config (user dict) option
+        parser.add_argument(
+            f"-{S_CFG_OPTION}",
+            dest=S_CFG_DEST,
+            help=S_CFG_HELP,
+            metavar=S_CFG_METAVAR
+        )
+
+        # add debug option
+        parser.add_argument(
+            f"-{S_DBG_OPTION}",
+            action=S_DBG_ACTION,
+            dest=S_DBG_DEST,
+            help=S_DBG_HELP
+        )
+
+    # --------------------------------------------------------------------------
+    # Boilerplate to use at the start of main
+    # --------------------------------------------------------------------------
+    def _setup(self):
+        """
+        Boilerplate to use at the start of main
+
+        Perform some mundane stuff like running the arg parser and loading
+        config files.
+        """
+
+        # call to set up and run arg parser
+        dict_args = super()._run_parser()
+
+        # get other options from command line
+        self._debug = dict_args[S_DBG_DEST]
+
+        # need to convert def config file to str
+        cfg_def = str(P_CFG)
+
+        # command line cfg is None or str
+        cfg_arg = dict_args[S_CFG_DEST]
+
+        # load the config file
+        # not using def path, using arg path
+        # super()._load_config(None, cfg_arg, D_CFG)
+        # using def path, not using arg
+        # super()._load_config(cfg_def, dict_def=D_CFG)
+        # using def path, using arg path, using internal
+        self._d_cfg = super()._load_config(cfg_def, cfg_arg, D_CFG)
+
+        # throw in a debug test
+        if self._debug:
+            print("load cfg:")
+            F.pp(self._d_cfg)
+
+    # --------------------------------------------------------------------------
+    # Boilerplate to use at the end of main
+    # --------------------------------------------------------------------------
+    def _teardown(self):
+        """
+        Boilerplate to use at the end of main
+
+        Perform some mundane stuff like saving config files.
+        """
+
+        # throw in a debug test
+        if self._debug:
+            print("save cfg:")
+            F.pp(self._d_cfg)
+
+        # call to save config
+        super()._save_config()
+
+
+# ------------------------------------------------------------------------------
+# Code to run when called from command line
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    # Code to run when called from command line
+
+    # This is the top level code of the program, called when the Python file is
+    # invoked from the command line.
+
+    # create a new instance of the main class
+    __PC_NAME_CLASS__().main()
+
+# -)

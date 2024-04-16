@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : __PC_NAME_BIG__                                        /          \
 # Filename: windowmain.py                                         |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -21,13 +21,7 @@ private functions declared here.
 
 # system imports
 from datetime import datetime
-from pathlib import Path
 import sys
-
-# TODO: use lib location
-# add lib path to import search
-C_DIR_LIB = Path(__file__).parents[1] / "lib"
-sys.path.append(str(C_DIR_LIB))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -35,13 +29,19 @@ sys.path.append(str(C_DIR_LIB))
 # pylint: disable=import-error
 
 # my imports
+# add custom import paths
+
+# add lib path to import search
+DIR_LIB = "__PC_USR_LIB__"
+sys.path.append(str(DIR_LIB))
+
 import guiconstants as GC
-from cnapplib.cnwindow import CNWindow # type: ignore
+from cnapplib.cnwindow import CNWindow  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
-# pylint: enable=import-error
 # pylint: enable=no-name-in-module
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Public classes

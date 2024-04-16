@@ -1,13 +1,13 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : __PC_NAME_BIG__                                        /          \
 # Filename: __init__.py                                           |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE__                                         \          /
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
-__PP_SHORT_DESC__
+__PM_SHORT_DESC__
 """
 
 # -)

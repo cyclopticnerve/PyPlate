@@ -1,7 +1,7 @@
 {
-    "__PP_VERSION__": "0.0.2",
-    "__PP_SHORT_DESC__": "A program for creating CLI/GUI/package projects in Python from a template",
-    "__PP_KEYWORDS__": [
+    "__PM_VERSION__": "0.0.2",
+    "__PM_SHORT_DESC__": "A program for creating CLI/GUI/package projects in Python from a template",
+    "__PM_KEYWORDS__": [
         "python",
         "python",
         "cli",
@@ -19,7 +19,7 @@
         "template,",
         "app"
     ],
-    "__PP_PY_DEPS__": {},
-    "__PP_SYS_DEPS__": [],
-    "__PP_GUI_CATEGORIES__": []
+    "__PM_PY_DEPS__": {},
+    "__PM_SYS_DEPS__": [],
+    "__PM_GUI_CATS__": []
 }
