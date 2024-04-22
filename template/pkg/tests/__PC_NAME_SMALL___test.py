@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: pkg_test.py                                           |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : __PC_NAME_BIG__                                        /          \
+# Filename: __PC_NAME_SMALL___test.py                             |     ()     |
+# Date    : __PC_DATE__                                           |            |
+# Author  : __PD_AUTHOR__                                         |   \____/   |
+# License : __PD_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -31,21 +31,21 @@ import sys
 # option 1:
 
 # path to dir above <package name>
-DIR_PKG = Path(__file__).parents[1] / "__PP_DEV_SRC__"
+DIR_PKG = Path(__file__).parents[1] / "__PD_DEV_SRC__"
 sys.path.append(str(DIR_PKG))
 
 # from <package name> import <module name>
-from __PP_NAME_SMALL__ import __PP_NAME_MOD__
+from __PC_NAME_SMALL__ import __PC_NAME_MOD__
 
 # ------------------------------------------------------------------------------
 # option 2:
 
 # # path to <package name>
-# DIR_PKG = Path(__file__).parents[1] / "__PP_DEV_SRC__" / "__PP_NAME_SMALL__"
+# DIR_PKG = Path(__file__).parents[1] / "__PD_DEV_SRC__" / "__PC_NAME_SMALL__"
 # sys.path.append(str(DIR_PKG))
 
 # # import <module name>
-# import __PP_NAME_MOD__
+# import __PC_NAME_MOD__
 
 # ------------------------------------------------------------------------------
 
@@ -63,6 +63,6 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    __PP_NAME_MOD__.func()
+    __PC_NAME_MOD__.func()  # type: ignore
 
 # -)

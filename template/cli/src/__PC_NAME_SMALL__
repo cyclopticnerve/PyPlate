@@ -43,7 +43,7 @@ DIR_PARENT = Path(__file__).parent
 if DIR_PARENT.name == "__PD_DEV_SRC__":
     DIR_PRJ = DIR_PARENT.parent
     DIR_CFG = DIR_PRJ / "__PD_DEV_CONF__"
-    DIR_LIB = "__PD_DEV_LIB__"
+    DIR_LIB = Path.home() / "__PC_DEV_LIB__"
     DIR_SRC = DIR_PRJ / "__PD_DEV_SRC__"
 else:
     DIR_HOME = Path.home()
@@ -64,20 +64,8 @@ from cnlib.cnclibase import CNCliBase  # type: ignore
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
-# Globals
+# Strings
 # ------------------------------------------------------------------------------
-
-# the default config dict
-D_CFG = {}
-
-# the default config path (if you want to load/save a default file)
-# NB: a default file isn't really necessary:
-# 1. defaults that can never change should be put in the above D_CFG
-# 2. if using the -c option to load a config, the full path is given anyway and
-#    C_DICT_CFG will only be loaded/saved using that path
-# use this only if your program needs to save modified values between runs
-# dicts loaded from either file will be combined with C_DICT_CFG
-P_CFG = DIR_CFG / "__PC_NAME_SMALL__.json"
 
 # version option strings
 S_VER_OPTION = "v"
@@ -85,7 +73,7 @@ S_VER_ACTION = "version"
 S_VER_HELP = (
     "__PC_NAME_SMALL__\n"
     + "__PM_SHORT_DESC__\n"
-    + __PD_VER_FMT__.format("__PM_VERSION__") + "\n"
+    + "__PD_VER_FMT__\n"
     + "__PD_URL__/__PC_NAME_BIG__"
 )
 
@@ -141,7 +129,7 @@ class __PC_NAME_CLASS__(CNCliBase):
         super().__init__()
 
         # set default property values
-        self._d_cfg = D_CFG
+        self._d_cfg = {}
         self._debug = False
 
     # --------------------------------------------------------------------------
@@ -219,17 +207,7 @@ class __PC_NAME_CLASS__(CNCliBase):
 
         # add version option
         parser.add_argument(
-            f"-{S_VER_OPTION}",
-            action=S_VER_ACTION,
-            version=S_VER_HELP
-        )
-
-        # add config (user dict) option
-        parser.add_argument(
-            f"-{S_CFG_OPTION}",
-            dest=S_CFG_DEST,
-            help=S_CFG_HELP,
-            metavar=S_CFG_METAVAR
+            f"-{S_VER_OPTION}", action=S_VER_ACTION, version=S_VER_HELP
         )
 
         # add debug option
@@ -237,7 +215,15 @@ class __PC_NAME_CLASS__(CNCliBase):
             f"-{S_DBG_OPTION}",
             action=S_DBG_ACTION,
             dest=S_DBG_DEST,
-            help=S_DBG_HELP
+            help=S_DBG_HELP,
+        )
+
+        # add config (user dict) option
+        parser.add_argument(
+            f"-{S_CFG_OPTION}",
+            dest=S_CFG_DEST,
+            help=S_CFG_HELP,
+            metavar=S_CFG_METAVAR,
         )
 
     # --------------------------------------------------------------------------
@@ -257,19 +243,25 @@ class __PC_NAME_CLASS__(CNCliBase):
         # get other options from command line
         self._debug = dict_args[S_DBG_DEST]
 
+        # the default config file
+        # NB: if using the cmd line to load a file, this path will still be
+        # checked for a config file
+        # the values at this path will be combined first, followed by the cmd
+        # line option
+
         # need to convert def config file to str
-        cfg_def = str(P_CFG)
+        cfg_def = str(DIR_CFG / "__PC_NAME_SMALL__.json")
 
         # command line cfg is None or str
         cfg_arg = dict_args[S_CFG_DEST]
 
         # load the config file
         # not using def path, using arg path
-        # super()._load_config(None, cfg_arg, D_CFG)
-        # using def path, not using arg
-        # super()._load_config(cfg_def, dict_def=D_CFG)
+        # super()._load_config(None, cfg_arg, self._d_cfg)
+        # using def path, not using arg path
+        # super()._load_config(cfg_def, dict_def=self._d_cfg)
         # using def path, using arg path, using internal
-        self._d_cfg = super()._load_config(cfg_def, cfg_arg, D_CFG)
+        super()._load_config(cfg_def, cfg_arg, self._d_cfg)
 
         # throw in a debug test
         if self._debug:

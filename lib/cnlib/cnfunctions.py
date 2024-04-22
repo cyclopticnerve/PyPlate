@@ -14,7 +14,7 @@ Functions:
     dpretty: Pretty print a dict
     lpretty: Pretty print a list
     pp: Pretty print a dictionary or list
-    combine_dicts: Update a dictionary with a second dictionary
+    combine_dicts: Update a dictionary with one or more dictionaries
     sh: Run a command string in the shell
     load_dicts: Combines dictionaries from all found paths
     save_dict: Save a dictionary to all paths
@@ -292,6 +292,7 @@ def pp(obj, indent_size=4, label=None):
         (default: 4)
         label: The string to use as a label (default: None)
 
+    
     Formats a dictionary or list nicely and prints it to the console. Note that
     this method includes magic commas in the output, and therefore cannot be
     used to create true JSON-compatible strings. It should only be used for
@@ -312,16 +313,16 @@ def pp(obj, indent_size=4, label=None):
 
 
 # ------------------------------------------------------------------------------
-# Update a dictionary with a second dictionary
+# Update a dictionary with one or more dictionaries
 # ------------------------------------------------------------------------------
 def combine_dicts(dict_old, dict_new):
     """
-    Update a dictionary with a second dictionary
+    Update a dictionary with one or more dictionaries
 
     Arguments:
         dict_old: The dictionary defined as the one to receive updates
-        dict_new: The dictionary containing new keys/values to be updated
-        in the old dictionary
+        dict_new: An array of  dictionaries containing new keys/values to be
+        updated in the old dictionary
 
     Returns:
         The updated dict_old, filled with updates from dict_new
@@ -332,27 +333,36 @@ def combine_dicts(dict_old, dict_new):
     """
 
     # sanity check
-    if dict_new is None:
+    if dict_new is None or len(dict_new) == 0:
         return dict_old
 
-    # for each k,v pair in dict_new
-    for k, v in dict_new.items():
-        # copy whole value if key is missing
-        if not k in dict_old:
-            dict_old[k] = v
+    # go through each dict
+    for dict_n in dict_new:
 
-        # if the key is present in both
-        else:
-            # if the value is a dict
-            if isinstance(v, dict):
-                # start recursing
-                # recurse using the current key and value
-                dict_old[k] = combine_dicts(dict_old[k], v)
-
-            # if the value is not a dict
-            else:
-                # just copy value from one dict to the other
+        # for each k,v pair in dict_n
+        for k, v in dict_n.items():
+            # copy whole value if key is missing
+            if not k in dict_old:
                 dict_old[k] = v
+
+            # if the key is present in both
+            else:
+                # if the value is a dict
+                if isinstance(v, dict):
+                    # start recursing
+                    # recurse using the current key and value
+                    dict_old[k] = combine_dicts(dict_old[k], [v])
+
+                # if the value is a list
+                elif isinstance(v, list):
+                    l_old = dict_old[k]
+                    for l_item in v:
+                        l_old.append(l_item)
+
+                # if the value is not a dict or a list
+                else:
+                    # just copy value from one dict to the other
+                    dict_old[k] = v
 
     # return the updated dict_old
     return dict_old
@@ -388,14 +398,17 @@ def sh(string):
 # --------------------------------------------------------------------------
 # Combines dictionaries from all found paths
 # --------------------------------------------------------------------------
-def load_dicts(paths, dict_=None):
+def load_dicts(paths, start_dict=None):
     """
     Combines dictionaries from all found paths
 
     Arguments:
         paths: The list of file paths to load from
-        dict_: The starting dict and final dict after combining (default: None)
+        start_dict: The starting dict and final dict after combining (default:
+        None)
 
+    Returns: The combined dictionary
+    
     Raises:
         FileNotFoundError: If the file does not exist
         json.JSONDecodeError: If the file is not a valid JSON file
@@ -405,8 +418,8 @@ def load_dicts(paths, dict_=None):
     """
 
     # set the default result
-    if dict_ is None:
-        dict_ = {}
+    if start_dict is None:
+        start_dict = {}
 
     # loop through possible files
     for path in paths:
@@ -430,7 +443,7 @@ def load_dicts(paths, dict_=None):
                 temp_dict = json.load(a_file)
 
                 # combine new dict with previous
-                dict_ = combine_dicts(dict_, temp_dict)
+                start_dict = combine_dicts(start_dict, [temp_dict])
 
         # file not found
         except FileNotFoundError:
@@ -441,7 +454,7 @@ def load_dicts(paths, dict_=None):
             print(C.CFG_ERR_NOT_VALID.format(path))
 
     # return the final dict
-    return dict_
+    return start_dict
 
 # --------------------------------------------------------------------------
 # Save a dictionary to all paths

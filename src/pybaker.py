@@ -15,6 +15,8 @@ files, according to the data present in the conf files.
 # show current version number
 # ask for new version number
 # read a dict of what to put in dist
+# TODO: when run, ask for new version str (default: old version str
+# put htat new version str in metadata file)
 
 # ------------------------------------------------------------------------------
 
@@ -706,9 +708,9 @@ def fix_pyproject():
 
 #     # replace imports block
 #     str_pattern = (
-#         r"(^#[\t ]*__PP_IMPORTS_START__[\t ]*)"
+#         r"(^#[\t ]*__PD_IMPORTS_START__[\t ]*)"
 #         r"(.*?)"
-#         r"(^#[\t ]*__PP_IMPORTS_END__[\t ]*)"
+#         r"(^#[\t ]*__PD_IMPORTS_END__[\t ]*)"
 #     )
 #     str_rep = rf"\g<1>\n{str_imports}\n{str_all}\n\g<3>"
 #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
@@ -1098,6 +1100,7 @@ def do_extras():
 
     # # create tree object and call
     # p_t = pytree.PyTree()
+    # TODO: make this use blacklist
     # tree = p_t.build_tree(_DIR_PRJ, DICT_SETTINGS['__PP_TREE_IGNORE__'])
 
     # # write tree to file
@@ -1429,6 +1432,7 @@ def _check_path(path_item):
     # global error count
     global G_ERROR_COUNT
 
+    # TODO make this use __PD, __PC, __PM
     # check for dunders in path
     if "__PP_" in path_item:
         print(f"{path_item}: Path contains __PP_")

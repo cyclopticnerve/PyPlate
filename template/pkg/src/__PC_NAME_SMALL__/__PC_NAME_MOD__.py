@@ -7,37 +7,12 @@
 # ------------------------------------------------------------------------------
 
 """
-__PM_SHORT_DESC__
+docstring
 """
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-
-# NB: this is an example of how to use cnlibs in a package project
-
-# system imports
-from pathlib import Path
-import sys
-
-# pylint: disable=wrong-import-position
-
-# my imports
-# add custom import paths
-
-# find paths to dev or user
-DIR_PARENT = Path(__file__).parents[1]
-if DIR_PARENT.name == "__PD_DEV_SRC__":
-    DIR_LIB = "__PD_DEV_LIB__"
-else:
-    DIR_LIB = Path.home() / "__PC_USR_LIB__"
-
-# add lib path to import search
-sys.path.append(str(DIR_LIB))
-
-from cnlib import cnfunctions as F  # type: ignore
-
-# pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -74,10 +49,6 @@ def func():
 
     Long description (including HTML).
     """
-
-    # test out using cnlib
-    dict_test = {"foo": "bar"}
-    F.pp(dict_test)
 
     # do the thing
     print("this is func")

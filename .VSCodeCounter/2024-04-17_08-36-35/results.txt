@@ -1,0 +1,88 @@
+Date : 2024-04-17 08:36:35
+Directory : /home/dana/Documents/Projects/Python/PyPlate
+Total : 39 files,  4157 codes, 2839 comments, 1782 blanks, all 8778 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| Python           |         27 |      3,672 |      2,801 |      1,665 |      8,138 |
+| Markdown         |          4 |        362 |          0 |         99 |        461 |
+| JSON             |          2 |         43 |          0 |          0 |         43 |
+| TOML             |          2 |         42 |         22 |         10 |         74 |
+| Desktop          |          2 |         20 |         16 |          6 |         42 |
+| pip requirements |          2 |         18 |          0 |          2 |         20 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                               | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                  |         39 |      4,157 |      2,839 |      1,782 |      8,778 |
+| . (Files)                                                                                          |          4 |        320 |         12 |         89 |        421 |
+| conf                                                                                               |          3 |        272 |        208 |         57 |        537 |
+| lib                                                                                                |         12 |      1,683 |      1,068 |        740 |      3,491 |
+| lib/cnapplib                                                                                       |          5 |        684 |        435 |        315 |      1,434 |
+| lib/cnlib                                                                                          |          7 |        999 |        633 |        425 |      2,057 |
+| misc                                                                                               |          3 |        120 |        117 |         84 |        321 |
+| src                                                                                                |          2 |      1,272 |        937 |        545 |      2,754 |
+| template                                                                                           |         15 |        490 |        497 |        267 |      1,254 |
+| template/all                                                                                       |          6 |        168 |        122 |         89 |        379 |
+| template/all (Files)                                                                               |          4 |        102 |         10 |         22 |        134 |
+| template/all/misc                                                                                  |          2 |         66 |        112 |         67 |        245 |
+| template/gui                                                                                       |          6 |        270 |        286 |        121 |        677 |
+| template/gui/src                                                                                   |          6 |        270 |        286 |        121 |        677 |
+| template/gui/src (Files)                                                                           |          3 |        232 |        270 |        115 |        617 |
+| template/gui/src/cfg                                                                               |          1 |         18 |          0 |          0 |         18 |
+| template/gui/src/gtk                                                                               |          2 |         20 |         16 |          6 |         42 |
+| template/pkg                                                                                       |          3 |         52 |         89 |         57 |        198 |
+| template/pkg/src                                                                                   |          2 |         42 |         50 |         37 |        129 |
+| template/pkg/src/__PP_NAME_SMALL__                                                                 |          2 |         42 |         50 |         37 |        129 |
+| template/pkg/tests                                                                                 |          1 |         10 |         39 |         20 |         69 |
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                                                           | language         | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| /home/dana/Documents/Projects/Python/PyPlate/CHANGELOG.md                                          | Markdown         |          1 |          0 |          0 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/README.md                                             | Markdown         |        280 |          0 |         83 |        363 |
+| /home/dana/Documents/Projects/Python/PyPlate/conf/keys.py                                          | Python           |         17 |         13 |          8 |         38 |
+| /home/dana/Documents/Projects/Python/PyPlate/conf/metadata.json                                    | JSON             |         25 |          0 |          0 |         25 |
+| /home/dana/Documents/Projects/Python/PyPlate/conf/settings.py                                      | Python           |        230 |        195 |         49 |        474 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/__init__.py                              | Python           |          3 |          8 |          3 |         14 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/cnapp.py                                 | Python           |        184 |        137 |         95 |        416 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/cnappconstants.py                        | Python           |         54 |         50 |         23 |        127 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/cnappfunctions.py                        | Python           |         61 |         45 |         32 |        138 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/cnwindow.py                              | Python           |        382 |        195 |        162 |        739 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/__init__.py                                 | Python           |          3 |          8 |          3 |         14 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnclibase.py                                | Python           |        104 |         87 |         44 |        235 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnconstants.py                              | Python           |         27 |         41 |         18 |         86 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnformatter.py                              | Python           |         16 |         18 |         10 |         44 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnfunctions.py                              | Python           |        255 |        121 |        114 |        490 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnpot.py                                    | Python           |        312 |        202 |        118 |        632 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cntree.py                                   | Python           |        282 |        156 |        118 |        556 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/__PP_NAME_SMALL__-gtk4.py                        | Python           |         71 |         53 |         48 |        172 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/install.py                                       | Python           |         27 |         31 |         17 |         75 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/uninstall.py                                     | Python           |         22 |         33 |         19 |         74 |
+| /home/dana/Documents/Projects/Python/PyPlate/pyproject.toml                                        | TOML             |         21 |         12 |          5 |         38 |
+| /home/dana/Documents/Projects/Python/PyPlate/requirements.txt                                      | pip requirements |         18 |          0 |          1 |         19 |
+| /home/dana/Documents/Projects/Python/PyPlate/src/pybaker.py                                        | Python           |        718 |        476 |        259 |      1,453 |
+| /home/dana/Documents/Projects/Python/PyPlate/src/pymaker.py                                        | Python           |        554 |        461 |        286 |      1,301 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/CHANGELOG.md                             | Markdown         |          0 |          0 |          1 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/README.md                                | Markdown         |         81 |          0 |         15 |         96 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/misc/default_class.py                    | Python           |         38 |         65 |         36 |        139 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/misc/default_mod.py                      | Python           |         28 |         47 |         31 |        106 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/pyproject.toml                           | TOML             |         21 |         10 |          5 |         36 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/requirements.txt                         | pip requirements |          0 |          0 |          1 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/src/appmain.py                           | Python           |        139 |        176 |         51 |        366 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/src/cfg/__PP_NAME_SMALL__.json           | JSON             |         18 |          0 |          0 |         18 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/src/gtk/__PP_NAME_SMALL__.desktop        | Desktop          |         10 |          8 |          3 |         21 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/src/gtk/template.desktop                 | Desktop          |         10 |          8 |          3 |         21 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/src/guiconstants.py                      | Python           |         14 |         29 |         14 |         57 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/src/windowmain.py                        | Python           |         79 |         65 |         50 |        194 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/pkg/src/__PP_NAME_SMALL__/__PP_NAME_MOD__.py | Python           |         39 |         42 |         34 |        115 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/pkg/src/__PP_NAME_SMALL__/__init__.py        | Python           |          3 |          8 |          3 |         14 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/pkg/tests/test_pkg.py                        | Python           |         10 |         39 |         20 |         69 |
+| Total                                                                                              |                  |      4,157 |      2,839 |      1,782 |      8,778 |
++----------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+

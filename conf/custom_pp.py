@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: settings.py                                           |     ()     |
+# Filename: custom_pp.py                                          |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -8,37 +8,41 @@
 
 """
 This module separates out the constants from pymaker.py/pybaker.py.
+This file, and the template folder, are the main ways to customize PyPlate.
 """
-
-# TODO: all dict keys that are currently dunders need to be constants
-# put dunders in separate .py file to share with pybaker
-# NEXT: put i18n back in for error messages and file/dir names
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
+import gettext
+import os
 from pathlib import Path
+import re
 
 # pylint: disable=no-name-in-module
 
 # my imports
-from . import keys as K  # type: ignore
+from . import keys2 as K  # type: ignore
 
 # pylint: enable=no-name-in-module
+
+# ------------------------------------------------------------------------------
+# I18N
+# ------------------------------------------------------------------------------
+
+_ = gettext.gettext
 
 # ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
 
-# help/version strings
-S_NAME_BIG = "PyMaker"
-S_NAME_SMALL = "pymaker"
-
-# version option strings
+# verbose option strings
 S_VER_OPTION = "v"
-S_VER_ACTION = "version"
+S_VER_ACTION = "store_true"
+S_VER_DEST = "VER_DEST"
+S_VER_HELP = "enable verbose option"
 
 # debug option strings
 S_DBG_OPTION = "d"
@@ -46,87 +50,79 @@ S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
 
+# base dir for project type folders, relative to dev home
+S_DIR_BASE = f"Documents{os.sep}Projects{os.sep}Python"
+
 # string constants for pymaker
-S_PRJ_NAME = "Project/Package name"
-S_PRJ_NAME_MOD = "Module name"
-S_PRJ_NAME_ERR = 'Project "{}" already exists in "{}"'
-S_PRJ_NAME_LEN = "Project names must be more than 1 character"
-S_PRJ_NAME_START = "Project names must start with a letter"
-S_PRJ_NAME_END = "Project names must end with a letter or number"
-S_PRJ_NAME_CONTAIN = (
+S_ASK_TYPE = "Project type"
+S_ASK_NAME = _("Project name")
+# NB: format param is __PC_NAME_SMALL__
+S_ASK_MOD = "Module name (default: {})"
+S_ERR_TYPE = "Please enter a valid project type"
+S_ERR_LEN = "Project names must be more than 1 character"
+S_ERR_START = "Project names must start with a letter"
+S_ERR_END = "Project names must end with a letter or number"
+S_ERR_CONTAIN = (
     "Project names must contain only letters, numbers,"
     "dashes (-), or underscores (_)"
 )
-S_PRJ_TYPE = "Project type"
-S_PRJ_TYPE_INVALID = "Please enter a valid project type"
+# NB: format params are __PP_NAME_BIG__ and S_DIR_BASE/(proj type dir)
+S_ERR_EXIST = 'Project "{}" already exists in "{}"'
 
 # formats for tree
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
-# dir names, relative to PyPlate or project dir
-S_DIR_VENV = ".venv"
-S_DIR_ALL = "all"
-S_DIR_LIB = "lib"
-S_DIR_MISC = "misc"
-S_DIR_PP = "pyplate"
-S_DIR_TEMPLATE = "template"
-S_DIR_CONF = "conf"
-S_DIR_CONF_DEFS = "defaults"
+# dir names, relative to PP template, or project dir
+# NB: if you change anything in the template structure, you should revisit this
+# and make any appropriate changes
+S_ALL_VENV = ".venv"
+S_ALL_CONF = "conf"
+S_ALL_DIST = "dist"
+S_ALL_DOCS = "docs"
+S_ALL_LOCALE = "locale"
+S_ALL_PO = "po"
+S_ALL_MISC = "misc"
+S_ALL_README = "README"
+S_ALL_SRC = "src"
+S_ALL_TESTS = "tests"
 
-# paths relative to end user only
-S_USR_CONF = ".config"
-S_USR_SHARE = ".local/share"
+# paths relative to end user home only
+S_USR_CONF = ".config"  # __PC_NAME_SMALL__ will be appended
+S_USR_SRC = f".local{os.sep}share"  # __PC_NAME_SMALL__ will be appended
+S_USR_APPS = f".local{os.sep}share{os.sep}applications"  # for .desktop file
+S_USR_BIN = f".local{os.sep}bin"  # where to put the binary
 
-# file names
-S_FILE_TOML = "pyproject.toml"
-S_FILE_METADATA = "metadata.json"
-S_FILE_METADATA_DEF = "metadata_default.json"
-S_FILE_SETTINGS = "settings.json"
-S_FILE_SETTINGS_DEF = "settings_default.json"
-S_FILE_TREE = "tree.txt"
-S_FILE_README = "README.md"
+# this is where the user libs will go
+S_USR_LIB_NAME = "lib"
+S_USR_LIB = (
+    f".local{os.sep}share"  # __PD_AUTHOR__/S_USR_LIB_NAME will be appended
+)
+
+# where to put the file tree
+S_FILE_TREE = f"{S_ALL_MISC}{os.sep}tree.txt"
+
+# screenshot loc
+S_FILE_SS = f"{S_ALL_README}{os.sep}screenshot.png"
 
 # commands for _do_after_fix
+# NB: format param is (proj dir)
 S_CMD_GIT = "git init {} -q"
+# NB: format param is (proj dir)/S_ALL_VENV
 S_CMD_VENV = "python -m venv {}"
-
-# ------------------------------------------------------------------------------
-# Paths
-# ------------------------------------------------------------------------------
-
-# this is the dir above where the script is being run from (e.g.
-# ~/Documents/Projects/Python/PyPlate/)
-P_DIR_PYPLATE = Path(__file__).parents[1]
-
-# path to lib project (e.g. ~/Documents/Projects/Python/PyPlate/lib)
-P_DIR_LIB = P_DIR_PYPLATE / S_DIR_LIB
-
-# this is the dir where the template files are located relative to this script
-# (e.g. ~/Documents/Projects/Python/PyPlate/template/)
-P_DIR_TEMPLATE = P_DIR_PYPLATE / S_DIR_TEMPLATE
-
-# this is the location where the project's subdir will be (above PyPlate)
-# (e.g. ~/Documents/Projects/Python/)
-P_DIR_BASE = P_DIR_PYPLATE.parent
-
-# the location of pyplate's metadata (we update this at runtime)
-P_PP_METADATA = P_DIR_PYPLATE / S_DIR_CONF / S_FILE_METADATA
 
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
 
 # the type of projects that will ask for a module name
-L_PKG = ["p"]
+L_NAME_MOD = ["p"]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
 # ------------------------------------------------------------------------------
 
 # the default settings to use to create the project
-# these can be used later by pybaker.py (from
-# <project>/pyplate/conf/settings.json)
 # NB: these are one-time settings that should be edited before you create your
 # first project
 D_PRJ_DEF = {
@@ -138,18 +134,18 @@ D_PRJ_DEF = {
     "__PD_URL__": "https://github.com/cyclopticnerve",
     # the author's email, used in headers and pyproject.toml
     "__PD_EMAIL__": "cyclopticnerve@gmail.com",
-    # the license name, used in headers, S_FILE_README, and pyproject.toml
+    # the license name, used in headers, __PD_README_FILE__, and pyproject.toml
     "__PD_LICENSE_NAME__": "WTFPLv2",
-    # the license image source, used in S_FILE_README
+    # the license image source, used in __PD_README_FILE__
     "__PD_LICENSE_IMG__": "https://img.shields.io/badge/License-WTFPL-brightgreen.svg",
     # the url for license image click
     "__PD_LICENSE_LINK__": "http://www.wtfpl.net",
     # the license file to use
     "__PD_LICENSE_FILE__": "LICENSE.txt",
-    # the screenshot to use in  S_FILE_README
-    "__PD_SCREENSHOT__": "README/screenshot.png",
-    # version format string for command line
-    "__PD_VER_FMT__": "Version {}",
+    # the screenshot to use in  __PD_README_FILE__
+    "__PD_SCREENSHOT__": S_FILE_SS,
+    # version format string for command line (context for pybaker replace)
+    "__PD_VER_FMT__": "Version __PM_VERSION__",
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -160,52 +156,51 @@ D_PRJ_DEF = {
     # run' along with author/email/license/etc
     "__PD_DATE_FMT__": "%m/%d/%Y",
     # readme file used in pyproject.toml
-    "__PD_README_FILE__": S_FILE_README,
-    # absolute path of libs in PP
-    "__PD_DEV_LIB__": str(P_DIR_LIB),
+    "__PD_README_FILE__": "README.md",
     # location of config files, relative to the project dir
-    "__PD_DEV_CONF__": S_DIR_CONF,
+    "__PD_DEV_CONF__": S_ALL_CONF,
     # location of src files, relative to the project dir
-    "__PD_DEV_SRC__": "src",
+    "__PD_DEV_SRC__": S_ALL_SRC,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    "__PD_USR_APPS__": ".local/share/applications",  # for .desktop file
-    "__PD_USR_BIN__": ".local/bin",  # where to put the exe
+    "__PD_USR_APPS__": S_USR_APPS,  # for .desktop file
+    "__PD_USR_BIN__": S_USR_BIN,  # where to put the binary
 }
 
 D_PRJ_CFG = {
     # --------------------------------------------------------------------------
     # these items will be filled in by _get_project_info
     "__PC_TYPE_PRJ__": "",  # 'c'
-    "__PC_DIR_PRJ__": "",  # '~/Documents/Projects/Python/CLIs/PyPlate'
     "__PC_NAME_BIG__": "",  # PyPlate
     "__PC_NAME_SMALL__": "",  # pyplate
-    "__PS.NAME_MOD__": "",  # module1.py
+    "__PC_NAME_MOD__": "",  # module1.py
     "__PC_NAME_CLASS__": "",  # Pascal case name for classes
     "__PC_DATE__": "",  # the date eac__PPh file was created, updated every time
+    "__PC_FILENAME__": "",  # filename after fixing path
+    # --------------------------------------------------------------------------
+    # these paths are calculated at runtime relative to the dev's home dir
+    "__PC_DEV_LIB__": "",  # location of cnlibs dir in PyPlate
+    "__PC_PYBAKER__": "",  # location of real pybaker in PyPlate
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the user's home dir
     "__PC_USR_CONF__": "",  # config dir
     "__PC_USR_LIB__": "",  # location of cnlibs dir
     "__PC_USR_SRC__": "",  # where the program will keep it's source
-    # --------------------------------------------------------------------------
-    # I18N dict calculated further down
-    "__PC_I18N__": {},
 }
 
 # the default metadata that the final project will use for pybaker.py
 # NB: all of these values will need to be set later before running pybaker.py
 D_PRJ_META = {
-    # the version number to use in S_FILE_README and pyproject.toml
+    # the version number to use in __PD_README_FILE__ and pyproject.toml
     "__PM_VERSION__": "",
-    # the short description to use in S_FILE_README and pyproject.toml
+    # the short description to use in __PD_README_FILE__ and pyproject.toml
     "__PM_SHORT_DESC__": "",
     # the keywords to use in pyproject.toml and github
     "__PM_KEYWORDS__": [],
-    # the python dependencies to use in S_FILE_README, pyproject.toml, github,
+    # the python dependencies to use in __PD_README_FILE__, pyproject.toml, github,
     # and install.py
     "__PM_PY_DEPS__": {},
-    # the system dependencies to use in S_FILE_README, github.com, and
+    # the system dependencies to use in __PD_README_FILE__, github.com, and
     # install.py
     "__PM_SYS_DEPS__": [],
     # the categories to use in .desktop for gui apps
@@ -224,18 +219,18 @@ D_BLACKLIST = {
     # NB: this is mostly to speed up processing by not even looking at them
     K.S_KEY_SKIP_ALL: [
         ".git",
-        ".venv",
-        ".vscode",
-        "docs",
-        "misc",
-        "README",
+        S_ALL_VENV,
+        ".VSCodeCounter",
+        S_ALL_CONF,
+        S_ALL_DIST,
+        S_ALL_DOCS,
+        S_ALL_LOCALE,
+        S_ALL_MISC,
+        S_ALL_README,
         "CHANGELOG.md",
         "LICENSE.txt",
         "requirements.txt",
         "**/__pycache__",
-        "lib",
-        "pyplate",
-        "locale",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -263,13 +258,16 @@ D_BLACKLIST = {
     # a glob
     K.S_KEY_SKIP_TREE: [
         ".git",
-        ".venv",
+        S_ALL_VENV,
         ".vscode",
         ".VSCodeCounter",
         "**/__pycache__",
-        "lib",
     ],
 }
+
+# entries to be put in blacklist before writing to project
+# NBL key is blacklist section, val is an array of strings
+D_BL_AFTER = {K.S_KEY_SKIP_ALL: [".vscode", S_ALL_TESTS]}
 
 # I18N stuff to be used in pybaker
 D_I18N = {
@@ -294,22 +292,20 @@ D_I18N = {
             "__PC_NAME_SMALL__",
         ],
     },
-    K.S_KEY_LOCALE: "locale",
-    K.S_KEY_PO: "po",
+    K.S_KEY_LOCALE: S_ALL_LOCALE,
+    K.S_KEY_PO: S_ALL_PO,
 }
-D_PRJ_CFG["__PC_I18N__"] = D_I18N
 
-# dict of files ""that should be copied from the PyPlate project to the resulting
+# dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
 # this is so that when you update a file in the PyPlate project, it gets copied
 # to the project, and cuts down on duplicate files
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
-    "misc/snippets.txt": "misc/snippets.txt",
-    "misc/style.txt": "misc/style.txt",
-    "src/pybaker.py": "pyplate/pybaker.py",
-    "conf/keys.py": "pyplate/conf/keys.py",
+    f"{S_ALL_MISC}{os.sep}snippets.txt": f"{S_ALL_MISC}{os.sep}snippets.txt",
+    f"{S_ALL_MISC}{os.sep}style.txt": f"{S_ALL_MISC}{os.sep}style.txt",
+    
 }
 
 # the types of projects this script can create
@@ -324,48 +320,9 @@ D_TYPES = {
     "p": ["Package", "Packages", "pkg"],
 }
 
-# the dict of keys to replace in the header of each file
-# these values are used to find matching lines in the file that are assumed to
-# be header lines, if they match the pattern used in _fix_header()
-# the file header line should contain lines that match the pattern:
-# '# <Key>: <val> ...'
-# or
-# '<!-- <key>: <val> ... -->'
-# where <key> is one of the keys here, and <val> is one of the dunders from
-# PyMaker's _dict_prj dictionary
-# if <key> does not match one of these items, the line is left untouched
-# an example header:
-# ------------------------------------------------------------------------------
-# Project : __PC_NAME_BIG__                                        /          \
-# Filename: __PC_NAME_SMALL__.py                                  |     ()     |
-# Date    : __PC_DATE__                                           |            |
-# Author  : __PD_AUTHOR__                                         |   \____/   |
-# License : __PD_LICENSE_NAME__                                    \          /
-# ------------------------------------------------------------------------------
-# spaces don't matter, but the colon does right aligned text at the end of each
-# line will be preserved the key in each item is the key to look for, and the
-# value is the key in  _dict_prj to replace it with NB: The Filename key
-# requires special handling that is, if the value for Filename is blank, it
-# will be replaced by the file's name (including extension) If the value is
-# something besides a dunder (with or without extension) it will be left alone
-# an example, assuming __PC_NAME_SMALL__ = 'foobar' and the file's name is
-# 'some_file.py':
-# ------------------------------------------------------------------------------
-# before                         | after
-# ------------------------------------------------------------------------------
-# Filename:                      | # Filename: some_file.py
-# Filename: some_file            | # Filename: some_file
-# Filename: some_file.py         | # Filename: some_file.py
-# Filename: __PC_NAME_SMALL__    | # Filename: foobar
-# Filename: __PC_NAME_SMALL__.py | # Filename: foobar.py
-# ------------------------------------------------------------------------------
-D_HEADER = {
-    "Project": "__PC_NAME_BIG__",  # PyPlate
-    "Filename": "__PC_NAME_SMALL__",  # pyplate.py
-    "Date": "__PC_DATE__",  # 12/08/2022
-    "Author": "__PD_AUTHOR__",  # cyclopticnerve
-    "License": "__PD_LICENSE_NAME__",  # WTFPLv2
-}
+# files to remove after the project is done
+# paths are relative to project dir
+D_PURGE = {"p": [Path(S_ALL_TESTS) / "ABOUT"]}
 
 # the dict of sections to remove in the README file
 # key is the project type we are making (may contain multiple project types)
@@ -379,7 +336,6 @@ D_HEADER = {
 # installation instructions, depending on whether your project is a package or
 # a cli/gui app
 D_README = {
-    "RM_FILENAME": S_FILE_README,
     "RM_LICENSE": {
         "RM_LICENSE_START": "<!-- __RM_LICENSE_START__ -->",
         "RM_LICENSE_END": "<!-- __RM_LICENSE_END__ -->",
@@ -402,71 +358,24 @@ D_README = {
 # Regex strings
 # ------------------------------------------------------------------------------
 
-# regex strings for toml
-R_TOML_NAME = r"(^\s*\[project\]\s*$)(.*?)(^\s*name[\t ]*=[\t ]*)(.*?$)"
-R_TOML_NAME_REP = r'\g<1>\g<2>\g<3>"{}"'
-R_TOML_VERSION = r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
-R_TOML_VERSION_REP = r'\g<1>\g<2>\g<3>"{}"'
-R_TOML_DESC = r"(^\s*\[project\]\s*$)(.*?)(^\s*description[\t ]*=[\t ]*)(.*?$)"
-R_TOML_DESC_REP = r'\g<1>\g<2>\g<3>"{}"'
-R_TOML_KEYS = r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
-R_TOML_KEYS_REP = r"\g<1>\g<2>\g<3>[{}]"
-R_TOML_DEPS = (
-    r"(^\s*\[project\]\s*$)(.*?)(^\s*dependencies[\t ]*=[\t ]*)(.*?\])"
-)
-R_TOML_DEPS_REP = r"\g<1>\g<2>\g<3>[{}]"
+# M: caret matches newline
+# off: ^(\w) matches A in A\nN
+# on: ^(\w) matches A and B in A\nB
+# breaks string into list at \n and iterates it, starting the caret match again
 
-# regex strings for readme
+# S: dot matches newlines
+# off: (.*) matches A, (e), B, (e) in A\nB
+# on: (.*) matches A\nB in A\nB
+
+# regex strings for readme to replace license image
 R_RM_START = D_README["RM_LICENSE"]["RM_LICENSE_START"]
 R_RM_END = D_README["RM_LICENSE"]["RM_LICENSE_END"]
 R_README = rf"({R_RM_START})(.*?)({R_RM_END})"
+# NB: format param is full license string
 R_README_REP = r"\g<1>\n{}\n\g<3>"
 
-# regex strings for headers
-R_HEADER = (
-    # key = item[0]
-    r"("  # start group 1
-    r"("  # start group 2
-    r"\s*"  # group 2
-    r"(#|<!--)"  # group 3 (comment marker)
-    r"\s*"  # group 2
-    r")"  # end group 2
-    r"({})"  # group 4 (key)
-    r"(\s*:\s*)"  # group 5
-    r")"  # end group 1
-    r"("  # start group 6
-    r"([^\.\s]*)"  # group 7 (dunder)
-    r"([\.\S]*)"  # group 8 (file extension, if present)
-    r"(\s*)"  # group 9 (padding for right-aligned text)
-    r"([^\n]*)"  # group 10 (right aligned text)
-    r")"  # end group 6
-)
-R_HEADER_REP = r"\g<1>{}\g<8>{}\g<10>"
-
-# ------------------------------------------------------------------------------
-# Public functions
-# ------------------------------------------------------------------------------
-
-
-# ------------------------------------------------------------------------------
-# Set up user paths
-# ------------------------------------------------------------------------------
-def get_user_paths():
-    """
-    Set up user paths
-
-    Here we calculate the different paths to use for dunder replacement. It is
-    done as a function so we can call it after the project name has been set.
-    """
-
-    # get values after pymaker has set them
-    author = D_PRJ_DEF["__PD_AUTHOR__"]
-    name_small = D_PRJ_CFG["__PC_NAME_SMALL__"]
-
-    # paths relative to the end user's (or dev's) useful folders
-    D_PRJ_CFG["__PC_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    D_PRJ_CFG["__PC_USR_LIB__"] = f"{S_USR_SHARE}/{author}/{S_DIR_LIB}"
-    D_PRJ_CFG["__PC_USR_SRC__"] = f"{S_USR_SHARE}/{name_small}"
-
+# search and sub flags
+# NB: need S for matches that span multiple lines (R_README)
+R_RM_SUB_FLAGS = re.S
 
 # -)

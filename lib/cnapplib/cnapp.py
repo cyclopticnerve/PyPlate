@@ -180,7 +180,7 @@ class CNApp(Gtk.Application):
         dict_app_windows = self._dict_app.get(AC.KEY_APP_WINDOWS, {})
 
         # combine ui settings and gui settings
-        self._dict_gui = CF.combine_dicts(dict_app_windows, dict_gui)
+        self._dict_gui = CF.combine_dicts(dict_app_windows, [dict_gui])
 
         # ----------------------------------------------------------------------
         # dict_cfg

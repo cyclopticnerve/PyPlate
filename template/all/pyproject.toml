@@ -15,7 +15,7 @@ build-backend = "setuptools.build_meta"
 # they are only here to satisfy the linter
 name = "__PC_NAME_SMALL__"
 version = "__PM_VERSION__"
-description = "__PC_SHORT_DESC__"
+description = "__PM_SHORT_DESC__"
 authors = [{ name = "__PD_AUTHOR__", email = "__PD_EMAIL__" }]
 readme = "__PD_README_FILE__"
 license = { file = "__PD_LICENSE_FILE__" }
@@ -30,6 +30,6 @@ dependencies = []
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/__PD_AUTHOR__/__PC_NAME_BIG__"
+Homepage = "__PD_URL__/__PC_NAME_BIG__"
 
 # -)

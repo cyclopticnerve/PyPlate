@@ -145,7 +145,7 @@ class CNWindow:
         # 2. values passed in from user (param dict_gui)
 
         # combine ui settings and user settings
-        self._dict_gui = CF.combine_dicts(self._dict_gui, dict_win)
+        self._dict_gui = CF.combine_dicts(self._dict_gui, [dict_win])
 
         # fix ints/bools in dict_gui
         self._dict_gui = AF.sanitize_gui(self._dict_class, self._dict_gui)

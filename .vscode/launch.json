@@ -26,15 +26,5 @@
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
         },
-        {
-            "name": "PM Libs",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "src/pymaker.py",
-            "console": "integratedTerminal",
-            "args": [
-                "-u"
-            ]
-        },
     ]
 }

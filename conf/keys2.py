@@ -10,9 +10,14 @@
 This module separates out the keys shared between pymaker and pybaker.
 """
 
-# keys for settings dict
-S_KEY_PROJECT = "PROJECT"
+# keys for pybaker private dict
+S_KEY_PRJ_DEF = "PRJ_DEF"
+S_KEY_PRJ_CFG = "PRJ_CFG"
+
+# keys for metadata, blacklist, i18n in pybaker dev dict
+S_KEY_META = "META"
 S_KEY_BLACKLIST = "BLACKLIST"
+S_KEY_I18N = "I18N"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
