@@ -11,12 +11,16 @@ This module modifies the current project to replace metadata in each of the
 files, according to the data present in the conf files.
 """
 
+# TODO: pybaker ask for ver or default, update meta, check for dunders, make
+# install.py, make dist
+# TODO: pybaker not rely so much on regex, more on context start/end
+
 # TODO: this prog should:
 # show current version number
 # ask for new version number
 # read a dict of what to put in dist
 # TODO: when run, ask for new version str (default: old version str
-# put htat new version str in metadata file)
+# put that new version str in metadata file)
 
 # ------------------------------------------------------------------------------
 
@@ -27,43 +31,6 @@ files, according to the data present in the conf files.
 # header, make sure to use today's date, not the one stored in a config dict
 # TODO: install script must install libs, src, etc. into proper folders
 # TODO: installer for pkg should move pkg to __PC_USER_LIB__
-# # --------------------------------------------------------------------------
-# # Do i18n stuff if the project is a GUI
-# # --------------------------------------------------------------------------
-# def _do_i18n(self):
-#     """
-#     Do i18n stuff if the project is a GUI
-
-#     If the project type requires i18n, do it now.
-#     """
-
-#     # check kif we need to do this
-#     if self._dict_prj["__PC_TYPE_PRJ__"] not in S.LIST_I18N:
-#         return
-
-#     # get project dir
-#     dir_prj = Path(self._dict_prj["__PC_DIR_PRJ__"])
-
-#     # output dir (where the .pot and locale files will go)
-#     dir_locale = dir_prj / S.S_DIR_LOCALE
-#     dir_po = dir_prj / S.S_DIR_PO
-
-#     # create the potpy object
-#     potpy = CNPotPy(
-#         dir_prj,
-#         self._dict_prj["__PC_NAME_BIG__"],
-#         S.DEF_VERSION,
-#         self._dict_prj["__PD_EMAIL__"],
-#         dir_locale=dir_locale,
-#         dir_po=dir_po,
-#         str_domain=self._dict_prj["__PC_NAME_BIG__"],
-#         dict_clangs=S.DICT_CLANGS,
-#         dict_no_ext=S.DICT_CLANGS_NO_EXT,
-#         charset=S.S_POT_CHARSET_DEF,
-#     )
-
-#     # I18N: run cnpot.py
-#     potpy.main()
 
 # ------------------------------------------------------------------------------
 # Imports

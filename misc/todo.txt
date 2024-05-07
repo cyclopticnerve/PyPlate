@@ -1,4 +1,5 @@
 
+TODO: 3 levels: cn (me), dev (user of this prg), end user (user of dev's prg)
 TODO: move all strings to S_ section in pybaker
 TODO: make tree happen in pybaker
 TODO: make pybaker check for empty entries in header (not just dunders)
@@ -110,6 +111,11 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: markdown needs to ignore hash
+DONE: do_after_fix in code, pub, prv
+DONE: _fix header only looks in lines starting with #, use ^
+DONE: __PC_FILENAME__
+DONE: order of imports: keys, public, private
 DONE: edit: D_META, D_BLACKLIST, and D_I18N
 DONE: for loops to comprehensions
 DONE: _fix_blacklist_dunders() has hacky code - use enumerate
@@ -188,7 +194,31 @@ DONE: initial filename in header of first src file (src/modtest - modtest.py)
 DONE: what about exec/icon paths in .desktop?
 DONE: _replace_headers could be done better with regex
 DONE: for pkg type, make sure all submodule names are in __init__.py
-
+# DONE: make pybaker an entry in .vscode/launch.json
+# DONE: add a .vscode launch for each prj type w/prj name small (or whatever
+# default file)
+# DONE: no full paths in dist files (any file that goes to end user)
+# DONE: _fix_settings_dunders()
+# DONE: MANIFEST.in, .gitignore header not fixed
+# DONE: _fix header(): author/license padding wrong (works in test)
+# DONE: rename pyplate/conf/project.py to private.py (private for pymaker)
+# DONE: rename pyplate/conf/settings.py to pyplate.py (public for
+# pymaker/pybaker)
+# DONE: rename prj/pyplate/project.json to pybaker.json (private for pybaker)
+# DONE: rename prj/pyplate/settings.json to project.json (public for pybaker)
+# DONE: lost metadata for pp
+# DONE: what pybaker functions do we need here (ie. _fix_toml is normally run
+# from pybaker.py)
+# DONE: combine before and after fix - what REALLY needs to be done before fix?
+# DONE: bools to turn on/off git, venv, tree
+# DONE: print warning when in debug mode
+# DONE  print warning/ask if in debug and about to clobber a dir
+# DONE: flesh out use of verbose option
+# DONE: make a pyplate folder in PyPlate, put in fake pybaker so we can run
+# pybaker on PyPlate project
+# also need to add bl/i18n/meta file named "project.json"
+# and a file with WHAT??? named "private.json"
+# DONE: fill in misc/tree.txt
 
 remove .py exts from executables after installing
 (makes them easier/more compliant to call from cmd line)

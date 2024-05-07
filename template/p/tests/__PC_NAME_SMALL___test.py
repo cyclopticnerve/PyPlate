@@ -35,7 +35,7 @@ DIR_PKG = Path(__file__).parents[1] / "__PD_DEV_SRC__"
 sys.path.append(str(DIR_PKG))
 
 # from <package name> import <module name>
-from __PC_NAME_SMALL__ import __PC_NAME_MOD__
+from __PC_NAME_SMALL__ import __PC_NAME_SEC__
 
 # ------------------------------------------------------------------------------
 # option 2:
@@ -45,7 +45,7 @@ from __PC_NAME_SMALL__ import __PC_NAME_MOD__
 # sys.path.append(str(DIR_PKG))
 
 # # import <module name>
-# import __PC_NAME_MOD__
+# import __PC_NAME_SEC__
 
 # ------------------------------------------------------------------------------
 
@@ -63,6 +63,6 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    __PC_NAME_MOD__.func()  # type: ignore
+    __PC_NAME_SEC__.func()  # type: ignore
 
 # -)

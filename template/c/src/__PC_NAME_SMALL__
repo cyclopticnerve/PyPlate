@@ -64,27 +64,38 @@ from cnlib.cnclibase import CNCliBase  # type: ignore
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
+# Required for pybaker
+# ------------------------------------------------------------------------------
+
+# globals for pb to find
+PB_SHORT_DESC = "__PM_SHORT_DESC__"
+PB_VERSION = "__PM_VERSION__"
+
+# ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
 
-# version option strings
-S_VER_OPTION = "v"
-S_VER_ACTION = "version"
-S_VER_HELP = (
+# NB: this initial stuff is just for command line
+
+# formatted version
+S_VER_FMT = "__PD_VER_FMT__".format(PB_VERSION)
+
+# about string
+S_ABOUT = (
     "__PC_NAME_SMALL__\n"
-    + "__PM_SHORT_DESC__\n"
-    + "__PD_VER_FMT__\n"
-    + "__PD_URL__/__PC_NAME_BIG__"
+    f"{PB_SHORT_DESC}\n"
+    f"{S_VER_FMT}\n"
+    "__PD_URL__/__PC_NAME_BIG__"
 )
 
 # config option strings
-S_CFG_OPTION = "c"
+S_CFG_OPTION = "-c"
 S_CFG_DEST = "CFG_DEST"
 S_CFG_HELP = "load configuration from file"
 S_CFG_METAVAR = "FILE"
 
 # debug option strings
-S_DBG_OPTION = "d"
+S_DBG_OPTION = "-d"
 S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
@@ -202,17 +213,15 @@ class __PC_NAME_CLASS__(CNCliBase):
         This method is teased out for better code maintenance.
         """
 
-        # set text for -h
-        parser.description = S_VER_HELP
+        # set help string
+        parser.description = S_ABOUT
 
-        # add version option
-        parser.add_argument(
-            f"-{S_VER_OPTION}", action=S_VER_ACTION, version=S_VER_HELP
-        )
+        # set text for -h
+        # parser.description = S_ABOUT
 
         # add debug option
         parser.add_argument(
-            f"-{S_DBG_OPTION}",
+            S_DBG_OPTION,
             action=S_DBG_ACTION,
             dest=S_DBG_DEST,
             help=S_DBG_HELP,
@@ -249,7 +258,7 @@ class __PC_NAME_CLASS__(CNCliBase):
         # the values at this path will be combined first, followed by the cmd
         # line option
 
-        # need to convert def config file to str
+        # need to get dir_cfg, append prj-name, convert to str
         cfg_def = str(DIR_CFG / "__PC_NAME_SMALL__.json")
 
         # command line cfg is None or str
@@ -265,8 +274,7 @@ class __PC_NAME_CLASS__(CNCliBase):
 
         # throw in a debug test
         if self._debug:
-            print("load cfg:")
-            F.pp(self._d_cfg)
+            F.pp(self._d_cfg, label="load cfg:")
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
@@ -280,8 +288,7 @@ class __PC_NAME_CLASS__(CNCliBase):
 
         # throw in a debug test
         if self._debug:
-            print("save cfg:")
-            F.pp(self._d_cfg)
+            F.pp(self._d_cfg, label="save cfg:")
 
         # call to save config
         super()._save_config()

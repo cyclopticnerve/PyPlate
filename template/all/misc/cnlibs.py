@@ -35,4 +35,4 @@ from cnlib import cnfunctions as F  # type: ignore
 # ------------------------------------------------------------------------------
 
 d = {"foo": "bar,"}
-F.pp(d)
+F.pp(d, label="test")

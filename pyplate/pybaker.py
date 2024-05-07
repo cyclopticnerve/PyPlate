@@ -35,7 +35,7 @@ def main():
 
     # path to dev pyplate src pybaker.py
     # TODO: text replacement or val if we can find dict in private
-    p_pb_real = Path.home() / "__PC_PYBAKER__"
+    p_pb_real = Path.home() / "Documents/Projects/Python/PyPlate/src/pybaker.py"
     s_pb_real = str(p_pb_real)
 
     # get current path

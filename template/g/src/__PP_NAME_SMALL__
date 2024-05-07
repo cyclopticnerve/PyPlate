@@ -104,11 +104,13 @@ C_GUI_DIR = Path("__PC_USR_SRC__") / "gtk"
 # ------------------------------------------------------------------------------
 
 # version string for -h/-v option
+# NB: need + b/c we are using i18n macro
 S_HELP_VERSION = (
-    "__PC_NAME_SMALL__\n" +
+    "__PC_NAME_SMALL__\n"
     # I18N: application description
-    _("__PM_SHORT_DESC__") + "\n"
-    "Version __PM_VERSION__\n" + "__PD_URL__/__PC_NAME_BIG__"
+    + _("__PM_SHORT_DESC__\n")
+    + "Version __PM_VERSION__\n"
+    + "__PD_URL__/__PC_NAME_BIG__"
 )
 
 # version option strings

@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __PC_NAME_BIG__                                        /          \
-# Filename: __PC_NAME_MOD__.py                                    |     ()     |
+# Filename: __PC_NAME_SEC__.py                                    |     ()     |
 # Date    : __PC_DATE__                                           |            |
 # Author  : __PD_AUTHOR__                                         |   \____/   |
 # License : __PD_LICENSE_NAME__                                    \          /

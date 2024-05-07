@@ -7,6 +7,8 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# pylint: disable=too-many-lines
+
 """
 This module gets the project type, the project's destination dir, copies the
 required dirs/files for the project type from the template to the specified
@@ -16,26 +18,55 @@ names in the resulting files.
 Run pymaker.py -h for more options.
 """
 
-# DONE: make pybaker an entry in .vscode/launch.json
-# DONE: add a .vscode launch for each prj type w/prj name small (or whatever
-# default file)
-# DONE: no full paths in dist files (any file that goes to end user)
-# DONE: _fix_settings_dunders()
-# DONE: MANIFEST.in, .gitignore header not fixed
-# DONE: _fix header(): author/license padding wrong (works in test)
-# DONE: rename pyplate/conf/project.py to private.py (private for pymaker)
-# DONE: rename pyplate/conf/settings.py to pyplate.py (public for pymaker/pybaker)
-# DONE: rename prj/pyplate/project.json to pybaker.json (private for pybaker)
-# DONE: rename prj/pyplate/settings.json to project.json (public for pybaker)
+# FIXME: make sure my home dir not in any src files
+# also fix __PC_PYBAKER__ and __PC_DEV_LIB__ - all we need is path to pyplate
 
-# FIXME: make fix_header WAY simpler
+
+# TODO: multiline comment support for triple quotes
+# TODO: html comments also open/close tag, can have code before or after
+# is it worth it? should we just replace every non-header line?
+# TODO: have pybaker swap dev/usr lib import in all .py files
+# or at least remove dev home from path
+# we are not using any rel path anymore
+# TODO: pybaker DOES do string repl (all those new files?
+# if it only runs at dist time, what about date? [pb never do date])
+# TODO: pb never do pyplate folder in prj
+# TODO: D_PB_NEED : dict of what pybaker needs : key is D_PRJ_..., val is list
+# of keys from that dict
+# TODO: never store proj dir
+# TODO: determine what lines in a file
+# TODO: _fix_... that use lines[] dont need re.M
+# TODO: _fix_header/_fix_code use multiline
+# non-rat: break on colon, do str rep on value, put back together
+# with regex, replace line in array
+# rat: break on colon, rest of line split at two spaces, that group 1 is values
+# that group 2 split at last space, that group 1 is pad, group 2 is rat
+
+# my cn rat regex is public/private?
+# it will need to be changed by dev
 # only match exactly MY headers
-# of make match both w/ boolean
+# or make match both w/ boolean
 # or make match, auto detect rat
 # if we go with rat only for me, what to do about blacklist?
 # headers and text should still be used, but public fix_header should only do
 # simple string replacement
 
+# TODO: _fix_code only looks in lines that don't start with #, split res at #,
+# only string rep first group, put first and sec back together, repl in M list
+
+# TODO: make sure all stuff in private is strictly pp- or cn-related and not output-related
+# make sure this stuff doesn't duplicate anything in public, only extend
+# vice versa for public
+# TODO: actually private is loaded first but imports public
+# main loads private (MUST STAY)
+# private loads public
+# private fills in private
+# main loads public
+# fix this?
+
+# TODO: which regex done as list/whole string?
+# TODO: how to use positional args in format strings
+# ie: the sky is {$1}, the sun is {$2}
 # TODO: where do we use match? only where we need to check len (ie rat)
 # everywhere else should just use sub for string replacements
 
@@ -47,26 +78,20 @@ Run pymaker.py -h for more options.
 #   1    |   0   |
 #   1    |   1   |
 
+# TODO: ask dev for base dir 1 time, can change later?
+# TODO: ask dev for everything 1 time?
+# TODO: always run header test on sample file w/o rat
 # TODO: what if you move project? what if you move PyPlate? vals should be
 # updated every run and store in a dev file
-# TODO: make a pyplate folder in PyPlate, put in fake pybaker so we can run
-# pybaker on PyPlate project
-# also need to add bl/i18n/meta file named "project.json"
-# and a file with WHAT??? named "private.json"
-# TODO: bools to turn on/off git, venv, tree
-# TODO: print warning when in debug mode
-# TODO  print warning/ask if in debug and about to clobber a dir
-# TODO: flesh out use of verbose option
+# TODO: fill in pyplate/private.json w pp prj_def/prg_cfg
+# TODO: fill in pyplate/project.json w pp blacklist/i18n/metadata
 # TODO: move get info input format to settings.py
 # TODO: move _check_name regex to settings
 # TODO: make a regex tester to run regex on toml, readme, header
 # TODO: make a flow list of all funcs in here
+# TODO: rename all const to be consistent
 # TODO: make sure all runnable files have shebang/chmod +x
-# TODO: what pybaker functions do we need here (ie. _fix_toml is normally run
-# from pybaker.py)
-# TODO: combine before and after fix - what REALLY needs to be done before fix?
 # TODO: write a tool to scan for unused keys/consts
-
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -80,6 +105,7 @@ from pathlib import Path
 import re
 import shutil
 import sys
+from tkinter import TRUE
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -99,10 +125,9 @@ sys.path.append(str(P_DIR_PYPLATE))
 from conf import private as P
 
 # add lib path to import search
-sys.path.append(str(P.P_DIR_LIB))
+sys.path.append(str(P.P_DIR_PP_LIB))
 
-from conf import keys2 as K  # type: ignore
-from conf import custom_pp as S  # type: ignore
+from conf import public as C
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -148,10 +173,8 @@ class PyMaker:
         """
 
         # set the initial values of properties
-        self._dict_pp_meta = {}
         self._debug = False
-        self._verbose = False
-        self._dict_repls = {}
+        self._dict_rep = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -168,11 +191,11 @@ class PyMaker:
         program, and performing its steps.
         """
 
-        # call boilerplate code
-        self._setup()
-
         # ----------------------------------------------------------------------
         #  do the work
+
+        # call boilerplate code
+        self._setup()
 
         # get info
         self._get_project_info()
@@ -180,7 +203,7 @@ class PyMaker:
         # copy template
         self._copy_template()
 
-        # copy any files that may need to be fixed
+        # call before fix
         self._do_before_fix()
 
         # do replacements in final project location
@@ -207,26 +230,18 @@ class PyMaker:
         """
 
         # ----------------------------------------------------------------------
-        # housekeeping
-
-        # load from conf/metadata.json
-        self._dict_pp_meta = F.load_dicts([P.P_FILE_META])
-
-        # fix our own toml file
-        self._fix_pp_toml()
-
-        # ----------------------------------------------------------------------
         # set pp cmd line stuff
 
         # get cmd line args
         dict_args = self._run_parser()
 
         # check for flags
-        self._debug = dict_args[S.S_DBG_DEST]
-        self._verbose = dict_args[S.S_VER_DEST]
+        self._debug = dict_args[P.S_DBG_DEST]
 
-        # ----------------------------------------------------------------------
-        # fix pp toml
+        # debug turns off some _do_after_fix features
+        if self._debug:
+            C.B_CMD_GIT = False
+            C.B_CMD_VENV = False
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -236,164 +251,162 @@ class PyMaker:
         Get project info
 
         Asks the user for project info, such as type and name, to be saved to
-        S.D_PRJ_CFG.
+        C.D_PRJ_CFG.
         """
+
+        # ----------------------------------------------------------------------
+        # maybe yell
+
+        if self._debug:
+
+            # yep, yell
+            print(C.S_ERR_DEBUG)
 
         # ----------------------------------------------------------------------
         # first question is type
 
         # sanity check
-        type_prj = ""
+        prj_type = ""
 
-        # get possible types
-        list_types = [f"{key} ({val[0]})" for (key, val) in S.D_TYPES.items()]
-        str_types = " | ".join(list_types)
-        in_type = f"{S.S_ASK_TYPE} [{str_types}]: "
+        # list of formatted possible types
+        list_types = []
+
+        # for each type
+        for key, val in C.D_TYPES.items():
+
+            # format the type: "short (long)"
+            fmt_str = C.S_TYPE_FMT.format(key, val)
+            list_types.append(fmt_str)
+
+        # join the types: "c (CLI) | g (GUI) | p (Project)"
+        str_types = C.S_TYPE_JOIN.join(list_types)
+
+        # format the question
+        in_type = C.S_ASK_TYPE.format(str_types)
 
         # loop forever until we get a valid type
         while True:
+
             # ask for type of project
-            type_prj = input(in_type)
+            prj_type = input(in_type)
 
             # check for valid type
-            if self._check_type(type_prj):
+            if self._check_type(prj_type):
+
                 # at this point, type is valid so exit loop
                 break
 
-        # save project type
-        S.D_PRJ_CFG["__PC_TYPE_PRJ__"] = type_prj
-
         # get output subdir
-        dir_type = S.D_TYPES[type_prj][1]
+        dir_prj_type = C.D_TYPES[prj_type]
 
         # ----------------------------------------------------------------------
         # next question is name
-        # NB: keep asking until we get a response that is a valid name and does
-        # not already exist
 
         # sanity check
-        name_prj = ""
+        prj_name = ""
 
-        # normal mode
-        if not self._debug:
+        # if in debug mode
+        if self._debug:
 
-            # loop forever until we get a valid name that does not exist
-            while True:
-                # ask for name of project
-                name_prj = input(f"{S.S_ASK_NAME}: ")
+            # get debug name of project
+            prj_name = f"{dir_prj_type}_DEBUG"
 
-                # check for valid name
-                if self._check_name(name_prj):
-                    # set up for existence check
-                    tmp_dir = Path.home() / S.S_DIR_BASE / dir_type / name_prj
+            # set up for existence check
+            tmp_dir = Path(C.S_DIR_PRJ.format(dir_prj_type, prj_name))
 
-                    # check if project already exists
-                    if tmp_dir.exists():
-                        # tell the user that the old name exists
-                        print(S.S_ERR_EXIST.format(name_prj, dir_type))
-                    else:
-                        break
-
-        # debug mode
-        else:
-            name_prj = f"{type_prj}_TEST"
-            # kill the dir if debugging
-            tmp_dir = Path.home() / S.S_DIR_BASE / dir_type / name_prj
+            # check if project already exists
             if tmp_dir.exists():
                 shutil.rmtree(tmp_dir)
 
-        # calculate final project location
-        p_prj = f"{S.S_DIR_BASE}{os.sep}{dir_type}{os.sep}{name_prj}"
-        S.D_PRJ_CFG["__PC_DIR_PRJ__"] = str(p_prj)
+        # not debug
+        else:
 
-        # at this point, both dir and name are valid, so store both and exit
-        # NB: make sure to store the project dir as a string, so it can be
-        # saved to file
-        S.D_PRJ_CFG["__PC_NAME_BIG__"] = name_prj
+            # loop forever until we get a valid name that does not exist
+            while True:
 
-        # calculate small name
-        name_small = name_prj.lower()
-        S.D_PRJ_CFG["__PC_NAME_SMALL__"] = name_small
+                # ask for name of project
+                prj_name = input(C.S_ASK_NAME)
 
-        # ----------------------------------------------------------------------
-        # here we figure out the binary/package name for a project
+                # check for valid name
+                if self._check_name(prj_name):
 
-        # NB: for a cli, the binary name is the project name lowercased
-        # TODO: for a gui...
-        # for a package, the package name is the project name lowercased
-        # the first module in the package needs a name to be replaced in
-        # test_pkg.py (default is to use package name)
-        # so if you give a module name, you would have:
-        # <Project_Name>
-        # |
-        # - <project_name>
-        #   |
-        #   - <module_name.py>
-        #
-        # or else the default:
-        # <Project_Name>
-        # |
-        # - <project_name>
-        #   |
-        #   - <project_name.py>
+                    # set up for existence check
+                    tmp_dir = Path(C.S_DIR_PRJ.format(dir_prj_type, prj_name))
 
-        # sanity check
-        name_mod = name_small
+                    # check if project already exists
+                    if tmp_dir.exists():
 
-        # if it is a project type that needs a module name, ask for it
-        if S.D_PRJ_CFG["__PC_TYPE_PRJ__"] in S.L_NAME_MOD:
-
-            # normal mode
-            if not self._debug:
-                # loop forever until we get a valid name or empty string
-                while True:
-
-                    # ask for name of module
-                    s_mod = S.S_ASK_MOD.format(name_small)
-                    name_mod = input(f"{s_mod}: ")
-                    if name_mod == "":
-                        name_mod = name_small
-
-                    # check for valid name
-                    if self._check_name(name_mod):
+                        # tell the user that the old name exists
+                        print(C.S_ERR_EXIST.format(tmp_dir))
+                    else:
                         break
 
-        # set the property
-        S.D_PRJ_CFG["__PC_NAME_MOD__"] = name_mod
+        # calculate small name
+        name_small = prj_name.lower()
+
+        # ----------------------------------------------------------------------
+        # here we figure out the binary/package/window name for a project
+
+        # NB: for a cli, the binary name is the project name lowercased
+        # for a gui we should ask for the main window class name
+        # for a package we should ask for the module name
+
+        # sanity check (or debug)
+        name_sec = name_small
+
+        # if not debug, if need second name, ask for it
+        if not self._debug and prj_type in C.D_NAME_SEC:
+
+            # format question for second name
+            s_name_sec = C.D_NAME_SEC[prj_type]
+            s_sec_fmt = C.S_ASK_SEC.format(s_name_sec, name_sec)
+
+            # loop forever until we get a valid name or empty string
+            while True:
+
+                # ask for second name
+                name_new = input(s_sec_fmt)
+                if name_new == "":
+                    name_new = name_small
+
+                # check for valid name
+                if self._check_name(name_new):
+                    name_sec = name_new
+                    break
 
         # ----------------------------------------------------------------------
         # here we figure out the Pascal cased project name for files with a
         # class
 
-        # create a new var that is a copy of name_small
+        # do formatting
         name_class = name_small
-
-        # first split if any underscores
         name_class = name_class.replace("_", " ")
-
-        # capitalize each word in name
+        name_class = name_class.replace("-", " ")
         name_class = name_class.title()
-
-        # put each word in name back together
         name_class = name_class.replace(" ", "")
-
-        # set name in dict
-        S.D_PRJ_CFG["__PC_NAME_CLASS__"] = name_class
 
         # ----------------------------------------------------------------------
         # calculate initial project date
         # NB: this is the initial create date for all files in the template
         # new files added to the project will have their dates set to the date
         # when pybaker was last run
+        # we put it in D_PRJ_CFG just for string replacement
         now = datetime.now()
-        fmt_date = S.D_PRJ_DEF["__PD_DATE_FMT__"]
+        fmt_date = C.D_PRJ_DEF["__PD_DATE_FMT__"]
         info_date = now.strftime(fmt_date)
-        S.D_PRJ_CFG["__PC_DATE__"] = info_date
 
         # ----------------------------------------------------------------------
-        # now that we have all project info, have settings.py calculate user
-        # paths
-        P.get_user_paths()
+        # save stuff to prj dict
+
+        # save project type
+        C.D_PRJ_CFG["__PC_TYPE_PRJ__"] = prj_type
+        C.D_PRJ_CFG["__PC_NAME_BIG__"] = prj_name
+        C.D_PRJ_CFG["__PC_NAME_SMALL__"] = name_small
+        C.D_PRJ_CFG["__PC_DIR_PRJ__"] = self._remove_home(str(tmp_dir))
+        C.D_PRJ_CFG["__PC_DEV_PP__"] = self._remove_home(str(P.P_DIR_PP))
+        C.D_PRJ_CFG["__PC_DATE__"] = info_date
+        C.D_PRJ_CFG["__PC_NAME_CLASS__"] = name_class
+        C.D_PRJ_CFG["__PC_NAME_SEC__"] = name_sec
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -406,22 +419,22 @@ class PyMaker:
         """
 
         # get the project final dir
-        dir_prj = Path.home() / Path(S.D_PRJ_CFG["__PC_DIR_PRJ__"])
+        dir_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
 
         # ----------------------------------------------------------------------
         # do template/all
 
         # copy common stuff
-        shutil.copytree(P.P_DIR_ALL, dir_prj)
+        shutil.copytree(P.P_DIR_PP_ALL, dir_prj)
 
         # ----------------------------------------------------------------------
         # do template/type
 
         # get a path to the template dir for this project type
-        prj_type = S.D_PRJ_CFG["__PC_TYPE_PRJ__"]
+        prj_type = C.D_PRJ_CFG["__PC_TYPE_PRJ__"]
 
         # get the src dir in the template dir
-        dir_template = P.P_DIR_TEMPLATE / S.D_TYPES[prj_type][2]
+        dir_template = P.P_DIR_PP_TMP / prj_type
 
         # get all top level folders/files in the template type
         list_src = list(Path.iterdir(dir_template))
@@ -439,11 +452,13 @@ class PyMaker:
 
             # template item is a dir
             else:
-                # NB: this is used if there is a dir in "all" and also a dir in
-                # template with the same name
-                # eg. "all" has a folder named "foo" and template has a folder
-                # named "foo", the template folder's contents will be combined
-                # with "all"'s contents
+                # NB: this is used if there is a dir in "template/all" and also
+                # a dir in "template/type" with the same name
+                # eg. "template/all/pyplate" and "template/c/pyplate"
+                # the template folder's contents will be combined with "all"'s
+                # contents
+                # NOTE: this only goes one level below "template/all" and
+                # "template/type"
 
                 # dest does not exist, copy dir
                 if not dst.exists():
@@ -460,28 +475,17 @@ class PyMaker:
                         else:
                             shutil.copytree(item_merge, dst)
 
-    # --------------------------------------------------------------------------
-    # Copy/create any other files before running _do_fix
-    # --------------------------------------------------------------------------
-    def _do_before_fix(self):
-        """
-        Copy/create any other files before running _do_fix
-
-        Adds dirs/files to the project before running the _do_fix method.
-        """
-
-        # combine dicts for string replacement
-        F.combine_dicts(self._dict_repls, [S.D_PRJ_DEF, S.D_PRJ_CFG])
+        # ----------------------------------------------------------------------
+        # do copy dict
 
         # project directory
-        path_prj = Path.home() / Path(S.D_PRJ_CFG["__PC_DIR_PRJ__"])
+        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
 
         # copy linked files
-        d_copy = F.combine_dicts(S.D_COPY, [P.D_COPY])
-        for key, val in d_copy.items():
+        for key, val in C.D_COPY.items():
 
             # first get full source path
-            path_in = P.P_DIR_PYPLATE / key
+            path_in = P.P_DIR_PP / key
 
             # then get full dest path
             path_out = path_prj / val
@@ -491,6 +495,20 @@ class PyMaker:
                 shutil.copytree(path_in, path_out)
             else:
                 shutil.copy2(path_in, path_out)
+
+    # --------------------------------------------------------------------------
+    # Dummy method to call "subclass" method (method in conf/public.py)
+    # --------------------------------------------------------------------------
+    def _do_before_fix(self):
+        """
+        Dummy function to call "subclass" function (function in conf/public.py)
+
+        This function is here just so i can follow the flow of the program in
+        my head better. I will be making a flowchart soon...
+        """
+
+        # call public before fix function
+        C.do_before_fix()
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -504,65 +522,28 @@ class PyMaker:
         needs fixing based on its appearance in the blacklist.
         """
 
+        # combine dicts for string replacement
+        # dict_rep = {}
+        F.combine_dicts(
+            self._dict_rep, [C.D_PRJ_DEF, C.D_PRJ_ADD, C.D_PRJ_CFG]
+        )
+
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
         dict_paths = self._get_blacklist_paths()
 
         # just shorten the names
-        skip_all = dict_paths[K.S_KEY_SKIP_ALL]
-        skip_contents = dict_paths[K.S_KEY_SKIP_CONTENTS]
-        skip_header = dict_paths[K.S_KEY_SKIP_HEADER]
-        skip_text = dict_paths[K.S_KEY_SKIP_TEXT]
-        skip_path = dict_paths[K.S_KEY_SKIP_PATH]
+        skip_all = dict_paths[C.S_KEY_SKIP_ALL]
+        skip_contents = dict_paths[C.S_KEY_SKIP_CONTENTS]
+        skip_header = dict_paths[C.S_KEY_SKIP_HEADER]
+        skip_code = dict_paths[C.S_KEY_SKIP_CODE]
+        skip_path = dict_paths[C.S_KEY_SKIP_PATH]
 
         # project directory
-        path_prj = Path.home() / S.D_PRJ_CFG["__PC_DIR_PRJ__"]
+        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
 
         # ----------------------------------------------------------------------
-        # do the fixes top down
-
-        # # walk from project dir
-        # # NB: note that root is a full path, dirs and files are relative to
-        # # root
-        # for root, root_dirs, root_files in os.walk(path_prj):
-
-        #     # convert root into Path object
-        #     root = Path(root)
-
-        #     # skip dir if in skip_all
-        #     if root in skip_all:
-        #         root_dirs.clear()
-        #         continue
-
-        #     # convert files into Paths
-        #     files = [root / f for f in root_files]
-
-        #     # for each file item (not dirs, they will be handled on the next
-        #     # iter)
-        #     for item in files:
-        #         # skip file if in skip_all
-        #         if item in skip_all:
-        #             continue
-
-        #         # fix README if it is the top-level README.md
-        #         # NB: need to do before any other stuff, requires special
-        #         # treatment
-        #         if root == path_prj and item.name == S.D_README["RM_FILENAME"]:
-        #             self._fix_readme(item)
-
-        #         # if we shouldn't skip contents
-        #         if root not in skip_contents and item not in skip_contents:
-        #             # fix headers
-        #             if root not in skip_header and item not in skip_header:
-        #                 if S.B_HDR_RAT:
-        #                     P.fix_header(item)
-
-        #             # fix text
-        #             if root not in skip_text and item not in skip_text:
-        #                 self._fix_text(item)
-
-        # ----------------------------------------------------------------------
-        # do the renaming bottom up
+        # do the fixes bottom up
         # NB: topdown=False is required for the renaming, as we don't want to
         # rename (and thus clobber) a directory name before we rename all its
         # child dirs/files
@@ -580,9 +561,9 @@ class PyMaker:
             # convert files into Paths
             files = [root / f for f in root_files]
 
-            # for each file item (not dirs, they will be handled on the next
-            # iter)
+            # for each file item
             for item in files:
+
                 # skip file if in skip_all
                 if item in skip_all:
                     continue
@@ -590,43 +571,32 @@ class PyMaker:
                 # fix README if it is the top-level README.md
                 # NB: need to do before any other stuff, requires special
                 # treatment
-                if (
-                    root == path_prj
-                    and item.name == S.D_PRJ_DEF["__PD_README_FILE__"]
-                ):
+                if item == path_prj / C.D_PRJ_DEF["__PD_README_FILE__"]:
                     self._fix_readme(item)
 
                 # if we shouldn't skip contents
                 if root not in skip_contents and item not in skip_contents:
-                    # fix headers
+
+                    # check for header bl
+                    bl_hdr = TRUE
                     if root not in skip_header and item not in skip_header:
-                        if P.B_HDR_RAT:
-                            P.fix_header(item)
+                        bl_hdr = False
+
+                    # check for code blacklist
+                    bl_code = True
+                    if root not in skip_code and item not in skip_code:
+                        bl_code = False
 
                     # fix text
-                    if root not in skip_text and item not in skip_text:
-                        self._fix_text(item)
+                    self._fix_content(item, bl_hdr, bl_code)
 
                 # fix path
                 if root not in skip_path and item not in skip_path:
-                    r = self._fix_path(item)
-
-                    if r:
-                        print("fixed", str(item))
-                        # store name in dict for string replacement
-                        # S.D_PRJ_CFG["__PC_FILENAME__"] = item.name
-
-                        # # in case we had __PC_FILENAME__
-                        # if S.B_HDR_RAT:
-                        #     P.fix_header(item)
-                        # self._fix_text(item)
+                    self._fix_path(item)
 
             # fix current dir path
             if root not in skip_path:
-                r = self._fix_path(root)
-
-                if r:
-                    print("fixed", str(root))
+                self._fix_path(root)
 
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
@@ -636,169 +606,142 @@ class PyMaker:
         Make any necessary changes after all fixes have been done
 
         This method is called after all fixes have been completed. There should
-        be no dunders in the file contents or path names. Do any further
-        project modification here.
+        be no dunders in the file or path names. Do any further project
+        modification here.
         """
 
-        dict_bl = F.combine_dicts(S.D_BL_AFTER, [P.D_BL_AFTER])
-        F.pp(dict_bl)
+        # put pyplate in skip_all (never touch again)
+        # NBL key is blacklist section, val is an array of strings
+        # C.D_BLACKLIST[C.S_KEY_SKIP_ALL].append("pyplate")
 
-        # add any final entries to blacklist
-        for key, val in S.D_BL_AFTER.items():
-            # add blacklist entries that we needed to fix once
-            for item in val:
-                S.D_BLACKLIST[key].append(item)
+        # ----------------------------------------------------------------------
+        # update blacklist
+        # NB: that is, set up the blacklist you want pybaker to use
+
+        # inner function to reduce duplicate code
+        # def bl(l_add, l_rem):
+
+        #     # add any final entries to blacklist
+        #     for key, val in l_add.items():
+        #         # add blacklist entries that we need for pybaker
+        #         for item in val:
+        #             old_list = C.D_BLACKLIST[key]
+        #             if not item in old_list:
+        #                 old_list.append(item)
+
+        #     # remove any final entries from blacklist
+        #     for key, val in l_rem.items():
+        #         # remove blacklist entries that we need pybaker to ignore
+        #         for item in val:
+        #             if item in old_list:
+        #                 old_list.remove(item)
+
+        # bl(C.D_BL_ADD, C.D_BL_REM)
+        # bl(P.D_BL_ADD_PRV, P.D_BL_REM_PRV)
 
         # ----------------------------------------------------------------------
         # save project settings
 
         # project directory
-        path_prj = Path.home() / S.D_PRJ_CFG["__PC_DIR_PRJ__"]
+        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
 
         # save project settings
-        p_no_edit = path_prj / P.S_PP_PRJ
+        path_no_edit = path_prj / P.S_PP_PRV
         dict_no_edit = {
-            K.S_KEY_PRJ_DEF: S.D_PRJ_DEF,
-            K.S_KEY_PRJ_CFG: S.D_PRJ_CFG,
+            C.S_KEY_PRJ_DEF: C.D_PRJ_DEF,
+            C.S_KEY_PRJ_ADD: C.D_PRJ_ADD,
+            C.S_KEY_PRJ_CFG: C.D_PRJ_CFG,
         }
-        F.save_dict([p_no_edit], dict_no_edit)
+        F.save_dict([path_no_edit], dict_no_edit)
 
         # save editable settings (only blacklist and i18n for now)
-        path_edit = path_prj / P.S_PP_CFG
+        path_edit = path_prj / P.S_PP_PRJ
         dict_edit = {
-            K.S_KEY_BLACKLIST: S.D_BLACKLIST,
-            K.S_KEY_I18N: S.D_I18N,
+            C.S_KEY_BLACKLIST: C.D_BLACKLIST,
+            C.S_KEY_I18N: C.D_I18N,
         }
         F.save_dict([path_edit], dict_edit)
 
+        # ----------------------------------------------------------------------
+        # fix dunders in bl/i18n
+
         # replace dunders in blacklist and i18n
-        self._fix_text(path_edit)
+        self._fix_content(path_edit, False, False)
 
         # reload dict from fixed file
         dict_edit = F.load_dicts([path_edit])
 
         # put in metadata and save back to file
-        dict_edit[K.S_KEY_META] = S.D_PRJ_META
+        dict_edit[C.S_KEY_META] = C.D_PRJ_META
         F.save_dict([path_edit], dict_edit)
-
-        # ----------------------------------------------------------------------
-        # tree
-
-        # get path to tree
-        file_tree = path_prj / S.S_FILE_TREE
-
-        # create the file so it includes itself
-        with open(file_tree, "w", encoding="UTF-8") as a_file:
-            a_file.write("")
-
-        # create tree object and call
-        tree_obj = CNTree()
-        tree_str = tree_obj.build_tree(
-            str(path_prj),
-            filter_list=S.D_BLACKLIST[K.S_KEY_SKIP_TREE],
-            dir_format=S.S_TREE_DIR_FORMAT,
-            file_format=S.S_TREE_FILE_FORMAT,
-        )
-
-        # write to file
-        with open(file_tree, "w", encoding="UTF-8") as a_file:
-            a_file.write(tree_str)
 
         # ----------------------------------------------------------------------
         # purge
 
-        dir_prj = Path.home() / S.D_PRJ_CFG["__PC_DIR_PRJ__"]
+        dir_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
         path_prj = Path(dir_prj)
 
         # remove any files from settings for this project type
-        prj_type = S.D_PRJ_CFG["__PC_TYPE_PRJ__"]
-        list_del = S.D_PURGE.get(prj_type, [])
+        prj_type = C.D_PRJ_CFG["__PC_TYPE_PRJ__"]
+        list_del = C.D_PURGE.get(prj_type, [])
         for item in list_del:
             path_del = path_prj / item
             path_del.unlink()
 
         # ----------------------------------------------------------------------
-
-        # if debug, we are done
-        if self._debug:
-            return
-
-        # ----------------------------------------------------------------------
         # git
 
-        # add git dir
-        str_cmd = S.S_CMD_GIT.format(str(path_prj))
-        F.sh(str_cmd)
+        # if git flag is set
+        if C.B_CMD_GIT:
+
+            # add git dir
+            str_cmd = C.S_GIT_CMD.format(str(path_prj))
+            F.sh(str_cmd)
 
         # ----------------------------------------------------------------------
         # venv
 
-        # set up venv
-        path_venv = path_prj / S.S_ALL_VENV
-        str_cmd = S.S_CMD_VENV.format(str(path_venv))
-        F.sh(str_cmd)
+        # if venv flag is set
+        if C.B_CMD_VENV:
 
+            # set up venv
+            path_venv = path_prj / C.S_ALL_VENV
+            str_cmd = C.S_VENV_CMD.format(str(path_venv))
+            F.sh(str_cmd)
+
+        # ----------------------------------------------------------------------
+        # tree
+        # NB: run last so it includes .git and .venv folders
+
+        # if tree flag is set
+        if C.B_CMD_TREE:
+
+            # get path to tree
+            file_tree = path_prj / C.S_TREE_FILE
+
+            # create the file so it includes itself
+            with open(file_tree, "w", encoding="UTF-8") as a_file:
+                a_file.write("")
+
+            # create tree object and call
+            tree_obj = CNTree()
+            tree_str = tree_obj.build_tree(
+                str(path_prj),
+                filter_list=C.D_BLACKLIST[C.S_KEY_SKIP_TREE],
+                dir_format=C.S_TREE_DIR_FORMAT,
+                file_format=C.S_TREE_FILE_FORMAT,
+            )
+
+            # write to file
+            with open(file_tree, "w", encoding="UTF-8") as a_file:
+                a_file.write(tree_str)
+
+        # call public after fix
+        # NB: set project path here
+        C.do_after_fix() # nothing
+
+    # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
-
-    # --------------------------------------------------------------------------
-    # Replace text in the pyproject.toml file
-    # --------------------------------------------------------------------------
-    def _fix_pp_toml(self):
-        """
-        Replace text in the pyproject.toml file
-
-        Replaces things like the short description, version keywords,
-        requirements, etc. in the toml file.
-        """
-
-        # check if the toml file exists
-        path_toml = P.P_DIR_PYPLATE / P.S_FILE_TOML
-
-        # default text if we can't open file
-        text = ""
-
-        # open file and get contents
-        with open(path_toml, "r", encoding="UTF-8") as f:
-            text = f.read()
-
-        # replace name
-        str_pattern = P.R_TOML_NAME
-        str_val = P.S_NAME_SMALL
-        str_rep = P.R_TOML_NAME_REP.format(str_val)
-        text = re.sub(str_pattern, str_rep, text, flags=P.R_TOML_SUB_FLAGS)
-
-        # replace version
-        str_pattern = P.R_TOML_VERSION
-        str_val = self._dict_pp_meta["__PM_VERSION__"]
-        str_rep = P.R_TOML_VERSION_REP.format(str_val)
-        text = re.sub(str_pattern, str_rep, text, flags=P.R_TOML_SUB_FLAGS)
-
-        # replace short description
-        str_pattern = P.R_TOML_DESC
-        str_val = self._dict_pp_meta["__PM_SHORT_DESC__"]
-        str_rep = P.R_TOML_DESC_REP.format(str_val)
-        text = re.sub(str_pattern, str_rep, text, flags=P.R_TOML_SUB_FLAGS)
-
-        # replace keywords array
-        str_pattern = P.R_TOML_KEYS
-        pp_keywords = self._dict_pp_meta["__PM_KEYWORDS__"]
-        str_pp_keywords = [f'"{item}"' for item in pp_keywords]
-        str_pp_keywords = ", ".join(str_pp_keywords)
-        str_rep = P.R_TOML_KEYS_REP.format(str_pp_keywords)
-        text = re.sub(str_pattern, str_rep, text, flags=P.R_TOML_SUB_FLAGS)
-
-        # replace dependencies array
-        str_pattern = P.R_TOML_DEPS
-        pp_py_deps = self._dict_pp_meta["__PM_PY_DEPS__"]
-        list_py_deps = [item for item in pp_py_deps.keys()]
-        str_pp_py_deps = [f'"{item}"' for item in list_py_deps]
-        str_pp_py_deps = ", ".join(str_pp_py_deps)
-        str_rep = P.R_TOML_DEPS_REP.format(str_pp_py_deps)
-        text = re.sub(str_pattern, str_rep, text, flags=P.R_TOML_SUB_FLAGS)
-
-        # save file
-        with open(path_toml, "w", encoding="UTF-8") as f:
-            f.write(text)
 
     # --------------------------------------------------------------------------
     # Set up and run the command line parser
@@ -807,8 +750,7 @@ class PyMaker:
         """
         Set up and run the command line parser
 
-        Returns:
-            A dictionary of command line arguments
+        Returns: A dictionary of command line arguments
 
         This method sets up and runs the command line parser to minimize code
         in the main method.
@@ -839,49 +781,26 @@ class PyMaker:
         This method is teased out for better code maintenance.
         """
 
-        # load description and version from metadata
-        s_desc = self._dict_pp_meta["__PM_SHORT_DESC__"]
-        s_ver_fmt = S.D_PRJ_DEF["__PD_VER_FMT__"]
-        s_ver_num = self._dict_pp_meta["__PM_VERSION__"]
-        s_ver = s_ver_fmt.format(s_ver_num)
-        s_url = S.D_PRJ_DEF["__PD_URL__"]
-
-        # format help/version string
-        s_ver_help = (
-            f"{P.S_NAME_SMALL}\n"
-            f"{s_desc}\n"
-            f"{s_ver}\n"
-            f"{s_url}/{P.S_NAME_BIG}"
-        )
-
         # set help string
-        parser.description = s_ver_help
-
-        # add version option
-        parser.add_argument(
-            f"-{S.S_VER_OPTION}",
-            action=S.S_VER_ACTION,
-            dest=S.S_VER_DEST,
-            help=S.S_VER_HELP,
-        )
+        parser.description = P.S_PP_ABOUT
 
         # add debug option
         parser.add_argument(
-            f"-{S.S_DBG_OPTION}",
-            action=S.S_DBG_ACTION,
-            dest=S.S_DBG_DEST,
-            help=S.S_DBG_HELP,
+            P.S_DBG_OPTION,
+            action=P.S_DBG_ACTION,
+            dest=P.S_DBG_DEST,
+            help=P.S_DBG_HELP,
         )
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
-    def _check_type(self, type_prj):
+    def _check_type(self, prj_type):
         """
         Check project type for allowed characters
 
         Arguments:
-            type_prj: Type to check for allowed characters
+            prj_type: Type to check for allowed characters
 
         Returns:
             Whether the type is valid to use
@@ -891,28 +810,28 @@ class PyMaker:
         """
 
         # must have length of 1
-        if len(type_prj) == 1:
+        if len(prj_type) == 1:
             # get first char and lower case it
-            char = type_prj[0]
+            char = prj_type[0]
             char = char.lower()
 
             # we got a valid type
-            if char in S.D_TYPES:
+            if char in C.D_TYPES:
                 return True
 
         # nope, fail
-        print(S.S_ERR_TYPE)
+        print(C.S_ERR_TYPE)
         return False
 
     # --------------------------------------------------------------------------
     # Check project name for allowed characters
     # --------------------------------------------------------------------------
-    def _check_name(self, name_prj):
+    def _check_name(self, prj_name):
         """
         Check project name for allowed characters
 
         Arguments:
-            name_prj: Name to check for allowed characters
+            prj_name: Name to check for allowed characters
 
         Returns:
             Whether the name is valid to use
@@ -933,32 +852,32 @@ class PyMaker:
         # steps where each step explains which part of the name is wrong.
 
         # check for blank name
-        if name_prj == "":
+        if prj_name == "":
             return False
 
-        if len(name_prj) == 1:
-            print(S.S_ERR_LEN)
+        if len(prj_name) == 1:
+            print(C.S_ERR_LEN)
             return False
 
         # match start or return false
         pattern = r"(^[a-zA-Z])"
-        res = re.search(pattern, name_prj)
+        res = re.search(pattern, prj_name)
         if not res:
-            print(S.S_ERR_START)
+            print(C.S_ERR_START)
             return False
 
         # match end or return false
         pattern = r"([a-zA-Z\d]$)"
-        res = re.search(pattern, name_prj)
+        res = re.search(pattern, prj_name)
         if not res:
-            print(S.S_ERR_END)
+            print(C.S_ERR_END)
             return False
 
         # match middle or return false
         pattern = r"(^[a-zA-Z\d\-_]*$)"
-        res = re.search(pattern, name_prj)
+        res = re.search(pattern, prj_name)
         if not res:
-            print(S.S_ERR_CONTAIN)
+            print(C.S_ERR_CONTAIN)
             return False
 
         # if we made it this far, return true
@@ -971,29 +890,28 @@ class PyMaker:
         """
         Convert items in blacklist to absolute Path objects
 
-        Strip any path separators and get absolute paths for all entries in the
-        blacklist.
+        Get absolute paths for all entries in the blacklist.
         """
 
         # def result
         res = {}
 
         # project directory
-        path_prj = Path.home() / S.D_PRJ_CFG["__PC_DIR_PRJ__"]
+        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
 
         # remove path separators
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
-        for key in S.D_BLACKLIST:
-            S.D_BLACKLIST[key] = [
-                item.rstrip(os.sep) for item in S.D_BLACKLIST[key]
+        for key in C.D_BLACKLIST:
+            C.D_BLACKLIST[key] = [
+                item.rstrip(os.sep) for item in C.D_BLACKLIST[key]
             ]
 
         # support for absolute/relative/glob
         # NB: taken from cntree.py
 
         # for each section of blacklist
-        for key, val in S.D_BLACKLIST.items():
+        for key, val in C.D_BLACKLIST.items():
             # convert all items in list to Path objects
             paths = [Path(item) for item in val]
 
@@ -1033,7 +951,7 @@ class PyMaker:
         Arguments:
             path: Path for the README to remove text
 
-        Fixes the license/image according to the S.D_PRJ_CFG settings, and
+        Fixes the license/image according to the C.D_PRJ_CFG settings, and
         also removes sections of the README file that are not appropriate to
         the specified type of project, such as Module/Package or CLI/GUI.
         """
@@ -1048,10 +966,13 @@ class PyMaker:
         with open(path, "r", encoding="UTF-8") as a_file:
             text = a_file.read()
 
+        # ----------------------------------------------------------------------
+        # TODO: move this to public
+
         # get replacement value
-        pp_license_name = S.D_PRJ_DEF["__PD_LICENSE_NAME__"]
-        pp_license_img = S.D_PRJ_DEF["__PD_LICENSE_IMG__"]
-        pp_license_link = S.D_PRJ_DEF["__PD_LICENSE_LINK__"]
+        pp_license_name = C.D_PRJ_DEF["__PD_LICENSE_NAME__"]
+        pp_license_img = C.D_PRJ_DEF["__PD_LICENSE_IMG__"]
+        pp_license_link = C.D_PRJ_DEF["__PD_LICENSE_LINK__"]
 
         # the default license value
         pp_license_full = (
@@ -1061,12 +982,14 @@ class PyMaker:
             f")]({pp_license_link})"  # img link
         )
 
+        # ----------------------------------------------------------------------
+
         # find the license block
-        str_pattern = S.R_README
+        str_pattern = C.R_README
 
         # replace text
-        str_rep = S.R_README_REP.format(pp_license_full)
-        text = re.sub(str_pattern, str_rep, text, flags=S.R_RM_SUB_FLAGS)
+        str_rep = C.R_README_REP.format(pp_license_full)
+        text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
 
         # save file
         with open(path, "w", encoding="UTF-8") as a_file:
@@ -1095,9 +1018,9 @@ class PyMaker:
 
         # what to ignore in the text
         # first get type of project
-        type_prj = S.D_PRJ_CFG["__PC_TYPE_PRJ__"]
-        for key, val in S.D_README.items():
-            if type_prj == key:
+        prj_type = C.D_PRJ_CFG["__PC_TYPE_PRJ__"]
+        for key, val in C.D_README.items():
+            if prj_type == key:
                 # get values for keys
                 rm_delete_start = val["RM_DELETE_START"]
                 rm_delete_end = val["RM_DELETE_END"]
@@ -1130,19 +1053,19 @@ class PyMaker:
             a_file.writelines(new_lines)
 
     # --------------------------------------------------------------------------
-    # Replace dunders inside files
+    # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_text(self, path):
+    def _fix_content(self, path: Path, bl_hdr, bl_code):
         """
-        Replace dunders inside files
+        Fix header or code for each line in a file
 
         Arguments:
             path: Path for replacing text
+            bl_hdr: Whether the file is blacklisted for header lines
+            bl_code: Whether the file is blacklisted for code lines
 
-        Replaces text inside a file. Given a Path object, it iterates the lines
-        one by one, replacing dunders as it goes. When it is done, it saves the
-        new lines as the old file. This replaces the __PD/__PC dunders inside
-        the file, excluding headers (which are already handled).
+        For the given file, loop through each line, checking to see if it is a
+        header line or a code line. Ignore blank lines and comment-only lines.
         """
 
         # default lines
@@ -1155,26 +1078,120 @@ class PyMaker:
         # for each line in array
         for index, line in enumerate(lines):
 
-            # ------------------------------------------------------------------
+            # skip blank lines, obv (l_type = 1)
+            if line.strip() == "":
 
-            # replace all text in line
-            for key, val in self._dict_repls.items():
-                # find every match in line (for authors/emails in
-                # pyproject.toml)
-                if key in line:
-                    # replace text with new value
-                    line = line.replace(key, val)
+                # go to next line in file
+                continue
 
-            # ------------------------------------------------------------------
+            # is this line a comment?
+            if not bl_hdr:
 
-            # set new line with all replacements
-            lines[index] = line
+                # check if it matches header pattern
+                str_pattern = C.D_HEADER[C.S_KEY_HDR_SEARCH]
+                res = re.search(str_pattern, line)
+                if res:
 
-            # ------------------------------------------------------------------
+                    # fix it
+                    lines[index] = self._fix_header(line)
 
-        # save lines to file
+                    # stop on first match
+                    continue
+
+            if not bl_code:
+                lines[index] = self._fix_code(line)
+
+        # open and read file
         with open(path, "w", encoding="UTF-8") as a_file:
             a_file.writelines(lines)
+
+    # --------------------------------------------------------------------------
+    # Replace dunders inside a file header
+    # --------------------------------------------------------------------------
+    def _fix_header(self, line):
+        """
+        Replace dunders inside a file header
+
+        Arguments:
+            line: The line of the file to replace text in
+
+        Returns:
+            The new line of code
+
+        Replaces text inside a file, using a regex to match specific lines.
+        Given a line, it replaces the found pattern withe the replacement as it
+        goes. 
+        """
+
+        # break apart header line
+        # NB: gotta do this again, can't pass res param
+        str_pattern = C.D_HEADER[C.S_KEY_HDR_SEARCH]
+        res = re.search(str_pattern, line)
+
+        # pull out val and pad
+        val = res.group(C.D_HEADER[C.S_KEY_GRP_VAL])
+        pad = res.group(C.D_HEADER[C.S_KEY_GRP_PAD])
+
+        # do all string replacements and measurements
+        old_len_val = len(val)
+        val = self._fix_code(val)
+        new_len_val = len(val)
+
+        # set default padding
+        old_len_pad = len(pad)
+
+        # only recalculate padding if val len changed
+        # there is padding, must be rat
+        if old_len_val != new_len_val and old_len_pad > 1:
+
+            # get length change (+/-)
+            val_diff = new_len_val - old_len_val
+
+            # check if the amount to change is less than we've got
+            # NB: invert the sign
+            new_len_pad = old_len_pad + (0 - val_diff)
+
+            # we need some padding
+            if new_len_pad > 0:
+                pad = " " * new_len_pad
+            else:
+                # always have at least one space in padding
+                pad = " "
+
+        # put the parts back together
+        repl = C.D_HEADER[C.S_KEY_FMT_VAL_PAD].format(val, pad)
+
+        # format replacement regex
+        str_rep = C.D_HEADER[C.S_KEY_HDR_REPLACE].format(repl)
+        line = re.sub(str_pattern, str_rep, line)
+
+        # return
+        return line
+
+    # --------------------------------------------------------------------------
+    # Replace dunders inside s file's contents
+    # --------------------------------------------------------------------------
+    def _fix_code(self, line):
+        """
+        Replace dunders inside s file's contents
+
+        Arguments:
+            line: The line of the file to replace text in
+
+        Returns:
+            The new line of code
+
+        Replaces text inside a file. Given a line, replaces dunders as it goes.
+        When it is done, it returns the new line. This replaces the __PD/__PC
+        dunders inside the file, excluding headers (which are already handled).
+        """
+
+        # find all dunders in line
+        for key, val in self._dict_rep.items():
+            line = line.replace(key, val)
+
+        # return fixed code
+        return line
 
     # --------------------------------------------------------------------------
     # Rename dirs/files in the project
@@ -1190,29 +1207,40 @@ class PyMaker:
         does not mean the file was renamed, only that it should be)
         Rename dirs/files. Given a path, it renames the dir/file by replacing
         dunders in the path with their appropriate replacements from
-        _dict_repls.
+        self._dict_rep.
         """
 
         # first get the path name (we only want to change the last component)
         last_part = path.name
 
         # replace dunders in last path component
-        for key, val in self._dict_repls.items():
-            if key in last_part:
-                # replace last part with val
-                last_part = last_part.replace(key, val)
+        for key, val in self._dict_rep.items():
+            # replace last part with val
+            last_part = last_part.replace(key, val)
+        # str_pattern = C.R_CODE_DUN
+        # for res in re.findall(str_pattern, last_part):
+        #     if res in dict_rep:
+        #         last_part = last_part.replace(res, dict_rep[res])
 
         # replace the name
         path_new = path.parent / last_part
 
         # if it hasn't changed, skip to avoid overhead
         if path_new == path:
-            return False
+            return
 
         # do rename
         path.rename(path_new)
-        return True
 
+    def _remove_home(self, path):
+        h = str(Path.home())
+        p = str(path)
+        p = p.lstrip(h).lstrip(C.S)
+        return p
+
+    def _add_home(self, path):
+
+        return Path.home() / path
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
