@@ -39,6 +39,10 @@ class CNCliBase:
     """
     The main class, responsible for the operation of the program
 
+    Properties:
+
+    Methods:
+
     This object does the most of the work of a typical CLI program. It parses
     command line options, loads/saves config files, and performs the operations
     required for the program.
@@ -61,8 +65,9 @@ class CNCliBase:
         """
 
         # set defaults
-        self._d_cfg = {}
-        self._p_cfg = None
+        self._dict_args = {}
+        self._dict_cfg = {}
+        self._path_cfg = None
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -74,9 +79,6 @@ class CNCliBase:
     def _run_parser(self):
         """
         Set up and run the command line parser
-
-        Returns:
-            A dictionary of command line arguments
 
         This method sets up and runs the command line parser to minimize code
         in the subclass. It calls the subclass to add it's arguments, then it
@@ -93,7 +95,7 @@ class CNCliBase:
         args = parser.parse_args()
 
         # convert namespace to dict
-        return vars(args)
+        self._dict_args = vars(args)
 
     # --------------------------------------------------------------------------
     # This method does nothing, it is for subclassing
@@ -113,24 +115,21 @@ class CNCliBase:
     # --------------------------------------------------------------------------
     # Load config dict by combining several json files
     # --------------------------------------------------------------------------
-    def _load_config(self, def_path, arg_path=None, dict_def=None):
+    def _load_config(self, path_def, path_arg=None, dict_def=None):
         """
         Load config dict by combining several json files
 
         Arguments:
-            def_path: The path to the default file (the one the program usually
+            path_def: The path to the default file (the one the program usually
             uses)
-            arg_path: The path passed on the command line (default: None)
+            path_arg: The path passed on the command line (default: None)
             dict_def: A dictionary of defaults to start with (usually hard
             coded in the program) (default: None)
 
-        Returns:
-            The combined dictionaries as a dictionary
-
         This method loads config files from several sources, and combines the
         resulting dictionaries. The order of precedence is:
-        1. arg_path
-        2. def_path
+        1. path_arg
+        2. path_def
         3. dict_def
         """
 
@@ -160,14 +159,18 @@ class CNCliBase:
         def_exists = False
         paths_load = []
 
+        # default return value
+        if dict_def is None:
+            dict_def = {}
+
         # get the flags for the truth table
-        arg_set = arg_path is not None
+        arg_set = path_arg is not None
         if arg_set:
-            p_arg = Path(arg_path)
+            p_arg = Path(path_arg)
             arg_exists = p_arg.exists()
-        def_set = def_path is not None
+        def_set = path_def is not None
         if def_set:
-            p_def = Path(def_path)
+            p_def = Path(path_def)
             def_exists = p_def.exists()
 
         # NB: we go from bottom up to avoid having to "not" everything
@@ -175,7 +178,7 @@ class CNCliBase:
         # there is an arg file
         if arg_set:
             # set the path to save
-            self._p_cfg = p_arg
+            self._path_cfg = p_arg
             # we got an arg
             if arg_exists:
                 if def_exists:
@@ -194,7 +197,7 @@ class CNCliBase:
         # there is no arg file
         else:
             # set the path to save
-            self._p_cfg = p_def
+            self._path_cfg = p_def
             if def_exists:
                 # load def only
                 paths_load = [p_def]  # 0 X 1
@@ -203,32 +206,25 @@ class CNCliBase:
                 paths_load = []  # 0 X 0
 
         # load dict from path(s)
-        F.load_dicts(paths_load, dict_def)
+        # NB: paths_load is a list, no brackets
+        self._dict_cfg = F.load_dicts(paths_load, dict_def)
 
     # --------------------------------------------------------------------------
     # Save config file to one of several sources
     # --------------------------------------------------------------------------
     def _save_config(self):
         """
-        Save config file to one of several sources
+        Save config file to a file
 
-        Arguments:
-            cfg_arg: The path passed on the command line (if present)
-            cfg_def: The default path to save the dict
-
-        This method saves the config dict to the first found file.
+        This method saves the config dict to the same file it was loaded from.
         """
 
         # save config dict to file, def, or just lose
-        # Order of precedence is:
-        # 1. The file passed to the command-line, stored in self._p_cfg
-        # 2. The file set in the P_CFG constant, also stored in self._p_cfg
-        # If neither of the above files are valid, the self._d_cfg dictionary
-        # will not be saved.
+        # this saves _dict_cfg to whatever path we determined in _load_config
 
         # save dict to path
-        if self._p_cfg is not None:
-            F.save_dict([self._p_cfg], self._d_cfg)
+        if self._path_cfg is not None:
+            F.save_dict([self._path_cfg], self._dict_cfg)
 
 
 # -)

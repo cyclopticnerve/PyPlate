@@ -16,12 +16,6 @@ Remember to connect all the appropriate window events in your ui file to the
 private methods declared here.
 """
 
-# FIXME: need balanced set/get gui state for each window as it is
-# created/destroyed
-
-# TODO: fix get/set state/control/controls
-# make it more friendly
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -38,45 +32,10 @@ from gi.repository import Gtk  # type: ignore
 
 # my imports
 from cnlib import cnfunctions as CF
-# from . import cnappconstants as AC
+from . import cnappconstants as AC
 from . import cnappfunctions as AF
 
 # pylint: enable=import-error
-
-# values for CLOSE_ACTION
-# don't save values, just close
-CLOSE_ACTION_CANCEL = "CLOSE_ACTION_CANCEL"
-# save values and close
-CLOSE_ACTION_SAVE = "CLOSE_ACTION_SAVE"
-# show dialog
-CLOSE_ACTION_ASK = "CLOSE_ACTION_ASK"
-
-KEY_WIN_VISIBLE = "KEY_WIN_VISIBLE"
-
-# CLOSE_ACTION_ASK = "CLOSE_ACTION_ASK"
-# CLOSE_ACTION_SAVE = "CLOSE_ACTION_SAVE"
-# CLOSE_ACTION_NO = "CLOSE_ACTION_NO"
-
-# window class keys
-# KEY_CLS_UI_FILE = "KEY_CLS_UI_FILE"
-# KEY_CLS_UI_NAME = "KEY_CLS_UI_NAME"
-# KEY_CLS_HANDLER = "KEY_CLS_HANDLER"
-# KEY_CLS_CLOSE_ACTION = "KEY_CLS_CLOSE_ACTION"
-# KEY_CLS_SHOW_MOD = "KEY_CLS_SHOW_MOD"
-# KEY_CLS_MOD_CHAR = "KEY_CLS_MOD_CHAR"
-# KEY_CLS_MOD_FMT = "KEY_CLS_MOD_FMT"
-# KEY_CLS_CTLS = "KEY_CLS_CTLS"
-
-# window instance keys
-# KEY_WIN_CLASS = "KEY_WIN_CLASS"
-# KEY_WIN_VISIBLE = "KEY_WIN_VISIBLE"
-# KEY_WIN_SIZE = "KEY_WIN_SIZE"
-# KEY_WIN_CTLS = "KEY_WIN_CTLS"
-
-# window size keys
-# KEY_SIZE_W = "KEY_SIZE_W"
-# KEY_SIZE_H = "KEY_SIZE_H"
-# KEY_SIZE_M = "KEY_SIZE_M"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -117,7 +76,7 @@ class CNWindow:
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, app, name_win, class_win):
+    def __init__(self, app, name_win, dict_win):
         """
         Initialize the new object
 
@@ -131,22 +90,20 @@ class CNWindow:
         its properties, and any other code needed to create a new object.
         """
 
-        # FIXME: store ui file, ui name, handler, props for erthing in dict_app
         # store params as class variables
         self._app = app
         self._name_win = name_win
-        self._class_win = class_win
 
         # minimum dict_win must contain:
         # AC.KEY_WIN_CLASS,
-        # class_win = dict_win.get(AC.KEY_WIN_CLASS, None)
-        # if class_win is None:
-        #     # I18N: the specified class is None
-        #     raise IOError(AC.ERR_CLASS_NONE)
+        class_win = dict_win.get(AC.KEY_WIN_CLASS, None)
+        if class_win is None:
+            # I18N: the specified class is None
+            raise IOError(AC.ERR_CLASS_NONE)
 
         # # get the app dict for the class
-        # dict_classes = self._app._dict_app[AC.KEY_APP_CLASSES]
-        # self._dict_class = dict_classes[class_win]
+        dict_classes = self._app._dict_app[AC.KEY_APP_CLASSES]
+        self._dict_class = dict_classes[class_win]
 
         # create the builder
         # NEXT: remove for templates
@@ -158,16 +115,12 @@ class CNWindow:
 
         # get class's ui file and add to builder
         # NB: cast in case it is a Path object
-        # ui_file = self._dict_class[AC.KEY_CLS_UI_FILE]
-        # self._builder.add_from_file(str(ui_file))
-        ui_file = class_win.C_UI_FILE
-
+        ui_file = self._dict_class[AC.KEY_CLS_UI_FILE]
         self._builder.add_from_file(str(ui_file))
 
         # get the main window object from the ui file
         # NB: public because we need it in app._activate
         ui_name = self._dict_class[AC.KEY_CLS_UI_NAME]
-        ui_name = class_win.KEY_CLS_UI_NAME
         self.window = self._builder.get_object(ui_name)
 
         # start with a clean dict
@@ -183,7 +136,6 @@ class CNWindow:
         # 2. values passed in from user (param dict_gui)
 
         # combine ui settings and user settings
-        dict_win = self._app.get_dict_state(self._name_win)
         self._dict_state = CF.combine_dicts(self._dict_state, [dict_win])
 
         # fix ints/bools in dict_gui
@@ -364,65 +316,6 @@ class CNWindow:
         return result
 
     # --------------------------------------------------------------------------
-    # Update the backing dict of a particular window, setting its size and
-    # control values
-    # --------------------------------------------------------------------------
-    def set_dict_state(self, name_win, dict_state):
-        """
-        Update the backing dict of a particular window, saving its size and
-        control values
-
-        Arguments:
-            name_win: The name of the window to save the GUI for
-            dict_state: The current state of the window's GUI, to be saved in
-            the global backing store
-
-        This method updates the backing store for a particular window whenever
-        that window's values change (such as size or control values).
-
-        This method should NOT be called by any outside script. It is public
-        only so it can be used by Window and its subclasses.
-
-        The contents of this dict are a reflection of the CURRENT VALUES of the
-        GUI, after any changes have been made. This method is called by the
-        window's _do_update method.
-        """
-
-        # set the gui dict for the window name
-        self._dict_state[name_win] = dict_state
-        # FIXME: for each window in dict_app, if has entry in dict_state, apply
-        # dict_state to window
-
-    # --------------------------------------------------------------------------
-    # Return the backing dict of all windows, containing their size and
-    # control values
-    # --------------------------------------------------------------------------
-    def get_dict_state(self, name_win):
-        """
-        Return the backing dict of all windows, containing their size and
-        control values
-
-        Returns:
-            The current backing dictionary
-
-        This method should be called after run(), so that the dict is updated
-        after any save actions have been completed.
-
-        The contents of this dict are a reflection of the CURRENT VALUES of the
-        GUI, after any changes have been made. The dict is updated by
-        set_dict_state.
-
-        The dictionary does NOT contain settings like window class, close
-        action, etc. since these do not need to be saved between sessions.
-        """
-
-        # return the backing gui dict
-        if name_win in self._dict_state:
-            return self._dict_state[name_win]
-
-        return None
-
-    # --------------------------------------------------------------------------
     # Called when the window needs to set if it has been modified
     # --------------------------------------------------------------------------
     def is_modified(self):
@@ -494,12 +387,6 @@ class CNWindow:
 
         # return dialog end result
         return result
-
-    def destroy(self):
-        """
-        docstring
-        """
-        self._app.remove_window(self._name_win)
 
     # --------------------------------------------------------------------------
     # Private methods

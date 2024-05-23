@@ -39,22 +39,24 @@ import sys
 # add custom import paths
 
 # find paths to dev or user
-DIR_PARENT = Path(__file__).parent
-if DIR_PARENT.name == "__PD_DEV_SRC__":
+DIR_PARENT = Path(__file__).parent.resolve()
+if DIR_PARENT.name == "__PA_DEV_SRC__":
     DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "__PD_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PC_DEV_LIB__"
-    DIR_SRC = DIR_PRJ / "__PD_DEV_SRC__"
+    DIR_CFG = DIR_PRJ / "__PA_DEV_CONF__"
+    DIR_LIB = Path.home() / "__PC_DEV_PP__" / "lib"
+    DIR_SRC = DIR_PRJ / "__PA_DEV_SRC__" / "__PA_SUPPORT__"
 else:
     DIR_HOME = Path.home()
     DIR_CFG = DIR_HOME / "__PC_USR_CONF__"
     DIR_LIB = DIR_HOME / "__PC_USR_LIB__"
     DIR_SRC = DIR_HOME / "__PC_USR_SRC__"
 
-# add lib path to import search
+# add paths to import search
 sys.path.append(str(DIR_LIB))
 sys.path.append(str(DIR_SRC))
 
+# import my stuff
+from cnlib import cnconstants as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnclibase import CNCliBase  # type: ignore
 
@@ -70,35 +72,6 @@ from cnlib.cnclibase import CNCliBase  # type: ignore
 # globals for pb to find
 PB_SHORT_DESC = "__PM_SHORT_DESC__"
 PB_VERSION = "__PM_VERSION__"
-
-# ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# NB: this initial stuff is just for command line
-
-# formatted version
-S_VER_FMT = "__PD_VER_FMT__".format(PB_VERSION)
-
-# about string
-S_ABOUT = (
-    "__PC_NAME_SMALL__\n"
-    f"{PB_SHORT_DESC}\n"
-    f"{S_VER_FMT}\n"
-    "__PD_URL__/__PC_NAME_BIG__"
-)
-
-# config option strings
-S_CFG_OPTION = "-c"
-S_CFG_DEST = "CFG_DEST"
-S_CFG_HELP = "load configuration from file"
-S_CFG_METAVAR = "FILE"
-
-# debug option strings
-S_DBG_OPTION = "-d"
-S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -140,7 +113,10 @@ class __PC_NAME_CLASS__(CNCliBase):
         super().__init__()
 
         # set default property values
-        self._d_cfg = {}
+        # NB: commented props are from super
+        # self._d_args = {}   # from super
+        # self._d_cfg = {}    # from super
+        # self._p_cfg = None  # from super
         self._debug = False
 
     # --------------------------------------------------------------------------
@@ -158,11 +134,20 @@ class __PC_NAME_CLASS__(CNCliBase):
         program, and performing its steps.
         """
 
+        # ----------------------------------------------------------------------
+        # setup
+
         # call boilerplate code
         self._setup()
 
+        # ----------------------------------------------------------------------
+        # main stuff
+
         # do the thing with the thing
         print(self._func())
+
+        # ----------------------------------------------------------------------
+        # teardown
 
         # call boilerplate code
         self._teardown()
@@ -201,41 +186,6 @@ class __PC_NAME_CLASS__(CNCliBase):
         return "this is func"
 
     # --------------------------------------------------------------------------
-    # Add arguments to argparse parser
-    # --------------------------------------------------------------------------
-    def _add_args(self, parser):
-        """
-        Add arguments to argparse parser
-
-        Arguments:
-            parser: The ArgumentParser to add the args to
-
-        This method is teased out for better code maintenance.
-        """
-
-        # set help string
-        parser.description = S_ABOUT
-
-        # set text for -h
-        # parser.description = S_ABOUT
-
-        # add debug option
-        parser.add_argument(
-            S_DBG_OPTION,
-            action=S_DBG_ACTION,
-            dest=S_DBG_DEST,
-            help=S_DBG_HELP,
-        )
-
-        # add config (user dict) option
-        parser.add_argument(
-            f"-{S_CFG_OPTION}",
-            dest=S_CFG_DEST,
-            help=S_CFG_HELP,
-            metavar=S_CFG_METAVAR,
-        )
-
-    # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
     # --------------------------------------------------------------------------
     def _setup(self):
@@ -247,22 +197,16 @@ class __PC_NAME_CLASS__(CNCliBase):
         """
 
         # call to set up and run arg parser
-        dict_args = super()._run_parser()
+        super()._run_parser()
 
         # get other options from command line
-        self._debug = dict_args[S_DBG_DEST]
+        self._debug = self._d_args[C.S_DBG_DEST]
 
         # the default config file
-        # NB: if using the cmd line to load a file, this path will still be
-        # checked for a config file
-        # the values at this path will be combined first, followed by the cmd
-        # line option
-
-        # need to get dir_cfg, append prj-name, convert to str
-        cfg_def = str(DIR_CFG / "__PC_NAME_SMALL__.json")
+        cfg_def = str(DIR_CFG / "cli.json")
 
         # command line cfg is None or str
-        cfg_arg = dict_args[S_CFG_DEST]
+        cfg_arg = self._d_args[C.S_CFG_DEST]
 
         # load the config file
         # not using def path, using arg path
@@ -275,6 +219,49 @@ class __PC_NAME_CLASS__(CNCliBase):
         # throw in a debug test
         if self._debug:
             F.pp(self._d_cfg, label="load cfg:")
+
+    # --------------------------------------------------------------------------
+    # Add arguments to argparse parser
+    # --------------------------------------------------------------------------
+    def _add_args(self, parser):
+        """
+        Add arguments to argparse parser
+
+        Arguments:
+            parser: The ArgumentParser to add the args to
+
+        This method is teased out for better code maintenance.
+        """
+
+        # formatted version
+        ver_fmt = "__PD_VER_FMT__".format(PB_VERSION)
+
+        # about string
+        s_about = (
+            "__PC_NAME_SMALL__\n"
+            f"{PB_SHORT_DESC}\n"
+            f"{ver_fmt}\n"
+            "__PD_URL__/__PC_NAME_BIG__"
+        )
+
+        # set help string
+        parser.description = s_about
+
+        # add debug option
+        parser.add_argument(
+            C.S_DBG_OPTION,
+            action=C.S_DBG_ACTION,
+            dest=C.S_DBG_DEST,
+            help=C.S_DBG_HELP,
+        )
+
+        # add config (user dict) option
+        parser.add_argument(
+            C.S_CFG_OPTION,
+            dest=C.S_CFG_DEST,
+            help=C.S_CFG_HELP,
+            metavar=C.S_CFG_METAVAR,
+        )
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
@@ -298,6 +285,7 @@ class __PC_NAME_CLASS__(CNCliBase):
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
+
     # Code to run when called from command line
 
     # This is the top level code of the program, called when the Python file is

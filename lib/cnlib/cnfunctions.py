@@ -27,6 +27,7 @@ Functions:
 # system imports
 import json
 import gettext
+from pathlib import Path
 import shlex
 import subprocess
 
@@ -425,6 +426,9 @@ def load_dicts(paths, start_dict=None):
     for path in paths:
 
         # sanity check
+        path = Path(path)
+
+        # sanity check
         if path is None:
             print(C.CFG_ERR_NOT_EXIST.format(path))
             continue
@@ -433,7 +437,7 @@ def load_dicts(paths, start_dict=None):
         try:
 
             # make sure path is absolute
-            if not path.is_absolute:
+            if not path.is_absolute():
                 print(C.CFG_ERR_NOT_EXIST.format(path))
                 continue
 
@@ -475,6 +479,9 @@ def save_dict(paths, dict_):
 
     # loop through possible files
     for path in paths:
+
+        # sanity check
+        path = Path(path)
 
         # try each option
         try:

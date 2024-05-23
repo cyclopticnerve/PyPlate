@@ -17,9 +17,9 @@ import sys
 
 # find paths to dev or user
 # TODO: make sure the parent name is right
-DIR_PARENT = Path(__file__).parent
-if DIR_PARENT.name == "__PD_DEV_SRC__":
-    DIR_LIB = Path.home() / "__PC_DEV_LIB__"
+DIR_PARENT = Path(__file__).parent.resolve()
+if DIR_PARENT.name == "__PA_DEV_SRC__":
+    DIR_LIB = Path.home() / "__PC_DEV_PP__" / "lib"
 else:
     DIR_LIB = Path.home() / "__PC_USR_LIB__"
 

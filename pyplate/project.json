@@ -1,6 +1,6 @@
 {
     "__PM_VERSION__": "0.0.2",
-    "__PP_SHORT_DESC__": "A program for creating CLI/GUI/package projects in Python from a template",
+    "__PM_SHORT_DESC__": "A program for creating CLI/GUI/package projects in Python from a template",
     "__PM_KEYWORDS__": [
         "python",
         "python",

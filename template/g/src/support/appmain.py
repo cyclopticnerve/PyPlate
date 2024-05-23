@@ -59,7 +59,7 @@ from cnlib import cnfunctions as CF  # type: ignore
 # path to src dir
 # TODO: use install location
 # C_PATH_SRC = Path.home() / ".local/share/__PC_NAME_SMALL__"
-C_PATH_SRC = Path(__file__).parent
+C_PATH_SRC = Path(__file__).parent.resolve()
 
 # get path to config file
 C_PATH_GUI = C_PATH_SRC / "cfg/__PC_NAME_SMALL__.json"

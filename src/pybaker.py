@@ -11,6 +11,10 @@ This module modifies the current project to replace metadata in each of the
 files, according to the data present in the conf files.
 """
 
+
+# TODO: do we need D_PRJ_DEF/D_PRJ_ADD?
+# TODO: what do we need from D_PRJ_CFG? just __PC_DEV_PP__?
+
 # TODO: pybaker ask for ver or default, update meta, check for dunders, make
 # install.py, make dist
 # TODO: pybaker not rely so much on regex, more on context start/end
@@ -58,7 +62,7 @@ from EVERYTHING.cntree import CNTree
 DEBUG = True
 
 # some useful constants
-_DIR_SELF = Path(__file__).parent
+_DIR_SELF = Path(__file__).parent.resolve()
 
 # this is the project dir
 _DIR_PRJ = _DIR_SELF.parent
@@ -1419,5 +1423,69 @@ if __name__ == "__main__":
 
     # run main function
     main()
+
+# def do_pot():
+#     """docstring"""
+
+#     # # dict of clangs and exts
+#     dict_in = {
+#         "Python": [
+#             "py",
+#         ],
+#         "Glade": [
+#             ".ui",
+#             ".glade",
+#         ],
+#         "Desktop": [".desktop"],
+#     }
+
+#     # dict of clangs and no exts (ie file names)
+#     dict_blank = {
+#         "Python": [
+#             "__PC_NAME_SMALL__",
+#         ],
+#     }
+
+#     # the list of languages your program has been translated into (can grow
+#     # over time, adding languages as they become available)
+#     list_wlang = [
+#         "es",
+#         "xo",
+#         "pq",
+#     ]
+
+#     # path to src dir
+#     dir_src = Path(__file__).parent.resolve()
+
+#     pp = CNPotPy(
+#         dir_src,
+#         str_appname="foo",
+#         str_version="0",
+#         str_email="foo@bar.com",
+#         str_domain=f"{C_DOMAIN}",
+#         dict_clangs=dict_in,
+#         dict_no_ext=dict_blank,
+#         list_wlangs=list_wlang,
+#     )
+
+#     # I18N: run cnpotpy
+#     pp.make_pot()
+#     pp.make_pos()
+#     pp.make_mos()
+#     pp.make_desktop(
+#         C_GUI_DIR / "template.desktop",
+#         C_GUI_DIR / "__PC_NAME_SMALL__.desktop",
+#     )
+
+#     # TODO: this is for testing purposes only
+#     t = gettext.translation(
+#         C.DOMAIN, localedir=C.POT_DEF_DIR_LOCALE, languages=["es"]
+#     )
+#     t.install()
+#     _ = t.gettext
+
+#     # get path to config file
+#     C_PATH_GUI = C_PATH_SRC / "cfg/__PC_NAME_SMALL__.json"
+
 
 # -)

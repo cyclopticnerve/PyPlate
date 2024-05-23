@@ -24,9 +24,10 @@ Functions:
 
 # my imports
 from cnlib import cnfunctions as CF
-from . import cnappconstants as AC
+from . import cnapp as AC
 
 # pylint: enable=import-error
+
 
 # ------------------------------------------------------------------------------
 # A convenience method to return the type of a control, parsed from the
@@ -55,6 +56,7 @@ def get_ctl_type(class_dict, ctl_name):
 
     # return the type
     return ctl_type
+
 
 # ------------------------------------------------------------------------------
 # Called when the gui dict is passed in, to ensure all values are of the

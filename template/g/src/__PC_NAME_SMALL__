@@ -437,7 +437,7 @@ if __name__ == "__main__":
     # ------------------------------------------------------------------------------
     # move this to pybaker
     # path to src dir
-    dir_src = Path(__file__).parent
+    dir_src = Path(__file__).parent.resolve()
 
     pp = CNPotPy(
         dir_src,

@@ -73,7 +73,7 @@ S_PP_PRJ = f"pyplate{S}project.json"
 
 # Path to PyPlate
 # (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/)
-P_DIR_PP = Path(__file__).parents[1]
+P_DIR_PP = Path(__file__).parents[1].resolve()
 
 # Path to PyPlate libs
 # (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/lib)

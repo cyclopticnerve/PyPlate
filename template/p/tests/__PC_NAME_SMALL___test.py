@@ -31,8 +31,9 @@ import sys
 # option 1:
 
 # path to dir above <package name>
-DIR_PKG = Path(__file__).parents[1] / "__PD_DEV_SRC__"
-sys.path.append(str(DIR_PKG))
+DIR_PRJ = Path(__file__).parents[1].resolve()
+DIR_SRC = DIR_PRJ / "__PA_DEV_SRC__"
+sys.path.append(str(DIR_SRC))
 
 # from <package name> import <module name>
 from __PC_NAME_SMALL__ import __PC_NAME_SEC__
@@ -41,8 +42,9 @@ from __PC_NAME_SMALL__ import __PC_NAME_SEC__
 # option 2:
 
 # # path to <package name>
-# DIR_PKG = Path(__file__).parents[1] / "__PD_DEV_SRC__" / "__PC_NAME_SMALL__"
-# sys.path.append(str(DIR_PKG))
+# DIR_PRJ = Path(__file__).parents[1].resolve()
+# DIR_SRC = DIR_PRJ / "__PA_DEV_SRC__" / "__PC_NAME_SMALL__"
+# sys.path.append(str(DIR_SRC))
 
 # # import <module name>
 # import __PC_NAME_SEC__

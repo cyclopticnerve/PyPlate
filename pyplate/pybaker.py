@@ -39,7 +39,7 @@ def main():
     s_pb_real = str(p_pb_real)
 
     # get current path
-    curr_path = Path(__file__)
+    curr_path = Path(__file__).resolve()
 
     # call real pybaker with current path on cmd line
     cmd = f"{s_pb_real} {curr_path}"

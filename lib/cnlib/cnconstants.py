@@ -10,6 +10,8 @@
 A file to hold constants for the rest of the library
 """
 
+# TODO: do we ever localize this?
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -81,5 +83,17 @@ TREE_SORT_ORDER = "_."  # sort first char of name in this order (above ord)
 CFG_ERR_NOT_EXIST = _("config file '{}' does not exist")
 CFG_ERR_NOT_VALID = _("config file '{}' is not a valid JSON file")
 CFG_ERR_NOT_CREATE = _("config file '{}' could not be created")
+
+# config option strings
+S_CFG_OPTION = "-c"
+S_CFG_DEST = "CFG_DEST"
+S_CFG_HELP = _("load configuration from file")
+S_CFG_METAVAR = "FILE"
+
+# debug option strings
+S_DBG_OPTION = "-d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP =_( "enable debugging option")
 
 # -)

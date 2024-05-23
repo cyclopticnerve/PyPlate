@@ -18,80 +18,12 @@ names in the resulting files.
 Run pymaker.py -h for more options.
 """
 
-# FIXME: make sure my home dir not in any src files
-# also fix __PC_PYBAKER__ and __PC_DEV_LIB__ - all we need is path to pyplate
-
-
-# TODO: multiline comment support for triple quotes
-# TODO: html comments also open/close tag, can have code before or after
-# is it worth it? should we just replace every non-header line?
-# TODO: have pybaker swap dev/usr lib import in all .py files
-# or at least remove dev home from path
-# we are not using any rel path anymore
-# TODO: pybaker DOES do string repl (all those new files?
-# if it only runs at dist time, what about date? [pb never do date])
-# TODO: pb never do pyplate folder in prj
-# TODO: D_PB_NEED : dict of what pybaker needs : key is D_PRJ_..., val is list
-# of keys from that dict
-# TODO: never store proj dir
-# TODO: determine what lines in a file
-# TODO: _fix_... that use lines[] dont need re.M
-# TODO: _fix_header/_fix_code use multiline
-# non-rat: break on colon, do str rep on value, put back together
-# with regex, replace line in array
-# rat: break on colon, rest of line split at two spaces, that group 1 is values
-# that group 2 split at last space, that group 1 is pad, group 2 is rat
-
-# my cn rat regex is public/private?
-# it will need to be changed by dev
-# only match exactly MY headers
-# or make match both w/ boolean
-# or make match, auto detect rat
-# if we go with rat only for me, what to do about blacklist?
-# headers and text should still be used, but public fix_header should only do
-# simple string replacement
-
-# TODO: _fix_code only looks in lines that don't start with #, split res at #,
-# only string rep first group, put first and sec back together, repl in M list
-
-# TODO: make sure all stuff in private is strictly pp- or cn-related and not output-related
-# make sure this stuff doesn't duplicate anything in public, only extend
-# vice versa for public
-# TODO: actually private is loaded first but imports public
-# main loads private (MUST STAY)
-# private loads public
-# private fills in private
-# main loads public
-# fix this?
-
-# TODO: which regex done as list/whole string?
-# TODO: how to use positional args in format strings
-# ie: the sky is {$1}, the sun is {$2}
-# TODO: where do we use match? only where we need to check len (ie rat)
-# everywhere else should just use sub for string replacements
-
-# TODO: how does bool flag affect files in skip_headers blacklist?
-#  flag  |  rat  |  res
-# ---------------------
-#   0    |   0   |
-#   0    |   1   |
-#   1    |   0   |
-#   1    |   1   |
-
-# TODO: ask dev for base dir 1 time, can change later?
-# TODO: ask dev for everything 1 time?
-# TODO: always run header test on sample file w/o rat
-# TODO: what if you move project? what if you move PyPlate? vals should be
-# updated every run and store in a dev file
-# TODO: fill in pyplate/private.json w pp prj_def/prg_cfg
-# TODO: fill in pyplate/project.json w pp blacklist/i18n/metadata
-# TODO: move get info input format to settings.py
-# TODO: move _check_name regex to settings
-# TODO: make a regex tester to run regex on toml, readme, header
-# TODO: make a flow list of all funcs in here
-# TODO: rename all const to be consistent
-# TODO: make sure all runnable files have shebang/chmod +x
-# TODO: write a tool to scan for unused keys/consts
+# FIXME: -c option should override def, but not internal
+# i.e. if a key is NOT in c, but IS in def or internal, DO NOT USE
+# more specifically, the internal def is used the first time the program is run
+# these values can be modified in the program
+# this dict is saved to the def location
+# all subsequent runs read/write the def file
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -118,7 +50,7 @@ from tkinter import TRUE
 # path to this project
 # parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
-P_DIR_PYPLATE = Path(__file__).parents[1]
+P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PYPLATE))
 
 # load this first so we can get lib dir name
@@ -173,8 +105,10 @@ class PyMaker:
         """
 
         # set the initial values of properties
+        self._d_args = {}
         self._debug = False
         self._dict_rep = {}
+        self._dir_prj = Path()
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -398,15 +332,22 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # save stuff to prj dict
 
-        # save project type
+        # save project stuff
         C.D_PRJ_CFG["__PC_TYPE_PRJ__"] = prj_type
         C.D_PRJ_CFG["__PC_NAME_BIG__"] = prj_name
         C.D_PRJ_CFG["__PC_NAME_SMALL__"] = name_small
-        C.D_PRJ_CFG["__PC_DIR_PRJ__"] = self._remove_home(str(tmp_dir))
-        C.D_PRJ_CFG["__PC_DEV_PP__"] = self._remove_home(str(P.P_DIR_PP))
         C.D_PRJ_CFG["__PC_DATE__"] = info_date
         C.D_PRJ_CFG["__PC_NAME_CLASS__"] = name_class
         C.D_PRJ_CFG["__PC_NAME_SEC__"] = name_sec
+
+        # remove home dir from PyPlate path
+        h = str(Path.home())
+        p = str(P.P_DIR_PP)
+        p = p.lstrip(h).lstrip(C.S)
+        C.D_PRJ_CFG["__PC_DEV_PP__"] = p
+
+        # save global property
+        self._dir_prj = tmp_dir
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -418,14 +359,11 @@ class PyMaker:
         Gets dirs/files from template and copies them to the project dir.
         """
 
-        # get the project final dir
-        dir_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
-
         # ----------------------------------------------------------------------
         # do template/all
 
         # copy common stuff
-        shutil.copytree(P.P_DIR_PP_ALL, dir_prj)
+        shutil.copytree(P.P_DIR_PP_ALL, str(self._dir_prj))
 
         # ----------------------------------------------------------------------
         # do template/type
@@ -443,7 +381,7 @@ class PyMaker:
         for item_src in list_src:
 
             # get destination name
-            dst = dir_prj / item_src.name
+            dst = self._dir_prj / item_src.name
 
             # template item is a file
             if item_src.is_file():
@@ -478,9 +416,6 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # do copy dict
 
-        # project directory
-        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
-
         # copy linked files
         for key, val in C.D_COPY.items():
 
@@ -488,7 +423,7 @@ class PyMaker:
             path_in = P.P_DIR_PP / key
 
             # then get full dest path
-            path_out = path_prj / val
+            path_out = self._dir_prj / val
 
             # copy file
             if path_in.is_dir():
@@ -523,7 +458,6 @@ class PyMaker:
         """
 
         # combine dicts for string replacement
-        # dict_rep = {}
         F.combine_dicts(
             self._dict_rep, [C.D_PRJ_DEF, C.D_PRJ_ADD, C.D_PRJ_CFG]
         )
@@ -539,16 +473,15 @@ class PyMaker:
         skip_code = dict_paths[C.S_KEY_SKIP_CODE]
         skip_path = dict_paths[C.S_KEY_SKIP_PATH]
 
-        # project directory
-        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
-
         # ----------------------------------------------------------------------
         # do the fixes bottom up
         # NB: topdown=False is required for the renaming, as we don't want to
         # rename (and thus clobber) a directory name before we rename all its
         # child dirs/files
         # note that root is a full path, dirs and files are relative to root
-        for root, root_dirs, root_files in os.walk(path_prj, topdown=False):
+        for root, root_dirs, root_files in os.walk(
+            self._dir_prj, topdown=False
+        ):
 
             # convert root into Path object
             root = Path(root)
@@ -571,7 +504,7 @@ class PyMaker:
                 # fix README if it is the top-level README.md
                 # NB: need to do before any other stuff, requires special
                 # treatment
-                if item == path_prj / C.D_PRJ_DEF["__PD_README_FILE__"]:
+                if item == self._dir_prj / C.D_PRJ_DEF["__PD_README_FILE__"]:
                     self._fix_readme(item)
 
                 # if we shouldn't skip contents
@@ -610,43 +543,11 @@ class PyMaker:
         modification here.
         """
 
-        # put pyplate in skip_all (never touch again)
-        # NBL key is blacklist section, val is an array of strings
-        # C.D_BLACKLIST[C.S_KEY_SKIP_ALL].append("pyplate")
-
-        # ----------------------------------------------------------------------
-        # update blacklist
-        # NB: that is, set up the blacklist you want pybaker to use
-
-        # inner function to reduce duplicate code
-        # def bl(l_add, l_rem):
-
-        #     # add any final entries to blacklist
-        #     for key, val in l_add.items():
-        #         # add blacklist entries that we need for pybaker
-        #         for item in val:
-        #             old_list = C.D_BLACKLIST[key]
-        #             if not item in old_list:
-        #                 old_list.append(item)
-
-        #     # remove any final entries from blacklist
-        #     for key, val in l_rem.items():
-        #         # remove blacklist entries that we need pybaker to ignore
-        #         for item in val:
-        #             if item in old_list:
-        #                 old_list.remove(item)
-
-        # bl(C.D_BL_ADD, C.D_BL_REM)
-        # bl(P.D_BL_ADD_PRV, P.D_BL_REM_PRV)
-
         # ----------------------------------------------------------------------
         # save project settings
 
-        # project directory
-        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
-
         # save project settings
-        path_no_edit = path_prj / P.S_PP_PRV
+        path_no_edit = self._dir_prj / P.S_PP_PRV
         dict_no_edit = {
             C.S_KEY_PRJ_DEF: C.D_PRJ_DEF,
             C.S_KEY_PRJ_ADD: C.D_PRJ_ADD,
@@ -655,7 +556,7 @@ class PyMaker:
         F.save_dict([path_no_edit], dict_no_edit)
 
         # save editable settings (only blacklist and i18n for now)
-        path_edit = path_prj / P.S_PP_PRJ
+        path_edit = self._dir_prj / P.S_PP_PRJ
         dict_edit = {
             C.S_KEY_BLACKLIST: C.D_BLACKLIST,
             C.S_KEY_I18N: C.D_I18N,
@@ -678,14 +579,11 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # purge
 
-        dir_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
-        path_prj = Path(dir_prj)
-
         # remove any files from settings for this project type
         prj_type = C.D_PRJ_CFG["__PC_TYPE_PRJ__"]
         list_del = C.D_PURGE.get(prj_type, [])
         for item in list_del:
-            path_del = path_prj / item
+            path_del = self._dir_prj / item
             path_del.unlink()
 
         # ----------------------------------------------------------------------
@@ -695,7 +593,7 @@ class PyMaker:
         if C.B_CMD_GIT:
 
             # add git dir
-            str_cmd = C.S_GIT_CMD.format(str(path_prj))
+            str_cmd = C.S_GIT_CMD.format(str(self._dir_prj))
             F.sh(str_cmd)
 
         # ----------------------------------------------------------------------
@@ -705,7 +603,7 @@ class PyMaker:
         if C.B_CMD_VENV:
 
             # set up venv
-            path_venv = path_prj / C.S_ALL_VENV
+            path_venv = self._dir_prj / C.S_ALL_VENV
             str_cmd = C.S_VENV_CMD.format(str(path_venv))
             F.sh(str_cmd)
 
@@ -717,7 +615,7 @@ class PyMaker:
         if C.B_CMD_TREE:
 
             # get path to tree
-            file_tree = path_prj / C.S_TREE_FILE
+            file_tree = self._dir_prj / C.S_TREE_FILE
 
             # create the file so it includes itself
             with open(file_tree, "w", encoding="UTF-8") as a_file:
@@ -726,7 +624,7 @@ class PyMaker:
             # create tree object and call
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
-                str(path_prj),
+                str(self._dir_prj),
                 filter_list=C.D_BLACKLIST[C.S_KEY_SKIP_TREE],
                 dir_format=C.S_TREE_DIR_FORMAT,
                 file_format=C.S_TREE_FILE_FORMAT,
@@ -737,7 +635,6 @@ class PyMaker:
                 a_file.write(tree_str)
 
         # call public after fix
-        # NB: set project path here
         C.do_after_fix() # nothing
 
     # --------------------------------------------------------------------------
@@ -764,9 +661,10 @@ class PyMaker:
 
         # get namespace object
         args = parser.parse_args()
+        self._d_args = vars(args)
 
         # convert namespace to dict
-        return vars(args)
+        return self._d_args
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -896,9 +794,6 @@ class PyMaker:
         # def result
         res = {}
 
-        # project directory
-        path_prj = self._add_home(C.D_PRJ_CFG["__PC_DIR_PRJ__"])
-
         # remove path separators
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
@@ -925,7 +820,7 @@ class PyMaker:
             other_strings = [str(item) for item in other_paths]
 
             # get glob results as generators
-            glob_results = [path_prj.glob(item) for item in other_strings]
+            glob_results = [self._dir_prj.glob(item) for item in other_strings]
 
             # start with absolutes
             result = abs_paths
@@ -1055,7 +950,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_content(self, path: Path, bl_hdr, bl_code):
+    def _fix_content(self, path, bl_hdr, bl_code):
         """
         Fix header or code for each line in a file
 
@@ -1213,14 +1108,8 @@ class PyMaker:
         # first get the path name (we only want to change the last component)
         last_part = path.name
 
-        # replace dunders in last path component
-        for key, val in self._dict_rep.items():
-            # replace last part with val
-            last_part = last_part.replace(key, val)
-        # str_pattern = C.R_CODE_DUN
-        # for res in re.findall(str_pattern, last_part):
-        #     if res in dict_rep:
-        #         last_part = last_part.replace(res, dict_rep[res])
+        # # replace dunders in last path component
+        last_part = self._fix_code(last_part)
 
         # replace the name
         path_new = path.parent / last_part
@@ -1232,15 +1121,6 @@ class PyMaker:
         # do rename
         path.rename(path_new)
 
-    def _remove_home(self, path):
-        h = str(Path.home())
-        p = str(path)
-        p = p.lstrip(h).lstrip(C.S)
-        return p
-
-    def _add_home(self, path):
-
-        return Path.home() / path
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------

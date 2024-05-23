@@ -29,6 +29,7 @@ D_PRJ_REQ = {
 
 # ------------------------------------------------------------------------------
 
+
 def _fix_content(lines, bl_hdr=False, bl_code=False):
 
     # for each line in array
@@ -55,7 +56,9 @@ def _fix_content(lines, bl_hdr=False, bl_code=False):
         if not bl_code:
             lines[index] = _fix_code(line)
 
+
 # ------------------------------------------------------------------------------
+
 
 def _fix_header(line):
 
@@ -105,7 +108,9 @@ def _fix_header(line):
     # return replacement result
     return line
 
+
 # ------------------------------------------------------------------------------
+
 
 def _fix_code(line):
 
@@ -116,13 +121,13 @@ def _fix_code(line):
     # return fixed code
     return line
 
+
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
     a_path = (
-        Path.home()
-        / "Documents/Projects/Python/PyPlate/template/all/tests/hdr_test.py"
+        Path.home() / "Documents/Projects/Python/PyPlate/tests/hdr_text.py"
     )
 
     a_lines = []

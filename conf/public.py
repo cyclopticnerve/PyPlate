@@ -128,11 +128,14 @@ S_ALL_VENV = ".venv"
 S_ALL_CONF = "conf"
 S_ALL_DIST = "dist"
 S_ALL_DOCS = "docs"
-S_ALL_LOCALE = "locale"
-S_ALL_PO = "po"
 S_ALL_MISC = "misc"
 S_ALL_README = "README"
 S_ALL_SRC = "src"
+S_ALL_SUPPORT = "support"
+S_ALL_I18N = "i18n"
+S_ALL_IMAGES = "images"
+S_ALL_LOCALE = "locale"
+S_ALL_PO = "po"
 S_ALL_TESTS = "tests"
 
 # initial location of project (to check for dups)
@@ -226,21 +229,24 @@ D_PRJ_DEF = {
     "__PD_DATE_FMT__": "%m/%d/%Y",
     # readme file used in pyproject.toml, rel to prj dir
     "__PD_README_FILE__": "README.md",
+}
+
+# these values are string replace only
+# NB: constant values moved here so we can change them easier
+D_PRJ_ADD = {
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home dir
     # location of config files, relative to the project dir
-    "__PD_DEV_CONF__": S_ALL_CONF,
+    "__PA_DEV_CONF__": S_ALL_CONF,
     # location of src files, relative to the project dir
-    "__PD_DEV_SRC__": S_ALL_SRC,
+    "__PA_DEV_SRC__": S_ALL_SRC,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    "__PD_USR_APPS__": S_USR_APPS,  # for .desktop file
-    "__PD_USR_BIN__": S_USR_BIN,  # where to put the binary
-}
-
-D_PRJ_ADD = {
-    # dummy value to use in headers with right aligned text
-    "__PA_DUMMY__": "",
+    "__PA_USR_APPS__": S_USR_APPS,  # for .desktop file
+    "__PA_USR_BIN__": S_USR_BIN,  # where to put the binary
+    "__PA_DUMMY__": "",  # dummy value to use in headers
+    "__PA_SUPPORT__": S_ALL_SUPPORT, # where is rest of code
+    "__PA_IMAGES__": S_ALL_IMAGES, # where gui images are stored
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -251,7 +257,6 @@ D_PRJ_CFG = {
     "__PC_TYPE_PRJ__": "",  # 'c'
     "__PC_NAME_BIG__": "",  # PyPlate
     "__PC_NAME_SMALL__": "",  # pyplate
-    "__PC_DIR_PRJ__": "", # (dev home)/Projects/Python/PyPlate
     "__PC_NAME_SEC__": "",  # module1.py
     "__PC_NAME_CLASS__": "",  # Pascal case name for classes
     "__PC_DATE__": "",  # the date each file was created, updated every time
@@ -548,17 +553,16 @@ def do_before_fix():
     # TODO: move all stuff that should not be built-in from
     # _get_project_info/_do_fix into here
 
+    # TODO: do this stuff in pybaker
 
-# TODO: do this stuff in pybaker
+    # get values after pymaker has set them
+    author = D_PRJ_DEF["__PD_AUTHOR__"]
+    name_small = D_PRJ_CFG["__PC_NAME_SMALL__"]
 
-# get values after pymaker has set them
-#    author = D_PRJ_REQ["__PD_AUTHOR__"]
-#    name_small = D_PRJ_CFG["__PC_NAME_SMALL__"]
-
-# paths relative to the end user's (or dev's) useful folders
-#    D_PRJ_CFG["__PC_USR_CONF__"] = f"{S_USR_CONF}{S}{name_small}"
-#    D_PRJ_CFG["__PC_USR_SRC__"] = f"{S_USR_SRC}{S}{name_small}"
-#    D_PRJ_CFG["__PC_USR_LIB__"] = f"{S_USR_LIB}{S}{author}{S}{S_USR_LIB_NAME}"
+    # paths relative to the end user's (or dev's) useful folders
+    D_PRJ_CFG["__PC_USR_CONF__"] = f"{S_USR_CONF}{S}{name_small}"
+    D_PRJ_CFG["__PC_USR_SRC__"] = f"{S_USR_SRC}{S}{name_small}"
+    D_PRJ_CFG["__PC_USR_LIB__"] = f"{S_USR_LIB}{S}{author}{S}{S_USR_LIB_NAME}"
 
 
 # --------------------------------------------------------------------------
@@ -575,6 +579,7 @@ def do_after_fix():
     # TODO:move _fix_readme call from _do_fix to here - should not be built-in
     # TODO : move any stuff that should not be built-in in _do_after_fix to
     # here
+
 
 # ------------------------------------------------------------------------------
 # Return a string of a Path object without dev home

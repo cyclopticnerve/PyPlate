@@ -1,4 +1,77 @@
 
+
+TODO: tool to scan .ui files and build a stub .py with get/set vals and connect actions
+TODO: multiline comment support for triple quotes
+TODO: html comments also open/close tag, can have code before or after
+is it worth it? should we just replace every non-header line?
+TODO: have pybaker swap dev/usr lib import in all .py files
+or at least remove dev home from path
+we are not using any rel path anymore
+TODO: pybaker DOES do string repl (all those new files?
+if it only runs at dist time, what about date? [pb never do date])
+TODO: pb never do pyplate folder in prj
+TODO: D_PB_NEED : dict of what pybaker needs : key is D_PRJ_..., val is list
+of keys from that dict
+TODO: never store proj dir
+TODO: determine what lines in a file
+TODO: _fix_... that use lines[] dont need re.M
+TODO: _fix_header/_fix_code use multiline
+non-rat: break on colon, do str rep on value, put back together
+with regex, replace line in array
+rat: break on colon, rest of line split at two spaces, that group 1 is values
+that group 2 split at last space, that group 1 is pad, group 2 is rat
+
+my cn rat regex is public/private?
+it will need to be changed by dev
+only match exactly MY headers
+or make match both w/ boolean
+or make match, auto detect rat
+if we go with rat only for me, what to do about blacklist?
+headers and text should still be used, but public fix_header should only do
+simple string replacement
+
+TODO: _fix_code only looks in lines that don't start with #, split res at #,
+only string rep first group, put first and sec back together, repl in M list
+
+TODO: make sure all stuff in private is strictly pp- or cn-related and not output-related
+make sure this stuff doesn't duplicate anything in public, only extend
+vice versa for public
+TODO: actually private is loaded first but imports public
+main loads private (MUST STAY)
+private loads public
+private fills in private
+main loads public
+fix this?
+
+TODO: which regex done as list/whole string?
+TODO: how to use positional args in format strings
+ie: the sky is {$1}, the sun is {$2}
+TODO: where do we use match? only where we need to check len (ie rat)
+everywhere else should just use sub for string replacements
+
+TODO: how does bool flag affect files in skip_headers blacklist?
+ flag  |  rat  |  res
+---------------------
+  0    |   0   |
+  0    |   1   |
+  1    |   0   |
+  1    |   1   |
+
+TODO: ask dev for base dir 1 time, can change later?
+TODO: ask dev for everything 1 time?
+TODO: always run header test on sample file w/o rat
+TODO: what if you move project? what if you move PyPlate? vals should be
+updated every run and store in a dev file
+TODO: fill in pyplate/private.json w pp prj_def/prg_cfg
+TODO: fill in pyplate/project.json w pp blacklist/i18n/metadata
+TODO: move get info input format to settings.py
+TODO: move _check_name regex to settings
+TODO: make a regex tester to run regex on toml, readme, header
+TODO: make a flow list of all funcs in here
+TODO: rename all const to be consistent
+TODO: make sure all runnable files have shebang/chmod +x
+TODO: write a tool to scan for unused keys/consts
+
 TODO: 3 levels: cn (me), dev (user of this prg), end user (user of dev's prg)
 TODO: move all strings to S_ section in pybaker
 TODO: make tree happen in pybaker
