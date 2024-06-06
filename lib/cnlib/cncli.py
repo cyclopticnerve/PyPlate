@@ -35,7 +35,7 @@ from . import cnfunctions as F
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class CNCliBase:
+class CNCli:
     """
     The main class, responsible for the operation of the program
 
@@ -47,6 +47,18 @@ class CNCliBase:
     command line options, loads/saves config files, and performs the operations
     required for the program.
     """
+
+    # config option strings
+    ARG_CFG_OPTION = "-c"
+    ARG_CFG_DEST = "CFG_DEST"
+    ARG_CFG_HELP = "load configuration from file"
+    ARG_CFG_METAVAR = "FILE"
+
+    # debug option strings
+    ARG_DBG_OPTION = "-d"
+    ARG_DBG_ACTION = "store_true"
+    ARG_DBG_DEST = "DBG_DEST"
+    ARG_DBG_HELP = "enable debugging option"
 
     # --------------------------------------------------------------------------
     # Class methods

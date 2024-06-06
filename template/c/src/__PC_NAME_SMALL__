@@ -56,9 +56,9 @@ sys.path.append(str(DIR_LIB))
 sys.path.append(str(DIR_SRC))
 
 # import my stuff
-from cnlib import cnconstants as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnclibase import CNCliBase  # type: ignore
+# import cnlib as C  # type: ignore
+from cnlib.cncli import CNCli  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -81,7 +81,7 @@ PB_VERSION = "__PM_VERSION__"
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PC_NAME_CLASS__(CNCliBase):
+class __PC_NAME_CLASS__(CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -200,13 +200,13 @@ class __PC_NAME_CLASS__(CNCliBase):
         super()._run_parser()
 
         # get other options from command line
-        self._debug = self._d_args[C.S_DBG_DEST]
+        self._debug = self._dict_args[CNCli.ARG_DBG_DEST]
 
         # the default config file
         cfg_def = str(DIR_CFG / "cli.json")
 
         # command line cfg is None or str
-        cfg_arg = self._d_args[C.S_CFG_DEST]
+        cfg_arg = self._d_args[CNCli.ARG_CFG_DEST]
 
         # load the config file
         # not using def path, using arg path
@@ -214,7 +214,7 @@ class __PC_NAME_CLASS__(CNCliBase):
         # using def path, not using arg path
         # super()._load_config(cfg_def, dict_def=self._d_cfg)
         # using def path, using arg path, using internal
-        super()._load_config(cfg_def, cfg_arg, self._d_cfg)
+        super()._load_config(cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg)
 
         # throw in a debug test
         if self._debug:
@@ -249,18 +249,18 @@ class __PC_NAME_CLASS__(CNCliBase):
 
         # add debug option
         parser.add_argument(
-            C.S_DBG_OPTION,
-            action=C.S_DBG_ACTION,
-            dest=C.S_DBG_DEST,
-            help=C.S_DBG_HELP,
+            CNCli.ARG_DBG_OPTION,
+            action=CNCli.ARG_DBG_ACTION,
+            dest=CNCli.ARG_DBG_DEST,
+            help=CNCli.ARG_DBG_HELP,
         )
 
         # add config (user dict) option
         parser.add_argument(
-            C.S_CFG_OPTION,
-            dest=C.S_CFG_DEST,
-            help=C.S_CFG_HELP,
-            metavar=C.S_CFG_METAVAR,
+            CNCli.ARG_CFG_OPTION,
+            dest=CNCli.ARG_CFG_DEST,
+            help=CNCli.ARG_CFG_HELP,
+            metavar=CNCli.ARG_CFG_METAVAR,
         )
 
     # --------------------------------------------------------------------------
@@ -275,7 +275,7 @@ class __PC_NAME_CLASS__(CNCliBase):
 
         # throw in a debug test
         if self._debug:
-            F.pp(self._d_cfg, label="save cfg:")
+            F.pp(self._dict_cfg, label="save cfg:")
 
         # call to save config
         super()._save_config()

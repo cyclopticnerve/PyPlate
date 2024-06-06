@@ -8,146 +8,71 @@
 
 """
 A class to manage a GTK Application with at least one window and possible
-·configuration parameters
+configuration parameters
 
 This class manages the basic functions of an application, such as activation
 and (possibly) setting/getting the backing dictionary of all window
 sizes/controls.
 """
 
-# TODO: move error strings out and get rid of gettext
 # TODO: quit from dock does not close all windows when one or more show
 # modified dialog
 # TODO: dock icon works in debugger, but not .desktop or terminal
 # this is a wayland thing, see here:
 # https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
 
-# NEXT: Save/load whole dict app - simpler (need to deal with wrapper class)
-# NEXT: Move size to class - new win of class uses curr size of last closed of
-# same class
-# NEXT: save session option
-# if true, on launch, restore all windows that were visible at last quit
-# if false, only show window marked as main/visible
-# app section in dict_state - app saves list of visible windows at quit
-# NEXT: hamburger menu in title bar or at least (i) icon for about dialog
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
-from datetime import datetime
-import gettext
-import gi
+import copy
+import importlib
+from pathlib import Path
+import sys
 
-gi.require_version("Gtk", "3.0")
+# find paths to lib
+# NB: this assumes cnlib is a "sister" folder to cnapplib
+DIR_LIB = Path(__file__).parents[1].resolve()
+
+# add paths to import search
+sys.path.append(str(DIR_LIB))
 
 # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
 # my imports
-from gi.repository import Gtk  # type: ignore
-from cnlib import cnfunctions as CF
+from cnlib import cnfunctions as CF  # type: ignore
+import gi  # type: ignore
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, GLib  # type: ignore
 
 # pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
-# ------------------------------------------------------------------------------
+
+# dict_state = {
+#     "name_win": { <== name_win/state_win
+#         KEY_CLASS: "windowmain.WindowMain",  # mod_name.class_name
+#         KEY_SIZE: {
+#             KEY_SIZE_W: 0,
+#             KEY_SIZE_H: 0,
+#             KEY_SIZE_M: False,
+#         },
+#         KEY_CTLS: {
+#             "entry_test": "a"
+#         },
+#     },
+# }
+
 
 # ------------------------------------------------------------------------------
-# Macros
-# ------------------------------------------------------------------------------
-
-_ = gettext.gettext
-
-# ------------------------------------------------------------------------------
-# Control types
-# ------------------------------------------------------------------------------
-
-KEY_CLS_CTLS = "KEY_CLS_CTLS"
-KEY_WIN_VISIBLE = "KEY_WIN_VISIBLE"
-KEY_WIN_SIZE = "KEY_WIN_SIZE"
-KEY_SIZE_W = "KEY_SIZE_W"
-KEY_SIZE_H = "KEY_SIZE_H"
-KEY_SIZE_M = "KEY_SIZE_M"
-KEY_WIN_CTLS = "KEY_WIN_CTLS"
-
-# NB: add new control types here
-# used to collate set/get functions and value types
-# NB: value type defaults to text, no conversion
-# if value type should be int or bool, set KEY_CTL_VAL_TYPE accordingly
-# this key/value is used by _sanitize_user to ensure proper type, in case
-# somebody borks the entry in the config file by hand
-
-# # window control keys
-KEY_CTL_TYPE = "KEY_CTL_TYPE"
-KEY_CTL_VAL = "KEY_CTL_VAL"
-KEY_CTL_SET = "KEY_CTL_SET"
-KEY_CTL_GET = "KEY_CTL_GET"
-KEY_CTL_VAL_TYPE = "KEY_CTL_VAL_TYPE"
-KEY_CTL_ACT = "KEY_CTL_ACT"
-
-# value types to convert in _sanitize_user
-CTL_VAL_TYPE_INT = "CTL_VAL_TYPE_INT"
-CTL_VAL_TYPE_BOOL = "CTL_VAL_TYPE_BOOL"
-
-# all text entries use the same set/get functions
-CTL_TYPE_TEXT = {
-    KEY_CTL_SET: "set_text",
-    KEY_CTL_GET: "get_text",
-    KEY_CTL_ACT: "do_text",
-}
-
-# all checkboxes use the same set/get functions and value type
-CTL_TYPE_CHECK = {
-    KEY_CTL_SET: "set_active",
-    KEY_CTL_GET: "get_active",
-    KEY_CTL_VAL_TYPE: CTL_VAL_TYPE_BOOL,
-    KEY_CTL_ACT: "do_check",
-}
-
-# ------------------------------------------------------------------------------
-# Defaults
-# ------------------------------------------------------------------------------
-
-# DEF_CLOSE_ACTION = CLOSE_ACTION_ASK
-# DEF_CLS_SHOW_MOD = True
-# DEF_CLS_MOD_CHAR = "\u29BF"
-# DEF_CLS_MOD_FMT = "${MOD} ${TITLE}"
-# DEF_WIN_VISIBLE = True
-# DEF_WIN_RESTORE = False
-# DEF_APP_RESTORE = False
-
-# ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# strings to be localized
-# I18N: the main message of the save dialog
-STR_CLOSE_DLG_MAIN = _("Save changes before closing?")
-# I18N: the sub message of the save dialog
-STR_CLOSE_DLG_SEC = _("If you don't save, changes will be permanently lost.")
-# I18N: the destructive button label (to close without saving)
-STR_CLOSE_DLG_CLOSE = _("Close without saving")
-# I18N: the cancel button label (to do nothing)
-STR_CLOSE_DLG_CANCEL = _("Cancel")
-# I18N: the save button label (to save and close)
-STR_CLOSE_DLG_SAVE = _("Save")
-# I18N: the save button label when the document is untitled (to save and close)
-STR_CLOSE_DLG_SAVE_AS = _("Save As...")
-
-# ------------------------------------------------------------------------------
-# Error strings
-# ------------------------------------------------------------------------------
-
-ERR_DICT_APP = _("no dict_app or dict_app is empty")
-ERR_NO_CLASS = _("no classes in dict_app")
-ERR_NO_WIN = _("no windows in dict_app")
-ERR_WIN_EXIST = _("window name already exists")
-# ERR_CLASS_NONE = _("class is None")
-
-# ------------------------------------------------------------------------------
-# Classes
+# Public classes
 # ------------------------------------------------------------------------------
 
 
@@ -158,28 +83,43 @@ class CNApp(Gtk.Application):
     """
     A subclass of Gtk.Application to suit our needs
 
-    Public methods:
-        add_instance: Add a new window instance with the specified name and
-        class
-        remove_instance: Remove the specified window instance from the internal
-        list
-        get_instances: Return the list of existing instances
-        set_dict_state: Update the backing dict of all window, setting their size
-        and control values
-        get_dict_state: Return the backing dict of all windows, containing their
-        size and control values
-        # format unique name for window
-        now = datetime.now()
-        name_win = now.strftime("%d-%m-%Y_%H-%M-%S")
-        # check if the name exists in the known window list
-        # if name_win in self._dict_inst:
-        #     # window name already exists
-        #     raise IOError(AC.ERR_WIN_EXIST)
+    Properties:
+        app_id: The reverse-notation id of the app (ie.
+        "org.cyclopticnerve.foobar")
 
+    Methods:
+        add_window: Add a new window instance
+        remove_window: Remove the window instance from the internal list
+        get_windows: Return the read-only list of currently visible windows
+        get_active_window: Return the CNWindow subclass instance for the active
+        window (the currently focused window)
 
     A class that extends Gtk.Application to manage the GUI for the calling
     Python script.
     """
+
+    # --------------------------------------------------------------------------
+    # Constants
+    # --------------------------------------------------------------------------
+
+    # keys for state dict
+    # size sub dict
+    KEY_SIZE = "KEY_SIZE"
+    KEY_SIZE_W = "KEY_SIZE_W"
+    KEY_SIZE_H = "KEY_SIZE_H"
+    KEY_SIZE_M = "KEY_SIZE_M"
+    # class name as string
+    KEY_CLASS = "KEY_CLASS"
+    # controls sub dict
+    KEY_CTLS = "KEY_CTLS"
+
+    # values for CLOSE_ACTION
+    # don't save values, just close
+    CLOSE_ACTION_CANCEL = "CLOSE_ACTION_CANCEL"
+    # always save values and close
+    CLOSE_ACTION_SAVE = "CLOSE_ACTION_SAVE"
+    # show dialog
+    CLOSE_ACTION_ASK = "CLOSE_ACTION_ASK"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -188,110 +128,66 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, app_id, path_state=None, def_class=None):
+    def __init__(self, app_id, path_state, dict_def_state):
         """
         Initialize the new object
 
         Arguments:
             app_id: The reverse-notation id of the app (ie.
-            "org.cyclopticnerve.foobar)
-            dict_app: The list of app properties for the Application
-                Keys and values are explained in the main file's DICT_APP
-                declaration
-            dict_state: The dict of properties that were saved upon last close
-            of the app, or loaded upon next open
-                Keys and values are a combination of each window's size and
-                control values from the defaults in the ui file and this dict
-            dict_cfg: THe dictionary parsed from the command line cfg option
+            "org.cyclopticnerve.foobar")
+            path_state: The path to the state file for loading/saving
+            dit_def_state: The dict that describes the startup state of the app
+            if path_state does not exist or is empty
 
         Initializes a new instance of the class, setting the default values of
-        its properties, and any other code needed to create a new object.
+        its properties, and any other code needed to create a new object.\n
+        The path_state property can be either a string or a Path, and can be
+        relative to the subclass's location.\n
+        See 'template/g/src/support/appmain.py' for an example.
         """
 
         # ----------------------------------------------------------------------
-        # dict_app
+        # app_id
 
-        # no app dict, kaboom
-        # if dict_app is None or len(dict_app) == 0:
-        #     # no dict or dict is empty
-        #     raise IOError(AC.ERR_DICT_APP)
+        # NB: this is prop'd and public for window classes to use as i18n domain
+        # (window subclasses are where the i18n stuff is done)
+        # self.app_id = app_id
+        self.app_id = app_id
 
-        # if no classes in dict_app
-        # NB: dict_app needs to contain KEY_APP_CLASSES with at least one entry
-        # if (
-        #     AC.KEY_APP_CLASSES not in dict_app
-        #     or len(dict_app[AC.KEY_APP_CLASSES]) == 0
-        # ):
-        #     # no classes in dict_app
-        #     raise IOError(AC.ERR_NO_CLASS)
+        # ----------------------------------------------------------------------
+        # path_state
 
-        # if no windows in dict_app
-        # NB: dict_app needs to contain KEY_APP_WINDOWS with at least one entry
-        # if (
-        #     AC.KEY_APP_WINDOWS not in dict_app
-        #     or len(dict_app[AC.KEY_APP_WINDOWS]) == 0
-        # ):
-        #     # no windows in dict_app
-        #     raise IOError(AC.ERR_NO_WIN)
-
-        # # set internal dict_app
-        # self._dict_app = dict_app
+        # get absolute path of state file
+        self._path_state = Path(path_state).resolve()
 
         # ----------------------------------------------------------------------
         # dict_state
 
-        # # set gui dict to default so we can query it
-        # # NB: we need this to be SOMETHING b/c we try to combine
-        # dict_app_windows = self._dict_app.get(AC.KEY_APP_WINDOWS, {})
-        # if dict_state is None:
-        #     dict_state = {}
-
-        # # combine ui settings and gui settings
-        # self._dict_state = CF.combine_dicts(dict_app_windows, [dict_state])
-
-        # we need this later to save session state
-        self._path_state = path_state
-
-        # set gui dict to default so we can query it
-        # NB: we need this to be SOMETHING b/c we try to combine
-        # dict_app_windows = self._dict_app[AC.KEY_APP_WINDOWS]
-        self._dict_state = {}
-
-        # load state
-        if path_state is not None:
-            self._dict_state = CF.load_dicts([self._path_state], {})
+        # save dict_def_state as current state (will be checked in _activate)
+        self._dict_state = dict_def_state
 
         # ----------------------------------------------------------------------
-        # def_class
-
-        # save def_class for _activate
-        self._def_class = def_class
-
-        # ----------------------------------------------------------------------
-        # dict_inst
+        # _dict_inst
 
         # create the default list of known windows (items are window instances)
-        # NEXT: remove for templates
         self._dict_inst = {}
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # setup
 
         # call super init to initialize the base class
-        super().__init__(application_id=app_id)
+        super().__init__(application_id=self.app_id)
 
-        # TODO: what does this do? do we need it? if we do, pass app name as
-        # param (don't use replacement value b/c this file doesn't get scanned
-        # by pyplate)
-        # some useless shit i found on the interwebs (doesn't do anything)
-        # GLib.set_prgname("__PC_NAME_BIG__")
-        # GLib.set_application_name("__PC_NAME_BIG__")
+        # NB: some useless shit i found on the interwebs (doesn't do anything)
+        GLib.set_prgname("__PC_NAME_BIG__")
+        GLib.set_application_name("__PC_NAME_BIG__")
 
         # ----------------------------------------------------------------------
         # connections
 
         # connect default operations for a new application
-        self.connect("activate", self._activate)
-        self.connect("shutdown", self._shutdown)
+        self.connect("activate", self._evt_app_activate)
+        self.connect("shutdown", self._evt_app_shutdown)
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -300,112 +196,36 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Add a new window instance with the specified name and class
     # --------------------------------------------------------------------------
-    def add_new_window(self, class_win):
+    def add_window(
+        self, class_win, name_win, state_win
+    ):  # pylint: disable=arguments-differ
         """
         Add a new window instance with the specified name and class
 
         Arguments:
+            class_win: The subclass of CNWindow to create
             name_win: The unique name to store in the backing dict
-            dict_win: The dict of properties, such as size and control values,
-                for the new window
+            state_win: The dict of properties, such as size and control values,
+            for the new window
 
-        Adds a new instance with a unique name and class type to put in the
-        backing store.
+        Adds a new instance of the specified class with the specified name and
+        state dict and puts it in the backing store.
         """
 
-        # minimum dict_win must contain:
-        # C.KEY_WIN_CLASS,
-        # class_win = dict_win.get(AC.KEY_WIN_CLASS, None)
-        # if class_win is None:
-        #     # class is None
-        #     raise IOError(ERR_CLASS_NONE)
-
-        # format unique name for window
-        now = datetime.now()
-        name_win = now.strftime("%d-%m-%Y_%H-%M-%S")
-        # check if the name exists in the known window list
-        # if name_win in self._dict_inst:
-        #     # window name already exists
-        #     raise IOError(AC.ERR_WIN_EXIST)
-
-        # # get the app dict for the class
-        # dict_classes = self._dict_app[AC.KEY_APP_CLASSES]
-        # dict_class = dict_classes[class_win]
-
-        # get window's handler class
-        # handler = dict_class[AC.KEY_CLS_HANDLER]  # WindowMain
+        # sanity check
+        if name_win in self._dict_inst:
+            print("window name exists")
+            return
 
         # create the window instance
-        # dict_state = self._dict_state.get(name_win, {})
-        inst_win = class_win(self, name_win, {})
+        inst_win = class_win(self, name_win, state_win)
 
-        # add the Window to the app
+        # add the window to the app
         super().add_window(inst_win.window)
         self._dict_inst[name_win] = inst_win
 
-        # return the new instance
-        return inst_win
-
-        # if the window should be visible, show it
-        # vis_win = dict_state.get(KEY_WIN_VISIBLE, DEF_WIN_VISIBLE)
-        # if vis_win:
-        #     inst_win.window.present()
-
-    # --------------------------------------------------------------------------
-    # Add a new window instance with the specified name and class
-    # --------------------------------------------------------------------------
-    def add_existing_window(self, class_win, name_win):
-        """
-        Add a new window instance with the specified name and class
-
-        Arguments:
-            name_win: The unique name to store in the backing dict
-            dict_win: The dict of properties, such as size and control values,
-                for the new window
-
-        Adds a new instance with a unique name and class type to put in the
-        backing store.
-        """
-
-        # minimum dict_win must contain:
-        # C.KEY_WIN_CLASS,
-        # class_win = dict_win.get(AC.KEY_WIN_CLASS, None)
-        # if class_win is None:
-        #     # class is None
-        #     raise IOError(ERR_CLASS_NONE)
-
-        # format unique name for window
-        # now = datetime.now()
-        # name_win = now.strftime("%d-%m-%Y_%H-%M-%S")
-        # check if the name exists in the known window list
-        # if name_win in self._dict_inst:
-        #     # window name already exists
-        #     raise IOError(AC.ERR_WIN_EXIST)
-
-        # # get the app dict for the class
-        # dict_classes = self._dict_app[AC.KEY_APP_CLASSES]
-        # dict_class = dict_classes[class_win]
-
-        # get window's handler class
-        # handler = dict_class[AC.KEY_CLS_HANDLER]  # WindowMain
-
-        dict_state = self._dict_state[name_win]
-
-        # create the window instance
-        # dict_state = self._dict_state.get(name_win, {})
-        inst_win = class_win(self, name_win, dict_state)
-
-        # add the Window to the app
-        super().add_window(inst_win.window)
-        self._dict_inst[name_win] = inst_win
-
-        # return the new instance
-        return inst_win
-
-        # if the window should be visible, show it
-        # vis_win = dict_state.get(KEY_WIN_VISIBLE, DEF_WIN_VISIBLE)
-        # if vis_win:
-        #     inst_win.window.present()
+        # show the window
+        inst_win.window.present()
 
     # --------------------------------------------------------------------------
     # Remove the specified window instance from the internal list
@@ -418,34 +238,64 @@ class CNApp(Gtk.Application):
             name_win: The name of the window instance to remove
 
         Removes a window instance from the internal list. Note that this does
-        not destroy the window, and this method should in fact be called from
-        the actual Gtk.Window object's destroy method.
+        not destroy the Gtk.window, and this method should in fact be called
+        from the actual Gtk.Window object's destroy method handler.
         """
 
-        # remove instance from list
+        # check if name in list
         if name_win in self._dict_inst:
+
+            # get handler
             inst = self._dict_inst[name_win]
+
+            # call super to remove window object from Gtk.Application
             super().remove_window(inst.window)
+
+            # and finally, remove handler from our list
+            # (yes i know its a dict not a list)
             self._dict_inst.pop(name_win)
-            # del self._dict_inst[name_win]
 
     # --------------------------------------------------------------------------
-    # Return the list of existing window instances
+    # Return the list of currently displayed windows
     # --------------------------------------------------------------------------
-    def get_windows(self, _app):  # pylint: disable=arguments-differ
+    def get_windows(self):
         """
-        Return the list of existing window instances
+        Return the list of currently displayed windows
+
+        Returns the list of currently displayed windows. This method makes the
+        list internal and thus read-only.
+        """
+
+        # return the (read-only?) dict
+        return copy.deepcopy(self._dict_inst)
+
+    # --------------------------------------------------------------------------
+    # Return the window name and handler instance for the active window (the
+    # currently focused window)
+    # --------------------------------------------------------------------------
+    def get_active_window(self):
+        """
+        Return the CNWindow subclass instance for the active window (the
+        currently focused window)
 
         Returns:
-            The dict of existing window instances
+            The CNWindow subclass instance for the active window
 
-        A convenience method to return the list of existing window instances.
+        Finds and returns the CNWindow subclass instance for the currently
+        focused Gtk.(Application)Window, or None if there is no active window
+        or it is not in the internal list.
         """
 
-        # NB: why is app a param for this func in super? weird...
+        # ask GTK.Application for active window
+        active_obj = super().get_active_window()
 
-        # return the list
-        return self._dict_inst
+        # loop until we find handler for active window
+        for _name, handler in self._dict_inst.items():
+            if handler.window == active_obj:
+                return handler
+
+        # cant find window, return none
+        return None
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -454,39 +304,43 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Called when the Application is activated (ie. first window is shown)
     # --------------------------------------------------------------------------
-    def _activate(self, _obj):
+    def _evt_app_activate(self, _obj):
         """
         Called when the Application is activated (ie. first window is shown)
 
         Arguments:
             _obj: Not used
 
-        The Application is about to start. Show all default windows and
-        possibly all windows that were open during last session.
+        The Application is about to start. Show default window(s) or possibly
+        all windows that were open during the last session.
         """
 
-        # restore all windows from prev session
-        print("activate")
-        # print("cnapp restore session:", C_RESTORE_SESSION)
-        # print("cnapp restore session:", self._restore_session)
+        # get state from file
+        # NB: at this point, self._dict_state is def state in init
+        tmp_state = CF.load_dicts([self._path_state], {})
 
-        # no restore or no file - add default window
-        if self._path_state is None or len(self._dict_state) == 0:
-            self.add_new_window(self._def_class)
-            return
+        # if there is a state in the file, use that
+        if len(tmp_state) > 0:
+            self._dict_state = tmp_state
 
-        # add all known windows to app's window list
-        # for name_win, class_win in self._dict_state.items():
-        #     self.add_instance(name_win, class_win)
-        # TODO: apply dict state
-        for _k, v in self._dict_state.items():
-            self.add_existing_window(v.class_name, v.name_win)
+        # loop through each window that needs to be shown
+        for name_win, state_win in self._dict_state.items():
+
+            # get class
+            mod_class_name = state_win[self.KEY_CLASS].split(".")
+            mod_name = mod_class_name[0]
+            class_name = mod_class_name[1]
+            mod = importlib.import_module(mod_name)
+            class_win = getattr(mod, class_name)
+
+            # add class instance using info from self._dict_state
+            self.add_window(class_win, name_win, state_win)
 
     # --------------------------------------------------------------------------
     # Called when the Application is stopped (ie. last window is closed, dock
     # menu quit, top bar quit, etc.)
     # --------------------------------------------------------------------------
-    def _shutdown(self, _obj):
+    def _evt_app_shutdown(self, _obj):
         """
         Called when the Application is stopped (ie. last window is closed, dock
         menu quit, top bar quit, etc.)
@@ -494,22 +348,30 @@ class CNApp(Gtk.Application):
         Arguments:
             _obj: Not used
 
-
         This method removes any windows left in the list when tha application
         quits.
         """
 
-        # TODO: what to do with this?
-        print("shutdown")
-        print("cnapp save session:", self._path_state)
+        # TODO: is this called before or after windows are destroyed?
+        # if before, can just call get_state on all remaining windows
+        # if after, get_state must be called in each window's destroy method
+        print("shutdown: ", len(self._dict_inst))
 
-        # FIXME: loop through all windows and build state dict
-        dict_state = {}
-        for k, v in self._dict_inst.items():
-            dict_state[k] = v.get_state()
-            v.window.delete()
+        # save _dict_state to _path_state
+        CF.save_dict([self._path_state], self._dict_state)
 
-        CF.save_dict([self._path_state], dict_state)
+        # TODO: is any of this needed?
+
+        # start with a fresh dict
+        # dict_state = {}
+
+        # # loop through all existing windows
+        # for k, v in self._dict_inst.items():
+        #     # dict_state[k] = v.get_state()
+        #     # simulate the 'X' button in window's title bar
+        #     v.window.destroy()
+
+        # CF.save_dict([self._path_state], dict_state)
         # destroy any windows left in the list
         # for key, value in self._dict_inst.items():
 

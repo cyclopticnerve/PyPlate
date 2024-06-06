@@ -34,10 +34,13 @@ import shutil
 # pylint: disable=import-error
 
 # my imports
-from . import cnconstants as C
 from . import cnfunctions as F
 
 # pylint: enable=import-error
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -52,13 +55,27 @@ class CNPotPy:
     A class to handle making the different I18N files needed for a Python
     project
 
-    Public ethods:
+    Public methods:
         main: Run the program
         make_desktop: Make a desktop file
 
     This class provides methods to create .pot, .po, .mo, and .desktop files
     for internationalizing a Python or PyGObject project.
     """
+
+    # default locale dir under src
+    DEF_DIR_LOCALE = "locale"
+    # default po dir under src
+    DEF_DIR_PO = "po"
+    # default encoding for .pot and .po files
+    DEF_CHARSET = "UTF-8"
+
+    # this is the default subdir for GNU
+    # NB: DO NOT CHANGE THIS! i only put it here because it is a string
+    DIR_MESSAGES = "LC_MESSAGES"
+    # the file to store all wlangs for bulk operations
+    # NB: DO NOT CHANGE THIS! i only put it here because it is a string
+    FILE_LINGUAS = "LINGUAS"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -155,14 +172,14 @@ class CNPotPy:
 
         # fix up dir_locale
         if dir_locale is None:
-            dir_locale = self._dir_src / C.POT_DEF_DIR_LOCALE
+            dir_locale = self._dir_src / self.DEF_DIR_LOCALE
         elif not dir_locale.is_absolute():
             dir_locale = self._dir_src / dir_locale
         self._dir_locale = dir_locale
 
         # fix up dir_po
         if dir_po is None:
-            dir_po = self._dir_src / C.POT_DEF_DIR_PO
+            dir_po = self._dir_src / self.DEF_DIR_PO
         elif not dir_po.is_absolute():
             dir_po = self._dir_src / dir_po
         self._dir_po = dir_po
@@ -187,7 +204,7 @@ class CNPotPy:
 
         # fix up charset
         if charset is None:
-            charset = C.POT_DEF_CHARSET
+            charset = self.DEF_CHARSET
         self._charset = charset
 
     # --------------------------------------------------------------------------
@@ -414,7 +431,7 @@ class CNPotPy:
             wlang_name = wlang_po.stem  # es
 
             # get .mo file (output)
-            mo_dir = self._dir_locale / wlang_name / C.POT_DIR_MESSAGES
+            mo_dir = self._dir_locale / wlang_name / self.DIR_MESSAGES
             mo_file = mo_dir / f"{self._str_domain}.mo"
 
             # do the command
@@ -581,14 +598,14 @@ class CNPotPy:
         for wlang in self._list_wlangs:
 
             # make the locale/lang/LC_MESSAGES dir
-            d = self._dir_locale / wlang / C.POT_DIR_MESSAGES
+            d = self._dir_locale / wlang / self.DIR_MESSAGES
             Path.mkdir(d, parents=True, exist_ok=True)
 
             # add each wlang to LINGUAS file
             linguas += wlang + " "
 
         # write the LINGUAS file
-        linguas_path = self._dir_po / C.POT_FILE_LINGUAS
+        linguas_path = self._dir_po / self.FILE_LINGUAS
         with open(linguas_path, "w", encoding="UTF8") as f:
             f.write(linguas)
 

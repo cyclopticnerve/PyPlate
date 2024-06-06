@@ -19,12 +19,39 @@ specified formats.
 # system imports
 from pathlib import Path
 
-# pylint: disable=import-error
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
 
-# my imports
-from . import cnconstants as C
+# # console/terminal values for the individual prefix/connector chars
+# CHAR_VERT = "\u2502"  # vertical join (pipe)
+# CHAR_HORZ = "\u2500"  # horizontal join (full-width dash)
+# CHAR_TEE = "\u251C"  # tee join (not last item)
+# CHAR_ELL = "\u2514"  # elbow join (last item)
+# CHAR_SPACE = " "  # single space char
 
-# pylint: enable=import-error
+# # char sequences for the prefix/connector char sets
+# # NB: these must always be equal length
+# PREFIX_VERT = f"{CHAR_VERT}{CHAR_SPACE}"  # next level ("| ")
+# PREFIX_NONE = f"{CHAR_SPACE}{CHAR_SPACE}"  # skip level ("  ")
+# CONNECTOR_TEE = f"{CHAR_TEE}{CHAR_HORZ}"  # next sub item ("T-")
+# CONNECTOR_ELL = f"{CHAR_ELL}{CHAR_HORZ}"  # last sub item ("L-")
+
+# # the default directory/file name formats
+# # NB: NAME alone is used for the top level directory name
+# # DIR is used for subdirectories and should have a leading space to separate it
+# # from the prefix and/or connector
+# # FILE has the same purpose as DIR, but for files (DUH!)
+# DEF_FORMAT_NAME = "$NAME"
+# DEF_FORMAT_DIR = f" {DEF_FORMAT_NAME}/"
+# DEF_FORMAT_FILE = f" {DEF_FORMAT_NAME}"
+
+# # custom error strings
+# # I18N: the specified value is not a directory
+# ERR_NOT_A_DIR = '"{}" is not a directory'
+
+# # custom sorting order
+# SORT_ORDER = "_."  # sort first char of name in this order (above ord)
 
 # ------------------------------------------------------------------------------
 # Generate a file tree in text format with the names formatted according to some
@@ -41,6 +68,36 @@ class CNTree:
     This class builds the tree as a complete string, ready to be printed to
     stdout or a file.
     """
+
+    # console/terminal values for the individual prefix/connector chars
+    CHAR_VERT = "\u2502"  # vertical join (pipe)
+    CHAR_HORZ = "\u2500"  # horizontal join (full-width dash)
+    CHAR_TEE = "\u251C"  # tee join (not last item)
+    CHAR_ELL = "\u2514"  # elbow join (last item)
+    CHAR_SPACE = " "  # single space char
+
+    # char sequences for the prefix/connector char sets
+    # NB: these must always be equal length
+    PREFIX_VERT = f"{CHAR_VERT}{CHAR_SPACE}"  # next level ("| ")
+    PREFIX_NONE = f"{CHAR_SPACE}{CHAR_SPACE}"  # skip level ("  ")
+    CONNECTOR_TEE = f"{CHAR_TEE}{CHAR_HORZ}"  # next sub item ("T-")
+    CONNECTOR_ELL = f"{CHAR_ELL}{CHAR_HORZ}"  # last sub item ("L-")
+
+    # the default directory/file name formats
+    # NB: NAME alone is used for the top level directory name
+    # DIR is used for subdirectories and should have a leading space to
+    # separate it from the prefix and/or connector
+    # FILE has the same purpose as DIR, but for files (DUH!)
+    DEF_FORMAT_NAME = "$NAME"
+    DEF_FORMAT_DIR = f" {DEF_FORMAT_NAME}/"
+    DEF_FORMAT_FILE = f" {DEF_FORMAT_NAME}"
+
+    # custom error strings
+    # I18N: the specified value is not a directory
+    ERR_NOT_A_DIR = '"{}" is not a directory'
+
+    # custom sorting order
+    SORT_ORDER = "_."  # sort first char of name in this order (above ord)
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -72,8 +129,8 @@ class CNTree:
         # NB: probably not needed, just a sanity check
         self._start_dir = Path("")
         self._filter_list = []
-        self._dir_format = C.TREE_DEF_FORMAT_DIR
-        self._file_format = C.TREE_DEF_FORMAT_FILE
+        self._dir_format = self.DEF_FORMAT_DIR
+        self._file_format = self.DEF_FORMAT_FILE
         self._dirs_only = False
         self._ignore_case = True
         self._root_lead = ""
@@ -128,9 +185,9 @@ class CNTree:
         https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
 
         The format strings for directory and file names will have the value
-        of "C.TREE_FORMAT_NAME" replaced by the directory or file name.
+        of "FORMAT_NAME" replaced by the directory or file name.
 
-        Example: (assuming C.TREE_FORMAT_NAME is set to "$NAME")
+        Example: (assuming FORMAT_NAME is set to "$NAME")
 
             dir_format = " [] $NAME/"
             item.name = "Foo"
@@ -169,8 +226,8 @@ class CNTree:
         # _sanitize* functions. just a sanity check
         self._start_dir = Path("")  # will set in sanitizer
         self._filter_list = []  # will set in sanitizer
-        self._dir_format = C.TREE_DEF_FORMAT_DIR
-        self._file_format = C.TREE_DEF_FORMAT_FILE
+        self._dir_format = self.DEF_FORMAT_DIR
+        self._file_format = self.DEF_FORMAT_FILE
         self._dirs_only = dirs_only
         self._ignore_case = ignore_case
         self._root_lead = ""
@@ -184,7 +241,7 @@ class CNTree:
 
         # this exception gets raised if start_dir is None or not a dir
         except OSError as exception:
-            err_string = C.TREE_ERR_NOT_A_DIR.format(start_dir)
+            err_string = self.ERR_NOT_A_DIR.format(start_dir)
             raise OSError(err_string) from exception
 
         # sanitize the filter list
@@ -298,7 +355,7 @@ class CNTree:
             file_format: Format to use for file names
 
         Ensures that the user entered a correctly formatted format string,
-        which is to say it includes the C.TREE_FORMAT_NAME.
+        which is to say it includes the FORMAT_NAME.
         """
 
         # set directory/file format
@@ -306,10 +363,10 @@ class CNTree:
         # build_tree(... dir_format=None)
         # or
         # build_tree(..., dir_format="")
-        # also check that the format string contains C.TREE_FORMAT_NAME
-        if dir_format and C.TREE_DEF_FORMAT_NAME in dir_format:
+        # also check that the format string contains FORMAT_NAME
+        if dir_format and self.DEF_FORMAT_NAME in dir_format:
             self._dir_format = dir_format
-        if file_format and C.TREE_DEF_FORMAT_NAME in file_format:
+        if file_format and self.DEF_FORMAT_NAME in file_format:
             self._file_format = file_format
 
     # --------------------------------------------------------------------------
@@ -323,7 +380,7 @@ class CNTree:
         the tree. The root folder should have no spaces (left-aligned) and
         each subsequent entry should add the number of spaces in a
         directory's format name. This allows us to align the connector with
-        the index of the C.TREE_FORMAT_NAME variable.
+        the index of the FORMAT_NAME variable.
         """
 
         # get the leads (extra indents to line up the pipes/tees/ells)
@@ -333,11 +390,11 @@ class CNTree:
         root_fmt = self._dir_format.lstrip()
 
         # set root lead as string
-        root_lead_count = root_fmt.find(C.TREE_DEF_FORMAT_NAME)
+        root_lead_count = root_fmt.find(self.DEF_FORMAT_NAME)
         self._root_lead = " " * root_lead_count
 
         # set directory lead as string
-        dir_lead_count = self._dir_format.find(C.TREE_DEF_FORMAT_NAME)
+        dir_lead_count = self._dir_format.find(self.DEF_FORMAT_NAME)
         self._dir_lead = " " * dir_lead_count
 
     # --------------------------------------------------------------------------
@@ -358,11 +415,11 @@ class CNTree:
         This function creates a dict in the form of:
         {char:index[, ...]}
         where:
-        char is the character in the C.TREE_SORT_ORDER string
+        char is the character in the SORT_ORDER string
         index is the ordinal of that char (starting at the lowest negative
         ordinal)
         so that:
-        C.TREE_SORT_ORDER = "_."
+        SORT_ORDER = "_."
         results in:
         self._sort_order = {"_": -2, ".": -1}
 
@@ -371,10 +428,10 @@ class CNTree:
         """
 
         # get length of string to count backwards
-        sort_len = len(C.TREE_SORT_ORDER)
+        sort_len = len(self.SORT_ORDER)
 
         # for each char in string
-        for index, char in enumerate(C.TREE_SORT_ORDER):
+        for index, char in enumerate(self.SORT_ORDER):
             # make a dict entry for the char and its new ord
             self._sort_order[char] = index - sort_len
 
@@ -391,9 +448,7 @@ class CNTree:
 
         # format the root directory name to a display name and add it
         fmt_root = self._dir_format.lstrip()
-        rep_name = fmt_root.replace(
-            C.TREE_DEF_FORMAT_NAME, self._start_dir.name
-        )
+        rep_name = fmt_root.replace(self.DEF_FORMAT_NAME, self._start_dir.name)
         self._tree.append(rep_name)
 
     # --------------------------------------------------------------------------
@@ -451,16 +506,16 @@ class CNTree:
         for index, item in enumerate(items):
             # get the type of connector based on position in enum
             connector = (
-                C.TREE_CONNECTOR_TEE
+                self.CONNECTOR_TEE
                 if index < (count - 1)
-                else C.TREE_CONNECTOR_ELL
+                else self.CONNECTOR_ELL
             )
 
             # get format string based on whether it is a dir or file
             fmt = self._dir_format if item.is_dir() else self._file_format
 
             # replace name in format string
-            rep_name = fmt.replace(C.TREE_DEF_FORMAT_NAME, item.name)
+            rep_name = fmt.replace(self.DEF_FORMAT_NAME, item.name)
 
             # add the item to the tree
             self._tree.append(
@@ -494,9 +549,7 @@ class CNTree:
         """
 
         # add a vert or a blank
-        prefix += (
-            C.TREE_PREFIX_VERT if index < (count - 1) else C.TREE_PREFIX_NONE
-        )
+        prefix += self.PREFIX_VERT if index < (count - 1) else self.PREFIX_NONE
 
         # add some spacing
         prefix += self._dir_lead

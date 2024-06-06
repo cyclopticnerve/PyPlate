@@ -26,7 +26,6 @@ Functions:
 
 # system imports
 import json
-import gettext
 from pathlib import Path
 import shlex
 import subprocess
@@ -34,15 +33,13 @@ import subprocess
 # pylint: disable=import-error
 
 # my imports
-from . import cnconstants as C
+# from . import cnconstants as C
 
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
-# Macros
+# Constants
 # ------------------------------------------------------------------------------
-
-_ = gettext.gettext
 
 # ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
@@ -108,8 +105,7 @@ def dpretty(dict_print, indent_size=4, indent_level=0, label=None):
 
     # sanity check
     if not isinstance(dict_print, dict):
-        # I18N: the parameter type is not a dictionary
-        raise OSError(_("dict_print param is not a dict"))
+        raise OSError("dict_print param is not a dict")
 
     # default out
     out = ""
@@ -209,7 +205,7 @@ def lpretty(list_print, indent_size=4, indent_level=0, label=None):
     # sanity check
     if not isinstance(list_print, list):
         # I18N: the parameter type is not a list
-        raise OSError(_("list_print param is not a list"))
+        raise OSError("list_print param is not a list")
 
     # default out
     out = ""
@@ -418,6 +414,9 @@ def load_dicts(paths, start_dict=None):
     combine them.
     """
 
+    err_not_exist = "config file '{}' does not exist"
+    err_not_valid = "config file '{}' is not a valid JSON file"
+
     # set the default result
     if start_dict is None:
         start_dict = {}
@@ -430,7 +429,7 @@ def load_dicts(paths, start_dict=None):
 
         # sanity check
         if path is None:
-            print(C.CFG_ERR_NOT_EXIST.format(path))
+            print(err_not_exist.format(path))
             continue
 
         # try each option
@@ -438,7 +437,7 @@ def load_dicts(paths, start_dict=None):
 
             # make sure path is absolute
             if not path.is_absolute():
-                print(C.CFG_ERR_NOT_EXIST.format(path))
+                print(err_not_exist.format(path))
                 continue
 
             # open the file
@@ -451,11 +450,11 @@ def load_dicts(paths, start_dict=None):
 
         # file not found
         except FileNotFoundError:
-            print(C.CFG_ERR_NOT_EXIST.format(path))
+            print(err_not_exist.format(path))
 
         # file mot JSON
         except json.JSONDecodeError:
-            print(C.CFG_ERR_NOT_VALID.format(path))
+            print(err_not_valid.format(path))
 
     # return the final dict
     return start_dict
@@ -477,6 +476,8 @@ def save_dict(paths, dict_):
     Save the dictionary to a file at all the specified locations.
     """
 
+    err_not_create = "config file '{}' could not be created"
+
     # loop through possible files
     for path in paths:
 
@@ -488,7 +489,7 @@ def save_dict(paths, dict_):
 
             # make sure path is absolute
             if not path.is_absolute():
-                print(C.CFG_ERR_NOT_CREATE.format(path))
+                print(err_not_create.format(path))
                 continue
 
             # first make dirs
@@ -504,6 +505,6 @@ def save_dict(paths, dict_):
 
         # raise an OS Error
         except OSError:
-            print(C.CFG_ERR_NOT_CREATE.format(path))
+            print(err_not_create.format(path))
 
 # -)

@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 
 """
-A package containing boilerplace code for cyclopticnerve programs
+A package containing boilerplate code for cyclopticnerve programs
 """
 
 # -)
