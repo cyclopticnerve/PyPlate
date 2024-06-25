@@ -203,7 +203,8 @@ class CNApp(Gtk.Application):
         Add a new window instance with the specified name and class
 
         Arguments:
-            class_win: The subclass of CNWindow to create
+            class_win: The subclass of CNWindow to create, passed as a string
+            in the form of "module_name.Class_Name"
             name_win: The unique name to store in the backing dict
             state_win: The dict of properties, such as size and control values,
             for the new window
@@ -217,8 +218,53 @@ class CNApp(Gtk.Application):
             print("window name exists")
             return
 
+        # this was a really hard piece of code to write, and it is U.G.L.Y. it
+        # ain't got no alibi. it's ugly. i'm still not sure if it is the right
+        # way to do this... basically what's going on here is: to create a
+        # window, we need a "handler" class. something to handle the clicks and
+        # clacks of the gui, which is stored in a module. which is just a text
+        # file, stored on some medium (disk drive, etc.) that text file is
+        # "tangible", that is we can see and interact directly with the code.
+        # we can use that text file to create an "intangible" object (oh hey
+        # OOP!) but if we want to load/save state, we need to know the class of
+        # the object, and it's props, so we can recreate it on the next run.
+        # but here's the kicker: since we are using json to save/load the
+        # state, we can only use simple scalar types like integers, booleans,
+        # and strings (yes i know about pickle files, but that is beyond
+        # complicated, and i'm too old/stupid/lazy to get into that, uh, jar of
+        # pickles? LOL see what i did there? look ma i made a pun!) so if we
+        # can only read/write simple scalar types, the best to use for
+        # complicated expressions is a string. so i thought the best way to
+        # refer to this intangible object in a tangible way was to store the
+        # module name and class name in a fixed way, and do it the same way
+        # Python does for im;orts - a filename-dot-classname.
+        # you will need to provide the path to the module, but that should
+        # already be handled by the template code, so a simple DIR_SELF /
+        # "module_name.Class_Name" should suffice.
+
+        # split the class name into module name / internal class name in the
+        # module
+        mod_class_name = class_win.split(".")
+        mod_name = mod_class_name[0]
+        class_name = mod_class_name[1]
+
+        # this is probably the part i like LEAST about this code
+        # mucking around in the Python import system gives me angina
+
+        # first we load the module (this is like the import statements at the
+        # top of this file, but done dynamically, so we don't need to know the
+        # filename beforehand)
+        mod = importlib.import_module(mod_name)
+
+        # here we use introspection (i know that's what it's called in c/c++,
+        # is that what python people call it too?) to find the class inside the
+        # module (this also feels ugly to me. i feel like you should know an
+        # object without having to say, "hey, give me all the names of your
+        # properties and methods, and i'll try to use the right one")
+        class_win_real = getattr(mod, class_name)
+
         # create the window instance
-        inst_win = class_win(self, name_win, state_win)
+        inst_win = class_win_real(self, name_win, state_win)
 
         # add the window to the app
         super().add_window(inst_win.window)
@@ -326,15 +372,12 @@ class CNApp(Gtk.Application):
         # loop through each window that needs to be shown
         for name_win, state_win in self._dict_state.items():
 
-            # get class
-            mod_class_name = state_win[self.KEY_CLASS].split(".")
-            mod_name = mod_class_name[0]
-            class_name = mod_class_name[1]
-            mod = importlib.import_module(mod_name)
-            class_win = getattr(mod, class_name)
+            # get the class as a string and let add_window handle the parsing
+            # and conversion to a class
+            mod_class_name = state_win[self.KEY_CLASS]
 
             # add class instance using info from self._dict_state
-            self.add_window(class_win, name_win, state_win)
+            self.add_window(mod_class_name, name_win, state_win)
 
     # --------------------------------------------------------------------------
     # Called when the Application is stopped (ie. last window is closed, dock

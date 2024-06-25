@@ -204,7 +204,7 @@ def lpretty(list_print, indent_size=4, indent_level=0, label=None):
 
     # sanity check
     if not isinstance(list_print, list):
-        # I18N: the parameter type is not a list
+        # the parameter type is not a list
         raise OSError("list_print param is not a list")
 
     # default out
