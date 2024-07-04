@@ -26,10 +26,10 @@ import sys
 
 # find paths to lib
 # NB: this assumes cnlib is a "sister" folder to cnapplib
-DIR_LIB = Path(__file__).parents[1].resolve()
+DIR_CNLIB = Path(__file__).parents[1].resolve()
 
 # add paths to import search
-sys.path.append(str(DIR_LIB))
+sys.path.append(str(DIR_CNLIB))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -154,16 +154,23 @@ class CNWindow:
         # dict_state
 
         # make a def state dict
-        def_state = self.get_state()
+        # def_state = self.get_state()
+        def_state = {}
+        def_state[A.KEY_SIZE] = self._get_size()
+        def_state[A.KEY_CTLS] = self._get_ctls()
+        def_state[A.KEY_TITLE] = self.get_title()
 
         # combine state dicts
         # order of precedence is:
         # 1. values from ui file (def_state)
         # 2. values passed in from user (param dict_state)
-        self._dict_state = CF.combine_dicts(def_state, [dict_state])
+        self._dict_state = CF.combine_dicts(def_state, dict_state)
 
         # apply final state to size/ctls
-        self.set_state()
+        # self.set_state()
+        self._set_size()
+        self._set_ctls()
+        self.set_title(self._dict_state[A.KEY_TITLE])
 
         # ----------------------------------------------------------------------
         # connections
@@ -182,13 +189,13 @@ class CNWindow:
     # --------------------------------------------------------------------------
     # A convenience method to set window size/ctls from state
     # --------------------------------------------------------------------------
-    def set_state(self):
-        """
-        A convenience method to set size/ctls from state
-        """
+    # def set_state(self):
+    #     """
+    #     A convenience method to set size/ctls from state
+    #     """
 
-        self._set_size()
-        self._set_ctls()
+    #     self._set_size()
+    #     self._set_ctls()
 
     # --------------------------------------------------------------------------
     # A convenience method to get size/ctls from window
@@ -198,15 +205,16 @@ class CNWindow:
         A convenience method to get size/ctls from window
         """
 
-        # the default result is an empty dict
-        result = {}
+        # # the default result is an empty dict
+        # result = {}
 
-        # state = size/ctls
-        result[A.KEY_SIZE] = self._get_size()
-        result[A.KEY_CTLS] = self._get_ctls()
+        # # state = size/ctls
+        # result[A.KEY_SIZE] = self._get_size()
+        # result[A.KEY_CTLS] = self._get_ctls()
 
+        # # return result
         # return result
-        return result
+        return self._dict_state
 
     # --------------------------------------------------------------------------
     # Sets the window title without borking modified indicator
@@ -494,6 +502,7 @@ class CNWindow:
 
         # always save size, don't care about ctls
         self._dict_state[A.KEY_SIZE] = self._get_size()
+        self._dict_state[A.KEY_TITLE] = self.get_title()
 
         # don't allow close, don't need ctls
         if self._close_action == A.CLOSE_ACTION_CANCEL:
@@ -585,7 +594,6 @@ class CNWindow:
         remove the window from the app's internal list.
         """
 
-        self._dict_state[]
         # remove the window from app list
         self._app.remove_window(self.name)
 

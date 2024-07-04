@@ -41,6 +41,7 @@ import subprocess
 # Constants
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
 # ------------------------------------------------------------------------------
@@ -289,7 +290,7 @@ def pp(obj, indent_size=4, label=None):
         (default: 4)
         label: The string to use as a label (default: None)
 
-    
+
     Formats a dictionary or list nicely and prints it to the console. Note that
     this method includes magic commas in the output, and therefore cannot be
     used to create true JSON-compatible strings. It should only be used for
@@ -310,56 +311,54 @@ def pp(obj, indent_size=4, label=None):
 
 
 # ------------------------------------------------------------------------------
-# Update a dictionary with one or more dictionaries
+# Update a dictionary with entries from another dict
 # ------------------------------------------------------------------------------
-def combine_dicts(dict_old, dict_new):
+def combine_dicts(dict_new, dict_old):
     """
-    Update a dictionary with one or more dictionaries
+    Update a dictionary with entries from another dict
 
     Arguments:
+        dict_new: A dictionary containing new keys/values to be updated in the
+        old dictionary
         dict_old: The dictionary defined as the one to receive updates
-        dict_new: An array of  dictionaries containing new keys/values to be
-        updated in the old dictionary
 
     Returns:
         The updated dict_old, filled with updates from dict_new
 
     This function takes key/value pairs from dict_new and adds/overwrites these
-    keys and values in dict_old, preserving any values that are blank or
-    None in dict_new.
+    keys and values in dict_old, preserving any values that are blank or None
+    in dict_new. It is also recursive, so a dict or list as a value will be
+    handled correctly.
     """
 
     # sanity check
-    if dict_new is None or len(dict_new) == 0:
+    if len(dict_new) == 0:
         return dict_old
 
-    # go through each dict
-    for dict_n in dict_new:
+    # for each k,v pair in dict_n
+    for k, v in dict_new.items():
+        # copy whole value if key is missing
+        if not k in dict_old:
+            dict_old[k] = v
 
-        # for each k,v pair in dict_n
-        for k, v in dict_n.items():
-            # copy whole value if key is missing
-            if not k in dict_old:
-                dict_old[k] = v
+        # if the key is present in both
+        else:
+            # if the value is a dict
+            if isinstance(v, dict):
+                # start recursing
+                # recurse using the current key and value
+                dict_old[k] = combine_dicts(v, dict_old[k])
 
-            # if the key is present in both
+            # if the value is a list
+            elif isinstance(v, list):
+                list_old = dict_old[k]
+                for list_item in v:
+                    list_old.append(list_item)
+
+            # if the value is not a dict or a list
             else:
-                # if the value is a dict
-                if isinstance(v, dict):
-                    # start recursing
-                    # recurse using the current key and value
-                    dict_old[k] = combine_dicts(dict_old[k], [v])
-
-                # if the value is a list
-                elif isinstance(v, list):
-                    l_old = dict_old[k]
-                    for l_item in v:
-                        l_old.append(l_item)
-
-                # if the value is not a dict or a list
-                else:
-                    # just copy value from one dict to the other
-                    dict_old[k] = v
+                # just copy value from one dict to the other
+                dict_old[k] = v
 
     # return the updated dict_old
     return dict_old
@@ -392,6 +391,7 @@ def sh(string):
     # return the result
     return res
 
+
 # --------------------------------------------------------------------------
 # Combines dictionaries from all found paths
 # --------------------------------------------------------------------------
@@ -400,12 +400,13 @@ def load_dicts(paths, start_dict=None):
     Combines dictionaries from all found paths
 
     Arguments:
-        paths: The list of file paths to load from
+        paths: The list of file paths to load
         start_dict: The starting dict and final dict after combining (default:
         None)
 
-    Returns: The combined dictionary
-    
+    Returns:
+        The final combined dictionary
+
     Raises:
         FileNotFoundError: If the file does not exist
         json.JSONDecodeError: If the file is not a valid JSON file
@@ -414,8 +415,8 @@ def load_dicts(paths, start_dict=None):
     combine them.
     """
 
-    err_not_exist = "config file '{}' does not exist"
-    err_not_valid = "config file '{}' is not a valid JSON file"
+    err_not_exist = "dict file '{}' does not exist"
+    err_not_valid = "dict file '{}' is not a valid JSON file"
 
     # set the default result
     if start_dict is None:
@@ -443,32 +444,33 @@ def load_dicts(paths, start_dict=None):
             # open the file
             with open(path, "r", encoding="UTF-8") as a_file:
                 # load dict from file
-                temp_dict = json.load(a_file)
+                new_dict = json.load(a_file)
 
                 # combine new dict with previous
-                start_dict = combine_dicts(start_dict, [temp_dict])
+                start_dict = combine_dicts(new_dict, start_dict)
 
         # file not found
         except FileNotFoundError:
             print(err_not_exist.format(path))
 
-        # file mot JSON
+        # file not JSON
         except json.JSONDecodeError:
             print(err_not_valid.format(path))
 
     # return the final dict
     return start_dict
 
-# --------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # Save a dictionary to all paths
-# --------------------------------------------------------------------------
-def save_dict(paths, dict_):
+# ------------------------------------------------------------------------------
+def save_dict(dict_, paths):
     """
     Save a dictionary to all paths
 
     Arguments:
-        paths: the list of file paths to save to
         dict_: the dictionary to save to the file
+        paths: the list of file paths to save to
 
     Raises:
         OSError: If the file does not exist and can't be created
@@ -476,7 +478,7 @@ def save_dict(paths, dict_):
     Save the dictionary to a file at all the specified locations.
     """
 
-    err_not_create = "config file '{}' could not be created"
+    err_not_create = "dict file '{}' could not be created"
 
     # loop through possible files
     for path in paths:
@@ -506,5 +508,6 @@ def save_dict(paths, dict_):
         # raise an OS Error
         except OSError:
             print(err_not_create.format(path))
+
 
 # -)
