@@ -10,7 +10,6 @@
     path - whole thing
     file - name/ext only
     dir - up to name or if a folder
-[] >2part vars: \b[a-zA-Z]+_[a-zA-Z]+_[a-zA-Z]+
 
 [] check for single quotes: (?<!")"(?!") (skips triple-doubles in docstrings)
 [] also check for empty double quotes: (?<!")""(?!")
@@ -21,7 +20,7 @@
 [] spellcheck
 [] separators ------
 [] over 80 cols
-[] use list/dict comprehensions (look for (for) loops)
+[] use list/dict comprehensions (look for "for" loops)
 [] reduce re flags/groups
 
 [] cli/gui: function/method not called from main: start with underscore

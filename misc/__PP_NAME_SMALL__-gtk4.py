@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PC_NAME_BIG__                                        /          \
-# Filename: __PC_NAME_SMALL__-gtk4.py                             |     ()     |
-# Date    : __PC_DATE__                                           |            |
-# Author  : __PD_AUTHOR__                                         |   \____/   |
-# License : __PD_LICENSE_NAME__                                    \          /
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: __PP_NAME_SMALL__-gtk4.py                             |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """ 
@@ -52,7 +52,7 @@ def main():
     # ------------------------------------------------------------------------------
 
     curr_dir = os.path.dirname(__file__)
-    gui_path = os.path.join(curr_dir, "gui", "__PC_NAME_SMALL__-gtk4.ui")
+    gui_path = os.path.join(curr_dir, "gui", "__PP_NAME_SMALL__-gtk4.ui")
 
     class MyApp(Adw.Application):
         """

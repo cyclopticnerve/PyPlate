@@ -2,8 +2,6 @@
 An example of how to add cnlibs to your script
 """
 
-# TODO: pybaker replace paths to lib
-
 # system imports
 from pathlib import Path
 import sys
@@ -16,12 +14,11 @@ import sys
 # add custom import paths
 
 # find paths to dev or user
-# TODO: make sure the parent name is right
 DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PA_DEV_SRC__":
-    DIR_LIB = Path.home() / "__PC_DEV_PP__" / "lib"
+if DIR_PARENT.name == "__PP_DEV_SRC__":
+    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
 else:
-    DIR_LIB = Path.home() / "__PC_USR_LIB__"
+    DIR_LIB = Path.home() / "__PP_USR_LIB__"
 
 # add lib path to import search
 sys.path.append(str(DIR_LIB))

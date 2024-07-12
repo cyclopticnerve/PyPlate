@@ -24,8 +24,8 @@ from pathlib import Path
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
-PB_SHORT_DESC = "__PM_SHORT_DESC__"
-PB_VERSION = "__PM_VERSION__"
+PB_SHORT_DESC = "__PP_SHORT_DESC__"
+PB_VERSION = "__PP_VERSION__"
 
 # ------------------------------------------------------------------------------
 # Strings
@@ -58,12 +58,12 @@ S_DBG_HELP = "enable debugging option"
 # ------------------------------------------------------------------------------
 # other strings
 
-# shorten sepK_
+# shorten sep
 S = os.sep
 
 # path to prj pyplate files
-S_PP_PRV = f"pyplate{S}private.json"
-S_PP_PRJ = f"pyplate{S}project.json"
+S_PP_PRV = f"pyplate{S}conf{S}private.json"
+S_PP_PRJ = f"pyplate{S}conf{S}project.json"
 
 # ------------------------------------------------------------------------------
 # Path objects
@@ -81,10 +81,10 @@ P_DIR_PP_LIB = P_DIR_PP / "lib"
 
 # Path to PyPlate template
 # (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/)
-P_DIR_PP_TMP = P_DIR_PP / "template"
+P_DIR_PP_TEMPLATE = P_DIR_PP / "template"
 
 # Path to PyPlate template/all
 # (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/all)
-P_DIR_PP_ALL = P_DIR_PP_TMP / "all"
+P_DIR_PP_ALL = P_DIR_PP_TEMPLATE / "all"
 
 # -)

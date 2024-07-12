@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PC_NAME_BIG__                                        /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: appmain.py                                            |     ()     |
-# Date    : __PC_DATE__                                           |            |
-# Author  : __PD_AUTHOR__                                         |   \____/   |
-# License : __PD_LICENSE_NAME__                                    \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -32,7 +32,7 @@ import sys
 
 
 # add lib path to import search
-C_DIR_LIB = "__PC_USR_LIB__"
+C_DIR_LIB = "__PP_USR_LIB__"
 sys.path.append(str(C_DIR_LIB))
 
 # pylint: disable=wrong-import-position
@@ -58,20 +58,20 @@ from cnlib import cnfunctions as CF  # type: ignore
 
 # path to src dir
 # TODO: use install location
-# C_PATH_SRC = Path.home() / ".local/share/__PC_NAME_SMALL__"
+# C_PATH_SRC = Path.home() / ".local/share/__PP_NAME_SMALL__"
 C_PATH_SRC = Path(__file__).parent.resolve()
 
 # get path to config file
-C_PATH_GUI = C_PATH_SRC / "cfg/__PC_NAME_SMALL__.json"
+C_PATH_GUI = C_PATH_SRC / "cfg/__PP_NAME_SMALL__.json"
 
 # get path to main ui file
-C_WIN_MAIN_UI_FILE = C_PATH_SRC / "gtk/__PC_NAME_SMALL__Gtk3.ui"
+C_WIN_MAIN_UI_FILE = C_PATH_SRC / "gtk/__PP_NAME_SMALL__Gtk3.ui"
 
 # properties for whole app
 # NB: THIS DICT MUST BE EDITED BY HAND!!!
 C_DICT_APP = {
     # the application id to use for GTK (default: "org.foo.bar")
-    # AC.KEY_APP_ID: "org.__PD_AUTHOR__.__PC_NAME_SMALL__",
+    # AC.KEY_APP_ID: "org.__PP_AUTHOR__.__PP_NAME_SMALL__",
     # I18N: the location of the locale files (default: "")
     # AC.KEY_APP_LOCALE: DIR_SELF / "locale",
     # list of window classes (default: None)

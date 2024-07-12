@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: project.py                                          |     ()     |
+# Filename: public.py                                             |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -16,16 +16,9 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # ------------------------------------------------------------------------------
 
 # system imports
-import gettext
 import os
 from pathlib import Path
 import re
-
-# ------------------------------------------------------------------------------
-# I18N
-# ------------------------------------------------------------------------------
-
-_ = gettext.gettext
 
 # ------------------------------------------------------------------------------
 # Bools
@@ -48,15 +41,15 @@ S = os.sep
 # base dir for project type folders, relative to dev home
 S_DIR_BASE = f"Documents{S}Projects{S}Python"
 
-# NB: format params are D_TYPES key, D_TYPES val
+# NB: format params are L_TYPES[0], L_TYPES[1]
 S_TYPE_FMT = "{} ({})"
 # join each project type with this
 S_TYPE_JOIN = " | "
 
 # NB: format param is joined list of project types
 S_ASK_TYPE = "Project type [{}]: "
-S_ASK_NAME = _("Project name: ")
-# NB: format params are D_TYPE_SEC[prj_type], __PC_NAME_SMALL__
+S_ASK_NAME = "Project name: "
+# NB: format params are D_TYPE_SEC[prj_type], __PP_NAME_SMALL__
 S_ASK_SEC = "{} name (default: {}): "
 
 # error strings
@@ -115,14 +108,10 @@ S_KEY_GRP_VAL = "S_KEY_GRP_VAL"
 S_KEY_GRP_PAD = "S_KEY_GRP_PAD"
 S_KEY_FMT_VAL_PAD = "S_KEY_FMT_VAL_PAD"
 
-# meta keys
-
-# prj keys
-
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
 # and make any appropriate changes
-# also make sure that these names should not appear in the blacklist, or else
+# also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
 S_ALL_VENV = ".venv"
 S_ALL_CONF = "conf"
@@ -148,14 +137,14 @@ S_DIR_PRJ = (
 )
 
 # paths relative to end user home only
-S_USR_CONF = ".config"  # __PC_NAME_SMALL__ will be appended
-S_USR_SRC = f".local{S}share"  # __PC_NAME_SMALL__ will be appended
+S_USR_CONF = ".config"  # __PP_NAME_SMALL__ will be appended
+S_USR_SRC = f".local{S}share"  # __PP_NAME_SMALL__ will be appended
 S_USR_APPS = f".local{S}share{S}applications"  # for .desktop file
 S_USR_BIN = f".local{S}bin"  # where to put the binary
 
 # this is where the user libs will go
 S_USR_LIB_NAME = "lib"
-S_USR_LIB = f".local{S}share"  # __PD_AUTHOR__/S_USR_LIB_NAME will be appended
+S_USR_LIB = f".local{S}share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # NB: these steps are optional
 
@@ -173,6 +162,17 @@ S_TREE_FILE_FORMAT = " [] $NAME"
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
+
+# the types of projects this script can create
+# value[0] is the short display name and the char to enter
+# value[1] is the long display name
+# value[2] is the template folder to copy
+# value[3] id the top level folder to put each project in
+L_TYPES = [
+    ["c", "CLI", "cli", "CLIs"],
+    ["p", "Package", "pkg", "Packages"],
+    ["g", "GUI", "gui", "GUIs"],
+]
 
 # list of keys to find in header
 # L_HEADER = [
@@ -200,24 +200,24 @@ D_PRJ_DEF = {
     # --------------------------------------------------------------------------
     # this stuff should only be set once
     # the author name, used in headers and pyproject.toml
-    "__PD_AUTHOR__": "cyclopticnerve",
+    "__PP_AUTHOR__": "cyclopticnerve",
     # the web url for all projects
-    "__PD_URL__": "https://github.com/cyclopticnerve",
+    "__PP_URL__": "https://github.com/cyclopticnerve",
     # the author's email, used in headers and pyproject.toml
-    "__PD_EMAIL__": "cyclopticnerve@gmail.com",
-    # the license name, used in headers, __PD_README_FILE__, and pyproject.toml
-    "__PD_LICENSE_NAME__": "WTFPLv2",
-    # the license image source, used in __PD_README_FILE__
-    "__PD_LICENSE_IMG__": "https://img.shields.io/badge/License-WTFPL-brightgreen.svg",
+    "__PP_EMAIL__": "cyclopticnerve@gmail.com",
+    # the license name, used in headers, __PP_README_FILE__, and pyproject.toml
+    "__PP_LICENSE_NAME__": "WTFPLv2",
+    # the license image source, used in __PP_README_FILE__
+    "__PP_LICENSE_IMG__": "https://img.shields.io/badge/License-WTFPL-brightgreen.svg",
     # the url for license image click
-    "__PD_LICENSE_LINK__": "http://www.wtfpl.net",
+    "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
     # the license file to use
-    "__PD_LICENSE_FILE__": "LICENSE.txt",
-    # the screenshot to use in  __PD_README_FILE__
-    "__PD_SCREENSHOT__": f"{S_ALL_README}{S}screenshot.png",
+    "__PP_LICENSE_FILE__": "LICENSE.txt",
+    # the screenshot to use in  __PP_README_FILE__
+    "__PP_SCREENSHOT__": f"{S_ALL_README}{S}screenshot.png",
     # version format string for command line (context for pybaker replace)
-    # NB: format param is __PM_VERSION__
-    "__PD_VER_FMT__": "Version {}",
+    # NB: format param is __PP_VERSION__
+    "__PP_VER_FMT__": "Version {}",
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -226,9 +226,9 @@ D_PRJ_DEF = {
     # sure how to proceed but i think for now i will leave this as a
     # user-editable string and place it in the realm of 'edit it before you
     # run' along with author/email/license/etc
-    "__PD_DATE_FMT__": "%m/%d/%Y",
+    "__PP_DATE_FMT__": "%m/%d/%Y",
     # readme file used in pyproject.toml, rel to prj dir
-    "__PD_README_FILE__": "README.md",
+    "__PP_README_FILE__": "README.md",
 }
 
 # these values are string replace only
@@ -237,16 +237,16 @@ D_PRJ_ADD = {
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home dir
     # location of config files, relative to the project dir
-    "__PA_DEV_CONF__": S_ALL_CONF,
+    "__PP_DEV_CONF__": S_ALL_CONF,
     # location of src files, relative to the project dir
-    "__PA_DEV_SRC__": S_ALL_SRC,
+    "__PP_DEV_SRC__": S_ALL_SRC,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    "__PA_USR_APPS__": S_USR_APPS,  # for .desktop file
-    "__PA_USR_BIN__": S_USR_BIN,  # where to put the binary
-    "__PA_DUMMY__": "",  # dummy value to use in headers
-    "__PA_SUPPORT__": S_ALL_SUPPORT, # where is rest of code
-    "__PA_IMAGES__": S_ALL_IMAGES, # where gui images are stored
+    "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
+    "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
+    "__PP_DUMMY__": "",  # dummy value to use in headers
+    "__PP_SUPPORT__": S_ALL_SUPPORT,  # where is rest of code
+    "__PP_IMAGES__": S_ALL_IMAGES,  # where gui images are stored
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -254,40 +254,40 @@ D_PRJ_ADD = {
 D_PRJ_CFG = {
     # --------------------------------------------------------------------------
     # these items will be filled in by _get_project_info
-    "__PC_TYPE_PRJ__": "",  # 'c'
-    "__PC_NAME_BIG__": "",  # PyPlate
-    "__PC_NAME_SMALL__": "",  # pyplate
-    "__PC_NAME_SEC__": "",  # module1.py
-    "__PC_NAME_CLASS__": "",  # Pascal case name for classes
-    "__PC_DATE__": "",  # the date each file was created, updated every time
+    "__PP_TYPE_PRJ__": "",  # 'c'
+    "__PP_NAME_BIG__": "",  # PyPlate
+    "__PP_NAME_SMALL__": "",  # pyplate
+    "__PP_NAME_SEC__": "",  # module1.py
+    "__PP_NAME_CLASS__": "",  # Pascal case name for classes
+    "__PP_DATE__": "",  # the date each file was created, updated every time
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
-    # "__PC_DEV_LIB__": "",  # location of cnlibs dir in PyPlate
-    "__PC_DEV_PP__": "",  # location of real pybaker in PyPlate, rel to dev home
+    # "__PP_DEV_LIB__": "",  # location of cnlibs dir in PyPlate
+    "__PP_DEV_PP__": "",  # location of real pybaker in PyPlate, rel to dev home
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the user's home dir
-    "__PC_USR_CONF__": "",  # config dir
-    "__PC_USR_LIB__": "",  # location of cnlibs dir
-    "__PC_USR_SRC__": "",  # where the program will keep it's source
+    "__PP_USR_CONF__": "",  # config dir
+    "__PP_USR_LIB__": "",  # location of cnlibs dir
+    "__PP_USR_SRC__": "",  # where the program will keep it's source
 }
 
 # these are settings that will be changed before running pybaker.py
 # consider them the "after create" settings
 D_PRJ_META = {
-    # the version number to use in __PD_README_FILE__ and pyproject.toml
-    "__PM_VERSION__": "0.0.0",
-    # the short description to use in __PD_README_FILE__ and pyproject.toml
-    "__PM_SHORT_DESC__": "",
+    # the version number to use in __PP_README_FILE__ and pyproject.toml
+    "__PP_VERSION__": "0.0.0",
+    # the short description to use in __PP_README_FILE__ and pyproject.toml
+    "__PP_SHORT_DESC__": "",
     # the keywords to use in pyproject.toml and github
-    "__PM_KEYWORDS__": [],
-    # the python dependencies to use in __PD_README_FILE__, pyproject.toml, github,
+    "__PP_KEYWORDS__": [],
+    # the python dependencies to use in __PP_README_FILE__, pyproject.toml, github,
     # and install.py
-    "__PM_PY_DEPS__": {},
-    # the system dependencies to use in __PD_README_FILE__, github.com, and
+    "__PP_PY_DEPS__": {},
+    # the system dependencies to use in __PP_README_FILE__, github.com, and
     # install.py
-    "__PM_SYS_DEPS__": [],
+    "__PP_SYS_DEPS__": [],
     # the categories to use in .desktop for gui apps
-    "__PM_GUI_CATS__": [],
+    "__PP_GUI_CATS__": [],
 }
 
 # the lists of dirs/files we don't mess with while running pymaker
@@ -376,7 +376,7 @@ D_I18N = {
     # dict of clangs and no exts (ie file names)
     S_KEY_NO_EXT: {
         "Python": [
-            "__PC_NAME_SMALL__",
+            "__PP_NAME_SMALL__",
         ],
     },
     S_KEY_LOCALE: S_ALL_LOCALE,
@@ -394,26 +394,14 @@ D_COPY = {
     f"{S_ALL_MISC}{S}style.txt": f"{S_ALL_MISC}{S}style.txt",
 }
 
-# the types of projects this script can create
-# key is the short type name (used for entry)
-# val is the long type name (used for display and the folder under _DIR_BASE
-# where the project will be created
-# NB: also, keys here need to be names of folders under template
-D_TYPES = {
-    "c": "CLI",
-    "g": "GUI",
-    "p": "Package",
-}
-
 # files to remove after the project is done
 # paths are relative to project dir
-# key is prj type key from D_TYPES
+# key is prj type key from L_TYPES[0]
 # val is path relative to dir_prj
 D_PURGE = {"p": [Path(S_ALL_TESTS) / "ABOUT"]}
-# D_PURGE = {}
 
 # the dict of sections to remove in the README file
-# key is the project type we are making
+# key is the project type we are making (from L_TYPES[2], the template src dir)
 # or a special section of the readme
 # rm_delete_start is the tag at the start of the section to remove
 # rm_delete_end is the tag at the end of the section to remove
@@ -428,15 +416,15 @@ D_README = {
         "RM_LICENSE_START": "<!-- __RM_LICENSE_START__ -->",
         "RM_LICENSE_END": "<!-- __RM_LICENSE_END__ -->",
     },
-    "c": {
+    "cli": {
         "RM_DELETE_START": "<!-- __RM_PKG_START__ -->",
         "RM_DELETE_END": "<!-- __RM_PKG_END__ -->",
     },
-    "g": {
+    "gui": {
         "RM_DELETE_START": "<!-- __RM_PKG_START__ -->",
         "RM_DELETE_END": "<!-- __RM_PKG_END__ -->",
     },
-    "p": {
+    "pkg": {
         "RM_DELETE_START": "<!-- __RM_APP_START__ -->",
         "RM_DELETE_END": "<!-- __RM_APP_END__ -->",
     },
@@ -556,13 +544,13 @@ def do_before_fix():
     # TODO: do this stuff in pybaker
 
     # get values after pymaker has set them
-    author = D_PRJ_DEF["__PD_AUTHOR__"]
-    name_small = D_PRJ_CFG["__PC_NAME_SMALL__"]
+    author = D_PRJ_DEF["__PP_AUTHOR__"]
+    name_small = D_PRJ_CFG["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    D_PRJ_CFG["__PC_USR_CONF__"] = f"{S_USR_CONF}{S}{name_small}"
-    D_PRJ_CFG["__PC_USR_SRC__"] = f"{S_USR_SRC}{S}{name_small}"
-    D_PRJ_CFG["__PC_USR_LIB__"] = f"{S_USR_LIB}{S}{author}{S}{S_USR_LIB_NAME}"
+    D_PRJ_CFG["__PP_USR_CONF__"] = f"{S_USR_CONF}{S}{name_small}"
+    D_PRJ_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}{S}{name_small}"
+    D_PRJ_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}{S}{author}{S}{S_USR_LIB_NAME}"
 
 
 # --------------------------------------------------------------------------
@@ -576,8 +564,8 @@ def do_after_fix():
     all files have been modified.
     """
 
-    # TODO:move _fix_readme call from _do_fix to here - should not be built-in
-    # TODO : move any stuff that should not be built-in in _do_after_fix to
+    # TODO: move _fix_readme call from _do_fix to here - should not be built-in
+    # TODO: move any stuff that should not be built-in in _do_after_fix to
     # here
 
 

@@ -177,7 +177,7 @@ The default 'blacklist.json' file should look something like this:
         "locale"
     ],
     "skip_file": [
-        "__PC_NAME_SMALL__.png"
+        "__PP_NAME_SMALL__.png"
     ],
     "skip_header": [],
     "skip_text": [
@@ -305,9 +305,9 @@ This the basic structure of 'settings.json':
         "type": "c"
     },
     "info": {
-        "__PC_NAME_BIG__": "CLITest",
-        "__PC_NAME_SMALL__": "clitest",
-        "__PC_DATE__": "06/23/2023"
+        "__PP_NAME_BIG__": "CLITest",
+        "__PP_NAME_SMALL__": "clitest",
+        "__PP_DATE__": "06/23/2023"
     }
 }
 ```

@@ -19,12 +19,12 @@ D_HEADER = {
 }
 
 D_PRJ_REQ = {
-    "__PD_AUTHOR__": "cyclopticnerve",
-    "__PD_LICENSE_NAME__": "WTFPLv2",
-    "__PA_DUMMY__": "",
-    "__PC_NAME_BIG__": "PyPlate",
-    "__PC_NAME_SMALL__": "pyplate",
-    "__PC_DATE__": "04/21/2024",
+    "__PP_AUTHOR__": "cyclopticnerve",
+    "__PP_LICENSE_NAME__": "WTFPLv2",
+    "__PP_DUMMY__": "",
+    "__PP_NAME_BIG__": "PyPlate",
+    "__PP_NAME_SMALL__": "pyplate",
+    "__PP_DATE__": "04/21/2024",
 }
 
 # ------------------------------------------------------------------------------

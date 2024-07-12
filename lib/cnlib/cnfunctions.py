@@ -313,52 +313,55 @@ def pp(obj, indent_size=4, label=None):
 # ------------------------------------------------------------------------------
 # Update a dictionary with entries from another dict
 # ------------------------------------------------------------------------------
-def combine_dicts(dict_new, dict_old):
+def combine_dicts(dicts_new, dict_old):
     """
     Update a dictionary with entries from another dict
 
     Arguments:
-        dict_new: A dictionary containing new keys/values to be updated in the
-        old dictionary
+        dicts_new: A list of dictionaries containing new keys/values to be
+        updated in the old dictionary
         dict_old: The dictionary defined as the one to receive updates
 
     Returns:
         The updated dict_old, filled with updates from dict_new
 
-    This function takes key/value pairs from dict_new and adds/overwrites these
-    keys and values in dict_old, preserving any values that are blank or None
-    in dict_new. It is also recursive, so a dict or list as a value will be
-    handled correctly.
+    This function takes key/value pairs from each of the new dicts and
+    adds/overwrites these keys and values in dict_old, preserving any values
+    that are blank or None in dict_new. It is also recursive, so a dict or list
+    as a value will be handled correctly.
     """
 
     # sanity check
-    if len(dict_new) == 0:
+    if len(dicts_new) == 0:
         return dict_old
 
-    # for each k,v pair in dict_n
-    for k, v in dict_new.items():
-        # copy whole value if key is missing
-        if not k in dict_old:
-            dict_old[k] = v
+    # go through the new dicts in order
+    for dict_new in dicts_new:
 
-        # if the key is present in both
-        else:
-            # if the value is a dict
-            if isinstance(v, dict):
-                # start recursing
-                # recurse using the current key and value
-                dict_old[k] = combine_dicts(v, dict_old[k])
-
-            # if the value is a list
-            elif isinstance(v, list):
-                list_old = dict_old[k]
-                for list_item in v:
-                    list_old.append(list_item)
-
-            # if the value is not a dict or a list
-            else:
-                # just copy value from one dict to the other
+        # for each k,v pair in dict_n
+        for k, v in dict_new.items():
+            # copy whole value if key is missing
+            if not k in dict_old:
                 dict_old[k] = v
+
+            # if the key is present in both
+            else:
+                # if the value is a dict
+                if isinstance(v, dict):
+                    # start recursing
+                    # recurse using the current key and value
+                    dict_old[k] = combine_dicts([v], dict_old[k])
+
+                # if the value is a list
+                elif isinstance(v, list):
+                    list_old = dict_old[k]
+                    for list_item in v:
+                        list_old.append(list_item)
+
+                # if the value is not a dict or a list
+                else:
+                    # just copy value from one dict to the other
+                    dict_old[k] = v
 
     # return the updated dict_old
     return dict_old
@@ -447,7 +450,7 @@ def load_dicts(paths, start_dict=None):
                 new_dict = json.load(a_file)
 
                 # combine new dict with previous
-                start_dict = combine_dicts(new_dict, start_dict)
+                start_dict = combine_dicts([new_dict], start_dict)
 
         # file not found
         except FileNotFoundError:
@@ -484,7 +487,7 @@ def save_dict(dict_, paths):
     for path in paths:
 
         # sanity check
-        path = Path(path)
+        path = Path(path).resolve()
 
         # try each option
         try:

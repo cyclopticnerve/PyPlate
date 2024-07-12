@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PC_NAME_BIG__                                        /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: install.py                                            |     ()     |
-# Date    : __PC_DATE__                                           |            |
-# Author  : __PD_AUTHOR__                                         |   \____/   |
-# License : __PD_LICENSE_NAME__                                    \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -24,14 +24,14 @@ import installerator
 
 # define the install settings
 g_dict_install = {
-    "general": {"name": "__PC_NAME_BIG__"},
+    "general": {"name": "__PP_NAME_BIG__"},
     "preflight": [],
     "deps_py": [],
     "deps_sys": [],
-    "dirs": ["${HOME}/.cyclopticnerve/__PC_NAME_SMALL__"],
+    "dirs": ["${HOME}/.cyclopticnerve/__PP_NAME_SMALL__"],
     "files": {
-        "LICENSE.txt": "${HOME}/.cyclopticnerve/__PC_NAME_SMALL__",
-        "uninstall.py": "${HOME}/.cyclopticnerve/__PC_NAME_SMALL__",
+        "LICENSE.txt": "${HOME}/.cyclopticnerve/__PP_NAME_SMALL__",
+        "uninstall.py": "${HOME}/.cyclopticnerve/__PP_NAME_SMALL__",
     },
     "postflight": [],
 }

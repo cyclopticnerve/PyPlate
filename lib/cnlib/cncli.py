@@ -8,7 +8,7 @@
 
 """
 This is the base class for a CLI program. The template CLI program subclasses
-it. See PyPlate/template/cli/src/__PC_NAME_SMALL__ for an example.
+it. See PyPlate/template/cli/src/__PP_NAME_SMALL__ for an example.
 """
 
 # ------------------------------------------------------------------------------
@@ -236,7 +236,7 @@ class CNCli:
 
         # save dict to path
         if self._path_cfg is not None:
-            F.save_dict([self._path_cfg], self._dict_cfg)
+            F.save_dict(self._dict_cfg, [self._path_cfg])
 
 
 # -)

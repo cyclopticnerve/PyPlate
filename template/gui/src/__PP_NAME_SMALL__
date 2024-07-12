@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PC_NAME_BIG__                                        /          \
-# Filename: __PC_NAME_SMALL__                                     |     ()     |
-# Date    : __PC_DATE__                                           |            |
-# Author  : __PD_AUTHOR__                                         |   \____/   |
-# License : __PD_LICENSE_NAME__                                    \          /
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: __PP_NAME_SMALL__                                     |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -13,11 +13,11 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PC_NAME_SMALL__ [cmd line]
+foo@bar:~[path to directory of this file]$ ./__PP_NAME_SMALL__ [cmd line]
 
 or if installed in a global location:
 
-foo@bar:~$ __PC_NAME_SMALL__ [cmd line]
+foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
 
 Typical usage is show in the main() method.
 """
@@ -40,16 +40,16 @@ import sys
 
 # find paths to dev or user
 DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PA_DEV_SRC__":
+if DIR_PARENT.name == "__PP_DEV_SRC__":
     DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "__PA_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PC_DEV_PP__" / "lib"
-    DIR_SRC = DIR_PRJ / "__PA_DEV_SRC__" / "__PA_SUPPORT__"
+    DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
+    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
+    DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
 else:
     DIR_HOME = Path.home()
-    DIR_CFG = DIR_HOME / "__PC_USR_CONF__"
-    DIR_LIB = DIR_HOME / "__PC_USR_LIB__"
-    DIR_SRC = DIR_HOME / "__PC_USR_SRC__"
+    DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
+    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
+    DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -57,8 +57,8 @@ sys.path.append(str(DIR_SRC))
 
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
-# import cnlib as C  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
+from gui.appmain import AppMain  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -69,9 +69,9 @@ from cnlib.cncli import CNCli  # type: ignore
 # Required for pybaker
 # ------------------------------------------------------------------------------
 
-# globals for pb to find
-PB_SHORT_DESC = "__PM_SHORT_DESC__"
-PB_VERSION = "__PM_VERSION__"
+# globals for pybaker to find
+PB_SHORT_DESC = "__PP_SHORT_DESC__"
+PB_VERSION = "__PP_VERSION__"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -81,7 +81,7 @@ PB_VERSION = "__PM_VERSION__"
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PC_NAME_CLASS__(CNCli):
+class __PP_NAME_CLASS__(CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -91,6 +91,9 @@ class __PC_NAME_CLASS__(CNCli):
     This class does the most of the work of a typical CLI program. It parses
     command line options, loads/saves config files, and performs the operations
     required for the program.
+
+    It also checks for the GUI option on the command line and, if found,
+    creates an object from another script to handle the GUI.
     """
 
     # --------------------------------------------------------------------------
@@ -114,9 +117,9 @@ class __PC_NAME_CLASS__(CNCli):
 
         # set default property values
         # NB: commented props are from super
-        # self._d_args = {}   # from super
-        # self._d_cfg = {}    # from super
-        # self._p_cfg = None  # from super
+        # self._dict_args = {}   # set in super
+        # self._dict_cfg = {}    # set in super
+        # self._path_cfg = None  # set in super
         self._debug = False
 
     # --------------------------------------------------------------------------
@@ -144,7 +147,8 @@ class __PC_NAME_CLASS__(CNCli):
         # main stuff
 
         # do the thing with the thing
-        print(self._func())
+        app = AppMain(self._dict_args)
+        app.run()
 
         # ----------------------------------------------------------------------
         # teardown
@@ -155,35 +159,6 @@ class __PC_NAME_CLASS__(CNCli):
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Short description
-    # --------------------------------------------------------------------------
-    def _func(self):
-        """
-        Short description
-
-        Arguments:
-            var_name: Short description
-
-        Returns:
-            Description
-
-        Raises:
-            exception_type(vars): Description
-
-        Long description (including HTML).
-        """
-
-        # change a value in the config dict
-        self._d_cfg["inside"] = "bar"
-
-        # check for debug flag
-        if self._debug:
-            return "this is func (DEBUG)"
-
-        # no debug, return normal result
-        return "this is func"
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
@@ -206,7 +181,7 @@ class __PC_NAME_CLASS__(CNCli):
         cfg_def = str(DIR_CFG / "cli.json")
 
         # command line cfg is None or str
-        cfg_arg = self._d_args[CNCli.ARG_CFG_DEST]
+        cfg_arg = self._dict_args[CNCli.ARG_CFG_DEST]
 
         # load the config file
         # not using def path, using arg path
@@ -214,11 +189,13 @@ class __PC_NAME_CLASS__(CNCli):
         # using def path, not using arg path
         # super()._load_config(cfg_def, dict_def=self._d_cfg)
         # using def path, using arg path, using internal
-        super()._load_config(cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg)
+        super()._load_config(
+            cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg
+        )
 
         # throw in a debug test
         if self._debug:
-            F.pp(self._d_cfg, label="load cfg:")
+            F.pp(self._dict_cfg, label="load cfg:")
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -234,14 +211,14 @@ class __PC_NAME_CLASS__(CNCli):
         """
 
         # formatted version
-        ver_fmt = "__PD_VER_FMT__".format(PB_VERSION)
+        ver_fmt = "__PP_VER_FMT__".format(PB_VERSION)
 
         # about string
         s_about = (
-            "__PC_NAME_SMALL__\n"
+            "__PP_NAME_SMALL__\n"
             f"{PB_SHORT_DESC}\n"
             f"{ver_fmt}\n"
-            "__PD_URL__/__PC_NAME_BIG__"
+            "__PP_URL__/__PP_NAME_BIG__"
         )
 
         # set help string
@@ -292,6 +269,6 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    __PC_NAME_CLASS__().main()
+    __PP_NAME_CLASS__().main()
 
 # -)

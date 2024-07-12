@@ -1,5 +1,10 @@
 
-
+TODO: fix README instuctions for installing (like where it gets
+installed/uninstalled from)
+TODO: output each step to terminal from pymaker
+TODO: combine all __PP dicts
+TODO: put pyplate/conf/private dicts into one
+TODO: make an html page for checklist.txt and tree.txt that checks all checkboxes for a "complete"
 TODO: tool to scan .ui files and build a stub .py with get/set vals and connect actions
 TODO: multiline comment support for triple quotes
 TODO: html comments also open/close tag, can have code before or after
@@ -89,8 +94,8 @@ TODO: lint (CTRL+S) all files
 
 TODO: in gui, what to set to make name change in top bar/dock 
 step 1: remove .py from main file
-step 2: where is it getting __PC_NAME_SMALL__? from main file?
-if so, need to rename main file to __PC_NAME_BIG__?
+step 2: where is it getting __PP_NAME_SMALL__? from main file?
+if so, need to rename main file to __PP_NAME_BIG__?
 how does that affect other stuff
 also why does it try to load png from current dir? (about dlg!)
 
@@ -139,7 +144,7 @@ NEXT: how to add new items to be replaced?
 all current keywords use a fixed regex but what if we want to do simple text replacement?
 like just replace 'PP_SOMETHING' with 'foobar'?
 NEXT: combine strings.json/blacklist.json
-NEXT: pybaker.py get all dunders from dict? i.e. strings.json uses __PD_XXX__
+NEXT: pybaker.py get all dunders from dict? i.e. strings.json uses __PP_XXX__
 NEXT: check for gtk version 3/4
    does gi.repository have a >= ?
    load ui file based on installed GTK version
@@ -187,7 +192,7 @@ NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.htm
 DONE: markdown needs to ignore hash
 DONE: do_after_fix in code, pub, prv
 DONE: _fix header only looks in lines starting with #, use ^
-DONE: __PC_FILENAME__
+DONE: __PP_FILENAME__
 DONE: order of imports: keys, public, private
 DONE: edit: D_META, D_BLACKLIST, and D_I18N
 DONE: for loops to comprehensions
@@ -249,7 +254,7 @@ DONE: dir - up to name or if a folder
 DONE: run pip freeze into template during copy
 DONE: docs folder is empty in template, so doesn't get into GitHub
 DONE: why does PP_SHORT_DESC/PP_VERSION change in misc/empty_main.py?
-DONE: __PC_NAME_BIG__ in empty_main.py? can we live with one error?
+DONE: __PP_NAME_BIG__ in empty_main.py? can we live with one error?
 DONE: in strings.json, make py deps into dict and add links for README
 DONE: check _split_quote in toml/install
 DONE: gui categories have commas in file, split on comma and join with semicolon
@@ -328,13 +333,13 @@ $ twine upload -r testpypi dist/*
 $ twine upload dist/*
 
 install from testpypi/pypi
-$ python3 -m pip install -i https://test.pypi.org/simple/__PC_NAME_BIG__
-$ python3 -m pip install __PC_NAME_BIG__
+$ python3 -m pip install -i https://test.pypi.org/simple/__PP_NAME_BIG__
+$ python3 -m pip install __PP_NAME_BIG__
 
 install from github
 https://packaging.python.org/en/latest/tutorials/installing-packages/#id23
-python3 -m pip install git+https://github.com/cyclopticnerve/__PC_NAME_BIG__
+python3 -m pip install git+https://github.com/cyclopticnerve/__PP_NAME_BIG__
 requirements? pip install -r requirements.txt
 
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__PC_NAME_BIG__.git#egg=__PC_NAME_BIG__         # from default branch
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__PC_NAME_BIG__.git@maine#egg=__PC_NAME_BIG__   # from specific branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git#egg=__PP_NAME_BIG__         # from default branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_BIG__.git@maine#egg=__PP_NAME_BIG__   # from specific branch
