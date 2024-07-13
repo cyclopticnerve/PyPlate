@@ -15,7 +15,8 @@ required dirs/files for the project type from the template to the specified
 destination, and performs some initial fixes/replacements of text and path
 names in the resulting files.
 
-Run pymaker.py -h for more options.
+Run pymaker -h for more options.
+"""
 
 # ------------------------------------------------------------------------------
 # Imports
