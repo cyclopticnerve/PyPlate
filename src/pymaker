@@ -16,14 +16,6 @@ destination, and performs some initial fixes/replacements of text and path
 names in the resulting files.
 
 Run pymaker.py -h for more options.
-"""
-
-# FIXME: -c option should override def, but not internal
-# i.e. if a key is NOT in c, but IS in def or internal, DO NOT USE
-# more specifically, the internal def is used the first time the program is run
-# these values can be modified in the program
-# this dict is saved to the def location
-# all subsequent runs read/write the def file
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -360,7 +352,7 @@ class PyMaker:
         # do template/all
 
         # copy common stuff
-        shutil.copytree(P.P_DIR_PP_ALL, str(self._dir_prj))
+        shutil.copytree(P.P_DIR_PP_ALL, self._dir_prj)
 
         # ----------------------------------------------------------------------
         # do template/type
@@ -369,47 +361,10 @@ class PyMaker:
         prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
 
         # get the src dir in the template dir
-        dir_template = P.P_DIR_PP_TEMPLATE / prj_type
+        dir_type = P.P_DIR_PP_TEMPLATE / prj_type
 
-        # get all top level folders/files in the template type
-        list_src = list(Path.iterdir(dir_template))
-
-        # for each top level dir/file
-        for item_src in list_src:
-
-            # get destination name
-            dst = self._dir_prj / item_src.name
-
-            # template item is a file
-            if item_src.is_file():
-                # copy file
-                shutil.copy2(item_src, dst)
-
-            # template item is a dir
-            else:
-                # NB: this is used if there is a dir in "template/all" and also
-                # a dir in "template/type" with the same name
-                # eg. "template/all/src" and "template/pkg/src"
-                # the "all/src" contents will be combined with the "pkg/src"
-                # contents
-                # this only goes one level below "template/all" and
-                # "template/pkg"
-
-                # dst does not exist, copy dir
-                if not dst.exists():
-                    shutil.copytree(item_src, dst)
-
-                # FIXME: this does not do what you think it does...
-                # dst exists, merge from template to proj
-                else:
-                    # get all first-level items
-                    list_merge = list(Path.iterdir(item_src))
-                    # copy each file or dir to dest proj dir
-                    for item_merge in list_merge:
-                        if item_merge.is_file():
-                            shutil.copy2(item_merge, dst)
-                        else:
-                            shutil.copytree(item_merge, dst, dirs_exist_ok=True)
+        # copy into existing dir
+        shutil.copytree(dir_type, self._dir_prj, dirs_exist_ok=True)
 
         # ----------------------------------------------------------------------
         # do copy dict

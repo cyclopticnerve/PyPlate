@@ -280,7 +280,7 @@
 
 #     # set the gui dict for the window name
 #     self._dict_state[name_win] = dict_state
-#     # FIXME: for each window in dict_app, if has entry in dict_state, apply
+#     # TODO: for each window in dict_app, if has entry in dict_state, apply
 #     # dict_state to window
 
 # # --------------------------------------------------------------------------
@@ -430,7 +430,7 @@
 # self._dict_state = CF.combine_dicts(self._dict_state, [dict_win])
 
 # fix ints/bools in dict_gui
-# FIXME: how to sanitize gui for bool/int/str without ctl type?
+# TODO: how to sanitize gui for bool/int/str without ctl type?
 # self._dict_state = self._sanitize_gui(self._dict_state)
 
 # once we have the final dict_gui, apply backing store to window

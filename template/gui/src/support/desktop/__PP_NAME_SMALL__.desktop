@@ -11,10 +11,10 @@ Encoding=UTF-8
 Version=1.0
 Type=Application
 Terminal=false
-Path=__PP_NAME_SRC__
+Path=__PP_USR_BIN__
 Exec=__PP_NAME_SMALL__
 Name=__PP_NAME_BIG__
-Icon=__PP_NAME_SRC__/__PP_IMAGES__/__PP_NAME_BIG__.png
+Icon=__PP_SUPPORT__/__PP_IMAGES__/__PP_NAME_BIG__.png
 X-Desktop-File-Install-Version=0.26
 
 # -)

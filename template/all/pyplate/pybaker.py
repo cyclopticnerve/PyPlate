@@ -34,7 +34,7 @@ def main():
     """
 
     # path to dev pyplate src pybaker.py
-    p_pb_real = Path.home() / "__PP_DEV_PP__" / "__PP_SUPPORT__" / "pybaker.py"
+    p_pb_real = Path.home() / "__PP_DEV_PP__" / "src" / "pybaker.py"
     s_pb_real = str(p_pb_real)
 
     # get current path

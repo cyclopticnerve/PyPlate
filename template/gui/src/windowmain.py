@@ -90,7 +90,9 @@ class WindowMain(CNWindow):
         """
 
         # props necessary tro create a basic window
-        ui_file = DIR_PARENT / "ui/__PP_NAME_SMALL__Gtk3.ui"
+        ui_file = (
+            DIR_PARENT / "__PP_SUPPORT__" / "ui" / "__PP_NAME_SMALL__Gtk3.ui"
+        )
         ui_path = Path(ui_file).resolve()
         ui_name = "win_main"
 
@@ -115,7 +117,7 @@ class WindowMain(CNWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        dlg_file = DIR_PARENT / "ui/dialogs.ui"
+        dlg_file = DIR_PARENT / "__PP_SUPPORT__" / "ui" / "dialogs.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "dlg_about")
 
@@ -148,9 +150,6 @@ class WindowMain(CNWindow):
         """
 
         print("btn_title", ": not implemented")
-        box = self.builder.get_object("entry+test")
-        val = box.get_text()
-        self.set_title(val)
 
     # --------------------------------------------------------------------------
     # Called when the Save button is clicked

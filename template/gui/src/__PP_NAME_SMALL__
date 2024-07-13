@@ -58,7 +58,7 @@ sys.path.append(str(DIR_SRC))
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
-from gui.appmain import AppMain  # type: ignore
+from appmain import AppMain  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -178,7 +178,7 @@ class __PP_NAME_CLASS__(CNCli):
         self._debug = self._dict_args[CNCli.ARG_DBG_DEST]
 
         # the default config file
-        cfg_def = str(DIR_CFG / "cli.json")
+        cfg_def = str(DIR_CFG / "__PP_NAME_SMALL__.json")
 
         # command line cfg is None or str
         cfg_arg = self._dict_args[CNCli.ARG_CFG_DEST]
@@ -211,7 +211,11 @@ class __PP_NAME_CLASS__(CNCli):
         """
 
         # formatted version
-        ver_fmt = "__PP_VER_FMT__".format(PB_VERSION)
+        ver_fmt = (
+            "__PP_VER_FMT__".format(  # pylint: disable=consider-using-f-string
+                PB_VERSION
+            )
+        )
 
         # about string
         s_about = (

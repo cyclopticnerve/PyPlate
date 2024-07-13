@@ -12,8 +12,8 @@
     <property name="comments" translatable="yes" context="context for program desription translation" comments="comment for program description translation">__PP_SHORT_DESC__</property>
     <property name="website">https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__</property>
     <property name="website-label" translatable="yes" context="context for website" comments="Github repository translation">GitHub repository</property>
-    <property name="license">__PP_LICENCE_NAME__
-__PP_LICENSE_URL__</property>
+    <property name="license">__PP_LICENSE_NAME__
+    __PP_LICENSE_LINK__</property>
     <property name="authors">__PP_AUTHOR__&lt;__PP_EMAIL__&gt;</property>
     <property name="logo">../images/__PP_NAME_BIG__.png</property>
     <property name="license-type">custom</property>

@@ -27,6 +27,8 @@ import sys
 
 # NB: package names below will give pylance error when viewed in the template
 # DO NOT IGNORE THEM! WE NEED TO CHECK THE REPLACEMENT NAMES IN FINAL PROJECT!
+# once you are sure the name is correct, you can add "# type: ignore" to the
+# line to ignore the error
 
 # ------------------------------------------------------------------------------
 # option 1:
