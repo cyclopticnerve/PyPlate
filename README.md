@@ -12,7 +12,7 @@
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
-A program for creating CLI/GUI/module/package projects in Python from a template
+A program for creating CLI/Package/GUI projects in Python from a template
 
 ## Requirements
 None
@@ -22,6 +22,11 @@ You can download the (hopefully stable) [latest
 release](https://github.com/cyclopticnerve/PyPlate/releases/latest) from the
 main branch.<br>
 Download either the 'tar.gz' or 'zip' file and extract it.<br>
+Go into the extracted folder and run the installer.
+```bash
+cd ~/Documents/Downloads/PyPlate-<version>$ ./install.sh
+```
+
 Rename the folder without the version, e.g. 'PyPlate-0.1.0' to 'PyPlate'.
 
 Or you can clone the git repo to get the latest (and often broken) code from the
@@ -29,6 +34,7 @@ dev branch:
 ```bash
 foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
+cd ~/Documents/Downloads/PyPlate-<version>$ ./install.sh
 ```
 
 Next, cut/copy/paste the 'PyPlate' directory wherever you want. For the examples

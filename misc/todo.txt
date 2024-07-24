@@ -25,6 +25,7 @@ non-rat: break on colon, do str rep on value, put back together
 with regex, replace line in array
 rat: break on colon, rest of line split at two spaces, that group 1 is values
 that group 2 split at last space, that group 1 is pad, group 2 is rat
+TODO: convert readme fix to html fix
 
 my cn rat regex is public/private?
 it will need to be changed by dev

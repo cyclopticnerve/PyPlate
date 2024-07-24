@@ -16,7 +16,6 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # ------------------------------------------------------------------------------
 
 # system imports
-import os
 from pathlib import Path
 import re
 
@@ -35,11 +34,11 @@ B_CMD_VENV = True
 # Strings
 # ------------------------------------------------------------------------------
 
-# path sep
-S = os.sep
+# current version
+S_VERSION = "0.0.1"
 
 # base dir for project type folders, relative to dev home
-S_DIR_BASE = f"Documents{S}Projects{S}Python"
+S_DIR_BASE = "Documents/Projects/Python"
 
 # NB: format params are L_TYPES[0], L_TYPES[1]
 S_TYPE_FMT = "{} ({})"
@@ -49,11 +48,12 @@ S_TYPE_JOIN = " | "
 # NB: format param is joined list of project types
 S_ASK_TYPE = "Project type [{}]: "
 S_ASK_NAME = "Project name: "
+S_ASK_DESC = "Short description: "
 # NB: format params are D_TYPE_SEC[prj_type], __PP_NAME_SMALL__
 S_ASK_SEC = "{} name (default: {}): "
 
 # error strings
-S_ERR_TYPE = "Please enter a valid project type"
+S_ERR_TYPE = "Type must be one of {}"
 S_ERR_LEN = "Project names must be more than 1 character"
 S_ERR_START = "Project names must start with a letter"
 S_ERR_END = "Project names must end with a letter or number"
@@ -77,7 +77,7 @@ S_ERR_DEBUG = (
 # TODO: which keys need to be global/which are only used once?
 # keys for pybaker private dict
 S_KEY_PRJ_DEF = "PRJ_DEF"
-S_KEY_PRJ_ADD = "PRJ_ADD"
+S_KEY_PRJ_DIST_DIRS = "PRJ_DIST_DIRS"
 S_KEY_PRJ_CFG = "PRJ_CFG"
 
 # keys for metadata, blacklist, i18n in pybaker dev dict
@@ -113,6 +113,7 @@ S_KEY_FMT_VAL_PAD = "S_KEY_FMT_VAL_PAD"
 # and make any appropriate changes
 # also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
+S_ALL_DIR = "all"
 S_ALL_VENV = ".venv"
 S_ALL_CONF = "conf"
 S_ALL_DIST = "dist"
@@ -128,23 +129,23 @@ S_ALL_PO = "po"
 S_ALL_TESTS = "tests"
 
 # initial location of project (to check for dups)
-S_HOME = str(Path.home()).rstrip(S)
+S_HOME = str(Path.home()).rstrip("/")
 S_DIR_PRJ = (
-    f"{S_HOME}{S}{S_DIR_BASE}{S}"  # /home/cn/Documents/Projects/Python/
+    f"{S_HOME}/{S_DIR_BASE}/"  # /home/cn/Documents/Projects/Python/
     "{}"  # prj type dir
-    f"{S}"  # /
+    f"/"  # /
     "{}"  # prj name
 )
 
 # paths relative to end user home only
 S_USR_CONF = ".config"  # __PP_NAME_SMALL__ will be appended
-S_USR_SRC = f".local{S}share"  # __PP_NAME_SMALL__ will be appended
-S_USR_APPS = f".local{S}share{S}applications"  # for .desktop file
-S_USR_BIN = f".local{S}bin"  # where to put the binary
+S_USR_SRC = ".local/share"  # __PP_NAME_SMALL__ will be appended
+S_USR_APPS = ".local/share/applications"  # for .desktop file
+S_USR_BIN = ".local/bin"  # where to put the binary
 
 # this is where the user libs will go
 S_USR_LIB_NAME = "lib"
-S_USR_LIB = f".local{S}share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
+S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # NB: these steps are optional
 
@@ -155,7 +156,7 @@ S_GIT_CMD = "git init {} -q"
 S_VENV_CMD = "python -m venv {}"
 
 # formats for tree
-S_TREE_FILE = f"{S_ALL_MISC}{S}tree.txt"
+S_TREE_FILE = f"{S_ALL_MISC}/tree.txt"
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
@@ -189,7 +190,7 @@ L_TYPES = [
 
 # NB: some of these are strictly for string replacement, but some are used by
 # pybaker, so don't remove anything unless you know what you are doing
-# if you want to ADD a key for string replacement only, use D_PRJ_ADD
+# if you want to ADD a key for string replacement only, use D_PRJ_DIST_DIRS
 
 # these are the settings that should be set before you run pymaker.py
 # consider them the "before create" settings
@@ -214,7 +215,7 @@ D_PRJ_DEF = {
     # the license file to use
     "__PP_LICENSE_FILE__": "LICENSE.txt",
     # the screenshot to use in  __PP_README_FILE__
-    "__PP_SCREENSHOT__": f"{S_ALL_README}{S}screenshot.png",
+    "__PP_SCREENSHOT__": f"{S_ALL_README}/screenshot.png",
     # version format string for command line (context for pybaker replace)
     # NB: format param is __PP_VERSION__
     "__PP_VER_FMT__": "Version {}",
@@ -233,7 +234,7 @@ D_PRJ_DEF = {
 
 # these values are string replace only
 # NB: constant values moved here so we can change them easier
-D_PRJ_ADD = {
+D_PRJ_DIST_DIRS = {
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home dir
     # location of config files, relative to the project dir
@@ -244,7 +245,6 @@ D_PRJ_ADD = {
     # these paths are relative to the user's home dir
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
-    "__PP_DUMMY__": "",  # dummy value to use in headers
     "__PP_SUPPORT__": S_ALL_SUPPORT,  # where is rest of code
     "__PP_IMAGES__": S_ALL_IMAGES,  # where gui images are stored
 }
@@ -252,14 +252,13 @@ D_PRJ_ADD = {
 # these are settings that will be calculated for you while running pymaker.py
 # consider them the "during create" settings
 D_PRJ_CFG = {
-    # --------------------------------------------------------------------------
-    # these items will be filled in by _get_project_info
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_BIG__": "",  # PyPlate
     "__PP_NAME_SMALL__": "",  # pyplate
     "__PP_NAME_SEC__": "",  # module1.py
     "__PP_NAME_CLASS__": "",  # Pascal case name for classes
     "__PP_DATE__": "",  # the date each file was created, updated every time
+    "__PP_DUMMY__": "",  # dummy value to use in headers
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
     # "__PP_DEV_LIB__": "",  # location of cnlibs dir in PyPlate
@@ -277,11 +276,11 @@ D_PRJ_META = {
     # the version number to use in __PP_README_FILE__ and pyproject.toml
     "__PP_VERSION__": "0.0.0",
     # the short description to use in __PP_README_FILE__ and pyproject.toml
-    "__PP_SHORT_DESC__": "",
+    "__PP_SHORT_DESC__": "Short description",
     # the keywords to use in pyproject.toml and github
     "__PP_KEYWORDS__": [],
-    # the python dependencies to use in __PP_README_FILE__, pyproject.toml, github,
-    # and install.py
+    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
+    # github, and install.py
     "__PP_PY_DEPS__": {},
     # the system dependencies to use in __PP_README_FILE__, github.com, and
     # install.py
@@ -390,8 +389,8 @@ D_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
-    f"{S_ALL_MISC}{S}snippets.txt": f"{S_ALL_MISC}{S}snippets.txt",
-    f"{S_ALL_MISC}{S}style.txt": f"{S_ALL_MISC}{S}style.txt",
+    f"{S_ALL_MISC}/snippets.txt": f"{S_ALL_MISC}/snippets.txt",
+    f"{S_ALL_MISC}/style.txt": f"{S_ALL_MISC}/style.txt",
 }
 
 # files to remove after the project is done
@@ -413,20 +412,24 @@ D_PURGE = {"p": [Path(S_ALL_TESTS) / "ABOUT"]}
 # a cli/gui app
 D_README = {
     "RM_LICENSE": {
-        "RM_LICENSE_START": "<!-- __RM_LICENSE_START__ -->",
-        "RM_LICENSE_END": "<!-- __RM_LICENSE_END__ -->",
+        "__RM_LICENSE_START__": "<!-- __RM_LICENSE_START__ -->",
+        "__RM_LICENSE_END__": "<!-- __RM_LICENSE_END__ -->",
+    },
+    "RM_SHORT_DESC": {
+        "__RM_SHORT_DESC_START__": "<!-- __RM_SHORT_DESC_START__ -->",
+        "__RM_SHORT_DESC_END__": "<!-- __RM_SHORT_DESC_END__ -->",
     },
     "cli": {
-        "RM_DELETE_START": "<!-- __RM_PKG_START__ -->",
-        "RM_DELETE_END": "<!-- __RM_PKG_END__ -->",
+        "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
+        "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
     },
     "gui": {
-        "RM_DELETE_START": "<!-- __RM_PKG_START__ -->",
-        "RM_DELETE_END": "<!-- __RM_PKG_END__ -->",
+        "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
+        "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
     },
     "pkg": {
-        "RM_DELETE_START": "<!-- __RM_APP_START__ -->",
-        "RM_DELETE_END": "<!-- __RM_APP_END__ -->",
+        "__RM_DELETE_START__": "<!-- __RM_APP_START__ -->",
+        "__RM_DELETE_END__": "<!-- __RM_APP_END__ -->",
     },
 }
 
@@ -510,16 +513,27 @@ D_NAME_SEC = {
 # R_CODE_DUN = r"__\S\S_\S*__"
 
 # regex strings for readme to replace license image
-R_RM_START = D_README["RM_LICENSE"]["RM_LICENSE_START"]
-R_RM_END = D_README["RM_LICENSE"]["RM_LICENSE_END"]
-R_README = rf"({R_RM_START})(.*?)({R_RM_END})"
+R_RM_LICENSE_START = D_README["RM_LICENSE"]["__RM_LICENSE_START__"]
+R_RM_LICENSE_END = D_README["RM_LICENSE"]["__RM_LICENSE_END__"]
+R_RM_LICENSE = rf"({R_RM_LICENSE_START})(.*?)({R_RM_LICENSE_END})"
 # NB: format param is full license string
-R_README_REP = r"\g<1>\n{}\n\g<3>"
+R_RM_LICENSE_REP = r"\g<1>\n{}\n\g<3>"
+
+# regex strings for readme to replace short description
+R_RM_SHORT_DESC_START = D_README["RM_SHORT_DESC"]["__RM_SHORT_DESC_START__"]
+R_RM_SHORT_DESC_END = D_README["RM_SHORT_DESC"]["__RM_SHORT_DESC_END__"]
+R_RM_SHORT_DESC = rf"({R_RM_SHORT_DESC_START})(.*?)({R_RM_SHORT_DESC_END})"
+# NB: format param is full license string
+R_RM_SHORT_DESC_REP = r"\g<1>\n{}\n\g<3>"
 
 # search and sub flags
-# NB: need S for matches that span multiple lines (R_README)
+# NB: need S for matches that span multiple lines (R_RM_LICENSE)
 R_RM_SUB_FLAGS = re.S
 
+# regex's to match project name
+R_PRJ_START = r"(^[a-zA-Z])"
+R_PRJ_END = r"([a-zA-Z\d]$)"
+R_PRJ_MID = r"(^[a-zA-Z\d\-_]*$)"
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -548,9 +562,9 @@ def do_before_fix():
     name_small = D_PRJ_CFG["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    D_PRJ_CFG["__PP_USR_CONF__"] = f"{S_USR_CONF}{S}{name_small}"
-    D_PRJ_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}{S}{name_small}"
-    D_PRJ_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}{S}{author}{S}{S_USR_LIB_NAME}"
+    D_PRJ_CFG["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
+    D_PRJ_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
+    D_PRJ_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
 
 
 # --------------------------------------------------------------------------

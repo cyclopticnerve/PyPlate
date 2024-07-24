@@ -34,14 +34,14 @@ def main():
     """
 
     # path to dev pyplate src pybaker.py
-    p_pb_real = Path.home() / "__PP_DEV_PP__" / "src" / "pybaker.py"
+    p_pb_real = Path.home() / "__PP_DEV_PP__/src/pybaker"
     s_pb_real = str(p_pb_real)
 
     # get current path
-    curr_path = Path(__file__).resolve()
+    curr_path = Path(__file__).parents[1].resolve()
 
     # call real pybaker with current path on cmd line
-    cmd = f"{s_pb_real} {curr_path}"
+    cmd = f"{s_pb_real} -f {curr_path}"
     cmd_array = shlex.split(cmd)
 
     # get result of running the shell command

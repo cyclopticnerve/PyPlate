@@ -10,6 +10,8 @@
 # pylint: disable=too-many-lines
 
 """
+A program to create a PyPlate project from a few variables
+
 This module gets the project type, the project's destination dir, copies the
 required dirs/files for the project type from the template to the specified
 destination, and performs some initial fixes/replacements of text and path
@@ -25,7 +27,6 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
-import os
 from pathlib import Path
 import re
 import shutil
@@ -42,16 +43,13 @@ import sys
 # path to this project
 # parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
-P_DIR_PYPLATE = Path(__file__).parents[1]# .resolve()
+P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
+P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
 sys.path.append(str(P_DIR_PYPLATE))
+sys.path.append(str(P_DIR_PP_LIB))
 
-# load this first so we can get lib dir name
-from conf import private as P
-
-# add lib path to import search
-sys.path.append(str(P.P_DIR_PP_LIB))
-
-from conf import public as C
+# local imports
+from conf import pymaker_conf as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -60,6 +58,57 @@ from cnlib.cntree import CNTree  # type: ignore
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
+
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# this is our metadata bootstrap
+
+# get names
+S_PP_NAME_BIG = "PyMaker"
+S_PP_NAME_SMALL = "pymaker"
+S_PP_SHORT_DESC = "A program to create a PyPlate project from a few variables"
+
+# formatted version
+S_PP_VER_FMT = f"Version {C.S_VERSION}"
+
+# about string
+S_PP_ABOUT = (
+    f"{S_PP_NAME_SMALL}\n"
+    f"{S_PP_SHORT_DESC}\n"
+    f"{S_PP_VER_FMT}\n"
+    f"https://www.github.com/cyclopticnerve/PyPlate"
+)
+
+# debug option strings
+S_DBG_OPTION = "-d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
+
+# path to prj pyplate files
+S_PP_PRV = "pyplate/conf/private.json"
+S_PP_PRJ = "pyplate/conf/project.json"
+
+# ------------------------------------------------------------------------------
+# Path objects
+# ------------------------------------------------------------------------------
+
+# get fixed paths to PyPlate and folders
+
+# Path to PyPlate libs
+# (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/lib)
+P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
+
+# Path to PyPlate template
+# (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/)
+P_DIR_PP_TEMPLATE = P_DIR_PYPLATE / "template"
+
+# Path to PyPlate template/all
+# (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/all)
+P_DIR_PP_ALL = P_DIR_PP_TEMPLATE / "all"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -101,6 +150,7 @@ class PyMaker:
         self._debug = False
         self._dict_rep = {}
         self._dir_prj = Path()
+        self._in_trips = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -162,7 +212,7 @@ class PyMaker:
         dict_args = self._run_parser()
 
         # check for flags
-        self._debug = dict_args[P.S_DBG_DEST]
+        self._debug = dict_args[S_DBG_DEST]
 
         # debug turns off some _do_after_fix features
         if self._debug:
@@ -268,6 +318,11 @@ class PyMaker:
         # calculate small name
         name_small = prj_name.lower()
 
+        # ------------------------------------------------------------------------------
+        # get short description
+
+        new_desc = input(C.S_ASK_DESC)
+
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
 
@@ -326,14 +381,15 @@ class PyMaker:
         C.D_PRJ_CFG["__PP_TYPE_PRJ__"] = prj_type
         C.D_PRJ_CFG["__PP_NAME_BIG__"] = prj_name
         C.D_PRJ_CFG["__PP_NAME_SMALL__"] = name_small
+        C.D_PRJ_META["__PP_SHORT_DESC__"] = new_desc
         C.D_PRJ_CFG["__PP_DATE__"] = info_date
         C.D_PRJ_CFG["__PP_NAME_CLASS__"] = name_class
         C.D_PRJ_CFG["__PP_NAME_SEC__"] = name_sec
 
         # remove home dir from PyPlate path
         h = str(Path.home())
-        p = str(P.P_DIR_PP)
-        p = p.lstrip(h).lstrip(C.S)
+        p = str(P_DIR_PYPLATE)
+        p = p.lstrip(h).lstrip("/")
         C.D_PRJ_CFG["__PP_DEV_PP__"] = p
 
         # save global property
@@ -353,7 +409,7 @@ class PyMaker:
         # do template/all
 
         # copy common stuff
-        shutil.copytree(P.P_DIR_PP_ALL, self._dir_prj)
+        shutil.copytree(P_DIR_PP_ALL, self._dir_prj)
 
         # ----------------------------------------------------------------------
         # do template/type
@@ -362,7 +418,7 @@ class PyMaker:
         prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
 
         # get the src dir in the template dir
-        dir_type = P.P_DIR_PP_TEMPLATE / prj_type
+        dir_type = P_DIR_PP_TEMPLATE / prj_type
 
         # copy into existing dir
         shutil.copytree(dir_type, self._dir_prj, dirs_exist_ok=True)
@@ -374,7 +430,7 @@ class PyMaker:
         for key, val in C.D_COPY.items():
 
             # first get full source path
-            path_in = P.P_DIR_PP / key
+            path_in = P_DIR_PYPLATE / key
 
             # then get full dest path
             path_out = self._dir_prj / val
@@ -413,8 +469,12 @@ class PyMaker:
 
         # combine dicts for string replacement
         F.combine_dicts(
-            [C.D_PRJ_DEF, C.D_PRJ_ADD, C.D_PRJ_CFG], self._dict_rep
+            [C.D_PRJ_DEF, C.D_PRJ_DIST_DIRS, C.D_PRJ_CFG], self._dict_rep
         )
+
+        # NB: q+d to add version and short desc to reps (these are strings)
+        self._dict_rep["__PP_VERSION__"] = C.D_PRJ_META["__PP_VERSION__"]
+        self._dict_rep["__PP_SHORT_DESC__"] = C.D_PRJ_META["__PP_SHORT_DESC__"]
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
@@ -433,12 +493,10 @@ class PyMaker:
         # rename (and thus clobber) a directory name before we rename all its
         # child dirs/files
         # note that root is a full path, dirs and files are relative to root
-        for root, root_dirs, root_files in os.walk(
-            self._dir_prj, topdown=False
-        ):
+        for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
 
             # convert root into Path object
-            root = Path(root)
+            # root = Path(root)
 
             # skip dir if in skip_all
             if root in skip_all:
@@ -503,14 +561,14 @@ class PyMaker:
         # save project settings
         dict_no_edit = {
             C.S_KEY_PRJ_DEF: C.D_PRJ_DEF,
-            C.S_KEY_PRJ_ADD: C.D_PRJ_ADD,
+            C.S_KEY_PRJ_DIST_DIRS: C.D_PRJ_DIST_DIRS,
             C.S_KEY_PRJ_CFG: C.D_PRJ_CFG,
         }
-        path_no_edit = self._dir_prj / P.S_PP_PRV
+        path_no_edit = self._dir_prj / S_PP_PRV
         F.save_dict(dict_no_edit, [path_no_edit])
 
         # save editable settings (only blacklist and i18n for now)
-        path_edit = self._dir_prj / P.S_PP_PRJ
+        path_edit = self._dir_prj / S_PP_PRJ
         dict_edit = {
             C.S_KEY_BLACKLIST: C.D_BLACKLIST,
             C.S_KEY_I18N: C.D_I18N,
@@ -615,9 +673,10 @@ class PyMaker:
 
         # get namespace object
         args = parser.parse_args()
-        self._d_args = vars(args)
 
         # convert namespace to dict
+        self._d_args = vars(args)
+
         return self._d_args
 
     # --------------------------------------------------------------------------
@@ -634,14 +693,14 @@ class PyMaker:
         """
 
         # set help string
-        parser.description = P.S_PP_ABOUT
+        parser.description = S_PP_ABOUT
 
         # add debug option
         parser.add_argument(
-            P.S_DBG_OPTION,
-            action=P.S_DBG_ACTION,
-            dest=P.S_DBG_DEST,
-            help=P.S_DBG_HELP,
+            S_DBG_OPTION,
+            action=S_DBG_ACTION,
+            dest=S_DBG_DEST,
+            help=S_DBG_HELP,
         )
 
     # --------------------------------------------------------------------------
@@ -673,7 +732,12 @@ class PyMaker:
                 return True
 
         # nope, fail
-        print(C.S_ERR_TYPE)
+        types = []
+        s = ""
+        for item in C.L_TYPES:
+            types.append(item[0])
+            s = ", ".join(types)
+        print(C.S_ERR_TYPE.format(s))
         return False
 
     # --------------------------------------------------------------------------
@@ -713,21 +777,24 @@ class PyMaker:
             return False
 
         # match start or return false
-        pattern = r"(^[a-zA-Z])"
+        # pattern = r"(^[a-zA-Z])"
+        pattern = C.R_PRJ_START
         res = re.search(pattern, prj_name)
         if not res:
             print(C.S_ERR_START)
             return False
 
         # match end or return false
-        pattern = r"([a-zA-Z\d]$)"
+        # pattern = r"([a-zA-Z\d]$)"
+        pattern = C.R_PRJ_END
         res = re.search(pattern, prj_name)
         if not res:
             print(C.S_ERR_END)
             return False
 
         # match middle or return false
-        pattern = r"(^[a-zA-Z\d\-_]*$)"
+        # pattern = r"(^[a-zA-Z\d\-_]*$)"
+        pattern = C.R_PRJ_MID
         res = re.search(pattern, prj_name)
         if not res:
             print(C.S_ERR_CONTAIN)
@@ -754,7 +821,7 @@ class PyMaker:
         # separators
         for key in C.D_BLACKLIST:
             C.D_BLACKLIST[key] = [
-                item.rstrip(os.sep) for item in C.D_BLACKLIST[key]
+                item.rstrip("/") for item in C.D_BLACKLIST[key]
             ]
 
         # support for absolute/relative/glob
@@ -817,7 +884,7 @@ class PyMaker:
             text = a_file.read()
 
         # ----------------------------------------------------------------------
-        # TODO: move this to public
+        # now build the final license html
 
         # get replacement value
         pp_license_name = C.D_PRJ_DEF["__PP_LICENSE_NAME__"]
@@ -832,14 +899,27 @@ class PyMaker:
             f")]({pp_license_link})"  # img link
         )
 
-        # ----------------------------------------------------------------------
-
         # find the license block
-        str_pattern = C.R_README
+        str_pattern = C.R_RM_LICENSE
 
         # replace text
-        str_rep = C.R_README_REP.format(pp_license_full)
+        str_rep = C.R_RM_LICENSE_REP.format(pp_license_full)
         text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
+
+        # ----------------------------------------------------------------------
+        # now do description
+
+        # find the short desc block
+        str_pattern = C.R_RM_SHORT_DESC
+
+        # get the new description
+        new_desc = C.D_PRJ_META["__PP_SHORT_DESC__"]
+
+        # replace text
+        str_rep = C.R_RM_SHORT_DESC_REP.format(new_desc)
+        text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
+
+        # ----------------------------------------------------------------------
 
         # save file
         with open(path, "w", encoding="UTF-8") as a_file:
@@ -872,8 +952,8 @@ class PyMaker:
         for key, val in C.D_README.items():
             if prj_type == key:
                 # get values for keys
-                rm_delete_start = val["RM_DELETE_START"]
-                rm_delete_end = val["RM_DELETE_END"]
+                rm_delete_start = val["__RM_DELETE_START__"]
+                rm_delete_end = val["__RM_DELETE_END__"]
                 break
 
         # where to put the needed lines
@@ -1036,11 +1116,51 @@ class PyMaker:
         dunders inside the file, excluding headers (which are already handled).
         """
 
+        # TODO: split line into code/comment
+        # ignore comment
+
         # find all dunders in line
         for key, val in self._dict_rep.items():
             line = line.replace(key, val)
 
         # return fixed code
+        return line
+
+    def _fix_line(self, line):
+        # find trips
+        a_count = line.count('"""')
+
+        # we found a trip
+        if a_count > 0:
+
+            # if it is a one-liner
+            if a_count > 1:
+
+                # single line trips, just skip
+                self._in_trips = False
+                return line
+
+            # flip in_trips flag and skip
+            self._in_trips = not self._in_trips
+            return line
+
+        # skip trips and their contents
+        if self._in_trips:
+            return line
+
+        # --------------------------------------------------------------------------
+
+        # ignore trailing comments
+        parts = line.split("#")
+
+        for key, val in self._dict_rep.items():
+            parts[0] = parts[0].replace(key, val)
+        # replace content
+        # parts[0] = parts[0].replace(, )
+
+        # rejoin trailing comments
+        line = "#".join(parts)
+
         return line
 
     # --------------------------------------------------------------------------

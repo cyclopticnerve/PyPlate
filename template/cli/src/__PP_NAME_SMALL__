@@ -69,7 +69,6 @@ from cnlib.cncli import CNCli  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
-PB_SHORT_DESC = "__PP_SHORT_DESC__"
 PB_VERSION = "__PP_VERSION__"
 
 # ------------------------------------------------------------------------------
@@ -242,7 +241,7 @@ class __PP_NAME_CLASS__(CNCli):
         # about string
         s_about = (
             "__PP_NAME_SMALL__\n"
-            f"{PB_SHORT_DESC}\n"
+            "__PP_SHORT_DESC__\n"
             f"{ver_fmt}\n"
             "__PP_URL__/__PP_NAME_BIG__"
         )
