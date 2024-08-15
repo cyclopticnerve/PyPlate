@@ -147,10 +147,10 @@ class PyMaker:
 
         # set the initial values of properties
         self._d_args = {}
-        self._debug = False
-        self._dict_rep = {}
         self._dir_prj = Path()
-        self._in_trips = False
+        self._dict_rep = {}
+        self._dict_sw_block = {}
+        self._dict_sw_line = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -209,15 +209,17 @@ class PyMaker:
         # set pp cmd line stuff
 
         # get cmd line args
-        dict_args = self._run_parser()
-
-        # check for flags
-        self._debug = dict_args[S_DBG_DEST]
+        self._d_args = self._run_parser()
 
         # debug turns off some _do_after_fix features
-        if self._debug:
+        # if self._debug:
+        if self._d_args.get(S_DBG_DEST, False):
             C.B_CMD_GIT = False
             C.B_CMD_VENV = False
+
+        # set flag dicts to defaults
+        self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
+        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -233,7 +235,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # maybe yell
 
-        if self._debug:
+        if self._d_args.get(S_DBG_DEST, False):
 
             # yep, yell
             print(C.S_ERR_DEBUG)
@@ -280,7 +282,7 @@ class PyMaker:
         prj_name = ""
 
         # if in debug mode
-        if self._debug:
+        if self._d_args.get(S_DBG_DEST, False):
 
             # get debug name of project
             prj_name = f"{dir_prj_type}_DEBUG"
@@ -321,7 +323,10 @@ class PyMaker:
         # ------------------------------------------------------------------------------
         # get short description
 
-        new_desc = input(C.S_ASK_DESC)
+        if not self._d_args.get(S_DBG_DEST, False):
+            new_desc = input(C.S_ASK_DESC)
+        else:
+            new_desc = "test desc"
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -334,7 +339,10 @@ class PyMaker:
         name_sec = name_small
 
         # if not debug, if need second name, ask for it
-        if not self._debug and prj_type in C.D_NAME_SEC:
+        if (
+            not self._d_args.get(S_DBG_DEST, False)
+            and prj_type in C.D_NAME_SEC
+        ):
 
             # format question for second name
             s_name_sec = C.D_NAME_SEC[prj_type]
@@ -469,12 +477,15 @@ class PyMaker:
 
         # combine dicts for string replacement
         F.combine_dicts(
-            [C.D_PRJ_DEF, C.D_PRJ_DIST_DIRS, C.D_PRJ_CFG], self._dict_rep
+            [
+                C.D_PRJ_DEF,
+                C.D_PRJ_DIST_DIRS,
+                C.D_PRJ_EXTRA,
+                C.D_PRJ_CFG,
+                C.D_PRJ_META,
+            ],
+            self._dict_rep,
         )
-
-        # NB: q+d to add version and short desc to reps (these are strings)
-        self._dict_rep["__PP_VERSION__"] = C.D_PRJ_META["__PP_VERSION__"]
-        self._dict_rep["__PP_SHORT_DESC__"] = C.D_PRJ_META["__PP_SHORT_DESC__"]
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
@@ -495,9 +506,6 @@ class PyMaker:
         # note that root is a full path, dirs and files are relative to root
         for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
 
-            # convert root into Path object
-            # root = Path(root)
-
             # skip dir if in skip_all
             if root in skip_all:
                 root_dirs.clear()
@@ -513,12 +521,6 @@ class PyMaker:
                 if item in skip_all:
                     continue
 
-                # fix README if it is the top-level README.md
-                # NB: need to do before any other stuff, requires special
-                # treatment
-                if item == self._dir_prj / C.D_PRJ_DEF["__PP_README_FILE__"]:
-                    self._fix_readme(item)
-
                 # if we shouldn't skip contents
                 if root not in skip_contents and item not in skip_contents:
 
@@ -532,8 +534,17 @@ class PyMaker:
                     if root not in skip_code and item not in skip_code:
                         bl_code = False
 
-                    # fix text
-                    self._fix_content(item, bl_hdr, bl_code)
+                    # check the file type (md/html/xml or other)
+                    wo_dot = item.suffix.lstrip(".")
+                    w_dot = "." + wo_dot
+                    # if it is a markup/markdown file, handle separately
+                    if wo_dot in C.L_MARKUP or w_dot in C.L_MARKUP:
+                        self._fix_markup(item, bl_hdr, bl_code)
+                    else:
+                        # fix python
+                        self._fix_content(item, bl_hdr, bl_code)
+
+                # --------------------------------------------------------------
 
                 # fix path
                 if root not in skip_path and item not in skip_path:
@@ -558,16 +569,17 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # save project settings
 
-        # save project settings
+        # save fixed settings
         dict_no_edit = {
             C.S_KEY_PRJ_DEF: C.D_PRJ_DEF,
             C.S_KEY_PRJ_DIST_DIRS: C.D_PRJ_DIST_DIRS,
+            C.S_KEY_PRJ_EXTRA: C.D_PRJ_EXTRA,
             C.S_KEY_PRJ_CFG: C.D_PRJ_CFG,
         }
         path_no_edit = self._dir_prj / S_PP_PRV
         F.save_dict(dict_no_edit, [path_no_edit])
 
-        # save editable settings (only blacklist and i18n for now)
+        # save editable settings (blacklist/i18n etc.)
         path_edit = self._dir_prj / S_PP_PRJ
         dict_edit = {
             C.S_KEY_BLACKLIST: C.D_BLACKLIST,
@@ -859,22 +871,62 @@ class PyMaker:
         return res
 
     # --------------------------------------------------------------------------
-    # Fix license/image and remove unnecessary parts of the README file
+    # Edit/remove parts of a mark-up/down structured file
     # --------------------------------------------------------------------------
-    def _fix_readme(self, path):
+    def _fix_markup(self, path, bl_hdr, bl_code):
         """
         Fix license/image and remove unnecessary parts of the README file
 
         Arguments:
             path: Path for the README to remove text
+            bl_hdr: Whether the file is blacklisted for header lines
+            bl_code: Whether the file is blacklisted for code lines
 
-        Fixes the license/image according to the C.D_PRJ_CFG settings, and
-        also removes sections of the README file that are not appropriate to
-        the specified type of project, such as Module/Package or CLI/GUI.
+        Edits/removes parts of the file using the C.D_PRJ_CFG settings.
         """
 
         # ----------------------------------------------------------------------
-        # first fix license/image
+        # do the headers first
+
+        # default lines
+        lines = []
+
+        # open and read file
+        with open(path, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
+
+        # for each line in array
+        for index, line in enumerate(lines):
+
+            # ------------------------------------------------------------------
+            # skip blank lines
+
+            # skip blank lines, obv
+            if line.strip() == "":
+                continue
+
+            # ------------------------------------------------------------------
+            # check for header
+
+            # check if blacklisted for headers
+            if not bl_hdr:
+
+                # check if it matches header pattern
+                str_pattern = C.D_HEADER[C.S_KEY_HDR_SEARCH]
+                res = re.search(str_pattern, line)
+                if res:
+
+                    # fix it
+                    lines[index] = self._fix_header(line)
+
+                    # stop on first match
+                    continue
+
+        # save lines to README.md
+        with open(path, "w", encoding="UTF-8") as a_file:
+            a_file.writelines(lines)
+
+        # ------------------------------------------------------------------------------
 
         # default text if we can't open file
         text = ""
@@ -884,7 +936,7 @@ class PyMaker:
             text = a_file.read()
 
         # ----------------------------------------------------------------------
-        # now build the final license html
+        # next is license
 
         # get replacement value
         pp_license_name = C.D_PRJ_DEF["__PP_LICENSE_NAME__"]
@@ -926,6 +978,15 @@ class PyMaker:
             a_file.write(text)
 
         # ----------------------------------------------------------------------
+        # now strip file of unnecessary lines
+
+        # default lines
+        lines = []
+
+        # open and read file
+        with open(path, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
+
         # NB: the strategy here is to go through the full README and only copy
         # lines that are:
         # 1. not in any block
@@ -959,10 +1020,6 @@ class PyMaker:
         # where to put the needed lines
         new_lines = []
 
-        # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
-
         # for each line
         for line in lines:
             # check if we have entered an invalid block
@@ -982,6 +1039,36 @@ class PyMaker:
         with open(path, "w", encoding="UTF-8") as a_file:
             a_file.writelines(new_lines)
 
+        # ----------------------------------------------------------------------
+
+        # lastly, we go through and replace ALL dunders
+        # TODO: can we use block/line switches in these files?
+        # it would need to be a separate "process html/md files" method
+        # # __PP_NAME_BIG__ <pyplate: enable=replace /> (code/comm)
+        # __PP_NAME_BIG__ <pyplate: enable=replace /> (code/comm)
+        # <pyplate: enable=replace /> (comm)
+        # # __PP_NAME_BIG__ (code)
+        # __PP_NAME_BIG__ (code)
+
+        # default lines
+        lines = []
+
+        # open and read file
+        with open(path, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
+
+        # replace all dunders
+        for index, line in enumerate(lines):
+
+            for key, val in self._dict_rep.items():
+                if isinstance(val, str):
+                    line = line.replace(key, val)
+            lines[index] = line
+
+        # open and write file
+        with open(path, "w", encoding="UTF-8") as a_file:
+            a_file.writelines(lines)
+
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
@@ -998,6 +1085,10 @@ class PyMaker:
         header line or a code line. Ignore blank lines and comment-only lines.
         """
 
+        # for each new file, reset block and line switches to default
+        self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
+        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
+
         # default lines
         lines = []
 
@@ -1008,13 +1099,43 @@ class PyMaker:
         # for each line in array
         for index, line in enumerate(lines):
 
-            # skip blank lines, obv (l_type = 1)
-            if line.strip() == "":
+            # ------------------------------------------------------------------
+            # skip blank lines
 
-                # go to next line in file
+            # skip blank lines, obv
+            if line.strip() == "":
                 continue
 
-            # is this line a comment?
+            # ------------------------------------------------------------------
+            # check for block switches
+
+            # match python block switches ('# python: enable=replace', etc)
+            match = re.match(C.R_SW_BLOCK, line)
+
+            # this line is a block switch
+            if match and match.group(1):
+                key = match.group(3)
+                val = match.group(2)
+
+                # check if key is valid
+                valid = False
+                if key in self._dict_sw_block:
+                    # test for specific values, in case it is malformed
+                    if val == C.S_SW_ENABLE:
+                        self._dict_sw_block[key] = C.I_SW_TRUE
+                        valid = True
+                    elif val == C.S_SW_DISABLE:
+                        self._dict_sw_block[key] = C.I_SW_FALSE
+                        valid = True
+
+                # if we found a valid block switch, no further processing
+                if valid:
+                    continue
+
+            # ------------------------------------------------------------------
+            # check for header
+
+            # check if blacklisted for headers
             if not bl_hdr:
 
                 # check if it matches header pattern
@@ -1028,10 +1149,25 @@ class PyMaker:
                     # stop on first match
                     continue
 
+            # ------------------------------------------------------------------
+            # check for any other comment lines
+
+            if line.lstrip().startswith(C.S_COMM):
+                # match = re.search(C.R_COMM_ONLY, line)
+                # if match:
+                continue
+
+            # ------------------------------------------------------------------
+            # not a blank, block, header, or comment, must be code ( + comment)
+
+            # check if blacklisted for code
             if not bl_code:
+
+                # fix dunders in real code lines (may still have trailing
+                # comments)
                 lines[index] = self._fix_code(line)
 
-        # open and read file
+        # open and write file
         with open(path, "w", encoding="UTF-8") as a_file:
             a_file.writelines(lines)
 
@@ -1048,9 +1184,9 @@ class PyMaker:
         Returns:
             The new line of code
 
-        Replaces text inside a file, using a regex to match specific lines.
-        Given a line, it replaces the found pattern withe the replacement as it
-        goes.
+        Replaces text inside a header line, using a regex to match specific
+        lines. Given a line, it replaces the found pattern withe the
+        replacement as it goes.
         """
 
         # break apart header line
@@ -1064,7 +1200,9 @@ class PyMaker:
 
         # do all string replacements and measurements
         old_len_val = len(val)
-        val = self._fix_code(val)
+        for key2, val2 in self._dict_rep.items():
+            if isinstance(val2, str):
+                val = val.replace(key2, val2)
         new_len_val = len(val)
 
         # set default padding
@@ -1099,11 +1237,11 @@ class PyMaker:
         return line
 
     # --------------------------------------------------------------------------
-    # Replace dunders inside s file's contents
+    # Replace dunders inside a file's contents
     # --------------------------------------------------------------------------
     def _fix_code(self, line):
         """
-        Replace dunders inside s file's contents
+        Replace dunders inside a file's contents
 
         Arguments:
             line: The line of the file to replace text in
@@ -1111,56 +1249,76 @@ class PyMaker:
         Returns:
             The new line of code
 
-        Replaces text inside a file. Given a line, replaces dunders as it goes.
-        When it is done, it returns the new line. This replaces the __PP/__PP
-        dunders inside the file, excluding headers (which are already handled).
+        Replaces text inside a line. Given a line, replaces dunders as it goes.
+        When it is done, it returns the new line. This replaces the __PP
+        dunders inside the file, excluding flag switches, headers, and
+        comment-only lines (all of which are previously handled in
+        _fix_content).
         """
 
-        # TODO: split line into code/comment
-        # ignore comment
+        # ----------------------------------------------------------------------
+        # split the line into code and comm
 
-        # find all dunders in line
-        for key, val in self._dict_rep.items():
-            line = line.replace(key, val)
+        # we will split the line into two parts
+        # NB: assume code is whole line (i.e. no trailing comment)
+        code = line
+        comm = ""
 
-        # return fixed code
-        return line
+        # do the split, checking each match to see if we get a trailing comment
+        matches = re.finditer(C.R_SW_SPLIT, line)
+        for match in matches:
+            # if there is a match group for hash mark (meaning we found a
+            # trailing comment)
+            if match.group(4):
+                # split the line (comm includes hash mark as first char, code
+                # get space between)
+                split = match.start(4)
+                code = line[:split]
+                comm = line[split:]
 
-    def _fix_line(self, line):
-        # find trips
-        a_count = line.count('"""')
+        # --------------------------------------------------------------
+        # check for line switches
 
-        # we found a trip
-        if a_count > 0:
+        # for each line, reset line dict
+        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
-            # if it is a one-liner
-            if a_count > 1:
+        # match python block switches ('# python: enable=replace', etc)
+        match = re.match(C.R_SW_BLOCK, comm)
 
-                # single line trips, just skip
-                self._in_trips = False
-                return line
+        # this line is a line switch
+        if match and match.group(1):
+            key = match.group(3)
+            val = match.group(2)
 
-            # flip in_trips flag and skip
-            self._in_trips = not self._in_trips
-            return line
+            # check if key is valid
+            if key in self._dict_sw_line:
+                # test for specific values, in case it is malformed
+                if val == C.S_SW_ENABLE:
+                    self._dict_sw_line[key] = C.I_SW_TRUE
+                elif val == C.S_SW_DISABLE:
+                    self._dict_sw_line[key] = C.I_SW_FALSE
 
-        # skip trips and their contents
-        if self._in_trips:
-            return line
+        # check for block or line replace switch
+        repl = False
+        if (
+            self._dict_sw_block[C.S_SW_REPLACE]
+            and self._dict_sw_line[C.S_SW_REPLACE] != C.I_SW_FALSE
+            or self._dict_sw_line[C.S_SW_REPLACE] == C.I_SW_TRUE
+        ):
+            repl = True
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
-        # ignore trailing comments
-        parts = line.split("#")
+        # replace content using current flag setting
+        if repl:
+            for key, val in self._dict_rep.items():
+                if isinstance(val, str):
+                    code = code.replace(key, val)
 
-        for key, val in self._dict_rep.items():
-            parts[0] = parts[0].replace(key, val)
-        # replace content
-        # parts[0] = parts[0].replace(, )
+        # put the line back together
+        line = code + comm
 
-        # rejoin trailing comments
-        line = "#".join(parts)
-
+        # return the (maybe replaced) line
         return line
 
     # --------------------------------------------------------------------------
@@ -1184,7 +1342,9 @@ class PyMaker:
         last_part = path.name
 
         # # replace dunders in last path component
-        last_part = self._fix_code(last_part)
+        for key, val in self._dict_rep.items():
+            if isinstance(val, str):
+                last_part = last_part.replace(key, val)
 
         # replace the name
         path_new = path.parent / last_part
@@ -1195,7 +1355,6 @@ class PyMaker:
 
         # do rename
         path.rename(path_new)
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

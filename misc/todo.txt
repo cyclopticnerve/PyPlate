@@ -1,4 +1,5 @@
 
+TODO: change __RM_XXX and _xxx_readme to 'mx/MX' (for markup/markdown)
 TODO: fix README instuctions for installing (like where it gets
 installed/uninstalled from)
 TODO: output each step to terminal from pymaker
@@ -26,6 +27,8 @@ with regex, replace line in array
 rat: break on colon, rest of line split at two spaces, that group 1 is values
 that group 2 split at last space, that group 1 is pad, group 2 is rat
 TODO: convert readme fix to html fix
+TODO: verify block/line switch keys and values against known values (cuts down
+on false positives?)
 
 my cn rat regex is public/private?
 it will need to be changed by dev

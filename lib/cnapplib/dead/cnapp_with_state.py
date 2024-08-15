@@ -243,7 +243,7 @@ class CNApp(Gtk.Application):
         # "module_name.Class_Name" should suffice.
 
         # split the class name into module name / internal class name
-        mod_class_name = class_win.split(".")
+        mod_class_name = class_win.split(".", 1)
         mod_name = mod_class_name[0]
         class_name = mod_class_name[1]
 

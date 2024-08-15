@@ -1,83 +1,92 @@
 """doc"""
 
-# TODO: will this fix header lines? it should, since we scan for them by regex
-# and fix separately from code
-
 from pathlib import Path
+import re
+from typing import Dict, Any
 
 path = Path(__file__).parent.resolve()
-path = path / "strs.py"
+path = path / "strs2.py"
 
-IN_TRIPS = False
+# ------------------------------------------------------------------------------
 
-def fix():
+S_SW_ENABLE = "enable"
+S_SW_DISABLE = "disable"
+S_SW_REPLACE = "replace"
+
+R_SW_SPLIT = r"(\'|\")([^\'\"\n]+)(\'|\")|(\#.*)"
+R_SW_SWITCH = r"^\s*#\s*pyplate\s*:\s*(\S*)\s*=\s*(\S*)\s*$"
+
+D_BLOCK = {
+    S_SW_REPLACE: True,
+}
+D_LINE: Dict[str, Any] = {
+    S_SW_REPLACE: None,
+}
+
+# ------------------------------------------------------------------------------
+
+def do_lines():
     """doc"""
-
-    print()
 
     with open(path, "r", encoding="UTF8") as a_file:
         lines = a_file.readlines()
 
-    global IN_TRIPS
-    IN_TRIPS = False
+    for line in lines:
 
-    for index, line in enumerate(lines):
-        # lines = lines_fix(lines)
-        # print(lines)
-        lines[index] = lines_fix(line)
+        code = line
+        comm = ""
 
-    print(lines)
+        matches = re.finditer(R_SW_SPLIT, line)
+        for match in matches:
+            if match.group(4):
+                split = match.start(4)
+                code = line[:split]
+                comm = line[split:]
 
+        handle_switch(code, comm)
 
-def lines_fix(line):
-    """doc"""
+        print("code :", code.rstrip())
+        print("comm :", comm.rstrip())
 
-    # skip blank lines
-    if line.strip() == "" or line.strip().startswith("#"):
-        return line
+        if (
+            D_BLOCK[S_SW_REPLACE]
+            and D_LINE[S_SW_REPLACE] != 0
+            or D_LINE[S_SW_REPLACE] == 1
+        ):
+            print("repl")
+        else:
+            print("no repl")
 
-    # --------------------------------------------------------------------------
-
-    # skip trips lines/trips blocks
-    global IN_TRIPS
-
-    # find trips
-    a_count = line.count('"""')
-
-    # we found a trip
-    if a_count > 0:
-
-        # if it is a one-liner
-        if a_count > 1:
-
-            # single line trips, just skip
-            IN_TRIPS = False
-            return line
-
-        # flip in_trips flag and skip
-        IN_TRIPS = not IN_TRIPS
-        return line
-
-    # skip trips and their contents
-    if IN_TRIPS:
-        return line
-
-    # --------------------------------------------------------------------------
-
-    # ignore trailing comments
-    parts = line.split("#")
-
-    # replace content
-    parts[0] = parts[0].replace("__PP_DIR_FOO__", "a_dir")
-
-    # rejoin trailing comments
-    line = "#".join(parts)
-
-    return line
-
+        print("----")
 
 # ------------------------------------------------------------------------------
 
-# do the thing
-if __name__ == "__main__":
-    fix()
+def handle_switch(code, comm):
+    """doc"""
+
+    switch = re.search(R_SW_SWITCH, comm)
+    if not switch:
+        return
+
+    key = switch.group(2)
+    val = switch.group(1)
+
+    if code.strip() == "":
+
+        if key in D_BLOCK:
+            if val == S_SW_ENABLE:
+                D_BLOCK[key] = True
+            elif val == S_SW_DISABLE:
+                D_BLOCK[key] = False
+
+    else:
+
+        D_LINE[key] = None
+        if key in D_LINE:
+            if val == S_SW_ENABLE:
+                D_LINE[key] = True
+            elif val == S_SW_DISABLE:
+                D_LINE[key] = False
+
+
+do_lines()

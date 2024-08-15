@@ -7,6 +7,7 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+# pyplate: disable=replace
 """
 The main file that runs the program
 
@@ -21,6 +22,7 @@ foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
 
 Typical usage is show in the main() method.
 """
+# pyplate: enable=replace
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -297,5 +299,9 @@ if __name__ == "__main__":
 
     # create a new instance of the main class
     __PP_NAME_CLASS__().main()
+
+# pyplate: disable=replace
+S1 = "__PP_NAME_BIG__"
+# pyplate: enable=replace
 
 # -)

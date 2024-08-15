@@ -78,6 +78,7 @@ S_ERR_DEBUG = (
 # keys for pybaker private dict
 S_KEY_PRJ_DEF = "PRJ_DEF"
 S_KEY_PRJ_DIST_DIRS = "PRJ_DIST_DIRS"
+S_KEY_PRJ_EXTRA = "PRJ_EXTRA"
 S_KEY_PRJ_CFG = "PRJ_CFG"
 
 # keys for metadata, blacklist, i18n in pybaker dev dict
@@ -113,7 +114,6 @@ S_KEY_FMT_VAL_PAD = "S_KEY_FMT_VAL_PAD"
 # and make any appropriate changes
 # also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
-S_ALL_DIR = "all"
 S_ALL_VENV = ".venv"
 S_ALL_CONF = "conf"
 S_ALL_DIST = "dist"
@@ -160,6 +160,23 @@ S_TREE_FILE = f"{S_ALL_MISC}/tree.txt"
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
+# switch constants
+S_SW_ENABLE = "enable"
+S_SW_DISABLE = "disable"
+S_SW_REPLACE = "replace"
+
+# comment char for most non-md/html/xml files
+S_COMM = "#"
+
+# ------------------------------------------------------------------------------
+# Integers
+# ------------------------------------------------------------------------------
+
+# values for line switches
+I_SW_NONE = -1
+I_SW_TRUE = 1
+I_SW_FALSE = 0
+
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
@@ -173,6 +190,15 @@ L_TYPES = [
     ["c", "CLI", "cli", "CLIs"],
     ["p", "Package", "pkg", "Packages"],
     ["g", "GUI", "gui", "GUIs"],
+]
+
+# list of file types to use md/html/xml fixer
+L_MARKUP = [
+    "md",
+    "html",
+    "xml",
+    "ui",
+    "glade",
 ]
 
 # list of keys to find in header
@@ -190,7 +216,7 @@ L_TYPES = [
 
 # NB: some of these are strictly for string replacement, but some are used by
 # pybaker, so don't remove anything unless you know what you are doing
-# if you want to ADD a key for string replacement only, use D_PRJ_DIST_DIRS
+# if you want to ADD a key for string replacement only, use D_PRJ_EXTRA
 
 # these are the settings that should be set before you run pymaker.py
 # consider them the "before create" settings
@@ -248,6 +274,10 @@ D_PRJ_DIST_DIRS = {
     "__PP_SUPPORT__": S_ALL_SUPPORT,  # where is rest of code
     "__PP_IMAGES__": S_ALL_IMAGES,  # where gui images are stored
 }
+
+# these values are string replace only
+# NB: constant values moved here so we can change them easier
+D_PRJ_EXTRA = {}
 
 # these are settings that will be calculated for you while running pymaker.py
 # consider them the "during create" settings
@@ -455,6 +485,17 @@ D_NAME_SEC = {
     "g": "Window class",
 }
 
+# default dict of block-level switches (should be I_SW_TRUE or I_SW_FALSE)
+D_SW_BLOCK_DEF = {
+    S_SW_REPLACE: I_SW_TRUE,
+}
+
+# default dict of line-level switches (should be I_SW_TRUE if present and
+# enabled, I_SW_FALSE if present and disabled, or I_SW_NONE if not present)
+D_SW_LINE_DEF = {
+    S_SW_REPLACE: I_SW_NONE,
+}
+
 # ------------------------------------------------------------------------------
 # Regex strings
 # ------------------------------------------------------------------------------
@@ -529,6 +570,22 @@ R_RM_SHORT_DESC_REP = r"\g<1>\n{}\n\g<3>"
 # search and sub flags
 # NB: need S for matches that span multiple lines (R_RM_LICENSE)
 R_RM_SUB_FLAGS = re.S
+
+# replace flag search and subs
+# NB: if group 1 is present, it is a hash comment
+# group 2 = enable, group 3 = replace
+
+# any and all whitespace EXCEPT newline
+W = r"[^\S\r\n]*"
+R_SW_BLOCK = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
+# R_SW_BLOCK = (
+#     # # pyplate:
+#     r"(^[^\S\r\n]*#[^\S\r\n]*pyplate[^\S\r\n]*:"
+#     # enable=replace
+#     r"[^\S\r\n]*(\S*)[^\S\r\n]*=[^\S\r\n]*(\S*)[^\S\r\n]*$)"
+# )
+R_SW_SPLIT = r"(\'|\")([^\'\"\n]+)(\'|\")|(\#.*)"
+R_SW_LINE = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
 
 # regex's to match project name
 R_PRJ_START = r"(^[a-zA-Z])"

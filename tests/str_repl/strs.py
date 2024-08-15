@@ -1,15 +1,20 @@
 """ __PP_DIR_FOO__ """
+'''__PP_DIR_FOO__'''
 
-S1 = "This is a test"
-S2 = "__PP_DIR_FOO__"
-S3 = "Test inline" # __PP_DIR_FOO__
+# pyplate: disable=replace
+S1 = 'this # is'  # #  a test # comment "# more"" '
+# bar#baz"not#or"#or#"this#"foo#bar# and " this #" '
+S2 = "this is # a test" + " of foobar # "  # 'foobar' '# foobar'
+# foobar: replace=enable
+S3 = "pyplate: enable=replace"
+X = 4
+"""
+# comment 
+"""  # comment
+'''
+this is code
+''' # foobar
 
-# __PP_DIR_FOO__
-
-def func():
-    """
-    don't replace this
-    __PP_DIR_FOO__
-    """
-
-S4 = "do this __PP_DIR_FOO__"
+# pyplate:enable=replace
+""  # comment
+X = "# pyplate: enable=replace" # pyplate: disable=replace

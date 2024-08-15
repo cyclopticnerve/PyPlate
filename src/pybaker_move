@@ -20,7 +20,7 @@ necessary files to create a complete distribution of the project.
 
 # TODO: fix every metadata using choice menu for new value
 # gonna need a lot of regex in pybaker.conf
-# TODO: do we need D_PRJ_DEF/D_PRJ_DIST_DIRS?
+# TODO: do we need D_PRJ_DEF/D_PRJ_EXTRA?
 # TODO: what do we need from D_PRJ_CFG? just __PP_DEV_PP__?
 
 # TODO: pybaker
@@ -368,6 +368,7 @@ class PyBaker:
             help=S_PRJ_HELP,
         )
 
+
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
@@ -380,4 +381,3 @@ if __name__ == "__main__":
     # run main method
     pb = PyBaker()
     pb.main()
-

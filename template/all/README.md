@@ -8,7 +8,7 @@
 
 # __PP_NAME_BIG__
 
-## "It mostly works™"
+## "It mostly works ™©®"
 
 <!-- __RM_LICENSE_START__ -->
 License: None
