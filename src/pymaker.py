@@ -149,6 +149,7 @@ class PyMaker:
         self._d_args = {}
         self._dir_prj = Path()
         self._dict_rep = {}
+        self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}
 
@@ -524,6 +525,10 @@ class PyMaker:
                 # if we shouldn't skip contents
                 if root not in skip_contents and item not in skip_contents:
 
+                    # for each new file, reset block and line switches to def
+                    self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
+                    self._dict_sw_line = dict(C.D_SW_LINE_DEF)
+
                     # check for header bl
                     bl_hdr = True
                     if root not in skip_header and item not in skip_header:
@@ -534,14 +539,12 @@ class PyMaker:
                     if root not in skip_code and item not in skip_code:
                         bl_code = False
 
-                    # check the file type (md/html/xml or other)
+                    # do md/html/xml separately (needs special handling)
                     wo_dot = item.suffix.lstrip(".")
                     w_dot = "." + wo_dot
-                    # if it is a markup/markdown file, handle separately
-                    if wo_dot in C.L_MARKUP or w_dot in C.L_MARKUP:
-                        self._fix_markup(item, bl_hdr, bl_code)
+                    if w_dot in C.L_MARKUP or wo_dot in C.L_MARKUP:
+                        self._fix_readme(item, bl_hdr, bl_code)
                     else:
-                        # fix python
                         self._fix_content(item, bl_hdr, bl_code)
 
                 # --------------------------------------------------------------
@@ -871,11 +874,11 @@ class PyMaker:
         return res
 
     # --------------------------------------------------------------------------
-    # Edit/remove parts of a mark-up/down structured file
+    # Edit/remove parts of the main README file
     # --------------------------------------------------------------------------
-    def _fix_markup(self, path, bl_hdr, bl_code):
+    def _fix_readme(self, path, bl_hdr, bl_code):
         """
-        Fix license/image and remove unnecessary parts of the README file
+         Edit/remove parts of the main README file
 
         Arguments:
             path: Path for the README to remove text
@@ -884,9 +887,6 @@ class PyMaker:
 
         Edits/removes parts of the file using the C.D_PRJ_CFG settings.
         """
-
-        # ----------------------------------------------------------------------
-        # do the headers first
 
         # default lines
         lines = []
@@ -1085,10 +1085,6 @@ class PyMaker:
         header line or a code line. Ignore blank lines and comment-only lines.
         """
 
-        # for each new file, reset block and line switches to default
-        self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
-        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
-
         # default lines
         lines = []
 
@@ -1109,28 +1105,8 @@ class PyMaker:
             # ------------------------------------------------------------------
             # check for block switches
 
-            # match python block switches ('# python: enable=replace', etc)
-            match = re.match(C.R_SW_BLOCK, line)
-
-            # this line is a block switch
-            if match and match.group(1):
-                key = match.group(3)
-                val = match.group(2)
-
-                # check if key is valid
-                valid = False
-                if key in self._dict_sw_block:
-                    # test for specific values, in case it is malformed
-                    if val == C.S_SW_ENABLE:
-                        self._dict_sw_block[key] = C.I_SW_TRUE
-                        valid = True
-                    elif val == C.S_SW_DISABLE:
-                        self._dict_sw_block[key] = C.I_SW_FALSE
-                        valid = True
-
-                # if we found a valid block switch, no further processing
-                if valid:
-                    continue
+            if self._check_switches(line):
+                continue
 
             # ------------------------------------------------------------------
             # check for header
@@ -1150,11 +1126,10 @@ class PyMaker:
                     continue
 
             # ------------------------------------------------------------------
-            # check for any other comment lines
-
-            if line.lstrip().startswith(C.S_COMM):
-                # match = re.search(C.R_COMM_ONLY, line)
-                # if match:
+            # skip any other comment lines
+            if line.lstrip().startswith(C.S_COMM) or line.lstrip().startswith(
+                C.S_COMM_HTML
+            ):
                 continue
 
             # ------------------------------------------------------------------
@@ -1277,26 +1252,15 @@ class PyMaker:
                 comm = line[split:]
 
         # --------------------------------------------------------------
-        # check for line switches
+        # # check for line switches
 
         # for each line, reset line dict
         self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
-        # match python block switches ('# python: enable=replace', etc)
-        match = re.match(C.R_SW_BLOCK, comm)
+        # do the check
+        self._check_switches(comm, True)
 
-        # this line is a line switch
-        if match and match.group(1):
-            key = match.group(3)
-            val = match.group(2)
-
-            # check if key is valid
-            if key in self._dict_sw_line:
-                # test for specific values, in case it is malformed
-                if val == C.S_SW_ENABLE:
-                    self._dict_sw_line[key] = C.I_SW_TRUE
-                elif val == C.S_SW_DISABLE:
-                    self._dict_sw_line[key] = C.I_SW_FALSE
+        # ----------------------------------------------------------------------
 
         # check for block or line replace switch
         repl = False
@@ -1355,6 +1319,169 @@ class PyMaker:
 
         # do rename
         path.rename(path_new)
+
+    # def _fix_readme(self, path):
+
+    # ----------------------------------------------------------------------
+    # next is license
+
+    # get replacement value
+    # pp_license_name = C.D_PRJ_DEF["__PP_LICENSE_NAME__"]
+    # pp_license_img = C.D_PRJ_DEF["__PP_LICENSE_IMG__"]
+    # pp_license_link = C.D_PRJ_DEF["__PP_LICENSE_LINK__"]
+
+    # # the default license value
+    # pp_license_full = (
+    #     f"[![{pp_license_name}]"  # alt text
+    #     f"({pp_license_img}"  # img src
+    #     f' "{pp_license_link}"'  # img tooltip
+    #     f")]({pp_license_link})"  # img link
+    # )
+
+    # # find the license block
+    # str_pattern = C.R_RM_LICENSE
+
+    # # replace text
+    # str_rep = C.R_RM_LICENSE_REP.format(pp_license_full)
+    # text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
+
+    # # ----------------------------------------------------------------------
+    # # now do description
+
+    # # find the short desc block
+    # str_pattern = C.R_RM_SHORT_DESC
+
+    # # get the new description
+    # new_desc = C.D_PRJ_META["__PP_SHORT_DESC__"]
+
+    # # replace text
+    # str_rep = C.R_RM_SHORT_DESC_REP.format(new_desc)
+    # text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
+
+    # # ----------------------------------------------------------------------
+
+    # # save file
+    # with open(path, "w", encoding="UTF-8") as a_file:
+    #     a_file.write(text)
+
+    # # ----------------------------------------------------------------------
+    # # now strip file of unnecessary lines
+
+    # # default lines
+    # lines = []
+
+    # # open and read file
+    # with open(path, "r", encoding="UTF-8") as a_file:
+    #     lines = a_file.readlines()
+
+    # # NB: the strategy here is to go through the full README and only copy
+    # # lines that are:
+    # # 1. not in any block
+    # # or
+    # # 2. in the block we want
+    # # the most efficient way to do this is to have an array that receives
+    # # wanted lines, then return that array
+    # # we use a new array vs. in-situ replacement here b/c we are removing A
+    # # LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
+    # # while that would look *ok* in the resulting Markdown, looks UGLY in
+    # # the source code
+    # # so we opt for not copying those lines.
+
+    # # just a boolean flag to say if we are kajiggering
+    # # if True, we are in a block we don't want to copy
+    # # assume False to say we want to copy
+    # ignore = False
+    # rm_delete_start = ""
+    # rm_delete_end = ""
+
+    # # what to ignore in the text
+    # # first get type of project
+    # prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
+    # for key, val in C.D_README.items():
+    #     if prj_type == key:
+    #         # get values for keys
+    #         rm_delete_start = val["__RM_DELETE_START__"]
+    #         rm_delete_end = val["__RM_DELETE_END__"]
+    #         break
+
+    # # where to put the needed lines
+    # new_lines = []
+
+    # # for each line
+    # for line in lines:
+    #     # check if we have entered an invalid block
+    #     if rm_delete_start in line:
+    #         ignore = True
+
+    #     # we're (still) in a valid block
+    #     if not ignore:
+    #         # iadd stuff inside valid block or outside any block
+    #         new_lines.append(line)
+
+    #     # check if we have left the invalid block
+    #     if rm_delete_end in line:
+    #         ignore = False
+
+    # # save lines to README.md
+    # with open(path, "w", encoding="UTF-8") as a_file:
+    #     a_file.writelines(new_lines)
+
+    # --------------------------------------------------------------------------
+    # Check if line or trailing comment is a switch
+    # --------------------------------------------------------------------------
+    def _check_switches(self, line, block=True):
+        """
+        Check if line or trailing comment is a switch
+
+        Arguments:
+            line: The line to check for block switches
+            block: True if we want to check a block switch, False if we want
+            to check a line switch
+
+        Returns:
+            True if a valid switch is found, False otherwise
+
+        This method checks to see if a line or trailing comment contains a
+        valid switch (for either markup or regular files). If a valid switch is
+        found, it sets the appropriate flag in either self._dict_sw_block or
+        self._dict_sw_line and returns True.
+        """
+
+        # match  switches ('#|<!-- python: enable=replace', etc)
+        match = re.match(C.R_SW_BLOCK, line)
+        if not match:
+            return False
+
+        # this line is a switch, is it py or html?
+        if match.group(1):
+            # py
+            key = match.group(3)
+            val = match.group(2)
+        elif match.group(4):
+            # html
+            key = match.group(6)
+            val = match.group(5)
+
+        # which dict to modify
+        dict_to_check = self._dict_sw_block
+        if not block:
+            dict_to_check = self._dict_sw_line
+
+        # ditch any matches that are not valid keys/vals
+        if not key or not val or not key in dict_to_check:
+            return False
+
+        # test for specific values, in case it is malformed
+        if val == C.S_SW_ENABLE:
+            dict_to_check[key] = C.I_SW_TRUE
+            return True
+        if val == C.S_SW_DISABLE:
+            dict_to_check[key] = C.I_SW_FALSE
+            return True
+
+        # no valid switch found
+        return False
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

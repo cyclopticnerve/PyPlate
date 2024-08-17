@@ -167,6 +167,7 @@ S_SW_REPLACE = "replace"
 
 # comment char for most non-md/html/xml files
 S_COMM = "#"
+S_COMM_HTML = "<!--"
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -553,6 +554,11 @@ D_SW_LINE_DEF = {
 # regex to find dunders in files
 # R_CODE_DUN = r"__\S\S_\S*__"
 
+# regex's to match project name
+R_PRJ_START = r"(^[a-zA-Z])"
+R_PRJ_END = r"([a-zA-Z\d]$)"
+R_PRJ_MID = r"(^[a-zA-Z\d\-_]*$)"
+
 # regex strings for readme to replace license image
 R_RM_LICENSE_START = D_README["RM_LICENSE"]["__RM_LICENSE_START__"]
 R_RM_LICENSE_END = D_README["RM_LICENSE"]["__RM_LICENSE_END__"]
@@ -564,7 +570,7 @@ R_RM_LICENSE_REP = r"\g<1>\n{}\n\g<3>"
 R_RM_SHORT_DESC_START = D_README["RM_SHORT_DESC"]["__RM_SHORT_DESC_START__"]
 R_RM_SHORT_DESC_END = D_README["RM_SHORT_DESC"]["__RM_SHORT_DESC_END__"]
 R_RM_SHORT_DESC = rf"({R_RM_SHORT_DESC_START})(.*?)({R_RM_SHORT_DESC_END})"
-# NB: format param is full license string
+# NB: format param is full short desc string
 R_RM_SHORT_DESC_REP = r"\g<1>\n{}\n\g<3>"
 
 # search and sub flags
@@ -578,19 +584,8 @@ R_RM_SUB_FLAGS = re.S
 # any and all whitespace EXCEPT newline
 W = r"[^\S\r\n]*"
 R_SW_BLOCK = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
-# R_SW_BLOCK = (
-#     # # pyplate:
-#     r"(^[^\S\r\n]*#[^\S\r\n]*pyplate[^\S\r\n]*:"
-#     # enable=replace
-#     r"[^\S\r\n]*(\S*)[^\S\r\n]*=[^\S\r\n]*(\S*)[^\S\r\n]*$)"
-# )
 R_SW_SPLIT = r"(\'|\")([^\'\"\n]+)(\'|\")|(\#.*)"
 R_SW_LINE = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
-
-# regex's to match project name
-R_PRJ_START = r"(^[a-zA-Z])"
-R_PRJ_END = r"([a-zA-Z\d]$)"
-R_PRJ_MID = r"(^[a-zA-Z\d\-_]*$)"
 
 # ------------------------------------------------------------------------------
 # Public functions
