@@ -31,6 +31,15 @@ B_CMD_GIT = True
 B_CMD_VENV = True
 
 # ------------------------------------------------------------------------------
+# Integers
+# ------------------------------------------------------------------------------
+
+# values for line switches
+I_SW_NONE = -1
+I_SW_TRUE = 1
+I_SW_FALSE = 0
+
+# ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
 
@@ -40,7 +49,7 @@ S_VERSION = "0.0.1"
 # base dir for project type folders, relative to dev home
 S_DIR_BASE = "Documents/Projects/Python"
 
-# NB: format params are L_TYPES[0], L_TYPES[1]
+# NB: format params are keys in D_TYPES and D_TYPES[key][0]
 S_TYPE_FMT = "{} ({})"
 # join each project type with this
 S_TYPE_JOIN = " | "
@@ -57,7 +66,7 @@ S_ERR_TYPE = "Type must be one of {}"
 S_ERR_LEN = "Project names must be more than 1 character"
 S_ERR_START = "Project names must start with a letter"
 S_ERR_END = "Project names must end with a letter or number"
-S_ERR_CONTAIN = (
+S_ERR_MID = (
     "Project names must contain only letters, numbers,"
     "dashes (-), or underscores (_)"
 )
@@ -102,12 +111,18 @@ S_KEY_NO_EXT = "NO_EXT"
 S_KEY_LOCALE = "LOCALE"
 S_KEY_PO = "PO"
 
-# header dict keys
-S_KEY_HDR_SEARCH = "S_KEY_HDR_SEARCH"
-S_KEY_HDR_REPLACE = "S_KEY_HDR_REPLACE"
-S_KEY_GRP_VAL = "S_KEY_GRP_VAL"
-S_KEY_GRP_PAD = "S_KEY_GRP_PAD"
-S_KEY_FMT_VAL_PAD = "S_KEY_FMT_VAL_PAD"
+# python header/split dict keys
+S_KEY_HDR = "S_KEY_HDR"
+S_KEY_LEAD = "S_KEY_GRP_LEAD"
+S_KEY_VAL = "S_KEY_GRP_VAL"
+S_KEY_PAD = "S_KEY_GRP_PAD"
+S_KEY_SWITCH = "S_KEY_SWITCH"
+S_KEY_COMM = "S_KEY_COMM"
+S_KEY_SPLIT = "S_KEY_SPLIT"
+
+S_KEY_NAME_START = "S_KEY_NAME_START"
+S_KEY_NAME_END = "S_KEY_NAME_END"
+S_KEY_NAME_MID = "S_KEY_NAME_MID"
 
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
@@ -165,33 +180,9 @@ S_SW_ENABLE = "enable"
 S_SW_DISABLE = "disable"
 S_SW_REPLACE = "replace"
 
-# comment char for most non-md/html/xml files
-S_COMM = "#"
-S_COMM_HTML = "<!--"
-
-# ------------------------------------------------------------------------------
-# Integers
-# ------------------------------------------------------------------------------
-
-# values for line switches
-I_SW_NONE = -1
-I_SW_TRUE = 1
-I_SW_FALSE = 0
-
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
-
-# the types of projects this script can create
-# value[0] is the short display name and the char to enter
-# value[1] is the long display name
-# value[2] is the template folder to copy
-# value[3] id the top level folder to put each project in
-L_TYPES = [
-    ["c", "CLI", "cli", "CLIs"],
-    ["p", "Package", "pkg", "Packages"],
-    ["g", "GUI", "gui", "GUIs"],
-]
 
 # list of file types to use md/html/xml fixer
 L_MARKUP = [
@@ -201,15 +192,6 @@ L_MARKUP = [
     "ui",
     "glade",
 ]
-
-# list of keys to find in header
-# L_HEADER = [
-#     "Project",
-#     "Filename",
-#     "Date",
-#     "Author",
-#     "License",
-# ]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
@@ -320,6 +302,17 @@ D_PRJ_META = {
     "__PP_GUI_CATS__": [],
 }
 
+# the types of projects this script can create
+# key is the short display name and the char to enter
+# value[0] is the long display name
+# value[1] is the template folder to copy
+# value[2] is the top level folder to put each project in
+D_TYPES = {
+    "c": ["CLI", "cli", "CLIs"],
+    "p": ["Package", "pkg", "Packages"],
+    "g": ["GUI", "gui", "GUIs"],
+}
+
 # the lists of dirs/files we don't mess with while running pymaker
 # each item can be a full path, a path relative to the project directory, or a
 # glob
@@ -340,7 +333,6 @@ D_BLACKLIST = {
         S_ALL_LOCALE,
         S_ALL_MISC,
         S_ALL_README,
-        "CHANGELOG.md",
         "LICENSE.txt",
         "requirements.txt",
         "**/__pycache__",
@@ -361,6 +353,7 @@ D_BLACKLIST = {
     S_KEY_SKIP_CODE: [
         "MANIFEST.in",
         ".gitignore",
+        "CHANGELOG.md",
     ],
     # fix header, fix text, skip path (1 1 0)
     # NB: not really useful, since we always want to fix paths with dunders,
@@ -426,58 +419,40 @@ D_COPY = {
 
 # files to remove after the project is done
 # paths are relative to project dir
-# key is prj type key from L_TYPES[0]
-# val is path relative to dir_prj
-D_PURGE = {"p": [Path(S_ALL_TESTS) / "ABOUT"]}
-
-# the dict of sections to remove in the README file
-# key is the project type we are making (from L_TYPES[2], the template src dir)
-# or a special section of the readme
-# rm_delete_start is the tag at the start of the section to remove
-# rm_delete_end is the tag at the end of the section to remove
-# NB: these tags start with 'RM' instead of 'PP' because most 'PP' keys will
-# remain in the file, and we don't want pybaker to report their presence as an
-# error
-# this way you can have different sections in the readme for things like
-# installation instructions, depending on whether your project is a package or
-# a cli/gui app
-D_README = {
-    "RM_LICENSE": {
-        "__RM_LICENSE_START__": "<!-- __RM_LICENSE_START__ -->",
-        "__RM_LICENSE_END__": "<!-- __RM_LICENSE_END__ -->",
-    },
-    "RM_SHORT_DESC": {
-        "__RM_SHORT_DESC_START__": "<!-- __RM_SHORT_DESC_START__ -->",
-        "__RM_SHORT_DESC_END__": "<!-- __RM_SHORT_DESC_END__ -->",
-    },
-    "cli": {
-        "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
-        "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
-    },
-    "gui": {
-        "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
-        "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
-    },
-    "pkg": {
-        "__RM_DELETE_START__": "<!-- __RM_APP_START__ -->",
-        "__RM_DELETE_END__": "<!-- __RM_APP_END__ -->",
-    },
+# key is prj type key from D_TYPES or "all"
+# val is list of paths relative to dir_prj
+D_PURGE = {
+    "all": [
+        Path(S_ALL_SRC) / "ABOUT"],
+    "p": [Path(S_ALL_TESTS) / "ABOUT"],
 }
 
-# the info for matching/fixing header lines
-D_HEADER = {
-    S_KEY_HDR_SEARCH: (
-        r"^((#|<!--) \S* *: )"  # 1/2 keyword
-        r"(\S+( \S+)*)"  # 3/4 value (multi word)
-        r"( *)"  # 5 padding (if any)
-        r"(.*)"  # 6 rat (if any)
+# the info for matching/fixing lines in markup files
+D_MU_REPL = {
+    S_KEY_HDR: r"^(\s*<!--\s*\S*\s*:\s*)(\S+)(.*-->.*)$",
+    S_KEY_LEAD: 1,
+    S_KEY_VAL: 2,
+    S_KEY_PAD: 3,
+    S_KEY_SWITCH: (
+        r"^[^\S\r\n]*<!--[^\S\r\n]*pyplate[^\S\r\n]*:"
+        r"[^\S\r\n]*(\S*)[^\S\r\n]*=[^\S\r\n]*(\S*)[^\S\r\n]*-->$"
     ),
-    # format param is fmt_val_pad result
-    S_KEY_HDR_REPLACE: r"\g<1>{}\g<6>",
-    S_KEY_GRP_VAL: 3,
-    S_KEY_GRP_PAD: 5,
-    # format params are grp_val and grp_pad result
-    S_KEY_FMT_VAL_PAD: "{}{}",
+    S_KEY_COMM: r"^\s*<!--(.*)-->\s*$",
+    S_KEY_SPLIT: r"(\'|\")([^\'\"\n]+)(\'|\")|(<!--.*-->)$",
+}
+
+# the info for matching/fixing lines in non-markup files
+D_PY_REPL = {
+    S_KEY_HDR: r"^(\s*#\s*\S*\s*:\s*)(\S+)(.*)$",
+    S_KEY_LEAD: 1,
+    S_KEY_VAL: 2,
+    S_KEY_PAD: 3,
+    S_KEY_SWITCH: (
+        r"^[^\S\r\n]*#[^\S\r\n]*pyplate[^\S\r\n]*:"
+        r"[^\S\r\n]*(\S*)[^\S\r\n]*=[^\S\r\n]*(\S*)[^\S\r\n]*$"
+    ),
+    S_KEY_COMM: r"^\s*#",
+    S_KEY_SPLIT: r"(\'|\")([^\'\"\n]+)(\'|\")|(#.*)$",
 }
 
 # the type of projects that will ask for a second name
@@ -497,95 +472,12 @@ D_SW_LINE_DEF = {
     S_SW_REPLACE: I_SW_NONE,
 }
 
-# ------------------------------------------------------------------------------
-# Regex strings
-# ------------------------------------------------------------------------------
-
-# if not using rat, and your headers are simple, you can use a regex like:
-
-# group 1 is the keyword from L_HEADER
-# group 2 is value
-# group 2 will have its text replaced and passed to R_HDR_REP
-# R_HDR_SCH = r"^(# {}\s*: )(\S*)"
-# R_HDR_REP = r"\g<1>{}"
-# R_HDR_VAL = 2
-
-# or even simpler:
-# the whole match will have its text replaced and passed to R_HDR_REP
-# R_HDR_SCH = r"^# {}\s*: \S*"
-# R_HDR_REP = r"{}"
-# R_HDR_VAL = 0
-
-# if you are using right-aligned text, you will need at least 3 groups:
-# 1. everything before the value (keyword, colon, etc)
-# 2. the value and the padding
-# 3. the rat
-# then your replacement string should look like:
-# R_HDR_REP = r"\g<1>{}\g<3>
-# and you should set R_HDR_VAL = 2
-
-# this is my setup:
-
-# the regex to split val/pad
-# NB: format params will be val and pad
-# NB: done first to reuse in R_HDR_SCH
-# R_VP_SCH = r"(\S+( \S+)*)(\s*)"
-# R_VP_REP = "{}{}"
-# R_VAL_GRP = 1
-# R_PAD_GRP = 3
-
-# the regex to split a line
-# group 1 is keyword/colon
-# group 2/3/4/5 is value and padding (multi word support)
-# group 6 is rat
-# NB: format params are comment str and item from L_HEADER
-# NB: make sure this uses R_MULTI_WORD
-# NB: note that R_VP_SCH is 3 groups, adjust group indexes
-# private
-# R_HDR_SCH = (
-#     r"^({} {}\s*: )"  # keyword
-#     rf"({R_VP_SCH})"  # value/padding
-#     r"(.*)"  # rat
-# )
-# # NB: format param is contents of group R_HDR_VAL after string replacement
-# R_HDR_REP = r"\g<1>{}\g<6>"
-# R_HDR_VAL = 2
-
-# regex to find dunders in files
-# R_CODE_DUN = r"__\S\S_\S*__"
-
 # regex's to match project name
-R_PRJ_START = r"(^[a-zA-Z])"
-R_PRJ_END = r"([a-zA-Z\d]$)"
-R_PRJ_MID = r"(^[a-zA-Z\d\-_]*$)"
-
-# regex strings for readme to replace license image
-R_RM_LICENSE_START = D_README["RM_LICENSE"]["__RM_LICENSE_START__"]
-R_RM_LICENSE_END = D_README["RM_LICENSE"]["__RM_LICENSE_END__"]
-R_RM_LICENSE = rf"({R_RM_LICENSE_START})(.*?)({R_RM_LICENSE_END})"
-# NB: format param is full license string
-R_RM_LICENSE_REP = r"\g<1>\n{}\n\g<3>"
-
-# regex strings for readme to replace short description
-R_RM_SHORT_DESC_START = D_README["RM_SHORT_DESC"]["__RM_SHORT_DESC_START__"]
-R_RM_SHORT_DESC_END = D_README["RM_SHORT_DESC"]["__RM_SHORT_DESC_END__"]
-R_RM_SHORT_DESC = rf"({R_RM_SHORT_DESC_START})(.*?)({R_RM_SHORT_DESC_END})"
-# NB: format param is full short desc string
-R_RM_SHORT_DESC_REP = r"\g<1>\n{}\n\g<3>"
-
-# search and sub flags
-# NB: need S for matches that span multiple lines (R_RM_LICENSE)
-R_RM_SUB_FLAGS = re.S
-
-# replace flag search and subs
-# NB: if group 1 is present, it is a hash comment
-# group 2 = enable, group 3 = replace
-
-# any and all whitespace EXCEPT newline
-W = r"[^\S\r\n]*"
-R_SW_BLOCK = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
-R_SW_SPLIT = r"(\'|\")([^\'\"\n]+)(\'|\")|(\#.*)"
-R_SW_LINE = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
+D_NAME = {
+    S_KEY_NAME_START: r"(^[a-zA-Z])",
+    S_KEY_NAME_END: r"([a-zA-Z\d]$)",
+    S_KEY_NAME_MID: r"(^[a-zA-Z\d\-_]*$)",
+}
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -595,19 +487,17 @@ R_SW_LINE = rf"(^{W}#{W}pyplate{W}:{W}(\S*){W}={W}(\S*){W}$)"
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix():
+def do_before_fix(_dir_prj):
     """
     Do any work before fix
+
+    Arguments:
+        dir_prj: The root of the new project
 
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
     modified.
     """
-
-    # TODO: move all stuff that should not be built-in from
-    # _get_project_info/_do_fix into here
-
-    # TODO: do this stuff in pybaker
 
     # get values after pymaker has set them
     author = D_PRJ_DEF["__PP_AUTHOR__"]
@@ -622,38 +512,186 @@ def do_before_fix():
 # --------------------------------------------------------------------------
 # Do any work after fix
 # --------------------------------------------------------------------------
-def do_after_fix():
+def do_after_fix(dir_prj):
     """
     Do any work after fix
 
-    Do any work after fix. This method is called at the end of the internal _do_after_fix, after
-    all files have been modified.
+    Arguments:
+        dir_prj: The root of the new project
+
+    Do any work after fix. This method is called at the end of the internal
+    _do_after_fix, after all files have been modified.
     """
 
-    # TODO: move _fix_readme call from _do_fix to here - should not be built-in
-    # TODO: move any stuff that should not be built-in in _do_after_fix to
-    # here
+    for root, _root_dirs, root_files in dir_prj.walk(top_down=False):
+
+        # convert files into Paths
+        files = [root / f for f in root_files]
+
+        # for each file item
+        for item in files:
+            # check if readme
+            if root == dir_prj and item.name == "README.md":
+                fix_readme(item)
 
 
-# ------------------------------------------------------------------------------
-# Return a string of a Path object without dev home
-# ------------------------------------------------------------------------------
-# def get_no_home(path):
-#     """
-#     Return a string of a Path object without dev home
+# --------------------------------------------------------------------------
+# Edit/remove parts of the main README file
+# --------------------------------------------------------------------------
+def fix_readme(path):
+    """
+    Edit/remove parts of the main README file
 
-#     Arguments:
-#         path: The Path object to remove the home folder from
+    Arguments:
+        path: Path for the README to remove text
 
-#     Remove the home folder component from a path object and return the string
-#     representation. It is here so it can be used anywhere.
-#     """
+    Edits/removes parts of the file using the C.D_PRJ_CFG settings.
+    """
 
-#     h = str(Path.home())
-#     s = str(path)
-#     s = s.replace(h, "")
-#     s = s.lstrip(S)
-#     return s
+    # TODO: holy hell this is shite
+
+    # key is the project type we are making (from D_TYPES[key][1], the template
+    # src dir) or a special section of the readme
+    # rm_delete_start is the tag at the start of the section to remove
+    # rm_delete_end is the tag at the end of the section to remove
+    # NB: these tags start with 'RM' instead of 'PP' because most 'PP' keys will
+    # remain in the file, and we don't want pybaker to report their presence as an
+    # error
+    # this way you can have different sections in the readme for things like
+    # installation instructions, depending on whether your project is a package or
+    # a cli/gui app
+    d_readme = {
+        "RM_LICENSE": {
+            "__RM_LICENSE_START__": "<!-- __RM_LICENSE_START__ -->",
+            "__RM_LICENSE_END__": "<!-- __RM_LICENSE_END__ -->",
+        },
+        "RM_SHORT_DESC": {
+            "__RM_SHORT_DESC_START__": "<!-- __RM_SHORT_DESC_START__ -->",
+            "__RM_SHORT_DESC_END__": "<!-- __RM_SHORT_DESC_END__ -->",
+        },
+        "RM_SCREENSHOT": {
+            "__RM_SCREENSHOT_START__": "<!-- __RM_SCREENSHOT_START__ -->",
+            "__RM_SCREENSHOT_END__": "<!-- __RM_SCREENSHOT_END__ -->",
+        },
+        "RM_PY_DEPS": {
+            "__RM_PY_DEPS_START__": "<!-- __RM_PY_DEPS_START__ -->",
+            "__RM_PY_DEPS_END__": "<!-- __RM_PY_DEPS_END__ -->",
+        },
+        "c": {
+            "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
+            "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
+        },
+        "g": {
+            "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
+            "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
+        },
+        "p": {
+            "__RM_DELETE_START__": "<!-- __RM_APP_START__ -->",
+            "__RM_DELETE_END__": "<!-- __RM_APP_END__ -->",
+        },
+    }
+
+    # regex strings for readme to replace license in README
+    r_rm_license_start = d_readme["RM_LICENSE"]["__RM_LICENSE_START__"]
+    r_rm_license_end = d_readme["RM_LICENSE"]["__RM_LICENSE_END__"]
+    r_rm_license = rf"({r_rm_license_start})(.*?)({r_rm_license_end})"
+    # NB: format param is full license string
+    r_rm_license_rep = r"\g<1>\n{}\n\g<3>"
+
+    # regex strings for readme to replace short description in README
+    r_rm_short_desc_start = d_readme["RM_SHORT_DESC"]["__RM_SHORT_DESC_START__"]
+    r_rm_short_desc_end = d_readme["RM_SHORT_DESC"]["__RM_SHORT_DESC_END__"]
+    r_rm_short_desc = rf"({r_rm_short_desc_start})(.*?)({r_rm_short_desc_end})"
+    # NB: format param is full short desc string
+    r_rm_short_desc_rep = r"\g<1>\n{}\n\g<3>"
+
+    # regex strings for readme to replace screenshot in README
+    r_rm_screenshot_start = d_readme["RM_SCREENSHOT"]["__RM_SCREENSHOT_START__"]
+    r_rm_screenshot_end = d_readme["RM_SCREENSHOT"]["__RM_SCREENSHOT_END__"]
+    r_rm_screenshot = rf"({r_rm_screenshot_start})(.*?)({r_rm_screenshot_end})"
+    # NB: format param is full short desc string
+    r_rm_screenshot_rep = r"\g<1>\n{}\n\g<3>"
+
+    # search and sub flags for README
+    # NB: need S for matches that span multiple lines (R_RM_LICENSE/R_RM_SHORT_DESC)
+    r_rm_sub_flags = re.S  # the dict of sections to remove in the README file
+
+    # --------------------------------------------------------------------------
+
+    # default text if we can't open file
+    text = ""
+
+    # open and read file
+    with open(path, "r", encoding="UTF-8") as a_file:
+        text = a_file.read()
+
+    # ----------------------------------------------------------------------
+    # first is license
+
+    # get replacement value
+    pp_license_name = D_PRJ_DEF["__PP_LICENSE_NAME__"]
+    pp_license_img = D_PRJ_DEF["__PP_LICENSE_IMG__"]
+    pp_license_link = D_PRJ_DEF["__PP_LICENSE_LINK__"]
+
+    # the default license value
+    new_license = (
+        f"[![{pp_license_name}]"  # alt text
+        f"({pp_license_img}"  # img src
+        f' "{pp_license_link}"'  # img tooltip
+        f")]({pp_license_link})"  # img link
+    )
+
+    # find the license block
+    str_pattern = r_rm_license
+
+    # replace text
+    str_rep = r_rm_license_rep.format(new_license)
+    text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
+
+    # ----------------------------------------------------------------------
+    # now do description
+
+    # get the new description
+    new_desc = D_PRJ_META["__PP_SHORT_DESC__"]
+
+    # find the short desc block
+    str_pattern = r_rm_short_desc
+
+    # replace text
+    str_rep = r_rm_short_desc_rep.format(new_desc)
+    text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
+
+    # ----------------------------------------------------------------------
+    # now do screenshot
+
+    # get the new description
+    new_ss = D_PRJ_META.get("__PP_SCREENSHOT__", None)
+    if new_ss:
+        # find the short desc block
+        str_pattern = r_rm_screenshot
+
+        # replace text
+        str_rep = r_rm_screenshot_rep.format(new_ss)
+        text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
+
+    # ----------------------------------------------------------------------
+
+    # find the remove blocks
+    prj_type = D_PRJ_CFG["__PP_TYPE_PRJ__"]
+    if prj_type == "c" or prj_type == "g":
+        str_pattern = "<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
+    else:
+        str_pattern = "<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
+
+    # replace text
+    str_rep = ""
+    text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
+
+    # --------------------------------------------------------------------------
+
+    # save file
+    with open(path, "w", encoding="UTF-8") as a_file:
+        a_file.write(text)
 
 
 # -)

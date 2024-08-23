@@ -250,8 +250,8 @@ class PyMaker:
 
         # build the input question
         types = []
-        for item in C.L_TYPES:
-            s = C.S_TYPE_FMT.format(item[0], item[1])
+        for key, val in C.D_TYPES.items():
+            s = C.S_TYPE_FMT.format(key, val[0])
             types.append(s)
         str_types = C.S_TYPE_JOIN.join(types)
 
@@ -271,10 +271,9 @@ class PyMaker:
                 break
 
         # get output subdir
-        for item in C.L_TYPES:
-            if item[0] == prj_type:
-                prj_type = item[2]
-                dir_prj_type = item[3]
+        for key, val in C.D_TYPES.items():
+            if key == prj_type:
+                dir_prj_type = val[2]
 
         # ----------------------------------------------------------------------
         # next question is name
@@ -418,19 +417,23 @@ class PyMaker:
         # do template/all
 
         # copy common stuff
-        shutil.copytree(P_DIR_PP_ALL, self._dir_prj)
+        src = P_DIR_PP_ALL
+        dst = self._dir_prj
+        shutil.copytree(src, dst)
 
         # ----------------------------------------------------------------------
         # do template/type
-
-        # get a path to the template dir for this project type
+        prj_tmp = ""
         prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
+        for key, val in C.D_TYPES.items():
+            if key == prj_type:
+                prj_tmp = val[1]
+                break
 
         # get the src dir in the template dir
-        dir_type = P_DIR_PP_TEMPLATE / prj_type
-
-        # copy into existing dir
-        shutil.copytree(dir_type, self._dir_prj, dirs_exist_ok=True)
+        src = P_DIR_PP_TEMPLATE / prj_tmp
+        dst = self._dir_prj
+        shutil.copytree(src, dst, dirs_exist_ok=True)
 
         # ----------------------------------------------------------------------
         # do copy dict
@@ -462,7 +465,7 @@ class PyMaker:
         """
 
         # call public before fix function
-        C.do_before_fix()
+        C.do_before_fix(self._dir_prj)
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -540,12 +543,20 @@ class PyMaker:
                         bl_code = False
 
                     # do md/html/xml separately (needs special handling)
+                    # mu = False
+                    d_repl = C.D_PY_REPL
                     wo_dot = item.suffix.lstrip(".")
                     w_dot = "." + wo_dot
-                    if w_dot in C.L_MARKUP or wo_dot in C.L_MARKUP:
-                        self._fix_readme(item, bl_hdr, bl_code)
-                    else:
-                        self._fix_content(item, bl_hdr, bl_code)
+                    if wo_dot in C.L_MARKUP or w_dot in C.L_MARKUP:
+                        # mu = True
+                        d_repl = C.D_MU_REPL
+                        print("markup:", item)
+
+                    self._fix_content(item, bl_hdr, bl_code, d_repl)
+
+                    #     self._fix_mu_content(item, bl_hdr, bl_code)
+                    # else:
+                    #     self._fix_py_content(item, bl_hdr, bl_code)
 
                 # --------------------------------------------------------------
 
@@ -594,7 +605,7 @@ class PyMaker:
         # fix dunders in bl/i18n
 
         # replace dunders in blacklist and i18n
-        self._fix_content(path_edit, False, False)
+        self._fix_content(path_edit, False, False, C.D_PY_REPL)
 
         # reload dict from fixed file
         dict_edit = F.load_dicts([path_edit])
@@ -605,6 +616,12 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # purge
+
+        # now do all
+        list_del = C.D_PURGE.get("all", [])
+        for item in list_del:
+            path_del = self._dir_prj / item
+            path_del.unlink()
 
         # remove any files from settings for this project type
         prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
@@ -662,7 +679,7 @@ class PyMaker:
                 a_file.write(tree_str)
 
         # call public after fix
-        C.do_after_fix()  # nothing
+        C.do_after_fix(self._dir_prj)  # fix readme
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
@@ -742,16 +759,16 @@ class PyMaker:
         first_char = first_char.lower()
 
         # we got a valid type
-        for item in C.L_TYPES:
-            if first_char == item[0]:
+        for key in C.D_TYPES:
+            if first_char == key:
                 return True
 
         # nope, fail
         types = []
         s = ""
-        for item in C.L_TYPES:
-            types.append(item[0])
-            s = ", ".join(types)
+        for key in C.D_TYPES:
+            types.append(key)
+        s = ", ".join(types)
         print(C.S_ERR_TYPE.format(s))
         return False
 
@@ -792,27 +809,24 @@ class PyMaker:
             return False
 
         # match start or return false
-        # pattern = r"(^[a-zA-Z])"
-        pattern = C.R_PRJ_START
+        pattern = C.D_NAME[C.S_KEY_NAME_START]
         res = re.search(pattern, prj_name)
         if not res:
             print(C.S_ERR_START)
             return False
 
         # match end or return false
-        # pattern = r"([a-zA-Z\d]$)"
-        pattern = C.R_PRJ_END
+        pattern = C.D_NAME[C.S_KEY_NAME_END]
         res = re.search(pattern, prj_name)
         if not res:
             print(C.S_ERR_END)
             return False
 
         # match middle or return false
-        # pattern = r"(^[a-zA-Z\d\-_]*$)"
-        pattern = C.R_PRJ_MID
+        pattern = C.D_NAME[C.S_KEY_NAME_MID]
         res = re.search(pattern, prj_name)
         if not res:
-            print(C.S_ERR_CONTAIN)
+            print(C.S_ERR_MID)
             return False
 
         # if we made it this far, return true
@@ -874,205 +888,9 @@ class PyMaker:
         return res
 
     # --------------------------------------------------------------------------
-    # Edit/remove parts of the main README file
-    # --------------------------------------------------------------------------
-    def _fix_readme(self, path, bl_hdr, bl_code):
-        """
-         Edit/remove parts of the main README file
-
-        Arguments:
-            path: Path for the README to remove text
-            bl_hdr: Whether the file is blacklisted for header lines
-            bl_code: Whether the file is blacklisted for code lines
-
-        Edits/removes parts of the file using the C.D_PRJ_CFG settings.
-        """
-
-        # default lines
-        lines = []
-
-        # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
-
-        # for each line in array
-        for index, line in enumerate(lines):
-
-            # ------------------------------------------------------------------
-            # skip blank lines
-
-            # skip blank lines, obv
-            if line.strip() == "":
-                continue
-
-            # ------------------------------------------------------------------
-            # check for header
-
-            # check if blacklisted for headers
-            if not bl_hdr:
-
-                # check if it matches header pattern
-                str_pattern = C.D_HEADER[C.S_KEY_HDR_SEARCH]
-                res = re.search(str_pattern, line)
-                if res:
-
-                    # fix it
-                    lines[index] = self._fix_header(line)
-
-                    # stop on first match
-                    continue
-
-        # save lines to README.md
-        with open(path, "w", encoding="UTF-8") as a_file:
-            a_file.writelines(lines)
-
-        # ------------------------------------------------------------------------------
-
-        # default text if we can't open file
-        text = ""
-
-        # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
-            text = a_file.read()
-
-        # ----------------------------------------------------------------------
-        # next is license
-
-        # get replacement value
-        pp_license_name = C.D_PRJ_DEF["__PP_LICENSE_NAME__"]
-        pp_license_img = C.D_PRJ_DEF["__PP_LICENSE_IMG__"]
-        pp_license_link = C.D_PRJ_DEF["__PP_LICENSE_LINK__"]
-
-        # the default license value
-        pp_license_full = (
-            f"[![{pp_license_name}]"  # alt text
-            f"({pp_license_img}"  # img src
-            f' "{pp_license_link}"'  # img tooltip
-            f")]({pp_license_link})"  # img link
-        )
-
-        # find the license block
-        str_pattern = C.R_RM_LICENSE
-
-        # replace text
-        str_rep = C.R_RM_LICENSE_REP.format(pp_license_full)
-        text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
-
-        # ----------------------------------------------------------------------
-        # now do description
-
-        # find the short desc block
-        str_pattern = C.R_RM_SHORT_DESC
-
-        # get the new description
-        new_desc = C.D_PRJ_META["__PP_SHORT_DESC__"]
-
-        # replace text
-        str_rep = C.R_RM_SHORT_DESC_REP.format(new_desc)
-        text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
-
-        # ----------------------------------------------------------------------
-
-        # save file
-        with open(path, "w", encoding="UTF-8") as a_file:
-            a_file.write(text)
-
-        # ----------------------------------------------------------------------
-        # now strip file of unnecessary lines
-
-        # default lines
-        lines = []
-
-        # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
-
-        # NB: the strategy here is to go through the full README and only copy
-        # lines that are:
-        # 1. not in any block
-        # or
-        # 2. in the block we want
-        # the most efficient way to do this is to have an array that receives
-        # wanted lines, then return that array
-        # we use a new array vs. in-situ replacement here b/c we are removing A
-        # LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
-        # while that would look *ok* in the resulting Markdown, looks UGLY in
-        # the source code
-        # so we opt for not copying those lines.
-
-        # just a boolean flag to say if we are kajiggering
-        # if True, we are in a block we don't want to copy
-        # assume False to say we want to copy
-        ignore = False
-        rm_delete_start = ""
-        rm_delete_end = ""
-
-        # what to ignore in the text
-        # first get type of project
-        prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
-        for key, val in C.D_README.items():
-            if prj_type == key:
-                # get values for keys
-                rm_delete_start = val["__RM_DELETE_START__"]
-                rm_delete_end = val["__RM_DELETE_END__"]
-                break
-
-        # where to put the needed lines
-        new_lines = []
-
-        # for each line
-        for line in lines:
-            # check if we have entered an invalid block
-            if rm_delete_start in line:
-                ignore = True
-
-            # we're (still) in a valid block
-            if not ignore:
-                # iadd stuff inside valid block or outside any block
-                new_lines.append(line)
-
-            # check if we have left the invalid block
-            if rm_delete_end in line:
-                ignore = False
-
-        # save lines to README.md
-        with open(path, "w", encoding="UTF-8") as a_file:
-            a_file.writelines(new_lines)
-
-        # ----------------------------------------------------------------------
-
-        # lastly, we go through and replace ALL dunders
-        # TODO: can we use block/line switches in these files?
-        # it would need to be a separate "process html/md files" method
-        # # __PP_NAME_BIG__ <pyplate: enable=replace /> (code/comm)
-        # __PP_NAME_BIG__ <pyplate: enable=replace /> (code/comm)
-        # <pyplate: enable=replace /> (comm)
-        # # __PP_NAME_BIG__ (code)
-        # __PP_NAME_BIG__ (code)
-
-        # default lines
-        lines = []
-
-        # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
-
-        # replace all dunders
-        for index, line in enumerate(lines):
-
-            for key, val in self._dict_rep.items():
-                if isinstance(val, str):
-                    line = line.replace(key, val)
-            lines[index] = line
-
-        # open and write file
-        with open(path, "w", encoding="UTF-8") as a_file:
-            a_file.writelines(lines)
-
-    # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_content(self, path, bl_hdr, bl_code):
+    def _fix_content(self, path, bl_hdr, bl_code, d_repl):
         """
         Fix header or code for each line in a file
 
@@ -1080,6 +898,7 @@ class PyMaker:
             path: Path for replacing text
             bl_hdr: Whether the file is blacklisted for header lines
             bl_code: Whether the file is blacklisted for code lines
+            d_repl: the dict to use for replacement
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.
@@ -1105,7 +924,8 @@ class PyMaker:
             # ------------------------------------------------------------------
             # check for block switches
 
-            if self._check_switches(line):
+            # param is True if we are looking for block switch vs line switch
+            if self._check_switches(line, True, d_repl):
                 continue
 
             # ------------------------------------------------------------------
@@ -1115,21 +935,21 @@ class PyMaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = C.D_HEADER[C.S_KEY_HDR_SEARCH]
+                str_pattern = d_repl[C.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
                     # fix it
-                    lines[index] = self._fix_header(line)
+                    lines[index] = self._fix_header(line, d_repl)
 
                     # stop on first match
                     continue
 
             # ------------------------------------------------------------------
             # skip any other comment lines
-            if line.lstrip().startswith(C.S_COMM) or line.lstrip().startswith(
-                C.S_COMM_HTML
-            ):
+
+            str_pattern = d_repl[C.S_KEY_COMM]
+            if re.search(str_pattern, line):
                 continue
 
             # ------------------------------------------------------------------
@@ -1140,7 +960,7 @@ class PyMaker:
 
                 # fix dunders in real code lines (may still have trailing
                 # comments)
-                lines[index] = self._fix_code(line)
+                lines[index] = self._fix_code(line, d_repl)
 
         # open and write file
         with open(path, "w", encoding="UTF-8") as a_file:
@@ -1149,12 +969,13 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a file header
     # --------------------------------------------------------------------------
-    def _fix_header(self, line):
+    def _fix_header(self, line, d_repl):
         """
         Replace dunders inside a file header
 
         Arguments:
             line: The line of the file to replace text in
+            d_repl: the dict to use for replacement
 
         Returns:
             The new line of code
@@ -1166,60 +987,46 @@ class PyMaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = C.D_HEADER[C.S_KEY_HDR_SEARCH]
+        str_pattern = d_repl[C.S_KEY_HDR]
+
+        # str_pattern = C.D_MU_REPL[C.S_KEY_HDR]
         res = re.search(str_pattern, line)
+        if not res:
+            return line
 
-        # pull out val and pad
-        val = res.group(C.D_HEADER[C.S_KEY_GRP_VAL])
-        pad = res.group(C.D_HEADER[C.S_KEY_GRP_PAD])
+        # pull out lead, val, and pad (OXFORD COMMA FTW!)
+        lead = res.group(d_repl[C.S_KEY_LEAD])
+        val = res.group(d_repl[C.S_KEY_VAL])
+        pad = res.group(d_repl[C.S_KEY_PAD])
 
-        # do all string replacements and measurements
-        old_len_val = len(val)
+        tmp_val = str(val)
+        old_val_len = len(tmp_val)
         for key2, val2 in self._dict_rep.items():
             if isinstance(val2, str):
-                val = val.replace(key2, val2)
-        new_len_val = len(val)
+                tmp_val = tmp_val.replace(key2, val2)
+        new_val_len = len(tmp_val)
+        val_diff = new_val_len - old_val_len
 
-        # set default padding
-        old_len_pad = len(pad)
+        tmp_pad = str(pad)
+        tmp_rat = tmp_pad.lstrip()
+        len_pad = len(tmp_pad) - len(tmp_rat) - val_diff
+        pad = " " * len_pad
 
-        # only recalculate padding if val len changed
-        # there is padding, must be rat
-        if old_len_val != new_len_val and old_len_pad > 1:
-
-            # get length change (+/-)
-            val_diff = new_len_val - old_len_val
-
-            # check if the amount to change is less than we've got
-            # NB: invert the sign
-            new_len_pad = old_len_pad + (0 - val_diff)
-
-            # we need some padding
-            if new_len_pad > 0:
-                pad = " " * new_len_pad
-            else:
-                # always have at least one space in padding
-                pad = " "
-
-        # put the parts back together
-        repl = C.D_HEADER[C.S_KEY_FMT_VAL_PAD].format(val, pad)
-
-        # format replacement regex
-        str_rep = C.D_HEADER[C.S_KEY_HDR_REPLACE].format(repl)
-        line = re.sub(str_pattern, str_rep, line)
+        line = lead + tmp_val + pad + tmp_rat + "\n"
 
         # return
         return line
 
     # --------------------------------------------------------------------------
-    # Replace dunders inside a file's contents
+    # Replace dunders inside a markup file's contents
     # --------------------------------------------------------------------------
-    def _fix_code(self, line):
+    def _fix_code(self, line, d_repl):
         """
-        Replace dunders inside a file's contents
+        Replace dunders inside a markup file's contents
 
         Arguments:
             line: The line of the file to replace text in
+            d_repl: the dict to use for replacement
 
         Returns:
             The new line of code
@@ -1240,7 +1047,7 @@ class PyMaker:
         comm = ""
 
         # do the split, checking each match to see if we get a trailing comment
-        matches = re.finditer(C.R_SW_SPLIT, line)
+        matches = re.finditer(d_repl[C.S_KEY_SPLIT], line)
         for match in matches:
             # if there is a match group for hash mark (meaning we found a
             # trailing comment)
@@ -1258,7 +1065,7 @@ class PyMaker:
         self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
         # do the check
-        self._check_switches(comm, True)
+        self._check_switches(comm, False, d_repl)
 
         # ----------------------------------------------------------------------
 
@@ -1320,116 +1127,10 @@ class PyMaker:
         # do rename
         path.rename(path_new)
 
-    # def _fix_readme(self, path):
-
-    # ----------------------------------------------------------------------
-    # next is license
-
-    # get replacement value
-    # pp_license_name = C.D_PRJ_DEF["__PP_LICENSE_NAME__"]
-    # pp_license_img = C.D_PRJ_DEF["__PP_LICENSE_IMG__"]
-    # pp_license_link = C.D_PRJ_DEF["__PP_LICENSE_LINK__"]
-
-    # # the default license value
-    # pp_license_full = (
-    #     f"[![{pp_license_name}]"  # alt text
-    #     f"({pp_license_img}"  # img src
-    #     f' "{pp_license_link}"'  # img tooltip
-    #     f")]({pp_license_link})"  # img link
-    # )
-
-    # # find the license block
-    # str_pattern = C.R_RM_LICENSE
-
-    # # replace text
-    # str_rep = C.R_RM_LICENSE_REP.format(pp_license_full)
-    # text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
-
-    # # ----------------------------------------------------------------------
-    # # now do description
-
-    # # find the short desc block
-    # str_pattern = C.R_RM_SHORT_DESC
-
-    # # get the new description
-    # new_desc = C.D_PRJ_META["__PP_SHORT_DESC__"]
-
-    # # replace text
-    # str_rep = C.R_RM_SHORT_DESC_REP.format(new_desc)
-    # text = re.sub(str_pattern, str_rep, text, flags=C.R_RM_SUB_FLAGS)
-
-    # # ----------------------------------------------------------------------
-
-    # # save file
-    # with open(path, "w", encoding="UTF-8") as a_file:
-    #     a_file.write(text)
-
-    # # ----------------------------------------------------------------------
-    # # now strip file of unnecessary lines
-
-    # # default lines
-    # lines = []
-
-    # # open and read file
-    # with open(path, "r", encoding="UTF-8") as a_file:
-    #     lines = a_file.readlines()
-
-    # # NB: the strategy here is to go through the full README and only copy
-    # # lines that are:
-    # # 1. not in any block
-    # # or
-    # # 2. in the block we want
-    # # the most efficient way to do this is to have an array that receives
-    # # wanted lines, then return that array
-    # # we use a new array vs. in-situ replacement here b/c we are removing A
-    # # LOT OF LINES, which in-situ would result in A LOT OF BLANK LINES and
-    # # while that would look *ok* in the resulting Markdown, looks UGLY in
-    # # the source code
-    # # so we opt for not copying those lines.
-
-    # # just a boolean flag to say if we are kajiggering
-    # # if True, we are in a block we don't want to copy
-    # # assume False to say we want to copy
-    # ignore = False
-    # rm_delete_start = ""
-    # rm_delete_end = ""
-
-    # # what to ignore in the text
-    # # first get type of project
-    # prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
-    # for key, val in C.D_README.items():
-    #     if prj_type == key:
-    #         # get values for keys
-    #         rm_delete_start = val["__RM_DELETE_START__"]
-    #         rm_delete_end = val["__RM_DELETE_END__"]
-    #         break
-
-    # # where to put the needed lines
-    # new_lines = []
-
-    # # for each line
-    # for line in lines:
-    #     # check if we have entered an invalid block
-    #     if rm_delete_start in line:
-    #         ignore = True
-
-    #     # we're (still) in a valid block
-    #     if not ignore:
-    #         # iadd stuff inside valid block or outside any block
-    #         new_lines.append(line)
-
-    #     # check if we have left the invalid block
-    #     if rm_delete_end in line:
-    #         ignore = False
-
-    # # save lines to README.md
-    # with open(path, "w", encoding="UTF-8") as a_file:
-    #     a_file.writelines(new_lines)
-
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
-    def _check_switches(self, line, block=True):
+    def _check_switches(self, line, block, d_repl):
         """
         Check if line or trailing comment is a switch
 
@@ -1437,6 +1138,7 @@ class PyMaker:
             line: The line to check for block switches
             block: True if we want to check a block switch, False if we want
             to check a line switch
+            d_repl: the dict to use for replacement
 
         Returns:
             True if a valid switch is found, False otherwise
@@ -1448,19 +1150,16 @@ class PyMaker:
         """
 
         # match  switches ('#|<!-- python: enable=replace', etc)
-        match = re.match(C.R_SW_BLOCK, line)
+        match = re.match(d_repl[C.S_KEY_SWITCH], line)
         if not match:
             return False
 
-        # this line is a switch, is it py or html?
-        if match.group(1):
-            # py
-            key = match.group(3)
-            val = match.group(2)
-        elif match.group(4):
-            # html
-            key = match.group(6)
-            val = match.group(5)
+        # this line is a switch
+        key = None
+        val = None
+        if match.group(1) and match.group(2):
+            key = match.group(2)
+            val = match.group(1)
 
         # which dict to modify
         dict_to_check = self._dict_sw_block
@@ -1481,7 +1180,6 @@ class PyMaker:
 
         # no valid switch found
         return False
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
