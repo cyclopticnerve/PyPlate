@@ -217,6 +217,7 @@ class PyMaker:
         if self._d_args.get(S_DBG_DEST, False):
             C.B_CMD_GIT = False
             C.B_CMD_VENV = False
+            C.B_CMD_TREE = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
@@ -543,20 +544,14 @@ class PyMaker:
                         bl_code = False
 
                     # do md/html/xml separately (needs special handling)
-                    # mu = False
                     d_repl = C.D_PY_REPL
                     wo_dot = item.suffix.lstrip(".")
                     w_dot = "." + wo_dot
                     if wo_dot in C.L_MARKUP or w_dot in C.L_MARKUP:
-                        # mu = True
                         d_repl = C.D_MU_REPL
-                        print("markup:", item)
 
+                    # fix content with appropriate dict
                     self._fix_content(item, bl_hdr, bl_code, d_repl)
-
-                    #     self._fix_mu_content(item, bl_hdr, bl_code)
-                    # else:
-                    #     self._fix_py_content(item, bl_hdr, bl_code)
 
                 # --------------------------------------------------------------
 
@@ -645,7 +640,7 @@ class PyMaker:
 
         # if venv flag is set
         if C.B_CMD_VENV:
-
+            print("venv")
             # set up venv
             path_venv = self._dir_prj / C.S_ALL_VENV
             str_cmd = C.S_VENV_CMD.format(str(path_venv))
@@ -657,7 +652,7 @@ class PyMaker:
 
         # if tree flag is set
         if C.B_CMD_TREE:
-
+            print("tree")
             # get path to tree
             file_tree = self._dir_prj / C.S_TREE_FILE
 
@@ -677,6 +672,9 @@ class PyMaker:
             # write to file
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
+
+        # ----------------------------------------------------------------------
+        # everything else
 
         # call public after fix
         C.do_after_fix(self._dir_prj)  # fix readme
