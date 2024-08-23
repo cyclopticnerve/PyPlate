@@ -15,35 +15,6 @@ data present in the conf files. It then sets up the dist folder with all
 necessary files to create a complete distribution of the project.
 """
 
-# TODO: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
-# dunder that is not in comment
-# report that as error
-
-# TODO: replace all PB_VERSION with new version, across all files in prj dir
-# TODO: fix every metadata using choice menu for new value
-# gonna need a lot of regex in pybaker.conf
-# TODO: do we need D_PRJ_DEF/D_PRJ_EXTRA?
-# TODO: what do we need from D_PRJ_CFG? just __PP_DEV_PP__?
-
-# DONE ask for meta
-# DONE update meta in conf file
-# replace (or just report) any dunders
-# replace metadata using prj pybaker (context is prj or dev specific)
-# make install.py
-# make dist (list of prj stuff into assets folder, install and README.md alongside)
-
-# TODO: pybaker not rely so much on regex, more on context start/end
-
-# ------------------------------------------------------------------------------
-
-# TODO: pull in a fresh copy of libs on every run and put it in dist
-# we need to get the location of PyPlate from settings (src)
-# we need the name of the "lib" folder from settings (dst)
-# TODO: any time pybaker encounters a file with __PP_DATE__ still in the
-# header, make sure to use today's date, not the one stored in a config dict
-# TODO: install script must install libs, src, etc. into proper folders
-# TODO: installer for pkg should move pkg to __PP_USER_LIB__
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
