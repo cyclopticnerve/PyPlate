@@ -10,22 +10,14 @@
 
 ## "It mostly works ™©®"
 
-<!-- __RM_LICENSE_START__ -->
-blah blah blah
-<!-- __RM_LICENSE_END__ -->
+__PP_RM_LICENSE__
 
-<!-- __RM_SHORT_DESC_START__ -->
-blah blah blah
-<!-- __RM_SHORT_DESC_END__ -->
+__PP_SHORT_DESC__
 
-<!-- __RM_SCREENSHOT_START__ -->
-blah blah blah
-<!-- __RM_SCREENSHOT_END__ -->
+__PP_SCREENSHOT__ 
 
 ## Requirements
-<!-- __RM_PY_DEPS_START__ -->
-blah blah blah
-<!-- __RM_PY_DEPS_END__ -->
+__PP_RM_DEPS__
 
 ## Installing
 <!-- __RM_PKG_START__ -->

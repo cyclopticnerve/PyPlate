@@ -281,6 +281,7 @@ class PyMaker:
 
         # sanity check
         prj_name = ""
+        tmp_dir = ""
 
         # if in debug mode
         if self._d_args.get(S_DBG_DEST, False):
@@ -318,16 +319,19 @@ class PyMaker:
                     else:
                         break
 
+        # save global property
+        self._dir_prj = tmp_dir
+
         # calculate small name
         name_small = prj_name.lower()
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # get short description
 
         if not self._d_args.get(S_DBG_DEST, False):
             new_desc = input(C.S_ASK_DESC)
         else:
-            new_desc = "test desc"
+            new_desc = "debug desc"
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -401,9 +405,6 @@ class PyMaker:
         p = p.lstrip(h).lstrip("/")
         C.D_PRJ_CFG["__PP_DEV_PP__"] = p
 
-        # save global property
-        self._dir_prj = tmp_dir
-
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
@@ -466,7 +467,7 @@ class PyMaker:
         """
 
         # call public before fix function
-        C.do_before_fix(self._dir_prj)
+        C.do_before_fix()
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -612,16 +613,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # purge
 
-        # now do all
-        list_del = C.D_PURGE.get("all", [])
-        for item in list_del:
-            path_del = self._dir_prj / item
-            path_del.unlink()
-
-        # remove any files from settings for this project type
-        prj_type = C.D_PRJ_CFG["__PP_TYPE_PRJ__"]
-        list_del = C.D_PURGE.get(prj_type, [])
-        for item in list_del:
+        for item in C.L_PURGE:
             path_del = self._dir_prj / item
             path_del.unlink()
 
@@ -640,7 +632,6 @@ class PyMaker:
 
         # if venv flag is set
         if C.B_CMD_VENV:
-            print("venv")
             # set up venv
             path_venv = self._dir_prj / C.S_ALL_VENV
             str_cmd = C.S_VENV_CMD.format(str(path_venv))
@@ -652,7 +643,6 @@ class PyMaker:
 
         # if tree flag is set
         if C.B_CMD_TREE:
-            print("tree")
             # get path to tree
             file_tree = self._dir_prj / C.S_TREE_FILE
 
@@ -677,7 +667,7 @@ class PyMaker:
         # everything else
 
         # call public after fix
-        C.do_after_fix(self._dir_prj)  # fix readme
+        C.do_after_fix(self._dir_prj, self._dict_rep)  # fix readme
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps

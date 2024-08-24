@@ -160,8 +160,8 @@ class PyBaker:
         self._setup()
 
         # load the config files
-        if not self._debug:
-            self.load_config_files()
+        # if not self._debug:
+        #     self.load_config_files()
 
         # ask for version number
         # self._get_version()

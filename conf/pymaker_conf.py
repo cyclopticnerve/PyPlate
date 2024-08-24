@@ -80,9 +80,6 @@ S_ERR_DEBUG = (
     "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
 )
 
-# NB: keys should really be private, need to keep them here to avoid circular
-# imports
-
 # TODO: which keys need to be global/which are only used once?
 # keys for pybaker private dict
 S_KEY_PRJ_DEF = "PRJ_DEF"
@@ -162,8 +159,6 @@ S_USR_BIN = ".local/bin"  # where to put the binary
 S_USR_LIB_NAME = "lib"
 S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
-# NB: these steps are optional
-
 # commands for _do_after_fix
 # NB: format param is (proj dir)
 S_GIT_CMD = "git init {} -q"
@@ -193,6 +188,12 @@ L_MARKUP = [
     "glade",
 ]
 
+# files to remove after the project is done
+# paths are relative to project dir
+L_PURGE = [
+    Path(S_ALL_SRC) / "ABOUT",
+]
+
 # ------------------------------------------------------------------------------
 # Dictionaries
 # ------------------------------------------------------------------------------
@@ -206,6 +207,9 @@ L_MARKUP = [
 
 # if you need to adjust any of these values in a function, use _do_before_fix()
 # in this file
+
+# NB: FOR THE LOVE OF GOD, DO NOT CHANGE THE KEYS IN THESE DICTS!!!
+
 D_PRJ_DEF = {
     # --------------------------------------------------------------------------
     # this stuff should only be set once
@@ -218,13 +222,21 @@ D_PRJ_DEF = {
     # the license name, used in headers, __PP_README_FILE__, and pyproject.toml
     "__PP_LICENSE_NAME__": "WTFPLv2",
     # the license image source, used in __PP_README_FILE__
-    "__PP_LICENSE_IMG__": "https://img.shields.io/badge/License-WTFPL-brightgreen.svg",
-    # the url for license image click
-    "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
+    # "__PP_LICENSE_IMG__": ,
+    # # the url for license image click
+    # "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
     # the license file to use
     "__PP_LICENSE_FILE__": "LICENSE.txt",
     # the screenshot to use in  __PP_README_FILE__
     "__PP_SCREENSHOT__": f"{S_ALL_README}/screenshot.png",
+    "__PP_RM_LICENSE__": (
+        "[!"
+        "[License: WTFPLv2]"
+        "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg "
+        '"http://www.wtfpl.net")'
+        "]"
+        "(http://www.wtfpl.net)"
+    ),
     # version format string for command line (context for pybaker replace)
     # NB: format param is __PP_VERSION__
     "__PP_VER_FMT__": "Version {}",
@@ -295,6 +307,8 @@ D_PRJ_META = {
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     "__PP_PY_DEPS__": {},
+    # the markup for readme deps
+    "__PP_RM_DEPS__": "",
     # the system dependencies to use in __PP_README_FILE__, github.com, and
     # install.py
     "__PP_SYS_DEPS__": [],
@@ -371,14 +385,6 @@ D_BLACKLIST = {
     ],
 }
 
-# entries to be remove fom/added to blacklist after project is created
-# this happens after _do_fix, but before writing to pb's project file
-# NB: key is blacklist section, val is an array of strings
-# NOTE: can't use dunders here (anything that would need a dunder should use
-# replacement value from D_PRJ_CFG)
-# D_BL_ADD = {S_KEY_SKIP_ALL: [".vscode", S_ALL_TESTS]}
-# D_BL_REM = {}
-
 # I18N stuff to be used in pybaker
 D_I18N = {
     # default charset for .pot/.po files
@@ -415,16 +421,6 @@ D_I18N = {
 D_COPY = {
     f"{S_ALL_MISC}/snippets.txt": f"{S_ALL_MISC}/snippets.txt",
     f"{S_ALL_MISC}/style.txt": f"{S_ALL_MISC}/style.txt",
-}
-
-# files to remove after the project is done
-# paths are relative to project dir
-# key is prj type key from D_TYPES or "all"
-# val is list of paths relative to dir_prj
-D_PURGE = {
-    "all": [
-        Path(S_ALL_SRC) / "ABOUT"],
-    "p": [Path(S_ALL_TESTS) / "ABOUT"],
 }
 
 # the info for matching/fixing lines in markup files
@@ -487,7 +483,7 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj):
+def do_before_fix():
     """
     Do any work before fix
 
@@ -497,6 +493,8 @@ def do_before_fix(_dir_prj):
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
     modified.
+    It is mostly used to make final adjustments to the various dunder dicts
+    before any replacement occurs.
     """
 
     # get values after pymaker has set them
@@ -508,22 +506,31 @@ def do_before_fix(_dir_prj):
     D_PRJ_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
     D_PRJ_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
 
+    # fix deps for readme
+    d_deps = D_PRJ_META["__PP_PY_DEPS__"]
+    s_deps = "None"
+    if len(d_deps):
+        s_deps = ""
+        for key, val in D_PRJ_META["__PP_PY_DEPS__"]:
+            s_deps += f"[{key}]({val}),"
+    D_PRJ_META["__PP_RM_DEPS__"] = s_deps
 
 # --------------------------------------------------------------------------
 # Do any work after fix
 # --------------------------------------------------------------------------
-def do_after_fix(dir_prj):
+def do_after_fix(dir_prj, _dict_rep):
     """
     Do any work after fix
 
     Arguments:
         dir_prj: The root of the new project
+        dict_rep: The dict of dunders to replace
 
     Do any work after fix. This method is called at the end of the internal
     _do_after_fix, after all files have been modified.
     """
 
-    for root, _root_dirs, root_files in dir_prj.walk(top_down=False):
+    for root, _root_dirs, root_files in dir_prj.walk():
 
         # convert files into Paths
         files = [root / f for f in root_files]
@@ -532,162 +539,45 @@ def do_after_fix(dir_prj):
         for item in files:
             # check if readme
             if root == dir_prj and item.name == "README.md":
-                fix_readme(item)
+                _fix_readme(item)
+
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
 
 
 # --------------------------------------------------------------------------
 # Edit/remove parts of the main README file
 # --------------------------------------------------------------------------
-def fix_readme(path):
+def _fix_readme(path):
     """
     Edit/remove parts of the main README file
 
     Arguments:
         path: Path for the README to remove text
+        dict_rep: The dict of dunders to replace
 
     Edits/removes parts of the file using the C.D_PRJ_CFG settings.
     """
 
-    # TODO: holy hell this is shite
-
-    # key is the project type we are making (from D_TYPES[key][1], the template
-    # src dir) or a special section of the readme
-    # rm_delete_start is the tag at the start of the section to remove
-    # rm_delete_end is the tag at the end of the section to remove
-    # NB: these tags start with 'RM' instead of 'PP' because most 'PP' keys will
-    # remain in the file, and we don't want pybaker to report their presence as an
-    # error
-    # this way you can have different sections in the readme for things like
-    # installation instructions, depending on whether your project is a package or
-    # a cli/gui app
-    d_readme = {
-        "RM_LICENSE": {
-            "__RM_LICENSE_START__": "<!-- __RM_LICENSE_START__ -->",
-            "__RM_LICENSE_END__": "<!-- __RM_LICENSE_END__ -->",
-        },
-        "RM_SHORT_DESC": {
-            "__RM_SHORT_DESC_START__": "<!-- __RM_SHORT_DESC_START__ -->",
-            "__RM_SHORT_DESC_END__": "<!-- __RM_SHORT_DESC_END__ -->",
-        },
-        "RM_SCREENSHOT": {
-            "__RM_SCREENSHOT_START__": "<!-- __RM_SCREENSHOT_START__ -->",
-            "__RM_SCREENSHOT_END__": "<!-- __RM_SCREENSHOT_END__ -->",
-        },
-        "RM_PY_DEPS": {
-            "__RM_PY_DEPS_START__": "<!-- __RM_PY_DEPS_START__ -->",
-            "__RM_PY_DEPS_END__": "<!-- __RM_PY_DEPS_END__ -->",
-        },
-        "c": {
-            "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
-            "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
-        },
-        "g": {
-            "__RM_DELETE_START__": "<!-- __RM_PKG_START__ -->",
-            "__RM_DELETE_END__": "<!-- __RM_PKG_END__ -->",
-        },
-        "p": {
-            "__RM_DELETE_START__": "<!-- __RM_APP_START__ -->",
-            "__RM_DELETE_END__": "<!-- __RM_APP_END__ -->",
-        },
-    }
-
-    # regex strings for readme to replace license in README
-    r_rm_license_start = d_readme["RM_LICENSE"]["__RM_LICENSE_START__"]
-    r_rm_license_end = d_readme["RM_LICENSE"]["__RM_LICENSE_END__"]
-    r_rm_license = rf"({r_rm_license_start})(.*?)({r_rm_license_end})"
-    # NB: format param is full license string
-    r_rm_license_rep = r"\g<1>\n{}\n\g<3>"
-
-    # regex strings for readme to replace short description in README
-    r_rm_short_desc_start = d_readme["RM_SHORT_DESC"]["__RM_SHORT_DESC_START__"]
-    r_rm_short_desc_end = d_readme["RM_SHORT_DESC"]["__RM_SHORT_DESC_END__"]
-    r_rm_short_desc = rf"({r_rm_short_desc_start})(.*?)({r_rm_short_desc_end})"
-    # NB: format param is full short desc string
-    r_rm_short_desc_rep = r"\g<1>\n{}\n\g<3>"
-
-    # regex strings for readme to replace screenshot in README
-    r_rm_screenshot_start = d_readme["RM_SCREENSHOT"]["__RM_SCREENSHOT_START__"]
-    r_rm_screenshot_end = d_readme["RM_SCREENSHOT"]["__RM_SCREENSHOT_END__"]
-    r_rm_screenshot = rf"({r_rm_screenshot_start})(.*?)({r_rm_screenshot_end})"
-    # NB: format param is full short desc string
-    r_rm_screenshot_rep = r"\g<1>\n{}\n\g<3>"
-
-    # search and sub flags for README
-    # NB: need S for matches that span multiple lines (R_RM_LICENSE/R_RM_SHORT_DESC)
-    r_rm_sub_flags = re.S  # the dict of sections to remove in the README file
-
-    # --------------------------------------------------------------------------
-
-    # default text if we can't open file
+    # the whole text of the file
     text = ""
 
-    # open and read file
+    # open and read whole file
     with open(path, "r", encoding="UTF-8") as a_file:
         text = a_file.read()
-
-    # ----------------------------------------------------------------------
-    # first is license
-
-    # get replacement value
-    pp_license_name = D_PRJ_DEF["__PP_LICENSE_NAME__"]
-    pp_license_img = D_PRJ_DEF["__PP_LICENSE_IMG__"]
-    pp_license_link = D_PRJ_DEF["__PP_LICENSE_LINK__"]
-
-    # the default license value
-    new_license = (
-        f"[![{pp_license_name}]"  # alt text
-        f"({pp_license_img}"  # img src
-        f' "{pp_license_link}"'  # img tooltip
-        f")]({pp_license_link})"  # img link
-    )
-
-    # find the license block
-    str_pattern = r_rm_license
-
-    # replace text
-    str_rep = r_rm_license_rep.format(new_license)
-    text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
-
-    # ----------------------------------------------------------------------
-    # now do description
-
-    # get the new description
-    new_desc = D_PRJ_META["__PP_SHORT_DESC__"]
-
-    # find the short desc block
-    str_pattern = r_rm_short_desc
-
-    # replace text
-    str_rep = r_rm_short_desc_rep.format(new_desc)
-    text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
-
-    # ----------------------------------------------------------------------
-    # now do screenshot
-
-    # get the new description
-    new_ss = D_PRJ_META.get("__PP_SCREENSHOT__", None)
-    if new_ss:
-        # find the short desc block
-        str_pattern = r_rm_screenshot
-
-        # replace text
-        str_rep = r_rm_screenshot_rep.format(new_ss)
-        text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
-
-    # ----------------------------------------------------------------------
 
     # find the remove blocks
     prj_type = D_PRJ_CFG["__PP_TYPE_PRJ__"]
     if prj_type == "c" or prj_type == "g":
-        str_pattern = "<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
+        str_pattern = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
     else:
-        str_pattern = "<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
+        str_pattern = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
 
-    # replace text
-    str_rep = ""
-    text = re.sub(str_pattern, str_rep, text, flags=r_rm_sub_flags)
-
-    # --------------------------------------------------------------------------
+    # replace block with empty string (equiv to deleting it)
+    # NB: need S flag to make dot match newline
+    text = re.sub(str_pattern, "", text, flags=re.S)
 
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:
