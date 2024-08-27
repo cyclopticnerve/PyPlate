@@ -7,6 +7,8 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# pylint: disable=too-many-lines
+
 """
 A program to set the metadata of a PyPlate project and create a dist
 
@@ -18,8 +20,6 @@ necessary files to create a complete distribution of the project.
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
-
-# a change to check branches
 
 # system imports
 import argparse
