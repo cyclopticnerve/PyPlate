@@ -18,7 +18,6 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # system imports
 from pathlib import Path
 import re
-import sys
 
 # ------------------------------------------------------------------------------
 # Bools
@@ -44,6 +43,7 @@ I_SW_FALSE = 0
 # Strings
 # ------------------------------------------------------------------------------
 
+# current version
 S_VERSION = "0.0.1"
 
 # base dir for project type folders, relative to dev home
@@ -73,10 +73,6 @@ S_ERR_MID = (
 # NB: format param arise dir_type/(proj type dir)
 S_ERR_EXIST = 'Project "{}" already exists'
 
-# error strings if cannot open/save file
-S_ERR_NOT_OPEN = "File '{}' could not be opened"
-S_ERR_NOT_CREATE = "File '{}' could not be created"
-
 # debug-specific strings
 S_ERR_DEBUG = (
     "\n"
@@ -84,6 +80,7 @@ S_ERR_DEBUG = (
     "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
 )
 
+# TODO: which keys need to be global/which are only used once?
 # keys for pybaker private dict
 S_KEY_PRJ_DEF = "PRJ_DEF"
 S_KEY_PRJ_DIST_DIRS = "PRJ_DIST_DIRS"
@@ -178,10 +175,6 @@ S_SW_ENABLE = "enable"
 S_SW_DISABLE = "disable"
 S_SW_REPLACE = "replace"
 
-# where in the project to store pyplate conf files
-S_PP_EDIT = "pyplate/conf/edit.json"
-S_PP_NO_EDIT = "pyplate/conf/no_edit.json"
-
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
@@ -197,10 +190,9 @@ L_MARKUP = [
 
 # files to remove after the project is done
 # paths are relative to project dir
-D_PURGE = {
-    "all": [Path(S_ALL_SRC) / "ABOUT"],
-    "p": [Path(S_ALL_TESTS) / "ABOUT"],
-}
+L_PURGE = [
+    Path(S_ALL_SRC) / "ABOUT",
+]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
@@ -230,11 +222,21 @@ D_PRJ_DEF = {
     # the license name, used in headers, __PP_README_FILE__, and pyproject.toml
     "__PP_LICENSE_NAME__": "WTFPLv2",
     # the license image source, used in __PP_README_FILE__
-    "__PP_LICENSE_IMG__": "https://img.shields.io/badge/License-WTFPL-brightgreen.svg",
-    # the url for license image click
-    "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
+    # "__PP_LICENSE_IMG__": ,
+    # # the url for license image click
+    # "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
     # the license file to use
     "__PP_LICENSE_FILE__": "LICENSE.txt",
+    # the screenshot to use in  __PP_README_FILE__
+    "__PP_SCREENSHOT__": f"{S_ALL_README}/screenshot.png",
+    "__PP_RM_LICENSE__": (
+        "[!"
+        "[License: WTFPLv2]"
+        "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg "
+        '"http://www.wtfpl.net")'
+        "]"
+        "(http://www.wtfpl.net)"
+    ),
     # version format string for command line (context for pybaker replace)
     # NB: format param is __PP_VERSION__
     "__PP_VER_FMT__": "Version {}",
@@ -285,7 +287,7 @@ D_PRJ_CFG = {
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
     # "__PP_DEV_LIB__": "",  # location of cnlibs dir in PyPlate
-    "__PP_DEV_PP__": "",  # location of PyPlate on dev's computer
+    "__PP_DEV_PP__": "",  # location of real pybaker in PyPlate, rel to dev home
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the user's home dir
     "__PP_USR_CONF__": "",  # config dir
@@ -305,13 +307,13 @@ D_PRJ_META = {
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     "__PP_PY_DEPS__": {},
+    # the markup for readme deps
+    "__PP_RM_DEPS__": "",
     # the system dependencies to use in __PP_README_FILE__, github.com, and
     # install.py
     "__PP_SYS_DEPS__": [],
     # the categories to use in .desktop for gui apps
     "__PP_GUI_CATS__": [],
-    # the screenshot to use in README.md
-    "__PP_SCREENSHOT__": "",
 }
 
 # the types of projects this script can create
@@ -504,11 +506,14 @@ def do_before_fix():
     D_PRJ_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
     D_PRJ_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
 
-    lic_name = D_PRJ_DEF["__PP_LICENSE_NAME__"]
-    lic_img = D_PRJ_DEF["__PP_LICENSE_IMG__"]
-    lic_link = D_PRJ_DEF["__PP_LICENSE_LINK__"]
-    s_lic = f'[![License: {lic_name}]({lic_img} "{lic_link}")]({lic_link})'
-    D_PRJ_DEF["__PP_RM_LICENSE__"] = s_lic
+    # fix deps for readme
+    d_deps = D_PRJ_META["__PP_PY_DEPS__"]
+    s_deps = "None"
+    if len(d_deps):
+        s_deps = ""
+        for key, val in D_PRJ_META["__PP_PY_DEPS__"]:
+            s_deps += f"[{key}]({val}),"
+    D_PRJ_META["__PP_RM_DEPS__"] = s_deps
 
 # --------------------------------------------------------------------------
 # Do any work after fix
@@ -560,59 +565,19 @@ def _fix_readme(path):
     text = ""
 
     # open and read whole file
-    try:
-        with open(path, "r", encoding="UTF-8") as a_file:
-            text = a_file.read()
-    except FileNotFoundError:
-        print(S_ERR_NOT_OPEN.format(str(path)))
-        sys.exit(0)
-
-    # --------------------------------------------------------------------------
-    # find blocks to replace
-
-    # --------------------------------------------------------------------------
-    # short desc
-    fill = D_PRJ_META["__PP_SHORT_DESC__"]
-    sch = r"(<!--\s*__PP_SHORT_DESC__\s*-->)(.*?)(<!--\s*__PP_SHORT_DESC__\s*-->)"
-    rep = rf"\g<1>\n{fill}\n\g<3>"
-    text = re.sub(sch, rep, text, flags=re.S)
-
-    # --------------------------------------------------------------------------
-    # screenshot
-    fill = D_PRJ_META["__PP_SCREENSHOT__"]
-    sch = r"(<!--\s*__PP_SCREENSHOT__\s*-->)(.*?)(<!--\s*__PP_SCREENSHOT__\s*-->)"
-    rep = rf"\g<1>\n{fill}\n\g<3>"
-    text = re.sub(sch, rep, text, flags=re.S)
-
-    # --------------------------------------------------------------------------
-    # requirements
-    d_deps = D_PRJ_META["__PP_PY_DEPS__"]
-    s_deps = ""
-    if len(d_deps):
-        s_deps = "## Requirements\n"
-        for key, val in D_PRJ_META["__PP_PY_DEPS__"].items():
-            s_deps += f"[{key}]({val})\n"
-
-    fill = s_deps
-    sch = r"(<!--\s*__PP_PY_DEPS__\s*-->)(.*?)(<!--\s*__PP_PY_DEPS__\s*-->)"
-    rep = rf"\g<1>\n{fill}\n\g<3>"
-    text = re.sub(sch, rep, text, flags=re.S)
-
-    # --------------------------------------------------------------------------
-    # find blocks to delete
+    with open(path, "r", encoding="UTF-8") as a_file:
+        text = a_file.read()
 
     # find the remove blocks
-    fill = ""
-    sch = ""
     prj_type = D_PRJ_CFG["__PP_TYPE_PRJ__"]
     if prj_type == "c" or prj_type == "g":
-        sch = r"<!--\s*__PP_RM_PKG__\s*-->(.*?)<!--\s*__PP_RM_PKG__\s*-->"
+        str_pattern = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
     else:
-        sch = r"<!--\s*__PP_RM_APP__\s*-->(.*?)<!--\s*__PP_RM_APP__\s*-->"
-    rep = ""
+        str_pattern = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
+
     # replace block with empty string (equiv to deleting it)
     # NB: need S flag to make dot match newline
-    text = re.sub(sch, rep, text, flags=re.S)
+    text = re.sub(str_pattern, "", text, flags=re.S)
 
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:

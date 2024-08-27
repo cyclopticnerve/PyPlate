@@ -18,6 +18,8 @@
 
 # TODO: pybaker not rely so much on regex, more on context start/end
 
+# ------------------------------------------------------------------------------
+
 # TODO: pull in a fresh copy of libs on every run and put it in dist
 # we need to get the location of PyPlate from settings (src)
 # we need the name of the "lib" folder from settings (dst)
@@ -26,10 +28,6 @@
 # TODO: install script must install libs, src, etc. into proper folders
 # TODO: installer for pkg should move pkg to __PP_USER_LIB__
 
-# ------------------------------------------------------------------------------
-
-
-TODO: conf: which keys need to be global/which are only used once?
 TODO: change __RM_XXX and _xxx_readme to 'mx/MX' (for markup/markdown)
 TODO: fix README instuctions for installing (like where it gets
 installed/uninstalled from)

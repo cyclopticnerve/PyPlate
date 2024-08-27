@@ -7,8 +7,6 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# pylint: disable=too-many-lines
-
 """
 A program to set the metadata of a PyPlate project and create a dist
 
@@ -43,7 +41,7 @@ sys.path.append(str(P_DIR_PYPLATE))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
-from conf import pybaker_conf as C  # type:ignore
+from conf import pybaker_conf as B  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 
@@ -67,7 +65,7 @@ S_PP_SHORT_DESC = (
 )
 
 # formatted version
-S_PP_VER_FMT = f"Version {C.S_VERSION}"
+S_PP_VER_FMT = f"Version {B.S_VERSION}"
 
 # about string
 S_PP_ABOUT = (
@@ -88,6 +86,10 @@ S_PRJ_OPTION = "-f"
 S_PRJ_METAVAR = "PROJECT DIR"
 S_PRJ_DEST = "PRJ_DEST"
 S_PRJ_HELP = "the project directory to bake"
+
+# path to prj pyplate files
+S_PP_PRV = "pyplate/conf/private.json"
+S_PP_PRJ = "pyplate/conf/project.json"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -126,9 +128,10 @@ class PyBaker:
 
         # set the initial values of properties
         self._d_args = {}
-        self._dir_prj = Path()
+        self._debug = False
         self._dict_rep = {}
-
+        self._dir_prj = Path()
+        self._version = ""
         self._d_blacklist = {}  # project.json
         self._d_i18n = {}  # project.json
         self._d_metadata = {}  # project.json
@@ -218,10 +221,10 @@ class PyBaker:
         # set pp cmd line stuff
 
         # get cmd line args
-        self._d_args = self._run_parser()
+        dict_args = self._run_parser()
 
         # check for flags
-        # self._debug = dict_args[S_DBG_DEST]
+        self._debug = dict_args[S_DBG_DEST]
 
         # # check for folder
         # if not self._debug:

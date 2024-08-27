@@ -88,6 +88,10 @@ S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
 
+# path to prj pyplate files
+S_PP_PRV = "pyplate/conf/private.json"
+S_PP_PRJ = "pyplate/conf/project.json"
+
 # ------------------------------------------------------------------------------
 # Path objects
 # ------------------------------------------------------------------------------
@@ -573,54 +577,45 @@ class PyMaker:
         """
 
         # ----------------------------------------------------------------------
-        # save editable settings and fix dunders
+        # save project settings
 
-        # create editable settings (blacklist/i18n etc.)
-        dict_edit = {
-            C.S_KEY_BLACKLIST: C.D_BLACKLIST,
-            C.S_KEY_I18N: C.D_I18N,
-        }
-
-        # save editable settings
-        path_edit = self._dir_prj / C.S_PP_EDIT
-        F.save_dict(dict_edit, [path_edit])
-
-        # replace dunders in blacklist/i18n
-        self._fix_content(path_edit, False, False, C.D_PY_REPL)
-
-        # add meta last (no fix dunders)
-        dict_edit = F.load_dicts([path_edit])
-        dict_edit[C.S_KEY_META] = C.D_PRJ_META
-        F.save_dict(dict_edit, [path_edit])
-
-        # ----------------------------------------------------------------------
-        # save non-editable settings
-
-        # create fixed settings
+        # save fixed settings
         dict_no_edit = {
             C.S_KEY_PRJ_DEF: C.D_PRJ_DEF,
             C.S_KEY_PRJ_DIST_DIRS: C.D_PRJ_DIST_DIRS,
             C.S_KEY_PRJ_EXTRA: C.D_PRJ_EXTRA,
             C.S_KEY_PRJ_CFG: C.D_PRJ_CFG,
         }
-
-        # save fixed settings
-        path_no_edit = self._dir_prj / C.S_PP_NO_EDIT
+        path_no_edit = self._dir_prj / S_PP_PRV
         F.save_dict(dict_no_edit, [path_no_edit])
+
+        # save editable settings (blacklist/i18n etc.)
+        path_edit = self._dir_prj / S_PP_PRJ
+        dict_edit = {
+            C.S_KEY_BLACKLIST: C.D_BLACKLIST,
+            C.S_KEY_I18N: C.D_I18N,
+        }
+        F.save_dict(dict_edit, [path_edit])
+
+        # ----------------------------------------------------------------------
+        # fix dunders in bl/i18n
+
+        # replace dunders in blacklist and i18n
+        self._fix_content(path_edit, False, False, C.D_PY_REPL)
+
+        # reload dict from fixed file
+        dict_edit = F.load_dicts([path_edit])
+
+        # put in metadata and save back to file
+        dict_edit[C.S_KEY_META] = C.D_PRJ_META
+        F.save_dict(dict_edit, [path_edit])
 
         # ----------------------------------------------------------------------
         # purge
 
-        for key, val in C.D_PURGE.items():
-            # first do all
-            if key == "all":
-                for item in val:
-                    path_del = self._dir_prj / item
-                    path_del.unlink()
-            elif key == C.D_PRJ_CFG["__PP_TYPE_PRJ__"]:
-                for item in val:
-                    path_del = self._dir_prj / item
-                    path_del.unlink()
+        for item in C.L_PURGE:
+            path_del = self._dir_prj / item
+            path_del.unlink()
 
         # ----------------------------------------------------------------------
         # git
@@ -652,12 +647,8 @@ class PyMaker:
             file_tree = self._dir_prj / C.S_TREE_FILE
 
             # create the file so it includes itself
-            try:
-                with open(file_tree, "w", encoding="UTF-8") as a_file:
-                    a_file.write("")
-            except FileNotFoundError:
-                print(C.S_ERR_NOT_OPEN.format(str(file_tree)))
-                sys.exit(0)
+            with open(file_tree, "w", encoding="UTF-8") as a_file:
+                a_file.write("")
 
             # create tree object and call
             tree_obj = CNTree()
@@ -905,12 +896,8 @@ class PyMaker:
         lines = []
 
         # open and read file
-        try:
-            with open(path, "r", encoding="UTF-8") as a_file:
-                lines = a_file.readlines()
-        except FileNotFoundError:
-            print(C.S_ERR_NOT_OPEN.format(str(path)))
-            sys.exit(0)
+        with open(path, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
 
         # for each line in array
         for index, line in enumerate(lines):
@@ -1181,7 +1168,6 @@ class PyMaker:
 
         # no valid switch found
         return False
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
