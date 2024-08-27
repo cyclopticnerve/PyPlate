@@ -69,7 +69,7 @@ from cnlib.cncli import CNCli  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
-PB_VERSION = "__PP_VERSION__"
+PB_VERSION = "0.0.0"
 
 # ------------------------------------------------------------------------------
 # Public classes

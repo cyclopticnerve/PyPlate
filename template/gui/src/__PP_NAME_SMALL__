@@ -210,11 +210,11 @@ class __PP_NAME_CLASS__(CNCli):
         """
 
         # formatted version
-        ver_fmt = (
-            "__PP_VER_FMT__".format(  # pylint: disable=consider-using-f-string
-                PB_VERSION
-            )
-        )
+        # pylint: disable=consider-using-f-string
+        # pylint: disable=format-string-without-interpolation
+        ver_fmt = "__PP_VER_FMT__".format(PB_VERSION)
+        # pylint: enable=consider-using-f-string
+        # pylint: enable=format-string-without-interpolation
 
         # about string
         s_about = (

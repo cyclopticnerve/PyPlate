@@ -12,15 +12,17 @@
 
 __PP_RM_LICENSE__
 
-__PP_SHORT_DESC__
+<!-- __PP_SHORT_DESC__ -->
+<!-- __PP_SHORT_DESC__ -->
 
-__PP_SCREENSHOT__ 
+<!-- __PP_SCREENSHOT__ -->
+<!-- __PP_SCREENSHOT__ -->
 
-## Requirements
-__PP_RM_DEPS__
+<!-- __PP_PY_DEPS__ -->
+<!-- __PP_PY_DEPS__ -->
 
 ## Installing
-<!-- __RM_PKG_START__ -->
+<!-- __PP_RM_PKG__ -->
 You can download the (hopefully stable)
 [latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__/releases/latest)
 from the main branch.<br>
@@ -44,8 +46,8 @@ foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install build
 foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m build
 foo@bar:~/Downloads/__PP_NAME_BIG__$ python -m pip install ./dist/__PP_NAME_SMALL__-<version>.tar.gz
 ```
-<!-- __RM_PKG_END__ -->
-<!-- __RM_APP_START__ -->
+<!-- __PP_RM_PKG__ -->
+<!-- __PP_RM_APP__ -->
 You can download the (hopefully stable)
 [latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__/releases/latest)
 from the main branch.<br>
@@ -65,23 +67,23 @@ foo@bar:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__
 foo@bar:~/Downloads$ cd __PP_NAME_BIG__
 foo@bar:~/Downloads/__PP_NAME_BIG__$ ./install.py
 ```
-<!-- __RM_APP_END__ -->
+<!-- __PP_RM_APP__ -->
 
 ## Usage
 blah blah blah
 
 ## Uninstalling
-<!-- __RM_PKG_START__ -->
+<!-- __PP_RM_PKG__ -->
 ```bash
 foo@bar:~$ python -m pip uninstall __PP_NAME_SMALL__
 ```
-<!-- __RM_PKG_END__ -->
-<!-- __RM_APP_START__ -->
+<!-- __PP_RM_PKG__ -->
+<!-- __PP_RM_APP__ -->
 ```bash
 foo@bar:~$ cd ~/.__PP_AUTHOR__/__PP_NAME_SMALL__
 foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
 ```
-<!-- __RM_APP_END__ -->
+<!-- __PP_RM_APP__ -->
 
 ## Notes
 blah blah blah
