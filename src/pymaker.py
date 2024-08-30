@@ -149,6 +149,7 @@ class PyMaker:
         self._d_args = {}
         self._dir_prj = Path()
         self._dict_rep = {}
+
         self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}

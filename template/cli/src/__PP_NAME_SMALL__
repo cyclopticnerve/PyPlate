@@ -69,7 +69,8 @@ from cnlib.cncli import CNCli  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
-PB_VERSION = "__PP_VERSION__"
+__PB_VERSION__ = "__PP_VERSION__"
+__PB_SHORT_DESC__ = "__PP_SHORT_DESC__"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -236,14 +237,14 @@ class __PP_NAME_CLASS__(CNCli):
         # formatted version
         # pylint: disable=consider-using-f-string
         # pylint: disable=format-string-without-interpolation
-        ver_fmt = "__PP_VER_FMT__".format(PB_VERSION)
+        ver_fmt = "__PP_VER_FMT__".format(__PB_VERSION__)
         # pylint: enable=consider-using-f-string
         # pylint: enable=format-string-without-interpolation
 
         # about string
         s_about = (
             "__PP_NAME_SMALL__\n"
-            "__PP_SHORT_DESC__\n"
+            f"{__PB_SHORT_DESC__}\n"
             f"{ver_fmt}\n"
             "__PP_URL__/__PP_NAME_BIG__"
         )

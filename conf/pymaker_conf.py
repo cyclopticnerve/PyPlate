@@ -227,8 +227,6 @@ D_PRJ_DEF = {
     # "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
     # the license file to use
     "__PP_LICENSE_FILE__": "LICENSE.txt",
-    # the screenshot to use in  __PP_README_FILE__
-    "__PP_SCREENSHOT__": f"{S_ALL_README}/screenshot.png",
     "__PP_RM_LICENSE__": (
         "[!"
         "[License: WTFPLv2]"
@@ -304,6 +302,11 @@ D_PRJ_META = {
     "__PP_SHORT_DESC__": "Short description",
     # the keywords to use in pyproject.toml and github
     "__PP_KEYWORDS__": [],
+    # the stringified version of the above array (created in _do_before_fix)
+    # NB: we are doing this early to get a dunder for the first round of fixes
+    # (aka pymaker)
+    # we will do it again later in pybaker to use any updated
+    "__PP_KW_STRING__": "",
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     "__PP_PY_DEPS__": {},
@@ -506,14 +509,12 @@ def do_before_fix():
     D_PRJ_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
     D_PRJ_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
 
-    # fix deps for readme
-    d_deps = D_PRJ_META["__PP_PY_DEPS__"]
-    s_deps = "None"
-    if len(d_deps):
-        s_deps = ""
-        for key, val in D_PRJ_META["__PP_PY_DEPS__"]:
-            s_deps += f"[{key}]({val}),"
-    D_PRJ_META["__PP_RM_DEPS__"] = s_deps
+    # fix keywords for first pass
+    s_keywords = ""
+    keywords = D_PRJ_META["__PP_KEYWORDS__"]
+    if keywords:
+        s_keywords = ", ".join(f'"{k}"' for k in keywords)
+    D_PRJ_CFG["__PP_KW_STRING__"] = s_keywords
 
 # --------------------------------------------------------------------------
 # Do any work after fix

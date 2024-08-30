@@ -13,7 +13,7 @@
             "name": "PyBaker",
             "type": "debugpy",
             "request": "launch",
-            "program": "pyplate/pybaker",
+            "program": "pyplate/pybaker.py",
             "console": "integratedTerminal"
         }
     ]

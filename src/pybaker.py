@@ -23,7 +23,10 @@ necessary files to create a complete distribution of the project.
 
 # system imports
 import argparse
+import json
 from pathlib import Path
+import re
+import shutil
 import sys
 
 # pylint: disable=wrong-import-position
@@ -43,8 +46,8 @@ sys.path.append(str(P_DIR_PYPLATE))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
-from conf import pybaker_conf as B  # type:ignore
-from cnlib import cnfunctions as F  # type: ignore
+from conf import pybaker_conf as C  # type:ignore
+# from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -67,7 +70,7 @@ S_PP_SHORT_DESC = (
 )
 
 # formatted version
-S_PP_VER_FMT = f"Version {B.S_VERSION}"
+S_PP_VER_FMT = f"Version {C.S_VERSION}"
 
 # about string
 S_PP_ABOUT = (
@@ -130,15 +133,16 @@ class PyBaker:
 
         # set the initial values of properties
         self._d_args = {}
-        self._debug = False
-        self._dict_rep = {}
         self._dir_prj = Path()
-        self._version = ""
-        self._d_blacklist = {}  # project.json
-        self._d_i18n = {}  # project.json
-        self._d_metadata = {}  # project.json
-        self._d_settings = {}  # private.json
-        self._error_count = 0
+        # self._dict_rep = {}
+
+        self._debug = False
+        # self._version = ""
+        # self._d_blacklist = {}  # project.json
+        # self._d_i18n = {}  # project.json
+        # self._d_metadata = {}  # project.json
+        # self._d_settings = {}  # private.json
+        # self._error_count = 0
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -160,6 +164,12 @@ class PyBaker:
 
         # call boilerplate code
         self._setup()
+
+        self._load_meta()
+
+        self._copy_files()
+
+        self._make_install()
 
         # load the config files
         # if not self._debug:
@@ -206,6 +216,214 @@ class PyBaker:
     # Private methods
     # --------------------------------------------------------------------------
 
+    def _load_meta(self):
+        """
+        docstring
+        """
+
+        dict_meta = {}
+        path = self._dir_prj / "pyplate" / "conf" / "project.json"
+        with open(path, "r", encoding="UTF-8") as a_file:
+            dict_project = json.load(a_file)
+            dict_meta = dict_project["META"]
+
+        # dict_private = {}
+        # path = self._dir_prj / "pyplate" / "conf" / "private.json"
+        # with open(path, "r", encoding="UTF-8") as a_file:
+        #     dict_private = json.load(a_file)
+
+        version = dict_meta["__PP_VERSION__"]
+        short_desc = dict_meta["__PP_SHORT_DESC__"]
+
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+        # TODO: get all py deps for toml and readme
+        # fix deps for toml
+
+        #        toml:
+        #            get format of deps/keywords
+        #            format deps and replace
+        #            format keywords and replace
+        #            put context around repls and search for them
+        #        readme:
+        #            format deps and replace
+
+        # input: ["foo", "bar"]
+        # output: '"foo", "bar"'
+        # seems obvious, right? well here's the thing:
+        # when you just join the items, you get:
+        # >>> ", ".join(items)
+        # >>> "foo, bar"
+        # one string, quoted on the outside, containing all items
+        # what we want is a string with single outer quotes, and all items
+        # individually double-quoted:
+        # >>> '"foo", "bar"'
+        s_keywords = ""
+        keywords = dict_meta["__PP_KEYWORDS__"]
+        if keywords:
+            s_keywords = ", ".join(f'"{k}"' for k in keywords)
+
+        # now figure out deps and links for readme
+        # get meta deps
+        py_deps = dict_meta["__PP_PY_DEPS__"]
+        # new list of deps
+        l_rm_deps = []
+        # default text
+        s_rm_deps = "None"
+        # convert deps dict to md style
+        if len(py_deps):
+            l_rm_deps = [f"[{key}]({val})" for (key, val) in py_deps.items()]
+            s_rm_deps = "\n".join(l_rm_deps)
+
+        # walk the project folder
+        for root, _root_dirs, root_files in self._dir_prj.walk():
+
+            # convert files into Paths
+            files = [root / f for f in root_files]
+
+            # for each file item
+            for item in files:
+                if item.name == "pyproject.toml":
+
+                    # do version in pyproject.toml
+                    lines = []
+                    with open(item, "r", encoding="UTF-8") as a_file:
+                        lines = a_file.readlines()
+
+                    for index, line in enumerate(lines):
+                        pat = r"(version\s*=\s*)(.*)(\n)"
+                        repl = rf'\g<1>"{version}"\g<3>'
+                        sch = re.search(pat, line)
+                        if sch:
+                            lines[index] = re.sub(pat, repl, line)
+
+                        pat = r"(description\s*=\s*)(.*)(\n)"
+                        repl = fr'\g<1>"{short_desc}"\g<3>'
+                        sch = re.search(pat, line)
+                        if sch:
+                            lines[index] = re.sub(pat, repl, line)
+
+                        pat = r"(keywords\s*=\s*\[)(.*)(\]\n)"
+                        repl = fr'\g<1>{s_keywords}\g<3>'
+                        sch = re.search(pat, line)
+                        if sch:
+                            lines[index] = re.sub(pat, repl, line)
+
+                    with open(item, "w", encoding="UTF-8") as a_file:
+                        a_file.writelines(lines)
+                    continue
+
+                if item.name == "README.md":
+
+                    # open and read whole file
+                    with open(item, "r", encoding="UTF-8") as a_file:
+                        text = a_file.read()
+
+                    # find the desc blocks
+                    pat = r"(<!-- __PP_SHORT_DESC__ -->)(.*?)(<!-- __PP_SHORT_DESC__ -->)"
+                    repl = rf"\g<1>\n{short_desc}\n\g<3>"
+                    sch = re.search(pat, text, flags=re.S)
+                    if sch:
+                        # NB: need S flag to make dot match newline
+                        text = re.sub(pat, repl, text, flags=re.S)
+
+                    # find the deps block
+                    pat = r"(<!-- __PP_RM_DEPS__ -->)(.*?)(<!-- __PP_RM_DEPS__ -->)"
+                    # rm_deps = dict_meta["__PP_RM_DEPS__"]
+                    repl = rf"\g<1>\n{s_rm_deps}\n\g<3>"
+                    sch = re.search(pat, text, flags=re.S)
+                    if sch:
+                        # NB: need S flag to make dot match newline
+                        text = re.sub(pat, repl, text, flags=re.S)
+
+                    # save file
+                    with open(item, "w", encoding="UTF-8") as a_file:
+                        a_file.write(text)
+                    continue
+
+                # all files in src
+                if root.name == "src":
+
+                    lines = []
+                    with open(item, "r", encoding="UTF-8") as a_file:
+                        lines = a_file.readlines()
+
+                    for index, line in enumerate(lines):
+
+                        pat = r"(__PB_VERSION__\s*=\s*)(.*)(\n)"
+                        repl = rf'\g<1>"{version}"\g<3>'
+                        sch = re.search(pat, line)
+                        if sch:
+                            lines[index] = re.sub(pat, repl, line)
+
+                        pat = r"(__PB_SHORT_DESC__\s*=\s*)(.*)(\n)"
+                        repl = rf'\g<1>"{short_desc}"\g<3>'
+                        sch = re.search(pat, line)
+                        if sch:
+                            lines[index] = re.sub(pat, repl, line)
+
+                    with open(item, "w", encoding="UTF-8") as a_file:
+                        a_file.writelines(lines)
+
+    # --------------------------------------------------------------------------
+
+    def _copy_files(self):
+        """
+        docstring
+        """
+
+        # list of files/folders from project to include in dist
+        src = [
+            "conf",
+            "README",
+            "src",
+            "LICENSE.txt",
+            "README.md",
+        ]
+
+        # path to project's dist folder
+        dst = Path(self._dir_prj) / "dist"
+
+        # copy files/folders
+        for item in src:
+            new_src = Path(self._dir_prj) / item
+            new_dst = dst / item
+            if new_src.is_dir():
+                shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
+            elif new_src.is_file():
+                shutil.copy2(new_src, new_dst)
+
+        # copy lib
+        new_src = P_DIR_PP_LIB
+        new_dst = dst / "lib"
+        shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
+
+    # --------------------------------------------------------------------------
+
+    def _make_install(self):
+        """
+        docstring
+        """
+
+        dict_install = {
+            "lib": ".local/share/cyclopticnerve", # __PP_AUTHOR__
+            "conf": ".config/CLIs_DEBUG", # __PP_NAME_BIG__
+            "src/clis_debug": ".local/bin", # __PP_NAME_SMALL__
+        }
+
+        dst = Path(self._dir_prj) / "dist" / "inst_conf.json"
+        with open(dst, "w", encoding="UTF-8") as a_file:
+            json.dump(dict_install, a_file, indent=4)
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+
     # NB: these are the main steps, called in order from main
 
     # --------------------------------------------------------------------------
@@ -228,68 +446,11 @@ class PyBaker:
         # check for flags
         self._debug = dict_args[S_DBG_DEST]
 
-        # # check for folder
-        # if not self._debug:
-        #     self._dir_prj = Path(dict_args[S_PRJ_DEST])
-
-    # # --------------------------------------------------------------------------
-    # # Load the required config files
-    # # --------------------------------------------------------------------------
-    # def load_config_files(self):
-    #     """Y
-    #     Load the required config files
-
-    #     Get required config files and load them into the dictionaries required
-    #     by the program. These files may sometimes be edited by users, so we
-    #     need to check that they:
-    #     (1. exist)
-    #     and
-    #     (2. are valid JSON).
-    #     Both of these are handled by F.load_dicts.
-    #     """
-
-    #     # TODO use dunders here
-    #     # get individual dicts in the project file
-    #     path_to_conf = self._dir_prj / "pyplate" / "conf" / "project.json"
-    #     dict_all = F.load_dicts([path_to_conf], {})
-    #     self._d_blacklist = dict_all["BLACKLIST"]
-    #     self._d_i18n = dict_all["I18N"]
-    #     self._d_metadata = dict_all["META"]
-
-    #     # get main dict in private.json
-    #     path_to_conf = self._dir_prj / "pyplate" / "conf" / "private.json"
-    #     self._d_settings = F.load_dicts([path_to_conf], {})
-
-    # # --------------------------------------------------------------------------
-    # # Get new version number
-    # # --------------------------------------------------------------------------
-    # def _get_version(self):
-    #     """
-    #     Get new version number
-
-    #     Asks the user for the version number of this distribution.
-    #     """
-
-    #     # NEXT: enforce semantic versioning (_check_version)
-    #     # first get old version from metadata
-    #     # NB: if no version key, use default of "0.0.1"
-    #     old_version = self._d_metadata.get("__PP_VERSION__", "")
-    #     if old_version == "":
-    #         old_version = "0.0.0"
-
-    #     # now ask user for new number or default
-    #     fmt_str = B.S_ASK_VER.format(old_version)
-    #     new_version = input(fmt_str)
-    #     if new_version == "":
-    #         new_version = old_version
-
-    #     # save new version to metadata
-    #     self._d_metadata["__PP_VERSION__"] = new_version
-    #     self._version = new_version
-    #     # TODO: save new version to file
-
-    # def fix_metadata(self):
-    #     """docstring"""
+        # check for folder
+        if not self._debug:
+            self._dir_prj = Path(dict_args[S_PRJ_DEST])
+        else:
+            self._dir_prj = Path("/home/dana/Documents/Projects/Python/CLIs/CLIs_DEBUG")
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
@@ -1386,5 +1547,64 @@ if __name__ == "__main__":
 # #     # get path to config file
 # #     C_PATH_GUI = C_PATH_SRC / "cfg/__PP_NAME_SMALL__.json"
 
+
+# # --------------------------------------------------------------------------
+# # Load the required config files
+# # --------------------------------------------------------------------------
+# def load_config_files(self):
+#     """Y
+#     Load the required config files
+
+#     Get required config files and load them into the dictionaries required
+#     by the program. These files may sometimes be edited by users, so we
+#     need to check that they:
+#     (1. exist)
+#     and
+#     (2. are valid JSON).
+#     Both of these are handled by F.load_dicts.
+#     """
+
+#     # TODO use dunders here
+#     # get individual dicts in the project file
+#     path_to_conf = self._dir_prj / "pyplate" / "conf" / "project.json"
+#     dict_all = F.load_dicts([path_to_conf], {})
+#     self._d_blacklist = dict_all["BLACKLIST"]
+#     self._d_i18n = dict_all["I18N"]
+#     self._d_metadata = dict_all["META"]
+
+#     # get main dict in private.json
+#     path_to_conf = self._dir_prj / "pyplate" / "conf" / "private.json"
+#     self._d_settings = F.load_dicts([path_to_conf], {})
+
+# # --------------------------------------------------------------------------
+# # Get new version number
+# # --------------------------------------------------------------------------
+# def _get_version(self):
+#     """
+#     Get new version number
+
+#     Asks the user for the version number of this distribution.
+#     """
+
+#     # NEXT: enforce semantic versioning (_check_version)
+#     # first get old version from metadata
+#     # NB: if no version key, use default of "0.0.1"
+#     old_version = self._d_metadata.get("__PP_VERSION__", "")
+#     if old_version == "":
+#         old_version = "0.0.0"
+
+#     # now ask user for new number or default
+#     fmt_str = B.S_ASK_VER.format(old_version)
+#     new_version = input(fmt_str)
+#     if new_version == "":
+#         new_version = old_version
+
+#     # save new version to metadata
+#     self._d_metadata["__PP_VERSION__"] = new_version
+#     self._version = new_version
+#     # TODO: save new version to file
+
+# def fix_metadata(self):
+#     """docstring"""
 
 # # -)
