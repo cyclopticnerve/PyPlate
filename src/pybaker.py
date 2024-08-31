@@ -137,7 +137,10 @@ class PyBaker:
         # self._dict_rep = {}
 
         self._debug = False
-        # self._version = ""
+        self._s_version = ""
+        self._s_short_desc = ""
+        self._s_keywords = ""
+        self._s_rm_deps = ""
         # self._d_blacklist = {}  # project.json
         # self._d_i18n = {}  # project.json
         # self._d_metadata = {}  # project.json
@@ -166,6 +169,8 @@ class PyBaker:
         self._setup()
 
         self._load_meta()
+
+        self._do_fix()
 
         self._copy_files()
 
@@ -232,8 +237,8 @@ class PyBaker:
         # with open(path, "r", encoding="UTF-8") as a_file:
         #     dict_private = json.load(a_file)
 
-        version = dict_meta["__PP_VERSION__"]
-        short_desc = dict_meta["__PP_SHORT_DESC__"]
+        self._s_version = dict_meta["__PP_VERSION__"]
+        self._s_short_desc = dict_meta["__PP_SHORT_DESC__"]
 
         # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
@@ -258,10 +263,10 @@ class PyBaker:
         # what we want is a string with single outer quotes, and all items
         # individually double-quoted:
         # >>> '"foo", "bar"'
-        s_keywords = ""
+        self._s_keywords = ""
         keywords = dict_meta["__PP_KEYWORDS__"]
         if keywords:
-            s_keywords = ", ".join(f'"{k}"' for k in keywords)
+            self._s_keywords = ", ".join(f'"{k}"' for k in keywords)
 
         # now figure out deps and links for readme
         # get meta deps
@@ -269,12 +274,21 @@ class PyBaker:
         # new list of deps
         l_rm_deps = []
         # default text
-        s_rm_deps = "None"
+        self._s_rm_deps = "None"
         # convert deps dict to md style
-        if len(py_deps):
-            l_rm_deps = [f"[{key}]({val})" for (key, val) in py_deps.items()]
-            s_rm_deps = "\n".join(l_rm_deps)
+        if py_deps:
+            l_rm_deps = [
+                f"[{key}]({val})" for (key, val) in py_deps.items()
+            ]
+            self._s_rm_deps = "\n".join(l_rm_deps)
 
+
+# ------------------------------------------------------------------------------
+
+    def _do_fix(self):
+        """
+        docstring
+        """
         # walk the project folder
         for root, _root_dirs, root_files in self._dir_prj.walk():
 
@@ -292,19 +306,19 @@ class PyBaker:
 
                     for index, line in enumerate(lines):
                         pat = r"(version\s*=\s*)(.*)(\n)"
-                        repl = rf'\g<1>"{version}"\g<3>'
+                        repl = rf'\g<1>"{self._s_version}"\g<3>'
                         sch = re.search(pat, line)
                         if sch:
                             lines[index] = re.sub(pat, repl, line)
 
                         pat = r"(description\s*=\s*)(.*)(\n)"
-                        repl = fr'\g<1>"{short_desc}"\g<3>'
+                        repl = fr'\g<1>"{self._s_short_desc}"\g<3>'
                         sch = re.search(pat, line)
                         if sch:
                             lines[index] = re.sub(pat, repl, line)
 
                         pat = r"(keywords\s*=\s*\[)(.*)(\]\n)"
-                        repl = fr'\g<1>{s_keywords}\g<3>'
+                        repl = fr'\g<1>{self._s_keywords}\g<3>'
                         sch = re.search(pat, line)
                         if sch:
                             lines[index] = re.sub(pat, repl, line)
@@ -321,7 +335,7 @@ class PyBaker:
 
                     # find the desc blocks
                     pat = r"(<!-- __PP_SHORT_DESC__ -->)(.*?)(<!-- __PP_SHORT_DESC__ -->)"
-                    repl = rf"\g<1>\n{short_desc}\n\g<3>"
+                    repl = rf"\g<1>\n{self._s_short_desc}\n\g<3>"
                     sch = re.search(pat, text, flags=re.S)
                     if sch:
                         # NB: need S flag to make dot match newline
@@ -330,7 +344,7 @@ class PyBaker:
                     # find the deps block
                     pat = r"(<!-- __PP_RM_DEPS__ -->)(.*?)(<!-- __PP_RM_DEPS__ -->)"
                     # rm_deps = dict_meta["__PP_RM_DEPS__"]
-                    repl = rf"\g<1>\n{s_rm_deps}\n\g<3>"
+                    repl = rf"\g<1>\n{self._s_rm_deps}\n\g<3>"
                     sch = re.search(pat, text, flags=re.S)
                     if sch:
                         # NB: need S flag to make dot match newline
@@ -351,13 +365,13 @@ class PyBaker:
                     for index, line in enumerate(lines):
 
                         pat = r"(__PB_VERSION__\s*=\s*)(.*)(\n)"
-                        repl = rf'\g<1>"{version}"\g<3>'
+                        repl = rf'\g<1>"{self._s_version}"\g<3>'
                         sch = re.search(pat, line)
                         if sch:
                             lines[index] = re.sub(pat, repl, line)
 
                         pat = r"(__PB_SHORT_DESC__\s*=\s*)(.*)(\n)"
-                        repl = rf'\g<1>"{short_desc}"\g<3>'
+                        repl = rf'\g<1>"{self._s_short_desc}"\g<3>'
                         sch = re.search(pat, line)
                         if sch:
                             lines[index] = re.sub(pat, repl, line)
@@ -532,8 +546,108 @@ if __name__ == "__main__":
 # # Public functions
 # # ------------------------------------------------------------------------------
 
-# # --------------------------------------------------------------------------
+# # ------------------------------------------------------------------------------
 # # Replace text in the pyproject file
+# # ------------------------------------------------------------------------------
+# def fix_pyproject():
+#     """
+#     Replace text in the pyproject file
+
+#     Replaces things like the keywords, requirements, etc. in the toml file.
+#     """
+
+#     # check if the file exists
+#     path_toml = _DIR_PRJ / "pyproject.toml"
+#     if not path_toml.exists():
+#         return
+
+#     # default text if we can't open file
+#     text = ""
+
+#     # open file and get contents
+#     with open(path_toml, "r", encoding="UTF8") as a_file:
+#         text = a_file.read()
+
+#     # NB: we do a dunder replace here because putting a dunder as the
+#     # default name in the toml file causes the linter to choke, so we use a
+#     # dummy name
+
+#     # replace name
+#     str_pattern = (
+#         r"(^\s*\[project\]\s*$)" r"(.*?)" r"(^\s*name[\t ]*=[\t ]*)" r"(.*?$)"
+#     )
+#     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
+#     str_rep = rf'\g<1>\g<2>\g<3>"{pp_name_small}"'
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # replace version
+#     str_pattern = (
+#         r"(^\s*\[project\]\s*$)"
+#         r"(.*?)"
+#         r"(^\s*version[\t ]*=[\t ]*)"
+#         r"(.*?$)"
+#     )
+#     pp_version = DICT_METADATA["__PP_VERSION__"]
+#     if pp_version == "":
+#         pp_version = S.DEF_VERSION
+#     str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # replace short description
+#     str_pattern = (
+#         r"(^\s*\[project\]\s*$)"
+#         r"(.*?)"
+#         r"(^\s*description[\t ]*=[\t ]*)"
+#         r"(.*?$)"
+#     )
+#     pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
+#     str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # # replace keywords array
+#     str_pattern = (
+#         r"(^\s*\[project\]\s*$)"
+#         r"(.*?)"
+#         r"(^\s*keywords[\t ]*=[\t ]*)"
+#         r"(.*?\])"
+#     )
+
+#     # convert dict to string
+#     pp_keywords = DICT_METADATA["__PP_KEYWORDS__"]
+#     str_pp_keywords = [f'"{item}"' for item in pp_keywords]
+#     str_pp_keywords = ", ".join(str_pp_keywords)
+
+#     # replace string
+#     str_rep = rf"\g<1>\g<2>\g<3>[{str_pp_keywords}]"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # replace dependencies array
+#     str_pattern = (
+#         r"(^\s*\[project\]\s*$)"
+#         r"(.*?)"
+#         r"(^\s*dependencies[\t ]*=[\t ]*)"
+#         r"(.*?\])"
+#     )
+
+#     # convert dict to string (only using keys)
+#     pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
+
+#     # NB: this is not conducive to a dict (we don't need links, only names)
+#     # so don't do what we did in README, keep it simple
+#     list_py_deps = [item for item in pp_py_deps.keys()]
+#     str_pp_py_deps = [f'"{item}"' for item in list_py_deps]
+#     str_pp_py_deps = ", ".join(str_pp_py_deps)
+
+#     # replace text
+#     str_rep = rf"\g<1>\g<2>\g<3>[{str_pp_py_deps}]"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # save file
+#     with open(path_toml, "w", encoding="UTF8") as a_file:
+#         a_file.write(text)
+
+# # --------------------------------------------------------------------------
+# # Replace text in the readme file
 # # --------------------------------------------------------------------------
 # def _fix_readme(self, item):
 #     """
@@ -718,106 +832,6 @@ if __name__ == "__main__":
 #         #     self._fix_path(root)
 
 # # ------------------------------------------------------------------------------
-# # Replace text in the pyproject file
-# # ------------------------------------------------------------------------------
-# def fix_pyproject():
-#     """
-#     Replace text in the pyproject file
-
-#     Replaces things like the keywords, requirements, etc. in the toml file.
-#     """
-
-#     # check if the file exists
-#     path_toml = _DIR_PRJ / "pyproject.toml"
-#     if not path_toml.exists():
-#         return
-
-#     # default text if we can't open file
-#     text = ""
-
-#     # open file and get contents
-#     with open(path_toml, "r", encoding="UTF8") as a_file:
-#         text = a_file.read()
-
-#     # NB: we do a dunder replace here because putting a dunder as the
-#     # default name in the toml file causes the linter to choke, so we use a
-#     # dummy name
-
-#     # replace name
-#     str_pattern = (
-#         r"(^\s*\[project\]\s*$)" r"(.*?)" r"(^\s*name[\t ]*=[\t ]*)" r"(.*?$)"
-#     )
-#     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
-#     str_rep = rf'\g<1>\g<2>\g<3>"{pp_name_small}"'
-#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-#     # replace version
-#     str_pattern = (
-#         r"(^\s*\[project\]\s*$)"
-#         r"(.*?)"
-#         r"(^\s*version[\t ]*=[\t ]*)"
-#         r"(.*?$)"
-#     )
-#     pp_version = DICT_METADATA["__PP_VERSION__"]
-#     if pp_version == "":
-#         pp_version = S.DEF_VERSION
-#     str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
-#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-#     # replace short description
-#     str_pattern = (
-#         r"(^\s*\[project\]\s*$)"
-#         r"(.*?)"
-#         r"(^\s*description[\t ]*=[\t ]*)"
-#         r"(.*?$)"
-#     )
-#     pp_short_desc = DICT_METADATA["__PP_SHORT_DESC__"]
-#     str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
-#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-#     # # replace keywords array
-#     str_pattern = (
-#         r"(^\s*\[project\]\s*$)"
-#         r"(.*?)"
-#         r"(^\s*keywords[\t ]*=[\t ]*)"
-#         r"(.*?\])"
-#     )
-
-#     # convert dict to string
-#     pp_keywords = DICT_METADATA["__PP_KEYWORDS__"]
-#     str_pp_keywords = [f'"{item}"' for item in pp_keywords]
-#     str_pp_keywords = ", ".join(str_pp_keywords)
-
-#     # replace string
-#     str_rep = rf"\g<1>\g<2>\g<3>[{str_pp_keywords}]"
-#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-#     # replace dependencies array
-#     str_pattern = (
-#         r"(^\s*\[project\]\s*$)"
-#         r"(.*?)"
-#         r"(^\s*dependencies[\t ]*=[\t ]*)"
-#         r"(.*?\])"
-#     )
-
-#     # convert dict to string (only using keys)
-#     pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
-
-#     # NB: this is not conducive to a dict (we don't need links, only names)
-#     # so don't do what we did in README, keep it simple
-#     list_py_deps = [item for item in pp_py_deps.keys()]
-#     str_pp_py_deps = [f'"{item}"' for item in list_py_deps]
-#     str_pp_py_deps = ", ".join(str_pp_py_deps)
-
-#     # replace text
-#     str_rep = rf"\g<1>\g<2>\g<3>[{str_pp_py_deps}]"
-#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-#     # save file
-#     with open(path_toml, "w", encoding="UTF8") as a_file:
-#         a_file.write(text)
-
-# # ------------------------------------------------------------------------------
 # # Replace text in the install file
 # # ------------------------------------------------------------------------------
 # def fix_install():
@@ -978,7 +992,6 @@ if __name__ == "__main__":
 #     # save file
 #     with open(path_desk, "w", encoding="UTF8") as a_file:
 #         a_file.write(text)
-
 
 # # ------------------------------------------------------------------------------
 # # Replace text in the UI file
@@ -1413,7 +1426,7 @@ if __name__ == "__main__":
 # # ------------------------------------------------------------------------------
 # # Checks file contents for replacements
 # # ------------------------------------------------------------------------------
-# def _check_text(path_item, lines):
+# def _check_code(path_item, lines):
 #     """
 #     Checks file contents for replacements
 
