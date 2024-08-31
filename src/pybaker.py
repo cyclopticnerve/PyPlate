@@ -168,54 +168,17 @@ class PyBaker:
         # call boilerplate code
         self._setup()
 
+        # load current metadata from conf
         self._load_meta()
 
+        # fix metadata in files
         self._do_fix()
 
+        # copy project files into dist folder
         self._copy_files()
 
+        # make conf file for installer
         self._make_install()
-
-        # load the config files
-        # if not self._debug:
-        #     self.load_config_files()
-
-        # ask for version number
-        # self._get_version()
-
-        # replace all dunders ala pymaker
-        # self._fix_version()
-        # self._fix_toml()
-
-        # self._fix_src()
-        # self.fix_metadata()
-        # fix_blacklist()
-        # fix_readme()
-
-        # # pkg
-        # fix_pyproject()
-        # # fix_init()
-
-        # # cli/gui
-        # fix_argparse()
-        # fix_install()
-
-        # # gui
-        # fix_desktop()
-        # fix_gtk3()
-
-        # # check for dunders left over or we missed
-        # recurse_and_check(_DIR_PRJ)
-
-        # # do housekeeping
-        # do_extras()
-
-        # # do gettext stuff
-        # # do_gettext()
-
-        # # # print error count (dunder stuff found)
-        # s = G_STRINGS["S_ERR_COUNT"]
-        # print(s.format(G_ERROR_COUNT))
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -431,12 +394,6 @@ class PyBaker:
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
 
     # NB: these are the main steps, called in order from main
 
@@ -545,6 +502,46 @@ if __name__ == "__main__":
 # # ------------------------------------------------------------------------------
 # # Public functions
 # # ------------------------------------------------------------------------------
+# load the config files
+# if not self._debug:
+#     self.load_config_files()
+
+# ask for version number
+# self._get_version()
+
+# replace all dunders ala pymaker
+# self._fix_version()
+# self._fix_toml()
+
+# self._fix_src()
+# self.fix_metadata()
+# fix_blacklist()
+# fix_readme()
+
+# # pkg
+# fix_pyproject()
+# # fix_init()
+
+# # cli/gui
+# fix_argparse()
+# fix_install()
+
+# # gui
+# fix_desktop()
+# fix_gtk3()
+
+# # check for dunders left over or we missed
+# recurse_and_check(_DIR_PRJ)
+
+# # do housekeeping
+# do_extras()
+
+# # do gettext stuff
+# # do_gettext()
+
+# # # print error count (dunder stuff found)
+# s = G_STRINGS["S_ERR_COUNT"]
+# print(s.format(G_ERROR_COUNT))
 
 # # ------------------------------------------------------------------------------
 # # Replace text in the pyproject file
