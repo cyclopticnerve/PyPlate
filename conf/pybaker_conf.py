@@ -12,7 +12,7 @@ S_ERR_DJSON = "ERROR: Default file {} is not a valid JSON file"
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
-LIST_CATEGORIES = [
+L_CATS = [
     "AudioVideo",
     "Audio",
     "Video",

@@ -6,8 +6,8 @@
 # TODO: replace all PB_VERSION with new version, across all files in prj dir
 # TODO: fix every metadata using choice menu for new value
 # gonna need a lot of regex in pybaker.conf
-# TODO: do we need D_PRJ_DEF/D_PRJ_EXTRA?
-# TODO: what do we need from D_PRJ_CFG? just __PP_DEV_PP__?
+# TODO: do we need D_PRV_DEF/D_PRV_EXTRA?
+# TODO: what do we need from D_PRV_CFG? just __PP_DEV_PP__?
 
 # DONE ask for meta
 # DONE update meta in conf file
@@ -100,7 +100,7 @@ TODO: ask dev for everything 1 time?
 TODO: always run header test on sample file w/o rat
 TODO: what if you move project? what if you move PyPlate? vals should be
 updated every run and store in a dev file
-TODO: fill in pyplate/private.json w pp prj_def/prg_cfg
+TODO: fill in pyplate/private.json w pp PRV_DEF/prg_cfg
 TODO: fill in pyplate/project.json w pp blacklist/i18n/metadata
 TODO: move get info input format to settings.py
 TODO: move _check_name regex to settings

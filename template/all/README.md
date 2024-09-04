@@ -22,7 +22,7 @@ __PP_SHORT_DESC__
 
 ## Requirements
 <!-- __PP_RM_DEPS__ -->
-None
+__PP_RM_DEPS__
 <!-- __PP_RM_DEPS__ -->
 
 ## Installing
