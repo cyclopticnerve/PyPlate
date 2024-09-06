@@ -224,9 +224,9 @@ class CNPotPy:
         # ----------------------------------------------------------------------
         # do the steps
 
-        self._make_pot()
-        self._make_pos()
-        self._make_mos()
+        self.make_pot()
+        self.make_pos()
+        self.make_mos()
 
     # --------------------------------------------------------------------------
     # Localize the desktop file using all available wlangs
@@ -260,7 +260,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Create a .pot file in the locale folder
     # --------------------------------------------------------------------------
-    def _make_pot(self):
+    def make_pot(self):
         """
         Create a .pot file in the locale folder
 
@@ -375,7 +375,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Merge any .po files in the pos folder with existing .po files
     # --------------------------------------------------------------------------
-    def _make_pos(self):
+    def make_pos(self):
         """
         Merge any .po files in the pos folder with existing .po files
 
@@ -409,7 +409,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Create .mo files for all .po files in the locale folder
     # --------------------------------------------------------------------------
-    def _make_mos(self):
+    def make_mos(self):
         """
         Create .mo files for all .po files in the locale folder
 

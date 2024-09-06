@@ -25,10 +25,13 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-# import json
+from datetime import date
+# import gettext
 from pathlib import Path
 import re
+import shlex
 import shutil
+import subprocess
 import sys
 
 # pylint: disable=wrong-import-position
@@ -54,6 +57,7 @@ from conf import pybaker_conf as B  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
+from cnlib.cnpot import CNPotPy  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -138,13 +142,14 @@ class PyBaker:
         """
 
         # set the initial values of properties
-        self._d_args = {}
+        self._dict_args = {}
         self._debug = False
         self._dir_prj = Path()
         self._dict_rep = {}
         self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}
+        self._dict_type_rep = {}
 
         self._dict_prj = {}
         self._dict_meta = {}
@@ -211,10 +216,10 @@ class PyBaker:
         # set pp cmd line stuff
 
         # get cmd line args
-        dict_args = self._run_parser()
+        self._run_parser()
 
         # check for flags
-        self._debug = self._d_args.get(S_DBG_DEST, False)
+        self._debug = self._dict_args.get(S_DBG_DEST, False)
 
         # debug turns off some _do_after_fix features
         if self._debug:
@@ -226,8 +231,17 @@ class PyBaker:
 
       # ----------------------------------------------------------------------
 
+        # if debug, use test project
+        if self._debug:
+            self._dir_prj = Path(
+                "/home/dana/Documents/Projects/Python/GUIs/GUIs_DEBUG"
+            )
+            return
+
+      # ----------------------------------------------------------------------
+
         # check for folder
-        dst = dict_args[S_PRJ_DEST]
+        dst = self._dict_args[S_PRJ_DEST]
         if dst:
             self._dir_prj = Path(dst)
             if not self._dir_prj.exists():
@@ -236,15 +250,6 @@ class PyBaker:
         else:
             print("project dir not provided")
             sys.exit()
-
-      # ----------------------------------------------------------------------
-
-        # if debug, use test project
-        if self._debug:
-            self._dir_prj = Path(
-                "/home/dana/Documents/Projects/Python/CLIs/CLIs_DEBUG"
-            )
-            return
 
     # --------------------------------------------------------------------------
     # Load the config files
@@ -383,14 +388,14 @@ class PyBaker:
                         bl_code = False
 
                     # do md/html/xml separately (needs special handling)
-                    d_repl = M.D_PY_REPL
+                    self._dict_type_rep = M.D_PY_REPL
                     wo_dot = item.suffix.lstrip(".")
                     w_dot = "." + wo_dot
                     if wo_dot in M.L_MARKUP or w_dot in M.L_MARKUP:
-                        d_repl = M.D_MU_REPL
+                        self._dict_type_rep = M.D_MU_REPL
 
                     # fix content with appropriate dict
-                    self._fix_content(item, bl_hdr, bl_code, d_repl)
+                    self._fix_content(item, bl_hdr, bl_code)
 
                 # --------------------------------------------------------------
 
@@ -420,14 +425,14 @@ class PyBaker:
         # save project settings
 
         # save fixed settings
-        dict_no_edit = {
-            M.S_KEY_PRV_DEF: M.D_PRV_DEF,
-            M.S_KEY_PRV_DIST_DIRS: M.D_PRV_DIST_DIRS,
-            M.S_KEY_PRV_EXTRA: M.D_PRV_EXTRA,
-            M.S_KEY_PRV_CFG: M.D_PRV_CFG,
-        }
+        # dict_no_edit = {
+        #     M.S_KEY_PRV_DEF: M.D_PRV_DEF,
+        #     M.S_KEY_PRV_DIST_DIRS: M.D_PRV_DIST_DIRS,
+        #     M.S_KEY_PRV_EXTRA: M.D_PRV_EXTRA,
+        #     M.S_KEY_PRV_CFG: M.D_PRV_CFG,
+        # }
         path_no_edit = self._dir_prj / S_PP_PRV
-        F.save_dict(dict_no_edit, [path_no_edit])
+        F.save_dict(self._dict_prv, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
         path_edit = self._dir_prj / S_PP_PRJ
@@ -441,7 +446,7 @@ class PyBaker:
         # fix dunders in bl/i18n
 
         # replace dunders in blacklist and i18n
-        self._fix_content(path_edit, False, False,self._dict_rep)
+        self._fix_content(path_edit, False, False)
 
         # reload dict from fixed file
         dict_edit = F.load_dicts([path_edit])
@@ -567,7 +572,9 @@ class PyBaker:
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
-        # also dont just go for all .desktop - don't edit template
+        # ----------------------------------------------------------------------
+        # other
+        # NB: also dont just go for all .desktop - don't edit template
         # pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
 
         for root, _root_dirs, root_files in self._dir_prj.walk():
@@ -595,69 +602,9 @@ class PyBaker:
                     if item.suffix == "ui" or item.suffix == ".glade":
                         self._fix_gtk3(item)
 
-        # reqs.txt, CHANGELOG.md, tree.txt, docs,
-# def do_extras():
-#     """
-#     Do extras functions to update project dir after recurse
-
-#     Do some extra functions like add requirements, update docs, and update
-#     the CHANGELOG file for the current project.
-#     """
-
-#     # get current dir
-#     dir_curr = os.getcwd()
-
-#     # make sure we are in project path
-#     os.chdir(_DIR_PRJ)
-
-#     # add requirements
-#     path_req = os.path.join(_DIR_PRJ, "requirements.txt")
-#     with open(path_req, "w", encoding="UTF8") as a_file:
-#         cmd = "python -m pip freeze -l --exclude-editable --require-virtualenv"
-#         cmd_array = shlex.split(cmd)
-#         subprocess.run(cmd_array, stdout=a_file, check=False)
-
-#     # update CHANGELOG
-#     path_chg = os.path.join(_DIR_PRJ, "CHANGELOG.md")
-#     with open(path_chg, "w", encoding="UTF8") as a_file:
-#         cmd = 'git log --pretty="%ad - %s"'
-#         cmd_array = shlex.split(cmd)
-#         subprocess.run(cmd_array, stdout=a_file, check=False)
-
-#     # get tree path
-#     path_tree = os.path.join(_DIR_PRJ, "misc", "tree.txt")
-
-#     # if not exist
-#     # if not os.path.exists(path_tree):
-
-#     # # create tree object and call
-#     # p_t = pytree.PyTree()
-#     # TODO: make this use blacklist
-#     # tree = p_t.build_tree(_DIR_PRJ, DICT_SETTINGS['__PP_TREE_IGNORE__'])
-
-#     # # write tree to file
-#     # with open(path_tree, 'w', encoding='UTF8') as a_file:
-#     #     a_file.write(tree)
-
-#     # update docs
-#     # NB: this is ugly and stupid, but it's the only way to get pdoc3 to work
-
-#     # move into src dir
-#     # dir_src = os.path.join(_DIR_PRJ, 'src')
-#     # os.chdir(dir_src)
-
-#     # # get docs dir
-#     # path_docs = os.path.join('..', 'docs')
-#     # path_docs = os.path.abspath(path_docs)
-
-#     # # # update docs
-#     # cmd = f'python -m pdoc --html -f -o {path_docs} .'
-#     # cmd_array = shlex.split(cmd)
-#     # subprocess.run(cmd_array, check=False)
-
-#     # # go back to old dir
-#     # os.chdir(dir_curr)
-
+        # do (x)gettext
+        self._do_gettext()
+        self._do_pot()
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
@@ -687,9 +634,7 @@ class PyBaker:
         args = parser.parse_args()
 
         # convert namespace to dict
-        self._d_args = vars(args)
-
-        return self._d_args
+        self._dict_args = vars(args)
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -781,7 +726,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_content(self, path, bl_hdr, bl_code, d_repl):
+    def _fix_content(self, path, bl_hdr, bl_code):
         """
         Fix header or code for each line in a file
 
@@ -789,7 +734,6 @@ class PyBaker:
             path: Path for replacing text
             bl_hdr: Whether the file is blacklisted for header lines
             bl_code: Whether the file is blacklisted for code lines
-            d_repl: the dict to use for replacement
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.
@@ -799,7 +743,7 @@ class PyBaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
+        with open(path, "r", encoding="UTF8") as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -816,7 +760,7 @@ class PyBaker:
             # check for block switches
 
             # param is True if we are looking for block switch vs line switch
-            if self._check_switches(line, True, d_repl):
+            if self._check_switches(line, True):
                 continue
 
             # ------------------------------------------------------------------
@@ -826,12 +770,12 @@ class PyBaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = d_repl[M.S_KEY_HDR]
+                str_pattern = self._dict_type_rep[M.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
                     # fix it
-                    lines[index] = self._fix_header(line, d_repl)
+                    lines[index] = self._fix_header(line)
 
                     # stop on first match
                     continue
@@ -839,7 +783,7 @@ class PyBaker:
             # ------------------------------------------------------------------
             # skip any other comment lines
 
-            str_pattern = d_repl[M.S_KEY_COMM]
+            str_pattern = self._dict_type_rep[M.S_KEY_COMM]
             if re.search(str_pattern, line):
                 continue
 
@@ -851,7 +795,7 @@ class PyBaker:
 
                 # fix dunders in real code lines (may still have trailing
                 # comments)
-                lines[index] = self._fix_code(line, d_repl)
+                lines[index] = self._fix_code(line)
 
         # open and write file
         with open(path, "w", encoding="UTF-8") as a_file:
@@ -886,13 +830,12 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a file header
     # --------------------------------------------------------------------------
-    def _fix_header(self, line, d_repl):
+    def _fix_header(self, line):
         """
         Replace dunders inside a file header
 
         Arguments:
             line: The line of the file to replace text in
-            d_repl: the dict to use for replacement
 
         Returns:
             The new line of code
@@ -904,7 +847,7 @@ class PyBaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = d_repl[M.S_KEY_HDR]
+        str_pattern = self._dict_type_rep[M.S_KEY_HDR]
 
         # str_pattern = M.D_MU_REPL[M.S_KEY_HDR]
         res = re.search(str_pattern, line)
@@ -912,9 +855,9 @@ class PyBaker:
             return line
 
         # pull out lead, val, and pad (OXFORD COMMA FTW!)
-        lead = res.group(d_repl[M.S_KEY_LEAD])
-        val = res.group(d_repl[M.S_KEY_VAL])
-        pad = res.group(d_repl[M.S_KEY_PAD])
+        lead = res.group(self._dict_type_rep[M.S_KEY_LEAD])
+        val = res.group(self._dict_type_rep[M.S_KEY_VAL])
+        pad = res.group(self._dict_type_rep[M.S_KEY_PAD])
 
         tmp_val = str(val)
         old_val_len = len(tmp_val)
@@ -937,13 +880,12 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a markup file's contents
     # --------------------------------------------------------------------------
-    def _fix_code(self, line, d_repl):
+    def _fix_code(self, line):
         """
         Replace dunders inside a markup file's contents
 
         Arguments:
             line: The line of the file to replace text in
-            d_repl: the dict to use for replacement
 
         Returns:
             The new line of code
@@ -964,7 +906,7 @@ class PyBaker:
         comm = ""
 
         # do the split, checking each match to see if we get a trailing comment
-        matches = re.finditer(d_repl[M.S_KEY_SPLIT], line)
+        matches = re.finditer(self._dict_type_rep[M.S_KEY_SPLIT], line)
         for match in matches:
             # if there is a match group for hash mark (meaning we found a
             # trailing comment)
@@ -982,7 +924,7 @@ class PyBaker:
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)
 
         # do the check
-        self._check_switches(comm, False, d_repl)
+        self._check_switches(comm, False)
 
         # ----------------------------------------------------------------------
 
@@ -1047,7 +989,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
-    def _check_switches(self, line, block, d_repl):
+    def _check_switches(self, line, block):
         """
         Check if line or trailing comment is a switch
 
@@ -1055,7 +997,6 @@ class PyBaker:
             line: The line to check for block switches
             block: True if we want to check a block switch, False if we want
             to check a line switch
-            d_repl: the dict to use for replacement
 
         Returns:
             True if a valid switch is found, False otherwise
@@ -1067,7 +1008,7 @@ class PyBaker:
         """
 
         # match  switches ('#|<!-- python: enable=replace', etc)
-        match = re.match(d_repl[M.S_KEY_SWITCH], line)
+        match = re.match(self._dict_type_rep[M.S_KEY_SWITCH], line)
         if not match:
             return False
 
@@ -1348,6 +1289,187 @@ class PyBaker:
         with open(item, "w", encoding="UTF8") as a_file:
             a_file.write(text)
 
+    # --------------------------------------------------------------------------
+    # Run xgettext over files to produce a locale template
+    # --------------------------------------------------------------------------
+    def _do_gettext(self):
+        """
+        Run xgettext over files to produce a locale template
+
+        Use xgettext to scan .py and .ui files for I18N strings and collect them
+        int a .pot file in the locale folder. Only applies to gui projects at
+        the moment.
+        """
+
+        # check if we are a gui project
+        # is_gui = self._dict_cfg["__PP_TYPE_PRJ__"] == "g"
+        # if not is_gui:
+        #     return
+
+        dir_locale = self._dir_prj /  M.S_ALL_SRC / "locale"
+        pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
+        path_pot = dir_locale / f"{pp_name_small}.pot"
+        pp_version = self._dict_meta["__PP_VERSION__"]
+
+        # remove old pot and recreate empty file
+        path_pot.parent.mkdir(parents=True, exist_ok=True)
+        if path_pot.exists():
+            path_pot.unlink()
+        with open(path_pot, "w", encoding="UTF8") as a_file:
+            a_file.write("")
+
+        # build a list of files
+        exts = [".py", ".ui", ".glade"]
+        author = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_AUTHOR__"]
+        email = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_EMAIL__"]
+
+        # scan for files in src directory
+        # dir_src = self._dir_prj / M.S_ALL_SRC
+        for root, _root_dirs, root_files in self._dir_prj.walk(top_down=False):
+
+            res = []
+
+            # convert files into Paths
+            files = [root / f for f in root_files]
+
+            # for each file item
+            for item in files:
+
+                # check for ext
+                if item.suffix in exts:
+                    # add to list
+                    res.append(item)
+
+            # for each file that can be I18N'd, run xgettext
+            for file in res:
+                cmd = (
+                    "xgettext "  # the xgettext cmd
+                    f"{file} "  # the file name
+                    "-j "  # append to current file
+                    '-c"I18N:" '  # look for tags in .py files
+                    "--no-location "  # don't print filename/line number
+                    f"-o {path_pot} "  # location of output file
+                    "-F "  # sort output by input file
+                    f"--copyright-holder={author} "
+                    f"--package-name={pp_name_small} "
+                    f"--package-version={pp_version} "
+                    f"--msgid-bugs-address={email}"
+                )
+                cmd_array = shlex.split(cmd)
+                subprocess.run(cmd_array, check=True)
+
+        # now lets do some text replacements to make it look nice
+
+        # default text if we can't open file
+        text = ""
+
+        # open file and get contents
+        with open(path_pot, "r", encoding="UTF8") as a_file:
+            text = a_file.read()
+
+        # replace short description
+        str_pattern = r"(# SOME DESCRIPTIVE TITLE.)"
+        pp_name_big = self._dict_cfg["__PP_NAME_BIG__"]
+        str_rep = f"# {pp_name_big} translation template"
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace copyright
+        author = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_AUTHOR__"]
+        str_pattern = rf"(# Copyright \(C\) )(.*?)( {author})"
+        year = date.today().year
+        str_rep = rf"\g<1>{year}\g<3>"
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace author's email
+        str_pattern = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
+        email = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_EMAIL__"]
+        year = date.today().year
+        str_rep = rf"\g<1>{email}\g<3>{year}"
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # replace charset
+        str_pattern = (
+            r'("Content-Type: text/plain; charset=)(CHARSET)(\\n")'
+        )
+        charset = "UTF-8"
+        str_rep = rf"\g<1>{charset}\g<3>"
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+        # save file
+        with open(path_pot, "w", encoding="UTF8") as a_file:
+            a_file.write(text)
+
+    # --------------------------------------------------------------------------
+    # Run CNPotPy over files to produce an I18N file
+    # --------------------------------------------------------------------------
+    def _do_pot(self):
+        """
+        docstring
+        """
+
+        # # dict of clangs and exts
+        dict_in = {
+            "Python": [
+                "py",
+            ],
+            "Glade": [
+                ".ui",
+                ".glade",
+            ],
+            "Desktop": [".desktop"],
+        }
+
+        # dict of clangs and no exts (ie file names)
+        dict_blank = {
+            "Python": [
+                "__PP_NAME_SMALL__",
+            ],
+        }
+
+        # the list of languages your program has been translated into (can grow
+        # over time, adding languages as they become available)
+        list_wlang = [
+            "es",
+            "xo",
+            "pq",
+        ]
+
+        # path to src dir
+        dir_src = self._dir_prj / M.S_ALL_SRC
+
+        pp = CNPotPy(
+            dir_src,
+            str_appname="foo",
+            str_version="0",
+            str_email="foo@bar.com",
+            str_domain=self._dict_cfg["__PP_NAME_SMALL__"],
+            dict_clangs=dict_in,
+            dict_no_ext=dict_blank,
+            list_wlangs=list_wlang,
+        )
+
+        pp.main()
+        # I18N: run cnpotpy
+        pp.make_pot()
+        # pp.make_pos()
+        # pp.make_mos()
+        # src = Path("foo")
+        # pp.make_desktop(
+        #     src / "support" / "desktop" / "template.desktop",
+        #     src / "support" / "desktop" / "__PP_NAME_SMALL__.desktop",
+        # )
+
+        # TODO: this is for testing purposes only
+        # t = gettext.translation(
+        #     self._dict_cfg["__PP_NAME_SMALL__"],
+        #     localedir=self._dir_prj /  M.S_ALL_SRC / "locale",
+        #     languages=["en"]
+        # )
+        # t.install()
+        # _ = t.gettext
+
+        # get path to config file
+        # C_PATH_GUI = src / "cfg/__PP_NAME_SMALL__.json"
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -1364,175 +1486,69 @@ if __name__ == "__main__":
 
     # --------------------------------------------------------------------------
 
-# # ------------------------------------------------------------------------------
-# # Run xgettext over files to produce a locale template
-# # ------------------------------------------------------------------------------
-# # def do_gettext():
-# #     """
-# #     Run xgettext over files to produce a locale template
+        # reqs.txt, CHANGELOG.md, tree.txt, docs,
+# def do_extras():
+#     """
+#     Do extras functions to update project dir after recurse
 
-# #     Use xgettext to scan .py and .ui files for I18N strings and collect them
-# #     int a .pot file in the locale folder. Only applies to gui projects at
-# #     the moment.
-# #     """
+#     Do some extra functions like add requirements, update docs, and update
+#     the CHANGELOG file for the current project.
+#     """
 
-# #     # check if we are a gui project
-# #     is_gui = DICT_SETTINGS["project"]["type"] == "g"
-# #     if not is_gui:
-# #         return
+#     # get current dir
+#     dir_curr = os.getcwd()
 
-# #     # get locale folder and pot filename
-# #     dir_locale = os.path.join(_DIR_PRJ, "src", "locale")
-# #     pp_name_small = DICT_SETTINGS["info"]["__PP_NAME_SMALL__"]
-# #     path_pot = os.path.join(dir_locale, f"{pp_name_small}.pot")
-# #     pp_version = DICT_METADATA["__PP_VERSION__"]
+#     # make sure we are in project path
+#     os.chdir(_DIR_PRJ)
 
-# #     # remove old pot and recreate empty file
-# #     if os.path.exists(path_pot):
-# #         os.remove(path_pot)
-# #     with open(path_pot, "w", encoding="UTF8") as a_file:
-# #         a_file.write("")
+#     # add requirements
+#     path_req = os.path.join(_DIR_PRJ, "requirements.txt")
+#     with open(path_req, "w", encoding="UTF8") as a_file:
+#         cmd = "python -m pip freeze -l --exclude-editable --require-virtualenv"
+#         cmd_array = shlex.split(cmd)
+#         subprocess.run(cmd_array, stdout=a_file, check=False)
 
-# #     # build a list of files
-# #     res = []
-# #     exts = [".py", ".ui", ".glade"]
+#     # update CHANGELOG
+#     path_chg = os.path.join(_DIR_PRJ, "CHANGELOG.md")
+#     with open(path_chg, "w", encoding="UTF8") as a_file:
+#         cmd = 'git log --pretty="%ad - %s"'
+#         cmd_array = shlex.split(cmd)
+#         subprocess.run(cmd_array, stdout=a_file, check=False)
 
-# #     # scan for files in src directory
-# #     dir_src = os.path.join(_DIR_PRJ, "src")
-# #     list_files = os.listdir(dir_src)
+#     # get tree path
+#     path_tree = os.path.join(_DIR_PRJ, "misc", "tree.txt")
 
-# #     # for each file in dir
-# #     for file in list_files:
-# #         # check for ext
-# #         for ext in exts:
-# #             if file.endswith(ext):
-# #                 # rebuild complete path and add to list
-# #                 path = os.path.join(dir_src, file)
-# #                 res.append(path)
+#     # if not exist
+#     # if not os.path.exists(path_tree):
 
-# #     # for each file that can be I18N'd, run xgettext
-# #     author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-# #     email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
-# #     for file in res:
-# #         cmd = (
-# #             "xgettext "  # the xgettext cmd
-# #             f"{file} "  # the file name
-# #             "-j "  # append to current file
-# #             '-c"I18N:" '  # look for tags in .py files
-# #             "--no-location "  # don't print filename/line number
-# #             f"-o {path_pot} "  # location of output file
-# #             "-F "  # sort output by input file
-# #             f"--copyright-holder={author} "
-# #             f"--package-name={pp_name_small} "
-# #             f"--package-version={pp_version} "
-# #             f"--msgid-bugs-address={email}"
-# #         )
-# #         cmd_array = shlex.split(cmd)
-# #         subprocess.run(cmd_array, check=False)
+#     # # create tree object and call
+#     # p_t = pytree.PyTree()
+#     # TODO: make this use blacklist
+#     # tree = p_t.build_tree(_DIR_PRJ, DICT_SETTINGS['__PP_TREE_IGNORE__'])
 
-# #     # now lets do some text replacements to make it look nice
+#     # # write tree to file
+#     # with open(path_tree, 'w', encoding='UTF8') as a_file:
+#     #     a_file.write(tree)
 
-# #     # default text if we can't open file
-# #     text = ""
+#     # update docs
+#     # NB: this is ugly and stupid, but it's the only way to get pdoc3 to work
 
-# #     # open file and get contents
-# #     with open(path_pot, "r", encoding="UTF8") as a_file:
-# #         text = a_file.read()
+#     # move into src dir
+#     # dir_src = os.path.join(_DIR_PRJ, 'src')
+#     # os.chdir(dir_src)
 
-# #     # replace short description
-# #     str_pattern = r"(# SOME DESCRIPTIVE TITLE.)"
-# #     pp_name_big = DICT_SETTINGS["info"]["__PP_NAME_BIG__"]
-# #     str_rep = f"# {pp_name_big} translation template"
-# #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # # get docs dir
+#     # path_docs = os.path.join('..', 'docs')
+#     # path_docs = os.path.abspath(path_docs)
 
-# #     # replace copyright
-# #     author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-# #     str_pattern = r"(# Copyright \(C\) )" r"(.*?)" rf"( {author})"
-# #     year = date.today().year
-# #     str_rep = rf"\g<1>{year}\g<3>"
-# #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # # # update docs
+#     # cmd = f'python -m pdoc --html -f -o {path_docs} .'
+#     # cmd_array = shlex.split(cmd)
+#     # subprocess.run(cmd_array, check=False)
 
-# #     # replace author's email
-# #     str_pattern = r"(# FIRST AUTHOR )" r"(<EMAIL@ADDRESS>)" r"(, )" r"(YEAR)"
-# #     email = DICT_SETTINGS["info"]["__PP_EMAIL__"]
-# #     year = date.today().year
-# #     str_rep = rf"\g<1>{email}\g<3>{year}"
-# #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # # go back to old dir
+#     # os.chdir(dir_curr)
 
-# #     # replace charset
-# #     str_pattern = (
-# #         r'("Content-Type: text/plain; charset=)' r"(CHARSET)" r'(\\n")'
-# #     )
-# #     charset = "UTF-8"
-# #     str_rep = rf"\g<1>{charset}\g<3>"
-# #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-# #     # save file
-# #     with open(path_pot, "w", encoding="UTF8") as a_file:
-# #         a_file.write(text)
-
-# # def do_pot():
-# #     """docstring"""
-
-# #     # # dict of clangs and exts
-# #     dict_in = {
-# #         "Python": [
-# #             "py",
-# #         ],
-# #         "Glade": [
-# #             ".ui",
-# #             ".glade",
-# #         ],
-# #         "Desktop": [".desktop"],
-# #     }
-
-# #     # dict of clangs and no exts (ie file names)
-# #     dict_blank = {
-# #         "Python": [
-# #             "__PP_NAME_SMALL__",
-# #         ],
-# #     }
-
-# #     # the list of languages your program has been translated into (can grow
-# #     # over time, adding languages as they become available)
-# #     list_wlang = [
-# #         "es",
-# #         "xo",
-# #         "pq",
-# #     ]
-
-# #     # path to src dir
-# #     dir_src = Path(__file__).parent.resolve()
-
-# #     pp = CNPotPy(
-# #         dir_src,
-# #         str_appname="foo",
-# #         str_version="0",
-# #         str_email="foo@bar.com",
-# #         str_domain=f"{C_DOMAIN}",
-# #         dict_clangs=dict_in,
-# #         dict_no_ext=dict_blank,
-# #         list_wlangs=list_wlang,
-# #     )
-
-# #     # I18N: run cnpotpy
-# #     pp.make_pot()
-# #     pp.make_pos()
-# #     pp.make_mos()
-# #     pp.make_desktop(
-# #         C_GUI_DIR / "template.desktop",
-# #         C_GUI_DIR / "__PP_NAME_SMALL__.desktop",
-# #     )
-
-# #     # TODO: this is for testing purposes only
-# #     t = gettext.translation(
-# #         M.DOMAIN, localedir=M.POT_DEF_DIR_LOCALE, languages=["es"]
-# #     )
-# #     t.install()
-# #     _ = t.gettext
-
-# #     # get path to config file
-# #     C_PATH_GUI = C_PATH_SRC / "cfg/__PP_NAME_SMALL__.json"
 
 
     # def _make_install(self):

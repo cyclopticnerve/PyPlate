@@ -352,6 +352,7 @@ D_BLACKLIST = {
         "LICENSE.txt",
         "requirements.txt",
         "**/__pycache__",
+        '**/locale',
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files

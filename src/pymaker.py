@@ -148,13 +148,14 @@ class PyMaker:
         """
 
         # set the initial values of properties
-        self._d_args = {}
+        self._dict_args = {}
         self._debug = False
         self._dir_prj = Path()
         self._dict_rep = {}
         self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}
+        self._dict_type_rep = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -216,10 +217,10 @@ class PyMaker:
         # set pp cmd line stuff
 
         # get cmd line args
-        self._d_args = self._run_parser()
+        self._run_parser()
 
         # check for flags
-        self._debug = self._d_args.get(S_DBG_DEST, False)
+        self._debug = self._dict_args.get(S_DBG_DEST, False)
 
         # debug turns off some _do_after_fix features
         if self._debug:
@@ -245,7 +246,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # maybe yell
 
-        if self._d_args.get(S_DBG_DEST, False):
+        if self._dict_args.get(S_DBG_DEST, False):
 
             # yep, yell
             print(M.S_ERR_DEBUG)
@@ -292,7 +293,7 @@ class PyMaker:
         tmp_dir = ""
 
         # if in debug mode
-        if self._d_args.get(S_DBG_DEST, False):
+        if self._dict_args.get(S_DBG_DEST, False):
 
             # get debug name of project
             prj_name = f"{dir_prj_type}_DEBUG"
@@ -336,7 +337,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # get short description
 
-        if not self._d_args.get(S_DBG_DEST, False):
+        if not self._dict_args.get(S_DBG_DEST, False):
             new_desc = input(M.S_ASK_DESC)
         else:
             new_desc = "debug desc"
@@ -353,7 +354,7 @@ class PyMaker:
 
         # if not debug, if need second name, ask for it
         if (
-            not self._d_args.get(S_DBG_DEST, False)
+            not self._dict_args.get(S_DBG_DEST, False)
             and prj_type in M.D_NAME_SEC
         ):
 
@@ -553,14 +554,14 @@ class PyMaker:
                         bl_code = False
 
                     # do md/html/xml separately (needs special handling)
-                    d_repl = M.D_PY_REPL
+                    self._dict_type_rep = M.D_PY_REPL
                     wo_dot = item.suffix.lstrip(".")
                     w_dot = "." + wo_dot
                     if wo_dot in M.L_MARKUP or w_dot in M.L_MARKUP:
-                        d_repl = M.D_MU_REPL
+                        self._dict_type_rep = M.D_MU_REPL
 
                     # fix content with appropriate dict
-                    self._fix_content(item, bl_hdr, bl_code, d_repl)
+                    self._fix_content(item, bl_hdr, bl_code)
 
                 # --------------------------------------------------------------
 
@@ -611,7 +612,7 @@ class PyMaker:
         # fix dunders in bl/i18n
 
         # replace dunders in blacklist and i18n
-        self._fix_content(path_edit, False, False, self._dict_rep)
+        self._fix_content(path_edit, False, False)
 
         # reload dict from fixed file
         dict_edit = F.load_dicts([path_edit])
@@ -724,9 +725,7 @@ class PyMaker:
         args = parser.parse_args()
 
         # convert namespace to dict
-        self._d_args = vars(args)
-
-        return self._d_args
+        self._dict_args = vars(args)
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -907,7 +906,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_content(self, path, bl_hdr, bl_code, d_repl):
+    def _fix_content(self, path, bl_hdr, bl_code):
         """
         Fix header or code for each line in a file
 
@@ -915,7 +914,6 @@ class PyMaker:
             path: Path for replacing text
             bl_hdr: Whether the file is blacklisted for header lines
             bl_code: Whether the file is blacklisted for code lines
-            d_repl: the dict to use for replacement
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.
@@ -942,7 +940,7 @@ class PyMaker:
             # check for block switches
 
             # param is True if we are looking for block switch vs line switch
-            if self._check_switches(line, True, d_repl):
+            if self._check_switches(line, True):
                 continue
 
             # ------------------------------------------------------------------
@@ -952,12 +950,12 @@ class PyMaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = d_repl[M.S_KEY_HDR]
+                str_pattern = self._dict_type_rep[M.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
                     # fix it
-                    lines[index] = self._fix_header(line, d_repl)
+                    lines[index] = self._fix_header(line)
 
                     # stop on first match
                     continue
@@ -965,7 +963,7 @@ class PyMaker:
             # ------------------------------------------------------------------
             # skip any other comment lines
 
-            str_pattern = d_repl[M.S_KEY_COMM]
+            str_pattern = self._dict_type_rep[M.S_KEY_COMM]
             if re.search(str_pattern, line):
                 continue
 
@@ -977,7 +975,7 @@ class PyMaker:
 
                 # fix dunders in real code lines (may still have trailing
                 # comments)
-                lines[index] = self._fix_code(line, d_repl)
+                lines[index] = self._fix_code(line)
 
         # open and write file
         with open(path, "w", encoding="UTF-8") as a_file:
@@ -986,13 +984,12 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a file header
     # --------------------------------------------------------------------------
-    def _fix_header(self, line, d_repl):
+    def _fix_header(self, line):
         """
         Replace dunders inside a file header
 
         Arguments:
             line: The line of the file to replace text in
-            d_repl: the dict to use for replacement
 
         Returns:
             The new line of code
@@ -1004,7 +1001,7 @@ class PyMaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = d_repl[M.S_KEY_HDR]
+        str_pattern = self._dict_type_rep[M.S_KEY_HDR]
 
         # str_pattern = M.D_MU_REPL[M.S_KEY_HDR]
         res = re.search(str_pattern, line)
@@ -1012,9 +1009,9 @@ class PyMaker:
             return line
 
         # pull out lead, val, and pad (OXFORD COMMA FTW!)
-        lead = res.group(d_repl[M.S_KEY_LEAD])
-        val = res.group(d_repl[M.S_KEY_VAL])
-        pad = res.group(d_repl[M.S_KEY_PAD])
+        lead = res.group(self._dict_type_rep[M.S_KEY_LEAD])
+        val = res.group(self._dict_type_rep[M.S_KEY_VAL])
+        pad = res.group(self._dict_type_rep[M.S_KEY_PAD])
 
         tmp_val = str(val)
         old_val_len = len(tmp_val)
@@ -1037,13 +1034,12 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a markup file's contents
     # --------------------------------------------------------------------------
-    def _fix_code(self, line, d_repl):
+    def _fix_code(self, line):
         """
         Replace dunders inside a markup file's contents
 
         Arguments:
             line: The line of the file to replace text in
-            d_repl: the dict to use for replacement
 
         Returns:
             The new line of code
@@ -1064,7 +1060,7 @@ class PyMaker:
         comm = ""
 
         # do the split, checking each match to see if we get a trailing comment
-        matches = re.finditer(d_repl[M.S_KEY_SPLIT], line)
+        matches = re.finditer(self._dict_type_rep[M.S_KEY_SPLIT], line)
         for match in matches:
             # if there is a match group for hash mark (meaning we found a
             # trailing comment)
@@ -1082,7 +1078,7 @@ class PyMaker:
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)
 
         # do the check
-        self._check_switches(comm, False, d_repl)
+        self._check_switches(comm, False)
 
         # ----------------------------------------------------------------------
 
@@ -1147,7 +1143,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
-    def _check_switches(self, line, block, d_repl):
+    def _check_switches(self, line, block):
         """
         Check if line or trailing comment is a switch
 
@@ -1155,7 +1151,6 @@ class PyMaker:
             line: The line to check for block switches
             block: True if we want to check a block switch, False if we want
             to check a line switch
-            d_repl: the dict to use for replacement
 
         Returns:
             True if a valid switch is found, False otherwise
@@ -1167,7 +1162,7 @@ class PyMaker:
         """
 
         # match  switches ('#|<!-- python: enable=replace', etc)
-        match = re.match(d_repl[M.S_KEY_SWITCH], line)
+        match = re.match(self._dict_type_rep[M.S_KEY_SWITCH], line)
         if not match:
             return False
 
