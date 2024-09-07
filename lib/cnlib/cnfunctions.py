@@ -30,18 +30,6 @@ from pathlib import Path
 import shlex
 import subprocess
 
-# pylint: disable=import-error
-
-# my imports
-# from . import cnconstants as C
-
-# pylint: enable=import-error
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-
 # ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
 # ------------------------------------------------------------------------------
@@ -388,8 +376,13 @@ def sh(string):
     # split the string using shell syntax (smart split/quote)
     cmd_array = shlex.split(string)
 
-    # get result of running the shell command
-    res = subprocess.run(cmd_array, check=True)
+    # default result
+    res = subprocess.CompletedProcess("", 0)
+    try:
+        # get result of running the shell command
+        res = subprocess.run(cmd_array, check=True, stdout=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        pass
 
     # return the result
     return res

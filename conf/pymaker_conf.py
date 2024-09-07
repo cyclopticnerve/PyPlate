@@ -1,13 +1,13 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: public.py                                             |     ()     |
+# Filename: pymaker_conf.py                                       |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
-This module separates out the constants from pymaker.py/pybaker.py.
+This module separates out the constants from pymaker.py.
 This file, and the template folder, are the main ways to customize PyPlate.
 """
 
@@ -25,10 +25,12 @@ import re
 
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
-# create a git using S_GIT_CMD
+# create a git using S_CMD_GIT
 B_CMD_GIT = True
-# create a venv using S_VENV_CMD
+# create a venv using S_CMD_VENV
 B_CMD_VENV = True
+# create docs
+B_CMD_DOCS = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -161,10 +163,11 @@ S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # commands for _do_after_fix
 # NB: format param is (proj dir)
-S_GIT_CMD = "git init {} -q"
+S_CMD_GIT = "git init {} -q"
 # NB: format param is (proj dir)/S_ALL_VENV
-S_VENV_CMD = "python -Xfrozen_modules=off -m venv {}"
+S_CMD_VENV = "python -Xfrozen_modules=off -m venv {}"
 # S_FREEZE_CMD =
+S_CMD_DOCS = "python -Xfrozen_modules=off -m pdoc --html -f -o {} ."
 
 # formats for tree
 S_TREE_FILE = f"{S_ALL_MISC}/tree.txt"
@@ -250,6 +253,7 @@ D_PRV_DEF = {
     "__PP_DATE_FMT__": "%m/%d/%Y",
     # readme file used in pyproject.toml, rel to prj dir
     "__PP_README_FILE__": "README.md",
+    "__PP_PRJ_TOML__": "pyproject.toml",
 }
 
 # these values are string replace only
@@ -341,18 +345,20 @@ D_BLACKLIST = {
     # NB: this is mostly to speed up processing by not even looking at them
     S_KEY_SKIP_ALL: [
         ".git",
+        ".vscode",
         S_ALL_VENV,
         ".VSCodeCounter",
         S_ALL_CONF,
         S_ALL_DIST,
         S_ALL_DOCS,
-        S_ALL_LOCALE,
+        f"**/{S_ALL_LOCALE}",
+        f"**/{S_ALL_PO}",
         S_ALL_MISC,
         S_ALL_README,
-        "LICENSE.txt",
+        D_PRV_DEF["__PP_LICENSE_FILE__"],
         "requirements.txt",
         "**/__pycache__",
-        '**/locale',
+        "**/*.mo",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files

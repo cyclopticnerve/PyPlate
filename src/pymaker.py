@@ -27,6 +27,7 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
+import os
 from pathlib import Path
 import re
 import shutil
@@ -99,10 +100,6 @@ S_PP_PRJ = "pyplate/conf/project.json"
 # ------------------------------------------------------------------------------
 
 # get fixed paths to PyPlate and folders
-
-# Path to PyPlate libs
-# (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/lib)
-P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
 
 # Path to PyPlate template
 # (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/)
@@ -465,11 +462,11 @@ class PyMaker:
                 shutil.copy2(path_in, path_out)
 
     # --------------------------------------------------------------------------
-    # Dummy method to call "subclass" method (method in conf/public.py)
+    # Dummy method to call conf/pymaker_conf.py
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
         """
-        Dummy function to call "subclass" function (function in conf/public.py)
+        Dummy function to call conf/pymaker_conf.py
 
         This function is here just so i can follow the flow of the program in
         my head better. I will be making a flowchart soon...
@@ -514,12 +511,9 @@ class PyMaker:
         skip_path = dict_paths[M.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
-        # do the fixes bottom up
-        # NB: topdown=False is required for the renaming, as we don't want to
-        # rename (and thus clobber) a directory name before we rename all its
-        # child dirs/files
+        # do the fixes
         # note that root is a full path, dirs and files are relative to root
-        for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
+        for root, root_dirs, root_files in self._dir_prj.walk():
 
             # skip dir if in skip_all
             if root in skip_all:
@@ -563,7 +557,26 @@ class PyMaker:
                     # fix content with appropriate dict
                     self._fix_content(item, bl_hdr, bl_code)
 
-                # --------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # NB: top_down=False is required for the renaming, as we don't want to
+        # rename (and thus clobber) a directory name before we rename all its
+        # child dirs/files
+        for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
+
+            # skip dir if in skip_all
+            if root in skip_all:
+                root_dirs.clear()
+                continue
+
+            # convert files into Paths
+            files = [root / f for f in root_files]
+
+            # for each file item
+            for item in files:
+
+                # skip file if in skip_all
+                if item in skip_all:
+                    continue
 
                 # fix path
                 if root not in skip_path and item not in skip_path:
@@ -584,8 +597,6 @@ class PyMaker:
         be no dunders in the file or path names. Do any further project
         modification here.
         """
-
-        # TODO: combine w/ pybaker
 
         # ----------------------------------------------------------------------
         # save project settings
@@ -611,7 +622,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # fix dunders in bl/i18n
 
-        # replace dunders in blacklist and i18n
+        # "lib"replace dunders in blacklist and i18n
         self._fix_content(path_edit, False, False)
 
         # reload dict from fixed file
@@ -635,7 +646,10 @@ class PyMaker:
     # --------------------------------------------------------------------------
     def _do_extras(self):
         """
-        docstring
+        Make any necessary changes after all fixes have been done
+
+        Do some extra functions like purge, create .git and .venv, and update
+        the tree file for the current project.
         """
 
         # ----------------------------------------------------------------------
@@ -653,7 +667,7 @@ class PyMaker:
         if M.B_CMD_GIT:
 
             # add git dir
-            str_cmd = M.S_GIT_CMD.format(str(self._dir_prj))
+            str_cmd = M.S_CMD_GIT.format(str(self._dir_prj))
             F.sh(str_cmd)
 
         # ----------------------------------------------------------------------
@@ -662,15 +676,18 @@ class PyMaker:
         # if venv flag is set
         if M.B_CMD_VENV:
             path_venv = self._dir_prj / M.S_ALL_VENV
-            str_cmd = M.S_VENV_CMD.format(str(path_venv))
+            str_cmd = M.S_CMD_VENV.format(str(path_venv))
             F.sh(str_cmd)
 
         # ----------------------------------------------------------------------
-        # requirements.txt
-
-        # TODO: need to be in prj .venv to do this
-        # req_path = self._dir_prj / "requirements.txt"
-        # F.sh(f"python -Xfrozen-modules=off -m pip freeze > {req_path}")
+        # add requirements
+        # path_req = self._dir_prj / "requirements.txt"
+        # with open(path_req, "w", encoding="UTF8") as a_file:
+        #     cmd = (
+        #         "python -Xfrozen_modules=off -m pip freeze -l "
+        #         f"--exclude-editable --require-virtualenv > {path_req}"
+        #     )
+        #     F.sh(cmd)
 
         # ----------------------------------------------------------------------
         # tree
@@ -698,6 +715,21 @@ class PyMaker:
             # write to file
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
+
+        # ----------------------------------------------------------------------
+        # update docs
+        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
+        # work
+
+        if M.B_CMD_DOCS:
+            # move into src dir
+            dir_src = self._dir_prj / M.S_ALL_SRC
+            os.chdir(dir_src)
+
+            # # update docs
+            path_docs = self._dir_prj / M.S_ALL_DOCS
+            cmd = M.S_CMD_DOCS.format(path_docs)
+            F.sh(cmd)
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
@@ -864,10 +896,10 @@ class PyMaker:
         # remove path separators
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
-        for key in M.D_BLACKLIST:
-            M.D_BLACKLIST[key] = [
-                item.rstrip("/") for item in M.D_BLACKLIST[key]
-            ]
+        l_bl = M.D_BLACKLIST
+        for key in l_bl:
+            l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
+        M.D_BLACKLIST = l_bl
 
         # support for absolute/relative/glob
         # NB: taken from cntree.py
@@ -1000,10 +1032,7 @@ class PyMaker:
         """
 
         # break apart header line
-        # NB: gotta do this again, can't pass res param
         str_pattern = self._dict_type_rep[M.S_KEY_HDR]
-
-        # str_pattern = M.D_MU_REPL[M.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
@@ -1071,8 +1100,8 @@ class PyMaker:
                 code = line[:split]
                 comm = line[split:]
 
-        # --------------------------------------------------------------
-        # # check for line switches
+        # ----------------------------------------------------------------------
+        # check for line switches
 
         # for each line, reset line dict
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)

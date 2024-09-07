@@ -202,7 +202,7 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Return the list of currently displayed windows
     # --------------------------------------------------------------------------
-    def get_windows(self):
+    def get_windows(self):  # pylint: disable=arguments-differ
         """
         Return the list of currently displayed windows
 
@@ -220,7 +220,7 @@ class CNApp(Gtk.Application):
     # Return a tuple of the CNWindow subclass name and instance for the active
     # window (the currently focused window)
     # --------------------------------------------------------------------------
-    def get_active_window(self):
+    def get_active_window(self):  # pylint: disable=arguments-differ
         """
         Return a tuple of the CNWindow subclass name and instance for the
         active window (the currently focused window)

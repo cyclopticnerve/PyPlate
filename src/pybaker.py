@@ -25,13 +25,10 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-from datetime import date
-# import gettext
+import os
 from pathlib import Path
 import re
-import shlex
 import shutil
-import subprocess
 import sys
 
 # pylint: disable=wrong-import-position
@@ -221,42 +218,43 @@ class PyBaker:
         # check for flags
         self._debug = self._dict_args.get(S_DBG_DEST, False)
 
-        # debug turns off some _do_after_fix features
+        # debug turns off some _do_extras features
         if self._debug:
+            M.B_CMD_DOCS = False
             M.B_CMD_TREE = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)
 
-      # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # if debug, use test project
         if self._debug:
             self._dir_prj = Path(
-                "/home/dana/Documents/Projects/Python/GUIs/GUIs_DEBUG"
+                Path.home() / "Documents/Projects/Python/CLIs/CLIs_DEBUG"
             )
             return
 
-      # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # check for folder
         dst = self._dict_args[S_PRJ_DEST]
         if dst:
             self._dir_prj = Path(dst)
             if not self._dir_prj.exists():
-                print("project dir does not exist")
+                print(B.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
                 sys.exit()
         else:
-            print("project dir not provided")
+            print(B.S_ERR_PRJ_DIR_NONE)
             sys.exit()
 
     # --------------------------------------------------------------------------
-    # Load the config files
+    # Get project info
     # --------------------------------------------------------------------------
     def _get_project_info(self):
         """
-        Load the config files
+        Get project info
 
         Get required config files and load them into the dictionaries required
         by the program. These files may sometimes be edited by users, so we
@@ -267,7 +265,6 @@ class PyBaker:
         Both of these are handled by F.load_dicts.
         """
 
-        # TODO use dunders here
         # get individual dicts in the project file
         path_to_conf = self._dir_prj / S_PP_PRJ
         self._dict_prj = F.load_dicts([path_to_conf], {})
@@ -278,32 +275,12 @@ class PyBaker:
         self._dict_prv = F.load_dicts([path_to_conf], {})
         self._dict_cfg = self._dict_prv[M.S_KEY_PRV_CFG]
 
-        # TODO: ask for some/all metadata?
-
-        # # NEXT: enforce semantic versioning (_check_version)
-        # # first get old version from metadata
-        # # NB: if no version key, use default of "0.0.1"
-        # old_version = self._d_metadata.get("__PP_VERSION__", "")
-        # if old_version == "":
-        #     old_version = "0.0.0"
-
-        # # now ask user for new number or default
-        # fmt_str = B.S_ASK_VER.format(old_version)
-        # new_version = input(fmt_str)
-        # if new_version == "":
-        #     new_version = old_version
-
-        # # save new version to metadata
-        # self._d_metadata["__PP_VERSION__"] = new_version
-        # self._version = new_version
-        # # TODO: save new version to file
-
     # --------------------------------------------------------------------------
-    # Dummy function to call "subclass" function (function in conf/public.py)
+    # Dummy function to call conf/pybaker_conf.py
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
         """
-        Dummy function to call "subclass" function (function in conf/public.py)
+        Dummy function to call conf/pybaker_conf.py
 
         This function is here just so i can follow the flow of the program in
         my head better. I will be making a flowchart soon...
@@ -348,12 +325,9 @@ class PyBaker:
         skip_path = dict_paths[M.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
-        # do the fixes bottom up
-        # NB: topdown=False is required for the renaming, as we don't want to
-        # rename (and thus clobber) a directory name before we rename all its
-        # child dirs/files
+        # do the fixes
         # note that root is a full path, dirs and files are relative to root
-        for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
+        for root, root_dirs, root_files in self._dir_prj.walk():
 
             # skip dir if in skip_all
             if root in skip_all:
@@ -397,7 +371,26 @@ class PyBaker:
                     # fix content with appropriate dict
                     self._fix_content(item, bl_hdr, bl_code)
 
-                # --------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # NB: top_down=False is required for the renaming, as we don't want to
+        # rename (and thus clobber) a directory name before we rename all its
+        # child dirs/files
+        for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
+
+            # skip dir if in skip_all
+            if root in skip_all:
+                root_dirs.clear()
+                continue
+
+            # convert files into Paths
+            files = [root / f for f in root_files]
+
+            # for each file item
+            for item in files:
+
+                # skip file if in skip_all
+                if item in skip_all:
+                    continue
 
                 # fix path
                 if root not in skip_path and item not in skip_path:
@@ -419,18 +412,10 @@ class PyBaker:
         modification here.
         """
 
-        # TODO: combine w/ pybaker
-
         # ----------------------------------------------------------------------
         # save project settings
 
         # save fixed settings
-        # dict_no_edit = {
-        #     M.S_KEY_PRV_DEF: M.D_PRV_DEF,
-        #     M.S_KEY_PRV_DIST_DIRS: M.D_PRV_DIST_DIRS,
-        #     M.S_KEY_PRV_EXTRA: M.D_PRV_EXTRA,
-        #     M.S_KEY_PRV_CFG: M.D_PRV_CFG,
-        # }
         path_no_edit = self._dir_prj / S_PP_PRV
         F.save_dict(self._dict_prv, [path_no_edit])
 
@@ -475,20 +460,12 @@ class PyBaker:
         """
 
         # list of files/folders from project to include in dist
-        src = [
-            "conf",
-            "README",
-            "src",
-            "LICENSE.txt",
-            "README.md",
-        ]
-
-        # path to project's dist folder
-        dst = Path(self._dir_prj) / "dist"
+        src = B.L_SRC
+        dst = Path(self._dir_prj) / B.S_DST
 
         # copy files/folders
         for item in src:
-            new_src = Path(self._dir_prj) / item
+            new_src = self._dir_prj / item
             new_dst = dst / item
             if new_src.is_dir():
                 shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
@@ -505,45 +482,57 @@ class PyBaker:
     # --------------------------------------------------------------------------
     def _do_extras(self):
         """
-        docstring
+        Make any necessary changes after all fixes have been done
+
+        Do some extra functions like add requirements, update docs, and update
+        the CHANGELOG file for the current project.
         """
 
-        # ----------------------------------------------------------------------
-        # purge
+        # get current dir
+        dir_curr = os.getcwd()
 
-        # TODO: maybe don't?
-        # for item in M.L_PURGE:
-        #     path_del = self._dir_prj / item
-        #     if path_del.exists():
-        #         path_del.unlink()
+        # make sure we are in project path
+        os.chdir(self._dir_prj)
 
         # ----------------------------------------------------------------------
-        # git
-
-        # TODO: maybe don't?
-        # if git flag is set
-        # if M.B_CMD_GIT:
-
-        #     # add git dir
-        #     str_cmd = M.S_GIT_CMD.format(str(self._dir_prj))
-        #     F.sh(str_cmd)
-
-        # ----------------------------------------------------------------------
-        # venv
-
-        # TODO: maybe don't?
-        # if venv flag is set
-        # if M.B_CMD_VENV:
-        #     path_venv = self._dir_prj / M.S_ALL_VENV
-        #     str_cmd = M.S_VENV_CMD.format(str(path_venv))
-        #     F.sh(str_cmd)
+        # add requirements
+        # path_req = self._dir_prj / "requirements.txt"
+        # with open(path_req, "w", encoding="UTF8") as a_file:
+        #     cmd = (
+        #         "python -Xfrozen_modules=off -m pip freeze -l "
+        #         f"--exclude-editable --require-virtualenv > {path_req}"
+        #     )
+        #     F.sh(cmd)
 
         # ----------------------------------------------------------------------
-        # requirements.txt
+        # update CHANGELOG
+        path_git = self._dir_prj / ".git"
+        if path_git.exists():
+            path_chg = self._dir_prj / B.S_CHANGELOG
+            with open(path_chg, "w", encoding="UTF8") as a_file:
+                cmd = B.S_CHANGELOG_CMD
+                res = F.sh(cmd)
+                if res.returncode != 0:
+                    print(res.stdout)
 
-        # TODO: need to be in prj .venv to do this
-        # req_path = self._dir_prj / "requirements.txt"
-        # F.sh(f"python -Xfrozen-modules=off -m pip freeze > {req_path}")
+        # ----------------------------------------------------------------------
+        # update docs
+        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
+        # work
+
+        if M.B_CMD_DOCS:
+            # move into src dir
+            dir_src = self._dir_prj / M.S_ALL_SRC
+            os.chdir(dir_src)
+
+            # # update docs
+            path_docs = self._dir_prj / M.S_ALL_DOCS
+            cmd = M.S_CMD_DOCS.format(path_docs)
+            F.sh(cmd)
+
+        # ----------------------------------------------------------------------
+        # go back to old dir
+        os.chdir(dir_curr)
 
         # ----------------------------------------------------------------------
         # tree
@@ -563,7 +552,7 @@ class PyBaker:
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 str(self._dir_prj),
-                filter_list=M.D_BLACKLIST[M.S_KEY_SKIP_TREE],
+                filter_list=self._dict_prj[M.S_KEY_PRJ_BL][M.S_KEY_SKIP_TREE],
                 dir_format=M.S_TREE_DIR_FORMAT,
                 file_format=M.S_TREE_FILE_FORMAT,
             )
@@ -573,10 +562,9 @@ class PyBaker:
                 a_file.write(tree_str)
 
         # ----------------------------------------------------------------------
-        # other
-        # NB: also dont just go for all .desktop - don't edit template
-        # pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
+        # outsource the big stuff
 
+        # scan project dir
         for root, _root_dirs, root_files in self._dir_prj.walk():
 
             # convert files into Paths
@@ -586,25 +574,32 @@ class PyBaker:
             if root == self._dir_prj:
                 # for each file item
                 for item in files:
-                    if item.name == "README.md":
+                    if (
+                        item.name
+                        == self._dict_prv[M.S_KEY_PRV_DEF][
+                            "__PP_README_FILE__"
+                        ]
+                    ):
                         self._fix_readme(item)
-                    if item.name == "pyproject.toml":
+                    if (
+                        item.name
+                        == self._dict_prv[M.S_KEY_PRV_DEF]["__PP_PRJ_TOML__"]
+                    ):
                         self._fix_pyproject(item)
 
-            # TODO: this need to be better - don't depend on _PP__NAME_SMALL__
-            # to be the filename
-            pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
             if root.name == M.S_ALL_SRC:
                 # for each file item
                 for item in files:
+                    # TODO: this need to be better - don't depend on _PP_NAME_SMALL__
+                    # to be the filename
+                    pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
                     if item.name == f"{pp_name_small}.desktop":
                         self._fix_desktop(item)
                     if item.suffix == "ui" or item.suffix == ".glade":
                         self._fix_gtk3(item)
 
-        # do (x)gettext
-        self._do_gettext()
-        self._do_pot()
+        # do i18n stuff
+        self._do_i18n()
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
@@ -624,8 +619,6 @@ class PyBaker:
 
         # create the command line parser
         parser = argparse.ArgumentParser(formatter_class=CNFormatter)
-
-      # ----------------------------------------------------------------------
 
         # add args
         self._add_args(parser)
@@ -693,7 +686,7 @@ class PyBaker:
         # NB: taken from cntree.py
 
         # for each section of blacklist
-        for key, val in l_bl.items():
+        for key, val in self._dict_prj[M.S_KEY_PRJ_BL].items():
             # convert all items in list to Path objects
             paths = [Path(item) for item in val]
 
@@ -797,35 +790,12 @@ class PyBaker:
                 # comments)
                 lines[index] = self._fix_code(line)
 
+                # fix __PB_VERSION__ / __PB_SHORT_DESC__ for cmd line help
+                lines[index] = self._fix_meta(line)
+
         # open and write file
         with open(path, "w", encoding="UTF-8") as a_file:
             a_file.writelines(lines)
-
-        # all files in src
-        # if root.name == "src":
-
-        #     lines = []
-        #     with open(item, "r", encoding="UTF-8") as a_file:
-        #         lines = a_file.readlines()
-
-        #     for index, line in enumerate(lines):
-
-        #         pat = r"(__PB_VERSION__\s*=\s*)(.*)(\n)"
-        #         repl = rf'\g<1>"{self._s_version}"\g<3>'
-        #         sch = re.search(pat, line)
-        #         if sch:
-        #             lines[index] = re.sub(pat, repl, line)
-
-        #         pat = r"(__PB_SHORT_DESC__\s*=\s*)(.*)(\n)"
-        #         repl = rf'\g<1>"{self._s_short_desc}"\g<3>'
-        #         sch = re.search(pat, line)
-        #         if sch:
-        #             lines[index] = re.sub(pat, repl, line)
-
-        #     with open(item, "w", encoding="UTF-8") as a_file:
-        #         a_file.writelines(lines)
-
-        # --------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Replace dunders inside a file header
@@ -848,8 +818,6 @@ class PyBaker:
         # break apart header line
         # NB: gotta do this again, can't pass res param
         str_pattern = self._dict_type_rep[M.S_KEY_HDR]
-
-        # str_pattern = M.D_MU_REPL[M.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
@@ -917,8 +885,8 @@ class PyBaker:
                 code = line[:split]
                 comm = line[split:]
 
-        # --------------------------------------------------------------
-        # # check for line switches
+        # ----------------------------------------------------------------------
+        # check for line switches
 
         # for each line, reset line dict
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)
@@ -949,6 +917,31 @@ class PyBaker:
         line = code + comm
 
         # return the (maybe replaced) line
+        return line
+
+    # --------------------------------------------------------------------------
+    # Fix version/short description in command line help
+    # --------------------------------------------------------------------------
+    def _fix_meta(self, line):
+        """
+        Fix version/short description in command line help
+
+        Fixes the version and short description parts of the command line help.
+        """
+
+        # replace version
+        ver = self._dict_meta["__PP_VERSION__"]
+        str_sch = B.S_META_VER_SEARCH
+        str_rep = B.S_META_VER_REPL.format(ver)
+        line = re.sub(str_sch, str_rep, line)
+
+        # replace short desc
+        desc = self._dict_meta["__PP_SHORT_DESC__"]
+        str_sch = B.S_META_SD_SEARCH
+        str_rep = B.S_META_SD_REPL.format(desc)
+        line = re.sub(str_sch, str_rep, line)
+
+        # return the fixed line
         return line
 
     # --------------------------------------------------------------------------
@@ -1053,39 +1046,28 @@ class PyBaker:
         text = ""
 
         # open file and get contents
-        with open(item, "r", encoding="UTF8") as a_file:
+        with open(item, "r", encoding="UTF-8") as a_file:
             text = a_file.read()
 
         # replace version
-        str_pattern = (
-            r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
-        )
+        str_pattern = B.S_TOML_VERSION_SEARCH
         pp_version = self._dict_meta["__PP_VERSION__"]
         if pp_version == "":
             pp_version = M.S_VERSION
-        str_rep = rf'\g<1>\g<2>\g<3>"{pp_version}"'
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        str_rep = B.S_TOML_VERSION_REPL.format(pp_version)
+        text = re.sub(str_pattern, str_rep, text)
 
         # replace short description
-        str_pattern = (
-            r"(^\s*\[project\]\s*$)"
-            r"(.*?)"
-            r"(^\s*description[\t ]*=[\t ]*)"
-            r"(.*?$)"
-        )
+        str_pattern = B.S_TOML_SHORT_DESC_SEARCH
         pp_short_desc = self._dict_meta["__PP_SHORT_DESC__"]
-        str_rep = rf'\g<1>\g<2>\g<3>"{pp_short_desc}"'
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        str_rep = B.S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
+        text = re.sub(str_pattern, str_rep, text)
 
         # replace keywords array
-        str_pattern = (
-            r"(^\s*\[project\]\s*$)"
-            r"(.*?)"
-            r"(^\s*keywords[\t ]*=[\t ]*)"
-            r"(.*?\])"
-        )
-        str_rep = rf"\g<1>\g<2>\g<3>[{self._dict_prv[M.S_KEY_PRV_EXTRA]["__PP_KW_STR__"]}]"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        str_pattern = B.S_TOML_KW_SEARCH
+        kw_str = self._dict_prv[M.S_KEY_PRV_EXTRA]["__PP_KW_STR__"]
+        str_rep = B.S_TOML_KW_REPL.format(kw_str)
+        text = re.sub(str_pattern, str_rep, text)
 
         # # replace dependencies array
         # str_pattern = (
@@ -1211,37 +1193,6 @@ class PyBaker:
         str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # TODO: none of this is metadata
-
-        # # get path to install dir
-        # path_home = os.path.expanduser("~")
-        # author = DICT_SETTINGS["info"]["__PP_AUTHOR__"]
-        # pp_name_big = DICT_SETTINGS["info"]["__PP_NAME_BIG__"]
-        # path_inst = os.path.join(path_home, f".{author}", pp_name_big, "src")
-
-        # # replace exec
-        # str_pattern = (
-        #     r"(^\s*\[Desktop Entry\]\s*$)" r"(.*?)" r"(^\s*Exec[\t ]*=)" r"(.*?$)"
-        # )
-        # path_exec = os.path.join(path_inst, f"{pp_name_small}.py")
-        # str_rep = rf"\g<1>\g<2>\g<3>{path_exec}"
-        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-        # # replace icon
-        # str_pattern = (
-        #     r"(^\s*\[Desktop Entry\]\s*$)" r"(.*?)" r"(^\s*Icon[\t ]*=)" r"(.*?$)"
-        # )
-        # path_icon = os.path.join(path_inst, f"{pp_name_small}.png")
-        # str_rep = rf"\g<1>\g<2>\g<3>{path_icon}"
-        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-        # # replace path
-        # str_pattern = (
-        #     r"(^\s*\[Desktop Entry\]\s*$)" r"(.*?)" r"(^\s*Path[\t ]*=)" r"(.*?$)"
-        # )
-        # str_rep = rf"\g<1>\g<2>\g<3>{path_inst}"
-        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
         # save file
         with open(item, "w", encoding="UTF8") as a_file:
             a_file.write(text)
@@ -1290,119 +1241,9 @@ class PyBaker:
             a_file.write(text)
 
     # --------------------------------------------------------------------------
-    # Run xgettext over files to produce a locale template
+    # Run CNPotPy over files to produce I18N files
     # --------------------------------------------------------------------------
-    def _do_gettext(self):
-        """
-        Run xgettext over files to produce a locale template
-
-        Use xgettext to scan .py and .ui files for I18N strings and collect them
-        int a .pot file in the locale folder. Only applies to gui projects at
-        the moment.
-        """
-
-        # check if we are a gui project
-        # is_gui = self._dict_cfg["__PP_TYPE_PRJ__"] == "g"
-        # if not is_gui:
-        #     return
-
-        dir_locale = self._dir_prj /  M.S_ALL_SRC / "locale"
-        pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
-        path_pot = dir_locale / f"{pp_name_small}.pot"
-        pp_version = self._dict_meta["__PP_VERSION__"]
-
-        # remove old pot and recreate empty file
-        path_pot.parent.mkdir(parents=True, exist_ok=True)
-        if path_pot.exists():
-            path_pot.unlink()
-        with open(path_pot, "w", encoding="UTF8") as a_file:
-            a_file.write("")
-
-        # build a list of files
-        exts = [".py", ".ui", ".glade"]
-        author = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_AUTHOR__"]
-        email = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_EMAIL__"]
-
-        # scan for files in src directory
-        # dir_src = self._dir_prj / M.S_ALL_SRC
-        for root, _root_dirs, root_files in self._dir_prj.walk(top_down=False):
-
-            res = []
-
-            # convert files into Paths
-            files = [root / f for f in root_files]
-
-            # for each file item
-            for item in files:
-
-                # check for ext
-                if item.suffix in exts:
-                    # add to list
-                    res.append(item)
-
-            # for each file that can be I18N'd, run xgettext
-            for file in res:
-                cmd = (
-                    "xgettext "  # the xgettext cmd
-                    f"{file} "  # the file name
-                    "-j "  # append to current file
-                    '-c"I18N:" '  # look for tags in .py files
-                    "--no-location "  # don't print filename/line number
-                    f"-o {path_pot} "  # location of output file
-                    "-F "  # sort output by input file
-                    f"--copyright-holder={author} "
-                    f"--package-name={pp_name_small} "
-                    f"--package-version={pp_version} "
-                    f"--msgid-bugs-address={email}"
-                )
-                cmd_array = shlex.split(cmd)
-                subprocess.run(cmd_array, check=True)
-
-        # now lets do some text replacements to make it look nice
-
-        # default text if we can't open file
-        text = ""
-
-        # open file and get contents
-        with open(path_pot, "r", encoding="UTF8") as a_file:
-            text = a_file.read()
-
-        # replace short description
-        str_pattern = r"(# SOME DESCRIPTIVE TITLE.)"
-        pp_name_big = self._dict_cfg["__PP_NAME_BIG__"]
-        str_rep = f"# {pp_name_big} translation template"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-        # replace copyright
-        author = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_AUTHOR__"]
-        str_pattern = rf"(# Copyright \(C\) )(.*?)( {author})"
-        year = date.today().year
-        str_rep = rf"\g<1>{year}\g<3>"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-        # replace author's email
-        str_pattern = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
-        email = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_EMAIL__"]
-        year = date.today().year
-        str_rep = rf"\g<1>{email}\g<3>{year}"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-        # replace charset
-        str_pattern = (
-            r'("Content-Type: text/plain; charset=)(CHARSET)(\\n")'
-        )
-        charset = "UTF-8"
-        str_rep = rf"\g<1>{charset}\g<3>"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-        # save file
-        with open(path_pot, "w", encoding="UTF8") as a_file:
-            a_file.write(text)
-
-    # --------------------------------------------------------------------------
-    # Run CNPotPy over files to produce an I18N file
-    # --------------------------------------------------------------------------
-    def _do_pot(self):
+    def _do_i18n(self):
         """
         docstring
         """
@@ -1420,56 +1261,57 @@ class PyBaker:
         }
 
         # dict of clangs and no exts (ie file names)
-        dict_blank = {
-            "Python": [
-                "__PP_NAME_SMALL__",
-            ],
-        }
+        no_ext = "Python"
 
         # the list of languages your program has been translated into (can grow
         # over time, adding languages as they become available)
-        list_wlang = [
+        list_wlangs = [
             "es",
             "xo",
             "pq",
         ]
 
+        name_big = self._dict_cfg["__PP_NAME_BIG__"]
+        name_small = self._dict_cfg["__PP_NAME_SMALL__"]
+        version = self._dict_meta["__PP_VERSION__"]
+        author = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_AUTHOR__"]
+        email = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_EMAIL__"]
+
         # path to src dir
         dir_src = self._dir_prj / M.S_ALL_SRC
+        dir_locale = self._dir_prj / "src" / "support" / "i18n" / "locale"
+        dir_po = self._dir_prj / "src" / "support" / "i18n" / "po"
 
+        # create CNPotPy object
         pp = CNPotPy(
             dir_src,
-            str_appname="foo",
-            str_version="0",
-            str_email="foo@bar.com",
-            str_domain=self._dict_cfg["__PP_NAME_SMALL__"],
+            str_appname=name_big,
+            str_version=version,
+            str_author=author,
+            str_email=email,
+            dir_locale=dir_locale,
+            dir_po=dir_po,
+            str_domain=name_small,
             dict_clangs=dict_in,
-            dict_no_ext=dict_blank,
-            list_wlangs=list_wlang,
+            no_ext=no_ext,
+            list_wlangs=list_wlangs,
         )
 
+        # this .pot, .po, and .mo files
         pp.main()
-        # I18N: run cnpotpy
-        pp.make_pot()
-        # pp.make_pos()
-        # pp.make_mos()
-        # src = Path("foo")
-        # pp.make_desktop(
-        #     src / "support" / "desktop" / "template.desktop",
-        #     src / "support" / "desktop" / "__PP_NAME_SMALL__.desktop",
-        # )
 
-        # TODO: this is for testing purposes only
-        # t = gettext.translation(
-        #     self._dict_cfg["__PP_NAME_SMALL__"],
-        #     localedir=self._dir_prj /  M.S_ALL_SRC / "locale",
-        #     languages=["en"]
-        # )
-        # t.install()
-        # _ = t.gettext
+        pp.make_desktop(
+            self._dir_prj / "src" / "support" / "desktop" / "template.desktop",
+            self._dir_prj
+            / "src"
+            / "support"
+            / "desktop"
+            / f"{name_small}.desktop",
+        )
 
         # get path to config file
         # C_PATH_GUI = src / "cfg/__PP_NAME_SMALL__.json"
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -1485,71 +1327,6 @@ if __name__ == "__main__":
     pb.main()
 
     # --------------------------------------------------------------------------
-
-        # reqs.txt, CHANGELOG.md, tree.txt, docs,
-# def do_extras():
-#     """
-#     Do extras functions to update project dir after recurse
-
-#     Do some extra functions like add requirements, update docs, and update
-#     the CHANGELOG file for the current project.
-#     """
-
-#     # get current dir
-#     dir_curr = os.getcwd()
-
-#     # make sure we are in project path
-#     os.chdir(_DIR_PRJ)
-
-#     # add requirements
-#     path_req = os.path.join(_DIR_PRJ, "requirements.txt")
-#     with open(path_req, "w", encoding="UTF8") as a_file:
-#         cmd = "python -m pip freeze -l --exclude-editable --require-virtualenv"
-#         cmd_array = shlex.split(cmd)
-#         subprocess.run(cmd_array, stdout=a_file, check=False)
-
-#     # update CHANGELOG
-#     path_chg = os.path.join(_DIR_PRJ, "CHANGELOG.md")
-#     with open(path_chg, "w", encoding="UTF8") as a_file:
-#         cmd = 'git log --pretty="%ad - %s"'
-#         cmd_array = shlex.split(cmd)
-#         subprocess.run(cmd_array, stdout=a_file, check=False)
-
-#     # get tree path
-#     path_tree = os.path.join(_DIR_PRJ, "misc", "tree.txt")
-
-#     # if not exist
-#     # if not os.path.exists(path_tree):
-
-#     # # create tree object and call
-#     # p_t = pytree.PyTree()
-#     # TODO: make this use blacklist
-#     # tree = p_t.build_tree(_DIR_PRJ, DICT_SETTINGS['__PP_TREE_IGNORE__'])
-
-#     # # write tree to file
-#     # with open(path_tree, 'w', encoding='UTF8') as a_file:
-#     #     a_file.write(tree)
-
-#     # update docs
-#     # NB: this is ugly and stupid, but it's the only way to get pdoc3 to work
-
-#     # move into src dir
-#     # dir_src = os.path.join(_DIR_PRJ, 'src')
-#     # os.chdir(dir_src)
-
-#     # # get docs dir
-#     # path_docs = os.path.join('..', 'docs')
-#     # path_docs = os.path.abspath(path_docs)
-
-#     # # # update docs
-#     # cmd = f'python -m pdoc --html -f -o {path_docs} .'
-#     # cmd_array = shlex.split(cmd)
-#     # subprocess.run(cmd_array, check=False)
-
-#     # # go back to old dir
-#     # os.chdir(dir_curr)
-
-
 
     # def _make_install(self):
     #     """
