@@ -27,7 +27,7 @@ import re
 B_CMD_TREE = True
 # create a git using S_CMD_GIT
 B_CMD_GIT = True
-# create a venv using S_CMD_VENV
+# create a venv using S_VENV_CMD_CREATE
 B_CMD_VENV = True
 # create docs
 B_CMD_DOCS = True
@@ -128,7 +128,8 @@ S_KEY_NAME_MID = "S_KEY_NAME_MID"
 # and make any appropriate changes
 # also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
-S_ALL_VENV = ".venv"
+S_ALL_VENV = ".*venv*"
+S_ALL_GIT = ".git"
 S_ALL_CONF = "conf"
 S_ALL_DIST = "dist"
 S_ALL_DOCS = "docs"
@@ -161,16 +162,12 @@ S_USR_BIN = ".local/bin"  # where to put the binary
 S_USR_LIB_NAME = "lib"
 S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
-# commands for _do_after_fix
-# NB: format param is (proj dir)
-S_CMD_GIT = "git init {} -q"
-# NB: format param is (proj dir)/S_ALL_VENV
-S_CMD_VENV = "python -Xfrozen_modules=off -m venv {}"
-# S_FREEZE_CMD =
-S_CMD_DOCS = "python -Xfrozen_modules=off -m pdoc --html -f -o {} ."
+# cmds for docs
+S_CMD_DOCS = "python -m pdoc --html -f -o {} ."
 
 # formats for tree
-S_TREE_FILE = f"{S_ALL_MISC}/tree.txt"
+S_TREE_NAME = "tree.txt"
+S_TREE_FILE = f"{S_ALL_MISC}/{S_TREE_NAME}"
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
@@ -178,6 +175,34 @@ S_TREE_FILE_FORMAT = " [] $NAME"
 S_SW_ENABLE = "enable"
 S_SW_DISABLE = "disable"
 S_SW_REPLACE = "replace"
+
+# path to prj pyplate files, relative to prj dir
+# NB: leave as string, no start dir yet
+S_PP_PUB_DIR = "pyplate"
+S_PP_PUB_CFG = f"{S_PP_PUB_DIR}/project.json"
+S_PP_PRV_DIR = "pyplate/nope"
+S_PP_PRV_CFG = f"{S_PP_PRV_DIR}/private.json"
+
+# commands for _do_extras
+# cmds for git
+# NB: format param is proj dir
+S_CMD_GIT = "git init {} -q"
+
+# cmds for venv
+# NB: format param is __PP_NAME_SMALL__
+S_VENV_FMT_NAME = ".venv-{}"
+# NB: format param is full path to S_VENV_FMT_NAME after formatting
+S_VENV_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
+# NB: path to reqs install/freeze scripts for venv, relative to project dir
+S_VENV_INSTALL = f"{S_PP_PRV_DIR}/reqs_install.sh"
+S_VENV_FREEZE = f"{S_PP_PRV_DIR}/reqs_freeze.sh"
+
+# ------------------------------------------------------------------------------
+
+S_VENV_CMD_FREEZE = (
+    "python -Xfrozen_modules=off -m pip freeze -l --exclude-editable "
+    "--require-virtualenv"
+)
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -253,7 +278,13 @@ D_PRV_DEF = {
     "__PP_DATE_FMT__": "%m/%d/%Y",
     # readme file used in pyproject.toml, rel to prj dir
     "__PP_README_FILE__": "README.md",
-    "__PP_PRJ_TOML__": "pyproject.toml",
+    "__PP_TOML_FILE__": "pyproject.toml",
+    "__PP_REQS_FILE__": "requirements.txt",
+    # these two are holding areas for calculated string
+    "__PP_KW_STR__": "",
+    "__PP_RM_DEPS__": "",
+    # name of venv folder (to be used in reqs install/freeze scripts)
+    "__PP_NAME_VENV__": ".venv",  # just a sensible default
 }
 
 # these values are string replace only
@@ -273,15 +304,9 @@ D_PRV_DIST_DIRS = {
     "__PP_IMAGES__": S_ALL_IMAGES,  # where gui images are stored
 }
 
-# these values are string replace only
-D_PRV_EXTRA = {
-    # these two are holding areas for calculated string
-    "__PP_KW_STR__": "",
-    "__PP_RM_DEPS__": "",
-}
-
 # these are settings that will be calculated for you while running pymaker.py
 # consider them the "during create" settings
+# THEY SHOULD NOT BE CHANGED ONCE A PROJECT IS CREATED!
 D_PRV_CFG = {
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_BIG__": "",  # PyPlate
@@ -300,6 +325,9 @@ D_PRV_CFG = {
     "__PP_USR_LIB__": "",  # location of cnlibs dir
     "__PP_USR_SRC__": "",  # where the program will keep it's source
 }
+
+# these values are string replace only
+D_PRV_EXTRA = {}
 
 # these are settings that will be changed before running pybaker.py
 # consider them the "after create" settings
@@ -345,7 +373,7 @@ D_BLACKLIST = {
     # NB: this is mostly to speed up processing by not even looking at them
     S_KEY_SKIP_ALL: [
         ".git",
-        ".vscode",
+        # ".vscode",
         S_ALL_VENV,
         ".VSCodeCounter",
         S_ALL_CONF,
@@ -356,7 +384,7 @@ D_BLACKLIST = {
         S_ALL_MISC,
         S_ALL_README,
         D_PRV_DEF["__PP_LICENSE_FILE__"],
-        "requirements.txt",
+        D_PRV_DEF["__PP_REQS_FILE__"],
         "**/__pycache__",
         "**/*.mo",
     ],
@@ -511,6 +539,9 @@ def do_before_fix(dict_meta, _dict_cfg):
     D_PRV_CFG["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
     D_PRV_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
     D_PRV_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
+
+    # this is to fix reqs_install.sh
+    D_PRV_CFG["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
 
     # fix keywords for first pass
     l_keywords = dict_meta["__PP_KEYWORDS__"]

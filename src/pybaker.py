@@ -25,7 +25,6 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-import os
 from pathlib import Path
 import re
 import shutil
@@ -97,11 +96,6 @@ S_PRJ_OPTION = "-f"
 S_PRJ_METAVAR = "PROJECT DIR"
 S_PRJ_DEST = "PRJ_DEST"
 S_PRJ_HELP = "the project directory to bake"
-
-# path to prj pyplate files
-# NB: leave as string, no start dir yet
-S_PP_PRV = "pyplate/conf/private.json"
-S_PP_PRJ = "pyplate/conf/project.json"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -209,6 +203,8 @@ class PyBaker:
         config files.
         """
 
+        print("Do setup... ", end="")
+
         # ----------------------------------------------------------------------
         # set pp cmd line stuff
 
@@ -232,7 +228,8 @@ class PyBaker:
         # if debug, use test project
         if self._debug:
             self._dir_prj = Path(
-                Path.home() / "Documents/Projects/Python/CLIs/CLIs_DEBUG"
+                # Path.home() / "Documents/Projects/Python/CLIs/CLIs_DEBUG"
+                Path.home() / "Documents/Projects/Python/GUIs/GUIs_DEBUG"
             )
             return
 
@@ -248,6 +245,8 @@ class PyBaker:
         else:
             print(B.S_ERR_PRJ_DIR_NONE)
             sys.exit()
+
+        print("Done")
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -266,12 +265,12 @@ class PyBaker:
         """
 
         # get individual dicts in the project file
-        path_to_conf = self._dir_prj / S_PP_PRJ
+        path_to_conf = self._dir_prj / M.S_PP_PUB_CFG
         self._dict_prj = F.load_dicts([path_to_conf], {})
         self._dict_meta = self._dict_prj[M.S_KEY_PRJ_META]
 
         # get main settings dict in private.json
-        path_to_conf = self._dir_prj / S_PP_PRV
+        path_to_conf = self._dir_prj / M.S_PP_PRV_CFG
         self._dict_prv = F.load_dicts([path_to_conf], {})
         self._dict_cfg = self._dict_prv[M.S_KEY_PRV_CFG]
 
@@ -286,8 +285,12 @@ class PyBaker:
         my head better. I will be making a flowchart soon...
         """
 
+        print("Do before fix... ", end="")
+
         # call public before fix function
         M.do_before_fix(self._dict_meta, self._dict_cfg)
+
+        print("Done")
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -300,6 +303,8 @@ class PyBaker:
         encounters, it passes the path to a filter to determine if the file
         needs fixing based on its appearance in the blacklist.
         """
+
+        print("Do fix... ", end="")
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -400,6 +405,8 @@ class PyBaker:
             if root not in skip_path:
                 self._fix_path(root)
 
+        print("Done")
+
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
@@ -412,15 +419,17 @@ class PyBaker:
         modification here.
         """
 
+        print("Do after fix... ", end="")
+
         # ----------------------------------------------------------------------
         # save project settings
 
         # save fixed settings
-        path_no_edit = self._dir_prj / S_PP_PRV
+        path_no_edit = self._dir_prj / M.S_PP_PRV_CFG
         F.save_dict(self._dict_prv, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
-        path_edit = self._dir_prj / S_PP_PRJ
+        path_edit = self._dir_prj / M.S_PP_PUB_CFG
         dict_edit = {
             M.S_KEY_PRJ_BL: self._dict_prj[M.S_KEY_PRJ_BL],
             M.S_KEY_PRJ_I18N: self._dict_prj[M.S_KEY_PRJ_I18N],
@@ -449,6 +458,8 @@ class PyBaker:
         # call public after fix
         M.do_after_fix(self._dir_prj, self._dict_rep)  # fix readme
 
+        print("Done")
+
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
@@ -458,6 +469,8 @@ class PyBaker:
 
         Gets dirs/files from project and copies them to the dist dir.
         """
+
+        print("Do copy files... ", end="")
 
         # list of files/folders from project to include in dist
         src = B.L_SRC
@@ -477,6 +490,8 @@ class PyBaker:
         new_dst = dst / "lib"
         shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
 
+        print("Done")
+
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
@@ -488,51 +503,29 @@ class PyBaker:
         the CHANGELOG file for the current project.
         """
 
-        # get current dir
-        dir_curr = os.getcwd()
-
-        # make sure we are in project path
-        os.chdir(self._dir_prj)
+        print("Do extras... ", end="")
 
         # ----------------------------------------------------------------------
-        # add requirements
-        # path_req = self._dir_prj / "requirements.txt"
-        # with open(path_req, "w", encoding="UTF8") as a_file:
-        #     cmd = (
-        #         "python -Xfrozen_modules=off -m pip freeze -l "
-        #         f"--exclude-editable --require-virtualenv > {path_req}"
-        #     )
-        #     F.sh(cmd)
+        # freeze requirements
+
+        # run script to freeze venv reqs
+        cmd = self._dir_prj / M.S_VENV_FREEZE
+        F.sh(cmd)
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
-        path_git = self._dir_prj / ".git"
+
+        # see if we have git
+        path_git = self._dir_prj / M.S_ALL_GIT
+        path_chg = self._dir_prj / B.S_CHANGELOG
         if path_git.exists():
-            path_chg = self._dir_prj / B.S_CHANGELOG
-            with open(path_chg, "w", encoding="UTF8") as a_file:
-                cmd = B.S_CHANGELOG_CMD
-                res = F.sh(cmd)
-                if res.returncode != 0:
-                    print(res.stdout)
 
-        # ----------------------------------------------------------------------
-        # update docs
-        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
-        # work
-
-        if M.B_CMD_DOCS:
-            # move into src dir
-            dir_src = self._dir_prj / M.S_ALL_SRC
-            os.chdir(dir_src)
-
-            # # update docs
-            path_docs = self._dir_prj / M.S_ALL_DOCS
-            cmd = M.S_CMD_DOCS.format(path_docs)
-            F.sh(cmd)
-
-        # ----------------------------------------------------------------------
-        # go back to old dir
-        os.chdir(dir_curr)
+            # run the cmd
+            cmd = B.S_CHANGELOG_CMD
+            res = F.sh(cmd)
+            if res.returncode != 0:
+                with open(path_chg, "w", encoding="UTF8") as a_file:
+                    a_file.write(res.stdout)
 
         # ----------------------------------------------------------------------
         # tree
@@ -551,7 +544,7 @@ class PyBaker:
             # create tree object and call
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
-                str(self._dir_prj),
+                self._dir_prj,
                 filter_list=self._dict_prj[M.S_KEY_PRJ_BL][M.S_KEY_SKIP_TREE],
                 dir_format=M.S_TREE_DIR_FORMAT,
                 file_format=M.S_TREE_FILE_FORMAT,
@@ -560,6 +553,21 @@ class PyBaker:
             # write to file
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
+
+        # ----------------------------------------------------------------------
+        # update docs
+        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
+        # work
+
+        # if M.B_CMD_DOCS:
+        #     # move into src dir
+        #     dir_src = self._dir_prj / M.S_ALL_SRC
+        #     os.chdir(dir_src)
+
+        #     # # update docs
+        #     path_docs = self._dir_prj / M.S_ALL_DOCS
+        #     cmd = M.S_CMD_DOCS.format(path_docs)
+        #     F.sh(cmd)
 
         # ----------------------------------------------------------------------
         # outsource the big stuff
@@ -583,7 +591,7 @@ class PyBaker:
                         self._fix_readme(item)
                     if (
                         item.name
-                        == self._dict_prv[M.S_KEY_PRV_DEF]["__PP_PRJ_TOML__"]
+                        == self._dict_prv[M.S_KEY_PRV_DEF]["__PP_TOML_FILE__"]
                     ):
                         self._fix_pyproject(item)
 
@@ -600,6 +608,8 @@ class PyBaker:
 
         # do i18n stuff
         self._do_i18n()
+
+        print("Done")
 
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps

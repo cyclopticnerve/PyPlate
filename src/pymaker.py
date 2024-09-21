@@ -33,6 +33,9 @@ import re
 import shutil
 import sys
 
+# import shlex
+# import subprocess
+
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 # pylint: disable=no-name-in-module
@@ -89,11 +92,6 @@ S_DBG_OPTION = "-d"
 S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
-
-# path to prj pyplate files
-# NB: leave as string, no start dir yet
-S_PP_PRV = "pyplate/conf/private.json"
-S_PP_PRJ = "pyplate/conf/project.json"
 
 # ------------------------------------------------------------------------------
 # Path objects
@@ -222,8 +220,9 @@ class PyMaker:
         # debug turns off some _do_after_fix features
         if self._debug:
             M.B_CMD_GIT = False
-            M.B_CMD_VENV = False
+            #     M.B_CMD_VENV = False
             M.B_CMD_TREE = False
+            M.B_CMD_DOCS = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
@@ -411,6 +410,13 @@ class PyMaker:
         p = p.lstrip(h).lstrip("/")
         M.D_PRV_CFG["__PP_DEV_PP__"] = p
 
+        # save location of prj for pybaker
+        # M.D_PRV_CFG["__PP_DIR_PRJ__"] = str(tmp_dir)
+
+        p = str(tmp_dir)
+        p = p.lstrip(h).lstrip("/")
+        M.D_PRV_CFG["__PP_DIR_PRJ__"] = p
+
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
@@ -420,6 +426,8 @@ class PyMaker:
 
         Gets dirs/files from template and copies them to the project dir.
         """
+
+        print("Copy files... ", end="")
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -461,6 +469,8 @@ class PyMaker:
             else:
                 shutil.copy2(path_in, path_out)
 
+        print("Done")
+
     # --------------------------------------------------------------------------
     # Dummy method to call conf/pymaker_conf.py
     # --------------------------------------------------------------------------
@@ -472,8 +482,12 @@ class PyMaker:
         my head better. I will be making a flowchart soon...
         """
 
+        print("Do before fix... ", end="")
+
         # call public before fix function
         M.do_before_fix(M.D_PRJ_META, M.D_PRV_CFG)
+
+        print("Done")
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -486,6 +500,8 @@ class PyMaker:
         encounters, it passes the path to a filter to determine if the file
         needs fixing based on its appearance in the blacklist.
         """
+
+        print("Do fix... ", end="")
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -586,6 +602,8 @@ class PyMaker:
             if root not in skip_path:
                 self._fix_path(root)
 
+        print("Done")
+
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
@@ -598,6 +616,8 @@ class PyMaker:
         modification here.
         """
 
+        print("Do after fix... ", end="")
+
         # ----------------------------------------------------------------------
         # save project settings
 
@@ -608,11 +628,11 @@ class PyMaker:
             M.S_KEY_PRV_EXTRA: M.D_PRV_EXTRA,
             M.S_KEY_PRV_CFG: M.D_PRV_CFG,
         }
-        path_no_edit = self._dir_prj / S_PP_PRV
+        path_no_edit = self._dir_prj / M.S_PP_PRV_CFG
         F.save_dict(dict_no_edit, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
-        path_edit = self._dir_prj / S_PP_PRJ
+        path_edit = self._dir_prj / M.S_PP_PUB_CFG
         dict_edit = {
             M.S_KEY_PRJ_BL: M.D_BLACKLIST,
             M.S_KEY_PRJ_I18N: M.D_I18N,
@@ -641,6 +661,10 @@ class PyMaker:
         # call public after fix
         M.do_after_fix(self._dir_prj, self._dict_rep)  # fix readme
 
+        # ----------------------------------------------------------------------
+        # done with after fix
+        print("Done")
+
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
@@ -651,6 +675,8 @@ class PyMaker:
         Do some extra functions like purge, create .git and .venv, and update
         the tree file for the current project.
         """
+
+        print("Do extras... ", end="")
 
         # ----------------------------------------------------------------------
         # purge
@@ -667,7 +693,7 @@ class PyMaker:
         if M.B_CMD_GIT:
 
             # add git dir
-            str_cmd = M.S_CMD_GIT.format(str(self._dir_prj))
+            str_cmd = M.S_CMD_GIT.format(self._dir_prj)
             F.sh(str_cmd)
 
         # ----------------------------------------------------------------------
@@ -675,19 +701,18 @@ class PyMaker:
 
         # if venv flag is set
         if M.B_CMD_VENV:
-            path_venv = self._dir_prj / M.S_ALL_VENV
-            str_cmd = M.S_CMD_VENV.format(str(path_venv))
-            F.sh(str_cmd)
 
-        # ----------------------------------------------------------------------
-        # add requirements
-        # path_req = self._dir_prj / "requirements.txt"
-        # with open(path_req, "w", encoding="UTF8") as a_file:
-        #     cmd = (
-        #         "python -Xfrozen_modules=off -m pip freeze -l "
-        #         f"--exclude-editable --require-virtualenv > {path_req}"
-        #     )
-        #     F.sh(cmd)
+            # print("Making venv... ", end="")
+
+            # create the venv folder w/ default pkgs
+            name_venv = self._dict_rep["__PP_NAME_VENV__"]
+            path_venv = self._dir_prj / name_venv
+            cmd = M.S_VENV_CMD_CREATE.format(path_venv)
+            F.sh(cmd)
+
+            # run script to install venv reqs
+            cmd = self._dir_prj / M.S_VENV_INSTALL
+            F.sh(str(cmd))
 
         # ----------------------------------------------------------------------
         # tree
@@ -696,6 +721,7 @@ class PyMaker:
 
         # if tree flag is set
         if M.B_CMD_TREE:
+
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
 
@@ -722,7 +748,9 @@ class PyMaker:
         # work
 
         if M.B_CMD_DOCS:
+
             # move into src dir
+            # TODO: fix this to get rid of os import
             dir_src = self._dir_prj / M.S_ALL_SRC
             os.chdir(dir_src)
 
@@ -731,6 +759,9 @@ class PyMaker:
             cmd = M.S_CMD_DOCS.format(path_docs)
             F.sh(cmd)
 
+        print("Done")
+
+    # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # NB: these are minor steps called from the main steps
 
