@@ -8,8 +8,7 @@
             "type": "shell",
             "command": "./pybaker.sh",
             "options": {
-                # TODO: SHWA is not expanded? how to keep user name out
-                "cwd": "~/__PP_DIR_PRJ__/pyplate/nope"
+                "cwd": "pyplate/nope"
             },
             "problemMatcher": [],
             "group": {

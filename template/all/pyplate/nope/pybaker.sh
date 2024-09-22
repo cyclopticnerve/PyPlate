@@ -15,8 +15,6 @@
 PRJ_DIR=$( cd ../.. && pwd)
 
 # pass the project dir to the real pybaker.py
-# TODO: need full path to dev pybaker.py
-# p_pb_real = Path.home() / "__PP_DEV_PP__/src/pybaker.py"
 ~/__PP_DEV_PP__/src/pybaker.py -f $PRJ_DIR
 
 # -)

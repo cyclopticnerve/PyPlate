@@ -25,6 +25,7 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
+import os
 from pathlib import Path
 import re
 import shutil
@@ -503,14 +504,18 @@ class PyBaker:
         the CHANGELOG file for the current project.
         """
 
-        print("Do extras... ", end="")
+        print("Do extras")
 
         # ----------------------------------------------------------------------
         # freeze requirements
 
+        print("Do extras/freeze... ", end="")
+
         # run script to freeze venv reqs
         cmd = self._dir_prj / M.S_VENV_FREEZE
         F.sh(cmd)
+
+        print("Done")
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
@@ -520,12 +525,16 @@ class PyBaker:
         path_chg = self._dir_prj / B.S_CHANGELOG
         if path_git.exists():
 
+            print("Do extras/CHANGELOG... ", end="")
+
             # run the cmd
             cmd = B.S_CHANGELOG_CMD
             res = F.sh(cmd)
             if res.returncode != 0:
                 with open(path_chg, "w", encoding="UTF8") as a_file:
                     a_file.write(res.stdout)
+
+            print("Done")
 
         # ----------------------------------------------------------------------
         # tree
@@ -534,6 +543,9 @@ class PyBaker:
 
         # if tree flag is set
         if M.B_CMD_TREE:
+
+            print("Do extras/tree... ", end="")
+
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
 
@@ -554,23 +566,32 @@ class PyBaker:
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
+            print("Done")
+
         # ----------------------------------------------------------------------
         # update docs
         # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
         # work
 
-        # if M.B_CMD_DOCS:
-        #     # move into src dir
-        #     dir_src = self._dir_prj / M.S_ALL_SRC
-        #     os.chdir(dir_src)
+        if M.B_CMD_DOCS:
 
-        #     # # update docs
-        #     path_docs = self._dir_prj / M.S_ALL_DOCS
-        #     cmd = M.S_CMD_DOCS.format(path_docs)
-        #     F.sh(cmd)
+            print("Do extras/docs... ", end="")
+
+            # move into src dir
+            dir_src = self._dir_prj / M.S_ALL_SRC
+            os.chdir(dir_src)
+
+            # # update docs
+            path_docs = self._dir_prj / M.S_ALL_DOCS
+            cmd = M.S_CMD_DOCS.format(path_docs)
+            F.sh(cmd)
+
+            print("Done")
 
         # ----------------------------------------------------------------------
         # outsource the big stuff
+
+        print("Do extras/other... ", end="")
 
         # scan project dir
         for root, _root_dirs, root_files in self._dir_prj.walk():
@@ -605,6 +626,8 @@ class PyBaker:
                         self._fix_desktop(item)
                     if item.suffix == "ui" or item.suffix == ".glade":
                         self._fix_gtk3(item)
+        print("Done")
+        print("Do extras/i18n", end="")
 
         # do i18n stuff
         self._do_i18n()

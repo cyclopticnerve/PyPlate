@@ -676,15 +676,19 @@ class PyMaker:
         the tree file for the current project.
         """
 
-        print("Do extras... ", end="")
+        print("Do extras")
 
         # ----------------------------------------------------------------------
         # purge
+
+        print("Do extras/purge... ", end="")
 
         for item in M.L_PURGE:
             path_del = self._dir_prj / item
             if path_del.exists():
                 path_del.unlink()
+
+        print("Done")
 
         # ----------------------------------------------------------------------
         # git
@@ -692,9 +696,13 @@ class PyMaker:
         # if git flag is set
         if M.B_CMD_GIT:
 
+            print("Do extras/git... ", end="")
+
             # add git dir
             str_cmd = M.S_CMD_GIT.format(self._dir_prj)
             F.sh(str_cmd)
+
+            print("Done")
 
         # ----------------------------------------------------------------------
         # venv
@@ -702,7 +710,7 @@ class PyMaker:
         # if venv flag is set
         if M.B_CMD_VENV:
 
-            # print("Making venv... ", end="")
+            print("Do extras/venv... ", end="")
 
             # create the venv folder w/ default pkgs
             name_venv = self._dict_rep["__PP_NAME_VENV__"]
@@ -714,6 +722,8 @@ class PyMaker:
             cmd = self._dir_prj / M.S_VENV_INSTALL
             F.sh(str(cmd))
 
+            print("Done")
+
         # ----------------------------------------------------------------------
         # tree
         # NB: run last so it includes .git and .venv folders
@@ -721,6 +731,8 @@ class PyMaker:
 
         # if tree flag is set
         if M.B_CMD_TREE:
+
+            print("Do extras/tree... ", end="")
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
@@ -742,6 +754,8 @@ class PyMaker:
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
+            print("Done")
+
         # ----------------------------------------------------------------------
         # update docs
         # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
@@ -749,17 +763,19 @@ class PyMaker:
 
         if M.B_CMD_DOCS:
 
+            print("Do extras/docs... ", end="")
+
             # move into src dir
             # TODO: fix this to get rid of os import
             dir_src = self._dir_prj / M.S_ALL_SRC
             os.chdir(dir_src)
-
+            # XXX combine reqs from all/curr prj type (all = pdoc3, gui = pygobj)
             # # update docs
             path_docs = self._dir_prj / M.S_ALL_DOCS
             cmd = M.S_CMD_DOCS.format(path_docs)
             F.sh(cmd)
 
-        print("Done")
+            print("Done")
 
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
