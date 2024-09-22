@@ -5,7 +5,7 @@
             "name": "PM",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pymaker",
+            "program": "src/pymaker.py",
             "console": "integratedTerminal"
         },
         {
@@ -22,7 +22,7 @@
             "name": "PM Args",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pymaker",
+            "program": "src/pymaker.py",
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
         },
@@ -37,7 +37,7 @@
             "name": "PB Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pybaker",
+            "program": "src/pybaker.py",
             "console": "integratedTerminal",
             "args": [
                 "-d"
@@ -47,7 +47,7 @@
             "name": "PB Args",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pybaker",
+            "program": "src/pybaker.py",
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
         },

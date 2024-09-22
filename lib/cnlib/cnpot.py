@@ -10,7 +10,7 @@
 Run GNU gettext tools to create i18n files for a project
 
 This class converts all marked strings in source files to i18n versions using
-xgettext, and creates .pot files in the locale directory. IT also uses msgfmt
+xgettext, and creates .pot files in the locale directory. It also uses msgfmt
 to convert .po files to .mo files.
 
 The class can handle all xgettext's supported file types by using each language
@@ -27,6 +27,7 @@ file (ie. "English", "Spanish"). I have tried to disambiguate this by using
 # ------------------------------------------------------------------------------
 
 # system imports
+from datetime import date
 from pathlib import Path
 import re
 import shutil
@@ -89,12 +90,13 @@ class CNPotPy:
         dir_src,
         str_appname,
         str_version,
+        str_author,
         str_email,
         dir_locale=None,
         dir_po=None,
         str_domain="messages",
         dict_clangs=None,
-        dict_no_ext=None,
+        no_ext="",
         list_wlangs=None,
         charset="UTF-8",
     ):
@@ -117,7 +119,7 @@ class CNPotPy:
                 domain to a locale folder
             dict_clangs: The dictionary of file extensions to scan for each
             clang
-            dict_no_ext: An optional dictionary mapping files with no extension
+            no_ext: An optional entry mapping files with no extension
             to their clang value
             list_wlangs: A list of supported languages to ensure a complete
             file structure in the project dir
@@ -168,6 +170,7 @@ class CNPotPy:
         # header info
         self._str_appname = str_appname
         self._str_version = str_version
+        self._str_author = str_author
         self._str_email = str_email
 
         # fix up dir_locale
@@ -192,10 +195,8 @@ class CNPotPy:
             dict_clangs = {}
         self._dict_clangs = dict_clangs
 
-        # fix up dict_no_ext
-        if dict_no_ext is None:
-            dict_no_ext = {}
-        self._dict_no_ext = dict_no_ext
+        # set no ext
+        self._no_ext = no_ext
 
         # fix up list_wlangs
         if list_wlangs is None:
@@ -224,9 +225,9 @@ class CNPotPy:
         # ----------------------------------------------------------------------
         # do the steps
 
-        self._make_pot()
-        self._make_pos()
-        self._make_mos()
+        self.make_pot()
+        self.make_pos()
+        self.make_mos()
 
     # --------------------------------------------------------------------------
     # Localize the desktop file using all available wlangs
@@ -260,7 +261,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Create a .pot file in the locale folder
     # --------------------------------------------------------------------------
-    def _make_pot(self):
+    def make_pot(self):
         """
         Create a .pot file in the locale folder
 
@@ -311,9 +312,7 @@ class CNPotPy:
         Path.touch(pot_file, exist_ok=True)
 
         # get all files for all clangs
-        files_dict = self._get_paths_for_exts(
-            self._dict_clangs, self._dict_no_ext
-        )
+        files_dict = self._get_paths_for_exts(self._dict_clangs)
 
         # for each clang name / list of clang files
         for clang_name, clang_files in files_dict.items():
@@ -370,12 +369,12 @@ class CNPotPy:
             F.sh(cmd)
 
         # fix CHARSET in pot
-        self._fix_pot_charset(pot_file)
+        self._fix_pot_header(pot_file)
 
     # --------------------------------------------------------------------------
     # Merge any .po files in the pos folder with existing .po files
     # --------------------------------------------------------------------------
-    def _make_pos(self):
+    def make_pos(self):
         """
         Merge any .po files in the pos folder with existing .po files
 
@@ -409,7 +408,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Create .mo files for all .po files in the locale folder
     # --------------------------------------------------------------------------
-    def _make_mos(self):
+    def make_mos(self):
         """
         Create .mo files for all .po files in the locale folder
 
@@ -441,7 +440,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Scan the source dir for files with certain extensions
     # --------------------------------------------------------------------------
-    def _get_paths_for_exts(self, dict_clangs, dict_no_ext):
+    def _get_paths_for_exts(self, dict_clangs):
         """
         Scan the source dir for files with certain extensions
 
@@ -493,7 +492,7 @@ class CNPotPy:
             ]
 
             # get all paths that match file ext
-            files = [f for f in paths if f.suffix in exts]
+            files = [f for f in paths if f.suffix in exts ]
 
             # make sure the key exists
             if not clang in dict_res:
@@ -503,19 +502,24 @@ class CNPotPy:
             dict_res[clang].extend(files)
 
         # now time to handle files with no ext
-        for clang, name_list in dict_no_ext.items():
+        for path in paths:
+            if path.suffix == "" and path.is_file():
+                dict_res[self._no_ext].append(path)
 
-            # get all paths that match file ext
-            # NB: the is_file() check here is to make sure we only add files
-            # that have no ext, not dirs (which have no ext, obvs)
-            files = [f for f in paths if f.name in name_list if f.is_file()]
+        # # now time to handle files with no ext
+        # for clang, name_list in dict_no_ext.items():
 
-            # make sure the key exists
-            if not clang in dict_res:
-                dict_res[clang] = []
+        #     # get all paths that match file ext
+        #     # NB: the is_file() check here is to make sure we only add files
+        #     # that have no ext, not dirs (which have no ext, obvs)
+        #     files = [f for f in paths if f.name in name_list if f.is_file()]
 
-            # add results to langs that have extensions
-            dict_res[clang].extend(files)
+        #     # make sure the key exists
+        #     if not clang in dict_res:
+        #         dict_res[clang] = []
+
+        #     # add results to langs that have extensions
+        #     dict_res[clang].extend(files)
 
         # return result
         return dict_res
@@ -612,7 +616,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Set the charset for the pot which will carry over to each po
     # --------------------------------------------------------------------------
-    def _fix_pot_charset(self, file_pot):
+    def _fix_pot_header(self, file_pot):
         """
         Set the charset for the pot which will carry over to each po
 
@@ -629,15 +633,28 @@ class CNPotPy:
         with open(file_pot, "r", encoding="UTF8") as a_file:
             text = a_file.read()
 
-        # the line to find in the header
+        # replace short description
+        str_pattern = r"# SOME DESCRIPTIVE TITLE."
+        str_rep = f"# {self._str_appname} translation template"
+        text = re.sub(str_pattern, str_rep, text)
+
+        # replace copyright
+        str_pattern = r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
+        year = date.today().year
+        str_rep = rf"\g<1>{year}\g<3>{self._str_author}"
+        text = re.sub(str_pattern, str_rep, text)
+
+        # replace author's email
+        str_pattern = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
+        email = self._str_email
+        year = date.today().year
+        str_rep = rf"\g<1>{email}\g<3>{year}"
+        text = re.sub(str_pattern, str_rep, text)
+
         # NB: if the specific phrase "CHARSET" is not found, nothing will be
         # changed
         str_pattern = r"(\"Content-Type: text/plain; charset=)(CHARSET)(.*)"
-
-        # the replacement text to use
         str_rep = rf"\g<1>{self._charset}\g<3>"
-
-        # do the replacement
         text = re.sub(str_pattern, str_rep, text, flags=re.M)
 
         # save file

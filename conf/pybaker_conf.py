@@ -1,18 +1,68 @@
-"""docstring"""
+# ------------------------------------------------------------------------------
+# Project : PyPlate                                                /          \
+# Filename: pybaker_conf.py                                       |     ()     |
+# Date    : 12/08/2022                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
 
-S_VERSION = "0.0.1"
+"""
+This module separates out the constants from pybaker.py.
+This file, and the template folder, are the main ways to customize PyPlate.
+"""
 
-S_ASK_VER = "Enter project version (default: {}): "
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
 
-S_ERR_COUNT = "Errors: {}"
-S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
-S_ERR_UJSON = "ERROR: FIle {} is not a valid JSON file, trying default"
-S_ERR_DFNF = "ERROR: Default file {} could not be found"
-S_ERR_DJSON = "ERROR: Default file {} is not a valid JSON file"
+S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
+S_ERR_PRJ_DIR_NONE = "Project dir not provided"
+
+S_DST = "dist"
+S_CHANGELOG = "CHANGELOG.md"
+S_CHANGELOG_CMD = "git log --pretty='%ad - %s'"
+
+S_TOML_VERSION_SEARCH = (
+    r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
+)
+S_TOML_VERSION_REPL = r'\g<1>\g<2>\g<3>"{}"'
+S_TOML_SHORT_DESC_SEARCH = (
+    r"(^\s*\[project\]\s*$)(.*?)(^\s*description[\t ]*=[\t ]*)(.*?$)"
+)
+S_TOML_SHORT_DESC_REPL = r'\g<1>\g<2>\g<3>"{}"'
+S_TOML_KW_SEARCH = (
+    r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
+)
+S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
+
+S_META_VER_SEARCH = r"(\s*__PB_VERSION__\s*=\s*)(.*)"
+S_META_VER_REPL = r'\g<1>"{}"'
+S_META_SD_SEARCH = r"(\s*__PB_SHORT_DESC__\s*=\s*)(.*)"
+S_META_SD_REPL = r'\g<1>"{}"'
+
+# ------------------------------------------------------------------------------
+
+# S_ERR_COUNT = "Errors: {}"
+# S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
+# S_ERR_UJSON = "ERROR: FIle {} is not a valid JSON file, trying default"
+# S_ERR_DFNF = "ERROR: Default file {} could not be found"
+# S_ERR_DJSON = "ERROR: Default file {} is not a valid JSON file"
+
+# ------------------------------------------------------------------------------
+# Lists
+# ------------------------------------------------------------------------------
+
+L_SRC = [
+    "conf",
+    "README",
+    "src",
+    "LICENSE.txt",
+    "README.md",
+]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
-LIST_CATEGORIES = [
+L_CATS = [
     "AudioVideo",
     "Audio",
     "Video",

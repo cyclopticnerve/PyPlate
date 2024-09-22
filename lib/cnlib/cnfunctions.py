@@ -30,17 +30,6 @@ from pathlib import Path
 import shlex
 import subprocess
 
-# pylint: disable=import-error
-
-# my imports
-# from . import cnconstants as C
-
-# pylint: enable=import-error
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
@@ -370,26 +359,50 @@ def combine_dicts(dicts_new, dict_old):
 # ------------------------------------------------------------------------------
 # Run a command string in the shell
 # ------------------------------------------------------------------------------
-def sh(string):
+def sh(cmd):
     """
     Run a command string in the shell
 
     Arguments:
-        string: The string to run
+        cmd: The command line to run
+
+    Raises:
+        CalledProcessError if something went wrong
 
     Returns:
-        The result of running the string
+        (CalledProcessResult) The result of running the command line, or none
+        if an error occurred
 
     This is just a dumb convenience method to use subprocess with a string
     instead of having to convert a string to an array with shlex every time I
     need to run a shell command.
     """
 
-    # split the string using shell syntax (smart split/quote)
-    cmd_array = shlex.split(string)
+    # make sure it's a string (sometime pass path object)
+    cmd = str(cmd)
 
-    # get result of running the shell command
-    res = subprocess.run(cmd_array, check=True)
+    # split the string using shell syntax (smart split/quote)
+    cmd_array = shlex.split(cmd)
+
+    # get result of running the shell command or bubble up an error
+    try:
+        res = subprocess.run(
+            # the array of commands produced by shlex.split
+            cmd_array,
+            # if check is True, an exception will be raised if the return code
+            # is not 0
+            # if check is False, no exception is raised but res will be None,
+            # meaning you have to test for it in the calling function
+            # but that also means you have no information on WHY it failed
+            check=True,
+            # convert stdout/stderr from bytes to text
+            text=True,
+            # put stdout/stderr into res
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as e:
+        # bubble up the error to the calling function
+        raise e
 
     # return the result
     return res

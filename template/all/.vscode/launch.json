@@ -8,13 +8,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
-        },
-        {
-            "name": "PyBaker",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "pyplate/pybaker",
-            "console": "integratedTerminal"
         }
     ]
 }
