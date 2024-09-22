@@ -16,13 +16,9 @@ __PP_RM_LICENSE__
 __PP_SHORT_DESC__
 <!-- __PP_SHORT_DESC__ -->
 
-<<<<<<< HEAD
-![alt-text](README/screenshot.png "screenshot")
-=======
 <!--PUT SCREENSHOT HERE LIKE: -->
 [![alt-text](README/screenshot.png "tooltip")](click-url)
 <!--[!(README/ss.png)] -->
->>>>>>> origin/pybsker
 
 ## Requirements
 <!-- __PP_RM_DEPS__ -->
