@@ -27,7 +27,7 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
-import os
+# import os
 from pathlib import Path
 import re
 import shutil
@@ -222,7 +222,7 @@ class PyMaker:
             M.B_CMD_GIT = False
             #     M.B_CMD_VENV = False
             M.B_CMD_TREE = False
-            M.B_CMD_DOCS = False
+            # M.B_CMD_DOCS = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
@@ -765,14 +765,7 @@ class PyMaker:
 
             print("Do extras/docs... ", end="")
 
-            # move into src dir
-            # TODO: fix this to get rid of os import
-            dir_src = self._dir_prj / M.S_ALL_SRC
-            os.chdir(dir_src)
-            # XXX combine reqs from all/curr prj type (all = pdoc3, gui = pygobj)
-            # # update docs
-            path_docs = self._dir_prj / M.S_ALL_DOCS
-            cmd = M.S_CMD_DOCS.format(path_docs)
+            cmd = self._dir_prj / M.S_DOCS_SCRIPT
             F.sh(cmd)
 
             print("Done")

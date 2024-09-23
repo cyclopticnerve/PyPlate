@@ -163,7 +163,7 @@ S_USR_LIB_NAME = "lib"
 S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # cmds for docs
-S_CMD_DOCS = "python -m pdoc --html -f -o {} ."
+# S_CMD_DOCS = "python -m pdoc --html -f -o {} ."
 
 # formats for tree
 S_TREE_NAME = "tree.txt"
@@ -197,12 +197,8 @@ S_VENV_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
 S_VENV_INSTALL = f"{S_PP_PRV_DIR}/reqs_install.sh"
 S_VENV_FREEZE = f"{S_PP_PRV_DIR}/reqs_freeze.sh"
 
-# ------------------------------------------------------------------------------
-
-S_VENV_CMD_FREEZE = (
-    "python -Xfrozen_modules=off -m pip freeze -l --exclude-editable "
-    "--require-virtualenv"
-)
+# path to docs script
+S_DOCS_SCRIPT = f"{S_PP_PRV_DIR}/docs.sh"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -542,6 +538,9 @@ def do_before_fix(dict_meta, _dict_cfg):
 
     # this is to fix reqs_install.sh
     D_PRV_CFG["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
+
+    # shift for replacement
+    D_PRV_CFG["__PP_DOCS_NAME__"] = S_ALL_DOCS
 
     # fix keywords for first pass
     l_keywords = dict_meta["__PP_KEYWORDS__"]

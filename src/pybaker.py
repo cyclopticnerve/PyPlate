@@ -25,7 +25,7 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-import os
+# import os
 from pathlib import Path
 import re
 import shutil
@@ -217,7 +217,7 @@ class PyBaker:
 
         # debug turns off some _do_extras features
         if self._debug:
-            M.B_CMD_DOCS = False
+            # M.B_CMD_DOCS = False
             M.B_CMD_TREE = False
 
         # set flag dicts to defaults
@@ -575,15 +575,18 @@ class PyBaker:
 
         if M.B_CMD_DOCS:
 
+            # move into src dir
+            # dir_src = self._dir_prj / M.S_ALL_SRC
+            # os.chdir(dir_src)
+
+            # # # update docs
+            # path_docs = self._dir_prj / M.S_ALL_DOCS
+            # cmd = M.S_CMD_DOCS.format(path_docs)
+            # F.sh(cmd)
+
             print("Do extras/docs... ", end="")
 
-            # move into src dir
-            dir_src = self._dir_prj / M.S_ALL_SRC
-            os.chdir(dir_src)
-
-            # # update docs
-            path_docs = self._dir_prj / M.S_ALL_DOCS
-            cmd = M.S_CMD_DOCS.format(path_docs)
+            cmd = self._dir_prj / M.S_DOCS_SCRIPT
             F.sh(cmd)
 
             print("Done")
