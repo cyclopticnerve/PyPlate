@@ -25,7 +25,7 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-import os
+# import os
 from pathlib import Path
 import re
 import shutil
@@ -577,14 +577,22 @@ class PyBaker:
 
             print("Do extras/docs... ", end="")
 
-            # move into src dir
-            dir_src = self._dir_prj / M.S_ALL_SRC
-            os.chdir(dir_src)
-
-            # # update docs
-            path_docs = self._dir_prj / M.S_ALL_DOCS
+            # create default docs
+            name_docs = self._dict_rep["__PP_NAME_DOCS__"]
+            path_docs = self._dir_prj / name_docs
             cmd = M.S_CMD_DOCS.format(path_docs)
             F.sh(cmd)
+
+            # ------------------------------------------------------------------
+
+            # # move into src dir
+            # dir_src = self._dir_prj / M.S_ALL_SRC
+            # os.chdir(dir_src)
+
+            # # # update docs
+            # path_docs = self._dir_prj / M.S_ALL_DOCS
+            # cmd = M.S_CMD_DOCS.format(path_docs)
+            # F.sh(cmd)
 
             print("Done")
 
@@ -619,14 +627,13 @@ class PyBaker:
             if root.name == M.S_ALL_SRC:
                 # for each file item
                 for item in files:
-                    # TODO: this need to be better - don't depend on _PP_NAME_SMALL__
-                    # to be the filename
-                    pp_name_small = self._dict_cfg["__PP_NAME_SMALL__"]
-                    if item.name == f"{pp_name_small}.desktop":
+                    name_desk = self._dict_prv["__PP_DESK_FILE__"]
+                    if item.name == name_desk:
                         self._fix_desktop(item)
                     if item.suffix == "ui" or item.suffix == ".glade":
                         self._fix_gtk3(item)
         print("Done")
+
         print("Do extras/i18n", end="")
 
         # do i18n stuff

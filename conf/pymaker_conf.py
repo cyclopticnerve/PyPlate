@@ -162,9 +162,6 @@ S_USR_BIN = ".local/bin"  # where to put the binary
 S_USR_LIB_NAME = "lib"
 S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
-# cmds for docs
-S_CMD_DOCS = "python -m pdoc --html -f -o {} ."
-
 # formats for tree
 S_TREE_NAME = "tree.txt"
 S_TREE_FILE = f"{S_ALL_MISC}/{S_TREE_NAME}"
@@ -188,6 +185,9 @@ S_PP_PRV_CFG = f"{S_PP_PRV_DIR}/private.json"
 # NB: format param is proj dir
 S_CMD_GIT = "git init {} -q"
 
+# desktop file format
+S_DESK_FMT = "{}.desktop"
+
 # cmds for venv
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
@@ -197,12 +197,8 @@ S_VENV_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
 S_VENV_INSTALL = f"{S_PP_PRV_DIR}/reqs_install.sh"
 S_VENV_FREEZE = f"{S_PP_PRV_DIR}/reqs_freeze.sh"
 
-# ------------------------------------------------------------------------------
-
-S_VENV_CMD_FREEZE = (
-    "python -Xfrozen_modules=off -m pip freeze -l --exclude-editable "
-    "--require-virtualenv"
-)
+# path to docs.sh relative to prj dir
+S_DOCS_MAKE = f"{S_PP_PRV_DIR}/docs.sh"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -548,6 +544,12 @@ def do_before_fix(dict_meta, _dict_cfg):
     q_keywords = [f'"{item}"' for item in l_keywords]
     D_PRV_EXTRA["__PP_KW_STR__"] = ", ".join(q_keywords)
 
+    # format for desktop file
+    D_PRV_EXTRA["__PP_DESK_FILE__"] = S_DESK_FMT.format(name_small)
+
+    # name of docs output folder (for repl in docs.sh)
+    D_PRV_CFG["__PP_DOCS_NAME__"] = S_ALL_DOCS
+
     # now figure out deps and links for readme
     # get meta deps
     d_py_deps = dict_meta["__PP_PY_DEPS__"]
@@ -566,7 +568,6 @@ def do_before_fix(dict_meta, _dict_cfg):
 
     # put the new string in config so it can be shared to _do_fix
     D_PRV_EXTRA["__PP_RM_DEPS__"] = s_rm_deps
-
 
 # --------------------------------------------------------------------------
 # Do any work after fix

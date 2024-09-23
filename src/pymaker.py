@@ -27,7 +27,7 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
-import os
+# import os
 from pathlib import Path
 import re
 import shutil
@@ -220,7 +220,7 @@ class PyMaker:
         # debug turns off some _do_after_fix features
         if self._debug:
             M.B_CMD_GIT = False
-            #     M.B_CMD_VENV = False
+            M.B_CMD_VENV = False
             M.B_CMD_TREE = False
             M.B_CMD_DOCS = False
 
@@ -413,9 +413,9 @@ class PyMaker:
         # save location of prj for pybaker
         # M.D_PRV_CFG["__PP_DIR_PRJ__"] = str(tmp_dir)
 
-        p = str(tmp_dir)
-        p = p.lstrip(h).lstrip("/")
-        M.D_PRV_CFG["__PP_DIR_PRJ__"] = p
+        # p = str(tmp_dir)
+        # p = p.lstrip(h).lstrip("/")
+        # M.D_PRV_CFG["__PP_DIR_PRJ__"] = p
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -470,6 +470,9 @@ class PyMaker:
                 shutil.copy2(path_in, path_out)
 
         print("Done")
+
+        # combine any reqs files
+        self._fix_reqs()
 
     # --------------------------------------------------------------------------
     # Dummy method to call conf/pymaker_conf.py
@@ -720,7 +723,7 @@ class PyMaker:
 
             # run script to install venv reqs
             cmd = self._dir_prj / M.S_VENV_INSTALL
-            F.sh(str(cmd))
+            F.sh(cmd)
 
             print("Done")
 
@@ -765,14 +768,8 @@ class PyMaker:
 
             print("Do extras/docs... ", end="")
 
-            # move into src dir
-            # TODO: fix this to get rid of os import
-            dir_src = self._dir_prj / M.S_ALL_SRC
-            os.chdir(dir_src)
-            # XXX combine reqs from all/curr prj type (all = pdoc3, gui = pygobj)
-            # # update docs
-            path_docs = self._dir_prj / M.S_ALL_DOCS
-            cmd = M.S_CMD_DOCS.format(path_docs)
+            # run script in project/pyplate/nope
+            cmd = self._dir_prj / M.S_DOCS_MAKE
             F.sh(cmd)
 
             print("Done")
@@ -1217,8 +1214,64 @@ class PyMaker:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
-    # Check if line or trailing comment is a switch
+    # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
+    def _fix_reqs(self):
+        """
+        Combine reqs from template/all and template/prj_type
+
+        This method combines reqs from the all dir (pdoc3, etc) used by all
+        projects, and those used by specific project type (gui needs pygobject,
+        etc)
+        """
+
+        print("Do fix reqs... ", end="")
+
+        # the new set of lines for requirements.txt
+        new_file = []
+
+        # the file name for reqs
+        reqs_name = M.D_PRV_DEF["__PP_REQS_FILE__"]
+
+        # get path to all/requirements.txt
+        reqs_all_path = f"all/{reqs_name}"
+        reqs_all_file = P_DIR_PP_TEMPLATE / reqs_all_path
+        if reqs_all_file.exists():
+            with open(reqs_all_file, "r", encoding="utf-8") as a_file:
+                old_file = a_file.readlines()
+                for line in old_file:
+                    # get all lines in file w/o newline
+                    new_file.append(line.rstrip())
+
+        # get path to template/prj_type
+        prj_tmp = ""
+        prj_type = M.D_PRV_CFG["__PP_TYPE_PRJ__"]
+        for key, val in M.D_TYPES.items():
+            if key == prj_type:
+                prj_tmp = val[1]
+                break
+
+        # get path to template/prj_type/requirements.txt
+        reqs_prj_path = f"{prj_tmp}/{reqs_name}"
+        reqs_prj_file = P_DIR_PP_TEMPLATE / reqs_prj_path
+        if reqs_prj_file.exists():
+            with open(reqs_prj_file, "r", encoding="utf-8") as a_file:
+                old_file = a_file.readlines()
+                for line in old_file:
+                    # get all lines in file w/o newline
+                    new_file.append(line.rstrip())
+
+        # put combined reqs into final file
+        out_file = self._dir_prj / reqs_name
+        joint = "\n".join(new_file)
+        with open(out_file, "w", encoding="utf-8") as a_file:
+            a_file.writelines(joint)
+
+        print("Done")
+
+    # --------------------------------------------------------------------------
+    # Check if line or trailing comment is a switch
+    # -------------aD------------------------------------------------------------
     def _check_switches(self, line, block):
         """
         Check if line or trailing comment is a switch

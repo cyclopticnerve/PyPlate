@@ -7,6 +7,10 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+#
+# A script to install initial requirements in venv
+#
+
 # change working dir to the project (which is two dirs up,
 # ie. "project/pyplate/nope/reqs_install.sh")
 SCRIPT_DIR=$(dirname $(realpath $0))
