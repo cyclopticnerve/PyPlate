@@ -93,6 +93,7 @@ S_KEY_PRV_CFG = "PRV_CFG"
 S_KEY_PRJ_META = "PRJ_META"
 S_KEY_PRJ_BL = "PRJ_BL"
 S_KEY_PRJ_I18N = "PRJ_I18N"
+S_KEY_PRJ_INSTALL = "PRJ_INSTALL"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -201,6 +202,43 @@ S_VENV_FREEZE = f"{S_PP_PRV_DIR}/reqs_freeze.sh"
 S_DOCS_SCRIPT = f"{S_PP_PRV_DIR}/docs.sh"
 
 # ------------------------------------------------------------------------------
+# pybaker stuff
+
+S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
+S_ERR_PRJ_DIR_NONE = "Project dir not provided"
+
+S_CHANGELOG = "CHANGELOG.md"
+S_CHANGELOG_CMD = "git log --pretty='%ad - %s'"
+
+S_TOML_VERSION_SEARCH = (
+    r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
+)
+S_TOML_VERSION_REPL = r'\g<1>\g<2>\g<3>"{}"'
+S_TOML_SHORT_DESC_SEARCH = (
+    r"(^\s*\[project\]\s*$)(.*?)(^\s*description[\t ]*=[\t ]*)(.*?$)"
+)
+S_TOML_SHORT_DESC_REPL = r'\g<1>\g<2>\g<3>"{}"'
+S_TOML_KW_SEARCH = (
+    r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
+)
+S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
+
+S_META_VER_SEARCH = r"(\s*__PB_VERSION__\s*=\s*)(.*)"
+S_META_VER_REPL = r'\g<1>"{}"'
+S_META_SD_SEARCH = r"(\s*__PB_SHORT_DESC__\s*=\s*)(.*)"
+S_META_SD_REPL = r'\g<1>"{}"'
+
+S_DST = "dist"
+S_ASSETS = "assets"
+S_FILE_INSTALL = f"{S_ALL_CONF}/install.json"
+
+# S_ERR_COUNT = "Errors: {}"
+# S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
+# S_ERR_UJSON = "ERROR: FIle {} is not a valid JSON file, trying default"
+# S_ERR_DFNF = "ERROR: Default file {} could not be found"
+# S_ERR_DJSON = "ERROR: Default file {} is not a valid JSON file"
+
+# ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
 
@@ -217,6 +255,164 @@ L_MARKUP = [
 # paths are relative to project dir
 L_PURGE = [
     Path(S_ALL_SRC) / "ABOUT",
+]
+
+# folders to put in dist
+L_SRC = [
+    "conf",
+    "README",
+    S_ALL_SRC,
+    "LICENSE.txt",
+    "README.md",
+]
+
+# get list of approved categories
+# https://specifications.freedesktop.org/menu-spec/latest/apa.html
+L_CATS = [
+    "AudioVideo",
+    "Audio",
+    "Video",
+    "Development",
+    "Education",
+    "Game",
+    "Graphics",
+    "Network",
+    "Office",
+    "Science",
+    "Settings",
+    "System",
+    "Utility",
+    "Building",
+    "Debugger",
+    "IDE",
+    "GUIDesigner",
+    "Profiling",
+    "RevisionControl",
+    "Translation",
+    "Calendar",
+    "ContactManagement",
+    "Database",
+    "Dictionary",
+    "Chart",
+    "Email",
+    "Finance",
+    "FlowChart",
+    "PDA",
+    "ProjectManagement",
+    "Presentation",
+    "Spreadsheet",
+    "WordProcessor",
+    "2DGraphics",
+    "VectorGraphics",
+    "RasterGraphics",
+    "3DGraphics",
+    "Scanning",
+    "OCR",
+    "Photography",
+    "Publishing",
+    "Viewer",
+    "TextTools",
+    "DesktopSettings",
+    "HardwareSettings",
+    "Printing",
+    "PackageManager",
+    "Dialup",
+    "InstantMessaging",
+    "Chat",
+    "IRCClient",
+    "Feed",
+    "FileTransfer",
+    "HamRadio",
+    "News",
+    "P2P",
+    "RemoteAccess",
+    "Telephony",
+    "TelephonyTools",
+    "VideoConference",
+    "WebBrowser",
+    "WebDevelopment",
+    "Midi",
+    "Mixer",
+    "Sequencer",
+    "Tuner",
+    "TV",
+    "AudioVideoEditing",
+    "Player",
+    "Recorder",
+    "DiscBurning",
+    "ActionGame",
+    "AdventureGame",
+    "ArcadeGame",
+    "BoardGame",
+    "BlocksGame",
+    "CardGame",
+    "KidsGame",
+    "LogicGame",
+    "RolePlaying",
+    "Shooter",
+    "Simulation",
+    "SportsGame",
+    "StrategyGame",
+    "Art",
+    "Construction",
+    "Music",
+    "Languages",
+    "ArtificialIntelligence",
+    "Astronomy",
+    "Biology",
+    "Chemistry",
+    "ComputerScience",
+    "DataVisualization",
+    "Economy",
+    "Electricity",
+    "Geography",
+    "Geology",
+    "Geoscience",
+    "History",
+    "Humanities",
+    "ImageProcessing",
+    "Literature",
+    "Maps",
+    "Math",
+    "NumericalAnalysis",
+    "MedicalSoftware",
+    "Physics",
+    "Robotics",
+    "Spirituality",
+    "Sports",
+    "ParallelComputing",
+    "Amusement",
+    "Archiving",
+    "Compression",
+    "Electronics",
+    "Emulator",
+    "Engineering",
+    "FileTools",
+    "FileManager",
+    "TerminalEmulator",
+    "Filesystem",
+    "Monitor",
+    "Security",
+    "Accessibility",
+    "Calculator",
+    "Clock",
+    "TextEditor",
+    "Documentation",
+    "Adult",
+    "Core",
+    "KDE",
+    "GNOME",
+    "XFCE",
+    "DDE",
+    "GTK",
+    "Qt",
+    "Motif",
+    "Java",
+    "ConsoleOnly",
+    "Screensaver",
+    "TrayIcon",
+    "Applet",
+    "Shell",
 ]
 
 # ------------------------------------------------------------------------------
@@ -281,6 +477,8 @@ D_PRV_DEF = {
     "__PP_RM_DEPS__": "",
     # name of venv folder (to be used in reqs install/freeze scripts)
     "__PP_NAME_VENV__": ".venv",  # just a sensible default
+    # name of assets folder in dist
+    "__PP_ASSETS__": "assets",  # just a sensible default
 }
 
 # these values are string replace only
@@ -346,6 +544,15 @@ D_PRJ_META = {
     "__PP_GUI_CATS__": [],
 }
 
+D_INSTALL = {
+    "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
+    "preflight": [],
+    "sys_reqs": [],
+    "py_reqs": [],
+    "content": {},
+    "postflight": [],
+}
+
 # the types of projects this script can create
 # key is the short display name and the char to enter
 # value[0] is the long display name
@@ -372,8 +579,8 @@ D_BLACKLIST = {
         # ".vscode",
         S_ALL_VENV,
         ".VSCodeCounter",
-        S_ALL_CONF,
-        S_ALL_DIST,
+        # S_ALL_CONF,
+        # S_ALL_DIST,
         S_ALL_DOCS,
         f"**/{S_ALL_LOCALE}",
         f"**/{S_ALL_PO}",
@@ -452,8 +659,12 @@ D_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
+    f"{S_ALL_MISC}/cnlibs.py": f"{S_ALL_MISC}/cnlibs.py",
+    f"{S_ALL_MISC}/default_class.py": f"{S_ALL_MISC}/default_class.py",
+    f"{S_ALL_MISC}/default_mod.py": f"{S_ALL_MISC}/default_mod.py",
     f"{S_ALL_MISC}/snippets.txt": f"{S_ALL_MISC}/snippets.txt",
     f"{S_ALL_MISC}/style.txt": f"{S_ALL_MISC}/style.txt",
+    "lib": f"{S_ALL_SRC}/{S_ALL_SUPPORT}/{S_USR_LIB_NAME}",
 }
 
 # the info for matching/fixing lines in markup files
@@ -565,6 +776,8 @@ def do_before_fix(dict_meta, _dict_cfg):
 
     # put the new string in config so it can be shared to _do_fix
     D_PRV_EXTRA["__PP_RM_DEPS__"] = s_rm_deps
+
+    D_PRV_EXTRA["__PP_FILE_INST__"] = S_FILE_INSTALL
 
 
 # --------------------------------------------------------------------------

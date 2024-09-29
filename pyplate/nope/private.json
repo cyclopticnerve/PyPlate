@@ -1,0 +1,48 @@
+{
+    "PRV_DEF": {
+        "__PP_AUTHOR__": "cyclopticnerve",
+        "__PP_URL__": "https://github.com/cyclopticnerve",
+        "__PP_EMAIL__": "cyclopticnerve@gmail.com",
+        "__PP_LICENSE_NAME__": "WTFPLv2",
+        "__PP_LICENSE_FILE__": "LICENSE.txt",
+        "__PP_RM_LICENSE__": "[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg \"http://www.wtfpl.net\")](http://www.wtfpl.net)",
+        "__PP_VER_FMT__": "Version {}",
+        "__PP_DATE_FMT__": "%m/%d/%Y",
+        "__PP_README_FILE__": "README.md",
+        "__PP_TOML_FILE__": "pyproject.toml",
+        "__PP_REQS_FILE__": "requirements.txt",
+        "__PP_KW_STR__": "",
+        "__PP_RM_DEPS__": "",
+        "__PP_NAME_VENV__": ".venv",
+        "__PP_ASSETS__": "assets"
+    },
+    "PRV_DIST_DIRS": {
+        "__PP_DEV_CONF__": "conf",
+        "__PP_DEV_SRC__": "src",
+        "__PP_USR_APPS__": ".local/share/applications",
+        "__PP_USR_BIN__": ".local/bin",
+        "__PP_SUPPORT__": "support",
+        "__PP_IMAGES__": "images"
+    },
+    "PRV_EXTRA": {
+        "__PP_KW_STR__": "",
+        "__PP_RM_DEPS__": "None",
+        "__PP_FILE_INST__": "conf/install.json"
+    },
+    "PRV_CFG": {
+        "__PP_TYPE_PRJ__": "g",
+        "__PP_NAME_BIG__": "GUIs_DEBUG",
+        "__PP_NAME_SMALL__": "guis_debug",
+        "__PP_NAME_SEC__": "guis_debug",
+        "__PP_NAME_CLASS__": "GuisDebug",
+        "__PP_DATE__": "09/29/2024",
+        "__PP_DUMMY__": "",
+        "__PP_DEV_PP__": "Documents/Projects/Python/PyPlate",
+        "__PP_USR_CONF__": ".config/guis_debug",
+        "__PP_USR_LIB__": ".local/share/cyclopticnerve/lib",
+        "__PP_USR_SRC__": ".local/share/guis_debug",
+        "__PP_DIR_PRJ__": "Documents/Projects/Python/GUIs/GUIs_DEBUG",
+        "__PP_NAME_VENV__": ".venv-guis_debug",
+        "__PP_DOCS_NAME__": "docs"
+    }
+}
