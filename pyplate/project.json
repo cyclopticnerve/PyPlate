@@ -59,20 +59,9 @@
         "LOCALE": "locale",
         "PO": "po"
     },
-    "PRJ_INSTALL": {
-        "meta": {
-            "name": "GUIs_DEBUG",
-            "version": "0.0.0"
-        },
-        "preflight": [],
-        "sys_reqs": [],
-        "py_reqs": [],
-        "content": {},
-        "postflight": []
-    },
     "PRJ_META": {
         "__PP_VERSION__": "0.0.0",
-        "__PP_SHORT_DESC__": "debug desc",
+        "__PP_SHORT_DESC__": "A program to create Python programs from a template",
         "__PP_KEYWORDS__": [],
         "__PP_PY_DEPS__": {},
         "__PP_SYS_DEPS__": {},

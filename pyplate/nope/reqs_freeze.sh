@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
-# Project : GUIs_DEBUG                                             /          \
+# Project : PyPlate                                                /          \
 # Filename: reqs_freeze.sh                                        |     ()     |
 # Date    : 09/29/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -17,7 +17,7 @@ SCRIPT_DIR=$(dirname $(realpath $0))
 cd $SCRIPT_DIR/../..
 
 # activate the project's venv and freeze reqs there
-. .venv-guis_debug/bin/activate
+. .venv-pyplate/bin/activate
 python -Xfrozen_modules=off -m pip freeze -l --exclude-editable --require-virtualenv > requirements.txt
 
 # -)

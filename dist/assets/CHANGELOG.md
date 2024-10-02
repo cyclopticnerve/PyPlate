@@ -1,0 +1,1 @@
+# Changelog file for PyPlate project

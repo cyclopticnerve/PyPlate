@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
-# Project : GUIs_DEBUG                                             /          \
+# Project : PyPlate                                                /          \
 # Filename: pybaker.sh                                            |     ()     |
 # Date    : 09/29/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |

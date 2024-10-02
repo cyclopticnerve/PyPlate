@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : GUIs_DEBUG                                             /          \
 # Filename: reqs_install.sh                                       |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 09/29/2024                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # change working dir to the project (which is two dirs up,

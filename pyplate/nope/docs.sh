@@ -17,7 +17,7 @@ SCRIPT_DIR=$(dirname $(realpath $0))
 cd $SCRIPT_DIR/../..
 
 # activate the project's venv and freeze reqs there
-. .venv-guis_debug/bin/activate
+. .venv-pyplate/bin/activate
 python -m pdoc --html -f -o docs src
 
 # -)
