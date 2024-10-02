@@ -1,0 +1,207 @@
+[] PyPlate/
+   ├─ [] dist/
+   │     ├─ [] assets/
+   │     │     ├─ [] lib/
+   │     │     │     ├─ [] cnapplib/
+   │     │     │     │     ├─ [] dead/
+   │     │     │     │     │     ├─ [] cnapp_with_state.py
+   │     │     │     │     │     ├─ [] cnappfunctions.py
+   │     │     │     │     │     ├─ [] cnwindow_junk.py
+   │     │     │     │     │     └─ [] cnwindow_w_state.py
+   │     │     │     │     ├─ [] __init__.py
+   │     │     │     │     ├─ [] cnapp.py
+   │     │     │     │     ├─ [] cnwindow.py
+   │     │     │     │     └─ [] state.py
+   │     │     │     ├─ [] cninstall/
+   │     │     │     │     ├─ [] tests/
+   │     │     │     │     │     ├─ [] assets/
+   │     │     │     │     │     │     └─ [] conf/
+   │     │     │     │     │     ├─ [] test_install.py
+   │     │     │     │     │     └─ [] test_uninstall.py
+   │     │     │     │     ├─ [] cninstall.py
+   │     │     │     │     ├─ [] cninstaller.py
+   │     │     │     │     └─ [] uninstallerator.py
+   │     │     │     ├─ [] cninstall~HEAD/
+   │     │     │     └─ [] cnlib/
+   │     │     │           ├─ [] __init__.py
+   │     │     │           ├─ [] cncli.py
+   │     │     │           ├─ [] cnformatter.py
+   │     │     │           ├─ [] cnfunctions.py
+   │     │     │           ├─ [] cnpot.py
+   │     │     │           └─ [] cntree.py
+   │     │     ├─ [] README/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] src/
+   │     │     │     ├─ [] support/
+   │     │     │     │     ├─ [] conf/
+   │     │     │     │     │     └─ [] pyplate_conf.py
+   │     │     │     │     └─ [] i18n/
+   │     │     │     │           ├─ [] locale/
+   │     │     │     │           │     ├─ [] es/
+   │     │     │     │           │     │     └─ [] LC_MESSAGES/
+   │     │     │     │           │     ├─ [] pq/
+   │     │     │     │           │     │     └─ [] LC_MESSAGES/
+   │     │     │     │           │     └─ [] xo/
+   │     │     │     │           │           └─ [] LC_MESSAGES/
+   │     │     │     │           └─ [] po/
+   │     │     │     │                 ├─ [] es.po
+   │     │     │     │                 ├─ [] guis_debug.pot
+   │     │     │     │                 ├─ [] LINGUAS
+   │     │     │     │                 ├─ [] pq.po
+   │     │     │     │                 └─ [] xo.po
+   │     │     │     ├─ [] pybaker.py
+   │     │     │     └─ [] pymaker.py
+   │     │     ├─ [] CHANGELOG.md
+   │     │     ├─ [] LICENSE.txt
+   │     │     └─ [] README.md
+   │     └─ [] ABOUT
+   ├─ [] docs/
+   │     └─ [] ABOUT
+   ├─ [] lib/
+   │     ├─ [] cnapplib/
+   │     │     ├─ [] dead/
+   │     │     │     ├─ [] cnapp_with_state.py
+   │     │     │     ├─ [] cnappfunctions.py
+   │     │     │     ├─ [] cnwindow_junk.py
+   │     │     │     └─ [] cnwindow_w_state.py
+   │     │     ├─ [] __init__.py
+   │     │     ├─ [] cnapp.py
+   │     │     ├─ [] cnwindow.py
+   │     │     └─ [] state.py
+   │     ├─ [] cninstall/
+   │     │     ├─ [] tests/
+   │     │     │     ├─ [] assets/
+   │     │     │     │     └─ [] conf/
+   │     │     │     ├─ [] test_install.py
+   │     │     │     └─ [] test_uninstall.py
+   │     │     ├─ [] cninstall.py
+   │     │     ├─ [] cninstaller.py
+   │     │     └─ [] uninstallerator.py
+   │     ├─ [] cninstall~HEAD/
+   │     └─ [] cnlib/
+   │           ├─ [] __init__.py
+   │           ├─ [] cncli.py
+   │           ├─ [] cnformatter.py
+   │           ├─ [] cnfunctions.py
+   │           ├─ [] cnpot.py
+   │           └─ [] cntree.py
+   ├─ [] misc/
+   │     ├─ [] other/
+   │     │     ├─ [] guis_debug-gtk4.py
+   │     │     └─ [] uninstall.py
+   │     ├─ [] checklist.html
+   │     ├─ [] checklist.txt
+   │     ├─ [] cnlibs.py
+   │     ├─ [] default_class.py
+   │     ├─ [] default_mod.py
+   │     ├─ [] snippets.txt
+   │     ├─ [] style.txt
+   │     ├─ [] todo.txt
+   │     └─ [] tree.txt
+   ├─ [] pyplate/
+   │     ├─ [] nope/
+   │     │     ├─ [] docs.sh
+   │     │     ├─ [] private.json
+   │     │     ├─ [] pybaker.sh
+   │     │     ├─ [] reqs_freeze.sh
+   │     │     └─ [] reqs_install.sh
+   │     └─ [] project.json
+   ├─ [] README/
+   │     └─ [] ABOUT
+   ├─ [] src/
+   │     ├─ [] support/
+   │     │     ├─ [] conf/
+   │     │     │     └─ [] pyplate_conf.py
+   │     │     └─ [] i18n/
+   │     │           ├─ [] locale/
+   │     │           │     ├─ [] es/
+   │     │           │     │     └─ [] LC_MESSAGES/
+   │     │           │     ├─ [] pq/
+   │     │           │     │     └─ [] LC_MESSAGES/
+   │     │           │     └─ [] xo/
+   │     │           │           └─ [] LC_MESSAGES/
+   │     │           └─ [] po/
+   │     │                 ├─ [] es.po
+   │     │                 ├─ [] guis_debug.pot
+   │     │                 ├─ [] LINGUAS
+   │     │                 ├─ [] pq.po
+   │     │                 └─ [] xo.po
+   │     ├─ [] pybaker.py
+   │     └─ [] pymaker.py
+   ├─ [] template/
+   │     ├─ [] all/
+   │     │     ├─ [] .vscode/
+   │     │     │     ├─ [] launch.json
+   │     │     │     └─ [] tasks.json
+   │     │     ├─ [] dist/
+   │     │     │     └─ [] install.py
+   │     │     ├─ [] docs/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] misc/
+   │     │     │     ├─ [] checklist.html
+   │     │     │     ├─ [] checklist.txt
+   │     │     │     └─ [] todo.txt
+   │     │     ├─ [] pyplate/
+   │     │     │     └─ [] nope/
+   │     │     │           ├─ [] docs.sh
+   │     │     │           ├─ [] pybaker.sh
+   │     │     │           ├─ [] reqs_freeze.sh
+   │     │     │           └─ [] reqs_install.sh
+   │     │     ├─ [] README/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] src/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] tests/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] .gitignore
+   │     │     ├─ [] CHANGELOG.md
+   │     │     ├─ [] LICENSE.txt
+   │     │     ├─ [] MANIFEST.in
+   │     │     ├─ [] pyproject.toml
+   │     │     ├─ [] README.md
+   │     │     └─ [] requirements.txt
+   │     ├─ [] cli/
+   │     │     └─ [] src/
+   │     │           └─ [] guis_debug
+   │     ├─ [] gui/
+   │     │     ├─ [] README/
+   │     │     │     └─ [] screenshot.png
+   │     │     ├─ [] src/
+   │     │     │     ├─ [] support/
+   │     │     │     │     ├─ [] conf/
+   │     │     │     │     │     └─ [] ABOUT
+   │     │     │     │     ├─ [] desktop/
+   │     │     │     │     │     ├─ [] guis_debug.desktop
+   │     │     │     │     │     └─ [] template.desktop
+   │     │     │     │     ├─ [] i18n/
+   │     │     │     │     │     ├─ [] locale/
+   │     │     │     │     │     │     └─ [] en/
+   │     │     │     │     │     │           └─ [] LC_MESSAGES/
+   │     │     │     │     │     │                 └─ [] ABOUT
+   │     │     │     │     │     └─ [] po/
+   │     │     │     │     │           └─ [] LINGUAS
+   │     │     │     │     ├─ [] images/
+   │     │     │     │     │     └─ [] GUIs_DEBUG.png
+   │     │     │     │     └─ [] ui/
+   │     │     │     │           ├─ [] dialogs.ui
+   │     │     │     │           └─ [] guis_debugGtk3.ui
+   │     │     │     ├─ [] appmain.py
+   │     │     │     ├─ [] guis_debug
+   │     │     │     └─ [] windowmain.py
+   │     │     └─ [] requirements.txt
+   │     └─ [] pkg/
+   │           ├─ [] src/
+   │           │     └─ [] guis_debug/
+   │           │           ├─ [] __init__.py
+   │           │           └─ [] guis_debug.py
+   │           └─ [] tests/
+   │                 └─ [] guis_debug_test.py
+   ├─ [] tests/
+   │     └─ [] ABOUT
+   ├─ [] .gitignore
+   ├─ [] CHANGELOG.md
+   ├─ [] LICENSE.txt
+   ├─ [] MANIFEST.in
+   ├─ [] pyproject.toml
+   ├─ [] README.md
+   └─ [] requirements.txt

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
-# Project : GUIs_DEBUG                                             /          \
+# Project : PyPlate                                                /          \
 # Filename: pybaker.sh                                            |     ()     |
 # Date    : 09/29/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -15,6 +15,6 @@
 PRJ_DIR=$( cd ../.. && pwd)
 
 # pass the project dir to the real pybaker.py
-~/__PP_DEV_PP__/src/pybaker.py -f $PRJ_DIR
+~/Documents/Projects/Python/PyPlate/src/pybaker.py -f $PRJ_DIR
 
 # -)

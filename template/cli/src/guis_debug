@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__                                     |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : GUIs_DEBUG                                             /          \
+# Filename: guis_debug                                            |     ()     |
+# Date    : 09/29/2024                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -58,7 +58,6 @@ sys.path.append(str(DIR_SRC))
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
-from appmain import AppMain  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -70,9 +69,8 @@ from appmain import AppMain  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
-__PB_VERSION__ = "__PP_VERSION__"
-__PB_SHORT_DESC__ = "__PP_SHORT_DESC__"
-
+__PB_VERSION__ = "0.0.0"
+__PB_SHORT_DESC__ = "A program to create Python programs from a template"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -92,9 +90,6 @@ class __PP_NAME_CLASS__(CNCli):
     This class does the most of the work of a typical CLI program. It parses
     command line options, loads/saves config files, and performs the operations
     required for the program.
-
-    It also checks for the GUI option on the command line and, if found,
-    creates an object from another script to handle the GUI.
     """
 
     # --------------------------------------------------------------------------
@@ -118,9 +113,9 @@ class __PP_NAME_CLASS__(CNCli):
 
         # set default property values
         # NB: commented props are from super
-        # self._dict_args = {}   # set in super
-        # self._dict_cfg = {}    # set in super
-        # self._path_cfg = None  # set in super
+        # self._d_args = {}   # from super
+        # self._dict_cfg = {}    # from super
+        # self._p_cfg = None  # from super
         self._debug = False
 
     # --------------------------------------------------------------------------
@@ -148,8 +143,7 @@ class __PP_NAME_CLASS__(CNCli):
         # main stuff
 
         # do the thing with the thing
-        app = AppMain(self._dict_args)
-        app.run()
+        print(self._func())
 
         # ----------------------------------------------------------------------
         # teardown
@@ -160,6 +154,35 @@ class __PP_NAME_CLASS__(CNCli):
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Short description
+    # --------------------------------------------------------------------------
+    def _func(self):
+        """
+        Short description
+
+        Arguments:
+            var_name: Short description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+        """
+
+        # change a value in the config dict
+        self._dict_cfg["inside"] = "bar"
+
+        # check for debug flag
+        if self._debug:
+            return "this is func (DEBUG)"
+
+        # no debug, return normal result
+        return "this is func"
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
@@ -186,9 +209,9 @@ class __PP_NAME_CLASS__(CNCli):
 
         # load the config file
         # not using def path, using arg path
-        # super()._load_config(None, cfg_arg, self._d_cfg)
+        # super()._load_config(None, cfg_arg, self._dict_cfg)
         # using def path, not using arg path
-        # super()._load_config(cfg_def, dict_def=self._d_cfg)
+        # super()._load_config(cfg_def, dict_def=self._dict_cfg)
         # using def path, using arg path, using internal
         super()._load_config(
             cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg

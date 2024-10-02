@@ -25,10 +25,10 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-# import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
 
 # pylint: disable=wrong-import-position
@@ -45,12 +45,14 @@ import sys
 DIR_SELF = Path(__file__).parent.resolve()
 P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
+P_DIR_SUPPORT = P_DIR_PYPLATE / "src" / "support"
 sys.path.append(str(P_DIR_PYPLATE))
 sys.path.append(str(P_DIR_PP_LIB))
+sys.path.append(str(P_DIR_SUPPORT))
 
 # local imports
-from conf import pymaker_conf as M  # type:ignore
-from conf import pybaker_conf as B  # type:ignore
+from conf import pyplate_conf as M  # type:ignore
+# from conf import pybaker_conf as B  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -217,7 +219,7 @@ class PyBaker:
 
         # debug turns off some _do_extras features
         if self._debug:
-            M.B_CMD_DOCS = False
+            # M.B_CMD_DOCS = False
             M.B_CMD_TREE = False
 
         # set flag dicts to defaults
@@ -228,10 +230,11 @@ class PyBaker:
 
         # if debug, use test project
         if self._debug:
-            self._dir_prj = Path(
+            self._dir_prj = (
                 # Path.home() / "Documents/Projects/Python/CLIs/CLIs_DEBUG"
                 Path.home() / "Documents/Projects/Python/GUIs/GUIs_DEBUG"
             )
+            print("Done")
             return
 
         # ----------------------------------------------------------------------
@@ -241,11 +244,11 @@ class PyBaker:
         if dst:
             self._dir_prj = Path(dst)
             if not self._dir_prj.exists():
-                print(B.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
-                sys.exit()
+                print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
+                sys.exit(-1)
         else:
-            print(B.S_ERR_PRJ_DIR_NONE)
-            sys.exit()
+            print(M.S_ERR_PRJ_DIR_NONE)
+            sys.exit(-1)
 
         print("Done")
 
@@ -474,8 +477,9 @@ class PyBaker:
         print("Do copy files... ", end="")
 
         # list of files/folders from project to include in dist
-        src = B.L_SRC
-        dst = Path(self._dir_prj) / B.S_DST
+        src = M.L_SRC
+        # and where to put it
+        dst = Path(self._dir_prj) / M.S_DST / M.S_ASSETS
 
         # copy files/folders
         for item in src:
@@ -486,11 +490,24 @@ class PyBaker:
             elif new_src.is_file():
                 shutil.copy2(new_src, new_dst)
 
+        # done copying project files
+        print("Done")
+
         # copy lib
+        print("Do copy lib...", end="")
         new_src = P_DIR_PP_LIB
         new_dst = dst / "lib"
         shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
+        print("Done")
 
+        # copy venv
+        print("Do copy venv...", end="")
+        name_small = self._dict_cfg["__PP_NAME_SMALL__"]
+        venv_name = M.S_VENV_FMT_NAME.format(name_small)
+        new_src = self._dir_prj / venv_name
+        new_dst = dst / venv_name
+        if new_src.exists():
+            shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
         print("Done")
 
     # --------------------------------------------------------------------------
@@ -511,30 +528,46 @@ class PyBaker:
 
         print("Do extras/freeze... ", end="")
 
-        # run script to freeze venv reqs
-        cmd = self._dir_prj / M.S_VENV_FREEZE
-        F.sh(cmd)
+        # see if we have git
+        path_git = self._dir_prj / M.S_ALL_GIT
+        name_small = self._dict_cfg["__PP_NAME_SMALL__"]
+        venv_name = M.S_VENV_FMT_NAME.format(name_small)
+        path_venv = self._dir_prj / venv_name
+        if path_git.exists() and path_venv.exists():
 
-        print("Done")
+            # run script to freeze venv reqs
+            cmd = self._dir_prj / M.S_VENV_FREEZE
+            res = F.sh(cmd)
+            if res.returncode == 0:
+                print("Done")
+            else:
+                print("Failed")
+        else:
+            print("Failed")
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
 
         # see if we have git
         path_git = self._dir_prj / M.S_ALL_GIT
-        path_chg = self._dir_prj / B.S_CHANGELOG
         if path_git.exists():
-
             print("Do extras/CHANGELOG... ", end="")
 
-            # run the cmd
-            cmd = B.S_CHANGELOG_CMD
-            res = F.sh(cmd)
-            if res.returncode != 0:
-                with open(path_chg, "w", encoding="UTF8") as a_file:
-                    a_file.write(res.stdout)
+            path_chg = self._dir_prj / M.S_CHANGELOG
 
-            print("Done")
+            # run the cmd
+            # NB: cmd will fail if there are no entries in git
+            cmd = M.S_CHANGELOG_CMD
+            try:
+                res = F.sh(cmd)
+                if res.returncode == 0:
+                    with open(path_chg, "w", encoding="UTF8") as a_file:
+                        a_file.write(res.stdout)
+                    print("Done")
+                else:
+                    print("Failed")
+            except subprocess.CalledProcessError:
+                print("Failed")
 
         # ----------------------------------------------------------------------
         # tree
@@ -575,8 +608,20 @@ class PyBaker:
 
         if M.B_CMD_DOCS:
 
+            # move into src dir
+            # dir_src = self._dir_prj / M.S_ALL_SRC
+            # os.chdir(dir_src)
+
+            # # # update docs
+            # path_docs = self._dir_prj / M.S_ALL_DOCS
+            # cmd = M.S_CMD_DOCS.format(path_docs)
+            # F.sh(cmd)
+
             print("Do extras/docs... ", end="")
 
+            # FIXME: this is broken
+            # cmd = self._dir_prj / M.S_DOCS_SCRIPT
+            # F.sh(cmd)
             # create default docs
             name_docs = self._dict_rep["__PP_NAME_DOCS__"]
             path_docs = self._dir_prj / name_docs
@@ -627,8 +672,9 @@ class PyBaker:
             if root.name == M.S_ALL_SRC:
                 # for each file item
                 for item in files:
-                    name_desk = self._dict_prv["__PP_DESK_FILE__"]
-                    if item.name == name_desk:
+                #     name_desk = self._dict_prv["__PP_DESK_FILE__"]
+                #     if item.name == name_desk:
+                    if item.suffix == "desktop":
                         self._fix_desktop(item)
                     if item.suffix == "ui" or item.suffix == ".glade":
                         self._fix_gtk3(item)
@@ -637,8 +683,8 @@ class PyBaker:
         print("Do extras/i18n", end="")
 
         # do i18n stuff
+        print("Do extras/i18n... ", end="")
         self._do_i18n()
-
         print("Done")
 
     # --------------------------------------------------------------------------
@@ -971,14 +1017,14 @@ class PyBaker:
 
         # replace version
         ver = self._dict_meta["__PP_VERSION__"]
-        str_sch = B.S_META_VER_SEARCH
-        str_rep = B.S_META_VER_REPL.format(ver)
+        str_sch = M.S_META_VER_SEARCH
+        str_rep = M.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
         desc = self._dict_meta["__PP_SHORT_DESC__"]
-        str_sch = B.S_META_SD_SEARCH
-        str_rep = B.S_META_SD_REPL.format(desc)
+        str_sch = M.S_META_SD_SEARCH
+        str_rep = M.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
 
         # return the fixed line
@@ -1090,23 +1136,23 @@ class PyBaker:
             text = a_file.read()
 
         # replace version
-        str_pattern = B.S_TOML_VERSION_SEARCH
+        str_pattern = M.S_TOML_VERSION_SEARCH
         pp_version = self._dict_meta["__PP_VERSION__"]
         if pp_version == "":
             pp_version = M.S_VERSION
-        str_rep = B.S_TOML_VERSION_REPL.format(pp_version)
+        str_rep = M.S_TOML_VERSION_REPL.format(pp_version)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace short description
-        str_pattern = B.S_TOML_SHORT_DESC_SEARCH
+        str_pattern = M.S_TOML_SHORT_DESC_SEARCH
         pp_short_desc = self._dict_meta["__PP_SHORT_DESC__"]
-        str_rep = B.S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
+        str_rep = M.S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace keywords array
-        str_pattern = B.S_TOML_KW_SEARCH
+        str_pattern = M.S_TOML_KW_SEARCH
         kw_str = self._dict_prv[M.S_KEY_PRV_EXTRA]["__PP_KW_STR__"]
-        str_rep = B.S_TOML_KW_REPL.format(kw_str)
+        str_rep = M.S_TOML_KW_REPL.format(kw_str)
         text = re.sub(str_pattern, str_rep, text)
 
         # # replace dependencies array
@@ -1191,7 +1237,7 @@ class PyBaker:
         wanted_cats = self._dict_meta["__PP_GUI_CATS__"]
         for cat in wanted_cats:
             # category is valid
-            if cat in B.L_CATS:
+            if cat in M.L_CATS:
                 # add to final list
                 pp_gui_categories.append(cat)
             else:
@@ -1288,6 +1334,8 @@ class PyBaker:
         docstring
         """
 
+        # TODO: move this to user editable (no strings)
+
         # # dict of clangs and exts
         dict_in = {
             "Python": [
@@ -1348,10 +1396,6 @@ class PyBaker:
             / "desktop"
             / f"{name_small}.desktop",
         )
-
-        # get path to config file
-        # C_PATH_GUI = src / "cfg/__PP_NAME_SMALL__.json"
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

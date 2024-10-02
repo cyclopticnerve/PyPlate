@@ -1,0 +1,70 @@
+{
+    "PRJ_BL": {
+        "SKIP_ALL": [
+            ".git",
+            ".*venv*",
+            ".VSCodeCounter",
+            "docs",
+            "**/locale",
+            "**/po",
+            "misc",
+            "README",
+            "LICENSE.txt",
+            "requirements.txt",
+            "**/__pycache__",
+            "**/*.mo"
+        ],
+        "SKIP_CONTENTS": [
+            "**/*.png",
+            "**/*.jpg",
+            "**/*.jpeg"
+        ],
+        "SKIP_HEADER": [],
+        "SKIP_CODE": [
+            "MANIFEST.in",
+            ".gitignore",
+            "CHANGELOG.md"
+        ],
+        "SKIP_PATH": [],
+        "SKIP_TREE": [
+            ".git",
+            ".*venv*",
+            ".vscode",
+            ".VSCodeCounter",
+            "**/__pycache__"
+        ]
+    },
+    "PRJ_I18N": {
+        "CHARSET": "UTF-8",
+        "TYPES": [
+            "g"
+        ],
+        "CLANGS": {
+            "Python": [
+                "py"
+            ],
+            "Glade": [
+                ".ui",
+                ".glade"
+            ],
+            "Desktop": [
+                ".desktop"
+            ]
+        },
+        "NO_EXT": {
+            "Python": [
+                "guis_debug"
+            ]
+        },
+        "LOCALE": "locale",
+        "PO": "po"
+    },
+    "PRJ_META": {
+        "__PP_VERSION__": "0.0.0",
+        "__PP_SHORT_DESC__": "A program to create Python programs from a template",
+        "__PP_KEYWORDS__": [],
+        "__PP_PY_DEPS__": {},
+        "__PP_SYS_DEPS__": {},
+        "__PP_GUI_CATS__": []
+    }
+}

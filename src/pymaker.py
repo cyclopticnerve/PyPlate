@@ -27,14 +27,10 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
-# import os
 from pathlib import Path
 import re
 import shutil
 import sys
-
-# import shlex
-# import subprocess
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -47,14 +43,15 @@ import sys
 # path to this project
 # parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
-DIR_SELF = Path(__file__).parent.resolve()
 P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
+P_DIR_SUPPORT_CONF = P_DIR_PYPLATE / "src" / "support"
 sys.path.append(str(P_DIR_PYPLATE))
 sys.path.append(str(P_DIR_PP_LIB))
+sys.path.append(str(P_DIR_SUPPORT_CONF))
 
 # local imports
-from conf import pymaker_conf as M  # type: ignore
+from conf import pyplate_conf as M  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -639,6 +636,7 @@ class PyMaker:
         dict_edit = {
             M.S_KEY_PRJ_BL: M.D_BLACKLIST,
             M.S_KEY_PRJ_I18N: M.D_I18N,
+            M.S_KEY_PRJ_INSTALL: M.D_INSTALL,
         }
         F.save_dict(dict_edit, [path_edit])
 
@@ -724,6 +722,7 @@ class PyMaker:
             # run script to install venv reqs
             cmd = self._dir_prj / M.S_VENV_INSTALL
             F.sh(cmd)
+            F.sh(cmd)
 
             print("Done")
 
@@ -768,15 +767,15 @@ class PyMaker:
 
             print("Do extras/docs... ", end="")
 
-            # run script in project/pyplate/nope
-            cmd = self._dir_prj / M.S_DOCS_MAKE
-            F.sh(cmd)
+            # FIXME: this is broken
+            # cmd = self._dir_prj / M.S_DOCS_SCRIPT
+            # F.sh(cmd)
 
             print("Done")
 
     # --------------------------------------------------------------------------
+    # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-    # NB: these are minor steps called from the main steps
 
     # --------------------------------------------------------------------------
     # Set up and run the command line parser
