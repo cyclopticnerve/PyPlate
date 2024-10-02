@@ -21,6 +21,7 @@
    │     │     │     │     ├─ [] cninstall.py
    │     │     │     │     ├─ [] cninstaller.py
    │     │     │     │     └─ [] uninstallerator.py
+   │     │     │     ├─ [] cninstall~HEAD/
    │     │     │     └─ [] cnlib/
    │     │     │           ├─ [] __init__.py
    │     │     │           ├─ [] cncli.py
@@ -32,8 +33,22 @@
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] src/
    │     │     │     ├─ [] support/
-   │     │     │     │     └─ [] conf/
-   │     │     │     │           └─ [] pyplate_conf.py
+   │     │     │     │     ├─ [] conf/
+   │     │     │     │     │     └─ [] pyplate_conf.py
+   │     │     │     │     └─ [] i18n/
+   │     │     │     │           ├─ [] locale/
+   │     │     │     │           │     ├─ [] es/
+   │     │     │     │           │     │     └─ [] LC_MESSAGES/
+   │     │     │     │           │     ├─ [] pq/
+   │     │     │     │           │     │     └─ [] LC_MESSAGES/
+   │     │     │     │           │     └─ [] xo/
+   │     │     │     │           │           └─ [] LC_MESSAGES/
+   │     │     │     │           └─ [] po/
+   │     │     │     │                 ├─ [] es.po
+   │     │     │     │                 ├─ [] guis_debug.pot
+   │     │     │     │                 ├─ [] LINGUAS
+   │     │     │     │                 ├─ [] pq.po
+   │     │     │     │                 └─ [] xo.po
    │     │     │     ├─ [] pybaker.py
    │     │     │     └─ [] pymaker.py
    │     │     ├─ [] CHANGELOG.md
@@ -62,6 +77,7 @@
    │     │     ├─ [] cninstall.py
    │     │     ├─ [] cninstaller.py
    │     │     └─ [] uninstallerator.py
+   │     ├─ [] cninstall~HEAD/
    │     └─ [] cnlib/
    │           ├─ [] __init__.py
    │           ├─ [] cncli.py
@@ -94,8 +110,22 @@
    │     └─ [] ABOUT
    ├─ [] src/
    │     ├─ [] support/
-   │     │     └─ [] conf/
-   │     │           └─ [] pyplate_conf.py
+   │     │     ├─ [] conf/
+   │     │     │     └─ [] pyplate_conf.py
+   │     │     └─ [] i18n/
+   │     │           ├─ [] locale/
+   │     │           │     ├─ [] es/
+   │     │           │     │     └─ [] LC_MESSAGES/
+   │     │           │     ├─ [] pq/
+   │     │           │     │     └─ [] LC_MESSAGES/
+   │     │           │     └─ [] xo/
+   │     │           │           └─ [] LC_MESSAGES/
+   │     │           └─ [] po/
+   │     │                 ├─ [] es.po
+   │     │                 ├─ [] guis_debug.pot
+   │     │                 ├─ [] LINGUAS
+   │     │                 ├─ [] pq.po
+   │     │                 └─ [] xo.po
    │     ├─ [] pybaker.py
    │     └─ [] pymaker.py
    ├─ [] template/
