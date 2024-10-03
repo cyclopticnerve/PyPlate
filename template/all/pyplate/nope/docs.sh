@@ -18,6 +18,6 @@ cd $SCRIPT_DIR/../..
 
 . __PP_NAME_VENV__/bin/activate
 # run docs on project's src dir
-python -m pdoc --html -f -o __PP_DOCS_NAME__ .
+python -m pdoc --html -f -o __PP_DOCS_NAME__ src
 
 # -)

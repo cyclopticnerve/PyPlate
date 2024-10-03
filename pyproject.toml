@@ -15,7 +15,7 @@ build-backend = "setuptools.build_meta"
 # they are only here to satisfy the linter
 # NB: this would normally come from the tool, but running the tool on the tool
 # seems redundant (and probably wouldn't work), so we enter it manually
-name = "pymaker"
+name = "pyplate"
 version = "0.0.1"
 description = "A program for creating CLI/Package/GUI projects in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
@@ -29,7 +29,7 @@ classifiers = [
 ]
 keywords = [
         "python",
-        "python",
+        "Python",
         "cli",
         "CLI",
         "gui",

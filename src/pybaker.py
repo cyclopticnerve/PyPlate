@@ -219,7 +219,7 @@ class PyBaker:
 
         # debug turns off some _do_extras features
         if self._debug:
-            # M.B_CMD_DOCS = False
+            M.B_CMD_DOCS = False
             M.B_CMD_TREE = False
 
         # set flag dicts to defaults
@@ -620,23 +620,8 @@ class PyBaker:
             print("Do extras/docs... ", end="")
 
             # FIXME: this is broken
+            # update docs
             # cmd = self._dir_prj / M.S_DOCS_SCRIPT
-            # F.sh(cmd)
-            # create default docs
-            name_docs = self._dict_rep["__PP_NAME_DOCS__"]
-            path_docs = self._dir_prj / name_docs
-            cmd = M.S_CMD_DOCS.format(path_docs)
-            F.sh(cmd)
-
-            # ------------------------------------------------------------------
-
-            # # move into src dir
-            # dir_src = self._dir_prj / M.S_ALL_SRC
-            # os.chdir(dir_src)
-
-            # # # update docs
-            # path_docs = self._dir_prj / M.S_ALL_DOCS
-            # cmd = M.S_CMD_DOCS.format(path_docs)
             # F.sh(cmd)
 
             print("Done")
@@ -672,8 +657,8 @@ class PyBaker:
             if root.name == M.S_ALL_SRC:
                 # for each file item
                 for item in files:
-                #     name_desk = self._dict_prv["__PP_DESK_FILE__"]
-                #     if item.name == name_desk:
+                    #     name_desk = self._dict_prv["__PP_DESK_FILE__"]
+                    #     if item.name == name_desk:
                     if item.suffix == "desktop":
                         self._fix_desktop(item)
                     if item.suffix == "ui" or item.suffix == ".glade":

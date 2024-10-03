@@ -57,7 +57,7 @@ project as its development continues.
 Let us start with 'pymaker.py'.
 
 ## PyMaker.py
-Before you do anything, you should edit the 'user.json' file in 'PyPlate/conf'.
+Before you do anything, you should edit the 'pyplate_conf.json' file in 'PyPlate/pyplate'.
 This file contains your personal information that is used when creating a new
 project. These are one-time-only values and will not be updated automatically
 later.  

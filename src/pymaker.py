@@ -239,7 +239,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # maybe yell
 
-        if self._dict_args.get(S_DBG_DEST, False):
+        if self._debug:
 
             # yep, yell
             print(M.S_ERR_DEBUG)
@@ -286,7 +286,7 @@ class PyMaker:
         tmp_dir = ""
 
         # if in debug mode
-        if self._dict_args.get(S_DBG_DEST, False):
+        if self._debug:
 
             # get debug name of project
             prj_name = f"{dir_prj_type}_DEBUG"
@@ -346,10 +346,7 @@ class PyMaker:
         name_sec = name_small
 
         # if not debug, if need second name, ask for it
-        if (
-            not self._dict_args.get(S_DBG_DEST, False)
-            and prj_type in M.D_NAME_SEC
-        ):
+        if not self._debug and prj_type in M.D_NAME_SEC:
 
             # format question for second name
             s_name_sec = M.D_NAME_SEC[prj_type]
