@@ -84,8 +84,8 @@ foo@bar:~$ python -m pip uninstall __PP_NAME_SMALL__
 <!-- __RM_PKG_END__ -->
 <!-- __RM_APP_START__ -->
 ```bash
-foo@bar:~$ cd ~/.__PP_AUTHOR__/__PP_NAME_SMALL__
-foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
+foo@bar:~$ cd ~/.config/__PP_NAME_SMALL__/conf
+foo@bar:~/.config//__PP_NAME_SMALL__/conf$ ./uninstall.sh
 ```
 <!-- __RM_APP_END__ -->
 

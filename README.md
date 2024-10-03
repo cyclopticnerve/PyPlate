@@ -15,39 +15,33 @@
 A program for creating CLI/Package/GUI projects in Python from a template
 
 ## Requirements
-None
+[Python 3.10+](https://www.python.org/)
 
 ## Installing
-You can download the (hopefully stable) [latest
+1. Download the (hopefully stable) [latest
 release](https://github.com/cyclopticnerve/PyPlate/releases/latest) from the
-main branch.<br>
-Download either the 'tar.gz' or 'zip' file and extract it.<br>
-Go into the extracted folder and run the installer.
+main branch. Select  either the 'tar.gz' or 'zip' file
+2. Extract/unzip the file.
+3. Go into the extracted folder and run the installer:
 ```bash
-cd ~/Documents/Downloads/PyPlate-<version>$ ./install.sh
+foo@bar:~/Documents/Downloads/PyPlate-<version>$ ./install.sh
 ```
 
-Rename the folder without the version, e.g. 'PyPlate-0.1.0' to 'PyPlate'.
-
-Or you can clone the git repo to get the latest (and often broken) code from the
-dev branch:
+Or you can clone the git repo to get the latest (and often broken) code from
+the dev branch:
 ```bash
 foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
-cd ~/Documents/Downloads/PyPlate-<version>$ ./install.sh
+foo@bar:~/Downloads$ cd ~/Documents/Downloads/PyPlate-<version>
+foo@bar:~/Documents/Downloads/PyPlate-<version>$ ./install.sh
 ```
-
-Next, cut/copy/paste the 'PyPlate' directory wherever you want. For the examples
-below, we will use '~/Documents/Projects/Python/'.
-```bash
-foo@bar:~/Downloads$ mv PyPlate ~/Documents/Projects/Python
-```
-
-Lastly, you can delete the downloaded folder, if you copied it.
 
 ## Uninstalling
-Just delete the 'PyPlate' folder from wherever you put it in the install step. 
-PyPlate does not install anything on your system.
+Go to the config folder for PyPlate and run the uninstaller:
+```bash
+foo@bar:~$ cd ~/.config/pyplate/conf
+foo@bar:~/.config/pyplate/conf$ ./uninstall.sh
+```
 
 ## Usage
 PyPlate consists of two main scripts, 'pymaker.py' and 'pybaker.py'. The first
@@ -57,306 +51,74 @@ project as its development continues.
 Let us start with 'pymaker.py'.
 
 ## PyMaker.py
-Before you do anything, you should edit the 'pyplate_conf.json' file in 'PyPlate/pyplate'.
-This file contains your personal information that is used when creating a new
-project. These are one-time-only values and will not be updated automatically
-later.  
+Before you do anything, you should take a look at the 'pyplate_conf.py' file in
+'~/.config/pyplate/conf'. This file contains A LOT of information that is used
+when creating/building a project. Most of these are string values and
+file/folder names used in the program, which you are free to change. PyPlate
+does not yet support i18n/l10n, but that may be included at a later date.  
+In the future, the installer will ask you for this information, so you only
+have to enter it at install time.
 
-The fields should be pretty self-explanatory, but here is a brief description of
-each:
+### One important thing to note:  
+By default, PyPlate will create it's projects in '~/Documents/Projects/Python'.
+To change this, edit this value in ~/.conf/pyplate/conf/pyplate_conf.py:
 
-### PP_AUTHOR
-The name to use for 'Author' in headers and pyproject.toml
-
-### PP_DATE_FMT
-The date format to use in headers
-
-### PP_EMAIL
-The email address to use in pyproject.toml
-
-### PP_LICENSE
-The license to use in headers
-
-You may also want to edit the 'types.json' file in 'PyPlate/conf'. The default
-file looks like this:
+```python
+S_BASE_DIR = "~/Documents/Projects/Python"
 ```
-{
-    "c": [
-        "CLI",
-        "CLIs",
-        "cli"
-    ],
-    "g": [
-        "GUI",
-        "GUIs",
-        "gui"
-    ],
-    "p": [
-        "Package",
-        "Packages",
-        "pkg"
-    ]
-}
-```
-The structure of each entry looks like this:
-```
-{
-    'short_type_name': {
-        ['long_type_name', 'destination_folder', 'source_folder']
-    }
-}
-```
-where:
+Again, this is a feature which should be handled by the installer, and I am
+working on it.
 
-### short_type_name
-A single letter (like 'c' for CLI projects)
+This file also contains some functions that are run at various times during
+creating/building the project, such as before copying files, after copying
+files, etc.
+These functions have been extended to the config file so you don't have to do a
+lot of mucking around in the source code, so be sure to take a look at those too.
 
-### long_type_name
-The name to display when asking for a project type (ie. 'CLI')
-
-### destination_folder
-The name of the folder under 'DIR_BASE' (explained below) to put the project in  
-
-### source_folder
-The folder under 'PyPlate/template' that the source files reside
-
-This allows you to add/edit/delete project types, as well as their displayed
-names and source\destination folders.
-
-Next, to create a project, cd into the 'PyPlate/src' directory, and run
-'pymaker.py':
-``` bash
-foo@bar:~$ cd ~/Documents/Projects/Python/PyPlate/src
-foo@bar:~/Documents/Projects/Python/PyPlate/src$ ./pymaker.py
+Now run the script from the command line:
+```bash
+foo@bar:~$ pymaker.py
 ```
 
 Enter the required information, and 'pymaker.py' will create the required files
-and folders in a subdirectory of 'DIR_BASE', where 'DIR_BASE' is the directory
-above 'PyPlate'. In our example, 'DIR_BASE' is '~/Documents/Projects/Python'.
+and folders in a subdirectory of 'S_BASE_DIR'. The project will eventually be
+created in 'S_BASE_DIR/TYPE/PRJ_NAME', where:
+1. 'S_BASE_DIR' is the base directory (as explained above)
+2. 'TYPE' is the type of project 
+   * 'CLIs' for a command line program
+   * 'PKGs' for a package
+   * 'GUIs' for a GTK3/4 application
+3. 'PRJ_NAME' as the project name entered when creating the project
 
 So, from all of our assumptions above, if the project type is 'c', and the
-project name is 'CLITest', then the project will be created in
-'~/Documents/Projects/Python/CLIs/CLITest'.
+project name is 'CLI_Test', then the project will be created in
+'~/Documents/Projects/Python/CLIs/CLI_Test'.
 
 That's it! From there you are free to modify the projects in your favorite IDE.
 
-<hr>
-
 ## PyBaker.py / Updating the project
-Once you have created a project, you can use 'pybaker.py' in the project's
-'conf' directory to update metadata in the project's files.
+Once you have created a project, you can use 'pybaker.sh' in the project's
+'pyplate' directory to update metadata in the project's files and create a
+'dist' folder.
+If you are using VSCode, you can select 'Terminal/Run Build Task...' from the
+menu bar or press 'Ctrl+Shift+B'.
 
-'pybaker.py' is a script which will replace certain keywords in the project
-directory. These keywords are placed in files in the 'conf' directory of your
-project. These files are explained below.
+'pybaker.py' is a script which will replace certain values in the project
+directory. These values are placed in the 'project.json' file in your
+project's 'pyplate/project.json' file. Things like version number, short
+description, and other values that might change during a project's lifecycle
+are placed here.
 
-The files in the 'conf' directory can be edited at any time (except
-'settings.json'), followed by re-running 'pybaker.py'. The script uses regular
-expressions to search for context (i.e. text before and after the replacement)
-so as long as the context does not change, 'pybaker.py' can replace text at any
-time. 
+The values in the ''pyplate/project.json' file can be edited at any time,
+followed by re-running 'pybaker.py'.
 
-## Blacklist.json
-You should edit this file by hand before running 'pybaker.py'. This file is used
-by 'pybaker.py' to determine which files/folders it can (or rather, *can't*)
-operate on.
-
-Files in the new project are divided, internally, into four categories:
-1. the file or directory's COMPLETE contents
-2. the file's headers
-3. the file's text (other than the header)
-4. the path to the file
-
-The default 'blacklist.json' file should look something like this:
-
+Note that pybaer.py has one required parameter: the directory of the project
+you wish to bake:
+```bash
+foo@bar:~$ pybaker.py ~/Documents/Projects/Python/MyApp
 ```
-{
-    "skip_all": [
-        ".venv",
-        ".git",
-        "dist",
-        "docs",
-        "misc",
-        "tests",
-        "__pycache__",
-        "PKG-INFO",
-        "locale"
-    ],
-    "skip_file": [
-        "__PP_NAME_SMALL__.png"
-    ],
-    "skip_header": [],
-    "skip_text": [
-        "pybaker.py",
-        "settings.json",
-        "strings.json"
-    ],
-    "skip_path": []
-}
-```
-
-The individual entries are:
-
-### skip_all
-A list of folders/files for which NOTHING should be done. Don't fix headers,
-text, or path. Leave them untouched.
-
-This section is usually used for files/folders which DO NOT belong to you, or
-are auto-generated outside your project.
-
-### skip_file
-'pybaker.py' may fix the path, but not the internal contents of the file.
-
-This is equivalent to placing the same file in both 'skip_header' and
-'skip_text'.
-
-This section is used for things like images, where the contents of the file are
-not text, but you may want to fix the filename.
-
-### skip_header
-'pybaker.py' may fix the contents of the file, as well as the path, but not the
-header contents.
-
-This section is rarely used.
-
-### skip_text
-'pybaker.py' may fix the header, as well as the path, but not the other contents
-of the file.
-
-This section is commonly used for config files where the header should match the
-project, but the contents should not be altered. 
-
-*Note that 'skip_text' should ALWAYS include 'pybaker.py', 'settings.json', and
-'strings.json', and should NEVER include 'blacklist.json'. This is because these
-files have certain keywords which need to be replaced (or not replaced) in order
-for 'pybaker.py' to function correctly.*
-
-### skip_path
-'pybaker.py' may fix the header, as well as the contents, but not the path of
-the file.
-
-This section is rarely used.
-
-## Strings.json
-You should edit this file by hand before running 'pybaker.py'. This file is used
-by 'pybaker.py' to determine what strings should be replaced in the project.
-
-This is a sample structure of 'strings.json':
-
-```
-{
-    "PP_VERSION": "0.1.0",
-    "PP_SHORT_DESC": "A program for creating module/package/CLI/GUI projects in Python from a template",
-    "PP_KEYWORDS": ["key", "word"],
-    "PP_PY_DEPS": {
-        "numpy", "https://numpy.org/",
-    },
-    "PP_SYS_DEPS": ["dep1", "dep2"],
-    "PP_GUI_CATEGORIES": ["cat1", "cat2"]
-}
-```
-
-The individual entries are:
-
-### PP_VERSION
-This is the canonical (only and absolute) version number string for this
-project. This should provide the absolute version number string (in [semantic
-notation](https://semver.org/)) of this project, and all other version numbers
-should be superseded by this string. Value is a string.
-
-### PP_SHORT_DESC
-This is the short description of the project, used in 'README.md' and
-'pyproject.toml', as well as the GUI "About" dialog. Value is a string.
-
-### PP_KEYWORDS
-This is an array of keywords for the project, for use in 'pyproject.toml' for
-the PyPI listing, and should also be used in the GitHub project page. Value is
-an array, with each value quoted, and separated by a comma.
-
-### PP_PY_DEPS
-This is an array of Python dependencies for the project. They are stored here
-for 'install.py', 'pyproject.toml', and 'README.md.' It is a dictionary where
-the key is the dependency name, and the value is a link to some web page (for
-'README.md'). When used in 'pyproject.toml' or 'install.py', it will be
-automatically downloaded by pip using just the dependency name.
-
-### PP_SYS_DEPS
-This is an array of system dependencies for the project, i.e non-python
-dependencies. They are stored here for 'install.py.'  Value is an array, with
-each value quoted, and separated by a comma.
-
-### PP_GUI_CATEGORIES
-This is an array of categories used in the '.desktop' file of a GUI program, to
-present in a menu-based Desktop UI (think windows start menu grouping). Value is
-an array, with each value separated by a semicolon, and must end with a 
-semicolon.  
-
-Each entry must match an entry in the list found
-[here](https://specifications.freedesktop.org/menu-spec/latest/apa.html).
-If the entry does not match, it will be ignored, and an error will be printed.
-
-## Settings.json
-
-You should NOT edit this file by hand. It is created when PyPlate creates a new
-project, and the dictionary is filled automatically. This file is used by
-'pybaker.py' to get the initial project settings.
-
-It is explained here only to show what it contains.
-
-This the basic structure of 'settings.json':
-
-```
-{
-    "project": {
-        "type": "c"
-    },
-    "info": {
-        "__PP_NAME_BIG__": "CLITest",
-        "__PP_NAME_SMALL__": "clitest",
-        "__PP_DATE__": "06/23/2023"
-    }
-}
-```
-
-And here is an explanation of what it contains:
-
-## Project
-
-### Type
-
-Indicates the type of project: "c" for CLI, "g" for PyGObject GUI, or "p" for 
-package.
-
-## Info
-
-### \_\_PP_NAME_BIG__
-
-The properly capitalized name of the project, for use in strings displayed to
-the user.
-
-### \_\_PP_NAME_SMALL__
-
-The lowercase version of the project name, used internally by pymaker.py and
-pybaker.py.
-
-### \_\_PP_DATE__
-
-The date the project was created, used internally by pymaker.py and pybaker.py.
-
-<hr>
-
-After these files have been edited appropriately, run 'pybaker.py' from the
-'conf' directory to update the metadata in the project. This module can be run
-any time AFTER the project has been created to update the metadata in the
-project. Here is an example for a project of type 'c' (CLI) named 'CLITest':
-
-``` bash
-foo@bar:~$ cd ~/Documents/Projects/Python/CLIs/CLITest/conf
-foo@bar:~/Documents/Projects/Python/CLIs/CLITest/conf$ ./pybaker.py
-```
-
-'clitest.py' will print any errors it finds, along with the filename and line
-number, so you can correct them.
+but this should be easy to do with any tool you use.  
+When using VSCode, this is done for you.,
 
 ## Notes
 If you make any changes to this template to better suit your own style/setup,

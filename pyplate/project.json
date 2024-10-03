@@ -2,7 +2,7 @@
     "PRJ_BL": {
         "SKIP_ALL": [
             ".git",
-            ".*venv*",
+            ".**/.venv*",
             ".VSCodeCounter",
             "docs",
             "**/locale",

@@ -45,6 +45,8 @@ I_SW_FALSE = 0
 # Strings
 # ------------------------------------------------------------------------------
 
+S_BASE_DIR = "~/Documents/Projects/Python"
+
 # current version
 S_VERSION = "0.0.1"
 

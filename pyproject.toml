@@ -11,10 +11,8 @@ requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-# some of these values will be replaced by either pymaker.py or pybaker.py
-# they are only here to satisfy the linter
-# NB: this would normally come from the tool, but running the tool on the tool
-# seems redundant (and probably wouldn't work), so we enter it manually
+# NB: some of these values would normally come from pymaker, but since this IS
+# pymaker, we need to enter it manually (aka bootstrap)
 name = "pyplate"
 version = "0.0.1"
 description = "A program for creating CLI/Package/GUI projects in Python from a template"
@@ -28,23 +26,17 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 keywords = [
-        "python",
-        "Python",
-        "cli",
-        "CLI",
-        "gui",
-        "GUI",
-        "Package",
-        "package",
-        "GTK3",
-        "GTK",
-        "gtk3",
-        "gtk",
-        "PyGObject",
-        "PyGTK",
-        "template,",
-        "app"
-   ]
+    "Python",
+    "cli",
+    "gui",
+    "package",
+    "gtk3",
+    "gtk",
+    "PyGObject",
+    "PyGTK",
+    "template,",
+    "app",
+]
 dependencies = []
 requires-python = ">=3.10"
 

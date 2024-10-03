@@ -9,6 +9,9 @@
 
 # pylint: disable=too-many-lines
 
+# FIXME: use S_BASE_DIR instead of sister dir for proj base dir
+# FIXME: use 1st param as prj dir
+
 """
 A program to create a PyPlate project from a few variables
 

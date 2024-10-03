@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "./pybaker.sh",
             "options": {
-                "cwd": "pyplate/nope"
+                "cwd": "pyplate"
             },
             "problemMatcher": [],
             "group": {
