@@ -12,9 +12,9 @@
 #
 
 # get the project directory (should always be two levels up)
-PRJ_DIR=$( cd ../.. && pwd)
+PRJ_DIR=$(cd ../.. && pwd)
 
 # pass the project dir to the real pybaker.py
-~/Documents/Projects/Python/PyPlate/src/pybaker.py -f $PRJ_DIR
+~/Documents/Projects/Python/PyPlate/src/pybaker.py $PRJ_DIR
 
 # -)

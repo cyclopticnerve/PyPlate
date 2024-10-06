@@ -8,7 +8,7 @@
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
-
+# FIXME: use 1st param as prj dir
 """
 A program to change the metadata of a PyPlate project and create a dist
 
@@ -477,7 +477,7 @@ class PyBaker:
         print("Do copy files... ", end="")
 
         # list of files/folders from project to include in dist
-        src = M.L_SRC
+        src = M.L_DIST
         # and where to put it
         dst = Path(self._dir_prj) / M.S_DST / M.S_ASSETS
 

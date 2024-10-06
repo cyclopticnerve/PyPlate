@@ -45,15 +45,10 @@ I_SW_FALSE = 0
 # Strings
 # ------------------------------------------------------------------------------
 
-S_BASE_DIR = "~/Documents/Projects/Python"
-
-# current version
-S_VERSION = "0.0.1"
-
 # base dir for project type folders, relative to dev home
-S_DIR_BASE = "Documents/Projects/Python"
+S_DIR_PRJ_BASE = "Documents/Projects/Python"
 
-# NB: format params are keys in D_TYPES and D_TYPES[key][0]
+# NB: format params are keys in L_TYPES[0] and L_TYPES[1]
 S_TYPE_FMT = "{} ({})"
 # join each project type with this
 S_TYPE_JOIN = " | "
@@ -121,6 +116,7 @@ S_KEY_PAD = "S_KEY_GRP_PAD"
 S_KEY_SWITCH = "S_KEY_SWITCH"
 S_KEY_COMM = "S_KEY_COMM"
 S_KEY_SPLIT = "S_KEY_SPLIT"
+S_KEY_SPLIT_INDEX = "S_KEY_SPLIT_INDEX"
 
 S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
@@ -131,28 +127,28 @@ S_KEY_NAME_MID = "S_KEY_NAME_MID"
 # and make any appropriate changes
 # also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
-S_ALL_GIT = ".git"
-S_ALL_CONF = "conf"
-S_ALL_DIST = "dist"
-S_ALL_DOCS = "docs"
-S_ALL_MISC = "misc"
-S_ALL_README = "README"
-S_ALL_SRC = "src"
-S_ALL_SUPPORT = "support"
-S_ALL_I18N = "i18n"
-S_ALL_IMAGES = "images"
-S_ALL_LOCALE = "locale"
-S_ALL_PO = "po"
-S_ALL_TESTS = "tests"
+S_DIR_TEMPLATE = "template"
+S_DIR_ALL = "all"
+S_DIR_GIT = ".git"
+S_DIR_CONF = "conf"
+S_DIR_DIST = "dist"
+S_DIR_ASSETS = "assets"
+S_DIR_DOCS = "docs"
+S_DIR_MISC = "misc"
+S_DIR_README = "README"
+S_DIR_SRC = "src"
+S_DIR_SUPPORT = "support"
+S_DIR_I18N = "i18n"
+S_DIR_IMAGES = "images"
+S_DIR_LOCALE = "locale"
+S_DIR_PO = "po"
+S_DIR_TESTS = "tests"
 
 # initial location of project (to check for dups)
-S_HOME = str(Path.home()).rstrip("/")
-S_DIR_PRJ = (
-    f"{S_HOME}/{S_DIR_BASE}/"  # /home/cn/Documents/Projects/Python/
-    "{}"  # prj type dir
-    f"/"  # /
-    "{}"  # prj name
-)
+# /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
+# NB: format params are project type and project name
+S_DIR_BASE = str(Path.home() / S_DIR_PRJ_BASE)
+S_DIR_PRJ = S_DIR_BASE + "/{}/{}"
 
 # paths relative to end user home only
 S_USR_CONF = ".config"  # __PP_NAME_SMALL__ will be appended
@@ -169,7 +165,7 @@ S_CMD_DOCS = "python -m pdoc --html -f -o {} ."
 
 # formats for tree
 S_TREE_NAME = "tree.txt"
-S_TREE_FILE = f"{S_ALL_MISC}/{S_TREE_NAME}"
+S_TREE_FILE = f"{S_DIR_MISC}/{S_TREE_NAME}"
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
@@ -231,7 +227,7 @@ S_META_SD_REPL = r'\g<1>"{}"'
 
 S_DST = "dist"
 S_ASSETS = "assets"
-S_FILE_INSTALL = f"{S_ALL_CONF}/install.json"
+S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
 
 # S_ERR_COUNT = "Errors: {}"
 # S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
@@ -242,6 +238,18 @@ S_FILE_INSTALL = f"{S_ALL_CONF}/install.json"
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
+
+# the types of projects this script can create
+# val[0] is the char to enter (short, display only)
+# val[1] is the display name in the cli (long, display only)
+# val[2] is the template folder to use (template/subdir)
+# val[3] is the name of the folder under S_DIR_PRJ_BASE in which to place the
+# project (prj_dir)
+L_TYPES = [
+    ["c", "CLI", "cli", "CLIs"],
+    ["g", "GUI", "gui", "GUIs"],
+    ["p", "Package", "pkg", "Packages"],
+]
 
 # list of file types to use md/html/xml fixer
 L_MARKUP = [
@@ -255,14 +263,14 @@ L_MARKUP = [
 # files to remove after the project is done
 # paths are relative to project dir
 L_PURGE = [
-    Path(S_ALL_SRC) / "ABOUT",
+    Path(S_DIR_SRC) / "ABOUT",
 ]
 
 # folders to put in dist
-L_SRC = [
+L_DIST = [
     "conf",
     "README",
-    S_ALL_SRC,
+    S_DIR_SRC,
     "CHANGELOG.md",
     "LICENSE.txt",
     "README.md",
@@ -474,11 +482,6 @@ D_PRV_DEF = {
     "__PP_README_FILE__": "README.md",
     "__PP_TOML_FILE__": "pyproject.toml",
     "__PP_REQS_FILE__": "requirements.txt",
-    # these two are holding areas for calculated string
-    "__PP_KW_STR__": "",
-    "__PP_RM_DEPS__": "",
-    # name of assets folder in dist
-    "__PP_ASSETS__": "assets",  # just a sensible default
 }
 
 # these values are string replace only
@@ -487,15 +490,15 @@ D_PRV_DIST_DIRS = {
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home dir
     # location of config files, relative to the project dir
-    "__PP_DEV_CONF__": S_ALL_CONF,
+    "__PP_DEV_CONF__": S_DIR_CONF,
     # location of src files, relative to the project dir
-    "__PP_DEV_SRC__": S_ALL_SRC,
+    "__PP_DEV_SRC__": S_DIR_SRC,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
-    "__PP_SUPPORT__": S_ALL_SUPPORT,  # where is rest of code
-    "__PP_IMAGES__": S_ALL_IMAGES,  # where gui images are stored
+    "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
+    "__PP_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -510,6 +513,7 @@ D_PRV_CFG = {
     "__PP_DATE__": "",  # the date each file was created, updated every time
     "__PP_DUMMY__": "",  # dummy value to use in headers
     "__PP_NAME_VENV__": ".venv",  # just a sensible default
+    "__PP_NAME_DOCS__": S_DIR_DOCS,
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
     # "__PP_DEV_LIB__": "",  # location of cnlibs dir in PyPlate
@@ -519,50 +523,9 @@ D_PRV_CFG = {
     "__PP_USR_CONF__": "",  # config dir
     "__PP_USR_LIB__": "",  # location of cnlibs dir
     "__PP_USR_SRC__": "",  # where the program will keep it's source
-}
-
-# these values are string replace only
-D_PRV_EXTRA = {}
-
-# these are settings that will be changed before running pybaker.py
-# consider them the "after create" settings
-D_PRJ_META = {
-    # the version number to use in __PP_README_FILE__ and pyproject.toml
-    "__PP_VERSION__": "0.0.0",
-    # the short description to use in __PP_README_FILE__ and pyproject.toml
-    "__PP_SHORT_DESC__": "Short description",
-    # the keywords to use in pyproject.toml and github
-    "__PP_KEYWORDS__": [],
-    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
-    # github, and install.py
-    # key is dep name, val is link to dep (optional)
-    "__PP_PY_DEPS__": {},
-    # the system dependencies to use in __PP_README_FILE__, github.com, and
-    # install.py
-    # key is dep name, val is link to dep (optional)
-    "__PP_SYS_DEPS__": {},
-    # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
-    "__PP_GUI_CATS__": [],
-}
-
-D_INSTALL = {
-    "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
-    "preflight": [],
-    "sys_reqs": [],
-    "py_reqs": [],
-    "content": {},
-    "postflight": [],
-}
-
-# the types of projects this script can create
-# key is the short display name and the char to enter
-# value[0] is the long display name
-# value[1] is the template folder to copy
-# value[2] is the top level folder to put each project in
-D_TYPES = {
-    "c": ["CLI", "cli", "CLIs"],
-    "p": ["Package", "pkg", "Packages"],
-    "g": ["GUI", "gui", "GUIs"],
+    # these two are holding areas for calculated string
+    "__PP_KW_STR__": "",
+    "__PP_RM_DEPS__": "",
 }
 
 # the lists of dirs/files we don't mess with while running pymaker
@@ -581,13 +544,13 @@ D_BLACKLIST = {
         # ".vscode",
         "**/*venv*",
         ".VSCodeCounter",
-        # S_ALL_CONF,
-        # S_ALL_DIST,
-        S_ALL_DOCS,
-        f"**/{S_ALL_LOCALE}",
-        f"**/{S_ALL_PO}",
-        S_ALL_MISC,
-        S_ALL_README,
+        # S_DIR_CONF,
+        # S_DIR_DIST,
+        S_DIR_DOCS,
+        f"**/{S_DIR_LOCALE}",
+        f"**/{S_DIR_PO}",
+        S_DIR_MISC,
+        S_DIR_README,
         D_PRV_DEF["__PP_LICENSE_FILE__"],
         D_PRV_DEF["__PP_REQS_FILE__"],
         "**/__pycache__",
@@ -650,8 +613,39 @@ D_I18N = {
             "__PP_NAME_SMALL__",
         ],
     },
-    S_KEY_LOCALE: S_ALL_LOCALE,
-    S_KEY_PO: S_ALL_PO,
+    S_KEY_LOCALE: S_DIR_LOCALE,
+    S_KEY_PO: S_DIR_PO,
+}
+
+# dict for install script
+D_INSTALL = {
+    "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
+    "preflight": [],
+    "sys_reqs": [],
+    "py_reqs": [],
+    "content": {},
+    "postflight": [],
+}
+
+# these are settings that will be changed before running pybaker.py
+# consider them the "after create" settings
+D_PRJ_META = {
+    # the version number to use in __PP_README_FILE__ and pyproject.toml
+    "__PP_VERSION__": "0.0.0",
+    # the short description to use in __PP_README_FILE__ and pyproject.toml
+    "__PP_SHORT_DESC__": "Short description",
+    # the keywords to use in pyproject.toml and github
+    "__PP_KEYWORDS__": [],
+    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
+    # github, and install.py
+    # key is dep name, val is link to dep (optional)
+    "__PP_PY_DEPS__": {},
+    # the system dependencies to use in __PP_README_FILE__, github.com, and
+    # install.py
+    # key is dep name, val is link to dep (optional)
+    "__PP_SYS_DEPS__": {},
+    # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
+    "__PP_GUI_CATS__": [],
 }
 
 # dict of files that should be copied from the PyPlate project to the resulting
@@ -661,12 +655,12 @@ D_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
-    f"{S_ALL_MISC}/cnlibs.py": f"{S_ALL_MISC}/cnlibs.py",
-    f"{S_ALL_MISC}/default_class.py": f"{S_ALL_MISC}/default_class.py",
-    f"{S_ALL_MISC}/default_mod.py": f"{S_ALL_MISC}/default_mod.py",
-    f"{S_ALL_MISC}/snippets.txt": f"{S_ALL_MISC}/snippets.txt",
-    f"{S_ALL_MISC}/style.txt": f"{S_ALL_MISC}/style.txt",
-    "lib": f"{S_ALL_SRC}/{S_ALL_SUPPORT}/{S_USR_LIB_NAME}",
+    f"{S_DIR_MISC}/cnlibs.py": f"{S_DIR_MISC}/cnlibs.py",
+    f"{S_DIR_MISC}/default_class.py": f"{S_DIR_MISC}/default_class.py",
+    f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
+    f"{S_DIR_MISC}/snippets.txt": f"{S_DIR_MISC}/snippets.txt",
+    f"{S_DIR_MISC}/style.txt": f"{S_DIR_MISC}/style.txt",
+    "lib": f"{S_DIR_SRC}/{S_DIR_SUPPORT}/{S_USR_LIB_NAME}",
 }
 
 # the info for matching/fixing lines in markup files
@@ -681,6 +675,7 @@ D_MU_REPL = {
     ),
     S_KEY_COMM: r"^\s*<!--(.*)-->\s*$",
     S_KEY_SPLIT: r"(\'|\")([^\'\"\n]+)(\'|\")|(<!--.*-->)$",
+    S_KEY_SPLIT_INDEX: 4,
 }
 
 # the info for matching/fixing lines in non-markup files
@@ -695,6 +690,7 @@ D_PY_REPL = {
     ),
     S_KEY_COMM: r"^\s*#",
     S_KEY_SPLIT: r"(\'|\")([^\'\"\n]+)(\'|\")|(#.*)$",
+    S_KEY_SPLIT_INDEX: 4,
 }
 
 # the type of projects that will ask for a second name
@@ -729,14 +725,18 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(dict_meta, dict_cfg):
+def do_before_fix(_dict_cfg, dict_meta):
     """
     Do any work before fix
 
+    Arguments:
+        dict_cfg: The dictionary of private options such as author, email, etc.
+        dict_meta: The dictionary containing metadata for the project
+
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
-    modified.
-    It is mostly used to make final adjustments to the various dunder dicts
+    modified.\n
+    It is mostly used to make final adjustments to the 'D_PRV_CFG' dunder dict
     before any replacement occurs.
     """
 
@@ -746,20 +746,20 @@ def do_before_fix(dict_meta, dict_cfg):
 
     # paths relative to the end user's (or dev's) useful folders
     D_PRV_CFG["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    D_PRV_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
     D_PRV_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
+    D_PRV_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # this is to fix reqs_install.sh
     D_PRV_CFG["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
-    dict_cfg["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
+    # dict_cfg["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
 
     # shift for replacement
-    D_PRV_CFG["__PP_NAME_DOCS__"] = S_ALL_DOCS
+    D_PRV_CFG["__PP_NAME_DOCS__"] = S_DIR_DOCS
 
     # fix keywords for first pass
     l_keywords = dict_meta["__PP_KEYWORDS__"]
     q_keywords = [f'"{item}"' for item in l_keywords]
-    D_PRV_EXTRA["__PP_KW_STR__"] = ", ".join(q_keywords)
+    D_PRV_CFG["__PP_KW_STR__"] = ", ".join(q_keywords)
 
     # now figure out deps and links for readme
     # get meta deps
@@ -778,15 +778,15 @@ def do_before_fix(dict_meta, dict_cfg):
         s_rm_deps = "<br>\n".join(l_rm_deps)
 
     # put the new string in config so it can be shared to _do_fix
-    D_PRV_EXTRA["__PP_RM_DEPS__"] = s_rm_deps
+    D_PRV_CFG["__PP_RM_DEPS__"] = s_rm_deps
 
-    D_PRV_EXTRA["__PP_FILE_INST__"] = S_FILE_INSTALL
-
+    # set the name of the install file
+    D_PRV_CFG["__PP_FILE_INST__"] = S_FILE_INSTALL
 
 # --------------------------------------------------------------------------
 # Do any work after fix
 # --------------------------------------------------------------------------
-def do_after_fix(dir_prj, _dict_rep):
+def do_after_fix(dir_prj):
     """
     Do any work after fix
 

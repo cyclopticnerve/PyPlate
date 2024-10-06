@@ -17,7 +17,7 @@ description = "__PP_SHORT_DESC__"
 authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
 readme = "__PP_README_FILE__"
 license = { file = "__PP_LICENSE_FILE__" }
-keywords = [__PP_KW_STR__]
+keywords = ["__PP_KW_STR__"]
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",

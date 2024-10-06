@@ -10,7 +10,7 @@
 # pylint: disable=too-many-lines
 
 # FIXME: use S_BASE_DIR instead of sister dir for proj base dir
-# FIXME: use 1st param as prj dir
+
 
 """
 A program to create a PyPlate project from a few variables
@@ -48,10 +48,10 @@ import sys
 # NB: needed to get imports from conf (bootstrap)
 P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-P_DIR_SUPPORT_CONF = P_DIR_PYPLATE / "src" / "support"
+P_DIR_SUPPORT = P_DIR_PYPLATE / "src" / "support"
 sys.path.append(str(P_DIR_PYPLATE))
 sys.path.append(str(P_DIR_PP_LIB))
-sys.path.append(str(P_DIR_SUPPORT_CONF))
+sys.path.append(str(P_DIR_SUPPORT))
 
 # local imports
 from conf import pyplate_conf as M  # type: ignore
@@ -70,14 +70,16 @@ from cnlib.cntree import CNTree  # type: ignore
 
 # ------------------------------------------------------------------------------
 # this is our metadata bootstrap
+# NB: these should be the only strings in this file, as they should NOT be
+# changed by dev
 
-# get names
-S_PP_NAME_BIG = "PyMaker"
+# name and desc for cmd line help
 S_PP_NAME_SMALL = "pymaker"
-S_PP_SHORT_DESC = "A program to create a Python dist from a few variables"
+S_PP_SHORT_DESC = "A program to create a Python project from a few variables"
+S_PP_VERSION = "0.0.1"
 
 # formatted version
-S_PP_VER_FMT = f"Version {M.S_VERSION}"
+S_PP_VER_FMT = f"Version {S_PP_VERSION}"
 
 # about string
 S_PP_ABOUT = (
@@ -92,20 +94,6 @@ S_DBG_OPTION = "-d"
 S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
-
-# ------------------------------------------------------------------------------
-# Path objects
-# ------------------------------------------------------------------------------
-
-# get fixed paths to PyPlate and folders
-
-# Path to PyPlate template
-# (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/)
-P_DIR_PP_TEMPLATE = P_DIR_PYPLATE / "template"
-
-# Path to PyPlate template/all
-# (e.g. /home/cyclopticnerve/Documents/Projects/Python/PyPlate/template/all)
-P_DIR_PP_ALL = P_DIR_PP_TEMPLATE / "all"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -204,12 +192,9 @@ class PyMaker:
         """
         Boilerplate to use at the start of main
 
-        Perform some mundane stuff like running the arg parser and loading
-        config files.
+        Perform some mundane stuff like running the arg parser and setting
+        properties.
         """
-
-        # ----------------------------------------------------------------------
-        # set pp cmd line stuff
 
         # get cmd line args
         self._run_parser()
@@ -217,16 +202,22 @@ class PyMaker:
         # check for flags
         self._debug = self._dict_args.get(S_DBG_DEST, False)
 
-        # debug turns off some _do_after_fix features
+        # debug turns off some features to speed up project creation
         if self._debug:
             M.B_CMD_GIT = False
             M.B_CMD_VENV = False
             M.B_CMD_TREE = False
             M.B_CMD_DOCS = False
 
-        # set flag dicts to defaults
+        # set switch dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)
+
+        # remove home dir from PyPlate path
+        h = str(Path.home())
+        p = str(P_DIR_PYPLATE)
+        p = p.lstrip(h).strip("/")
+        M.D_PRV_CFG["__PP_DEV_PP__"] = p
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -244,11 +235,12 @@ class PyMaker:
 
         if self._debug:
 
-            # yep, yell
+            # yup, yell
             print(M.S_ERR_DEBUG)
 
         # ----------------------------------------------------------------------
-        # first question is type - this makes the string to display in term
+        # first question is type
+        # this makes the string to display in terminal
 
         # sanity check
         prj_type = ""
@@ -256,8 +248,8 @@ class PyMaker:
 
         # build the input question
         types = []
-        for key, val in M.D_TYPES.items():
-            s = M.S_TYPE_FMT.format(key, val[0])
+        for item in M.L_TYPES:
+            s = M.S_TYPE_FMT.format(item[0], item[1])
             types.append(s)
         str_types = M.S_TYPE_JOIN.join(types)
 
@@ -267,7 +259,7 @@ class PyMaker:
         # loop forever until we get a valid type
         while True:
 
-            # ask for type of project
+            # ask for type of project (single letter)
             prj_type = input(in_type)
 
             # check for valid type
@@ -277,9 +269,10 @@ class PyMaker:
                 break
 
         # get output subdir
-        for key, val in M.D_TYPES.items():
-            if key == prj_type:
-                dir_prj_type = val[2]
+        for item in M.L_TYPES:
+            if item[0] == prj_type:
+                dir_prj_type = item[3]
+                break
 
         # ----------------------------------------------------------------------
         # next question is name
@@ -309,6 +302,7 @@ class PyMaker:
 
                 # ask for name of project
                 prj_name = input(M.S_ASK_NAME)
+                prj_name = prj_name.strip(" ")
 
                 # check for valid name
                 if self._check_name(prj_name):
@@ -333,10 +327,10 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # get short description
 
-        if not self._dict_args.get(S_DBG_DEST, False):
-            new_desc = input(M.S_ASK_DESC)
-        else:
+        if self._debug:
             new_desc = "debug desc"
+        else:
+            new_desc = input(M.S_ASK_DESC)
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -345,21 +339,23 @@ class PyMaker:
         # for a gui we should ask for the main window class name
         # for a package we should ask for the module name
 
-        # sanity check (or debug)
-        name_sec = name_small
+        # sanity check
+        def_name_sec = name_small
+        name_sec = def_name_sec
 
         # if not debug, if need second name, ask for it
         if not self._debug and prj_type in M.D_NAME_SEC:
 
             # format question for second name
             s_name_sec = M.D_NAME_SEC[prj_type]
-            s_sec_fmt = M.S_ASK_SEC.format(s_name_sec, name_sec)
+            s_sec_fmt = M.S_ASK_SEC.format(s_name_sec, def_name_sec)
 
             # loop forever until we get a valid name or empty string
             while True:
 
                 # ask for second name
                 name_new = input(s_sec_fmt)
+                name_new = name_new.strip(" ")
                 if name_new == "":
                     name_new = name_small
 
@@ -384,7 +380,8 @@ class PyMaker:
         # NB: this is the initial create date for all files in the template
         # new files added to the project will have their dates set to the date
         # when pybaker was last run
-        # we put it in D_PRV_CFG just for string replacement
+
+        # get current date and format it according to dev fmt
         now = datetime.now()
         fmt_date = M.D_PRV_DEF["__PP_DATE_FMT__"]
         info_date = now.strftime(fmt_date)
@@ -396,23 +393,10 @@ class PyMaker:
         M.D_PRV_CFG["__PP_TYPE_PRJ__"] = prj_type
         M.D_PRV_CFG["__PP_NAME_BIG__"] = prj_name
         M.D_PRV_CFG["__PP_NAME_SMALL__"] = name_small
-        M.D_PRJ_META["__PP_SHORT_DESC__"] = new_desc
         M.D_PRV_CFG["__PP_DATE__"] = info_date
         M.D_PRV_CFG["__PP_NAME_CLASS__"] = name_class
         M.D_PRV_CFG["__PP_NAME_SEC__"] = name_sec
-
-        # remove home dir from PyPlate path
-        h = str(Path.home())
-        p = str(P_DIR_PYPLATE)
-        p = p.lstrip(h).lstrip("/")
-        M.D_PRV_CFG["__PP_DEV_PP__"] = p
-
-        # save location of prj for pybaker
-        # M.D_PRV_CFG["__PP_DIR_PRJ__"] = str(tmp_dir)
-
-        # p = str(tmp_dir)
-        # p = p.lstrip(h).lstrip("/")
-        # M.D_PRV_CFG["__PP_DIR_PRJ__"] = p
+        M.D_PRJ_META["__PP_SHORT_DESC__"] = new_desc
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -429,22 +413,26 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # do template/all
 
-        # copy common stuff
-        src = P_DIR_PP_ALL
+        # copy template/all
+        src = P_DIR_PYPLATE / M.S_DIR_TEMPLATE / M.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst)
 
         # ----------------------------------------------------------------------
-        # do template/type
-        prj_tmp = ""
-        prj_type = M.D_PRV_CFG["__PP_TYPE_PRJ__"]
-        for key, val in M.D_TYPES.items():
-            if key == prj_type:
-                prj_tmp = val[1]
+        # copy template/type
+
+        # get some paths
+        prj_type_short = M.D_PRV_CFG["__PP_TYPE_PRJ__"]
+        prj_type_long = ""
+
+        # get parent of project
+        for item in M.L_TYPES:
+            if item[0] == prj_type_short:
+                prj_type_long = item[2]
                 break
 
         # get the src dir in the template dir
-        src = P_DIR_PP_TEMPLATE / prj_tmp
+        src = P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -454,38 +442,38 @@ class PyMaker:
         # copy linked files
         for key, val in M.D_COPY.items():
 
-            # first get full source path
-            path_in = P_DIR_PYPLATE / key
+            # get src/dst
+            src = P_DIR_PYPLATE / key
+            dst = self._dir_prj / val
 
-            # then get full dest path
-            path_out = self._dir_prj / val
-
-            # copy file
-            if path_in.is_dir():
-                shutil.copytree(path_in, path_out)
+            # copy dir/file
+            if src.is_dir():
+                shutil.copytree(src, dst)
             else:
-                shutil.copy2(path_in, path_out)
+                shutil.copy2(src, dst)
 
-        print("Done")
-
+        # ----------------------------------------------------------------------
         # combine any reqs files
         self._fix_reqs()
 
+        print("Done")
+
     # --------------------------------------------------------------------------
-    # Dummy method to call conf/pymaker_conf.py
+    # A function to do stuff before fix
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
         """
-        Dummy function to call conf/pymaker_conf.py
+        A function to do stuff before fix
 
-        This function is here just so i can follow the flow of the program in
-        my head better. I will be making a flowchart soon...
+        This function does some more changes before the actual fix. Mostly it
+        is used to call the do_before_fix method in pyplate_conf.py.
         """
 
         print("Do before fix... ", end="")
 
         # call public before fix function
-        M.do_before_fix(M.D_PRJ_META, M.D_PRV_CFG)
+        # TODO: remove prv_cfg
+        M.do_before_fix(M.D_PRV_CFG, M.D_PRJ_META)
 
         print("Done")
 
@@ -508,7 +496,6 @@ class PyMaker:
             [
                 M.D_PRV_DEF,
                 M.D_PRV_DIST_DIRS,
-                M.D_PRV_EXTRA,
                 M.D_PRV_CFG,
                 M.D_PRJ_META,
             ],
@@ -517,7 +504,7 @@ class PyMaker:
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        dict_paths = self._get_blacklist_paths()
+        dict_paths = self._fix_blacklist_paths()
 
         # just shorten the names
         skip_all = dict_paths[M.S_KEY_SKIP_ALL]
@@ -528,11 +515,12 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # do the fixes
-        # note that root is a full path, dirs and files are relative to root
+        # NB: root is a full path, dirs and files are relative to root
         for root, root_dirs, root_files in self._dir_prj.walk():
 
             # skip dir if in skip_all
             if root in skip_all:
+                # NB: don't recurse into subfolders
                 root_dirs.clear()
                 continue
 
@@ -553,12 +541,12 @@ class PyMaker:
                     self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
                     self._dict_sw_line = dict(M.D_SW_LINE_DEF)
 
-                    # check for header bl
+                    # check for header in blacklist
                     bl_hdr = True
                     if root not in skip_header and item not in skip_header:
                         bl_hdr = False
 
-                    # check for code blacklist
+                    # check for code in blacklist
                     bl_code = True
                     if root not in skip_code and item not in skip_code:
                         bl_code = False
@@ -574,6 +562,7 @@ class PyMaker:
                     self._fix_content(item, bl_hdr, bl_code)
 
         # ----------------------------------------------------------------------
+        # fix path
         # NB: top_down=False is required for the renaming, as we don't want to
         # rename (and thus clobber) a directory name before we rename all its
         # child dirs/files
@@ -581,6 +570,7 @@ class PyMaker:
 
             # skip dir if in skip_all
             if root in skip_all:
+                # NB: do not recurse
                 root_dirs.clear()
                 continue
 
@@ -612,8 +602,8 @@ class PyMaker:
         Make any necessary changes after all fixes have been done
 
         This method is called after all fixes have been completed. There should
-        be no dunders in the file or path names. Do any further project
-        modification here.
+        be no dunders in the file contents or path names. Do any further
+        project modification in do_after_fix in pyplate_conf.py.
         """
 
         print("Do after fix... ", end="")
@@ -625,25 +615,22 @@ class PyMaker:
         dict_no_edit = {
             M.S_KEY_PRV_DEF: M.D_PRV_DEF,
             M.S_KEY_PRV_DIST_DIRS: M.D_PRV_DIST_DIRS,
-            M.S_KEY_PRV_EXTRA: M.D_PRV_EXTRA,
             M.S_KEY_PRV_CFG: M.D_PRV_CFG,
         }
         path_no_edit = self._dir_prj / M.S_PP_PRV_CFG
         F.save_dict(dict_no_edit, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
-        path_edit = self._dir_prj / M.S_PP_PUB_CFG
         dict_edit = {
             M.S_KEY_PRJ_BL: M.D_BLACKLIST,
             M.S_KEY_PRJ_I18N: M.D_I18N,
             M.S_KEY_PRJ_INSTALL: M.D_INSTALL,
         }
+        path_edit = self._dir_prj / M.S_PP_PUB_CFG
         F.save_dict(dict_edit, [path_edit])
 
         # ----------------------------------------------------------------------
-        # fix dunders in bl/i18n
-
-        # "lib"replace dunders in blacklist and i18n
+        # fix dunders in bl/i18n/install
         self._fix_content(path_edit, False, False)
 
         # reload dict from fixed file
@@ -659,11 +646,9 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # everything else
 
-        # call public after fix
-        M.do_after_fix(self._dir_prj, self._dict_rep)  # fix readme
+        # call conf after fix
+        M.do_after_fix(self._dir_prj)
 
-        # ----------------------------------------------------------------------
-        # done with after fix
         print("Done")
 
     # --------------------------------------------------------------------------
@@ -684,6 +669,7 @@ class PyMaker:
 
         print("Do extras/purge... ", end="")
 
+        # delete any unnecessary files
         for item in M.L_PURGE:
             path_del = self._dir_prj / item
             if path_del.exists():
@@ -714,14 +700,14 @@ class PyMaker:
             print("Do extras/venv... ", end="")
 
             # create the venv folder w/ default pkgs
-            name_venv = self._dict_rep["__PP_NAME_VENV__"]
+            name_small = M.D_PRV_CFG["__PP_NAME_SMALL__"]
+            name_venv = M.S_VENV_FMT_NAME.format(name_small)
             path_venv = self._dir_prj / name_venv
             cmd = M.S_VENV_CMD_CREATE.format(path_venv)
             F.sh(cmd)
 
             # run script to install venv reqs
             cmd = self._dir_prj / M.S_VENV_INSTALL
-            F.sh(cmd)
             F.sh(cmd)
 
             print("Done")
@@ -784,7 +770,8 @@ class PyMaker:
         """
         Set up and run the command line parser
 
-        Returns: A dictionary of command line arguments
+        Returns:
+            A dictionary of command line arguments
 
         This method sets up and runs the command line parser to minimize code
         in the main method.
@@ -843,22 +830,19 @@ class PyMaker:
         types.
         """
 
-        # must have length of 1
-        # if len(prj_type) == 1:
         # get first char and lower case it
-        first_char = prj_type[0]
-        first_char = first_char.lower()
+        first_char = prj_type[0].lower()
 
         # we got a valid type
-        for key in M.D_TYPES:
-            if first_char == key:
+        for item in M.L_TYPES:
+            if first_char == item[0]:
                 return True
 
         # nope, fail
         types = []
         s = ""
-        for key in M.D_TYPES:
-            types.append(key)
+        for item in M.L_TYPES:
+            types.append(item[0])
         s = ", ".join(types)
         print(M.S_ERR_TYPE.format(s))
         return False
@@ -877,11 +861,10 @@ class PyMaker:
             Whether the name is valid to use
 
         Checks the passed name for these criteria:
-        1. non-blank name
-        2. longer than 1 char
-        3. starts with an alpha char
-        4. ends with an alphanumeric char
-        5. contains only alphanumeric chars or dash(-)/underscore (_)
+        1. longer than 1 char
+        2. starts with an alpha char
+        3. ends with an alphanumeric char
+        4. contains only alphanumeric chars and/or dash(-) or underscore(_)
         """
 
         # NB: there is an easier way to do this with regex:
@@ -891,11 +874,8 @@ class PyMaker:
         # user as much feedback as possible, so I break down the regex into
         # steps where each step explains which part of the name is wrong.
 
-        # check for blank name
-        if prj_name == "":
-            return False
-
-        if len(prj_name) == 1:
+        # check for name length
+        if len(prj_name.strip) < 2:
             print(M.S_ERR_LEN)
             return False
 
@@ -926,7 +906,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
     # --------------------------------------------------------------------------
-    def _get_blacklist_paths(self):
+    def _fix_blacklist_paths(self):
         """
         Convert items in blacklist to absolute Path objects
 
@@ -1007,14 +987,15 @@ class PyMaker:
             # ------------------------------------------------------------------
             # skip blank lines
 
-            # skip blank lines, obv
+            # skip blank lines, obvs
             if line.strip() == "":
                 continue
 
             # ------------------------------------------------------------------
             # check for block switches
 
-            # param is True if we are looking for block switch vs line switch
+            # second param is True if we are looking for block switch vs line
+            # switch
             if self._check_switches(line, True):
                 continue
 
@@ -1064,27 +1045,30 @@ class PyMaker:
         Replace dunders inside a file header
 
         Arguments:
-            line: The line of the file to replace text in
+            line: The header line of the file in which to replace text
 
         Returns:
-            The new line of code
+            The new header line
 
         Replaces text inside a header line, using a regex to match specific
-        lines. Given a line, it replaces the found pattern withe the
-        replacement as it goes.
+        lines. Given a line, it replaces the found pattern with the replacement
+        as it goes.
         """
 
-        # break apart header line
+        # sanity check
         str_pattern = self._dict_type_rep[M.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
-        # pull out lead, val, and pad (OXFORD COMMA FTW!)
+        # pull out lead, val, and pad using group match values from M
         lead = res.group(self._dict_type_rep[M.S_KEY_LEAD])
         val = res.group(self._dict_type_rep[M.S_KEY_VAL])
         pad = res.group(self._dict_type_rep[M.S_KEY_PAD])
 
+        # TODO: this could be cleaned up a bit
+        # this is a complicated function to get the length of the spaces
+        # between the key/val pair and the RAT (right-aligned text)
         tmp_val = str(val)
         old_val_len = len(tmp_val)
         for key2, val2 in self._dict_rep.items():
@@ -1093,22 +1077,24 @@ class PyMaker:
         new_val_len = len(tmp_val)
         val_diff = new_val_len - old_val_len
 
+        # get new padding value based in diff key/val length
         tmp_pad = str(pad)
         tmp_rat = tmp_pad.lstrip()
         len_pad = len(tmp_pad) - len(tmp_rat) - val_diff
         pad = " " * len_pad
 
+        # put the header line back together, adjusting for the pad len
         line = lead + tmp_val + pad + tmp_rat + "\n"
 
         # return
         return line
 
     # --------------------------------------------------------------------------
-    # Replace dunders inside a markup file's contents
+    # Replace dunders inside a file's contents
     # --------------------------------------------------------------------------
     def _fix_code(self, line):
         """
-        Replace dunders inside a markup file's contents
+        Replace dunders inside a file's contents
 
         Arguments:
             line: The line of the file to replace text in
@@ -1117,7 +1103,7 @@ class PyMaker:
             The new line of code
 
         Replaces text inside a line. Given a line, replaces dunders as it goes.
-        When it is done, it returns the new line. This replaces the __PP
+        When it is done, it returns the new line. This replaces the __PP_*
         dunders inside the file, excluding flag switches, headers, and
         comment-only lines (all of which are previously handled in
         _fix_content).
@@ -1132,14 +1118,16 @@ class PyMaker:
         comm = ""
 
         # do the split, checking each match to see if we get a trailing comment
-        matches = re.finditer(self._dict_type_rep[M.S_KEY_SPLIT], line)
+        split = self._dict_type_rep[M.S_KEY_SPLIT]
+        split_index = self._dict_type_rep[M.S_KEY_SPLIT_INDEX]
+        matches = re.finditer(split, line)
         for match in matches:
-            # if there is a match group for hash mark (meaning we found a
+            # if there is a match group for comment (meaning we found a
             # trailing comment)
-            if match.group(4):
+            if match.group(split_index):
                 # split the line (comm includes hash mark as first char, code
                 # get space between)
-                split = match.start(4)
+                split = match.start(split_index)
                 code = line[:split]
                 comm = line[split:]
 
@@ -1187,8 +1175,6 @@ class PyMaker:
         Arguments:
             path: Path for dir/file to be renamed
 
-        Returns: A bool indication whether the name changed (Note that this
-        does not mean the file was renamed, only that it should be)
         Rename dirs/files. Given a path, it renames the dir/file by replacing
         dunders in the path with their appropriate replacements from
         self._dict_rep.
@@ -1219,9 +1205,8 @@ class PyMaker:
         """
         Combine reqs from template/all and template/prj_type
 
-        This method combines reqs from the all dir (pdoc3, etc) used by all
-        projects, and those used by specific project type (gui needs pygobject,
-        etc)
+        This method combines reqs from the all dir used by all projects, and
+        those used by specific project type (gui needs pygobject, etc).
         """
 
         print("Do fix reqs... ", end="")
@@ -1229,12 +1214,18 @@ class PyMaker:
         # the new set of lines for requirements.txt
         new_file = []
 
+        # get path to template
+        path_template = P_DIR_PYPLATE / M.S_DIR_TEMPLATE
+
         # the file name for reqs
         reqs_name = M.D_PRV_DEF["__PP_REQS_FILE__"]
 
-        # get path to all/requirements.txt
-        reqs_all_path = f"all/{reqs_name}"
-        reqs_all_file = P_DIR_PP_TEMPLATE / reqs_all_path
+        # ----------------------------------------------------------------------
+
+        # get path to template/all/requirements.txt
+        reqs_all_file = path_template / M.S_DIR_ALL / reqs_name
+
+        # read reqs file and put in result
         if reqs_all_file.exists():
             with open(reqs_all_file, "r", encoding="utf-8") as a_file:
                 old_file = a_file.readlines()
@@ -1242,23 +1233,32 @@ class PyMaker:
                     # get all lines in file w/o newline
                     new_file.append(line.rstrip())
 
+        # ----------------------------------------------------------------------
+
         # get path to template/prj_type
         prj_tmp = ""
         prj_type = M.D_PRV_CFG["__PP_TYPE_PRJ__"]
-        for key, val in M.D_TYPES.items():
-            if key == prj_type:
-                prj_tmp = val[1]
+        # for key, val in M.L_TYPES.items():
+        #     if key == prj_type:
+        #         prj_tmp = val[1]
+        #         break
+        for item in M.L_TYPES:
+            if prj_type == item[0]:
+                prj_tmp = item[3]
                 break
 
         # get path to template/prj_type/requirements.txt
-        reqs_prj_path = f"{prj_tmp}/{reqs_name}"
-        reqs_prj_file = P_DIR_PP_TEMPLATE / reqs_prj_path
+        reqs_prj_file = path_template / prj_tmp / reqs_name
+
+        # read reqs file and put in result
         if reqs_prj_file.exists():
             with open(reqs_prj_file, "r", encoding="utf-8") as a_file:
                 old_file = a_file.readlines()
                 for line in old_file:
                     # get all lines in file w/o newline
                     new_file.append(line.rstrip())
+
+        # ----------------------------------------------------------------------
 
         # put combined reqs into final file
         out_file = self._dir_prj / reqs_name
@@ -1270,7 +1270,7 @@ class PyMaker:
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
-    # -------------aD------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _check_switches(self, line, block):
         """
         Check if line or trailing comment is a switch
