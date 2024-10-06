@@ -875,7 +875,7 @@ class PyMaker:
         # steps where each step explains which part of the name is wrong.
 
         # check for name length
-        if len(prj_name.strip) < 2:
+        if len(prj_name.strip(" ")) < 2:
             print(M.S_ERR_LEN)
             return False
 
