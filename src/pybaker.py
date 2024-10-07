@@ -52,6 +52,7 @@ sys.path.append(str(P_DIR_SUPPORT))
 
 # local imports
 from conf import pyplate_conf as M  # type:ignore
+
 # from conf import pybaker_conf as B  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
@@ -232,7 +233,8 @@ class PyBaker:
         if self._debug:
             self._dir_prj = (
                 # Path.home() / "Documents/Projects/Python/CLIs/CLIs_DEBUG"
-                Path.home() / "Documents/Projects/Python/GUIs/GUIs_DEBUG"
+                Path.home()
+                / "Documents/Projects/Python/GUIs/GUIs_DEBUG"
             )
             print("Done")
             return
@@ -313,8 +315,7 @@ class PyBaker:
         # combine dicts for string replacement
         F.combine_dicts(
             [
-                self._dict_prv[M.S_KEY_PRV_DEF],
-                self._dict_prv[M.S_KEY_PRV_DIST_DIRS],
+                self._dict_prv[M.S_KEY_PRV_ALL],
                 self._dict_prv[M.S_KEY_PRV_EXTRA],
                 self._dict_cfg,
                 self._dict_meta,
@@ -643,14 +644,14 @@ class PyBaker:
                 for item in files:
                     if (
                         item.name
-                        == self._dict_prv[M.S_KEY_PRV_DEF][
+                        == self._dict_prv[M.S_KEY_PRV_ALL][
                             "__PP_README_FILE__"
                         ]
                     ):
                         self._fix_readme(item)
                     if (
                         item.name
-                        == self._dict_prv[M.S_KEY_PRV_DEF]["__PP_TOML_FILE__"]
+                        == self._dict_prv[M.S_KEY_PRV_ALL]["__PP_TOML_FILE__"]
                     ):
                         self._fix_pyproject(item)
 
@@ -1347,8 +1348,8 @@ class PyBaker:
         name_big = self._dict_cfg["__PP_NAME_BIG__"]
         name_small = self._dict_cfg["__PP_NAME_SMALL__"]
         version = self._dict_meta["__PP_VERSION__"]
-        author = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_AUTHOR__"]
-        email = self._dict_prv[M.S_KEY_PRV_DEF]["__PP_EMAIL__"]
+        author = self._dict_prv[M.S_KEY_PRV_ALL]["__PP_AUTHOR__"]
+        email = self._dict_prv[M.S_KEY_PRV_ALL]["__PP_EMAIL__"]
 
         # path to src dir
         dir_src = self._dir_prj / M.S_ALL_SRC
@@ -1381,6 +1382,7 @@ class PyBaker:
             / "desktop"
             / f"{name_small}.desktop",
         )
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

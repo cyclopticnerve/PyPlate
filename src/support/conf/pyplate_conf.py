@@ -48,6 +48,9 @@ I_SW_FALSE = 0
 # base dir for project type folders, relative to dev home
 S_DIR_PRJ_BASE = "Documents/Projects/Python"
 
+# date format
+S_DATE_FMT = "%m/%d/%Y"
+
 # NB: format params are keys in L_TYPES[0] and L_TYPES[1]
 S_TYPE_FMT = "{} ({})"
 # join each project type with this
@@ -81,13 +84,12 @@ S_ERR_DEBUG = (
 
 # TODO: which keys need to be global/which are only used once?
 # keys for pybaker private dict
-S_KEY_PRV_DEF = "PRV_DEF"
-S_KEY_PRV_DIST_DIRS = "PRV_DIST_DIRS"
-S_KEY_PRV_EXTRA = "PRV_EXTRA"
-S_KEY_PRV_CFG = "PRV_CFG"
+S_KEY_PRV_ALL = "PRV_ALL"
+# S_KEY_PRV_EXTRA = "PRV_EXTRA"
+S_KEY_PRV_PRJ = "PRV_PRJ"
 
 # keys for metadata, blacklist, i18n in pybaker dev dict
-S_KEY_PRJ_META = "PRJ_META"
+S_KEY_PUB_META = "PUB_META"
 S_KEY_PRJ_BL = "PRJ_BL"
 S_KEY_PRJ_I18N = "PRJ_I18N"
 S_KEY_PRJ_INSTALL = "PRJ_INSTALL"
@@ -144,6 +146,13 @@ S_DIR_LOCALE = "locale"
 S_DIR_PO = "po"
 S_DIR_TESTS = "tests"
 
+# common file names, rel to prj dir or pyplate dir
+S_FILE_LICENSE = "LICENSE.txt"
+S_FILE_README = "README.md"
+S_FILE_TOML = "pyproject.toml"
+S_FILE_REQS = "requirements.txt"
+S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
+
 # initial location of project (to check for dups)
 # /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
 # NB: format params are project type and project name
@@ -178,10 +187,12 @@ S_SW_REPLACE = "replace"
 # NB: leave as string, no start dir yet
 S_PP_PUB_DIR = "pyplate"
 S_PP_PUB_CFG = f"{S_PP_PUB_DIR}/project.json"
-S_PP_PRV_DIR = "pyplate/nope"
-S_PP_PRV_CFG = f"{S_PP_PRV_DIR}/private.json"
+S_PP_PRV_DIR = "pyplate/private"
+S_PP_PRV_PRJ = f"{S_PP_PRV_DIR}/private.json"
 
+# ------------------------------------------------------------------------------
 # commands for _do_extras
+
 # cmds for git
 # NB: format param is proj dir
 S_CMD_GIT = "git init {} -q"
@@ -225,9 +236,9 @@ S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*__PB_SHORT_DESC__\s*=\s*)(.*)"
 S_META_SD_REPL = r'\g<1>"{}"'
 
-S_DST = "dist"
-S_ASSETS = "assets"
-S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
+# S_DST = "dist"
+# S_ASSETS = "assets"
+# S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
 
 # S_ERR_COUNT = "Errors: {}"
 # S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
@@ -429,35 +440,28 @@ L_CATS = [
 # Dictionaries
 # ------------------------------------------------------------------------------
 
-# NB: some of these are strictly for string replacement, but some are used by
-# pybaker, so don't remove anything unless you know what you are doing
-# if you want to ADD a key for string replacement only, use D_PRV_EXTRA
+# ------------------------------------------------------------------------------
+# Private dictionaries
+# ------------------------------------------------------------------------------
 
 # these are the settings that should be set before you run pymaker.py
-# consider them the "before create" settings
+# consider them the "global" settings
+# they are used for all projects, and should not be changed after a project is
+# created, as pybaker.py will not update them
 
-# if you need to adjust any of these values in a function, use _do_before_fix()
+# if you need to adjust any of these values in a function, use do_before_fix()
 # in this file
 
-# NB: FOR THE LOVE OF GOD, DO NOT CHANGE THE KEYS IN THESE DICTS!!!
-
-D_PRV_DEF = {
-    # --------------------------------------------------------------------------
-    # this stuff should only be set once
+D_PRV_ALL = {
     # the author name, used in headers and pyproject.toml
     "__PP_AUTHOR__": "cyclopticnerve",
-    # the web url for all projects
+    # the base url for all projects, used in pyproject.toml and GUI about dlg
     "__PP_URL__": "https://github.com/cyclopticnerve",
     # the author's email, used in headers and pyproject.toml
     "__PP_EMAIL__": "cyclopticnerve@gmail.com",
-    # the license name, used in headers, __PP_README_FILE__, and pyproject.toml
+    # the license name, used in headers and pyproject.toml
     "__PP_LICENSE_NAME__": "WTFPLv2",
-    # the license image source, used in __PP_README_FILE__
-    # "__PP_LICENSE_IMG__": ,
-    # # the url for license image click
-    # "__PP_LICENSE_LINK__": "http://www.wtfpl.net",
-    # the license file to use
-    "__PP_LICENSE_FILE__": "LICENSE.txt",
+    # the license image/link to use in __PP_README_FILE__
     "__PP_RM_LICENSE__": (
         "[!"
         "[License: WTFPLv2]"
@@ -467,7 +471,7 @@ D_PRV_DEF = {
         "(http://www.wtfpl.net)"
     ),
     # version format string for command line (context for pybaker replace)
-    # NB: format param is __PP_VERSION__
+    # NB: format param is __PP_VERSION__ from metadata
     "__PP_VER_FMT__": "Version {}",
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
@@ -477,22 +481,20 @@ D_PRV_DEF = {
     # sure how to proceed but i think for now i will leave this as a
     # user-editable string and place it in the realm of 'edit it before you
     # run' along with author/email/license/etc
-    "__PP_DATE_FMT__": "%m/%d/%Y",
-    # readme file used in pyproject.toml, rel to prj dir
-    "__PP_README_FILE__": "README.md",
-    "__PP_TOML_FILE__": "pyproject.toml",
-    "__PP_REQS_FILE__": "requirements.txt",
-}
-
-# these values are string replace only
-# NB: constant values moved here so we can change them easier
-D_PRV_DIST_DIRS = {
+    "__PP_DATE_FMT__": S_DATE_FMT,
+    # file names replaced in various places, rel to prj dir
+    "__PP_LICENSE_FILE__": S_FILE_LICENSE,
+    "__PP_README_FILE__": S_FILE_README,
+    "__PP_TOML_FILE__": S_FILE_TOML,
+    "__PP_REQS_FILE__": S_FILE_REQS,
+    "__PP_INST_FILE__": S_FILE_INSTALL,
     # --------------------------------------------------------------------------
-    # these paths are relative to the dev's home dir
-    # location of config files, relative to the project dir
-    "__PP_DEV_CONF__": S_DIR_CONF,
-    # location of src files, relative to the project dir
+    # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
+    # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
+    # location of src files
     "__PP_DEV_SRC__": S_DIR_SRC,
+    # location of config files
+    "__PP_DEV_CONF__": f"{S_DIR_SRC}/{S_DIR_SUPPORT}/{S_DIR_CONF}",
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
@@ -502,9 +504,10 @@ D_PRV_DIST_DIRS = {
 }
 
 # these are settings that will be calculated for you while running pymaker.py
-# consider them the "during create" settings
-# THEY SHOULD NOT BE CHANGED ONCE A PROJECT IS CREATED!
-D_PRV_CFG = {
+# consider them the "per project" settings
+# they are used for an individual project, and should not be changed after a
+# project is created, as pybaker.py will not update them
+D_PRV_PRJ = {
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_BIG__": "",  # PyPlate
     "__PP_NAME_SMALL__": "",  # pyplate
@@ -528,6 +531,10 @@ D_PRV_CFG = {
     "__PP_RM_DEPS__": "",
 }
 
+# ------------------------------------------------------------------------------
+# Public dictionaries
+# ------------------------------------------------------------------------------
+
 # the lists of dirs/files we don't mess with while running pymaker
 # each item can be a full path, a path relative to the project directory, or a
 # glob
@@ -540,7 +547,7 @@ D_BLACKLIST = {
     # NB: this is mostly to speed up processing by not even looking at them
     S_KEY_SKIP_ALL: [
         ".git",
-        # TODO: tasks.json needs dunders
+        # NB: tasks.json needs dunders
         # ".vscode",
         "**/*venv*",
         ".VSCodeCounter",
@@ -551,8 +558,10 @@ D_BLACKLIST = {
         f"**/{S_DIR_PO}",
         S_DIR_MISC,
         S_DIR_README,
-        D_PRV_DEF["__PP_LICENSE_FILE__"],
-        D_PRV_DEF["__PP_REQS_FILE__"],
+        # D_PRV_ALL["__PP_LICENSE_FILE__"],
+        # D_PRV_ALL["__PP_REQS_FILE__"],
+        S_FILE_LICENSE,
+        S_FILE_REQS,
         "**/__pycache__",
         "**/*.mo",
     ],
@@ -629,7 +638,7 @@ D_INSTALL = {
 
 # these are settings that will be changed before running pybaker.py
 # consider them the "after create" settings
-D_PRJ_META = {
+D_PUB_META = {
     # the version number to use in __PP_README_FILE__ and pyproject.toml
     "__PP_VERSION__": "0.0.0",
     # the short description to use in __PP_README_FILE__ and pyproject.toml
@@ -647,6 +656,10 @@ D_PRJ_META = {
     # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
     "__PP_GUI_CATS__": [],
 }
+
+# ------------------------------------------------------------------------------
+# Other dictionaries
+# ------------------------------------------------------------------------------
 
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
@@ -736,30 +749,30 @@ def do_before_fix(_dict_cfg, dict_meta):
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
     modified.\n
-    It is mostly used to make final adjustments to the 'D_PRV_CFG' dunder dict
+    It is mostly used to make final adjustments to the 'D_PRV_PRJ' dunder dict
     before any replacement occurs.
     """
 
     # get values after pymaker has set them
-    author = D_PRV_DEF["__PP_AUTHOR__"]
-    name_small = D_PRV_CFG["__PP_NAME_SMALL__"]
+    author = D_PRV_ALL["__PP_AUTHOR__"]
+    name_small = D_PRV_PRJ["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    D_PRV_CFG["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    D_PRV_CFG["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
-    D_PRV_CFG["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
+    D_PRV_PRJ["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
+    D_PRV_PRJ["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
+    D_PRV_PRJ["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # this is to fix reqs_install.sh
-    D_PRV_CFG["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
+    D_PRV_PRJ["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
     # dict_cfg["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
 
     # shift for replacement
-    D_PRV_CFG["__PP_NAME_DOCS__"] = S_DIR_DOCS
+    D_PRV_PRJ["__PP_NAME_DOCS__"] = S_DIR_DOCS
 
     # fix keywords for first pass
     l_keywords = dict_meta["__PP_KEYWORDS__"]
     q_keywords = [f'"{item}"' for item in l_keywords]
-    D_PRV_CFG["__PP_KW_STR__"] = ", ".join(q_keywords)
+    D_PRV_PRJ["__PP_KW_STR__"] = ", ".join(q_keywords)
 
     # now figure out deps and links for readme
     # get meta deps
@@ -778,10 +791,11 @@ def do_before_fix(_dict_cfg, dict_meta):
         s_rm_deps = "<br>\n".join(l_rm_deps)
 
     # put the new string in config so it can be shared to _do_fix
-    D_PRV_CFG["__PP_RM_DEPS__"] = s_rm_deps
+    D_PRV_PRJ["__PP_RM_DEPS__"] = s_rm_deps
 
     # set the name of the install file
-    D_PRV_CFG["__PP_FILE_INST__"] = S_FILE_INSTALL
+    D_PRV_PRJ["__PP_FILE_INST__"] = S_FILE_INSTALL
+
 
 # --------------------------------------------------------------------------
 # Do any work after fix
@@ -827,7 +841,7 @@ def _fix_readme(path):
         path: Path for the README to remove text
         dict_rep: The dict of dunders to replace
 
-    Edits/removes parts of the file using the C.D_PRV_CFG settings.
+    Edits/removes parts of the file using the C.D_PRV_PRJ settings.
     """
 
     # the whole text of the file
@@ -838,7 +852,7 @@ def _fix_readme(path):
         text = a_file.read()
 
     # find the remove blocks
-    prj_type = D_PRV_CFG["__PP_TYPE_PRJ__"]
+    prj_type = D_PRV_PRJ["__PP_TYPE_PRJ__"]
     if prj_type == "c" or prj_type == "g":
         str_pattern = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
     else:

@@ -9,6 +9,8 @@
 
 # pylint: disable=too-many-lines
 
+# FIXME: template names/header are FUCKED!!! what happened?
+
 """
 A program to create a PyPlate project from a few variables
 
@@ -214,7 +216,8 @@ class PyMaker:
         h = str(Path.home())
         p = str(P_DIR_PYPLATE)
         p = p.lstrip(h).strip("/")
-        M.D_PRV_CFG["__PP_DEV_PP__"] = p
+        # NB: change global val
+        M.D_PRV_ALL["__PP_DEV_PP__"] = p
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -224,7 +227,7 @@ class PyMaker:
         Get project info
 
         Asks the user for project info, such as type and name, to be saved to
-        M.D_PRV_CFG.
+        M.D_PRV_PRJ.
         """
 
         # ----------------------------------------------------------------------
@@ -380,20 +383,20 @@ class PyMaker:
 
         # get current date and format it according to dev fmt
         now = datetime.now()
-        fmt_date = M.D_PRV_DEF["__PP_DATE_FMT__"]
+        fmt_date = M.S_DATE_FMT
         info_date = now.strftime(fmt_date)
 
         # ----------------------------------------------------------------------
         # save stuff to prj dict
 
         # save project stuff
-        M.D_PRV_CFG["__PP_TYPE_PRJ__"] = prj_type
-        M.D_PRV_CFG["__PP_NAME_BIG__"] = prj_name
-        M.D_PRV_CFG["__PP_NAME_SMALL__"] = name_small
-        M.D_PRV_CFG["__PP_DATE__"] = info_date
-        M.D_PRV_CFG["__PP_NAME_CLASS__"] = name_class
-        M.D_PRV_CFG["__PP_NAME_SEC__"] = name_sec
-        M.D_PRJ_META["__PP_SHORT_DESC__"] = new_desc
+        M.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
+        M.D_PRV_PRJ["__PP_NAME_BIG__"] = prj_name
+        M.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
+        M.D_PRV_PRJ["__PP_DATE__"] = info_date
+        M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
+        M.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
+        M.D_PUB_META["__PP_SHORT_DESC__"] = new_desc
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -419,7 +422,7 @@ class PyMaker:
         # copy template/type
 
         # get some paths
-        prj_type_short = M.D_PRV_CFG["__PP_TYPE_PRJ__"]
+        prj_type_short = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         prj_type_long = ""
 
         # get parent of project
@@ -469,8 +472,8 @@ class PyMaker:
         print("Do before fix... ", end="")
 
         # call public before fix function
-        # TODO: remove prv_cfg
-        M.do_before_fix(M.D_PRV_CFG, M.D_PRJ_META)
+        # TODO: remove PRV_PRJ
+        M.do_before_fix(M.D_PRV_PRJ, M.D_PUB_META)
 
         print("Done")
 
@@ -491,10 +494,9 @@ class PyMaker:
         # combine dicts for string replacement
         F.combine_dicts(
             [
-                M.D_PRV_DEF,
-                M.D_PRV_DIST_DIRS,
-                M.D_PRV_CFG,
-                M.D_PRJ_META,
+                M.D_PRV_ALL,
+                M.D_PRV_PRJ,
+                M.D_PUB_META,
             ],
             self._dict_rep,
         )
@@ -610,11 +612,10 @@ class PyMaker:
 
         # save fixed settings
         dict_no_edit = {
-            M.S_KEY_PRV_DEF: M.D_PRV_DEF,
-            M.S_KEY_PRV_DIST_DIRS: M.D_PRV_DIST_DIRS,
-            M.S_KEY_PRV_CFG: M.D_PRV_CFG,
+            M.S_KEY_PRV_ALL: M.D_PRV_ALL,
+            M.S_KEY_PRV_PRJ: M.D_PRV_PRJ,
         }
-        path_no_edit = self._dir_prj / M.S_PP_PRV_CFG
+        path_no_edit = self._dir_prj / M.S_PP_PRV_PRJ
         F.save_dict(dict_no_edit, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
@@ -637,7 +638,7 @@ class PyMaker:
         # save meta
 
         # put in metadata and save back to file
-        dict_edit[M.S_KEY_PRJ_META] = M.D_PRJ_META
+        dict_edit[M.S_KEY_PUB_META] = M.D_PUB_META
         F.save_dict(dict_edit, [path_edit])
 
         # ----------------------------------------------------------------------
@@ -697,7 +698,7 @@ class PyMaker:
             print("Do extras/venv... ", end="")
 
             # create the venv folder w/ default pkgs
-            name_small = M.D_PRV_CFG["__PP_NAME_SMALL__"]
+            name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
             name_venv = M.S_VENV_FMT_NAME.format(name_small)
             path_venv = self._dir_prj / name_venv
             cmd = M.S_VENV_CMD_CREATE.format(path_venv)
@@ -1215,7 +1216,7 @@ class PyMaker:
         path_template = P_DIR_PYPLATE / M.S_DIR_TEMPLATE
 
         # the file name for reqs
-        reqs_name = M.D_PRV_DEF["__PP_REQS_FILE__"]
+        reqs_name = M.D_PRV_ALL["__PP_REQS_FILE__"]
 
         # ----------------------------------------------------------------------
 
@@ -1234,7 +1235,7 @@ class PyMaker:
 
         # get path to template/prj_type
         prj_tmp = ""
-        prj_type = M.D_PRV_CFG["__PP_TYPE_PRJ__"]
+        prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         # for key, val in M.L_TYPES.items():
         #     if key == prj_type:
         #         prj_tmp = val[1]

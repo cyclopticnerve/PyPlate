@@ -10,8 +10,6 @@
 # TODO: do we need D_PRV_DEF/D_PRV_EXTRA?
 # TODO: what do we need from D_PRV_CFG? just __PP_DEV_PP__?
 
-# DONE ask for meta
-# DONE update meta in conf file
 # replace (or just report) any dunders
 # replace metadata using prj pybaker (context is prj or dev specific)
 # make install.py
@@ -223,6 +221,8 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE ask for meta
+DONE update meta in conf file
 DONE: markdown needs to ignore hash
 DONE: do_after_fix in code, pub, prv
 DONE: _fix header only looks in lines starting with #, use ^
