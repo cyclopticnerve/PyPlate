@@ -248,7 +248,7 @@ S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
 L_TYPES = [
     ["c", "CLI", "cli", "CLIs"],
     ["g", "GUI", "gui", "GUIs"],
-    ["p", "Package", "pkg", "Packages"],
+    ["p", "PKG", "pkg", "PKGs"],
 ]
 
 # list of file types to use md/html/xml fixer
