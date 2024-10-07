@@ -542,7 +542,7 @@ D_PRV_PRJ = {
 # NB: you can use dunders here since the path is the last thing to get fixed
 # these dir/file names should match what's in the template dir (before any
 # modifications, hence using dunder keys)
-D_BLACKLIST = {
+D_PUB_BL = {
     # skip header, skip text, skip path (0 0 0)
     # NB: this is mostly to speed up processing by not even looking at them
     S_KEY_SKIP_ALL: [
@@ -593,14 +593,14 @@ D_BLACKLIST = {
     S_KEY_SKIP_TREE: [
         ".git",
         "**/*venv*",
-        ".vscode",
+        # ".vscode",
         ".VSCodeCounter",
         "**/__pycache__",
     ],
 }
 
 # I18N stuff to be used in pybaker
-D_I18N = {
+D_PUB_I18N = {
     # default charset for .pot/.po files
     S_KEY_CHARSET: "UTF-8",
     # the types of projects that will have i18n applied
@@ -627,7 +627,7 @@ D_I18N = {
 }
 
 # dict for install script
-D_INSTALL = {
+D_PUB_INST = {
     "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
     "preflight": [],
     "sys_reqs": [],

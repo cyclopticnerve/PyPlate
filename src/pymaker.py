@@ -620,9 +620,9 @@ class PyMaker:
 
         # save editable settings (blacklist/i18n etc.)
         dict_edit = {
-            M.S_KEY_PRJ_BL: M.D_BLACKLIST,
-            M.S_KEY_PRJ_I18N: M.D_I18N,
-            M.S_KEY_PRJ_INSTALL: M.D_INSTALL,
+            M.S_KEY_PRJ_BL: M.D_PUB_BL,
+            M.S_KEY_PRJ_I18N: M.D_PUB_I18N,
+            M.S_KEY_PRJ_INSTALL: M.D_PUB_INST,
         }
         path_edit = self._dir_prj / M.S_PP_PUB_CFG
         F.save_dict(dict_edit, [path_edit])
@@ -731,7 +731,7 @@ class PyMaker:
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 str(self._dir_prj),
-                filter_list=M.D_BLACKLIST[M.S_KEY_SKIP_TREE],
+                filter_list=M.D_PUB_BL[M.S_KEY_SKIP_TREE],
                 dir_format=M.S_TREE_DIR_FORMAT,
                 file_format=M.S_TREE_FILE_FORMAT,
             )
@@ -917,16 +917,16 @@ class PyMaker:
         # remove path separators
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
-        l_bl = M.D_BLACKLIST
+        l_bl = M.D_PUB_BL
         for key in l_bl:
             l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
-        M.D_BLACKLIST = l_bl
+        M.D_PUB_BL = l_bl
 
         # support for absolute/relative/glob
         # NB: taken from cntree.py
 
         # for each section of blacklist
-        for key, val in M.D_BLACKLIST.items():
+        for key, val in M.D_PUB_BL.items():
             # convert all items in list to Path objects
             paths = [Path(item) for item in val]
 
