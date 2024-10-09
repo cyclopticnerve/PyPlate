@@ -8,7 +8,22 @@
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
-# FIXME: use 1st param as prj dir
+
+# FIXME: use 1st param as prj dir (no need for -f)
+
+# FIXME: pass:
+# per prj:  M.D_PRV_PRJ / self._dict_prv["S_PRV_PRJ"]
+# and:
+# per build dicts: M.D_PUB_META / self._dict_pub["S_PUB_META"]
+
+# separately in pub do_before_fix
+
+# also save back to pyplate/private dir - load/inc/save build number
+# otherwise switching between projects may not update pyplate_conf.py D_PRV_PRJ
+# and D_PUB_META
+# PYMAKER - JUST MAKE FILE DO NOT SAVE ANYTHING
+# PYBAKER - read file, do metadata, save file
+
 """
 A program to change the metadata of a PyPlate project and create a dist
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: reqs_install.sh                                       |     ()     |
+# Filename: venv_install.sh                                       |     ()     |
 # Date    : 09/29/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # change working dir to the project (which is two dirs up,
-# ie. "project/pyplate/nope/reqs_install.sh")
+# ie. "project/pyplate/private/venv_install.sh")
 SCRIPT_DIR=$(dirname $(realpath $0))
 cd $SCRIPT_DIR/../..
 

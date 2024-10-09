@@ -12,7 +12,7 @@
 #
 
 # change working dir to the project (which is two dirs up,
-# ie. "project/pyplate/nope/reqs_freeze.sh")
+# ie. "project/pyplate/private/venv_freeze.sh")
 SCRIPT_DIR=$(dirname $(realpath $0))
 cd $SCRIPT_DIR/../..
 

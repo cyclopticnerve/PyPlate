@@ -402,6 +402,7 @@ def sh(cmd):
         )
     except subprocess.CalledProcessError as e:
         # bubble up the error to the calling function
+        print(e.output)
         raise e
 
     # return the result

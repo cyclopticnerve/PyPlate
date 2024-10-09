@@ -1,9 +1,9 @@
 <!----------------------------------------------------------------------------->
-<!-- Project : GUIs_DEBUG                                      /          \  -->
+<!-- Project : __PP_NAME_BIG__                                 /          \  -->
 <!-- Filename: README.md                                      |     ()     | -->
-<!-- Date    : 09/29/2024                                     |            | -->
-<!-- Author  : cyclopticnerve                                 |   \____/   | -->
-<!-- License : WTFPLv2                                         \          /  -->
+<!-- Date    : __PP_DATE__                                    |            | -->
+<!-- Author  : __PP_AUTHOR__                                  |   \____/   | -->
+<!-- License : __PP_LICENSE_NAME__                             \          /  -->
 <!----------------------------------------------------------------------------->
 
 # __PP_NAME_BIG__
@@ -16,9 +16,13 @@ __PP_RM_LICENSE__
 __PP_SHORT_DESC__
 <!-- __PP_SHORT_DESC__ -->
 
+<<<<<<< HEAD
+![alt-text](README/screenshot.png "screenshot")
+=======
 <!--PUT SCREENSHOT HERE LIKE: -->
 [![alt-text](README/screenshot.png "tooltip")](click-url)
 <!--[!(README/ss.png)] -->
+>>>>>>> origin/pybsker
 
 ## Requirements
 <!-- __PP_RM_DEPS__ -->
@@ -84,8 +88,8 @@ foo@bar:~$ python -m pip uninstall __PP_NAME_SMALL__
 <!-- __RM_PKG_END__ -->
 <!-- __RM_APP_START__ -->
 ```bash
-foo@bar:~$ cd ~/.config/__PP_NAME_SMALL__/conf
-foo@bar:~/.config//__PP_NAME_SMALL__/conf$ ./uninstall.sh
+foo@bar:~$ cd ~/.__PP_AUTHOR__/__PP_NAME_SMALL__
+foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
 ```
 <!-- __RM_APP_END__ -->
 

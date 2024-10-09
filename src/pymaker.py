@@ -9,8 +9,6 @@
 
 # pylint: disable=too-many-lines
 
-# FIXME: template names/header are FUCKED!!! what happened?
-
 """
 A program to create a PyPlate project from a few variables
 
@@ -29,6 +27,7 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
+import fileinput
 from pathlib import Path
 import re
 import shutil
@@ -204,7 +203,7 @@ class PyMaker:
         # debug turns off some features to speed up project creation
         if self._debug:
             M.B_CMD_GIT = False
-            M.B_CMD_VENV = False
+            # M.B_CMD_VENV = False
             M.B_CMD_TREE = False
             M.B_CMD_DOCS = False
 
@@ -217,7 +216,7 @@ class PyMaker:
         p = str(P_DIR_PYPLATE)
         p = p.lstrip(h).strip("/")
         # NB: change global val
-        M.D_PRV_ALL["__PP_DEV_PP__"] = p
+        M.D_PRV_PRJ["__PP_DEV_PP__"] = p
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -387,15 +386,16 @@ class PyMaker:
         info_date = now.strftime(fmt_date)
 
         # ----------------------------------------------------------------------
-        # save stuff to prj dict
+        # save stuff to prj/meta dicts
 
         # save project stuff
         M.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
         M.D_PRV_PRJ["__PP_NAME_BIG__"] = prj_name
         M.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
-        M.D_PRV_PRJ["__PP_DATE__"] = info_date
-        M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
         M.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
+        M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
+        M.D_PRV_PRJ["__PP_DATE__"] = info_date
+        M.D_PRV_PRJ["__PP_NAME_VENV__"] = M.S_VENV_FMT_NAME.format(name_small)
         M.D_PUB_META["__PP_SHORT_DESC__"] = new_desc
 
     # --------------------------------------------------------------------------
@@ -408,7 +408,7 @@ class PyMaker:
         Gets dirs/files from template and copies them to the project dir.
         """
 
-        print("Copy files... ", end="")
+        print("Do copy files... ", end="")
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -454,7 +454,32 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # combine any reqs files
-        self._fix_reqs()
+
+        # get files to combine
+        filenames = []
+        src_all = (
+            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / M.S_DIR_ALL / M.S_FILE_REQS
+        )
+        src_prj = (
+            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long / M.S_FILE_REQS
+        )
+
+        # get dst to put file lines
+        dst = self._dir_prj / M.S_FILE_REQS
+
+        # make src file names into list
+        if src_all.exists():
+            filenames.append(src_all)
+        if src_prj.exists():
+            filenames.append(src_prj)
+
+        # open dst, iterate src, write to dst
+        with (
+            open(dst, "w", encoding="utf8") as f_out,
+            fileinput.input(filenames) as f_in,
+        ):
+            for line in f_in:
+                f_out.write(line)
 
         print("Done")
 
@@ -472,8 +497,7 @@ class PyMaker:
         print("Do before fix... ", end="")
 
         # call public before fix function
-        # TODO: remove PRV_PRJ
-        M.do_before_fix(M.D_PRV_PRJ, M.D_PUB_META)
+        M.do_before_fix()
 
         print("Done")
 
@@ -615,19 +639,18 @@ class PyMaker:
             M.S_KEY_PRV_ALL: M.D_PRV_ALL,
             M.S_KEY_PRV_PRJ: M.D_PRV_PRJ,
         }
-        path_no_edit = self._dir_prj / M.S_PP_PRV_PRJ
+        path_no_edit = self._dir_prj / M.S_PRJ_PRV_CFG
         F.save_dict(dict_no_edit, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
         dict_edit = {
-            M.S_KEY_PRJ_BL: M.D_PUB_BL,
-            M.S_KEY_PRJ_I18N: M.D_PUB_I18N,
-            M.S_KEY_PRJ_INSTALL: M.D_PUB_INST,
+            M.S_KEY_PUB_BL: M.D_PUB_BL,
+            M.S_KEY_PUB_I18N: M.D_PUB_I18N,
+            M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
         }
-        path_edit = self._dir_prj / M.S_PP_PUB_CFG
+        path_edit = self._dir_prj / M.S_PRJ_PUB_CFG
         F.save_dict(dict_edit, [path_edit])
 
-        # ----------------------------------------------------------------------
         # fix dunders in bl/i18n/install
         self._fix_content(path_edit, False, False)
 
@@ -697,11 +720,13 @@ class PyMaker:
 
             print("Do extras/venv... ", end="")
 
-            # create the venv folder w/ default pkgs
-            name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
-            name_venv = M.S_VENV_FMT_NAME.format(name_small)
+            # calculate name of venv
+            name_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
             path_venv = self._dir_prj / name_venv
-            cmd = M.S_VENV_CMD_CREATE.format(path_venv)
+            str_cmd = M.S_VENV_CREATE.format(path_venv)
+
+            # create venv
+            cmd = self._dir_prj / str_cmd
             F.sh(cmd)
 
             # run script to install venv reqs
@@ -1064,7 +1089,6 @@ class PyMaker:
         val = res.group(self._dict_type_rep[M.S_KEY_VAL])
         pad = res.group(self._dict_type_rep[M.S_KEY_PAD])
 
-        # TODO: this could be cleaned up a bit
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
         tmp_val = str(val)
@@ -1207,64 +1231,62 @@ class PyMaker:
         those used by specific project type (gui needs pygobject, etc).
         """
 
-        print("Do fix reqs... ", end="")
+        # # the new set of lines for requirements.txt
+        # new_file = []
 
-        # the new set of lines for requirements.txt
-        new_file = []
+        # # get path to template
+        # path_template = P_DIR_PYPLATE / M.S_DIR_TEMPLATE
 
-        # get path to template
-        path_template = P_DIR_PYPLATE / M.S_DIR_TEMPLATE
+        # # the file name for reqs
+        # reqs_name = M.D_PRV_ALL["__PP_REQS_FILE__"]
 
-        # the file name for reqs
-        reqs_name = M.D_PRV_ALL["__PP_REQS_FILE__"]
+        # # ----------------------------------------------------------------------
 
-        # ----------------------------------------------------------------------
+        # # get path to template/all/requirements.txt
+        # reqs_all_file = path_template / M.S_DIR_ALL / reqs_name
 
-        # get path to template/all/requirements.txt
-        reqs_all_file = path_template / M.S_DIR_ALL / reqs_name
+        # # read reqs file and put in result
+        # if reqs_all_file.exists():
+        #     with open(reqs_all_file, "r", encoding="utf-8") as a_file:
+        #         old_file = a_file.readlines()
+        #         for line in old_file:
+        #             # get all lines in file w/o newline
+        #             new_file.append(line.rstrip())
 
-        # read reqs file and put in result
-        if reqs_all_file.exists():
-            with open(reqs_all_file, "r", encoding="utf-8") as a_file:
-                old_file = a_file.readlines()
-                for line in old_file:
-                    # get all lines in file w/o newline
-                    new_file.append(line.rstrip())
+        # # ----------------------------------------------------------------------
 
-        # ----------------------------------------------------------------------
-
-        # get path to template/prj_type
-        prj_tmp = ""
-        prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
-        # for key, val in M.L_TYPES.items():
-        #     if key == prj_type:
-        #         prj_tmp = val[1]
+        # # get path to template/prj_type
+        # prj_tmp = ""
+        # prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        # # for key, val in M.L_TYPES.items():
+        # #     if key == prj_type:
+        # #         prj_tmp = val[1]
+        # #         break
+        # for item in M.L_TYPES:
+        #     if prj_type == item[0]:
+        #         prj_tmp = item[3]
         #         break
-        for item in M.L_TYPES:
-            if prj_type == item[0]:
-                prj_tmp = item[3]
-                break
 
-        # get path to template/prj_type/requirements.txt
-        reqs_prj_file = path_template / prj_tmp / reqs_name
+        # # get path to template/prj_type/requirements.txt
+        # reqs_prj_file = path_template / prj_tmp / reqs_name
 
-        # read reqs file and put in result
-        if reqs_prj_file.exists():
-            with open(reqs_prj_file, "r", encoding="utf-8") as a_file:
-                old_file = a_file.readlines()
-                for line in old_file:
-                    # get all lines in file w/o newline
-                    new_file.append(line.rstrip())
+        # # read reqs file and put in result
+        # if reqs_prj_file.exists():
+        #     with open(reqs_prj_file, "r", encoding="utf-8") as a_file:
+        #         old_file = a_file.readlines()
+        #         for line in old_file:
+        #             # get all lines in file w/o newline
+        #             new_file.append(line.rstrip())
+
+        # # ----------------------------------------------------------------------
+
+        # # put combined reqs into final file
+        # out_file = self._dir_prj / reqs_name
+        # joint = "\n".join(new_file)
+        # with open(out_file, "w", encoding="utf-8") as a_file:
+        #     a_file.writelines(joint)
 
         # ----------------------------------------------------------------------
-
-        # put combined reqs into final file
-        out_file = self._dir_prj / reqs_name
-        joint = "\n".join(new_file)
-        with open(out_file, "w", encoding="utf-8") as a_file:
-            a_file.writelines(joint)
-
-        print("Done")
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
