@@ -8,7 +8,7 @@
 # ------------------------------------------------------------------------------
 
 # change working dir to the project (which is two dirs up,
-# ie. "project/pyplate/private/venv_install.sh")
+# ie. "project/pyplate/private/venv_create.sh")
 SCRIPT_DIR=$(dirname $(realpath $0))
 cd $SCRIPT_DIR/../../..
 
