@@ -30,7 +30,6 @@ from pathlib import Path
 import shlex
 import subprocess
 
-
 # ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
 # ------------------------------------------------------------------------------
@@ -359,19 +358,21 @@ def combine_dicts(dicts_new, dict_old):
 # ------------------------------------------------------------------------------
 # Run a command string in the shell
 # ------------------------------------------------------------------------------
-def sh(cmd):
+def sh(cmd, shell=False):
     """
     Run a command string in the shell
 
     Arguments:
         cmd: The command line to run
+        shell: If False (the default), run the cmd as one long string. If True,
+        split the cmd into separate arguments
 
     Raises:
-        CalledProcessError if something went wrong
+        Exception if something went wrong
 
     Returns:
-        (CalledProcessResult) The result of running the command line, or none
-        if an error occurred
+        The result of running the command line, as a
+        subprocess.CompletedProcess object
 
     This is just a dumb convenience method to use subprocess with a string
     instead of having to convert a string to an array with shlex every time I
@@ -382,13 +383,15 @@ def sh(cmd):
     cmd = str(cmd)
 
     # split the string using shell syntax (smart split/quote)
-    cmd_array = shlex.split(cmd)
+    # NB: only split if running a file - if running a shell cmd, don't split
+    if not shell:
+        cmd = shlex.split(cmd)
 
     # get result of running the shell command or bubble up an error
     try:
         res = subprocess.run(
             # the array of commands produced by shlex.split
-            cmd_array,
+            cmd,
             # if check is True, an exception will be raised if the return code
             # is not 0
             # if check is False, no exception is raised but res will be None,
@@ -400,9 +403,8 @@ def sh(cmd):
             # put stdout/stderr into res
             capture_output=True,
         )
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         # bubble up the error to the calling function
-        print(e.output)
         raise e
 
     # return the result

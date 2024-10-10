@@ -9,8 +9,6 @@
 
 # pylint: disable=too-many-lines
 
-# FIXME: why is pyplate/private/venv ignored in .git?
-
 """
 A program to create a PyPlate project from a few variables
 
@@ -29,7 +27,6 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
-import fileinput
 from pathlib import Path
 import re
 import shutil
@@ -205,7 +202,7 @@ class PyMaker:
         # debug turns off some features to speed up project creation
         if self._debug:
             M.B_CMD_GIT = False
-            # M.B_CMD_VENV = False
+            M.B_CMD_VENV = False
             M.B_CMD_TREE = False
             M.B_CMD_DOCS = False
 
@@ -456,32 +453,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # combine any reqs files
-
-        # get files to combine
-        filenames = []
-        src_all = (
-            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / M.S_DIR_ALL / M.S_FILE_REQS
-        )
-        src_prj = (
-            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long / M.S_FILE_REQS
-        )
-
-        # get dst to put file lines
-        dst = self._dir_prj / M.S_FILE_REQS
-
-        # make src file names into list
-        if src_all.exists():
-            filenames.append(src_all)
-        if src_prj.exists():
-            filenames.append(src_prj)
-
-        # open dst, iterate src, write to dst
-        with (
-            open(dst, "w", encoding="utf8") as f_out,
-            fileinput.input(filenames) as f_in,
-        ):
-            for line in f_in:
-                f_out.write(line)
+        self._fix_reqs(prj_type_long)
 
         print("Done")
 
@@ -733,9 +705,12 @@ class PyMaker:
 
             # run script to install venv reqs
             cmd = self._dir_prj / M.S_VENV_INSTALL
-            F.sh(cmd)
-
-            print("Done")
+            try:
+                F.sh(cmd)
+                print("Done")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                print("Fail")
+                print(e)
 
         # ----------------------------------------------------------------------
         # tree
@@ -1225,70 +1200,41 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
-    def _fix_reqs(self):
+    def _fix_reqs(self, prj_type_long):
         """
         Combine reqs from template/all and template/prj_type
+
+        Arguments:
+            prj_type_long: the folder in template for the current project type
 
         This method combines reqs from the all dir used by all projects, and
         those used by specific project type (gui needs pygobject, etc).
         """
 
+        # get sources and filter out items that don't exist
+        src = [
+            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / M.S_DIR_ALL / M.S_FILE_REQS,
+            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long / M.S_FILE_REQS,
+        ]
+        src = [str(item) for item in src if item.exists()]
+
+        # get dst to put file lines
+        dst = self._dir_prj / M.S_FILE_REQS
+
         # # the new set of lines for requirements.txt
-        # new_file = []
+        new_file = []
 
-        # # get path to template
-        # path_template = P_DIR_PYPLATE / M.S_DIR_TEMPLATE
+        # read reqs files and put in result
+        for item in src:
+            with open(item, "r", encoding="UTF-8") as a_file:
+                old_file = a_file.readlines()
+                old_file = [line.rstrip() for line in old_file]
+                new_file = new_file + old_file
 
-        # # the file name for reqs
-        # reqs_name = M.D_PRV_ALL["__PP_REQS_FILE__"]
-
-        # # ----------------------------------------------------------------------
-
-        # # get path to template/all/requirements.txt
-        # reqs_all_file = path_template / M.S_DIR_ALL / reqs_name
-
-        # # read reqs file and put in result
-        # if reqs_all_file.exists():
-        #     with open(reqs_all_file, "r", encoding="utf-8") as a_file:
-        #         old_file = a_file.readlines()
-        #         for line in old_file:
-        #             # get all lines in file w/o newline
-        #             new_file.append(line.rstrip())
-
-        # # ----------------------------------------------------------------------
-
-        # # get path to template/prj_type
-        # prj_tmp = ""
-        # prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
-        # # for key, val in M.L_TYPES.items():
-        # #     if key == prj_type:
-        # #         prj_tmp = val[1]
-        # #         break
-        # for item in M.L_TYPES:
-        #     if prj_type == item[0]:
-        #         prj_tmp = item[3]
-        #         break
-
-        # # get path to template/prj_type/requirements.txt
-        # reqs_prj_file = path_template / prj_tmp / reqs_name
-
-        # # read reqs file and put in result
-        # if reqs_prj_file.exists():
-        #     with open(reqs_prj_file, "r", encoding="utf-8") as a_file:
-        #         old_file = a_file.readlines()
-        #         for line in old_file:
-        #             # get all lines in file w/o newline
-        #             new_file.append(line.rstrip())
-
-        # # ----------------------------------------------------------------------
-
-        # # put combined reqs into final file
-        # out_file = self._dir_prj / reqs_name
-        # joint = "\n".join(new_file)
-        # with open(out_file, "w", encoding="utf-8") as a_file:
-        #     a_file.writelines(joint)
-
-        # ----------------------------------------------------------------------
+        # put combined reqs into final file
+        joint = "\n".join(new_file)
+        with open(dst, "w", encoding="UTF-8") as a_file:
+            a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
