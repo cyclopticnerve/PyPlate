@@ -9,6 +9,8 @@
 
 # pylint: disable=too-many-lines
 
+# FIXME: why is pyplate/private/venv ignored in .git?
+
 """
 A program to create a PyPlate project from a few variables
 
