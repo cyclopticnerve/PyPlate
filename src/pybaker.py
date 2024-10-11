@@ -9,20 +9,9 @@
 
 # pylint: disable=too-many-lines
 
-# FIXME: use 1st param as prj dir (no need for -f)
+# FIXME: common version number for pm/pb/install/etc
 
-# FIXME: pass:
-# per prj:  M.D_PRV_PRJ / self._dict_prv["S_PRV_PRJ"]
-# and:
-# per build dicts: M.D_PUB_META / self._dict_pub["S_PUB_META"]
-
-# separately in pub do_before_fix
-
-# also save back to pyplate/private dir - load/inc/save build number
-# otherwise switching between projects may not update pyplate_conf.py D_PRV_PRJ
-# and D_PUB_META
-# PYMAKER - JUST MAKE FILE DO NOT SAVE ANYTHING
-# PYBAKER - read file, do metadata, save file
+# FIXME: do before fix
 
 """
 A program to change the metadata of a PyPlate project and create a dist
@@ -43,7 +32,6 @@ import argparse
 from pathlib import Path
 import re
 import shutil
-import subprocess
 import sys
 
 # pylint: disable=wrong-import-position
@@ -57,7 +45,6 @@ import sys
 # path to this project
 # parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
-DIR_SELF = Path(__file__).parent.resolve()
 P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
 P_DIR_SUPPORT = P_DIR_PYPLATE / "src" / "support"
@@ -67,8 +54,6 @@ sys.path.append(str(P_DIR_SUPPORT))
 
 # local imports
 from conf import pyplate_conf as M  # type:ignore
-
-# from conf import pybaker_conf as B  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -85,16 +70,18 @@ from cnlib.cnpot import CNPotPy  # type: ignore
 
 # ------------------------------------------------------------------------------
 # this is our metadata bootstrap
+# NB: these should be the only strings in this file, as they should NOT be
+# changed by dev
 
-# get names
-S_PP_NAME_BIG = "PyBaker"
+# name and desc for cmd line help
 S_PP_NAME_SMALL = "pybaker"
 S_PP_SHORT_DESC = (
     "A program to set the metadata of a PyPlate project and create a dist"
 )
+S_PP_VERSION = "0.0.1"
 
 # formatted version
-S_PP_VER_FMT = f"Version {M.S_VERSION}"
+S_PP_VER_FMT = f"Version {S_PP_VERSION}"
 
 # about string
 S_PP_ABOUT = (
@@ -111,7 +98,7 @@ S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
 
 # folder option strings
-S_PRJ_OPTION = "-f"
+S_PRJ_OPTION = "prj_dir"
 S_PRJ_METAVAR = "PROJECT DIR"
 S_PRJ_DEST = "PRJ_DEST"
 S_PRJ_HELP = "the project directory to bake"
@@ -161,10 +148,12 @@ class PyBaker:
         self._dict_sw_line = {}
         self._dict_type_rep = {}
 
-        self._dict_prj = {}
-        self._dict_meta = {}
-        self._dict_prv = {}
-        self._dict_cfg = {}
+        self._dict_prv_all = {}
+        self._dict_prv_prj = {}
+        self._dict_pub_meta = {}
+        self._dict_pub_bl = {}
+        self._dict_pub_i18n = {}
+        self._dict_pub_install = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -218,11 +207,9 @@ class PyBaker:
         """
         Boilerplate to use at the start of main
 
-        Perform some mundane stuff like running the arg parser and loading
-        config files.
+        Perform some mundane stuff like running the arg parser and setting
+        properties.
         """
-
-        print("Do setup... ", end="")
 
         # ----------------------------------------------------------------------
         # set pp cmd line stuff
@@ -235,39 +222,29 @@ class PyBaker:
 
         # debug turns off some _do_extras features
         if self._debug:
-            M.B_CMD_DOCS = False
+            M.B_CMD_GIT = False
+            M.B_CMD_VENV = False
             M.B_CMD_TREE = False
+            M.B_CMD_DOCS = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(M.D_SW_LINE_DEF)
 
-        # ----------------------------------------------------------------------
-
-        # if debug, use test project
-        if self._debug:
-            self._dir_prj = (
-                # Path.home() / "Documents/Projects/Python/CLIs/CLIs_DEBUG"
-                Path.home()
-                / "Documents/Projects/Python/GUIs/GUIs_DEBUG"
-            )
-            print("Done")
-            return
+        # remove home dir from PyPlate path
+        h = str(Path.home())
+        p = str(P_DIR_PYPLATE)
+        p = p.lstrip(h).strip("/")
+        # NB: change global val
+        M.D_PRV_PRJ["__PP_DEV_PP__"] = p
 
         # ----------------------------------------------------------------------
 
         # check for folder
-        dst = self._dict_args[S_PRJ_DEST]
-        if dst:
-            self._dir_prj = Path(dst)
-            if not self._dir_prj.exists():
-                print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
-                sys.exit(-1)
-        else:
-            print(M.S_ERR_PRJ_DIR_NONE)
+        self._dir_prj = Path(self._dict_args[S_PRJ_DEST])
+        if not self._dir_prj.exists():
+            print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
             sys.exit(-1)
-
-        print("Done")
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -279,28 +256,32 @@ class PyBaker:
         Get required config files and load them into the dictionaries required
         by the program. These files may sometimes be edited by users, so we
         need to check that they:
-        (1. exist)
+        1. exist
         and
-        (2. are valid JSON).
+        2. are valid JSON.\n
         Both of these are handled by F.load_dicts.
         """
 
-        # get individual dicts in the project file
-        path_to_conf = self._dir_prj / M.S_PP_PUB_CFG
-        self._dict_prj = F.load_dicts([path_to_conf], {})
-        self._dict_meta = self._dict_prj[M.S_KEY_PRJ_META]
+        # get global and calculated settings dict in private.json
+        path_to_prv = self._dir_prj / M.S_PRJ_PRV_CFG
+        dict_prv = F.load_dicts([path_to_prv], {})
+        self._dict_prv_all = dict_prv[M.S_KEY_PRV_ALL]
+        self._dict_prv_prj = dict_prv[M.S_KEY_PRV_PRJ]
 
-        # get main settings dict in private.json
-        path_to_conf = self._dir_prj / M.S_PP_PRV_CFG
-        self._dict_prv = F.load_dicts([path_to_conf], {})
-        self._dict_cfg = self._dict_prv[M.S_KEY_PRV_CFG]
+        # get individual dicts in the public file
+        path_to_pub = self._dir_prj / M.S_PRJ_PUB_CFG
+        dict_pub = F.load_dicts([path_to_pub], {})
+        self._dict_pub_meta = dict_pub[M.S_KEY_PUB_META]
+        self._dict_pub_bl = dict_pub[M.S_KEY_PUB_BL]
+        self._dict_pub_i18n = dict_pub[M.S_KEY_PUB_I18N]
+        self._dict_pub_install = dict_pub[M.S_KEY_PUB_INSTALL]
 
     # --------------------------------------------------------------------------
     # Dummy function to call conf/pybaker_conf.py
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
         """
-        Dummy function to call conf/pybaker_conf.py
+        Dummy function to call pyplate_conf.py
 
         This function is here just so i can follow the flow of the program in
         my head better. I will be making a flowchart soon...
@@ -308,8 +289,8 @@ class PyBaker:
 
         print("Do before fix... ", end="")
 
-        # call public before fix function
-        M.do_before_fix(self._dict_meta, self._dict_cfg)
+        # call function to update kw/readme deps
+        M.do_before_fix(self._dict_pub_meta)
 
         print("Done")
 
@@ -330,17 +311,16 @@ class PyBaker:
         # combine dicts for string replacement
         F.combine_dicts(
             [
-                self._dict_prv[M.S_KEY_PRV_ALL],
-                self._dict_prv[M.S_KEY_PRV_EXTRA],
-                self._dict_cfg,
-                self._dict_meta,
+                self._dict_prv_all,
+                self._dict_prv_prj,
+                self._dict_pub_meta,
             ],
             self._dict_rep,
         )
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        dict_paths = self._get_blacklist_paths()
+        dict_paths = self._fix_blacklist_paths()
 
         # just shorten the names
         skip_all = dict_paths[M.S_KEY_SKIP_ALL]
@@ -445,15 +425,20 @@ class PyBaker:
         # save project settings
 
         # save fixed settings
+        dict_no_edit = {
+            M.S_KEY_PRV_ALL: self._dict_prv_all,
+            M.S_KEY_PRV_PRJ: self._dict_prv_prj,
+        }
         path_no_edit = self._dir_prj / M.S_PP_PRV_CFG
-        F.save_dict(self._dict_prv, [path_no_edit])
+        F.save_dict(dict_no_edit, [path_no_edit])
 
         # save editable settings (blacklist/i18n etc.)
-        path_edit = self._dir_prj / M.S_PP_PUB_CFG
         dict_edit = {
-            M.S_KEY_PRJ_BL: self._dict_prj[M.S_KEY_PRJ_BL],
-            M.S_KEY_PRJ_I18N: self._dict_prj[M.S_KEY_PRJ_I18N],
+            M.S_KEY_PRJ_BL: self._dict_pub_bl,
+            M.S_KEY_PRJ_I18N: self._dict_pub_i18n,
+            M.S_KEY_PUB_INSTALL: self._dict_pub_install,
         }
+        path_edit = self._dir_prj / M.S_PP_PUB_CFG
         F.save_dict(dict_edit, [path_edit])
 
         # ----------------------------------------------------------------------
@@ -469,7 +454,7 @@ class PyBaker:
         # save meta
 
         # put in metadata and save back to file
-        dict_edit[M.S_KEY_PRJ_META] = self._dict_meta
+        dict_edit[M.S_KEY_PRJ_META] = self._dict_pub_meta
         F.save_dict(dict_edit, [path_edit])
 
         # ----------------------------------------------------------------------
@@ -495,7 +480,7 @@ class PyBaker:
         # list of files/folders from project to include in dist
         src = M.L_DIST
         # and where to put it
-        dst = Path(self._dir_prj) / M.S_DST / M.S_ASSETS
+        dst = Path(self._dir_prj) / M.S_DIR_DIST / M.S_DIR_ASSETS
 
         # copy files/folders
         for item in src:
@@ -518,7 +503,7 @@ class PyBaker:
 
         # copy venv
         print("Do copy venv...", end="")
-        name_small = self._dict_cfg["__PP_NAME_SMALL__"]
+        name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
         venv_name = M.S_VENV_FMT_NAME.format(name_small)
         new_src = self._dir_prj / venv_name
         new_dst = dst / venv_name
@@ -544,46 +529,31 @@ class PyBaker:
 
         print("Do extras/freeze... ", end="")
 
-        # see if we have git
-        path_git = self._dir_prj / M.S_ALL_GIT
-        name_small = self._dict_cfg["__PP_NAME_SMALL__"]
-        venv_name = M.S_VENV_FMT_NAME.format(name_small)
-        path_venv = self._dir_prj / venv_name
-        if path_git.exists() and path_venv.exists():
-
+        # run the cmd
+        # NB: cmd will fail if there is no git
+        cmd = self._dir_prj / M.S_VENV_FREEZE
+        try:
             # run script to freeze venv reqs
-            cmd = self._dir_prj / M.S_VENV_FREEZE
-            res = F.sh(cmd)
-            if res.returncode == 0:
-                print("Done")
-            else:
-                print("Failed")
-        else:
+            F.sh(cmd)
+            print("Done")
+        except F.CNShellError as e:
             print("Failed")
+            print(e)
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
 
-        # see if we have git
-        path_git = self._dir_prj / M.S_ALL_GIT
-        if path_git.exists():
-            print("Do extras/CHANGELOG... ", end="")
+        print("Do extras/CHANGELOG... ", end="")
 
-            path_chg = self._dir_prj / M.S_CHANGELOG
-
-            # run the cmd
-            # NB: cmd will fail if there are no entries in git
-            cmd = M.S_CHANGELOG_CMD
-            try:
-                res = F.sh(cmd)
-                if res.returncode == 0:
-                    with open(path_chg, "w", encoding="UTF8") as a_file:
-                        a_file.write(res.stdout)
-                    print("Done")
-                else:
-                    print("Failed")
-            except subprocess.CalledProcessError:
-                print("Failed")
+        # run the cmd
+        # NB: cmd will fail if there are no entries in git
+        cmd = M.S_CHANGELOG_CMD
+        try:
+            F.sh(cmd)
+            print("Done")
+        except F.CNShellError as e:
+            print("Failed")
+            print(e)
 
         # ----------------------------------------------------------------------
         # tree
@@ -606,7 +576,7 @@ class PyBaker:
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 self._dir_prj,
-                filter_list=self._dict_prj[M.S_KEY_PRJ_BL][M.S_KEY_SKIP_TREE],
+                filter_list=self._dict_pub_bl[M.S_KEY_SKIP_TREE],
                 dir_format=M.S_TREE_DIR_FORMAT,
                 file_format=M.S_TREE_FILE_FORMAT,
             )
@@ -624,6 +594,10 @@ class PyBaker:
 
         if M.B_CMD_DOCS:
 
+            print("Do extras/docs... ", end="")
+
+            # FIXME: this is broken
+
             # move into src dir
             # dir_src = self._dir_prj / M.S_ALL_SRC
             # os.chdir(dir_src)
@@ -633,9 +607,6 @@ class PyBaker:
             # cmd = M.S_CMD_DOCS.format(path_docs)
             # F.sh(cmd)
 
-            print("Do extras/docs... ", end="")
-
-            # FIXME: this is broken
             # update docs
             # cmd = self._dir_prj / M.S_DOCS_SCRIPT
             # F.sh(cmd)
@@ -657,17 +628,9 @@ class PyBaker:
             if root == self._dir_prj:
                 # for each file item
                 for item in files:
-                    if (
-                        item.name
-                        == self._dict_prv[M.S_KEY_PRV_ALL][
-                            "__PP_README_FILE__"
-                        ]
-                    ):
+                    if item.name == self._dict_prv_all["__PP_README_FILE__"]:
                         self._fix_readme(item)
-                    if (
-                        item.name
-                        == self._dict_prv[M.S_KEY_PRV_ALL]["__PP_TOML_FILE__"]
-                    ):
+                    if item.name == self._dict_prv_all["__PP_TOML_FILE__"]:
                         self._fix_pyproject(item)
 
             if root.name == M.S_ALL_SRC:
@@ -680,8 +643,6 @@ class PyBaker:
                     if item.suffix == "ui" or item.suffix == ".glade":
                         self._fix_gtk3(item)
         print("Done")
-
-        print("Do extras/i18n", end="")
 
         # do i18n stuff
         print("Do extras/i18n... ", end="")
@@ -744,14 +705,13 @@ class PyBaker:
         parser.add_argument(
             S_PRJ_OPTION,
             metavar=S_PRJ_METAVAR,
-            dest=S_PRJ_DEST,
             help=S_PRJ_HELP,
         )
 
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
     # --------------------------------------------------------------------------
-    def _get_blacklist_paths(self):
+    def _fix_blacklist_paths(self):
         """
         Convert items in blacklist to absolute Path objects
 
@@ -764,16 +724,16 @@ class PyBaker:
         # remove path separators
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
-        l_bl = self._dict_prj[M.S_KEY_PRJ_BL]
+        l_bl = self._dict_pub_bl
         for key in l_bl:
             l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
-        self._dict_prj[M.S_KEY_PRJ_BL] = l_bl
+        self._dict_pub_bl = l_bl
 
         # support for absolute/relative/glob
         # NB: taken from cntree.py
 
         # for each section of blacklist
-        for key, val in self._dict_prj[M.S_KEY_PRJ_BL].items():
+        for key, val in self._dict_pub_bl.items():
             # convert all items in list to Path objects
             paths = [Path(item) for item in val]
 
@@ -1017,13 +977,13 @@ class PyBaker:
         """
 
         # replace version
-        ver = self._dict_meta["__PP_VERSION__"]
+        ver = self._dict_pub_meta["__PP_VERSION__"]
         str_sch = M.S_META_VER_SEARCH
         str_rep = M.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
-        desc = self._dict_meta["__PP_SHORT_DESC__"]
+        desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
         str_sch = M.S_META_SD_SEARCH
         str_rep = M.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
@@ -1138,7 +1098,7 @@ class PyBaker:
 
         # replace version
         str_pattern = M.S_TOML_VERSION_SEARCH
-        pp_version = self._dict_meta["__PP_VERSION__"]
+        pp_version = self._dict_pub_meta["__PP_VERSION__"]
         if pp_version == "":
             pp_version = M.S_VERSION
         str_rep = M.S_TOML_VERSION_REPL.format(pp_version)
@@ -1146,36 +1106,15 @@ class PyBaker:
 
         # replace short description
         str_pattern = M.S_TOML_SHORT_DESC_SEARCH
-        pp_short_desc = self._dict_meta["__PP_SHORT_DESC__"]
+        pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
         str_rep = M.S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace keywords array
         str_pattern = M.S_TOML_KW_SEARCH
-        kw_str = self._dict_prv[M.S_KEY_PRV_EXTRA]["__PP_KW_STR__"]
+        kw_str = self._dict_prv_prj["__PP_KW_STR__"]
         str_rep = M.S_TOML_KW_REPL.format(kw_str)
         text = re.sub(str_pattern, str_rep, text)
-
-        # # replace dependencies array
-        # str_pattern = (
-        #     r"(^\s*\[project\]\s*$)"
-        #     r"(.*?)"
-        #     r"(^\s*dependencies[\t ]*=[\t ]*)"
-        #     r"(.*?\])"
-        # )
-
-        # # convert dict to string (only using keys)
-        # pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
-
-        # # NB: this is not conducive to a dict (we don't need links, only names)
-        # # so don't do what we did in README, keep it simple
-        # list_py_deps = [item for item in pp_py_deps.keys()]
-        # str_pp_py_deps = [f'"{item}"' for item in list_py_deps]
-        # str_pp_py_deps = ", ".join(str_pp_py_deps)
-
-        # # replace text
-        # str_rep = rf"\g<1>\g<2>\g<3>[{str_pp_py_deps}]"
-        # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
         # save file
         with open(item, "w", encoding="UTF8") as a_file:
@@ -1205,7 +1144,7 @@ class PyBaker:
             r"(.*?)"
             r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
         )
-        pp_short_desc = self._dict_meta["__PP_SHORT_DESC__"]
+        pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
         str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
         text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
@@ -1215,7 +1154,7 @@ class PyBaker:
             r"(.*?)"
             r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
         )
-        str_rep = rf'\g<1>\n{self._dict_prv[M.S_KEY_PRV_EXTRA]["__PP_RM_DEPS__"]}\g<3>'
+        str_rep = rf'\g<1>\n{self._dict_prv_prj["__PP_RM_DEPS__"]}\g<3>'
         text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
         # save file
@@ -1235,7 +1174,7 @@ class PyBaker:
 
         # validate wanted categories into approved categories
         pp_gui_categories = []
-        wanted_cats = self._dict_meta["__PP_GUI_CATS__"]
+        wanted_cats = self._dict_pub_meta["__PP_GUI_CATS__"]
         for cat in wanted_cats:
             # category is valid
             if cat in M.L_CATS:
@@ -1276,7 +1215,7 @@ class PyBaker:
             r"(^\s*Comment[\t ]*=)"
             r"(.*?$)"
         )
-        pp_short_desc = self._dict_meta["__PP_SHORT_DESC__"]
+        pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
         str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1308,7 +1247,7 @@ class PyBaker:
             r"(.*?)"
             r"(</property>)"
         )
-        pp_short_desc = self._dict_meta["__PP_SHORT_DESC__"]
+        pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
         str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1319,7 +1258,7 @@ class PyBaker:
             r"(.*?)"
             r"(</property>.*)"
         )
-        pp_version = self._dict_meta["__PP_VERSION__"]
+        pp_version = self._dict_pub_meta["__PP_VERSION__"]
         str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1360,11 +1299,11 @@ class PyBaker:
             "pq",
         ]
 
-        name_big = self._dict_cfg["__PP_NAME_BIG__"]
-        name_small = self._dict_cfg["__PP_NAME_SMALL__"]
-        version = self._dict_meta["__PP_VERSION__"]
-        author = self._dict_prv[M.S_KEY_PRV_ALL]["__PP_AUTHOR__"]
-        email = self._dict_prv[M.S_KEY_PRV_ALL]["__PP_EMAIL__"]
+        name_big = self._dict_prv_prj["__PP_NAME_BIG__"]
+        name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+        version = self._dict_pub_meta["__PP_VERSION__"]
+        author = self._dict_prv_all["__PP_AUTHOR__"]
+        email = self._dict_prv_all["__PP_EMAIL__"]
 
         # path to src dir
         dir_src = self._dir_prj / M.S_ALL_SRC

@@ -31,6 +31,26 @@ import shlex
 import subprocess
 
 # ------------------------------------------------------------------------------
+# A class to wrap errors from the sh function
+# ------------------------------------------------------------------------------
+class CNShellError(Exception):
+    """
+    A class to wrap errors from the sh function
+
+    Arguments:
+        e: the original exception
+
+    This class is used to wrap exceptions from the sh function, so that a file
+    that uses sh does not need to import or check for all possible failures.
+    The original exception and it's properties will be exposed by the
+    'exception' property, but printing will defer to the original exception's
+    __repr__ property.
+    """
+    def __init__(self, exception):
+        self.exception = exception
+        self.__repr__ = self.exception.__repr__
+
+# ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
 # ------------------------------------------------------------------------------
 def do_bool(val):
@@ -356,11 +376,11 @@ def combine_dicts(dicts_new, dict_old):
 
 
 # ------------------------------------------------------------------------------
-# Run a command string in the shell
+# Run a program or command string in the shell
 # ------------------------------------------------------------------------------
 def sh(cmd, shell=False):
     """
-    Run a command string in the shell
+    Run a program or command string in the shell
 
     Arguments:
         cmd: The command line to run
@@ -368,7 +388,7 @@ def sh(cmd, shell=False):
         split the cmd into separate arguments
 
     Raises:
-        Exception if something went wrong
+        CNShellError if something went wrong
 
     Returns:
         The result of running the command line, as a
@@ -402,10 +422,14 @@ def sh(cmd, shell=False):
             text=True,
             # put stdout/stderr into res
             capture_output=True,
+            # whether the call is a file w/ params (False) or a direct shell
+            # input (True)
+            shell=shell,
         )
     except Exception as e:
         # bubble up the error to the calling function
-        raise e
+        new_err = CNShellError(e)
+        raise new_err from e
 
     # return the result
     return res

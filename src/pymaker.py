@@ -193,6 +193,9 @@ class PyMaker:
         properties.
         """
 
+        # ----------------------------------------------------------------------
+        # set pp cmd line stuff
+
         # get cmd line args
         self._run_parser()
 
@@ -708,8 +711,8 @@ class PyMaker:
             try:
                 F.sh(cmd)
                 print("Done")
-            except Exception as e:  # pylint: disable=broad-exception-caught
-                print("Fail")
+            except F.CNShellError as e:
+                print("Failed")
                 print(e)
 
         # ----------------------------------------------------------------------

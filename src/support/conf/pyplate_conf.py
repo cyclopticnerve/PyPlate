@@ -220,7 +220,7 @@ S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
 S_ERR_PRJ_DIR_NONE = "Project dir not provided"
 
 S_CHANGELOG = "CHANGELOG.md"
-S_CHANGELOG_CMD = "git log --pretty='%ad - %s'"
+S_CHANGELOG_CMD = f"git log --pretty='%ad - %s' > {S_CHANGELOG}"
 
 S_TOML_VERSION_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
@@ -239,10 +239,6 @@ S_META_VER_SEARCH = r"(\s*__PB_VERSION__\s*=\s*)(.*)"
 S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*__PB_SHORT_DESC__\s*=\s*)(.*)"
 S_META_SD_REPL = r'\g<1>"{}"'
-
-# S_DST = "dist"
-# S_ASSETS = "assets"
-# S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
 
 # S_ERR_COUNT = "Errors: {}"
 # S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
@@ -745,7 +741,7 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(dict_meta=None):
+def do_before_fix(dict_prv=None, dict_pub=None):
     """
     Do any work before fix
 
@@ -761,8 +757,10 @@ def do_before_fix(dict_meta=None):
     """
 
     # sanity check
-    if not dict_meta:
-        dict_meta = D_PUB_META
+    if not dict_prv:
+        dict_prv = D_PRV_PRJ
+    if not dict_pub:
+        dict_pub = D_PUB_META
 
     # ------------------------------------------------------------------------------
     # these paths are formatted here because they are complex and may be
@@ -780,16 +778,16 @@ def do_before_fix(dict_meta=None):
     # ------------------------------------------------------------------------------
     # fix keywords for pyproject.toml
     # NB: this code is placed here b/c it is used in both pm and pb
-    l_keywords = dict_meta["__PP_KEYWORDS__"]
+    l_keywords = dict_pub["__PP_KEYWORDS__"]
     q_keywords = [f'"{item}"' for item in l_keywords]
-    dict_meta["__PP_KW_STR__"] = ", ".join(q_keywords)
+    D_PRV_PRJ["__PP_KW_STR__"] = ", ".join(q_keywords)
 
     # ------------------------------------------------------------------------------
     # now figure out py deps and links for readme
     # NB: this code is placed here b/c it is used in both pm and pb
 
     # get meta deps
-    d_py_deps = dict_meta["__PP_PY_DEPS__"]
+    d_py_deps = dict_pub["__PP_PY_DEPS__"]
     # new list of deps
     l_rm_deps = []
     # default text
@@ -803,7 +801,7 @@ def do_before_fix(dict_meta=None):
                 l_rm_deps.append(f"[{key}]({val})")
         s_rm_deps = "<br>\n".join(l_rm_deps)
     # put the new string in config so it can be shared to _do_fix
-    dict_meta["__PP_RM_DEPS__"] = s_rm_deps
+    D_PRV_PRJ["__PP_RM_DEPS__"] = s_rm_deps
 
 
 # --------------------------------------------------------------------------
