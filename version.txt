@@ -1,0 +1,8 @@
+pyproject.toml - pm ok, pb
+project.json - pm ok, pb
+
+pymaker.py - only in strings
+pybaker.py - only in strings
+pyplate_conf.py - pm ok, pb
+
+dialogs.ui - pm ok, pb

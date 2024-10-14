@@ -32,11 +32,17 @@ from pathlib import Path
 import re
 import shutil
 
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
 # my imports
 from . import cnfunctions as F
 
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------

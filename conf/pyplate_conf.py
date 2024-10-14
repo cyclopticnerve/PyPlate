@@ -6,6 +6,8 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
+# pylint: disable=too-many-lines
+
 """
 This module separates out the constants from pymaker.py.
 This file, and the template folder, are the main ways to customize PyPlate.
@@ -137,9 +139,11 @@ S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_DOCS = "docs"
 S_DIR_MISC = "misc"
-S_DIR_README = "README"
+S_DIR_README = "readme"
 S_DIR_SRC = "src"
 S_DIR_SUPPORT = "support"
+S_DIR_DESKTOP = "desktop"
+S_DIR_UI = "ui"
 S_DIR_I18N = "i18n"
 S_DIR_IMAGES = "images"
 S_DIR_LOCALE = "locale"
@@ -198,14 +202,10 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 S_CMD_GIT = "git init {} -q"
 
 # cmds for venv
-
-# S_VENV_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
-
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
 # NB: path to venv create/install/freeze scripts for venv, relative to prj dir
-# NB: format param is full path to S_VENV_FMT_NAME after formatting
-# S_VENV_CREATE = "python -Xfrozen_modules=off -m venv {}"
+# NB: format param is S_VENV_FMT_NAME
 S_VENV_CREATE = f"{S_PRJ_PRV_DIR}/venv/venv_create.sh" " {}"
 S_VENV_INSTALL = f"{S_PRJ_PRV_DIR}/venv/venv_install.sh"
 S_VENV_FREEZE = f"{S_PRJ_PRV_DIR}/venv/venv_freeze.sh"
@@ -235,9 +235,9 @@ S_TOML_KW_SEARCH = (
 )
 S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
 
-S_META_VER_SEARCH = r"(\s*__PB_VERSION__\s*=\s*)(.*)"
+S_META_VER_SEARCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
 S_META_VER_REPL = r'\g<1>"{}"'
-S_META_SD_SEARCH = r"(\s*__PB_SHORT_DESC__\s*=\s*)(.*)"
+S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=\s*)(.*)"
 S_META_SD_REPL = r'\g<1>"{}"'
 
 # S_ERR_COUNT = "Errors: {}"
@@ -264,11 +264,20 @@ L_TYPES = [
 
 # list of file types to use md/html/xml fixer
 L_MARKUP = [
-    "md",
-    "html",
-    "xml",
-    "ui",
-    "glade",
+    ".md",
+    ".html",
+    ".xml",
+    ".ui",
+    ".glade",
+]
+
+# file exts for pybaker
+L_DESKTOP = [
+    ".desktop"
+]
+L_GTK = [
+    ".ui",
+    ".glade"
 ]
 
 # files to remove after the project is done
@@ -280,8 +289,9 @@ L_PURGE = [
 # folders to put in dist
 L_DIST = [
     "conf",
-    "README",
+    "readme",
     S_DIR_SRC,
+    "lib",
     "CHANGELOG.md",
     "LICENSE.txt",
     "README.md",
@@ -474,7 +484,7 @@ D_PRV_ALL = {
     "__PP_DUMMY__": "",
     # docs folder
     "__PP_NAME_DOCS__": S_DIR_DOCS,
-    # version format string for command line (context for pybaker replace)
+    # version format string for command line
     # NB: format param is __PP_VERSION__ from metadata
     "__PP_VER_FMT__": "Version {}",
     # NB: the struggle here is that using the fixed format results in a
@@ -498,7 +508,7 @@ D_PRV_ALL = {
     # location of src files
     "__PP_DEV_SRC__": S_DIR_SRC,
     # location of config files
-    "__PP_DEV_CONF__": f"{S_DIR_SRC}/{S_DIR_SUPPORT}/{S_DIR_CONF}",
+    "__PP_DEV_CONF__": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
@@ -671,12 +681,12 @@ D_PUB_INST = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
+    "lib": "lib",
     f"{S_DIR_MISC}/cnlibs.py": f"{S_DIR_MISC}/cnlibs.py",
     f"{S_DIR_MISC}/default_class.py": f"{S_DIR_MISC}/default_class.py",
     f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
     f"{S_DIR_MISC}/snippets.txt": f"{S_DIR_MISC}/snippets.txt",
     f"{S_DIR_MISC}/style.txt": f"{S_DIR_MISC}/style.txt",
-    "lib": f"{S_DIR_SRC}/{S_DIR_SUPPORT}/{S_USR_LIB_NAME}",
 }
 
 # the info for matching/fixing lines in markup files
@@ -741,13 +751,14 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(dict_prv=None, dict_pub=None):
+def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
     """
     Do any work before fix
 
     Arguments:
-        dict_meta: The dictionary containing metadata for the project (default:
-        D_PUB_META)
+        dict_prv_prj: The dict of project settings (default: D_PRV_PRJ)
+        dict_pub_meta: The dictionary containing metadata for the project
+        (default: D_PUB_META)
 
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
@@ -757,10 +768,10 @@ def do_before_fix(dict_prv=None, dict_pub=None):
     """
 
     # sanity check
-    if not dict_prv:
-        dict_prv = D_PRV_PRJ
-    if not dict_pub:
-        dict_pub = D_PUB_META
+    if not dict_prv_prj:
+        dict_prv_prj = D_PRV_PRJ
+    if not dict_pub_meta:
+        dict_pub_meta = D_PUB_META
 
     # ------------------------------------------------------------------------------
     # these paths are formatted here because they are complex and may be
@@ -768,26 +779,26 @@ def do_before_fix(dict_prv=None, dict_pub=None):
 
     # get values after pymaker has set them
     author = D_PRV_ALL["__PP_AUTHOR__"]
-    name_small = D_PRV_PRJ["__PP_NAME_SMALL__"]
+    name_small = dict_prv_prj["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    D_PRV_PRJ["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    D_PRV_PRJ["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
-    D_PRV_PRJ["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
+    dict_prv_prj["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
+    dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
+    dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # ------------------------------------------------------------------------------
     # fix keywords for pyproject.toml
     # NB: this code is placed here b/c it is used in both pm and pb
-    l_keywords = dict_pub["__PP_KEYWORDS__"]
+    l_keywords = dict_pub_meta["__PP_KEYWORDS__"]
     q_keywords = [f'"{item}"' for item in l_keywords]
-    D_PRV_PRJ["__PP_KW_STR__"] = ", ".join(q_keywords)
+    dict_prv_prj["__PP_KW_STR__"] = ", ".join(q_keywords)
 
     # ------------------------------------------------------------------------------
     # now figure out py deps and links for readme
     # NB: this code is placed here b/c it is used in both pm and pb
 
     # get meta deps
-    d_py_deps = dict_pub["__PP_PY_DEPS__"]
+    d_py_deps = dict_pub_meta["__PP_PY_DEPS__"]
     # new list of deps
     l_rm_deps = []
     # default text
@@ -801,13 +812,16 @@ def do_before_fix(dict_prv=None, dict_pub=None):
                 l_rm_deps.append(f"[{key}]({val})")
         s_rm_deps = "<br>\n".join(l_rm_deps)
     # put the new string in config so it can be shared to _do_fix
-    D_PRV_PRJ["__PP_RM_DEPS__"] = s_rm_deps
+    dict_prv_prj["__PP_RM_DEPS__"] = s_rm_deps
 
+    # add venv to dist list
+    venv_name = S_VENV_FMT_NAME.format(name_small)
+    L_DIST.append(venv_name)
 
 # --------------------------------------------------------------------------
 # Do any work after fix
 # --------------------------------------------------------------------------
-def do_after_fix(dir_prj):
+def do_after_fix():
     """
     Do any work after fix
 
@@ -818,39 +832,86 @@ def do_after_fix(dir_prj):
     _do_after_fix, after all files have been modified.
     """
 
-    readme = Path(dir_prj) / "README.md"
-    if readme.exists():
-        _fix_readme(readme)
+# ------------------------------------------------------------------------------
+# File-specific fixes after everything else
+# ------------------------------------------------------------------------------
+def do_extras(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
+    """
+    File-specific fixes after everything else
 
-    # for root, _root_dirs, root_files in dir_prj.walk():
+    Arguments:
+        dir_prj: the path to the project's directory
 
-    #     # convert files into Paths
-    #     files = [root / f for f in root_files]
 
-    #     # check if readme
-    #     if root == dir_prj:
-    #         # for each file item
-    #         for item in files:
-    #             if item.name == "README.md":
-    #                 _fix_readme(item)
+    """
 
+    # sanity check
+    if not dict_prv_prj:
+        dict_prv_prj = D_PRV_PRJ
+    if not dict_pub_meta:
+        dict_pub_meta = D_PUB_META
+
+    # outsource the big stuff
+
+    print("Do extras/other... ", end="")
+
+    # scan project dir
+    for root, _root_dirs, root_files in dir_prj.walk():
+
+        # convert files into Paths
+        files = [root / f for f in root_files]
+
+        # check if readme
+        if root == dir_prj:
+            # for each file item
+            for item in files:
+                if item.name == D_PRV_ALL["__PP_README_FILE__"]:
+                    _fix_readme(item, dict_prv_prj, dict_pub_meta)
+                if item.name == D_PRV_ALL["__PP_TOML_FILE__"]:
+                    _fix_pyproject(item)
+
+        if root.name == S_DIR_DESKTOP:
+            # for each file item
+            for item in files:
+                suffix = item.suffix.lstrip(".")
+                suffix = "." + suffix
+                if suffix in L_DESKTOP:
+                    fix_desktop(item)
+
+        if root.name == S_DIR_UI:
+            # for each file item
+            for item in files:
+                suffix = item.suffix.lstrip(".")
+                suffix = "." + suffix
+            if suffix in L_GTK:
+                fix_gtk(item)
+
+    print("Done")
+
+    # do i18n stuff
+    print("Do extras/i18n... ", end="")
+    do_i18n()
+    print("Done")
 
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
 
 
-# --------------------------------------------------------------------------
-# Remove parts of the main README file
-# --------------------------------------------------------------------------
-def _fix_readme(path):
+# ------------------------------------------------------------------------------
+# Remove/replace parts of the main README file
+# ------------------------------------------------------------------------------
+def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     """
-    Remove parts of the main README file
+    Remove/replace parts of the main README file
 
     Arguments:
-        path: Path for the README to remove text
+        path: Path for the README to modify text
+        dict_prv_prj: the private calculated proj dict
+        dict_pub_meta: the dict of metadata to replace in the file
 
-    Removes parts of the file not applicable to the current project type.
+    Removes parts of the file not applicable to the current project type. Also
+    fixes metadata in the file when dict_meta is present.
     """
 
     # the whole text of the file
@@ -860,8 +921,11 @@ def _fix_readme(path):
     with open(path, "r", encoding="UTF-8") as a_file:
         text = a_file.read()
 
+    # --------------------------------------------------------------------------
+    # this part is used by pymaker to remove readme sections
+
     # find the remove blocks
-    prj_type = D_PRV_PRJ["__PP_TYPE_PRJ__"]
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
     if prj_type == "c" or prj_type == "g":
         str_pattern = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
     else:
@@ -871,9 +935,77 @@ def _fix_readme(path):
     # NB: need S flag to make dot match newline
     text = re.sub(str_pattern, "", text, flags=re.S)
 
+    # --------------------------------------------------------------------------
+    # this part is used by pybaker to replace metadata
+
+    # replace short description
+    str_pattern = (
+        r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
+        r"(.*?)"
+        r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
+    )
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
+    # replace dependencies array
+    str_pattern = (
+        r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
+        r"(.*?)"
+        r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
+    )
+    str_rep = rf'\g<1>\n{dict_prv_prj["__PP_RM_DEPS__"]}\g<3>'
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:
         a_file.write(text)
 
+# --------------------------------------------------------------------------
+# Replace text in the pyproject file
+# --------------------------------------------------------------------------
+def _fix_pyproject(path):
+    """
+    Replace text in the pyproject file
+
+    Arguments:
+        path: Path for the pyproject.toml file to modify text
+
+    Replaces things like the keywords, requirements, etc. in the toml file.
+    """
+
+    # default text if we can't open file
+    text = ""
+
+    # open file and get contents
+    with open(path, "r", encoding="UTF-8") as a_file:
+        text = a_file.read()
+
+    # replace version
+    str_pattern = S_TOML_VERSION_SEARCH
+    pp_version = dict_pub_meta["__PP_VERSION__"]
+    str_rep = S_TOML_VERSION_REPL.format(pp_version)
+    text = re.sub(str_pattern, str_rep, text)
+
+    # replace short description
+    str_pattern = S_TOML_SHORT_DESC_SEARCH
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    str_rep = S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
+    text = re.sub(str_pattern, str_rep, text)
+
+    # replace keywords array
+    str_pattern = S_TOML_KW_SEARCH
+    kw_str = dict_prv_prj["__PP_KW_STR__"]
+    str_rep = S_TOML_KW_REPL.format(kw_str)
+    text = re.sub(str_pattern, str_rep, text)
+
+    # save file
+    with open(path, "w", encoding="UTF-8") as a_file:
+        a_file.write(text)
+
+def do_i18n():
+    """
+    docstring
+    """
 
 # -)

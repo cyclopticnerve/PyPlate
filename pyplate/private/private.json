@@ -1,0 +1,39 @@
+{
+    "PRV_ALL": {
+        "__PP_AUTHOR__": "cyclopticnerve",
+        "__PP_URL__": "https://github.com/cyclopticnerve",
+        "__PP_EMAIL__": "cyclopticnerve@gmail.com",
+        "__PP_LICENSE_NAME__": "WTFPLv2",
+        "__PP_RM_LICENSE__": "[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg \"http://www.wtfpl.net\")](http://www.wtfpl.net)",
+        "__PP_DUMMY__": "",
+        "__PP_NAME_DOCS__": "docs",
+        "__PP_VER_FMT__": "Version {}",
+        "__PP_DATE_FMT__": "%m/%d/%Y",
+        "__PP_LICENSE_FILE__": "LICENSE.txt",
+        "__PP_README_FILE__": "README.md",
+        "__PP_TOML_FILE__": "pyproject.toml",
+        "__PP_REQS_FILE__": "requirements.txt",
+        "__PP_INST_FILE__": "conf/install.json",
+        "__PP_DEV_SRC__": "src",
+        "__PP_DEV_CONF__": "src/support/conf",
+        "__PP_USR_APPS__": ".local/share/applications",
+        "__PP_USR_BIN__": ".local/bin",
+        "__PP_SUPPORT__": "support",
+        "__PP_IMAGES__": "images"
+    },
+    "PRV_PRJ": {
+        "__PP_TYPE_PRJ__": "c",
+        "__PP_NAME_BIG__": "PyPlate",
+        "__PP_NAME_SMALL__": "pyplate",
+        "__PP_NAME_SEC__": "pyplate",
+        "__PP_NAME_CLASS__": "PyPlate",
+        "__PP_DATE__": "12/08/2022",
+        "__PP_NAME_VENV__": ".venv-pyplate",
+        "__PP_DEV_PP__": "Documents/Projects/Python/PyPlate",
+        "__PP_USR_CONF__": ".config/pyplate",
+        "__PP_USR_LIB__": ".local/share/cyclopticnerve/lib",
+        "__PP_USR_SRC__": ".local/share/pyplate",
+        "__PP_KW_STR__": "\"Python\", \"cli\", \"gui\", \"package\", \"gtk3\", \"gtk\", \"PyGObject\", \"PyGTK\", \"template\", \"app\"",
+        "__PP_RM_DEPS__": "None"
+    }
+}

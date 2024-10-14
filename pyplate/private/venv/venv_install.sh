@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                               /          \
-# Filename: docs.sh                                               |     ()     |
+# Project : PyPlate                                                /          \
+# Filename: venv_install.sh                                       |     ()     |
 # Date    : 09/29/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-#
-# A script to run your documentation program
-#
-
 # change working dir to the project (which is two dirs up,
-# ie. "project/pyplate/private/venv_freeze.sh")
+# ie. "project/pyplate/private/venv_install.sh")
 SCRIPT_DIR=$(dirname $(realpath $0))
-cd $SCRIPT_DIR/../..
+cd $SCRIPT_DIR/../../..
 
-# activate the project's venv and freeze reqs there
+# activate the project's venv and install reqs there
 . .venv-pyplate/bin/activate
-python -m pdoc --html -f -o docs src
+python -m pip install -r requirements.txt
 
 # -)

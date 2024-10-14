@@ -28,8 +28,7 @@
         "SKIP_PATH": [],
         "SKIP_TREE": [
             ".git",
-            ".*venv*",
-            ".vscode",
+            "**/.venv*",
             ".VSCodeCounter",
             "**/__pycache__"
         ]
@@ -41,7 +40,7 @@
         ],
         "CLANGS": {
             "Python": [
-                "py"
+                ".py"
             ],
             "Glade": [
                 ".ui",
@@ -60,9 +59,20 @@
         "PO": "po"
     },
     "PRJ_META": {
-        "__PP_VERSION__": "0.0.0",
-        "__PP_SHORT_DESC__": "A program to create Python programs from a template",
-        "__PP_KEYWORDS__": [],
+        "__PP_VERSION__": "0.0.1",
+        "__PP_SHORT_DESC__": "A program for creating CLI/Package/GUI projects in Python from a template",
+        "__PP_KEYWORDS__": [
+            "Python",
+            "cli",
+            "gui",
+            "package",
+            "gtk3",
+            "gtk",
+            "PyGObject",
+            "PyGTK",
+            "template",
+            "app"
+        ],
         "__PP_PY_DEPS__": {},
         "__PP_SYS_DEPS__": {},
         "__PP_GUI_CATS__": []

@@ -34,7 +34,7 @@ keywords = [
     "gtk",
     "PyGObject",
     "PyGTK",
-    "template,",
+    "template",
     "app",
 ]
 dependencies = []

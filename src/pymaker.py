@@ -71,8 +71,10 @@ from cnlib.cntree import CNTree  # type: ignore
 # changed by dev
 
 # name and desc for cmd line help
-S_PP_NAME_SMALL = "pymaker"
-S_PP_SHORT_DESC = "A program to create a Python project from a few variables"
+S_PP_NAME_BIG = "PyMaker"
+S_PP_SHORT_DESC = (
+    "A program for creating CLI/Package/GUI projects in Python from a template"
+)
 S_PP_VERSION = "0.0.1"
 
 # formatted version
@@ -80,7 +82,7 @@ S_PP_VER_FMT = f"Version {S_PP_VERSION}"
 
 # about string
 S_PP_ABOUT = (
-    f"{S_PP_NAME_SMALL}\n"
+    f"{S_PP_NAME_BIG}\n"
     f"{S_PP_SHORT_DESC}\n"
     f"{S_PP_VER_FMT}\n"
     f"https://www.github.com/cyclopticnerve/PyPlate"
@@ -397,7 +399,8 @@ class PyMaker:
         M.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
         M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
         M.D_PRV_PRJ["__PP_DATE__"] = info_date
-        M.D_PRV_PRJ["__PP_NAME_VENV__"] = M.S_VENV_FMT_NAME.format(name_small)
+        s = M.S_VENV_FMT_NAME.format(name_small)
+        M.D_PRV_PRJ["__PP_NAME_VENV__"] = s
         M.D_PUB_META["__PP_SHORT_DESC__"] = new_desc
 
     # --------------------------------------------------------------------------
@@ -553,9 +556,9 @@ class PyMaker:
 
                     # do md/html/xml separately (needs special handling)
                     self._dict_type_rep = M.D_PY_REPL
-                    wo_dot = item.suffix.lstrip(".")
-                    w_dot = "." + wo_dot
-                    if wo_dot in M.L_MARKUP or w_dot in M.L_MARKUP:
+                    suffix = item.suffix.lstrip(".")
+                    suffix = "." + suffix
+                    if suffix in M.L_MARKUP :
                         self._dict_type_rep = M.D_MU_REPL
 
                     # fix content with appropriate dict
@@ -612,40 +615,41 @@ class PyMaker:
         # save project settings
 
         # save fixed settings
-        dict_no_edit = {
+        dict_prv = {
             M.S_KEY_PRV_ALL: M.D_PRV_ALL,
             M.S_KEY_PRV_PRJ: M.D_PRV_PRJ,
         }
-        path_no_edit = self._dir_prj / M.S_PRJ_PRV_CFG
-        F.save_dict(dict_no_edit, [path_no_edit])
+        path_prv = self._dir_prj / M.S_PRJ_PRV_CFG
+        F.save_dict(dict_prv, [path_prv])
 
         # save editable settings (blacklist/i18n etc.)
-        dict_edit = {
+        dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
             M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
         }
-        path_edit = self._dir_prj / M.S_PRJ_PUB_CFG
-        F.save_dict(dict_edit, [path_edit])
+        path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
+        F.save_dict(dict_pub, [path_pub])
 
+        # ----------------------------------------------------------------------
         # fix dunders in bl/i18n/install
-        self._fix_content(path_edit, False, False)
+        self._fix_content(path_pub, False, False)
 
         # reload dict from fixed file
-        dict_edit = F.load_dicts([path_edit])
+        dict_pub = F.load_dicts([path_pub])
 
         # ----------------------------------------------------------------------
         # save meta
 
         # put in metadata and save back to file
-        dict_edit[M.S_KEY_PUB_META] = M.D_PUB_META
-        F.save_dict(dict_edit, [path_edit])
+        dict_pub[M.S_KEY_PUB_META] = M.D_PUB_META
+        F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
         # everything else
 
         # call conf after fix
-        M.do_after_fix(self._dir_prj)
+        M.do_after_fix()
 
         print("Done")
 
@@ -656,24 +660,11 @@ class PyMaker:
         """
         Make any necessary changes after all fixes have been done
 
-        Do some extra functions like purge, create .git and .venv, and update
-        the tree file for the current project.
+        Do some extra functions like create .git and .venv ,update docs, purge,
+        and update the tree file for the current project.
         """
 
         print("Do extras")
-
-        # ----------------------------------------------------------------------
-        # purge
-
-        print("Do extras/purge... ", end="")
-
-        # delete any unnecessary files
-        for item in M.L_PURGE:
-            path_del = self._dir_prj / item
-            if path_del.exists():
-                path_del.unlink()
-
-        print("Done")
 
         # ----------------------------------------------------------------------
         # git
@@ -716,6 +707,39 @@ class PyMaker:
                 print(e)
 
         # ----------------------------------------------------------------------
+        # purge
+
+        print("Do extras/purge... ", end="")
+
+        # delete any unnecessary files
+        for item in M.L_PURGE:
+            path_del = self._dir_prj / item
+            if path_del.exists():
+                path_del.unlink()
+
+        print("Done")
+
+        # ----------------------------------------------------------------------
+        # update docs
+        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
+        # work
+
+        if M.B_CMD_DOCS:
+
+            print("Do extras/docs... ", end="")
+
+            # FIXME: this is broken
+            # cmd = self._dir_prj / M.S_DOCS_SCRIPT
+            # F.sh(cmd)
+
+            print("Done")
+
+        # ----------------------------------------------------------------------
+        # do any custom extras in pyplate_conf.py
+
+        M.do_extras(self._dir_prj)
+
+        # ----------------------------------------------------------------------
         # tree
         # NB: run last so it includes .git and .venv folders
         # NB: this will wipe out all previous checks (maybe good?)
@@ -744,21 +768,6 @@ class PyMaker:
             # write to file
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
-
-            print("Done")
-
-        # ----------------------------------------------------------------------
-        # update docs
-        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
-        # work
-
-        if M.B_CMD_DOCS:
-
-            print("Do extras/docs... ", end="")
-
-            # FIXME: this is broken
-            # cmd = self._dir_prj / M.S_DOCS_SCRIPT
-            # F.sh(cmd)
 
             print("Done")
 
