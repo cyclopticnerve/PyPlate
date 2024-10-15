@@ -11,6 +11,8 @@
 
 # FIXME: common version number for pm/pb/install/etc
 # FIXME: remove strings
+# move fix_readme, toml, .desktop/.ui
+# move do_i18n/make_install
 
 
 """
@@ -1079,110 +1081,110 @@ class PyBaker:
     #     with open(item, "w", encoding="UTF-8") as a_file:
     #         a_file.write(text)
 
-    # ------------------------------------------------------------------------------
-    # Replace text in the desktop file
-    # ------------------------------------------------------------------------------
-    def _fix_desktop(self, item):
-        """
-        Replace text in the desktop file
+    # # ------------------------------------------------------------------------------
+    # # Replace text in the desktop file
+    # # ------------------------------------------------------------------------------
+    # def _fix_desktop(self, item):
+    #     """
+    #     Replace text in the desktop file
 
-        Replaces the desc, exec, icon, path, and category text in a .desktop
-        file for programs that use this.
-        """
+    #     Replaces the desc, exec, icon, path, and category text in a .desktop
+    #     file for programs that use this.
+    #     """
 
-        # validate wanted categories into approved categories
-        pp_gui_categories = []
-        wanted_cats = self._dict_pub_meta["__PP_GUI_CATS__"]
-        for cat in wanted_cats:
-            # category is valid
-            if cat in M.L_CATS:
-                # add to final list
-                pp_gui_categories.append(cat)
-            else:
-                # category is not valid, print error and increase error count
-                print(
-                    f'In PP_GUI_CATEGORIES, "{cat}" is not valid, see \n'
-                    "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
-                )
+    #     # validate wanted categories into approved categories
+    #     pp_gui_categories = []
+    #     wanted_cats = self._dict_pub_meta["__PP_GUI_CATS__"]
+    #     for cat in wanted_cats:
+    #         # category is valid
+    #         if cat in M.L_CATS:
+    #             # add to final list
+    #             pp_gui_categories.append(cat)
+    #         else:
+    #             # category is not valid, print error and increase error count
+    #             print(
+    #                 f'In PP_GUI_CATEGORIES, "{cat}" is not valid, see \n'
+    #                 "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
+    #             )
 
-        # convert list to string
-        str_cat = ";".join(pp_gui_categories)
-        str_cat += ";"
+    #     # convert list to string
+    #     str_cat = ";".join(pp_gui_categories)
+    #     str_cat += ";"
 
-        # default text if we can't open file
-        text = ""
+    #     # default text if we can't open file
+    #     text = ""
 
-        # open file and get contents
-        with open(item, "r", encoding="UTF-8") as a_file:
-            text = a_file.read()
+    #     # open file and get contents
+    #     with open(item, "r", encoding="UTF-8") as a_file:
+    #         text = a_file.read()
 
-        # replace categories
-        str_pattern = (
-            r"(^\s*\[Desktop Entry\]\s*$)"
-            r"(.*?)"
-            r"(^\s*Categories[\t ]*=)"
-            r"(.*?$)"
-        )
-        str_rep = rf"\g<1>\g<2>\g<3>{str_cat}"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+    #     # replace categories
+    #     str_pattern = (
+    #         r"(^\s*\[Desktop Entry\]\s*$)"
+    #         r"(.*?)"
+    #         r"(^\s*Categories[\t ]*=)"
+    #         r"(.*?$)"
+    #     )
+    #     str_rep = rf"\g<1>\g<2>\g<3>{str_cat}"
+    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # replace short description
-        str_pattern = (
-            r"(^\s*\[Desktop Entry\]\s*$)"
-            r"(.*?)"
-            r"(^\s*Comment[\t ]*=)"
-            r"(.*?$)"
-        )
-        pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
-        str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+    #     # replace short description
+    #     str_pattern = (
+    #         r"(^\s*\[Desktop Entry\]\s*$)"
+    #         r"(.*?)"
+    #         r"(^\s*Comment[\t ]*=)"
+    #         r"(.*?$)"
+    #     )
+    #     pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
+    #     str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
+    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # save file
-        with open(item, "w", encoding="UTF-8") as a_file:
-            a_file.write(text)
+    #     # save file
+    #     with open(item, "w", encoding="UTF-8") as a_file:
+    #         a_file.write(text)
 
-    # ------------------------------------------------------------------------------
-    # Replace text in the UI file
-    # ------------------------------------------------------------------------------
-    def _fix_gtk(self, item):
-        """
-        Replace text in the UI file
+    # # ------------------------------------------------------------------------------
+    # # Replace text in the UI file
+    # # ------------------------------------------------------------------------------
+    # def _fix_gtk(self, item):
+    #     """
+    #     Replace text in the UI file
 
-        Replace description and version number in the UI file.
-        """
+    #     Replace description and version number in the UI file.
+    #     """
 
-        # default text if we can't open file
-        text = ""
+    #     # default text if we can't open file
+    #     text = ""
 
-        # open file and get contents
-        with open(item, "r", encoding="UTF-8") as a_file:
-            text = a_file.read()
+    #     # open file and get contents
+    #     with open(item, "r", encoding="UTF-8") as a_file:
+    #         text = a_file.read()
 
-        # replace short description
-        str_pattern = (
-            r"(<object class=\"GtkAboutDialog\".*?)"
-            r"(<property name=\"comments\".*?\>)"
-            r"(.*?)"
-            r"(</property>)"
-        )
-        pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
-        str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+    #     # replace short description
+    #     str_pattern = (
+    #         r"(<object class=\"GtkAboutDialog\".*?)"
+    #         r"(<property name=\"comments\".*?\>)"
+    #         r"(.*?)"
+    #         r"(</property>)"
+    #     )
+    #     pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
+    #     str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
+    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # replace version
-        str_pattern = (
-            r"(<object class=\"GtkAboutDialog\".*?)"
-            r"(<property name=\"version\">)"
-            r"(.*?)"
-            r"(</property>.*)"
-        )
-        pp_version = self._dict_pub_meta["__PP_VERSION__"]
-        str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+    #     # replace version
+    #     str_pattern = (
+    #         r"(<object class=\"GtkAboutDialog\".*?)"
+    #         r"(<property name=\"version\">)"
+    #         r"(.*?)"
+    #         r"(</property>.*)"
+    #     )
+    #     pp_version = self._dict_pub_meta["__PP_VERSION__"]
+    #     str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
+    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-        # save file
-        with open(item, "w", encoding="UTF-8") as a_file:
-            a_file.write(text)
+    #     # save file
+    #     with open(item, "w", encoding="UTF-8") as a_file:
+    #         a_file.write(text)
 
     # --------------------------------------------------------------------------
     # Run CNPotPy over files to produce I18N files

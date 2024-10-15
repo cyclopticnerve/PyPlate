@@ -205,7 +205,7 @@ S_CMD_GIT = "git init {} -q"
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
 # NB: path to venv create/install/freeze scripts for venv, relative to prj dir
-# NB: format param is S_VENV_FMT_NAME
+# NB: format param is __PP_NAME_VENV__
 S_VENV_CREATE = f"{S_PRJ_PRV_DIR}/venv/venv_create.sh" " {}"
 S_VENV_INSTALL = f"{S_PRJ_PRV_DIR}/venv/venv_install.sh"
 S_VENV_FREEZE = f"{S_PRJ_PRV_DIR}/venv/venv_freeze.sh"
@@ -272,13 +272,8 @@ L_MARKUP = [
 ]
 
 # file exts for pybaker
-L_DESKTOP = [
-    ".desktop"
-]
-L_GTK = [
-    ".ui",
-    ".glade"
-]
+L_DESKTOP = [".desktop"]
+L_GTK = [".ui", ".glade"]
 
 # files to remove after the project is done
 # paths are relative to project dir
@@ -287,6 +282,7 @@ L_PURGE = [
 ]
 
 # folders to put in dist
+# TODO: should this be per-project?
 L_DIST = [
     "conf",
     "readme",
@@ -786,37 +782,11 @@ def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
     dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
     dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
-    # ------------------------------------------------------------------------------
-    # fix keywords for pyproject.toml
-    # NB: this code is placed here b/c it is used in both pm and pb
-    l_keywords = dict_pub_meta["__PP_KEYWORDS__"]
-    q_keywords = [f'"{item}"' for item in l_keywords]
-    dict_prv_prj["__PP_KW_STR__"] = ", ".join(q_keywords)
-
-    # ------------------------------------------------------------------------------
-    # now figure out py deps and links for readme
-    # NB: this code is placed here b/c it is used in both pm and pb
-
-    # get meta deps
-    d_py_deps = dict_pub_meta["__PP_PY_DEPS__"]
-    # new list of deps
-    l_rm_deps = []
-    # default text
-    s_rm_deps = "None"
-    # convert deps dict to md style
-    if d_py_deps:
-        for key, val in d_py_deps.items():
-            if val == "":
-                l_rm_deps.append(key)
-            else:
-                l_rm_deps.append(f"[{key}]({val})")
-        s_rm_deps = "<br>\n".join(l_rm_deps)
-    # put the new string in config so it can be shared to _do_fix
-    dict_prv_prj["__PP_RM_DEPS__"] = s_rm_deps
-
     # add venv to dist list
-    venv_name = S_VENV_FMT_NAME.format(name_small)
+    # NB: we do this here to avoid having to handle globs in L_DIST
+    venv_name = dict_prv_prj["__PP_VENV_NAME__"]
     L_DIST.append(venv_name)
+
 
 # --------------------------------------------------------------------------
 # Do any work after fix
@@ -832,10 +802,11 @@ def do_after_fix():
     _do_after_fix, after all files have been modified.
     """
 
+
 # ------------------------------------------------------------------------------
 # File-specific fixes after everything else
 # ------------------------------------------------------------------------------
-def do_extras(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
+def do_extras(dir_prj, dict_pub_meta=None, dict_prv_prj=None):
     """
     File-specific fixes after everything else
 
@@ -846,10 +817,10 @@ def do_extras(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
     """
 
     # sanity check
-    if not dict_prv_prj:
-        dict_prv_prj = D_PRV_PRJ
     if not dict_pub_meta:
         dict_pub_meta = D_PUB_META
+    if not dict_prv_prj:
+        dict_prv_prj = D_PRV_PRJ
 
     # outsource the big stuff
 
@@ -868,30 +839,35 @@ def do_extras(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
                 if item.name == D_PRV_ALL["__PP_README_FILE__"]:
                     _fix_readme(item, dict_prv_prj, dict_pub_meta)
                 if item.name == D_PRV_ALL["__PP_TOML_FILE__"]:
-                    _fix_pyproject(item)
+                    _fix_pyproject(item, dict_pub_meta)
 
         if root.name == S_DIR_DESKTOP:
             # for each file item
             for item in files:
-                suffix = item.suffix.lstrip(".")
-                suffix = "." + suffix
+                # suffix = item.suffix.lstrip(".")
+                suffix = (
+                    item.suffix if item.suffix[0] == "." else "." + item.suffix
+                )
                 if suffix in L_DESKTOP:
-                    fix_desktop(item)
+                    _fix_desktop(item, dict_pub_meta)
 
         if root.name == S_DIR_UI:
             # for each file item
             for item in files:
-                suffix = item.suffix.lstrip(".")
-                suffix = "." + suffix
-            if suffix in L_GTK:
-                fix_gtk(item)
+                suffix = (
+                    item.suffix if item.suffix[0] == "." else "." + item.suffix
+                )
+                if suffix in L_GTK:
+                    _fix_gtk(item, dict_pub_meta)
 
     print("Done")
 
     # do i18n stuff
-    print("Do extras/i18n... ", end="")
-    do_i18n()
-    print("Done")
+    # print("Do extras/i18n... ", end="")
+    # dict_i18n =
+    # do_i18n(dict_prj, dict_i18n)
+    # print("Done")
+
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -901,14 +877,14 @@ def do_extras(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
-def _fix_readme(path, dict_prv_prj, dict_pub_meta):
+def _fix_readme(path, dict_pub_meta, dict_prv_prj):
     """
     Remove/replace parts of the main README file
 
     Arguments:
         path: Path for the README to modify text
-        dict_prv_prj: the private calculated proj dict
         dict_pub_meta: the dict of metadata to replace in the file
+        dict_prv_prj: the private calculated proj dict
 
     Removes parts of the file not applicable to the current project type. Also
     fixes metadata in the file when dict_meta is present.
@@ -948,28 +924,50 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
+    # get deps as links for readme
+    d_py_deps = dict_pub_meta["__PP_PY_DEPS__"]
+    l_rm_deps = [
+        f"[{key}]({val})" if val != "" else key for key, val in d_py_deps
+    ]
+
+    #        | 1 | |  2  | | 3| | 4 | |    5    |
+    # lst = [res_a if cond else res_b for x in xx]
+
+    # lst = []
+    # for x in xx:              5
+    #   if cond:                2
+    #       lst.append(res_a)   1
+    #   else:                   3
+    #       lst.append(res_b)   4
+
+    s_rm_deps = "<br>\n".join(l_rm_deps)
+    if len(s_rm_deps) == 0:
+        s_rm_deps = "None"
+
     # replace dependencies array
     str_pattern = (
         r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
         r"(.*?)"
         r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
     )
-    str_rep = rf'\g<1>\n{dict_prv_prj["__PP_RM_DEPS__"]}\g<3>'
+    str_rep = rf"\g<1>\n{s_rm_deps}\g<3>"
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:
         a_file.write(text)
 
+
 # --------------------------------------------------------------------------
 # Replace text in the pyproject file
 # --------------------------------------------------------------------------
-def _fix_pyproject(path):
+def _fix_pyproject(path, dict_pub_meta):
     """
     Replace text in the pyproject file
 
     Arguments:
-        path: Path for the pyproject.toml file to modify text
+        path: Path for the file to modify text
+        dict_pub_meta: the dict of metadata to replace in the file
 
     Replaces things like the keywords, requirements, etc. in the toml file.
     """
@@ -993,19 +991,204 @@ def _fix_pyproject(path):
     str_rep = S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text)
 
+    # fix keywords for pyproject.toml
+    l_keywords = dict_pub_meta["__PP_KEYWORDS__"]
+    q_keywords = [f'"{item}"' for item in l_keywords]
+    s_keywords = ", ".join(q_keywords)
+
     # replace keywords array
     str_pattern = S_TOML_KW_SEARCH
-    kw_str = dict_prv_prj["__PP_KW_STR__"]
-    str_rep = S_TOML_KW_REPL.format(kw_str)
+    str_rep = S_TOML_KW_REPL.format(s_keywords)
     text = re.sub(str_pattern, str_rep, text)
 
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:
         a_file.write(text)
 
-def do_i18n():
+
+# ------------------------------------------------------------------------------
+# Replace text in the desktop file
+# ------------------------------------------------------------------------------
+def _fix_desktop(path, dict_pub_meta):
     """
-    docstring
+    Replace text in the desktop file
+
+    Arguments:
+        path: Path for the file to modify text
+        dict_pub_meta: the dict of metadata to replace in the file
+
+    Replaces the desc, exec, icon, path, and category text in a .desktop
+    file for programs that use this.
     """
+
+    # validate wanted categories into approved categories
+    pp_gui_categories = []
+    wanted_cats = dict_pub_meta["__PP_GUI_CATS__"]
+    for cat in wanted_cats:
+        # category is valid
+        if cat in L_CATS:
+            # add to final list
+            pp_gui_categories.append(cat)
+        else:
+            # category is not valid, print error and increase error count
+            print(
+                f'In metadata categories, "{cat}" is not valid, see \n'
+                "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
+            )
+
+    # convert list to string
+    str_cat = ";".join(pp_gui_categories)
+    # NB: must have trailing semicolon
+    str_cat += ";"
+
+    # default text if we can't open file
+    text = ""
+
+    # open file and get contents
+    with open(path, "r", encoding="UTF-8") as a_file:
+        text = a_file.read()
+
+    # replace categories
+    str_pattern = (
+        r"(^\s*\[Desktop Entry\]\s*$)"
+        r"(.*?)"
+        r"(^\s*Categories[\t ]*=)"
+        r"(.*?$)"
+    )
+    str_rep = rf"\g<1>\g<2>\g<3>{str_cat}"
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # replace short description
+    str_pattern = (
+        r"(^\s*\[Desktop Entry\]\s*$)"
+        r"(.*?)"
+        r"(^\s*Comment[\t ]*=)"
+        r"(.*?$)"
+    )
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # save file
+    with open(path, "w", encoding="UTF-8") as a_file:
+        a_file.write(text)
+
+
+# ------------------------------------------------------------------------------
+# Replace text in the UI files
+# ------------------------------------------------------------------------------
+def _fix_gtk(path, dict_pub_meta):
+    """
+    Replace text in the UI files
+
+    Arguments:
+        path: Path for the file to modify text
+        dict_pub_meta: the dict of metadata to replace in the file
+
+    Replace description and version number in the UI file.
+    """
+
+    # default text if we can't open file
+    text = ""
+
+    # open file and get contents
+    with open(path, "r", encoding="UTF-8") as a_file:
+        text = a_file.read()
+
+    # replace short description
+    str_pattern = (
+        r"(<object class=\"GtkAboutDialog\".*?)"
+        r"(<property name=\"comments\".*?\>)"
+        r"(.*?)"
+        r"(</property>)"
+    )
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # replace version
+    str_pattern = (
+        r"(<object class=\"GtkAboutDialog\".*?)"
+        r"(<property name=\"version\">)"
+        r"(.*?)"
+        r"(</property>.*)"
+    )
+    pp_version = dict_pub_meta["__PP_VERSION__"]
+    str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # save file
+    with open(path, "w", encoding="UTF-8") as a_file:
+        a_file.write(text)
+
+# # --------------------------------------------------------------------------
+# # Run CNPotPy over files to produce I18N files
+# # --------------------------------------------------------------------------
+# def _do_i18n(dict_prj, dict_pub_i18n):
+#     """
+#     Run CNPotPy over files to produce I18N files
+#     """
+
+#     # # dict of clangs and exts
+#     dict_in = {
+#         "Python": [
+#             ".py",
+#         ],
+#         "Glade": [
+#             ".ui",
+#             ".glade",
+#         ],
+#         "Desktop": [".desktop"],
+#     }
+
+#     # dict of clangs and no exts (ie file names)
+#     no_ext = "Python"
+
+#     # the list of languages your program has been translated into (can grow
+#     # over time, adding languages as they become available)
+#     list_wlangs = [
+#         "es",
+#         "xo",
+#         "pq",
+#     ]
+
+#     name_big = self._dict_prv_prj["__PP_NAME_BIG__"]
+#     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+#     version = self._dict_pub_meta["__PP_VERSION__"]
+#     author = self._dict_prv_all["__PP_AUTHOR__"]
+#     email = self._dict_prv_all["__PP_EMAIL__"]
+
+#     # path to src dir
+#     dir_src = self._dir_prj / M.S_DIR_SRC
+#     dir_locale = self._dir_prj / "src" / "support" / "i18n" / "locale"
+#     dir_po = self._dir_prj / "src" / "support" / "i18n" / "po"
+
+#     # create CNPotPy object
+#     pp = CNPotPy(
+#         dir_src,
+#         str_appname=name_big,
+#         str_version=version,
+#         str_author=author,
+#         str_email=email,
+#         dir_locale=dir_locale,
+#         dir_po=dir_po,
+#         str_domain=name_small,
+#         dict_clangs=dict_in,
+#         no_ext=no_ext,
+#         list_wlangs=list_wlangs,
+#     )
+
+#     # this .pot, .po, and .mo files
+#     pp.main()
+
+#     # pp.make_desktop(
+#     #     self._dir_prj / "src" / "support" / "desktop" / "template.desktop",
+#     #     self._dir_prj
+#     #     / "src"
+#     #     / "support"
+#     #     / "desktop"
+#     #     / f"{name_small}.desktop",
+#     # )
+
 
 # -)
