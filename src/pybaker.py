@@ -9,12 +9,6 @@
 
 # pylint: disable=too-many-lines
 
-# FIXME: common version number for pm/pb/install/etc
-# FIXME: remove strings
-# move fix_readme, toml, .desktop/.ui
-# move do_i18n/make_install
-
-
 """
 A program to change the metadata of a PyPlate project and create a dist
 
@@ -24,6 +18,8 @@ necessary files to create a complete distribution of the project.
 
 Run pybaker -h for more options.
 """
+
+# TODO: make all Path concats in conf
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -48,14 +44,13 @@ import sys
 # parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
 P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
+P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-P_DIR_SUPPORT = P_DIR_PYPLATE / "src" / "support"
-sys.path.append(str(P_DIR_PYPLATE))
+sys.path.append(str(P_DIR_PP_CONF))
 sys.path.append(str(P_DIR_PP_LIB))
-sys.path.append(str(P_DIR_SUPPORT))
 
 # local imports
-from conf import pyplate_conf as M  # type:ignore
+import pyplate_conf as M  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -190,11 +185,8 @@ class PyBaker:
         # do extra stuff to final dir after fix
         self._do_after_fix()
 
-        # do extra stuff not related to changing files
-        self._do_extras()
-
         # copy project files into dist folder
-        self._do_dist()
+        self._do_copy()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -226,8 +218,9 @@ class PyBaker:
         if self._debug:
             M.B_CMD_GIT = False
             M.B_CMD_VENV = False
-            M.B_CMD_TREE = False
+            M.B_CMD_I18N = False
             M.B_CMD_DOCS = False
+            M.B_CMD_TREE = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
@@ -265,14 +258,14 @@ class PyBaker:
         """
 
         # get global and calculated settings dict in private.json
-        path_to_prv = self._dir_prj / M.S_PRJ_PRV_CFG
-        dict_prv = F.load_dicts([path_to_prv], {})
+        path_prv = self._dir_prj / M.S_PRJ_PRV_CFG
+        dict_prv = F.load_dicts([path_prv], {})
         self._dict_prv_all = dict_prv[M.S_KEY_PRV_ALL]
         self._dict_prv_prj = dict_prv[M.S_KEY_PRV_PRJ]
 
         # get individual dicts in the public file
-        path_to_pub = self._dir_prj / M.S_PRJ_PUB_CFG
-        dict_pub = F.load_dicts([path_to_pub], {})
+        path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
+        dict_pub = F.load_dicts([path_pub], {})
         self._dict_pub_meta = dict_pub[M.S_KEY_PUB_META]
         self._dict_pub_bl = dict_pub[M.S_KEY_PUB_BL]
         self._dict_pub_i18n = dict_pub[M.S_KEY_PUB_I18N]
@@ -373,8 +366,11 @@ class PyBaker:
 
                     # do md/html/xml separately (needs special handling)
                     self._dict_type_rep = M.D_PY_REPL
-                    suffix = item.suffix.lstrip(".")
-                    suffix = "." + suffix
+                    suffix = (
+                        f".{item.suffix}"
+                        if not item.suffix.startswith(".")
+                        else item.suffix
+                    )
                     if suffix in M.L_MARKUP:
                         self._dict_type_rep = M.D_MU_REPL
 
@@ -446,7 +442,7 @@ class PyBaker:
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # fix dunders in bl/i18n
+        # fix dunders in bl/i18n/install
         self._fix_content(path_pub, False, False)
 
         # reload dict from fixed file
@@ -460,61 +456,48 @@ class PyBaker:
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # everything else
-
-        # call public after fix
-        M.do_after_fix()
-
-        print("Done")
-
-    # --------------------------------------------------------------------------
-    # Make any necessary changes after all fixes have been done
-    # --------------------------------------------------------------------------
-    def _do_extras(self):
-        """
-        Make any necessary changes after all fixes have been done
-
-        Do some extra functions like freeze requirements, and update changelog
-        and docs for the current project.
-        """
-
-        print("Do extras")
-
-        # ----------------------------------------------------------------------
         # freeze requirements
 
-        print("Do extras/freeze... ", end="")
+        if M.B_CMD_GIT:
+            path_git = self._dir_prj / M.S_DIR_GIT
+            if path_git.exists():
 
-        # run the cmd
-        # NB: cmd will fail if there is no git
-        cmd = self._dir_prj / M.S_VENV_FREEZE
-        try:
-            # run script to freeze venv reqs
-            F.sh(cmd)
-            print("Done")
-        except F.CNShellError as e:
-            print("Failed")
-            print(e)
+                print("Do freeze... ", end="")
+
+                # run the cmd
+                # NB: cmd will fail if there is no git
+                cmd = self._dir_prj / M.S_VENV_FREEZE
+                try:
+                    # run script to freeze venv reqs
+                    F.sh(cmd)
+                    print("Done")
+                except F.CNShellError as e:
+                    print("Failed")
+                    print(e)
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
 
-        print("Do extras/CHANGELOG... ", end="")
+        if M.B_CMD_GIT:
+            path_git = self._dir_prj / M.S_DIR_GIT
+            if path_git.exists():
 
-        # run the cmd
-        # NB: cmd will fail if there are no entries in git
-        cmd = M.S_CHANGELOG_CMD
-        try:
-            F.sh(cmd)
-            print("Done")
-        except F.CNShellError as e:
-            print("Failed")
-            print(e)
+                print("Do CHANGELOG... ", end="")
+
+                # run the cmd
+                # NB: cmd will fail if there are no entries in git
+                cmd = M.S_CHANGELOG_CMD
+                try:
+                    F.sh(cmd, shell=True)
+                    print("Done")
+                except F.CNShellError as e:
+                    print("Failed")
+                    print(e.message)
 
         # ----------------------------------------------------------------------
         # purge
 
-        print("Do extras/purge... ", end="")
+        print("Do purge... ", end="")
 
         # delete any unnecessary files
         for item in M.L_PURGE:
@@ -525,24 +508,62 @@ class PyBaker:
         print("Done")
 
         # ----------------------------------------------------------------------
+        # call conf after fix
+        print("Do after fix... ", end="")
+        M.do_after_fix(self._dir_prj, self._dict_prv_prj, self._dict_pub_meta)
+        print("Done")
+
+        # ----------------------------------------------------------------------
+        # i18n
+        # if i18n flag is set
+        if M.B_CMD_I18N:
+
+            print("Do i18n... ", end="")
+
+            # create CNPotPy object
+            potpy = CNPotPy(
+                dir_src=self._dir_prj / M.S_DIR_SRC,
+                str_appname=self._dict_prv_prj["__PP_NAME_BIG__"],
+                str_version=self._dict_pub_meta["__PP_VERSION__"],
+                str_author=self._dict_prv_all["__PP_AUTHOR__"],
+                str_email=self._dict_prv_all["__PP_EMAIL__"],
+                dir_locale=self._dir_prj / M.S_DIR_I18N / M.S_DIR_LOCALE,
+                dir_po=self._dir_prj / M.S_DIR_I18N / M.S_DIR_PO,
+                str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
+                dict_clangs=self._dict_pub_i18n[M.S_KEY_CLANGS],
+                dict_no_ext=self._dict_pub_i18n[M.S_KEY_NO_EXT],
+                list_wlangs=self._dict_pub_i18n[M.S_KEY_WLANGS],
+                charset="UTF-8",
+            )
+
+            # this .pot, .po, and .mo files
+            potpy.main()
+
+            # make .desktop file
+            path_desk = self._dir_prj / M.S_DIR_CONF / M.S_DIR_DESKTOP
+            if path_desk.is_dir():
+                path_template = path_desk / M.S_FILE_DESK_TEMPLATE
+                name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+                path_out_name = f"{name_small}.desktop"
+                path_out = path_desk / path_out_name
+                potpy.make_desktop(path_template, path_out)
+
+            print("Done")
+
+        # ----------------------------------------------------------------------
         # update docs
         # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
         # work
 
         if M.B_CMD_DOCS:
 
-            print("Do extras/docs... ", end="")
+            print("Do docs... ", end="")
 
             # FIXME: this is broken
             # cmd = self._dir_prj / M.S_DOCS_SCRIPT
             # F.sh(cmd)
 
             print("Done")
-
-        # ----------------------------------------------------------------------
-        # do any custom extras in pyplate_conf.py
-
-        M.do_extras(self._dir_prj)
 
         # ----------------------------------------------------------------------
         # tree
@@ -552,7 +573,7 @@ class PyBaker:
         # if tree flag is set
         if M.B_CMD_TREE:
 
-            print("Do extras/tree... ", end="")
+            print("Do tree... ", end="")
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
@@ -564,7 +585,7 @@ class PyBaker:
             # create tree object and call
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
-                self._dir_prj,
+                str(self._dir_prj),
                 filter_list=self._dict_pub_bl[M.S_KEY_SKIP_TREE],
                 dir_format=M.S_TREE_DIR_FORMAT,
                 file_format=M.S_TREE_FILE_FORMAT,
@@ -579,7 +600,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
-    def _do_dist(self):
+    def _do_copy(self):
         """
         Copy fixed files to final location
 
@@ -795,7 +816,7 @@ class PyBaker:
                 # comments)
                 lines[index] = self._fix_code(line)
 
-                # fix __PB_VERSION__ / __PB_SHORT_DESC__ for cmd line help
+                # fix S_PB_VERSION / S_PB_SHORT_DESC for cmd line help
                 lines[index] = self._fix_meta(line)
 
         # open and write file
@@ -921,19 +942,6 @@ class PyBaker:
         # put the line back together
         line = code + comm
 
-        # return the (maybe replaced) line
-        return line
-
-    # --------------------------------------------------------------------------
-    # Fix version/short description in command line help
-    # --------------------------------------------------------------------------
-    def _fix_meta(self, line):
-        """
-        Fix version/short description in command line help
-
-        Fixes the version and short description parts of the command line help.
-        """
-
         # replace version
         ver = self._dict_pub_meta["__PP_VERSION__"]
         str_sch = M.S_META_VER_SEARCH
@@ -946,7 +954,7 @@ class PyBaker:
         str_rep = M.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
 
-        # return the fixed line
+        # return the (maybe replaced) line
         return line
 
     # --------------------------------------------------------------------------
@@ -1036,225 +1044,6 @@ class PyBaker:
 
         # no valid switch found
         return False
-
-    # FIXME: move this to pyplate_conf what with all the strings and custom
-    # code
-
-    # --------------------------------------------------------------------------
-    # Replace text in the readme file
-    # --------------------------------------------------------------------------
-    # def _fix_readme(self, item):
-    #     """
-    #     Replace text in the README file
-
-    #     Replace short description, dependencies, and version number in the
-    #     README file.
-    #     """
-
-    #     # default text if we can't open file
-    #     text = ""
-
-    #     # open file and get contents
-    #     with open(item, "r", encoding="UTF-8") as a_file:
-    #         text = a_file.read()
-
-    #     # replace short description
-    #     str_pattern = (
-    #         r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
-    #         r"(.*?)"
-    #         r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
-    #     )
-    #     pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
-    #     str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
-    #     text = re.sub(str_pattern, str_rep, text, flags=re.S)
-
-    #     # replace dependencies array
-    #     str_pattern = (
-    #         r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
-    #         r"(.*?)"
-    #         r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
-    #     )
-    #     str_rep = rf'\g<1>\n{self._dict_prv_prj["__PP_RM_DEPS__"]}\g<3>'
-    #     text = re.sub(str_pattern, str_rep, text, flags=re.S)
-
-    #     # save file
-    #     with open(item, "w", encoding="UTF-8") as a_file:
-    #         a_file.write(text)
-
-    # # ------------------------------------------------------------------------------
-    # # Replace text in the desktop file
-    # # ------------------------------------------------------------------------------
-    # def _fix_desktop(self, item):
-    #     """
-    #     Replace text in the desktop file
-
-    #     Replaces the desc, exec, icon, path, and category text in a .desktop
-    #     file for programs that use this.
-    #     """
-
-    #     # validate wanted categories into approved categories
-    #     pp_gui_categories = []
-    #     wanted_cats = self._dict_pub_meta["__PP_GUI_CATS__"]
-    #     for cat in wanted_cats:
-    #         # category is valid
-    #         if cat in M.L_CATS:
-    #             # add to final list
-    #             pp_gui_categories.append(cat)
-    #         else:
-    #             # category is not valid, print error and increase error count
-    #             print(
-    #                 f'In PP_GUI_CATEGORIES, "{cat}" is not valid, see \n'
-    #                 "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
-    #             )
-
-    #     # convert list to string
-    #     str_cat = ";".join(pp_gui_categories)
-    #     str_cat += ";"
-
-    #     # default text if we can't open file
-    #     text = ""
-
-    #     # open file and get contents
-    #     with open(item, "r", encoding="UTF-8") as a_file:
-    #         text = a_file.read()
-
-    #     # replace categories
-    #     str_pattern = (
-    #         r"(^\s*\[Desktop Entry\]\s*$)"
-    #         r"(.*?)"
-    #         r"(^\s*Categories[\t ]*=)"
-    #         r"(.*?$)"
-    #     )
-    #     str_rep = rf"\g<1>\g<2>\g<3>{str_cat}"
-    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-    #     # replace short description
-    #     str_pattern = (
-    #         r"(^\s*\[Desktop Entry\]\s*$)"
-    #         r"(.*?)"
-    #         r"(^\s*Comment[\t ]*=)"
-    #         r"(.*?$)"
-    #     )
-    #     pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
-    #     str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
-    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-    #     # save file
-    #     with open(item, "w", encoding="UTF-8") as a_file:
-    #         a_file.write(text)
-
-    # # ------------------------------------------------------------------------------
-    # # Replace text in the UI file
-    # # ------------------------------------------------------------------------------
-    # def _fix_gtk(self, item):
-    #     """
-    #     Replace text in the UI file
-
-    #     Replace description and version number in the UI file.
-    #     """
-
-    #     # default text if we can't open file
-    #     text = ""
-
-    #     # open file and get contents
-    #     with open(item, "r", encoding="UTF-8") as a_file:
-    #         text = a_file.read()
-
-    #     # replace short description
-    #     str_pattern = (
-    #         r"(<object class=\"GtkAboutDialog\".*?)"
-    #         r"(<property name=\"comments\".*?\>)"
-    #         r"(.*?)"
-    #         r"(</property>)"
-    #     )
-    #     pp_short_desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
-    #     str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
-    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-    #     # replace version
-    #     str_pattern = (
-    #         r"(<object class=\"GtkAboutDialog\".*?)"
-    #         r"(<property name=\"version\">)"
-    #         r"(.*?)"
-    #         r"(</property>.*)"
-    #     )
-    #     pp_version = self._dict_pub_meta["__PP_VERSION__"]
-    #     str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
-    #     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-    #     # save file
-    #     with open(item, "w", encoding="UTF-8") as a_file:
-    #         a_file.write(text)
-
-    # --------------------------------------------------------------------------
-    # Run CNPotPy over files to produce I18N files
-    # --------------------------------------------------------------------------
-    def _do_i18n(self):
-        """
-        docstring
-        """
-
-        # # dict of clangs and exts
-        dict_in = {
-            "Python": [
-                ".py",
-            ],
-            "Glade": [
-                ".ui",
-                ".glade",
-            ],
-            "Desktop": [".desktop"],
-        }
-
-        # dict of clangs and no exts (ie file names)
-        no_ext = "Python"
-
-        # the list of languages your program has been translated into (can grow
-        # over time, adding languages as they become available)
-        list_wlangs = [
-            "es",
-            "xo",
-            "pq",
-        ]
-
-        name_big = self._dict_prv_prj["__PP_NAME_BIG__"]
-        name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-        version = self._dict_pub_meta["__PP_VERSION__"]
-        author = self._dict_prv_all["__PP_AUTHOR__"]
-        email = self._dict_prv_all["__PP_EMAIL__"]
-
-        # path to src dir
-        dir_src = self._dir_prj / M.S_DIR_SRC
-        dir_locale = self._dir_prj / "src" / "support" / "i18n" / "locale"
-        dir_po = self._dir_prj / "src" / "support" / "i18n" / "po"
-
-        # create CNPotPy object
-        pp = CNPotPy(
-            dir_src,
-            str_appname=name_big,
-            str_version=version,
-            str_author=author,
-            str_email=email,
-            dir_locale=dir_locale,
-            dir_po=dir_po,
-            str_domain=name_small,
-            dict_clangs=dict_in,
-            no_ext=no_ext,
-            list_wlangs=list_wlangs,
-        )
-
-        # this .pot, .po, and .mo files
-        pp.main()
-
-        # pp.make_desktop(
-        #     self._dir_prj / "src" / "support" / "desktop" / "template.desktop",
-        #     self._dir_prj
-        #     / "src"
-        #     / "support"
-        #     / "desktop"
-        #     / f"{name_small}.desktop",
-        # )
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

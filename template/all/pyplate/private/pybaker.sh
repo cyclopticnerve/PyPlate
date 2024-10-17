@@ -15,6 +15,6 @@
 PRJ_DIR=$(cd ../.. && pwd)
 
 # pass the project dir to the real pybaker.py
-~/__PP_DEV_PP__/src/pybaker.py $PRJ_DIR
+~/__PP_DEV_PP__/src/pybaker.py $PRJ_DIR $@
 
 # -)

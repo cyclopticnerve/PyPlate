@@ -20,6 +20,8 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
+# TODO: make all Path concats in conf
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -44,17 +46,17 @@ import sys
 # parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
 P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
+P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-P_DIR_SUPPORT = P_DIR_PYPLATE / "src" / "support"
-sys.path.append(str(P_DIR_PYPLATE))
+sys.path.append(str(P_DIR_PP_CONF))
 sys.path.append(str(P_DIR_PP_LIB))
-sys.path.append(str(P_DIR_SUPPORT))
 
 # local imports
-from conf import pyplate_conf as M  # type: ignore
+import pyplate_conf as M  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
+from cnlib.cnpot import CNPotPy  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -164,7 +166,7 @@ class PyMaker:
         self._get_project_info()
 
         # copy template
-        self._copy_files()
+        self._do_copy()
 
         # call before fix
         self._do_before_fix()
@@ -174,9 +176,6 @@ class PyMaker:
 
         # do extra stuff to final dir after fix
         self._do_after_fix()
-
-        # do extra stuff not related to changing files
-        self._do_extras()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -208,8 +207,9 @@ class PyMaker:
         if self._debug:
             M.B_CMD_GIT = False
             M.B_CMD_VENV = False
-            M.B_CMD_TREE = False
+            M.B_CMD_I18N = False
             M.B_CMD_DOCS = False
+            M.B_CMD_TREE = False
 
         # set switch dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
@@ -406,7 +406,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
-    def _copy_files(self):
+    def _do_copy(self):
         """
         Copy template files to final location
 
@@ -556,9 +556,12 @@ class PyMaker:
 
                     # do md/html/xml separately (needs special handling)
                     self._dict_type_rep = M.D_PY_REPL
-                    suffix = item.suffix.lstrip(".")
-                    suffix = "." + suffix
-                    if suffix in M.L_MARKUP :
+                    suffix = (
+                        f".{item.suffix}"
+                        if not item.suffix.startswith(".")
+                        else item.suffix
+                    )
+                    if suffix in M.L_MARKUP:
                         self._dict_type_rep = M.D_MU_REPL
 
                     # fix content with appropriate dict
@@ -609,8 +612,6 @@ class PyMaker:
         project modification in do_after_fix in pyplate_conf.py.
         """
 
-        print("Do after fix... ", end="")
-
         # ----------------------------------------------------------------------
         # save project settings
 
@@ -646,33 +647,12 @@ class PyMaker:
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # everything else
-
-        # call conf after fix
-        M.do_after_fix()
-
-        print("Done")
-
-    # --------------------------------------------------------------------------
-    # Make any necessary changes after all fixes have been done
-    # --------------------------------------------------------------------------
-    def _do_extras(self):
-        """
-        Make any necessary changes after all fixes have been done
-
-        Do some extra functions like create .git and .venv ,update docs, purge,
-        and update the tree file for the current project.
-        """
-
-        print("Do extras")
-
-        # ----------------------------------------------------------------------
         # git
 
-        # if git flag is set
+        # if git flag
         if M.B_CMD_GIT:
 
-            print("Do extras/git... ", end="")
+            print("Do git... ", end="")
 
             # add git dir
             str_cmd = M.S_CMD_GIT.format(self._dir_prj)
@@ -686,7 +666,7 @@ class PyMaker:
         # if venv flag is set
         if M.B_CMD_VENV:
 
-            print("Do extras/venv... ", end="")
+            print("Do venv... ", end="")
 
             # calculate name of venv
             name_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
@@ -709,7 +689,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # purge
 
-        print("Do extras/purge... ", end="")
+        print("Do purge... ", end="")
 
         # delete any unnecessary files
         for item in M.L_PURGE:
@@ -720,24 +700,62 @@ class PyMaker:
         print("Done")
 
         # ----------------------------------------------------------------------
+        # call conf after fix
+        print("Do after fix... ", end="")
+        M.do_after_fix(self._dir_prj)
+        print("Done")
+
+        # ----------------------------------------------------------------------
+        # i18n
+        # if i18n flag is set
+        if M.B_CMD_I18N:
+
+            print("Do i18n... ", end="")
+
+            # create CNPotPy object
+            potpy = CNPotPy(
+                dir_src=self._dir_prj / M.S_DIR_SRC,
+                str_appname=M.D_PRV_PRJ["__PP_NAME_BIG__"],
+                str_version=M.D_PUB_META["__PP_VERSION__"],
+                str_author=M.D_PRV_ALL["__PP_AUTHOR__"],
+                str_email=M.D_PRV_ALL["__PP_EMAIL__"],
+                dir_locale=self._dir_prj / M.S_DIR_I18N / M.S_DIR_LOCALE,
+                dir_po=self._dir_prj / M.S_DIR_I18N / M.S_DIR_PO,
+                str_domain=M.D_PRV_PRJ["__PP_NAME_SMALL__"],
+                dict_clangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CLANGS],
+                dict_no_ext=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_NO_EXT],
+                list_wlangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_WLANGS],
+                charset="UTF-8",
+            )
+
+            # make .pot, .po, and .mo files
+            potpy.main()
+
+            # make .desktop file
+            path_desk = self._dir_prj / M.S_DIR_CONF / M.S_DIR_DESKTOP
+            if path_desk.is_dir():
+                path_template = path_desk / M.S_FILE_DESK_TEMPLATE
+                name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
+                path_out_name = f"{name_small}.desktop"
+                path_out = path_desk / path_out_name
+                potpy.make_desktop(path_template, path_out)
+
+            print("Done")
+
+        # ----------------------------------------------------------------------
         # update docs
         # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
         # work
 
         if M.B_CMD_DOCS:
 
-            print("Do extras/docs... ", end="")
+            print("Do docs... ", end="")
 
             # FIXME: this is broken
             # cmd = self._dir_prj / M.S_DOCS_SCRIPT
             # F.sh(cmd)
 
             print("Done")
-
-        # ----------------------------------------------------------------------
-        # do any custom extras in pyplate_conf.py
-
-        M.do_extras(self._dir_prj)
 
         # ----------------------------------------------------------------------
         # tree
@@ -747,7 +765,7 @@ class PyMaker:
         # if tree flag is set
         if M.B_CMD_TREE:
 
-            print("Do extras/tree... ", end="")
+            print("Do tree... ", end="")
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
@@ -824,96 +842,6 @@ class PyMaker:
             dest=S_DBG_DEST,
             help=S_DBG_HELP,
         )
-
-    # --------------------------------------------------------------------------
-    # Check project type for allowed characters
-    # --------------------------------------------------------------------------
-    def _check_type(self, prj_type):
-        """
-        Check project type for allowed characters
-
-        Arguments:
-            prj_type: Type to check for allowed characters
-
-        Returns:
-            Whether the type is valid to use
-
-        Checks the passed type to see if it is one of the allowed project
-        types.
-        """
-
-        # get first char and lower case it
-        first_char = prj_type[0].lower()
-
-        # we got a valid type
-        for item in M.L_TYPES:
-            if first_char == item[0]:
-                return True
-
-        # nope, fail
-        types = []
-        s = ""
-        for item in M.L_TYPES:
-            types.append(item[0])
-        s = ", ".join(types)
-        print(M.S_ERR_TYPE.format(s))
-        return False
-
-    # --------------------------------------------------------------------------
-    # Check project name for allowed characters
-    # --------------------------------------------------------------------------
-    def _check_name(self, prj_name):
-        """
-        Check project name for allowed characters
-
-        Arguments:
-            prj_name: Name to check for allowed characters
-
-        Returns:
-            Whether the name is valid to use
-
-        Checks the passed name for these criteria:
-        1. longer than 1 char
-        2. starts with an alpha char
-        3. ends with an alphanumeric char
-        4. contains only alphanumeric chars and/or dash(-) or underscore(_)
-        """
-
-        # NB: there is an easier way to do this with regex:
-        # ^([a-zA-Z]+[a-zA-Z\d\-_]*[a-zA-Z\d]+)$ AND OMG DID IT TAKE A LONG
-        # TIME TO FIND IT! in case you were looking for it. It will give you a
-        # quick yes-no answer. I don't use it here because I want to give the
-        # user as much feedback as possible, so I break down the regex into
-        # steps where each step explains which part of the name is wrong.
-
-        # check for name length
-        if len(prj_name.strip(" ")) < 2:
-            print(M.S_ERR_LEN)
-            return False
-
-        # match start or return false
-        pattern = M.D_NAME[M.S_KEY_NAME_START]
-        res = re.search(pattern, prj_name)
-        if not res:
-            print(M.S_ERR_START)
-            return False
-
-        # match end or return false
-        pattern = M.D_NAME[M.S_KEY_NAME_END]
-        res = re.search(pattern, prj_name)
-        if not res:
-            print(M.S_ERR_END)
-            return False
-
-        # match middle or return false
-        pattern = M.D_NAME[M.S_KEY_NAME_MID]
-        res = re.search(pattern, prj_name)
-        if not res:
-            print(M.S_ERR_MID)
-            return False
-
-        # if we made it this far, return true
-        return True
 
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
@@ -1173,6 +1101,18 @@ class PyMaker:
         # put the line back together
         line = code + comm
 
+        # replace version
+        ver = M.D_PRV_PRJ["__PP_VERSION__"]
+        str_sch = M.S_META_VER_SEARCH
+        str_rep = M.S_META_VER_REPL.format(ver)
+        line = re.sub(str_sch, str_rep, line)
+
+        # replace short desc
+        desc = M.D_PUB_META["__PP_SHORT_DESC__"]
+        str_sch = M.S_META_SD_SEARCH
+        str_rep = M.S_META_SD_REPL.format(desc)
+        line = re.sub(str_sch, str_rep, line)
+
         # return the (maybe replaced) line
         return line
 
@@ -1300,6 +1240,96 @@ class PyMaker:
 
         # no valid switch found
         return False
+
+    # --------------------------------------------------------------------------
+    # Check project type for allowed characters
+    # --------------------------------------------------------------------------
+    def _check_type(self, prj_type):
+        """
+        Check project type for allowed characters
+
+        Arguments:
+            prj_type: Type to check for allowed characters
+
+        Returns:
+            Whether the type is valid to use
+
+        Checks the passed type to see if it is one of the allowed project
+        types.
+        """
+
+        # get first char and lower case it
+        first_char = prj_type[0].lower()
+
+        # we got a valid type
+        for item in M.L_TYPES:
+            if first_char == item[0]:
+                return True
+
+        # nope, fail
+        types = []
+        s = ""
+        for item in M.L_TYPES:
+            types.append(item[0])
+        s = ", ".join(types)
+        print(M.S_ERR_TYPE.format(s))
+        return False
+
+    # --------------------------------------------------------------------------
+    # Check project name for allowed characters
+    # --------------------------------------------------------------------------
+    def _check_name(self, prj_name):
+        """
+        Check project name for allowed characters
+
+        Arguments:
+            prj_name: Name to check for allowed characters
+
+        Returns:
+            Whether the name is valid to use
+
+        Checks the passed name for these criteria:
+        1. longer than 1 char
+        2. starts with an alpha char
+        3. ends with an alphanumeric char
+        4. contains only alphanumeric chars and/or dash(-) or underscore(_)
+        """
+
+        # NB: there is an easier way to do this with regex:
+        # ^([a-zA-Z]+[a-zA-Z\d\-_]*[a-zA-Z\d]+)$ AND OMG DID IT TAKE A LONG
+        # TIME TO FIND IT! in case you were looking for it. It will give you a
+        # quick yes-no answer. I don't use it here because I want to give the
+        # user as much feedback as possible, so I break down the regex into
+        # steps where each step explains which part of the name is wrong.
+
+        # check for name length
+        if len(prj_name.strip(" ")) < 2:
+            print(M.S_ERR_LEN)
+            return False
+
+        # match start or return false
+        pattern = M.D_NAME[M.S_KEY_NAME_START]
+        res = re.search(pattern, prj_name)
+        if not res:
+            print(M.S_ERR_START)
+            return False
+
+        # match end or return false
+        pattern = M.D_NAME[M.S_KEY_NAME_END]
+        res = re.search(pattern, prj_name)
+        if not res:
+            print(M.S_ERR_END)
+            return False
+
+        # match middle or return false
+        pattern = M.D_NAME[M.S_KEY_NAME_MID]
+        res = re.search(pattern, prj_name)
+        if not res:
+            print(M.S_ERR_MID)
+            return False
+
+        # if we made it this far, return true
+        return True
 
 
 # ------------------------------------------------------------------------------

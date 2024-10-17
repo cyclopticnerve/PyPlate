@@ -29,10 +29,12 @@ import re
 B_CMD_TREE = True
 # create a git using S_CMD_GIT
 B_CMD_GIT = True
-# create a venv using S_VENV_CMD_CREATE
+# create a venv using S_VENV_CREATE
 B_CMD_VENV = True
 # create docs
 B_CMD_DOCS = True
+# do i18n
+B_CMD_I18N = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -108,6 +110,7 @@ S_KEY_SKIP_TREE = "SKIP_TREE"
 S_KEY_CHARSET = "CHARSET"
 S_KEY_TYPES = "TYPES"
 S_KEY_CLANGS = "CLANGS"
+S_KEY_WLANGS = "WLANGS"
 S_KEY_NO_EXT = "NO_EXT"
 S_KEY_LOCALE = "LOCALE"
 S_KEY_PO = "PO"
@@ -149,6 +152,7 @@ S_DIR_IMAGES = "images"
 S_DIR_LOCALE = "locale"
 S_DIR_PO = "po"
 S_DIR_TESTS = "tests"
+S_DIR_SCRATCH = "scratch"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -156,6 +160,7 @@ S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
 S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
+S_FILE_DESK_TEMPLATE = "template.desktop"
 
 # initial location of project (to check for dups)
 # /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
@@ -213,6 +218,52 @@ S_VENV_FREEZE = f"{S_PRJ_PRV_DIR}/venv/venv_freeze.sh"
 # path to docs script
 S_DOCS_SCRIPT = f"{S_PRJ_PRV_DIR}/docs.sh"
 
+S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
+S_RM_APP = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
+
+S_RM_DESC_SCH = (
+    r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
+    r"(.*?)"
+    r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
+)
+
+S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
+S_RM_DEPS_SCH = (
+    r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
+    r"(.*?)"
+    r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
+)
+S_RM_DEPS_REP = r"\g<1>\n{}\g<3>"
+
+S_DESK_ERR_CAT = (
+    'In metadata categories, "{}" is not valid, see '
+    "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
+)
+
+S_DESK_CAT_SCH = (
+    r"(^\s*\[Desktop Entry\]\s*$)"
+    r"(.*?)"
+    r"(^\s*Categories[\t ]*=)"
+    r"(.*?$)"
+)
+S_DESK_CAT_REP = r"\g<1>\g<2>\g<3>{}"
+S_DESK_DESC_SCH = r"(^\s*\[Desktop Entry\]\s*$)(.*?)(^\s*Comment[\t ]*=)(.*?$)"
+S_DESK_DESC_REP = r"\g<1>\g<2>\g<3>{}"
+
+S_GTK_DESC_SCH = (
+    r"(<object class=\"GtkAboutDialog\".*?)"
+    r"(<property name=\"comments\".*?\>)"
+    r"(.*?)"
+    r"(</property>)"
+)
+S_GTK_DESC_REP = r"\g<1>\g<2>{}\g<4>"
+S_GTK_VER_SCH = (
+    r"(<object class=\"GtkAboutDialog\".*?)"
+    r"(<property name=\"version\">)"
+    r"(.*?)"
+    r"(</property>.*)"
+)
+S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 # ------------------------------------------------------------------------------
 # pybaker stuff
 
@@ -240,12 +291,6 @@ S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=\s*)(.*)"
 S_META_SD_REPL = r'\g<1>"{}"'
 
-# S_ERR_COUNT = "Errors: {}"
-# S_ERR_UFNF = "ERROR: File {} could not be found, trying default"
-# S_ERR_UJSON = "ERROR: FIle {} is not a valid JSON file, trying default"
-# S_ERR_DFNF = "ERROR: Default file {} could not be found"
-# S_ERR_DJSON = "ERROR: Default file {} is not a valid JSON file"
-
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
@@ -258,6 +303,8 @@ S_META_SD_REPL = r'\g<1>"{}"'
 # project (prj_dir)
 L_TYPES = [
     ["c", "CLI", "cli", "CLIs"],
+    # TODO: load cfg, not global
+    # and what about desktop?
     ["g", "GUI", "gui", "GUIs"],
     ["p", "PKG", "pkg", "PKGs"],
 ]
@@ -652,8 +699,8 @@ D_PUB_I18N = {
             "__PP_NAME_SMALL__",
         ],
     },
-    S_KEY_LOCALE: S_DIR_LOCALE,
-    S_KEY_PO: S_DIR_PO,
+    # list of written languages that are available
+    S_KEY_WLANGS: ["en"],
 }
 
 # dict for install script
@@ -784,14 +831,14 @@ def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
 
     # add venv to dist list
     # NB: we do this here to avoid having to handle globs in L_DIST
-    venv_name = dict_prv_prj["__PP_VENV_NAME__"]
+    venv_name = dict_prv_prj["__PP_NAME_VENV__"]
     L_DIST.append(venv_name)
 
 
 # --------------------------------------------------------------------------
 # Do any work after fix
 # --------------------------------------------------------------------------
-def do_after_fix():
+def do_after_fix(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
     """
     Do any work after fix
 
@@ -802,29 +849,11 @@ def do_after_fix():
     _do_after_fix, after all files have been modified.
     """
 
-
-# ------------------------------------------------------------------------------
-# File-specific fixes after everything else
-# ------------------------------------------------------------------------------
-def do_extras(dir_prj, dict_pub_meta=None, dict_prv_prj=None):
-    """
-    File-specific fixes after everything else
-
-    Arguments:
-        dir_prj: the path to the project's directory
-
-
-    """
-
     # sanity check
-    if not dict_pub_meta:
-        dict_pub_meta = D_PUB_META
     if not dict_prv_prj:
         dict_prv_prj = D_PRV_PRJ
-
-    # outsource the big stuff
-
-    print("Do extras/other... ", end="")
+    if not dict_pub_meta:
+        dict_pub_meta = D_PUB_META
 
     # scan project dir
     for root, _root_dirs, root_files in dir_prj.walk():
@@ -844,9 +873,10 @@ def do_extras(dir_prj, dict_pub_meta=None, dict_prv_prj=None):
         if root.name == S_DIR_DESKTOP:
             # for each file item
             for item in files:
-                # suffix = item.suffix.lstrip(".")
                 suffix = (
-                    item.suffix if item.suffix[0] == "." else "." + item.suffix
+                    f".{item.suffix}"
+                    if not item.suffix.startswith(".")
+                    else item.suffix
                 )
                 if suffix in L_DESKTOP:
                     _fix_desktop(item, dict_pub_meta)
@@ -855,19 +885,12 @@ def do_extras(dir_prj, dict_pub_meta=None, dict_prv_prj=None):
             # for each file item
             for item in files:
                 suffix = (
-                    item.suffix if item.suffix[0] == "." else "." + item.suffix
+                    f".{item.suffix}"
+                    if not item.suffix.startswith(".")
+                    else item.suffix
                 )
                 if suffix in L_GTK:
                     _fix_gtk(item, dict_pub_meta)
-
-    print("Done")
-
-    # do i18n stuff
-    # print("Do extras/i18n... ", end="")
-    # dict_i18n =
-    # do_i18n(dict_prj, dict_i18n)
-    # print("Done")
-
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -877,14 +900,14 @@ def do_extras(dir_prj, dict_pub_meta=None, dict_prv_prj=None):
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
-def _fix_readme(path, dict_pub_meta, dict_prv_prj):
+def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     """
     Remove/replace parts of the main README file
 
     Arguments:
         path: Path for the README to modify text
-        dict_pub_meta: the dict of metadata to replace in the file
-        dict_prv_prj: the private calculated proj dict
+        dict_prv_prj: Private calculated proj dict
+        dict_pub_meta: Dict of metadata to replace in the file
 
     Removes parts of the file not applicable to the current project type. Also
     fixes metadata in the file when dict_meta is present.
@@ -903,9 +926,9 @@ def _fix_readme(path, dict_pub_meta, dict_prv_prj):
     # find the remove blocks
     prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
     if prj_type == "c" or prj_type == "g":
-        str_pattern = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
+        str_pattern = S_RM_PKG
     else:
-        str_pattern = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
+        str_pattern = S_RM_APP
 
     # replace block with empty string (equiv to deleting it)
     # NB: need S flag to make dot match newline
@@ -915,13 +938,9 @@ def _fix_readme(path, dict_pub_meta, dict_prv_prj):
     # this part is used by pybaker to replace metadata
 
     # replace short description
-    str_pattern = (
-        r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
-        r"(.*?)"
-        r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
-    )
+    str_pattern = S_RM_DESC_SCH
     pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
-    str_rep = rf"\g<1>\n{pp_short_desc}\n\g<3>"
+    str_rep = S_RM_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # get deps as links for readme
@@ -945,12 +964,8 @@ def _fix_readme(path, dict_pub_meta, dict_prv_prj):
         s_rm_deps = "None"
 
     # replace dependencies array
-    str_pattern = (
-        r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
-        r"(.*?)"
-        r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
-    )
-    str_rep = rf"\g<1>\n{s_rm_deps}\g<3>"
+    str_pattern = S_RM_DEPS_SCH
+    str_rep = S_RM_DEPS_REP.format(s_rm_deps)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
@@ -1031,10 +1046,7 @@ def _fix_desktop(path, dict_pub_meta):
             pp_gui_categories.append(cat)
         else:
             # category is not valid, print error and increase error count
-            print(
-                f'In metadata categories, "{cat}" is not valid, see \n'
-                "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
-            )
+            print(S_DESK_ERR_CAT.format(cat))
 
     # convert list to string
     str_cat = ";".join(pp_gui_categories)
@@ -1049,24 +1061,14 @@ def _fix_desktop(path, dict_pub_meta):
         text = a_file.read()
 
     # replace categories
-    str_pattern = (
-        r"(^\s*\[Desktop Entry\]\s*$)"
-        r"(.*?)"
-        r"(^\s*Categories[\t ]*=)"
-        r"(.*?$)"
-    )
-    str_rep = rf"\g<1>\g<2>\g<3>{str_cat}"
+    str_pattern = S_DESK_CAT_SCH
+    str_rep = S_DESK_CAT_REP.format(str_cat)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
-    str_pattern = (
-        r"(^\s*\[Desktop Entry\]\s*$)"
-        r"(.*?)"
-        r"(^\s*Comment[\t ]*=)"
-        r"(.*?$)"
-    )
+    str_pattern = S_DESK_DESC_SCH
     pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
-    str_rep = rf"\g<1>\g<2>\g<3>{pp_short_desc}"
+    str_rep = S_DESK_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
@@ -1096,99 +1098,20 @@ def _fix_gtk(path, dict_pub_meta):
         text = a_file.read()
 
     # replace short description
-    str_pattern = (
-        r"(<object class=\"GtkAboutDialog\".*?)"
-        r"(<property name=\"comments\".*?\>)"
-        r"(.*?)"
-        r"(</property>)"
-    )
+    str_pattern = S_GTK_DESC_SCH
     pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
-    str_rep = rf"\g<1>\g<2>{pp_short_desc}\g<4>"
+    str_rep = S_GTK_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace version
-    str_pattern = (
-        r"(<object class=\"GtkAboutDialog\".*?)"
-        r"(<property name=\"version\">)"
-        r"(.*?)"
-        r"(</property>.*)"
-    )
+    str_pattern = S_GTK_VER_SCH
     pp_version = dict_pub_meta["__PP_VERSION__"]
-    str_rep = rf"\g<1>\g<2>{pp_version}\g<4>"
+    str_rep = S_GTK_VER_REP.format(pp_version)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:
         a_file.write(text)
-
-# # --------------------------------------------------------------------------
-# # Run CNPotPy over files to produce I18N files
-# # --------------------------------------------------------------------------
-# def _do_i18n(dict_prj, dict_pub_i18n):
-#     """
-#     Run CNPotPy over files to produce I18N files
-#     """
-
-#     # # dict of clangs and exts
-#     dict_in = {
-#         "Python": [
-#             ".py",
-#         ],
-#         "Glade": [
-#             ".ui",
-#             ".glade",
-#         ],
-#         "Desktop": [".desktop"],
-#     }
-
-#     # dict of clangs and no exts (ie file names)
-#     no_ext = "Python"
-
-#     # the list of languages your program has been translated into (can grow
-#     # over time, adding languages as they become available)
-#     list_wlangs = [
-#         "es",
-#         "xo",
-#         "pq",
-#     ]
-
-#     name_big = self._dict_prv_prj["__PP_NAME_BIG__"]
-#     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-#     version = self._dict_pub_meta["__PP_VERSION__"]
-#     author = self._dict_prv_all["__PP_AUTHOR__"]
-#     email = self._dict_prv_all["__PP_EMAIL__"]
-
-#     # path to src dir
-#     dir_src = self._dir_prj / M.S_DIR_SRC
-#     dir_locale = self._dir_prj / "src" / "support" / "i18n" / "locale"
-#     dir_po = self._dir_prj / "src" / "support" / "i18n" / "po"
-
-#     # create CNPotPy object
-#     pp = CNPotPy(
-#         dir_src,
-#         str_appname=name_big,
-#         str_version=version,
-#         str_author=author,
-#         str_email=email,
-#         dir_locale=dir_locale,
-#         dir_po=dir_po,
-#         str_domain=name_small,
-#         dict_clangs=dict_in,
-#         no_ext=no_ext,
-#         list_wlangs=list_wlangs,
-#     )
-
-#     # this .pot, .po, and .mo files
-#     pp.main()
-
-#     # pp.make_desktop(
-#     #     self._dir_prj / "src" / "support" / "desktop" / "template.desktop",
-#     #     self._dir_prj
-#     #     / "src"
-#     #     / "support"
-#     #     / "desktop"
-#     #     / f"{name_small}.desktop",
-#     # )
 
 
 # -)

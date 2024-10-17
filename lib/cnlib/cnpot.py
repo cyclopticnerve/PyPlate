@@ -102,7 +102,7 @@ class CNPotPy:
         dir_po=None,
         str_domain="messages",
         dict_clangs=None,
-        no_ext="",
+        dict_no_ext=None,
         list_wlangs=None,
         charset="UTF-8",
     ):
@@ -125,7 +125,7 @@ class CNPotPy:
                 domain to a locale folder
             dict_clangs: The dictionary of file extensions to scan for each
             clang
-            no_ext: An optional entry mapping files with no extension
+            dict_no_ext: An optional dict mapping files with no extension
             to their clang value
             list_wlangs: A list of supported languages to ensure a complete
             file structure in the project dir
@@ -202,7 +202,9 @@ class CNPotPy:
         self._dict_clangs = dict_clangs
 
         # set no ext
-        self._no_ext = no_ext
+        if dict_no_ext is None:
+            dict_no_ext = {}
+        self._dict_no_ext = dict_no_ext
 
         # fix up list_wlangs
         if list_wlangs is None:
@@ -444,6 +446,10 @@ class CNPotPy:
             F.sh(cmd)
 
     # --------------------------------------------------------------------------
+    # Private functions
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
     # Scan the source dir for files with certain extensions
     # --------------------------------------------------------------------------
     def _get_paths_for_exts(self, dict_clangs):
@@ -480,10 +486,10 @@ class CNPotPy:
         # get all paths to all files in source dir, recursively
         # NB: very important to convert generator to list here
         # this is because generators use yield to return every result
-        # individually, while lists are monolithic
+        # individually, while lists are monolithic (and rglob is a generator)
         # you cannot iterate over a generator's yield result, because it is
         # generally only one item, while a list contains all results
-        # calling list() on a generator causes thew generator to give ALL it's
+        # calling list() on a generator causes the generator to give ALL it's
         # generated results to the final list
         paths = list(self._dir_src.rglob("*"))
 
@@ -498,7 +504,7 @@ class CNPotPy:
             ]
 
             # get all paths that match file ext
-            files = [f for f in paths if f.suffix in exts ]
+            files = [f for f in paths if f.suffix in exts]
 
             # make sure the key exists
             if not clang in dict_res:
@@ -508,24 +514,19 @@ class CNPotPy:
             dict_res[clang].extend(files)
 
         # now time to handle files with no ext
-        for path in paths:
-            if path.suffix == "" and path.is_file():
-                dict_res[self._no_ext].append(path)
+        for clang, name_list in self._dict_no_ext.items():
 
-        # # now time to handle files with no ext
-        # for clang, name_list in dict_no_ext.items():
+            # get all paths that match file ext
+            # NB: the is_file() check here is to make sure we only add files
+            # that have no ext, not dirs (which have no ext, obvs)
+            files = [f for f in paths if f.name in name_list if f.is_file()]
 
-        #     # get all paths that match file ext
-        #     # NB: the is_file() check here is to make sure we only add files
-        #     # that have no ext, not dirs (which have no ext, obvs)
-        #     files = [f for f in paths if f.name in name_list if f.is_file()]
+            # make sure the key exists
+            if not clang in dict_res:
+                dict_res[clang] = []
 
-        #     # make sure the key exists
-        #     if not clang in dict_res:
-        #         dict_res[clang] = []
-
-        #     # add results to langs that have extensions
-        #     dict_res[clang].extend(files)
+            # add results to langs that have extensions
+            dict_res[clang].extend(files)
 
         # return result
         return dict_res

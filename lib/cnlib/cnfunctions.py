@@ -46,8 +46,9 @@ class CNShellError(Exception):
     'exception' property, but printing will defer to the original exception's
     __repr__ property.
     """
-    def __init__(self, exception):
+    def __init__(self, exception, message):
         self.exception = exception
+        self.message = message
         self.__repr__ = self.exception.__repr__
 
 # ------------------------------------------------------------------------------
@@ -426,9 +427,13 @@ def sh(cmd, shell=False):
             # input (True)
             shell=shell,
         )
+    except subprocess.CalledProcessError as e:
+        # bubble up the error to the calling function
+        new_err = CNShellError(e, e.stderr)
+        raise new_err from e
     except Exception as e:
         # bubble up the error to the calling function
-        new_err = CNShellError(e)
+        new_err = CNShellError(e, e.__repr__)
         raise new_err from e
 
     # return the result
