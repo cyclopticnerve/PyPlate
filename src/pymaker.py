@@ -20,8 +20,6 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# TODO: make all Path concats in conf
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -419,7 +417,7 @@ class PyMaker:
         # do template/all
 
         # copy template/all
-        src = P_DIR_PYPLATE / M.S_DIR_TEMPLATE / M.S_DIR_ALL
+        src = P_DIR_PYPLATE / M.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst)
 
@@ -719,8 +717,8 @@ class PyMaker:
                 str_version=M.D_PUB_META["__PP_VERSION__"],
                 str_author=M.D_PRV_ALL["__PP_AUTHOR__"],
                 str_email=M.D_PRV_ALL["__PP_EMAIL__"],
-                dir_locale=self._dir_prj / M.S_DIR_I18N / M.S_DIR_LOCALE,
-                dir_po=self._dir_prj / M.S_DIR_I18N / M.S_DIR_PO,
+                dir_locale=self._dir_prj / M.S_DIR_LOCALE,
+                dir_po=self._dir_prj / M.S_DIR_PO,
                 str_domain=M.D_PRV_PRJ["__PP_NAME_SMALL__"],
                 dict_clangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CLANGS],
                 dict_no_ext=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_NO_EXT],
@@ -732,11 +730,11 @@ class PyMaker:
             potpy.main()
 
             # make .desktop file
-            path_desk = self._dir_prj / M.S_DIR_CONF / M.S_DIR_DESKTOP
+            path_desk = self._dir_prj / M.S_DIR_DESKTOP
             if path_desk.is_dir():
-                path_template = path_desk / M.S_FILE_DESK_TEMPLATE
+                path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
                 name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
-                path_out_name = f"{name_small}.desktop"
+                path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = path_desk / path_out_name
                 potpy.make_desktop(path_template, path_out)
 
@@ -1102,7 +1100,7 @@ class PyMaker:
         line = code + comm
 
         # replace version
-        ver = M.D_PRV_PRJ["__PP_VERSION__"]
+        ver = M.D_PUB_META["__PP_VERSION__"]
         str_sch = M.S_META_VER_SEARCH
         str_rep = M.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
@@ -1165,7 +1163,7 @@ class PyMaker:
 
         # get sources and filter out items that don't exist
         src = [
-            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / M.S_DIR_ALL / M.S_FILE_REQS,
+            P_DIR_PYPLATE / M.S_DIR_ALL / M.S_FILE_REQS,
             P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long / M.S_FILE_REQS,
         ]
         src = [str(item) for item in src if item.exists()]

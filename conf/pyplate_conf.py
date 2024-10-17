@@ -135,22 +135,22 @@ S_KEY_NAME_MID = "S_KEY_NAME_MID"
 # also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
 S_DIR_TEMPLATE = "template"
-S_DIR_ALL = "all"
+S_DIR_ALL = f"{S_DIR_TEMPLATE}/all"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_DIST = "dist"
-S_DIR_ASSETS = "assets"
+S_DIR_ASSETS = f"{S_DIR_DIST}/assets"
 S_DIR_DOCS = "docs"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
 S_DIR_SUPPORT = "support"
-S_DIR_DESKTOP = "desktop"
+S_DIR_DESKTOP = f"{S_DIR_CONF}/desktop"
 S_DIR_UI = "ui"
 S_DIR_I18N = "i18n"
 S_DIR_IMAGES = "images"
-S_DIR_LOCALE = "locale"
-S_DIR_PO = "po"
+S_DIR_LOCALE = f"{S_DIR_I18N}/locale"
+S_DIR_PO = f"{S_DIR_I18N}/po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
 
@@ -160,8 +160,9 @@ S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
 S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
-S_FILE_DESK_TEMPLATE = "template.desktop"
-
+S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
+S_FILE_DESK_OUT = "{}.desktop"
+["__PP_VERSION__"]
 # initial location of project (to check for dups)
 # /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
 # NB: format params are project type and project name
@@ -303,8 +304,6 @@ S_META_SD_REPL = r'\g<1>"{}"'
 # project (prj_dir)
 L_TYPES = [
     ["c", "CLI", "cli", "CLIs"],
-    # TODO: load cfg, not global
-    # and what about desktop?
     ["g", "GUI", "gui", "GUIs"],
     ["p", "PKG", "pkg", "PKGs"],
 ]

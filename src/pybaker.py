@@ -19,8 +19,6 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# TODO: make all Path concats in conf
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -527,8 +525,8 @@ class PyBaker:
                 str_version=self._dict_pub_meta["__PP_VERSION__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
-                dir_locale=self._dir_prj / M.S_DIR_I18N / M.S_DIR_LOCALE,
-                dir_po=self._dir_prj / M.S_DIR_I18N / M.S_DIR_PO,
+                dir_locale=self._dir_prj / M.S_DIR_LOCALE,
+                dir_po=self._dir_prj / M.S_DIR_PO,
                 str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
                 dict_clangs=self._dict_pub_i18n[M.S_KEY_CLANGS],
                 dict_no_ext=self._dict_pub_i18n[M.S_KEY_NO_EXT],
@@ -540,11 +538,11 @@ class PyBaker:
             potpy.main()
 
             # make .desktop file
-            path_desk = self._dir_prj / M.S_DIR_CONF / M.S_DIR_DESKTOP
+            path_desk = self._dir_prj / M.S_DIR_DESKTOP
             if path_desk.is_dir():
-                path_template = path_desk / M.S_FILE_DESK_TEMPLATE
+                path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
                 name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-                path_out_name = f"{name_small}.desktop"
+                path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = path_desk / path_out_name
                 potpy.make_desktop(path_template, path_out)
 
@@ -612,7 +610,7 @@ class PyBaker:
         # list of files/folders from project to include in dist
         src = M.L_DIST
         # and where to put it
-        dst = Path(self._dir_prj) / M.S_DIR_DIST / M.S_DIR_ASSETS
+        dst = self._dir_prj / M.S_DIR_ASSETS
 
         # copy files/folders
         for item in src:
@@ -815,9 +813,6 @@ class PyBaker:
                 # fix dunders in real code lines (may still have trailing
                 # comments)
                 lines[index] = self._fix_code(line)
-
-                # fix S_PB_VERSION / S_PB_SHORT_DESC for cmd line help
-                lines[index] = self._fix_meta(line)
 
         # open and write file
         with open(path, "w", encoding="UTF-8") as a_file:
