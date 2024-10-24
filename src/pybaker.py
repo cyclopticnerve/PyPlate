@@ -53,6 +53,8 @@ from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib.cnvenv import CNVenv  # type: ignore
+from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -455,28 +457,25 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # freeze requirements
+        if M.B_CMD_VENV:
 
-        if M.B_CMD_GIT:
-            path_git = self._dir_prj / M.S_DIR_GIT
-            if path_git.exists():
+            print("Do venv... ", end="")
 
-                print("Do freeze... ", end="")
+            # get name ov venv folder and reqs file
+            dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
+            file_reqs = M.S_FILE_REQS
 
-                # run the cmd
-                # NB: cmd will fail if there is no git
-                cmd = self._dir_prj / M.S_VENV_FREEZE
-                try:
-                    # run script to freeze venv reqs
-                    F.sh(cmd)
-                    print("Done")
-                except F.CNShellError as e:
-                    print("Failed")
-                    print(e)
+            # do the thing with the thing
+            cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
+            try:
+                cv.freeze()
+            except F.CNShellError as e:
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
 
-        if M.B_CMD_GIT:
+        if M.B_CMD_CHANGELOG:
             path_git = self._dir_prj / M.S_DIR_GIT
             if path_git.exists():
 
@@ -550,18 +549,23 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # update docs
-        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
-        # work
 
+        # if docs flag is set
         if M.B_CMD_DOCS:
 
             print("Do docs... ", end="")
 
-            # FIXME: this is broken
-            # cmd = self._dir_prj / M.S_DOCS_SCRIPT
-            # F.sh(cmd)
+            # get path to project's venv
+            venv = self._dict_prv_prj["__PP_NAME_VENV__"]
 
-            print("Done")
+            # do the thing with the thing
+            cs = CNSphinx(self._dir_prj, M.S_DIR_SRC, M.S_DIR_DOCS)
+            try:
+                cs.build(venv)
+                print("Done")
+            except F.CNShellError as e:
+                print("Fail")
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # tree

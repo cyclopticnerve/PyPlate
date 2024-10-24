@@ -1,0 +1,38 @@
+# ------------------------------------------------------------------------------
+# Project : CNInstallLib                                           /          \
+# Filename: pyproject.toml                                        |     ()     |
+# Date    : 10/22/2024                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+[build-system]
+requires = ["setuptools>=59.6.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cninstalllib"
+version = "0.0.1"
+description = "A library to make install/uninstall scripts for a PyPlate project"
+authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+keywords = []
+classifiers = [
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.10"
+# NB: dependencies in pyproject.toml are WAY too complicated for an automaton,
+# and are best handled manually (ie. you're on your own here, bud...)
+dependencies = []
+
+[project.urls]
+homepage = "https://github.com/cyclopticnerve/CNInstallLib"
+
+[tool.setuptools]
+py-modules = []
+
+# -)

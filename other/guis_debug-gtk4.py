@@ -24,11 +24,11 @@ import argparse
 import os
 
 # PyGObject imports
-import gi
+# import gi
 
-gi.require_version("Adw", "1")
-gi.require_version("Gtk", "4.0")
-from gi.repository import Adw, Gtk
+# gi.require_version("Adw", "1")
+# gi.require_version("Gtk", "4.0")
+# from gi.repository import Adw, Gtk
 
 # ------------------------------------------------------------------------------
 # Public functions

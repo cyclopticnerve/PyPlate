@@ -21,10 +21,18 @@ from pathlib import Path
 
 # pylint: disable=import-error
 
-# my imports
-from .cnformatter import CNFormatter
-from . import cnfunctions as F
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 
+# my imports
+from cnformatter import CNFormatter # type: ignore
+import cnfunctions as F  # type: ignore
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------

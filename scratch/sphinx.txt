@@ -1,0 +1,20 @@
+X. in venv::
+    pip install sphinx
+    pip install sphinx-rtd-theme
+
+1. in docs:
+    sphinx-quickstart --sep -p PyPlate -a cyclopticnerve -r 0.0.1 -l en --ext-autodoc --extensions sphinx.ext.napoleon
+
+2. in docs/source/conf.py:
+
+    2a. add:
+        from pathlib import Path
+        import sys
+        path_src = Path("../../src").resolve()
+        sys.path.insert(0, str(path_src))
+
+    2b. modify:
+        html_theme = "sphinx_rtd_theme"
+
+3. in docs:
+    sphinx-apidoc -o source ../src && make html

@@ -512,12 +512,12 @@ def load_dicts(paths, start_dict=None):
 # ------------------------------------------------------------------------------
 # Save a dictionary to all paths
 # ------------------------------------------------------------------------------
-def save_dict(dict_, paths):
+def save_dict(a_dict, paths):
     """
     Save a dictionary to all paths
 
     Arguments:
-        dict_: the dictionary to save to the file
+        a_dict: the dictionary to save to the file
         paths: the list of file paths to save to
 
     Raises:
@@ -548,7 +548,7 @@ def save_dict(dict_, paths):
             # open the file
             with open(path, "w", encoding="UTF-8") as a_file:
                 # save dict tp file
-                json.dump(dict_, a_file, indent=4)
+                json.dump(a_dict, a_file, indent=4)
 
             # it worked, done here
             return

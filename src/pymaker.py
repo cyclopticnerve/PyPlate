@@ -55,6 +55,8 @@ from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib.cnvenv import CNVenv  # type: ignore
+from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -457,6 +459,9 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # combine any reqs files
+        # NB: this combines initial reqs from the "all" template folder and the
+        # "type" template folder. these will then be installed during
+        # _do_after_fix, after the venv is created
         self._fix_reqs(prj_type_long)
 
         print("Done")
@@ -666,23 +671,19 @@ class PyMaker:
 
             print("Do venv... ", end="")
 
-            # calculate name of venv
-            name_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
-            path_venv = self._dir_prj / name_venv
-            str_cmd = M.S_VENV_CREATE.format(path_venv)
+            # get name ov venv folder and reqs file
+            dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
+            file_reqs = M.S_FILE_REQS
 
-            # create venv
-            cmd = self._dir_prj / str_cmd
-            F.sh(cmd)
-
-            # run script to install venv reqs
-            cmd = self._dir_prj / M.S_VENV_INSTALL
+            # do the thing with the thing
+            cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
             try:
-                F.sh(cmd)
+                cv.create()
+                cv.install()
                 print("Done")
             except F.CNShellError as e:
-                print("Failed")
-                print(e)
+                print("Fail")
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # purge
@@ -705,6 +706,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # i18n
+
         # if i18n flag is set
         if M.B_CMD_I18N:
 
@@ -731,29 +733,42 @@ class PyMaker:
 
             # make .desktop file
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
-            if path_desk.is_dir():
-                path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
+            path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
+            if path_desk.is_dir() and path_template.is_file():
                 name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
-                path_out = path_desk / path_out_name
+                path_out = self._dir_prj / path_out_name
                 potpy.make_desktop(path_template, path_out)
 
             print("Done")
 
         # ----------------------------------------------------------------------
         # update docs
-        # NB: this is ugly and stupid, but it's the only way to get pdoc3 to
-        # work
 
+        # if docs flag is set
         if M.B_CMD_DOCS:
 
             print("Do docs... ", end="")
 
-            # FIXME: this is broken
-            # cmd = self._dir_prj / M.S_DOCS_SCRIPT
-            # F.sh(cmd)
+            name = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
+            author = M.D_PRV_ALL["__PP_AUTHOR__"]
+            version = M.D_PUB_META["__PP_VERSION__"]
+            # revision = "0.0.0"
 
-            print("Done")
+            # do the thing with the thing
+            cs = CNSphinx(self._dir_prj, M.S_DIR_SRC, M.S_DIR_DOCS)
+            try:
+                cs.create(
+                    name,
+                    author,
+                    version,
+                    dirs_import=["lib"],
+                    theme=M.S_DOCS_THEME,
+                )
+                print("Done")
+            except F.CNShellError as e:
+                print("Fail")
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # tree
@@ -1162,9 +1177,10 @@ class PyMaker:
         """
 
         # get sources and filter out items that don't exist
+        reqs_prj = M.S_FILE_REQS_TYPE.format(prj_type_long)
         src = [
-            P_DIR_PYPLATE / M.S_DIR_ALL / M.S_FILE_REQS,
-            P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long / M.S_FILE_REQS,
+            P_DIR_PYPLATE / M.S_FILE_REQS_ALL,
+            P_DIR_PYPLATE / reqs_prj,
         ]
         src = [str(item) for item in src if item.exists()]
 

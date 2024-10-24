@@ -86,7 +86,6 @@ S_ERR_DEBUG = (
     "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
 )
 
-# TODO: which keys need to be global/which are only used once?
 # keys for pybaker private dict
 S_KEY_PRV_ALL = "PRV_ALL"
 # S_KEY_PRV_EXTRA = "PRV_EXTRA"
@@ -138,6 +137,7 @@ S_DIR_TEMPLATE = "template"
 S_DIR_ALL = f"{S_DIR_TEMPLATE}/all"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
+S_DIR_VENV = "venv"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = f"{S_DIR_DIST}/assets"
 S_DIR_DOCS = "docs"
@@ -159,10 +159,14 @@ S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
+S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
+# NB: format param is L_TYPES[2] (long prj type, subdir in template)
+S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
 S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
-S_FILE_DESK_OUT = "{}.desktop"
-["__PP_VERSION__"]
+# NB: format param is __PP_NAME_SMALL__
+S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/" + "{}.desktop"
+
 # initial location of project (to check for dups)
 # /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
 # NB: format params are project type and project name
@@ -178,9 +182,6 @@ S_USR_BIN = ".local/bin"  # where to put the binary
 # this is where the user libs will go
 S_USR_LIB_NAME = "lib"
 S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
-
-# cmds for docs
-S_CMD_DOCS = "python -m pdoc --html -f -o {} ."
 
 # formats for tree
 S_TREE_NAME = "tree.txt"
@@ -212,13 +213,18 @@ S_CMD_GIT = "git init {} -q"
 S_VENV_FMT_NAME = ".venv-{}"
 # NB: path to venv create/install/freeze scripts for venv, relative to prj dir
 # NB: format param is __PP_NAME_VENV__
-S_VENV_CREATE = f"{S_PRJ_PRV_DIR}/venv/venv_create.sh" " {}"
-S_VENV_INSTALL = f"{S_PRJ_PRV_DIR}/venv/venv_install.sh"
-S_VENV_FREEZE = f"{S_PRJ_PRV_DIR}/venv/venv_freeze.sh"
+# S_VENV_CREATE = f"{S_PRJ_PRV_DIR}/{S_DIR_VENV}/venv_create.sh" " {}"
+# S_VENV_INSTALL = f"{S_PRJ_PRV_DIR}/{S_DIR_VENV}/venv_install.sh"
+# S_VENV_FREEZE = f"{S_PRJ_PRV_DIR}/{S_DIR_VENV}/venv_freeze.sh"
 
 # path to docs script
-S_DOCS_SCRIPT = f"{S_PRJ_PRV_DIR}/docs.sh"
+# S_DOCS_CREATE = f"{S_PRJ_PRV_DIR}/{S_DIR_DOCS}/docs_create.sh"
+# S_DOCS_MODIFY = f"{S_PRJ_PRV_DIR}/{S_DIR_DOCS}/docs_modify.py"
+# S_DOCS_RUN = f"{S_PRJ_PRV_DIR}/{S_DIR_DOCS}/docs_run.sh"
 
+S_DOCS_THEME = "sphinx_rtd_theme"
+
+# fix readme
 S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
 S_RM_APP = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
 
@@ -236,6 +242,7 @@ S_RM_DEPS_SCH = (
 )
 S_RM_DEPS_REP = r"\g<1>\n{}\g<3>"
 
+# fix desktop
 S_DESK_ERR_CAT = (
     'In metadata categories, "{}" is not valid, see '
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
@@ -251,6 +258,7 @@ S_DESK_CAT_REP = r"\g<1>\g<2>\g<3>{}"
 S_DESK_DESC_SCH = r"(^\s*\[Desktop Entry\]\s*$)(.*?)(^\s*Comment[\t ]*=)(.*?$)"
 S_DESK_DESC_REP = r"\g<1>\g<2>\g<3>{}"
 
+# fix gtk
 S_GTK_DESC_SCH = (
     r"(<object class=\"GtkAboutDialog\".*?)"
     r"(<property name=\"comments\".*?\>)"
@@ -265,15 +273,18 @@ S_GTK_VER_SCH = (
     r"(</property>.*)"
 )
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
+
 # ------------------------------------------------------------------------------
 # pybaker stuff
 
 S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
 S_ERR_PRJ_DIR_NONE = "Project dir not provided"
 
+# changelog
 S_CHANGELOG = "CHANGELOG.md"
 S_CHANGELOG_CMD = f"git log --pretty='%ad - %s' > {S_CHANGELOG}"
 
+# pyproject.toml
 S_TOML_VERSION_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
 )
@@ -287,6 +298,7 @@ S_TOML_KW_SEARCH = (
 )
 S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
 
+# global vars for cmd line help
 S_META_VER_SEARCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
 S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=\s*)(.*)"
@@ -297,7 +309,7 @@ S_META_SD_REPL = r'\g<1>"{}"'
 # ------------------------------------------------------------------------------
 
 # the types of projects this script can create
-# val[0] is the char to enter (short, display only)
+# val[0] is the char to enter in the cli (short, display only)
 # val[1] is the display name in the cli (long, display only)
 # val[2] is the template folder to use (template/subdir)
 # val[3] is the name of the folder under S_DIR_PRJ_BASE in which to place the
