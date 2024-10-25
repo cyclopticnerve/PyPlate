@@ -10,20 +10,18 @@
 The class to use for installing.
 """
 
-# TODO: strings
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
-# global imports
+#  global imports
 import json
 from pathlib import Path
 import shutil
 import sys
 
 # find paths to lib
-# NB: this assumes cnlib is a "sister" folder to cnapplib
+# NB: this assumes cninstall is a "sister" folder to cnlib
 DIR_CNLIB = Path(__file__).parents[1].resolve()
 
 # add paths to import search
@@ -71,7 +69,7 @@ from cnlib import cnfunctions as F  # type: ignore
 # ------------------------------------------------------------------------------
 # Define the main class
 # ------------------------------------------------------------------------------
-class CNInstall:
+class CNInstaller:
     """
     The class to use for installing.
     """
@@ -83,27 +81,24 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Initialize the class
     # --------------------------------------------------------------------------
-    def __init__(self, debug=False):
-
+    def __init__(self, path_conf, dir_assets, debug=False):
         """
         The default initialization of the class
 
-        Public methods:
-            run_file:
-            run_dict:
         Creates a new instance of the class and set initial properties.
         """
 
-        # default conf dict
+        # default properties
         self._dict_conf = {}
 
         # set conf dict
         # TODO: catch exc
-        # with open(path_conf, "r", encoding="utf8") as a_file:
-        #     self._dict_conf = json.load(a_file)
+        with open(path_conf, "r", encoding="utf8") as a_file:
+            self._dict_conf = json.load(a_file)
 
+        # new properties
         # the dir where the install.py is being run
-        # self._dir_assets = dir_assets
+        self._dir_assets = dir_assets
         # set debug prop
         self._debug = debug
 
@@ -113,16 +108,6 @@ class CNInstall:
     def run_file(self, a_file):
         """
         Run the install process using a file path
-
-        Arguments:
-            a_file: File containing ONLY the install dict
-
-        Raises:
-            FileNotFoundError: If the file could not be found
-            json.JSONDecodeError: If the file is not a valid JSON file
-
-        Runs the installer using a file path, which must ONLY contain the
-        install dict.
         """
 
         # set conf dict
@@ -141,9 +126,6 @@ class CNInstall:
         """
         Run the install process using a dict
 
-        Arguments:
-            a_dict: Dictionary to use for install information
-
         This method is the main function of the class. It performs the
         various steps required to install a python program, and should be
         the only method called by your install.py file.
@@ -161,7 +143,6 @@ class CNInstall:
         # check if we need sudo password
         if len(sys_reqs) or len(py_reqs):
             cmd = "sudo echo -n"
-            # TODO: check for error
             F.sh(cmd)
 
         # show some text
@@ -183,6 +164,10 @@ class CNInstall:
 
         # done installing
         print(f"{prog_name} installed")
+
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Install system requirements
@@ -295,15 +280,14 @@ class CNInstall:
                     print(f"copy2 {src} to {dst}")
 
     # --------------------------------------------------------------------------
-    # Run preflight/postflight scripts
+    # Runs the scripts from preflight or postflight
     # --------------------------------------------------------------------------
     def _run_scripts(self, step):
-
         """
         Runs the scripts from preflight or postflight
 
         Arguments:
-            step [str]: The step to run, either preflight or postflight
+            step [str]: The step to run, either "preflight" or "postflight"
 
         This method is the common code for running preflight/postflight
         scripts. It takes the step (specified by the key name) and runs the
@@ -311,161 +295,23 @@ class CNInstall:
         """
 
         # check for empty/no list
-        # if not self._needs_step(step):
-        #     return
-
-        # check for empty/no list
         items = self._dict_conf.get(step, None)
         if not items or len(items) == 0:
             return
 
         # show some text
-        print(f'Running {step} scripts... ', end="")
+        print(f"Running {step} scripts")
 
         for item in self._dict_conf[step]:
 
             # show that we are doing something
-            # print(f'install running {item}... ', end='')
+            print(f"Running {item}... ", end="")
 
-            # TODO: except
             # get item as cmd line array
             if not self._debug:
                 F.sh(item)
 
             # done
             print("Done")
-
-    # --------------------------------------------------------------------------
-    # Run the script
-    # --------------------------------------------------------------------------
-    # def run(self, dict_user):
-    #     """
-    #     Runs the setup using the supplied user dictionary
-
-    #     Arguments:
-    #         dict_user [dict]: the user dict to get options from
-
-    #     This method takes the user dictionary and does some housekeeping,
-    #     such as creating the substitution directory. It also uses
-    #     configurator to merge the default and user dicts and apply the
-    #     substitutions.
-    #     """
-
-    # the defs dict
-    # dict_defs = {
-    #     "general": {"name": ""},
-    #     "preflight": [],
-    #     "sys_reqs": [],
-    #     "py_reqs": [],
-    #     "dirs": [],
-    #     "files": {},
-    #     "postflight": [],
-    # }
-
-    # get current user's home dir
-    # home_dir = os.path.expanduser("~")
-
-    # # get location
-    # src_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # # the default dict of substitutions
-    # dict_subs = {"${HOME}": home_dir, "${SRC}": src_dir}
-
-    # do the config merge
-    # NB: allow_user_extras is here for the 'files' section, which will have
-    # keys (filenames) we don't know about yet
-    # self.dict_conf = configurator.load(
-    #     dict_defs, dict_user, dict_subs, allow_user_extras=True
-    # )
-    # self._dict_conf = dict_user
-
-    # --------------------------------------------------------------------------
-    # Private methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Run preflight scripts
-    # --------------------------------------------------------------------------
-    # def _do_preflight(self):
-
-    #     """
-    #         Run preflight scripts (before we do the heavy lifting)
-
-    #         This method runs any scripts specified in the preflight section of
-    #         the user dict, in the order they are specified.
-    #     """
-
-    #     # run preflight scripts
-    #     self._run_scripts('preflight')
-
-    # --------------------------------------------------------------------------
-    # Run postflight scripts
-    # --------------------------------------------------------------------------
-    # def _do_postflight(self):
-
-    #     """
-    #         Run postflight scripts (after we do the heavy lifting)
-
-    #         This method runs any scripts specified in the postflight section of
-    #         the user dict, in the order they are specified.
-    #     """
-
-    #     # run postflight scripts
-    #     self._run_scripts('postflight')
-
-    # --------------------------------------------------------------------------
-    # Check if we are going to need sudo password and get it now
-    # --------------------------------------------------------------------------
-    # def _check_sudo(self):
-
-    #     """
-    #         Checks if we need sudo permission early in the install
-
-    #         Returns:
-    #             [bool]: True if we need sudo permission, False if we don't
-
-    #         This method is used to check if we will need sudo (for sys_reqs or
-    #         py_reqs) and ask for the sudo password early in the install process.
-    #         This gives a better visual appearance to the process.
-    #     """
-
-    # if either of theses steps is required, we need sudo
-    # if self._needs_step('sys_reqs') or self._needs_step('py_reqs'):
-
-    #     # ask for sudo password now (no try block 'cause f*** it)
-    #     cmd = 'sudo echo -n'
-    #     cmd_array = shlex.split(cmd)
-    #     subprocess.run(cmd_array, check=True)
-
-    # --------------------------------------------------------------------------
-    # Check if a step needs to be performed or can be skipped
-    # --------------------------------------------------------------------------
-    # def _needs_step(self, step):
-
-    #     """
-    #     Check if an entry in the defs/user needs to be run
-
-    #     Arguments:
-    #         step [str]: the step to check for in the final dict
-
-    #     Returns:
-    #         [bool]:True if the dict contains the step, False otherwise
-
-    #     This method checks to see if a step (specified by the key name) is
-    #     needed, or if the value is empty. This saves us from printing info
-    #     about a step that will not actually be performed (such as not having
-    #     any preflight scripts to run, etc.).
-    #     """
-
-    #     # if the section is present
-    #     if step in self._dict_conf:
-
-    #         # if there are entries in the section
-    #         step_conf = self._dict_conf[step]
-    #         if len(step_conf):
-    #             return True
-
-    #     # otherwise we can skip this step
-    #     return False
 
 # -)

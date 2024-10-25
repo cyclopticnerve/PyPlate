@@ -1,10 +1,14 @@
 # ------------------------------------------------------------------------------
-# Project : Installerator                                          /          \
-# Filename: uninstallerator.py                                    |     ()     |
+# Project : CNInstall                                              /          \
+# Filename: uninstall.py                                          |     ()     |
 # Date    : 09/29/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
+
+"""
+The class to use for uninstalling.
+"""
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -15,14 +19,6 @@
 # import shutil
 
 # local imports
-# from installerator.base_installerator import Base_Installerator
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-DEBUG = 0
-
 
 # ------------------------------------------------------------------------------
 # Define the main class

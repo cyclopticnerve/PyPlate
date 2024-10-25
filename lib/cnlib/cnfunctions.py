@@ -42,7 +42,7 @@ class CNShellError(Exception):
 
     This class is used to wrap exceptions from the sh function, so that a file
     that uses sh does not need to import or check for all possible failures.
-    The original exception and it's properties will be exposed by the
+    The original exception and its properties will be exposed by the
     'exception' property, but printing will defer to the original exception's
     __repr__ property.
     """
