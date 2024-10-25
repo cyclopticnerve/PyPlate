@@ -6,7 +6,7 @@
         {
             "label": "PyBaker",
             "type": "shell",
-            "command": "./pybaker.sh",
+            "command": "./pybaker.py",
             "options": {
                 "cwd": "pyplate/private"
             },

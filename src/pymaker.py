@@ -722,10 +722,11 @@ class PyMaker:
                 dir_locale=self._dir_prj / M.S_DIR_LOCALE,
                 dir_po=self._dir_prj / M.S_DIR_PO,
                 str_domain=M.D_PRV_PRJ["__PP_NAME_SMALL__"],
+                # NB: use dict_pub here b/c dunders have been fixed
                 dict_clangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CLANGS],
                 dict_no_ext=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_NO_EXT],
                 list_wlangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_WLANGS],
-                charset="UTF-8",
+                charset=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CHARSET],
             )
 
             # make .pot, .po, and .mo files
@@ -762,7 +763,7 @@ class PyMaker:
                     name,
                     author,
                     version,
-                    dirs_import=["lib"],
+                    dirs_import=[M.S_DIR_LIB],
                     theme=M.S_DOCS_THEME,
                 )
                 print("Done")

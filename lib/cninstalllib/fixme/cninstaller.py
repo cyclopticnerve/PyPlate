@@ -252,7 +252,7 @@ class CNInstaller:
         """
         Runs the scripts from preflight or postflight
 
-        Paramaters:
+        Arguments:
             step [str]: The step to run, either "preflight" or "postflight"
 
         This method is the common code for running preflight/postflight

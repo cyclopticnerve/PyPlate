@@ -180,7 +180,7 @@ S_USR_APPS = ".local/share/applications"  # for .desktop file
 S_USR_BIN = ".local/bin"  # where to put the binary
 
 # this is where the user libs will go
-S_USR_LIB_NAME = "lib"
+# S_USR_LIB_NAME = "lib"
 S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # formats for tree
@@ -341,15 +341,15 @@ L_PURGE = [
 
 # folders to put in dist
 # TODO: should this be per-project?
-L_DIST = [
-    "conf",
-    "readme",
-    S_DIR_SRC,
-    "lib",
-    "CHANGELOG.md",
-    "LICENSE.txt",
-    "README.md",
-]
+# L_DIST = [
+#     "conf",
+#     "readme",
+#     S_DIR_SRC,
+#     "lib",
+#     "CHANGELOG.md",
+#     "LICENSE.txt",
+#     "README.md",
+# ]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -837,13 +837,13 @@ def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
 
     # paths relative to the end user's (or dev's) useful folders
     dict_prv_prj["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{S_USR_LIB_NAME}"
+    dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
     dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # add venv to dist list
     # NB: we do this here to avoid having to handle globs in L_DIST
-    venv_name = dict_prv_prj["__PP_NAME_VENV__"]
-    L_DIST.append(venv_name)
+    # venv_name = dict_prv_prj["__PP_NAME_VENV__"]
+    # L_DIST.append(venv_name)
 
 
 # --------------------------------------------------------------------------
