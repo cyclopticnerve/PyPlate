@@ -139,8 +139,8 @@ S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = "venv"
 S_DIR_DIST = "dist"
-S_DIR_ASSETS = f"{S_DIR_DIST}/assets"
 S_DIR_DOCS = "docs"
+S_DIR_INSTALL = "install"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -153,6 +153,8 @@ S_DIR_LOCALE = f"{S_DIR_I18N}/locale"
 S_DIR_PO = f"{S_DIR_I18N}/po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
+S_DIR_ASSETS = "assets"
+# S_DIR_INST_CONF = f"{S_DIR_INST_ASSETS}/{S_DIR_CONF}"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -162,7 +164,7 @@ S_FILE_REQS = "requirements.txt"
 S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-S_FILE_INSTALL = f"{S_DIR_CONF}/install.json"
+S_FILE_INSTALL = f"{S_DIR_INSTALL}/install.json"
 S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
 # NB: format param is __PP_NAME_SMALL__
 S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/" + "{}.desktop"
@@ -181,7 +183,7 @@ S_USR_BIN = ".local/bin"  # where to put the binary
 
 # this is where the user libs will go
 # S_USR_LIB_NAME = "lib"
-S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
+# S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # formats for tree
 S_TREE_NAME = "tree.txt"
@@ -555,6 +557,10 @@ D_PRV_ALL = {
     "__PP_README_FILE__": S_FILE_README,
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
+    # --------------------------------------------------------------------------
+    # install stuff
+    "__PP_INST_ASSETS__": S_DIR_ASSETS,
+    # "__PP_INST_CONF__": S_DIR_INST_CONF,
     "__PP_INST_FILE__": S_FILE_INSTALL,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
@@ -590,7 +596,7 @@ D_PRV_PRJ = {
     # these paths are calculated in do_before_fix, relative to the user's home
     # dir
     "__PP_USR_CONF__": "",  # config dir
-    "__PP_USR_LIB__": "",  # location of cnlibs dir
+    # "__PP_USR_LIB__": "",  # location of cnlibs dir
     "__PP_USR_SRC__": "",  # where the program will keep it's source
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
@@ -832,12 +838,12 @@ def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
     # changed by dev
 
     # get values after pymaker has set them
-    author = D_PRV_ALL["__PP_AUTHOR__"]
+    # author = D_PRV_ALL["__PP_AUTHOR__"]
     name_small = dict_prv_prj["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
     dict_prv_prj["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
+    # dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
     dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # add venv to dist list

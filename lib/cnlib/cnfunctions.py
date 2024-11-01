@@ -37,19 +37,34 @@ class CNShellError(Exception):
     """
     A class to wrap errors from the sh function
 
-    Arguments:
-        e: the original exception
-
     This class is used to wrap exceptions from the sh function, so that a file
     that uses sh does not need to import or check for all possible failures.
     The original exception and its properties will be exposed by the
-    'exception' property, but printing will defer to the original exception's
-    __repr__ property.
+    'exception' property, but printing will defer to the object's repr_str
+    property.
     """
-    def __init__(self, exception, message):
+
+    # --------------------------------------------------------------------------
+    # Class methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the class
+    # --------------------------------------------------------------------------
+    def __init__(self, exception, repr_str):
+        """
+        Initialize the class
+
+        Arguments:
+            exception: The original exception
+            repr_str: A custom string to print for clarity.
+
+        Creates a new instance of the object and initializes its properties.
+        """
+
         self.exception = exception
-        self.message = message
-        self.__repr__ = self.exception.__repr__
+        self.__repr__ = repr_str
+
 
 # ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
@@ -427,10 +442,12 @@ def sh(cmd, shell=False):
             # input (True)
             shell=shell,
         )
+    # this is the return code check
     except subprocess.CalledProcessError as e:
         # bubble up the error to the calling function
         new_err = CNShellError(e, e.stderr)
         raise new_err from e
+    # this is everything else
     except Exception as e:
         # bubble up the error to the calling function
         new_err = CNShellError(e, e.__repr__)

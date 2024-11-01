@@ -16,13 +16,7 @@ __PP_RM_LICENSE__
 __PP_SHORT_DESC__
 <!-- __PP_SHORT_DESC__ -->
 
-<<<<<<< HEAD
 ![alt-text](README/screenshot.png "screenshot")
-=======
-<!--PUT SCREENSHOT HERE LIKE: -->
-[![alt-text](README/screenshot.png "tooltip")](click-url)
-<!--[!(README/ss.png)] -->
->>>>>>> origin/pybsker
 
 ## Requirements
 <!-- __PP_RM_DEPS__ -->
@@ -88,8 +82,8 @@ foo@bar:~$ python -m pip uninstall __PP_NAME_SMALL__
 <!-- __RM_PKG_END__ -->
 <!-- __RM_APP_START__ -->
 ```bash
-foo@bar:~$ cd ~/.__PP_AUTHOR__/__PP_NAME_SMALL__
-foo@bar:~/.__PP_AUTHOR__/__PP_NAME_SMALL__$ ./uninstall.py
+foo@bar:~$ cd ~/.conf/__PP_NAME_SMALL__
+foo@bar:~/.conf/__PP_NAME_SMALL__$ ./uninstall.py
 ```
 <!-- __RM_APP_END__ -->
 

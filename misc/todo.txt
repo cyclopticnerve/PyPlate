@@ -16,7 +16,7 @@
 # make dist (list of prj stuff into assets folder, install and README.md alongside)
 
 # TODO: pybaker not rely so much on regex, more on context start/end
-
+# TODO: check for version number? needs to be stored on user's comp somewhere
 # ------------------------------------------------------------------------------
 
 # TODO: pull in a fresh copy of libs on every run and put it in dist

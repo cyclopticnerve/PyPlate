@@ -1,0 +1,11 @@
+{
+    "META": {
+        "NAME": "",
+        "VERSION": ""
+    },
+    "PREFLIGHT": [],
+    "SYS_REQS": [],
+    "PY_REQS": [],
+    "CONTENT": [],
+    "POSTFLIGHT": []
+}
