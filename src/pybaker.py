@@ -90,6 +90,7 @@ S_PP_ABOUT = (
 
 # folder positional strings
 S_PRJ_OPTION = "prj_dir"
+S_PRJ_DEST = "PRJ_DEST"
 S_PRJ_HELP = "the project directory to bake"
 S_PRJ_METAVAR = "DIR"
 
@@ -221,6 +222,7 @@ class PyBaker:
             M.B_CMD_I18N = False
             M.B_CMD_DOCS = False
             M.B_CMD_TREE = False
+            M.B_CMD_CHANGELOG = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
@@ -470,7 +472,7 @@ class PyBaker:
             try:
                 cv.freeze()
             except F.CNShellError as e:
-                print(e.message)
+                print(e)
 
         # ----------------------------------------------------------------------
         # update CHANGELOG
@@ -565,7 +567,7 @@ class PyBaker:
                 print("Done")
             except F.CNShellError as e:
                 print("Fail")
-                print(e.message)
+                print(e)
 
         # ----------------------------------------------------------------------
         # tree
@@ -673,20 +675,20 @@ class PyBaker:
         # set help string
         parser.description = S_PP_ABOUT
 
-        # add debug option
-        parser.add_argument(
-            S_DBG_OPTION,
-            action=S_DBG_ACTION,
-            dest=S_DBG_DEST,
-            help=S_DBG_HELP,
-        )
-
         # add project dir
         parser.add_argument(
             S_PRJ_OPTION,
             # dest=S_PRJ_DEST,
             metavar=S_PRJ_METAVAR,
             help=S_PRJ_HELP,
+        )
+
+        # add debug option
+        parser.add_argument(
+            S_DBG_OPTION,
+            action=S_DBG_ACTION,
+            dest=S_DBG_DEST,
+            help=S_DBG_HELP,
         )
 
     # --------------------------------------------------------------------------

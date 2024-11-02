@@ -35,6 +35,7 @@ B_CMD_VENV = True
 B_CMD_DOCS = True
 # do i18n
 B_CMD_I18N = True
+B_CMD_CHANGELOG = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -343,15 +344,15 @@ L_PURGE = [
 
 # folders to put in dist
 # TODO: should this be per-project?
-# L_DIST = [
-#     "conf",
-#     "readme",
-#     S_DIR_SRC,
-#     "lib",
-#     "CHANGELOG.md",
-#     "LICENSE.txt",
-#     "README.md",
-# ]
+L_DIST = [
+    "conf",
+    "readme",
+    S_DIR_SRC,
+    "lib",
+    "CHANGELOG.md",
+    "LICENSE.txt",
+    "README.md",
+]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
