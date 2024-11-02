@@ -603,7 +603,7 @@ D_PRV_PRJ = {
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
-    # ""Python", "cli", "gui", "package", "gtk3", "gtk", "PyGObject", "PyGTK", "template", "app"": "",  # fix up keywords list for pyproject.toml
+    ""Python", "cli", "gui", "package", "gtk3", "gtk", "PyGObject", "PyGTK", "template", "app"": "",  # fix up keywords list for pyproject.toml
     "None": "",  # fix up deps for README.md
 }
 

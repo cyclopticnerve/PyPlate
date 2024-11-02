@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : CNAppLib                                               /          \
 # Filename: pyproject.toml                                        |     ()     |
-# Date    : 12/08/2022                                            |            |
+# Date    : 10/22/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -11,13 +11,13 @@ requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyplate"
+name = "cnapplib"
 version = "0.0.1"
-description = "A program for creating CLI/Package/GUI projects in Python from a template"
+description = "A library to do handle GUI apps in a PyPLate project"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
-keywords = ["Python", "cli", "gui", "package", "gtk3", "gtk", "PyGObject", "PyGTK", "template", "app"]
+keywords = []
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
@@ -30,6 +30,9 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.urls]
-homepage = "https://github.com/cyclopticnerve/PyPlate"
+homepage = "https://github.com/cyclopticnerve/CNAppLib"
+
+[tool.setuptools]
+py-modules = []
 
 # -)

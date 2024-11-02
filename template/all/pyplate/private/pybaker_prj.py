@@ -27,36 +27,22 @@ import sys
 # my imports
 # add custom import paths
 
-# find paths to dev or user
-DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PP_DEV_SRC__":
-    # DIR_PRJ = DIR_PARENT.parent
-    # DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
-    # DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
-else:
-    DIR_HOME = Path.home()
-    # DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
-    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
-    # DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
+# run the real pybaker with the prj dir
+DIR_HOME = str(Path.home()).rstrip("/")
+DIR_SRC = f"{DIR_HOME}/Documents/Projects/Python/PyPlate/src/"
 
 # add paths to import search
-sys.path.append(str(DIR_LIB))
-# sys.path.append(str(DIR_SRC))
+sys.path.append(str(DIR_SRC))
 
 # import my stuff
-from cnlib import cnfunctions as F  # type: ignore
+from pybaker import PyBaker # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
-# get the project dir
-DIR_PRJ = Path(__file__).parents[2].resolve()
-
-# run the real pybaker with the prj dir
-cmd = f"python -m ~/__PP_DEV_PP__/src/pybaker.py {DIR_PRJ}"
-F.sh(cmd)
+p = PyBaker()
+p.main()
 
 # -)

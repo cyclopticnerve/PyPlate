@@ -72,9 +72,7 @@ from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # name and desc for cmd line help
 S_PP_NAME_BIG = "PyBaker"
-# TODO: regex breaks when this is a multiline string but formatter
-# (control+shift+i) makes it multiline
-S_PP_SHORT_DESC = (
+S_PP_SHORT_DESC = "A program for creating CLI/Package/GUI projects in Python from a template"
     "A program to set the metadata of a PyPlate project and create a dist"
 )
 S_PP_VERSION = "0.0.1"
@@ -233,7 +231,7 @@ class PyBaker:
         p = str(P_DIR_PYPLATE)
         p = p.lstrip(h).strip("/")
         # NB: change global val
-        M.D_PRV_PRJ["__PP_DEV_PP__"] = p
+        M.D_PRV_PRJ["Documents/Projects/Python/PyPlate"] = p
 
         # ----------------------------------------------------------------------
 
@@ -468,7 +466,7 @@ class PyBaker:
             print("Do venv... ", end="")
 
             # get name ov venv folder and reqs file
-            dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
+            dir_venv = M.D_PRV_PRJ[".venv-pyplate"]
             file_reqs = M.S_FILE_REQS
 
             # do the thing with the thing
@@ -525,13 +523,13 @@ class PyBaker:
             # create CNPotPy object
             potpy = CNPotPy(
                 dir_src=self._dir_prj / M.S_DIR_SRC,
-                str_appname=self._dict_prv_prj["__PP_NAME_BIG__"],
-                str_version=self._dict_pub_meta["__PP_VERSION__"],
-                str_author=self._dict_prv_all["__PP_AUTHOR__"],
-                str_email=self._dict_prv_all["__PP_EMAIL__"],
+                str_appname=self._dict_prv_prj["PyPlate"],
+                str_version=self._dict_pub_meta["0.0.1"],
+                str_author=self._dict_prv_all["cyclopticnerve"],
+                str_email=self._dict_prv_all["cyclopticnerve@gmail.com"],
                 dir_locale=self._dir_prj / M.S_DIR_LOCALE,
                 dir_po=self._dir_prj / M.S_DIR_PO,
-                str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
+                str_domain=self._dict_prv_prj["pyplate"],
                 dict_clangs=self._dict_pub_i18n[M.S_KEY_CLANGS],
                 dict_no_ext=self._dict_pub_i18n[M.S_KEY_NO_EXT],
                 list_wlangs=self._dict_pub_i18n[M.S_KEY_WLANGS],
@@ -545,7 +543,7 @@ class PyBaker:
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
             if path_desk.is_dir():
                 path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
-                name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+                name_small = self._dict_prv_prj["pyplate"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = path_desk / path_out_name
                 potpy.make_desktop(path_template, path_out)
@@ -561,7 +559,7 @@ class PyBaker:
             print("Do docs... ", end="")
 
             # get path to project's venv
-            venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+            venv = self._dict_prv_prj[".venv-pyplate"]
 
             # do the thing with the thing
             cs = CNSphinx(self._dir_prj, M.S_DIR_SRC, M.S_DIR_DOCS)
@@ -947,13 +945,13 @@ class PyBaker:
         line = code + comm
 
         # replace version
-        ver = self._dict_pub_meta["__PP_VERSION__"]
+        ver = self._dict_pub_meta["0.0.1"]
         str_sch = M.S_META_VER_SEARCH
         str_rep = M.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
-        desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
+        desc = self._dict_pub_meta["A program for creating CLI/Package/GUI projects in Python from a template"]
         str_sch = M.S_META_SD_SEARCH
         str_rep = M.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
@@ -1048,7 +1046,6 @@ class PyBaker:
 
         # no valid switch found
         return False
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

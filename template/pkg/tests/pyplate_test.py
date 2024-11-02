@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL___test.py                             |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate_test.py                                       |     ()     |
+# Date    : 12/08/2022                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -35,11 +35,11 @@ import sys
 
 # path to dir above <package name>
 DIR_PRJ = Path(__file__).parents[1].resolve()
-DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__"
+DIR_SRC = DIR_PRJ / "src"
 sys.path.append(str(DIR_SRC))
 
 # from <package name> import <module name>
-from __PP_NAME_SMALL__ import __PP_NAME_SEC__
+from pyplate import pyplate
 
 # ------------------------------------------------------------------------------
 # option 2:
@@ -68,6 +68,6 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    __PP_NAME_SEC__.func()  # type: ignore
+    pyplate.func()  # type: ignore
 
 # -)
