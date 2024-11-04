@@ -19,6 +19,9 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# FIXME: if used as class, sep invoke or pymaker -b, or task to run directly,
+# or from private dir?
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -89,16 +92,13 @@ S_PP_ABOUT = (
 )
 
 # folder positional strings
-S_PRJ_OPTION = "prj_dir"
-S_PRJ_DEST = "PRJ_DEST"
-S_PRJ_HELP = "the project directory to bake"
-S_PRJ_METAVAR = "DIR"
+S_PRJ_OPTION = "<DIR>" # key in dict_args
+S_PRJ_HELP = "the project directory to bake"  # display in help
 
 # debug option strings
-S_DBG_OPTION = "-d"
+S_DBG_OPTION = "-d" # display in help
+S_DBG_HELP = "enable debugging option"  # display in help
 S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -213,7 +213,7 @@ class PyBaker:
         self._run_parser()
 
         # check for flags
-        self._debug = self._dict_args.get(S_DBG_DEST, False)
+        self._debug = self._dict_args.get(S_DBG_OPTION, False)
 
         # debug turns off some _do_extras features
         if self._debug:
@@ -284,7 +284,7 @@ class PyBaker:
         is used to call the do_before_fix method in pyplate_conf.py.
         """
 
-        print("Do before fix... ", end="")
+        print("Do before fix... ", end="", flush=True)
 
         # call function to update kw/readme deps
         M.do_before_fix(
@@ -305,7 +305,7 @@ class PyBaker:
         needs fixing based on its appearance in the blacklist.
         """
 
-        print("Do fix... ", end="")
+        print("Do fix... ", end="", flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -461,7 +461,7 @@ class PyBaker:
         # freeze requirements
         if M.B_CMD_VENV:
 
-            print("Do venv... ", end="")
+            print("Do venv... ", end="", flush=True)
 
             # get name ov venv folder and reqs file
             dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
@@ -481,7 +481,7 @@ class PyBaker:
             path_git = self._dir_prj / M.S_DIR_GIT
             if path_git.exists():
 
-                print("Do CHANGELOG... ", end="")
+                print("Do CHANGELOG... ", end="", flush=True)
 
                 # run the cmd
                 # NB: cmd will fail if there are no entries in git
@@ -496,7 +496,7 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # purge
 
-        print("Do purge... ", end="")
+        print("Do purge... ", end="", flush=True)
 
         # delete any unnecessary files
         for item in M.L_PURGE:
@@ -508,7 +508,7 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # call conf after fix
-        print("Do after fix... ", end="")
+        print("Do after fix... ", end="", flush=True)
         M.do_after_fix(self._dir_prj, self._dict_prv_prj, self._dict_pub_meta)
         print("Done")
 
@@ -517,7 +517,7 @@ class PyBaker:
         # if i18n flag is set
         if M.B_CMD_I18N:
 
-            print("Do i18n... ", end="")
+            print("Do i18n... ", end="", flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
@@ -538,6 +538,8 @@ class PyBaker:
             # this .pot, .po, and .mo files
             potpy.main()
 
+
+            # FIXME: broken
             # make .desktop file
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
             if path_desk.is_dir():
@@ -555,7 +557,7 @@ class PyBaker:
         # if docs flag is set
         if M.B_CMD_DOCS:
 
-            print("Do docs... ", end="")
+            print("Do docs... ", end="", flush=True)
 
             # get path to project's venv
             venv = self._dict_prv_prj["__PP_NAME_VENV__"]
@@ -577,7 +579,7 @@ class PyBaker:
         # if tree flag is set
         if M.B_CMD_TREE:
 
-            print("Do tree... ", end="")
+            print("Do tree... ", end="", flush=True)
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
@@ -611,7 +613,7 @@ class PyBaker:
         Gets dirs/files from project and copies them to the dist dir.
         """
 
-        print("Do copy files... ", end="")
+        print("Do copy files... ", end="", flush=True)
 
         # list of files/folders from project to include in dist
         src = M.L_DIST
@@ -677,18 +679,15 @@ class PyBaker:
 
         # add project dir
         parser.add_argument(
-            S_PRJ_OPTION,
-            # dest=S_PRJ_DEST,
-            metavar=S_PRJ_METAVAR,
+            S_PRJ_OPTION,  # args key
             help=S_PRJ_HELP,
         )
 
         # add debug option
         parser.add_argument(
-            S_DBG_OPTION,
-            action=S_DBG_ACTION,
-            dest=S_DBG_DEST,
+            S_DBG_OPTION,  # args key
             help=S_DBG_HELP,
+            action=S_DBG_ACTION,
         )
 
     # --------------------------------------------------------------------------

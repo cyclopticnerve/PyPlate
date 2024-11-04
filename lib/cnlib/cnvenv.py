@@ -127,7 +127,7 @@ class CNVenv:
         # the command to install packages to venv from reqs
         cmd = (
             f"cd {self._dir_venv.parent}; "
-            f". {self._dir_venv.name}/bin/activate; "
+            f". ./{self._dir_venv.name}/bin/activate; "
             f"python "
             "-m pip install "
             f"-r {self._file_reqs}"
@@ -154,7 +154,7 @@ class CNVenv:
         # the command to freeze a venv
         cmd = (
             f"cd {self._dir_venv.parent}; "
-            f". {self._dir_venv.name}/bin/activate; "
+            f". ./{self._dir_venv.name}/bin/activate; "
             "python "
             "-Xfrozen_modules=off "
             "-m pip freeze "

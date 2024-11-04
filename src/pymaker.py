@@ -20,11 +20,8 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: make sure this still works
+# FIXME: don't run pybaker on PyPlate project dir
 # FIXME: run pymaker from anywhere, use curr dir as parent of proj dir
-# FIXME: same with pybaker? or use as class?
-# if used as class, sep invoke or pymaker -b, or task to run directly, or from private dir?
-# FIXME: don't run pymaker or pybaker on PyPlate project dir
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -419,7 +416,7 @@ class PyMaker:
         Gets dirs/files from template and copies them to the project dir.
         """
 
-        print("Do copy files... ", end="")
+        print("Do copy files... ", end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -483,7 +480,7 @@ class PyMaker:
         is used to call the do_before_fix method in pyplate_conf.py.
         """
 
-        print("Do before fix... ", end="")
+        print("Do before fix... ", end="", flush=True)
 
         # call public before fix function
         M.do_before_fix()
@@ -502,7 +499,7 @@ class PyMaker:
         needs fixing based on its appearance in the blacklist.
         """
 
-        print("Do fix... ", end="")
+        print("Do fix... ", end="", flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -661,7 +658,7 @@ class PyMaker:
         # if git flag
         if M.B_CMD_GIT:
 
-            print("Do git... ", end="")
+            print("Do git... ", end="", flush=True)
 
             # add git dir
             str_cmd = M.S_CMD_GIT.format(self._dir_prj)
@@ -675,7 +672,7 @@ class PyMaker:
         # if venv flag is set
         if M.B_CMD_VENV:
 
-            print("Do venv... ", end="")
+            print("Do venv... ", end="", flush=True)
 
             # get name ov venv folder and reqs file
             dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
@@ -694,7 +691,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # purge
 
-        print("Do purge... ", end="")
+        print("Do purge... ", end="", flush=True)
 
         # delete any unnecessary files
         for item in M.L_PURGE:
@@ -706,7 +703,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # call conf after fix
-        print("Do after fix... ", end="")
+        print("Do after fix... ", end="", flush=True)
         M.do_after_fix(self._dir_prj)
         print("Done")
 
@@ -716,7 +713,7 @@ class PyMaker:
         # if i18n flag is set
         if M.B_CMD_I18N:
 
-            print("Do i18n... ", end="")
+            print("Do i18n... ", end="", flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
@@ -755,7 +752,7 @@ class PyMaker:
         # if docs flag is set
         if M.B_CMD_DOCS:
 
-            print("Do docs... ", end="")
+            print("Do docs... ", end="", flush=True)
 
             name = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
             author = M.D_PRV_ALL["__PP_AUTHOR__"]
@@ -785,7 +782,7 @@ class PyMaker:
         # if tree flag is set
         if M.B_CMD_TREE:
 
-            print("Do tree... ", end="")
+            print("Do tree... ", end="", flush=True)
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
