@@ -92,7 +92,7 @@ class CNSphinx:
     # Create a new docs setup given the params
     # --------------------------------------------------------------------------
     def create(
-        self, name, author, version, revision="", dirs_import=None, theme=""
+        self, name, author, version, dirs_import=None, theme=""
     ):
         """
         Create a new docs setup given the params
@@ -101,7 +101,6 @@ class CNSphinx:
             name: Name of the program (usually camel cased)
             author: Author of the program
             version: Version of the program as a string
-            revision: Revision number of the docs as a string (default: "")
             dirs_import: List of paths or names of other files to have Sphinx
             import (can be strings or Path objects, absolute or relative to
             dir_prj) (default: None)
@@ -122,6 +121,9 @@ class CNSphinx:
         if not dirs_import:
             dirs_import = []
 
+        # make into Paths
+        dirs_import = [Path(dir_import) for dir_import in dirs_import]
+
         # do imports
         dirs_import = [
             (
@@ -134,25 +136,22 @@ class CNSphinx:
 
         # the command to run sphinx-quickstart
         cmd = (
-            f"cd {self._dir_docs}; "
+            f"cd {self._dir_docs};"
             f"sphinx-quickstart "
             "--sep "
             f"-p {name} "
             f"-a {author} "
             f"-v {version} "
+            f"-r {version} "
             "-l en "
             "--ext-autodoc "
             "--extensions sphinx.ext.napoleon"
         )
-        if revision != "":
-            cmd +=  f" -r {revision}"
         try:
             F.sh(cmd, shell=True)
             self._modify(dirs_import, theme)
         except F.CNShellError as e:
             raise e
-
-        # ------------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Build the docs and create html files

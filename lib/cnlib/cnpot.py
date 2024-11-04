@@ -424,7 +424,6 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get all wlangs to output
-        # TODO: test this
         wlangs_pos = list(self._dir_po.glob("*.po"))
 
         # for each wlang

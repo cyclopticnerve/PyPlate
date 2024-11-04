@@ -20,6 +20,12 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
+# FIXME: make sure this still works
+# FIXME: run pymaker from anywhere, use curr dir as parent of proj dir
+# FIXME: same with pybaker? or use as class?
+# if used as class, sep invoke or pymaker -b, or task to run directly, or from private dir?
+# FIXME: don't run pymaker or pybaker on PyPlate project dir
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -763,7 +769,7 @@ class PyMaker:
                     name,
                     author,
                     version,
-                    dirs_import=[M.S_DIR_LIB],
+                    dirs_import=["lib"],
                     theme=M.S_DOCS_THEME,
                 )
                 print("Done")

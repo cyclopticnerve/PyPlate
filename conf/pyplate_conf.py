@@ -343,7 +343,8 @@ L_PURGE = [
 ]
 
 # folders to put in dist
-# TODO: should this be per-project?
+# NB: this is the base list, project.json values to be added
+# NB: items are rel to prj dir
 L_DIST = [
     "conf",
     "readme",
