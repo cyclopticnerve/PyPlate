@@ -19,6 +19,7 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# FIXME: don't run pybaker on PyPlate project dir
 # FIXME: if used as class, sep invoke or pymaker -b, or task to run directly,
 # or from private dir?
 
@@ -464,14 +465,16 @@ class PyBaker:
             print("Do venv... ", end="", flush=True)
 
             # get name ov venv folder and reqs file
-            dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
+            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
             file_reqs = M.S_FILE_REQS
 
             # do the thing with the thing
             cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
             try:
                 cv.freeze()
+                print("Done")
             except F.CNShellError as e:
+                print("Failed")
                 print(e)
 
         # ----------------------------------------------------------------------
@@ -538,18 +541,18 @@ class PyBaker:
             # this .pot, .po, and .mo files
             potpy.main()
 
-
-            # FIXME: broken
             # make .desktop file
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
             if path_desk.is_dir():
                 path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
                 name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
-                path_out = path_desk / path_out_name
-                potpy.make_desktop(path_template, path_out)
-
-            print("Done")
+                path_out = self._dir_prj / path_out_name
+                if path_template.exists():
+                    potpy.make_desktop(path_template, path_out)
+                    print("Done")
+                else:
+                    print(f"File {path_template} does not exist")
 
         # ----------------------------------------------------------------------
         # update docs

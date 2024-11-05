@@ -20,7 +20,6 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: don't run pybaker on PyPlate project dir
 # FIXME: run pymaker from anywhere, use curr dir as parent of proj dir
 
 # ------------------------------------------------------------------------------
@@ -161,6 +160,10 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         #  do the work
+
+        # print about info
+        print(S_PP_ABOUT)
+        print()
 
         # call boilerplate code
         self._setup()

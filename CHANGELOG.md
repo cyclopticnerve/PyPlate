@@ -1,3 +1,4 @@
+Mon Nov 4 18:11:50 2024 -0500 - get ready for dist
 Mon Nov 4 13:26:14 2024 -0500 - pymaker/pymaker debug work
 Sat Nov 2 19:21:10 2024 -0400 - check in check in
 Fri Nov 1 02:22:58 2024 -0400 - check in

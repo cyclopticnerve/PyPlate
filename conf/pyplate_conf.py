@@ -848,10 +848,13 @@ def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
     # dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
     dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
+    # add venv name to dunders
+    dict_prv_prj["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
+
     # add venv to dist list
     # NB: we do this here to avoid having to handle globs in L_DIST
-    # venv_name = dict_prv_prj["__PP_NAME_VENV__"]
-    # L_DIST.append(venv_name)
+    venv_name = dict_prv_prj["__PP_NAME_VENV__"]
+    L_DIST.append(venv_name)
 
 
 # --------------------------------------------------------------------------
