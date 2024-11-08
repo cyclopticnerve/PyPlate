@@ -724,7 +724,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # call conf after fix
-        
+
         print(M.S_ACTION_AFTER, end="", flush=True)
         M.do_after_fix(self._dir_prj, dict_prv, dict_pub)
         print(M.S_ACTION_DONE)
