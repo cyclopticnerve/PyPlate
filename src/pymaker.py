@@ -20,6 +20,8 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
+# FIXME: no purge
+
 # FIXME: run pymaker from anywhere, use curr dir as parent of proj dir
 
 # ------------------------------------------------------------------------------
@@ -419,7 +421,7 @@ class PyMaker:
         Gets dirs/files from template and copies them to the project dir.
         """
 
-        print("Do copy files... ", end="", flush=True)
+        print(M.S_ACTION_COPY, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -470,7 +472,7 @@ class PyMaker:
         # _do_after_fix, after the venv is created
         self._fix_reqs(prj_type_long)
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -483,12 +485,27 @@ class PyMaker:
         is used to call the do_before_fix method in pyplate_conf.py.
         """
 
-        print("Do before fix... ", end="", flush=True)
+        print(M.S_ACTION_BEFORE, end="", flush=True)
+
+        # save fixed settings
+        dict_prv = {
+            M.S_KEY_PRV_ALL: M.D_PRV_ALL,
+            M.S_KEY_PRV_PRJ: M.D_PRV_PRJ,
+        }
+
+        # save editable settings (blacklist/i18n etc.)
+        dict_pub = {
+            M.S_KEY_PUB_BL: M.D_PUB_BL,
+            M.S_KEY_PUB_I18N: M.D_PUB_I18N,
+            M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
+            M.S_KEY_PUB_DIST: M.D_PUB_DIST,
+            M.S_KEY_PUB_META: M.D_PUB_META,
+        }
 
         # call public before fix function
-        M.do_before_fix()
+        M.do_before_fix(self._dir_prj, dict_prv, dict_pub)
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -502,7 +519,7 @@ class PyMaker:
         needs fixing based on its appearance in the blacklist.
         """
 
-        print("Do fix... ", end="", flush=True)
+        print(M.S_ACTION_FIX, end="", flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -570,7 +587,7 @@ class PyMaker:
                         if not item.suffix.startswith(".")
                         else item.suffix
                     )
-                    if suffix in M.L_MARKUP:
+                    if suffix in M.L_EXT_MARKUP:
                         self._dict_type_rep = M.D_MU_REPL
 
                     # fix content with appropriate dict
@@ -607,7 +624,7 @@ class PyMaker:
             if root not in skip_path:
                 self._fix_path(root)
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
@@ -637,6 +654,7 @@ class PyMaker:
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
             M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
+            M.S_KEY_PUB_DIST: M.D_PUB_DIST,
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
@@ -661,13 +679,13 @@ class PyMaker:
         # if git flag
         if M.B_CMD_GIT:
 
-            print("Do git... ", end="", flush=True)
+            print(M.S_ACTION_GIT, end="", flush=True)
 
             # add git dir
             str_cmd = M.S_CMD_GIT.format(self._dir_prj)
             F.sh(str_cmd)
 
-            print("Done")
+            print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # venv
@@ -675,7 +693,7 @@ class PyMaker:
         # if venv flag is set
         if M.B_CMD_VENV:
 
-            print("Do venv... ", end="", flush=True)
+            print(M.S_ACTION_VENV, end="", flush=True)
 
             # get name ov venv folder and reqs file
             dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
@@ -686,15 +704,15 @@ class PyMaker:
             try:
                 cv.create()
                 cv.install()
-                print("Done")
+                print(M.S_ACTION_DONE)
             except F.CNShellError as e:
-                print("Fail")
+                print(M.S_ACTION_FAIL)
                 print(e.message)
 
         # ----------------------------------------------------------------------
         # purge
 
-        print("Do purge... ", end="", flush=True)
+        print(M.S_ACTION_PURGE, end="", flush=True)
 
         # delete any unnecessary files
         for item in M.L_PURGE:
@@ -702,13 +720,14 @@ class PyMaker:
             if path_del.exists():
                 path_del.unlink()
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # call conf after fix
-        print("Do after fix... ", end="", flush=True)
-        M.do_after_fix(self._dir_prj)
-        print("Done")
+        
+        print(M.S_ACTION_AFTER, end="", flush=True)
+        M.do_after_fix(self._dir_prj, dict_prv, dict_pub)
+        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -716,7 +735,7 @@ class PyMaker:
         # if i18n flag is set
         if M.B_CMD_I18N:
 
-            print("Do i18n... ", end="", flush=True)
+            print(M.S_ACTION_I18N, end="", flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
@@ -747,7 +766,7 @@ class PyMaker:
                 path_out = self._dir_prj / path_out_name
                 potpy.make_desktop(path_template, path_out)
 
-            print("Done")
+            print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
@@ -755,7 +774,7 @@ class PyMaker:
         # if docs flag is set
         if M.B_CMD_DOCS:
 
-            print("Do docs... ", end="", flush=True)
+            print(M.S_ACTION_DOCS, end="", flush=True)
 
             name = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
             author = M.D_PRV_ALL["__PP_AUTHOR__"]
@@ -772,9 +791,9 @@ class PyMaker:
                     dirs_import=["lib"],
                     theme=M.S_DOCS_THEME,
                 )
-                print("Done")
+                print(M.S_ACTION_DONE)
             except F.CNShellError as e:
-                print("Fail")
+                print(M.S_ACTION_FAIL)
                 print(e.message)
 
         # ----------------------------------------------------------------------
@@ -785,7 +804,7 @@ class PyMaker:
         # if tree flag is set
         if M.B_CMD_TREE:
 
-            print("Do tree... ", end="", flush=True)
+            print(M.S_ACTION_TREE, end="", flush=True)
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
@@ -807,7 +826,7 @@ class PyMaker:
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
-            print("Done")
+            print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps

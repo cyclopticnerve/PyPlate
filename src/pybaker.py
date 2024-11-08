@@ -19,7 +19,12 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: don't run pybaker on PyPlate project dir
+# FIXME: add more files to D_LIST/project.json
+# put install.json in assets
+# put install.py in dist
+
+# FIXME: no purge
+
 # FIXME: if used as class, sep invoke or pymaker -b, or task to run directly,
 # or from private dir?
 
@@ -93,11 +98,11 @@ S_PP_ABOUT = (
 )
 
 # folder positional strings
-S_PRJ_OPTION = "<DIR>" # key in dict_args
+S_PRJ_OPTION = "<DIR>"  # key in dict_args
 S_PRJ_HELP = "the project directory to bake"  # display in help
 
 # debug option strings
-S_DBG_OPTION = "-d" # display in help
+S_DBG_OPTION = "-d"  # display in help
 S_DBG_HELP = "enable debugging option"  # display in help
 S_DBG_ACTION = "store_true"
 
@@ -137,19 +142,23 @@ class PyBaker:
         """
 
         # set the initial values of properties
-        self._dict_args = {}
-        self._debug = False
         self._dir_prj = Path()
+        self._debug = False
         self._dict_rep = {}
         self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}
         self._dict_type_rep = {}
 
-        # PB specific dicts
+        # private.json dicts
+        self._dict_prv = {}
         self._dict_prv_all = {}
         self._dict_prv_prj = {}
+
+        # project.json dicts
+        self._dict_pub = {}
         self._dict_pub_meta = {}
+        self._dict_pub_dist = {}
         self._dict_pub_bl = {}
         self._dict_pub_i18n = {}
         self._dict_pub_install = {}
@@ -161,16 +170,28 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self):
+    def main(self, dir_prj, debug=False):
         """
         The main method of the program
+
+        Arguments:
+            dir_prj: Path to the project dir
+            debug: Whether to run in debug mode (default: False)
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
 
+        # store args
+        self._dir_prj = Path(dir_prj).resolve()
+        self._debug = debug
+
         # ----------------------------------------------------------------------
         #  do the work
+
+        # print about info
+        print(S_PP_ABOUT)
+        print()
 
         # call boilerplate code
         self._setup()
@@ -203,18 +224,16 @@ class PyBaker:
         """
         Boilerplate to use at the start of main
 
-        Perform some mundane stuff like running the arg parser and setting
+        Perform some mundane stuff like checking the arg parser and setting
         properties.
         """
 
         # ----------------------------------------------------------------------
         # set pp cmd line stuff
 
-        # get cmd line args
-        self._run_parser()
-
-        # check for flags
-        self._debug = self._dict_args.get(S_DBG_OPTION, False)
+        # check for pos args and flags
+        # self._dir_prj = self._dict_args.get(S_PRJ_OPTION, "")
+        # self._debug = self._dict_args.get(S_DBG_OPTION, False)
 
         # debug turns off some _do_extras features
         if self._debug:
@@ -239,9 +258,11 @@ class PyBaker:
         # ----------------------------------------------------------------------
 
         # check for folder
-        self._dir_prj = Path(self._dict_args[S_PRJ_OPTION])
         if not self._dir_prj.exists():
             print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
+            sys.exit(-1)
+        if "pyplate" in str(self._dir_prj).lower():
+            print(M.S_ERR_PRJ_DIR_IS_PP)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -262,17 +283,18 @@ class PyBaker:
 
         # get global and calculated settings dict in private.json
         path_prv = self._dir_prj / M.S_PRJ_PRV_CFG
-        dict_prv = F.load_dicts([path_prv], {})
-        self._dict_prv_all = dict_prv[M.S_KEY_PRV_ALL]
-        self._dict_prv_prj = dict_prv[M.S_KEY_PRV_PRJ]
+        self._dict_prv = F.load_dicts([path_prv], {})
+        self._dict_prv_all = self._dict_prv[M.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[M.S_KEY_PRV_PRJ]
 
         # get individual dicts in the public file
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
-        dict_pub = F.load_dicts([path_pub], {})
-        self._dict_pub_meta = dict_pub[M.S_KEY_PUB_META]
-        self._dict_pub_bl = dict_pub[M.S_KEY_PUB_BL]
-        self._dict_pub_i18n = dict_pub[M.S_KEY_PUB_I18N]
-        self._dict_pub_install = dict_pub[M.S_KEY_PUB_INSTALL]
+        self._dict_pub = F.load_dicts([path_pub], {})
+        self._dict_pub_meta = self._dict_pub[M.S_KEY_PUB_META]
+        self._dict_pub_bl = self._dict_pub[M.S_KEY_PUB_BL]
+        self._dict_pub_i18n = self._dict_pub[M.S_KEY_PUB_I18N]
+        self._dict_pub_install = self._dict_pub[M.S_KEY_PUB_INSTALL]
+        self._dict_pub_dist = self._dict_pub[M.S_KEY_PUB_DIST]
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -285,14 +307,12 @@ class PyBaker:
         is used to call the do_before_fix method in pyplate_conf.py.
         """
 
-        print("Do before fix... ", end="", flush=True)
+        print(M.S_ACTION_BEFORE, end="", flush=True)
 
         # call function to update kw/readme deps
-        M.do_before_fix(
-            dict_prv_prj=self._dict_prv_prj, dict_pub_meta=self._dict_pub_meta
-        )
+        M.do_before_fix(self._dir_prj, self._dict_prv, self._dict_pub)
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -306,7 +326,7 @@ class PyBaker:
         needs fixing based on its appearance in the blacklist.
         """
 
-        print("Do fix... ", end="", flush=True)
+        print(M.S_ACTION_FIX, end="", flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -374,7 +394,7 @@ class PyBaker:
                         if not item.suffix.startswith(".")
                         else item.suffix
                     )
-                    if suffix in M.L_MARKUP:
+                    if suffix in M.L_EXT_MARKUP:
                         self._dict_type_rep = M.D_MU_REPL
 
                     # fix content with appropriate dict
@@ -410,7 +430,7 @@ class PyBaker:
             if root not in skip_path:
                 self._fix_path(root)
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
@@ -440,6 +460,7 @@ class PyBaker:
             M.S_KEY_PUB_BL: self._dict_pub_bl,
             M.S_KEY_PUB_I18N: self._dict_pub_i18n,
             M.S_KEY_PUB_INSTALL: self._dict_pub_install,
+            M.S_KEY_PUB_DIST: self._dict_pub_dist,
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
@@ -462,7 +483,7 @@ class PyBaker:
         # freeze requirements
         if M.B_CMD_VENV:
 
-            print("Do venv... ", end="", flush=True)
+            print(M.S_ACTION_VENV, end="", flush=True)
 
             # get name ov venv folder and reqs file
             dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
@@ -472,9 +493,9 @@ class PyBaker:
             cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
             try:
                 cv.freeze()
-                print("Done")
+                print(M.S_ACTION_DONE)
             except F.CNShellError as e:
-                print("Failed")
+                print(M.S_ACTION_FAIL)
                 print(e)
 
         # ----------------------------------------------------------------------
@@ -484,22 +505,22 @@ class PyBaker:
             path_git = self._dir_prj / M.S_DIR_GIT
             if path_git.exists():
 
-                print("Do CHANGELOG... ", end="", flush=True)
+                print(M.S_ACTION_CHANGE, end="", flush=True)
 
                 # run the cmd
                 # NB: cmd will fail if there are no entries in git
                 cmd = M.S_CHANGELOG_CMD
                 try:
                     F.sh(cmd, shell=True)
-                    print("Done")
+                    print(M.S_ACTION_DONE)
                 except F.CNShellError as e:
-                    print("Failed")
+                    print(M.S_ACTION_FAIL)
                     print(e.message)
 
         # ----------------------------------------------------------------------
         # purge
 
-        print("Do purge... ", end="", flush=True)
+        print(M.S_ACTION_PURGE, end="", flush=True)
 
         # delete any unnecessary files
         for item in M.L_PURGE:
@@ -507,20 +528,20 @@ class PyBaker:
             if path_del.exists():
                 path_del.unlink()
 
-        print("Done")
+        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # call conf after fix
-        print("Do after fix... ", end="", flush=True)
-        M.do_after_fix(self._dir_prj, self._dict_prv_prj, self._dict_pub_meta)
-        print("Done")
+        print(M.S_ACTION_AFTER, end="", flush=True)
+        M.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
+        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
         # if i18n flag is set
         if M.B_CMD_I18N:
 
-            print("Do i18n... ", end="", flush=True)
+            print(M.S_ACTION_I18N, end="", flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
@@ -543,16 +564,15 @@ class PyBaker:
 
             # make .desktop file
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
-            if path_desk.is_dir():
+            if path_desk.exists():
                 path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
                 name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = self._dir_prj / path_out_name
-                if path_template.exists():
-                    potpy.make_desktop(path_template, path_out)
-                    print("Done")
-                else:
-                    print(f"File {path_template} does not exist")
+                potpy.make_desktop(path_template, path_out)
+
+            # we are done
+            print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
@@ -560,7 +580,7 @@ class PyBaker:
         # if docs flag is set
         if M.B_CMD_DOCS:
 
-            print("Do docs... ", end="", flush=True)
+            print(M.S_ACTION_DOCS, end="", flush=True)
 
             # get path to project's venv
             venv = self._dict_prv_prj["__PP_NAME_VENV__"]
@@ -569,9 +589,9 @@ class PyBaker:
             cs = CNSphinx(self._dir_prj, M.S_DIR_SRC, M.S_DIR_DOCS)
             try:
                 cs.build(venv)
-                print("Done")
+                print(M.S_ACTION_DONE)
             except F.CNShellError as e:
-                print("Fail")
+                print(M.S_ACTION_FAIL)
                 print(e)
 
         # ----------------------------------------------------------------------
@@ -582,7 +602,7 @@ class PyBaker:
         # if tree flag is set
         if M.B_CMD_TREE:
 
-            print("Do tree... ", end="", flush=True)
+            print(M.S_ACTION_TREE, end="", flush=True)
 
             # get path to tree
             file_tree = self._dir_prj / M.S_TREE_FILE
@@ -604,7 +624,7 @@ class PyBaker:
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
-            print("Done")
+            print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -613,17 +633,26 @@ class PyBaker:
         """
         Copy fixed files to final location
 
-        Gets dirs/files from project and copies them to the dist dir.
+        Gets dirs/files from project and copies them to the dist/assets dir.
         """
 
-        print("Do copy files... ", end="", flush=True)
+        print(M.S_ACTION_COPY, end="", flush=True)
 
-        # list of files/folders from project to include in dist
-        src = M.L_DIST
-        # and where to put it
-        dst = self._dir_prj / M.S_DIR_ASSETS
+        # get src and dst dicts
+        # name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+
+        # find old dist? nuke it from orbit! it's the only way to be sure!
+        p_dist = self._dir_prj / M.S_DIR_DIST
+        if p_dist.is_dir():
+            shutil.rmtree(p_dist)
+        Path.mkdir(p_dist, parents=True)
+
+        # NB: "dst" as in destination, NOT "dist" as in distribution
+        # l_dst = self._dir_prj / M.S_DIR_DIST / "assets" / name_small
 
         # copy files/folders
+        src = self._dict_pub_dist
+        dst = p_dist
         for item in src:
             new_src = self._dir_prj / item
             new_dst = dst / item
@@ -633,65 +662,11 @@ class PyBaker:
                 shutil.copy2(new_src, new_dst)
 
         # done copying project files
-        print("Done")
+        print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Set up and run the command line parser
-    # --------------------------------------------------------------------------
-    def _run_parser(self):
-        """
-        Set up and run the command line parser
-
-        Returns: A dictionary of command line arguments
-
-        This method sets up and runs the command line parser to minimize code
-        in the main method.
-        """
-
-        # create the command line parser
-        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
-
-        # add args
-        self._add_args(parser)
-
-        # get namespace object
-        args = parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(args)
-
-    # --------------------------------------------------------------------------
-    # Add arguments to argparse parser
-    # --------------------------------------------------------------------------
-    def _add_args(self, parser):
-        """
-        Add arguments to argparse parser
-
-        Arguments:
-            parser: The parser for which to add arguments
-
-        This method is teased out for better code maintenance.
-        """
-
-        # set help string
-        parser.description = S_PP_ABOUT
-
-        # add project dir
-        parser.add_argument(
-            S_PRJ_OPTION,  # args key
-            help=S_PRJ_HELP,
-        )
-
-        # add debug option
-        parser.add_argument(
-            S_DBG_OPTION,  # args key
-            help=S_DBG_HELP,
-            action=S_DBG_ACTION,
-        )
 
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
@@ -1048,6 +1023,72 @@ class PyBaker:
         # no valid switch found
         return False
 
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Add arguments to argparse parser
+# ------------------------------------------------------------------------------
+def _add_args(parser):
+    """
+    Add arguments to argparse parser
+
+    Arguments:
+        parser: The parser for which to add arguments
+
+    This method is teased out for better code maintenance.
+    """
+
+    # set help string
+    parser.description = S_PP_ABOUT
+
+    # add project dir
+    parser.add_argument(
+        S_PRJ_OPTION,  # args key
+        help=S_PRJ_HELP,
+    )
+
+    # add debug option
+    parser.add_argument(
+        S_DBG_OPTION,  # args key
+        help=S_DBG_HELP,
+        action=S_DBG_ACTION,
+    )
+
+
+# --------------------------------------------------------------------------
+# Set up and run the command line parser
+# --------------------------------------------------------------------------
+def _run_parser():
+    """
+    Set up and run the command line parser
+
+    Returns:
+        [dict]: The dict of command line options
+
+    This method sets up and runs the command line parser to minimize code
+    in the main method.
+    """
+
+    # create the command line parser
+    parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+
+    # add args
+    _add_args(parser)
+
+    # get namespace object
+    args = parser.parse_args()
+
+    # convert namespace to dict
+    dict_args = vars(args)
+
+    # return the cmd line dict
+    return dict_args
+
+
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
@@ -1057,9 +1098,16 @@ if __name__ == "__main__":
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # run main method
+    # get cmd line args
+    a_dict_args = _run_parser()
+    a_dir_prj = a_dict_args.get(S_PRJ_OPTION, "")
+    a_debug = a_dict_args.get(S_DBG_OPTION, False)
+
+    # create object
     pb = PyBaker()
-    pb.main()
+
+    # call main
+    pb.main(a_dir_prj, a_debug)
 
     # --------------------------------------------------------------------------
 
