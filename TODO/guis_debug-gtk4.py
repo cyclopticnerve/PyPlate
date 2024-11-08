@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__-gtk4.py                             |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate-gtk4.py                                       |     ()     |
+# Date    : 12/08/2022                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """ 
@@ -52,7 +52,7 @@ def main():
     # ------------------------------------------------------------------------------
 
     curr_dir = os.path.dirname(__file__)
-    gui_path = os.path.join(curr_dir, "gui", "__PP_NAME_SMALL__-gtk4.ui")
+    gui_path = os.path.join(curr_dir, "gui", "pyplate-gtk4.ui")
 
     class MyApp(Adw.Application):
         """

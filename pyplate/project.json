@@ -1,8 +1,8 @@
 {
-    "PRJ_BL": {
+    "PUB_BL": {
         "SKIP_ALL": [
             ".git",
-            ".**/.venv*",
+            "**/.venv*",
             ".VSCodeCounter",
             "docs",
             "**/locale",
@@ -33,7 +33,7 @@
             "**/__pycache__"
         ]
     },
-    "PRJ_I18N": {
+    "PUB_I18N": {
         "CHARSET": "UTF-8",
         "TYPES": [
             "g"
@@ -58,7 +58,8 @@
         "LOCALE": "locale",
         "PO": "po"
     },
-    "PRJ_META": {
+    "PUB_INSTALL": {},
+    "PUB_META": {
         "__PP_VERSION__": "0.0.1",
         "__PP_SHORT_DESC__": "A program for creating CLI/Package/GUI projects in Python from a template",
         "__PP_KEYWORDS__": [

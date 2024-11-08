@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
+# Project : PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 12/08/2022                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -15,23 +15,25 @@ appropriate locations on the user's computer. It also provides for hooks to run
 Python (or other language) scripts before and after the actual install process.
 """
 
-# C.S_KEY_META: {
-#       "NAME": "__PP_NAME_BIG__",
-#       "VERSION": "__PP_VERSION__"
-# },
-# C.S_KEY_PREFLIGHT: ["preflight_script_1"],
-# C.S_KEY_SYS_REQS: ["sys_reqs_1"],
-# C.S_KEY_PY_REQS: ["py_reqs_1"],
-# C.S_KEY_CONTENT: {
-#     "conf": ".conf/__PP_NAME_SMALL__",
-#     "spaceoddity.py": ".__PP_NAME_SMALL__",
-#     "LICENSE": ".__PP_NAME_SMALL__",
-#     "VERSION": ".__PP_NAME_SMALL__",
-#     "uninstall.py": ".__PP_NAME_SMALL__",
-#     "uninstall.json": ".__PP_NAME_SMALL__",
-#     "cron_uninstall.py": ".config/.__PP_NAME_SMALL__",
-# },
-# C.S_KEY_POSTFLIGHT: ["postflight_script_1"],
+# f00_bar = {
+#     C.S_KEY_META: {
+#         "NAME": "PyPlate",        
+#         "VERSION": "0.0.1"         
+#     },
+#     C.S_KEY_PREFLIGHT: ["preflight_script_1"],
+#     C.S_KEY_SYS_REQS: ["sys_reqs_1"],
+#     C.S_KEY_PY_REQS: ["py_reqs_1"],
+#     C.S_KEY_CONTENT: {
+#         "conf": ".conf/pyplate",          
+#         "spaceoddity.py": ".pyplate",          
+#         "LICENSE": ".pyplate",          
+#         "VERSION": ".pyplate",          
+#         "uninstall.py": ".pyplate",          
+#         "uninstall.json": ".pyplate",          
+#         "cron_uninstall.py": ".config/.pyplate",          
+#     },
+#     C.S_KEY_POSTFLIGHT: ["postflight_script_1"],
+# }
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -52,7 +54,7 @@ import sys
 DIR_SELF = Path(__file__).parent.resolve()
 DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
 DIR_LIB = DIR_ASSETS / "lib"
-FILE_INSTALL = DIR_ASSETS / "__PP_INST_FILE__"
+FILE_INSTALL = DIR_ASSETS / "conf/install.json"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))

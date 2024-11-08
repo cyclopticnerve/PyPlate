@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__                                     |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate                                               |     ()     |
+# Date    : 12/08/2022                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -13,11 +13,11 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PP_NAME_SMALL__ [cmd line]
+foo@bar:~[path to directory of this file]$ ./pyplate [cmd line]
 
 or if installed in a global location:
 
-foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
+foo@bar:~$ pyplate [cmd line]
 
 Typical usage is show in the main() method.
 """
@@ -40,16 +40,16 @@ import sys
 
 # find paths to dev or user
 DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PP_DEV_SRC__":
+if DIR_PARENT.name == "src":
     DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
-    DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
+    DIR_CFG = DIR_PRJ / "src/support/conf"
+    DIR_LIB = Path.home() / "Documents/Projects/Python/PyPlate" / "lib"
+    DIR_SRC = DIR_PRJ / "src" / "support"
 else:
     DIR_HOME = Path.home()
-    DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
-    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
-    DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
+    DIR_CFG = DIR_HOME / ".config/pyplate"
+    DIR_LIB = DIR_HOME / ".local/share/cyclopticnerve/lib"
+    DIR_SRC = DIR_HOME / ".local/share/pyplate"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -58,6 +58,7 @@ sys.path.append(str(DIR_SRC))
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
+from appmain import AppMain  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -69,8 +70,9 @@ from cnlib.cncli import CNCli  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
-S_PP_VERSION = "__PP_VERSION__"
-S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
+S_PP_VERSION = "0.0.1"
+S_PP_SHORT_DESC = "A program for creating CLI/Package/GUI projects in Python from a template"
+
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -80,7 +82,7 @@ S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__(CNCli):
+class PyPlate(CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -90,6 +92,9 @@ class __PP_NAME_CLASS__(CNCli):
     This class does the most of the work of a typical CLI program. It parses
     command line options, loads/saves config files, and performs the operations
     required for the program.
+
+    It also checks for the GUI option on the command line and, if found,
+    creates an object from another script to handle the GUI.
     """
 
     # --------------------------------------------------------------------------
@@ -113,9 +118,9 @@ class __PP_NAME_CLASS__(CNCli):
 
         # set default property values
         # NB: commented props are from super
-        # self._d_args = {}   # from super
-        # self._dict_cfg = {}    # from super
-        # self._p_cfg = None  # from super
+        # self._dict_args = {}   # set in super
+        # self._dict_cfg = {}    # set in super
+        # self._path_cfg = None  # set in super
         self._debug = False
 
     # --------------------------------------------------------------------------
@@ -143,7 +148,8 @@ class __PP_NAME_CLASS__(CNCli):
         # main stuff
 
         # do the thing with the thing
-        print(self._func())
+        app = AppMain(self._dict_args)
+        app.run()
 
         # ----------------------------------------------------------------------
         # teardown
@@ -154,35 +160,6 @@ class __PP_NAME_CLASS__(CNCli):
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Short description
-    # --------------------------------------------------------------------------
-    def _func(self):
-        """
-        Short description
-
-        Arguments:
-            var_name: Short description
-
-        Returns:
-            Description
-
-        Raises:
-            exception_type(vars): Description
-
-        Long description (including HTML).
-        """
-
-        # change a value in the config dict
-        self._dict_cfg["inside"] = "bar"
-
-        # check for debug flag
-        if self._debug:
-            return "this is func (DEBUG)"
-
-        # no debug, return normal result
-        return "this is func"
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
@@ -202,16 +179,16 @@ class __PP_NAME_CLASS__(CNCli):
         self._debug = self._dict_args[CNCli.ARG_DBG_DEST]
 
         # the default config file
-        cfg_def = str(DIR_CFG / "__PP_NAME_SMALL__.json")
+        cfg_def = str(DIR_CFG / "pyplate.json")
 
         # command line cfg is None or str
         cfg_arg = self._dict_args[CNCli.ARG_CFG_DEST]
 
         # load the config file
         # not using def path, using arg path
-        # super()._load_config(None, cfg_arg, self._dict_cfg)
+        # super()._load_config(None, cfg_arg, self._d_cfg)
         # using def path, not using arg path
-        # super()._load_config(cfg_def, dict_def=self._dict_cfg)
+        # super()._load_config(cfg_def, dict_def=self._d_cfg)
         # using def path, using arg path, using internal
         super()._load_config(
             cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg
@@ -236,15 +213,15 @@ class __PP_NAME_CLASS__(CNCli):
 
         # formatted version
         # NB: done in two steps to avoid linter warnings
-        ver_cfg = "__PP_VER_FMT__"
+        ver_cfg = "Version {}"
         ver_fmt = ver_cfg.format(S_PP_VERSION)
 
         # about string
         s_about = (
-            "__PP_NAME_BIG__\n"
+            "PyPlate\n"
             f"{S_PP_SHORT_DESC}\n"
             f"{ver_fmt}\n"
-            "__PP_URL__/__PP_NAME_BIG__"
+            "https://github.com/cyclopticnerve/PyPlate"
         )
 
         # set help string
@@ -295,6 +272,6 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    __PP_NAME_CLASS__().main()
+    PyPlate().main()
 
 # -)

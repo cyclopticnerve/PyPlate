@@ -35,7 +35,6 @@ B_CMD_VENV = True
 B_CMD_DOCS = True
 # do i18n
 B_CMD_I18N = True
-B_CMD_CHANGELOG = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -80,22 +79,6 @@ S_ERR_MID = (
 # NB: format param arise dir_type/(proj type dir)
 S_ERR_EXIST = 'Project "{}" already exists'
 
-# output msg for steps
-S_ACTION_BEFORE = "Do before fix... "
-S_ACTION_FIX = "Do fix... "
-S_ACTION_GIT = "Do git... "
-S_ACTION_VENV = "Do venv... "
-S_ACTION_CHANGE = "Do CHANGELOG... "
-S_ACTION_PURGE = "Do purge... "
-S_ACTION_AFTER = "Do after fix... "
-S_ACTION_I18N = "Do i18n... "
-S_ACTION_DOCS = "Do docs... "
-S_ACTION_TREE = "Do tree... "
-S_ACTION_COPY = "Do copy files... "
-
-S_ACTION_DONE = "Done"
-S_ACTION_FAIL = "Failed"
-
 # debug-specific strings
 S_ERR_DEBUG = (
     "\n"
@@ -105,6 +88,7 @@ S_ERR_DEBUG = (
 
 # keys for pybaker private dict
 S_KEY_PRV_ALL = "PRV_ALL"
+# S_KEY_PRV_EXTRA = "PRV_EXTRA"
 S_KEY_PRV_PRJ = "PRV_PRJ"
 
 # keys for metadata, blacklist, i18n in pybaker dev dict
@@ -112,7 +96,6 @@ S_KEY_PUB_META = "PUB_META"
 S_KEY_PUB_BL = "PUB_BL"
 S_KEY_PUB_I18N = "PUB_I18N"
 S_KEY_PUB_INSTALL = "PUB_INSTALL"
-S_KEY_PUB_DIST = "PUB_DIST"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -155,7 +138,9 @@ S_DIR_ALL = f"{S_DIR_TEMPLATE}/all"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = "venv"
+S_DIR_DIST = "dist"
 S_DIR_DOCS = "docs"
+S_DIR_INSTALL = "install"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -168,9 +153,7 @@ S_DIR_LOCALE = f"{S_DIR_I18N}/locale"
 S_DIR_PO = f"{S_DIR_I18N}/po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
-S_DIR_DIST = "dist"
-S_DIR_ASSETS = f"{S_DIR_DIST}/assets"
-S_DIR_INSTALL = "install"
+S_DIR_ASSETS = "assets"
 # S_DIR_INST_CONF = f"{S_DIR_INST_ASSETS}/{S_DIR_CONF}"
 
 # common file names, rel to prj dir or pyplate dir
@@ -181,9 +164,7 @@ S_FILE_REQS = "requirements.txt"
 S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-S_FILE_INSTALL_CFG = f"{S_DIR_INSTALL}/install.json"
-S_FILE_INSTALL = f"{S_DIR_INSTALL}/install.py"
-S_FILE_UNINSTALL = f"{S_DIR_INSTALL}/uninstall.py"
+S_FILE_INSTALL = f"{S_DIR_INSTALL}/install.json"
 S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
 # NB: format param is __PP_NAME_SMALL__
 S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/" + "{}.desktop"
@@ -254,8 +235,8 @@ S_RM_DESC_SCH = (
     r"(.*?)"
     r"(<!--[\t ]*A program for creating CLI/Package/GUI projects in Python from a template[\t ]*-->)"
 )
-S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
 
+S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
 S_RM_DEPS_SCH = (
     r"(<!--[\t ]*None[\t ]*-->)"
     r"(.*?)"
@@ -300,7 +281,6 @@ S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
 S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
 S_ERR_PRJ_DIR_NONE = "Project dir not provided"
-S_ERR_PRJ_DIR_IS_PP = "Cannot run pymaker/pybaker on pyplate dir"
 
 # changelog
 S_CHANGELOG = "CHANGELOG.md"
@@ -343,7 +323,7 @@ L_TYPES = [
 ]
 
 # list of file types to use md/html/xml fixer
-L_EXT_MARKUP = [
+L_MARKUP = [
     ".md",
     ".html",
     ".xml",
@@ -352,13 +332,26 @@ L_EXT_MARKUP = [
 ]
 
 # file exts for pybaker
-L_EXT_DESKTOP = [".desktop"]
-L_EXT_GTK = [".ui", ".glade"]
+L_DESKTOP = [".desktop"]
+L_GTK = [".ui", ".glade"]
 
 # files to remove after the project is done
 # paths are relative to project dir
 L_PURGE = [
     Path(S_DIR_SRC) / "ABOUT",
+]
+
+# folders to put in dist
+# TODO: should this be per-project?
+L_DIST = [
+    "conf",
+    "install",
+    "readme",
+    S_DIR_SRC,
+    "lib",
+    "CHANGELOG.md",
+    "LICENSE.txt",
+    "README.md",
 ]
 
 # get list of approved categories
@@ -567,6 +560,7 @@ D_PRV_ALL = {
     "requirements.txt": S_FILE_REQS,
     # --------------------------------------------------------------------------
     # install stuff
+    "__PP_INST_ASSETS__": S_DIR_ASSETS,
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
     "conf/install.json": S_FILE_INSTALL,
     # --------------------------------------------------------------------------
@@ -609,7 +603,7 @@ D_PRV_PRJ = {
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
-    # ""Python", "cli", "gui", "package", "gtk3", "gtk", "PyGObject", "PyGTK", "template", "app"": "",  # fix up keywords list for pyproject.toml
+    ""Python", "cli", "gui", "package", "gtk3", "gtk", "PyGObject", "PyGTK", "template", "app"": "",  # fix up keywords list for pyproject.toml
     "None": "",  # fix up deps for README.md
 }
 
@@ -636,23 +630,6 @@ D_PUB_META = {
     "__PP_SYS_DEPS__": {},
     # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
     "__PP_GUI_CATS__": [],
-}
-
-# dict of file to put in dist folder (defaults, written by pymaker, edited by
-# hand, read by pybaker)
-# NB: key is src, rel to prj dir
-# NB: val is dst, rel to dist dir
-D_PUB_DIST = {
-    S_DIR_CONF: S_DIR_ASSETS,
-    "lib": S_DIR_ASSETS,
-    S_DIR_README: S_DIR_ASSETS,
-    S_DIR_SRC: S_DIR_ASSETS,
-    S_CHANGELOG: S_DIR_ASSETS,
-    S_FILE_LICENSE: S_DIR_ASSETS,
-    S_FILE_README: S_DIR_ASSETS,
-    S_FILE_INSTALL: S_DIR_DIST,
-    S_FILE_UNINSTALL: S_DIR_ASSETS,
-    S_FILE_INSTALL_CFG: S_DIR_ASSETS,
 }
 
 # the lists of dirs/files we don't mess with while running pymaker
@@ -699,7 +676,7 @@ D_PUB_BL = {
     S_KEY_SKIP_CODE: [
         "MANIFEST.in",
         ".gitignore",
-        S_CHANGELOG,
+        "CHANGELOG.md",
     ],
     # fix header, fix text, skip path (1 1 0)
     # NB: not really useful, since we always want to fix paths with dunders,
@@ -835,15 +812,14 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub):
+def do_before_fix(dict_prv_prj=None, dict_pub_meta=None):
     """
     Do any work before fix
 
-
     Arguments:
-        dir_prj: The root of the new project
-        dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data
+        dict_prv_prj: The dict of project settings (default: D_PRV_PRJ)
+        dict_pub_meta: The dictionary containing metadata for the project
+        (default: D_PUB_META)
 
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
@@ -852,13 +828,15 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     before any replacement occurs.
     """
 
-    # --------------------------------------------------------------------------
+    # sanity check
+    if not dict_prv_prj:
+        dict_prv_prj = D_PRV_PRJ
+    if not dict_pub_meta:
+        dict_pub_meta = D_PUB_META
+
+    # ------------------------------------------------------------------------------
     # these paths are formatted here because they are complex and may be
     # changed by dev
-
-    # get sub-dicts we need
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    dict_pub_dist = dict_pub[S_KEY_PUB_DIST]
 
     # get values after pymaker has set them
     # author = D_PRV_ALL["__PP_AUTHOR__"]
@@ -869,33 +847,31 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     # dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
     dict_prv_prj[".local/share/pyplate"] = f"{S_USR_SRC}/{name_small}"
 
-    # add venv name to dunders
-    dict_prv_prj["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
-
     # add venv to dist list
     # NB: we do this here to avoid having to handle globs in L_DIST
-    name_venv = dict_prv_prj["__PP_NAME_VENV__"]
-    dict_pub_dist["__PP_NAME_VENV__"] = name_venv
+    # venv_name = dict_prv_prj["__PP_NAME_VENV__"]
+    # L_DIST.append(venv_name)
 
-# ------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
 # Do any work after fix
-# ------------------------------------------------------------------------------
-def do_after_fix(dir_prj, dict_prv, dict_pub):
+# --------------------------------------------------------------------------
+def do_after_fix(dir_prj, dict_prv_prj=None, dict_pub_meta=None):
     """
     Do any work after fix
 
     Arguments:
         dir_prj: The root of the new project
-        dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data
 
     Do any work after fix. This method is called at the end of the internal
     _do_after_fix, after all files have been modified.
     """
 
-    # get sub-dicts we need
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    dict_pub_meta = dict_pub[S_KEY_PUB_META]
+    # sanity check
+    if not dict_prv_prj:
+        dict_prv_prj = D_PRV_PRJ
+    if not dict_pub_meta:
+        dict_pub_meta = D_PUB_META
 
     # scan project dir
     for root, _root_dirs, root_files in dir_prj.walk():
@@ -920,7 +896,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
                     if not item.suffix.startswith(".")
                     else item.suffix
                 )
-                if suffix in L_EXT_DESKTOP:
+                if suffix in L_DESKTOP:
                     _fix_desktop(item, dict_pub_meta)
 
         if root.name == S_DIR_UI:
@@ -931,9 +907,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
                     if not item.suffix.startswith(".")
                     else item.suffix
                 )
-                if suffix in L_EXT_GTK:
+                if suffix in L_GTK:
                     _fix_gtk(item, dict_pub_meta)
-
 
 # ------------------------------------------------------------------------------
 # Private functions
