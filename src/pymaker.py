@@ -20,8 +20,6 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: no purge
-
 # FIXME: run pymaker from anywhere, use curr dir as parent of proj dir
 
 # ------------------------------------------------------------------------------
@@ -706,19 +704,6 @@ class PyMaker:
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
                 print(e.message)
-
-        # ----------------------------------------------------------------------
-        # purge
-
-        print(M.S_ACTION_PURGE, end="", flush=True)
-
-        # delete any unnecessary files
-        for item in M.L_PURGE:
-            path_del = self._dir_prj / item
-            if path_del.exists():
-                path_del.unlink()
-
-        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # call conf after fix

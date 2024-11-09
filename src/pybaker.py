@@ -19,12 +19,6 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: add more files to D_LIST/project.json
-# put install.json in assets
-# put install.py in dist
-
-# FIXME: no purge
-
 # FIXME: if used as class, sep invoke or pymaker -b, or task to run directly,
 # or from private dir?
 
@@ -522,19 +516,6 @@ class PyBaker:
             except F.CNShellError as e:
                 print("Failed")
                 print(e.message)
-
-        # ----------------------------------------------------------------------
-        # purge
-
-        print(M.S_ACTION_PURGE, end="", flush=True)
-
-        # delete any unnecessary files
-        for item in M.L_PURGE:
-            path_del = self._dir_prj / item
-            if path_del.exists():
-                path_del.unlink()
-
-        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # call conf after fix
