@@ -169,7 +169,7 @@ S_DIR_PO = f"{S_DIR_I18N}/po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
 S_DIR_DIST = "dist"
-S_DIR_ASSETS = f"{S_DIR_DIST}/assets"
+S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
 # S_DIR_INST_CONF = f"{S_DIR_INST_ASSETS}/{S_DIR_CONF}"
 
@@ -650,7 +650,7 @@ D_PUB_DIST = {
     S_CHANGELOG: S_DIR_ASSETS,
     S_FILE_LICENSE: S_DIR_ASSETS,
     S_FILE_README: S_DIR_ASSETS,
-    S_FILE_INSTALL: S_DIR_DIST,
+    S_FILE_INSTALL: "",
     S_FILE_UNINSTALL: S_DIR_ASSETS,
     S_FILE_INSTALL_CFG: S_DIR_ASSETS,
 }
@@ -875,7 +875,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     # add venv to dist list
     # NB: we do this here to avoid having to handle globs in L_DIST
     name_venv = dict_prv_prj["__PP_NAME_VENV__"]
-    dict_pub_dist["__PP_NAME_VENV__"] = name_venv
+    dict_pub_dist[name_venv] = S_DIR_ASSETS
 
 # ------------------------------------------------------------------------------
 # Do any work after fix

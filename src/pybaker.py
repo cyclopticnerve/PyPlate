@@ -647,19 +647,22 @@ class PyBaker:
             shutil.rmtree(p_dist)
         Path.mkdir(p_dist, parents=True)
 
-        # NB: "dst" as in destination, NOT "dist" as in distribution
-        # l_dst = self._dir_prj / M.S_DIR_DIST / "assets" / name_small
-
         # copy files/folders
         src = self._dict_pub_dist
         dst = p_dist
-        for item in src:
-            new_src = self._dir_prj / item
-            new_dst = dst / item
-            if new_src.is_dir():
+        for k, v in src.items():
+            new_src = self._dir_prj / k
+            new_dst = dst / v / new_src.name
+            # print("dst", dst)
+            # new_dst_parent = new_dst.parent
+            # if not new_dst_parent.exists():
+            #     new_dst_parent.mkdir(dirs_exist_ok=True)
+            if new_src.exists() and new_src.is_dir():
                 shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
-            elif new_src.is_file():
+            elif new_src.exists() and new_src.is_file():
                 shutil.copy2(new_src, new_dst)
+
+            print(f"copy {new_src} to {new_dst}")
 
         # done copying project files
         print(M.S_ACTION_DONE)
