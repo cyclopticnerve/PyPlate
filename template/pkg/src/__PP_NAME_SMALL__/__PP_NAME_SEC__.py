@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
-# Filename: pyplate.py                                            |     ()     |
-# Date    : 12/08/2022                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: __PP_NAME_SEC__.py                                    |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """

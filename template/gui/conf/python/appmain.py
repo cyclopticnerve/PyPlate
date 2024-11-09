@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: appmain.py                                            |     ()     |
-# Date    : 12/08/2022                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -26,16 +26,16 @@ import sys
 
 # find paths to dev or user
 DIR_PARENT = Path(__file__).parents[1].resolve()
-if DIR_PARENT.name == "src":
+if DIR_PARENT.name == "__PP_DEV_SRC__":
     DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "src/support/conf"
-    DIR_LIB = Path.home() / "Documents/Projects/Python/PyPlate" / "lib"
-    DIR_SRC = DIR_PRJ / "src" / "support"
+    DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
+    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
+    DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
 else:
     DIR_HOME = Path.home()
-    DIR_CFG = DIR_HOME / ".config/pyplate"
-    DIR_LIB = DIR_HOME / ".local/share/cyclopticnerve/lib"
-    DIR_SRC = DIR_HOME / ".local/share/pyplate"
+    DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
+    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
+    DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -97,7 +97,7 @@ class AppMain(CNApp):
         self._dict_args = dict_args
 
         # app props
-        app_id = "org.cyclopticnerve.pyplate"
+        app_id = "org.__PP_AUTHOR__.__PP_NAME_SMALL__"
         name_win = "default_window"
 
         # call super with our custom args

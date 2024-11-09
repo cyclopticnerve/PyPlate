@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : 12/08/2022                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -33,7 +33,7 @@ import sys
 
 DIR_SELF = Path(__file__).parent.resolve()
 DIR_LIB = DIR_SELF / "lib"
-FILE_INSTALL = DIR_SELF / "conf/install.json"
+FILE_INSTALL = DIR_SELF / "__PP_INST_FILE__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))

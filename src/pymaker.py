@@ -78,7 +78,9 @@ from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # name and desc for cmd line help
 S_PP_NAME_BIG = "PyMaker"
-S_PP_SHORT_DESC = "A program for creating CLI/Package/GUI projects in Python from a template"
+S_PP_SHORT_DESC = (
+    "A program for creating CLI/Package/GUI projects in Python from a template"
+)
 S_PP_VERSION = "0.0.1"
 
 # formatted version
@@ -226,7 +228,7 @@ class PyMaker:
         p = str(P_DIR_PYPLATE)
         p = p.lstrip(h).strip("/")
         # NB: change global val
-        M.D_PRV_PRJ["Documents/Projects/Python/PyPlate"] = p
+        M.D_PRV_PRJ["__PP_DEV_PP__"] = p
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -399,15 +401,15 @@ class PyMaker:
         # save stuff to prj/meta dicts
 
         # save project stuff
-        M.D_PRV_PRJ["c"] = prj_type
-        M.D_PRV_PRJ["PyPlate"] = prj_name
-        M.D_PRV_PRJ["pyplate"] = name_small
-        M.D_PRV_PRJ["pyplate"] = name_sec
-        M.D_PRV_PRJ["PyPlate"] = name_class
-        M.D_PRV_PRJ["12/08/2022"] = info_date
+        M.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
+        M.D_PRV_PRJ["__PP_NAME_BIG__"] = prj_name
+        M.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
+        M.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
+        M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
+        M.D_PRV_PRJ["__PP_DATE__"] = info_date
         s = M.S_VENV_FMT_NAME.format(name_small)
-        M.D_PRV_PRJ[".venv-pyplate"] = s
-        M.D_PUB_META["A program for creating CLI/Package/GUI projects in Python from a template"] = new_desc
+        M.D_PRV_PRJ["__PP_NAME_VENV__"] = s
+        M.D_PUB_META["__PP_SHORT_DESC__"] = new_desc
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -433,7 +435,7 @@ class PyMaker:
         # copy template/type
 
         # get some paths
-        prj_type_short = M.D_PRV_PRJ["c"]
+        prj_type_short = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         prj_type_long = ""
 
         # get parent of project
@@ -694,7 +696,7 @@ class PyMaker:
             print(M.S_ACTION_VENV, end="", flush=True)
 
             # get name ov venv folder and reqs file
-            dir_venv = M.D_PRV_PRJ[".venv-pyplate"]
+            dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
             file_reqs = M.S_FILE_REQS
 
             # do the thing with the thing
@@ -738,13 +740,13 @@ class PyMaker:
             # create CNPotPy object
             potpy = CNPotPy(
                 dir_src=self._dir_prj / M.S_DIR_SRC,
-                str_appname=M.D_PRV_PRJ["PyPlate"],
-                str_version=M.D_PUB_META["0.0.1"],
-                str_author=M.D_PRV_ALL["cyclopticnerve"],
-                str_email=M.D_PRV_ALL["cyclopticnerve@gmail.com"],
+                str_appname=M.D_PRV_PRJ["__PP_NAME_BIG__"],
+                str_version=M.D_PUB_META["__PP_VERSION__"],
+                str_author=M.D_PRV_ALL["__PP_AUTHOR__"],
+                str_email=M.D_PRV_ALL["__PP_EMAIL__"],
                 dir_locale=self._dir_prj / M.S_DIR_LOCALE,
                 dir_po=self._dir_prj / M.S_DIR_PO,
-                str_domain=M.D_PRV_PRJ["pyplate"],
+                str_domain=M.D_PRV_PRJ["__PP_NAME_SMALL__"],
                 # NB: use dict_pub here b/c dunders have been fixed
                 dict_clangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CLANGS],
                 dict_no_ext=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_NO_EXT],
@@ -759,7 +761,7 @@ class PyMaker:
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
             path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
             if path_desk.is_dir() and path_template.is_file():
-                name_small = M.D_PRV_PRJ["pyplate"]
+                name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = self._dir_prj / path_out_name
                 potpy.make_desktop(path_template, path_out)
@@ -774,9 +776,9 @@ class PyMaker:
 
             print(M.S_ACTION_DOCS, end="", flush=True)
 
-            name = M.D_PRV_PRJ["pyplate"]
-            author = M.D_PRV_ALL["cyclopticnerve"]
-            version = M.D_PUB_META["0.0.1"]
+            name = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
+            author = M.D_PRV_ALL["__PP_AUTHOR__"]
+            version = M.D_PUB_META["__PP_VERSION__"]
             # revision = "0.0.0"
 
             # do the thing with the thing
@@ -1139,13 +1141,13 @@ class PyMaker:
         line = code + comm
 
         # replace version
-        ver = M.D_PUB_META["0.0.1"]
+        ver = M.D_PUB_META["__PP_VERSION__"]
         str_sch = M.S_META_VER_SEARCH
         str_rep = M.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
-        desc = M.D_PUB_META["A program for creating CLI/Package/GUI projects in Python from a template"]
+        desc = M.D_PUB_META["__PP_SHORT_DESC__"]
         str_sch = M.S_META_SD_SEARCH
         str_rep = M.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)

@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_BIG__                                        /          \
 # Filename: windowmain.py                                         |     ()     |
-# Date    : 12/08/2022                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -26,16 +26,16 @@ import sys
 
 # find paths to dev or user
 DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "src":
+if DIR_PARENT.name == "__PP_DEV_SRC__":
     DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "src/support/conf"
-    DIR_LIB = Path.home() / "Documents/Projects/Python/PyPlate" / "lib"
-    DIR_SRC = DIR_PRJ / "src" / "support"
+    DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
+    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
+    DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
 else:
     DIR_HOME = Path.home()
-    DIR_CFG = DIR_HOME / ".config/pyplate"
-    DIR_LIB = DIR_HOME / ".local/share/cyclopticnerve/lib"
-    DIR_SRC = DIR_HOME / ".local/share/pyplate"
+    DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
+    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
+    DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -91,7 +91,7 @@ class WindowMain(CNWindow):
 
         # props necessary tro create a basic window
         ui_file = (
-            DIR_PARENT / "support" / "ui" / "pyplateGtk3.ui"
+            DIR_PARENT / "__PP_SUPPORT__" / "ui" / "__PP_NAME_SMALL__Gtk3.ui"
         )
         ui_path = Path(ui_file).resolve()
         ui_name = "win_main"
@@ -117,7 +117,7 @@ class WindowMain(CNWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        dlg_file = DIR_PARENT / "support" / "ui" / "dialogs.ui"
+        dlg_file = DIR_PARENT / "__PP_SUPPORT__" / "ui" / "dialogs.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "dlg_about")
 

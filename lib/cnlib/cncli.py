@@ -8,7 +8,7 @@
 
 """
 This is the base class for a CLI program. The template CLI program subclasses
-it. See PyPlate/template/cli/src/pyplate for an example.
+it. See PyPlate/template/cli/src/__PP_NAME_SMALL__ for an example.
 """
 
 # ------------------------------------------------------------------------------

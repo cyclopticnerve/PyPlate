@@ -81,8 +81,6 @@ from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # name and desc for cmd line help
 S_PP_NAME_BIG = "PyBaker"
-# TODO: regex breaks when this is a multiline string but formatter
-# (control+shift+i) makes it multiline
 S_PP_SHORT_DESC = (
     "A program to set the metadata of a PyPlate project and create a dist"
 )
@@ -260,11 +258,6 @@ class PyBaker:
         # ----------------------------------------------------------------------
 
         # check for folder
-
-        # self._dir_prj = Path(self._dict_args[S_PRJ_OPTION])
-        self._dir_prj = Path(self._dir_prj).resolve()
-        # self._dir_prj = Path("/home/dana/Documents/Projects/Python/CLIs/CLIs_DEBUG")
-
         if not self._dir_prj.exists():
             print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
             sys.exit(-1)
@@ -508,20 +501,21 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # update CHANGELOG
 
-        path_git = self._dir_prj / M.S_DIR_GIT
-        if path_git.exists():
+        if M.B_CMD_CHANGELOG:
+            path_git = self._dir_prj / M.S_DIR_GIT
+            if path_git.exists():
 
-            print("Do CHANGELOG... ", end="")
+                print(M.S_ACTION_CHANGE, end="", flush=True)
 
-            # run the cmd
-            # NB: cmd will fail if there are no entries in git
-            cmd = M.S_CHANGELOG_CMD
-            try:
-                F.sh(cmd, shell=True)
-                print("Done")
-            except F.CNShellError as e:
-                print("Failed")
-                print(e.message)
+                # run the cmd
+                # NB: cmd will fail if there are no entries in git
+                cmd = M.S_CHANGELOG_CMD
+                try:
+                    F.sh(cmd, shell=True)
+                    print(M.S_ACTION_DONE)
+                except F.CNShellError as e:
+                    print(M.S_ACTION_FAIL)
+                    print(e.message)
 
         # ----------------------------------------------------------------------
         # purge
@@ -597,8 +591,8 @@ class PyBaker:
                 cs.build(venv)
                 print(M.S_ACTION_DONE)
             except F.CNShellError as e:
-                print("Fail")
-                print(e.message)
+                print(M.S_ACTION_FAIL)
+                print(e)
 
         # ----------------------------------------------------------------------
         # tree
@@ -673,63 +667,6 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Set up and run the command line parser
-    # --------------------------------------------------------------------------
-    def _run_parser(self):
-        """
-        Set up and run the command line parser
-
-        Returns: A dictionary of command line arguments
-
-        This method sets up and runs the command line parser to minimize code
-        in the main method.
-        """
-
-        # create the command line parser
-        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
-
-        # add args
-        self._add_args(parser)
-
-        # get namespace object
-        args = parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(args)
-
-    # --------------------------------------------------------------------------
-    # Add arguments to argparse parser
-    # --------------------------------------------------------------------------
-    def _add_args(self, parser):
-        """
-        Add arguments to argparse parser
-
-        Arguments:
-            parser: The parser for which to add arguments
-
-        This method is teased out for better code maintenance.
-        """
-
-        # set help string
-        parser.description = S_PP_ABOUT
-
-        # add debug option
-        parser.add_argument(
-            S_DBG_OPTION,
-            action=S_DBG_ACTION,
-            # dest=S_DBG_DEST,
-            help=S_DBG_HELP,
-        )
-
-        # add project dir
-        parser.add_argument(
-            S_PRJ_OPTION,
-            # dest=S_PRJ_DEST,
-            # metavar=S_PRJ_METAVAR,
-            help=S_PRJ_HELP,
-        )
 
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
@@ -1085,6 +1022,72 @@ class PyBaker:
 
         # no valid switch found
         return False
+
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Add arguments to argparse parser
+# ------------------------------------------------------------------------------
+def _add_args(parser):
+    """
+    Add arguments to argparse parser
+
+    Arguments:
+        parser: The parser for which to add arguments
+
+    This method is teased out for better code maintenance.
+    """
+
+    # set help string
+    parser.description = S_PP_ABOUT
+
+    # add project dir
+    parser.add_argument(
+        S_PRJ_OPTION,  # args key
+        help=S_PRJ_HELP,
+    )
+
+    # add debug option
+    parser.add_argument(
+        S_DBG_OPTION,  # args key
+        help=S_DBG_HELP,
+        action=S_DBG_ACTION,
+    )
+
+
+# --------------------------------------------------------------------------
+# Set up and run the command line parser
+# --------------------------------------------------------------------------
+def _run_parser():
+    """
+    Set up and run the command line parser
+
+    Returns:
+        [dict]: The dict of command line options
+
+    This method sets up and runs the command line parser to minimize code
+    in the main method.
+    """
+
+    # create the command line parser
+    parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+
+    # add args
+    _add_args(parser)
+
+    # get namespace object
+    args = parser.parse_args()
+
+    # convert namespace to dict
+    dict_args = vars(args)
+
+    # return the cmd line dict
+    return dict_args
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

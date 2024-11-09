@@ -29,15 +29,15 @@ import sys
 
 # find paths to dev or user
 DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "src":
+if DIR_PARENT.name == "__PP_DEV_SRC__":
     # DIR_PRJ = DIR_PARENT.parent
     # DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
-    DIR_LIB = Path.home() / "Documents/Projects/Python/PyPlate" / "lib"
+    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
     # DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
 else:
     DIR_HOME = Path.home()
     # DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
-    DIR_LIB = DIR_HOME / ".local/share/cyclopticnerve/lib"
+    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
     # DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
 
 # add paths to import search
@@ -56,7 +56,7 @@ from cnlib import cnfunctions as F  # type: ignore
 DIR_PRJ = Path(__file__).parents[2].resolve()
 
 # run the real pybaker with the prj dir
-cmd = f"python -m ~/Documents/Projects/Python/PyPlate/src/pybaker.py {DIR_PRJ}"
+cmd = f"python -m ~/__PP_DEV_PP__/src/pybaker.py {DIR_PRJ}"
 F.sh(cmd)
 
 # -)

@@ -250,16 +250,16 @@ S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
 S_RM_APP = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
 
 S_RM_DESC_SCH = (
-    r"(<!--[\t ]*A program for creating CLI/Package/GUI projects in Python from a template[\t ]*-->)"
+    r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
     r"(.*?)"
-    r"(<!--[\t ]*A program for creating CLI/Package/GUI projects in Python from a template[\t ]*-->)"
+    r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
 )
 S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
 
 S_RM_DEPS_SCH = (
-    r"(<!--[\t ]*None[\t ]*-->)"
+    r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
     r"(.*?)"
-    r"(<!--[\t ]*None[\t ]*-->)"
+    r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
 )
 S_RM_DEPS_REP = r"\g<1>\n{}\g<3>"
 
@@ -528,15 +528,15 @@ L_CATS = [
 
 D_PRV_ALL = {
     # the author name, used in headers and pyproject.toml
-    "cyclopticnerve": "cyclopticnerve",
+    "__PP_AUTHOR__": "cyclopticnerve",
     # the base url for all projects, used in pyproject.toml and GUI about dlg
-    "https://github.com/cyclopticnerve": "https://github.com/cyclopticnerve",
+    "__PP_URL__": "https://github.com/cyclopticnerve",
     # the author's email, used in headers and pyproject.toml
-    "cyclopticnerve@gmail.com": "cyclopticnerve@gmail.com",
+    "__PP_EMAIL__": "cyclopticnerve@gmail.com",
     # the license name, used in headers and pyproject.toml
-    "WTFPLv2": "WTFPLv2",
+    "__PP_LICENSE_NAME__": "WTFPLv2",
     # the license image/link to use in __PP_README_FILE__
-    "[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg "http://www.wtfpl.net")](http://www.wtfpl.net)": (
+    "__PP_RM_LICENSE__": (
         "[!"
         "[License: WTFPLv2]"
         "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg "
@@ -545,12 +545,12 @@ D_PRV_ALL = {
         "(http://www.wtfpl.net)"
     ),
     # dummy value to use in headers
-    "": "",
+    "__PP_DUMMY__": "",
     # docs folder
-    "docs": S_DIR_DOCS,
+    "__PP_NAME_DOCS__": S_DIR_DOCS,
     # version format string for command line
     # NB: format param is __PP_VERSION__ from metadata
-    "Version {}": "Version {}",
+    "__PP_VER_FMT__": "Version {}",
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -559,29 +559,29 @@ D_PRV_ALL = {
     # sure how to proceed but i think for now i will leave this as a
     # user-editable string and place it in the realm of 'edit it before you
     # run' along with author/email/license/etc
-    "%m/%d/%Y": S_DATE_FMT,
+    "__PP_DATE_FMT__": S_DATE_FMT,
     # file names replaced in various places, rel to prj dir
-    "LICENSE.txt": S_FILE_LICENSE,
-    "README.md": S_FILE_README,
-    "pyproject.toml": S_FILE_TOML,
-    "requirements.txt": S_FILE_REQS,
+    "__PP_LICENSE_FILE__": S_FILE_LICENSE,
+    "__PP_README_FILE__": S_FILE_README,
+    "__PP_TOML_FILE__": S_FILE_TOML,
+    "__PP_REQS_FILE__": S_FILE_REQS,
     # --------------------------------------------------------------------------
     # install stuff
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
-    "conf/install.json": S_FILE_INSTALL,
+    "__PP_INST_FILE__": S_FILE_INSTALL,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
     # location of src files
-    "src": S_DIR_SRC,
+    "__PP_DEV_SRC__": S_DIR_SRC,
     # location of config files
-    "src/support/conf": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
+    "__PP_DEV_CONF__": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    ".local/share/applications": S_USR_APPS,  # for .desktop file
-    ".local/bin": S_USR_BIN,  # where to put the binary
-    "support": S_DIR_SUPPORT,  # where is rest of code
-    "images": S_DIR_IMAGES,  # where gui images are stored
+    "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
+    "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
+    "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
+    "__PP_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -589,28 +589,28 @@ D_PRV_ALL = {
 # they are used for an individual project, and should not be changed after a
 # project is created, as pybaker.py will not update them
 D_PRV_PRJ = {
-    "c": "",  # 'c'
-    "PyPlate": "",  # PyPlate
-    "pyplate": "",  # pyplate
-    "pyplate": "",  # module1.py
-    "PyPlate": "",  # Pascal case name for classes
-    "12/08/2022": "",  # the date each file was created, updated every time
-    ".venv-pyplate": "",  # venv folder name
+    "__PP_TYPE_PRJ__": "",  # 'c'
+    "__PP_NAME_BIG__": "",  # PyPlate
+    "__PP_NAME_SMALL__": "",  # pyplate
+    "__PP_NAME_SEC__": "",  # module1.py
+    "__PP_NAME_CLASS__": "",  # Pascal case name for classes
+    "__PP_DATE__": "",  # the date each file was created, updated every time
+    "__PP_NAME_VENV__": "",  # venv folder name
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
-    "Documents/Projects/Python/PyPlate": "",  # location of PyPlate src dir, rel to dev home
+    "__PP_DEV_PP__": "",  # location of PyPlate src dir, rel to dev home
     # --------------------------------------------------------------------------
     # these paths are calculated in do_before_fix, relative to the user's home
     # dir
-    ".config/pyplate": "",  # config dir
+    "__PP_USR_CONF__": "",  # config dir
     # "__PP_USR_LIB__": "",  # location of cnlibs dir
-    ".local/share/pyplate": "",  # where the program will keep it's source
+    "__PP_USR_SRC__": "",  # where the program will keep it's source
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
-    # ""Python", "cli", "gui", "package", "gtk3", "gtk", "PyGObject", "PyGTK", "template", "app"": "",  # fix up keywords list for pyproject.toml
-    "None": "",  # fix up deps for README.md
+    "__PP_KW_STR__": "",  # fix up keywords list for pyproject.toml
+    "__PP_RM_DEPS__": "",  # fix up deps for README.md
 }
 
 # ------------------------------------------------------------------------------
@@ -621,9 +621,9 @@ D_PRV_PRJ = {
 # consider them the "each build" settings
 D_PUB_META = {
     # the version number to use in __PP_README_FILE__ and pyproject.toml
-    "0.0.1": "0.0.0",
+    "__PP_VERSION__": "0.0.0",
     # the short description to use in __PP_README_FILE__ and pyproject.toml
-    "A program for creating CLI/Package/GUI projects in Python from a template": "Short description",
+    "__PP_SHORT_DESC__": "Short description",
     # the keywords to use in pyproject.toml and github
     "__PP_KEYWORDS__": [],
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
@@ -737,7 +737,7 @@ D_PUB_I18N = {
     # dict of clangs and no exts (ie file names)
     S_KEY_NO_EXT: {
         "Python": [
-            "pyplate",
+            "__PP_NAME_SMALL__",
         ],
     },
     # list of written languages that are available
@@ -746,7 +746,7 @@ D_PUB_I18N = {
 
 # dict for install script
 D_PUB_INST = {
-    "meta": {"name": "PyPlate", "version": "0.0.1"},
+    "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
     "preflight": [],
     "sys_reqs": [],
     "py_reqs": [],
@@ -862,12 +862,12 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
 
     # get values after pymaker has set them
     # author = D_PRV_ALL["__PP_AUTHOR__"]
-    name_small = dict_prv_prj["pyplate"]
+    name_small = dict_prv_prj["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    dict_prv_prj[".config/pyplate"] = f"{S_USR_CONF}/{name_small}"
+    dict_prv_prj["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
     # dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
-    dict_prv_prj[".local/share/pyplate"] = f"{S_USR_SRC}/{name_small}"
+    dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # add venv name to dunders
     dict_prv_prj["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
@@ -907,9 +907,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
         if root == dir_prj:
             # for each file item
             for item in files:
-                if item.name == D_PRV_ALL["README.md"]:
+                if item.name == D_PRV_ALL["__PP_README_FILE__"]:
                     _fix_readme(item, dict_prv_prj, dict_pub_meta)
-                if item.name == D_PRV_ALL["pyproject.toml"]:
+                if item.name == D_PRV_ALL["__PP_TOML_FILE__"]:
                     _fix_pyproject(item, dict_pub_meta)
 
         if root.name == S_DIR_DESKTOP:
@@ -967,7 +967,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     # this part is used by pymaker to remove readme sections
 
     # find the remove blocks
-    prj_type = dict_prv_prj["c"]
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
     if prj_type == "c" or prj_type == "g":
         str_pattern = S_RM_PKG
     else:
@@ -982,7 +982,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
 
     # replace short description
     str_pattern = S_RM_DESC_SCH
-    pp_short_desc = dict_pub_meta["A program for creating CLI/Package/GUI projects in Python from a template"]
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
     str_rep = S_RM_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
@@ -1039,13 +1039,13 @@ def _fix_pyproject(path, dict_pub_meta):
 
     # replace version
     str_pattern = S_TOML_VERSION_SEARCH
-    pp_version = dict_pub_meta["0.0.1"]
+    pp_version = dict_pub_meta["__PP_VERSION__"]
     str_rep = S_TOML_VERSION_REPL.format(pp_version)
     text = re.sub(str_pattern, str_rep, text)
 
     # replace short description
     str_pattern = S_TOML_SHORT_DESC_SEARCH
-    pp_short_desc = dict_pub_meta["A program for creating CLI/Package/GUI projects in Python from a template"]
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
     str_rep = S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text)
 
@@ -1110,7 +1110,7 @@ def _fix_desktop(path, dict_pub_meta):
 
     # replace short description
     str_pattern = S_DESK_DESC_SCH
-    pp_short_desc = dict_pub_meta["A program for creating CLI/Package/GUI projects in Python from a template"]
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
     str_rep = S_DESK_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1142,13 +1142,13 @@ def _fix_gtk(path, dict_pub_meta):
 
     # replace short description
     str_pattern = S_GTK_DESC_SCH
-    pp_short_desc = dict_pub_meta["A program for creating CLI/Package/GUI projects in Python from a template"]
+    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
     str_rep = S_GTK_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace version
     str_pattern = S_GTK_VER_SCH
-    pp_version = dict_pub_meta["0.0.1"]
+    pp_version = dict_pub_meta["__PP_VERSION__"]
     str_rep = S_GTK_VER_REP.format(pp_version)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
