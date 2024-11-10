@@ -619,9 +619,6 @@ class PyBaker:
 
         print(M.S_ACTION_COPY, end="", flush=True)
 
-        # get src and dst dicts
-        # name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-
         # find old dist? nuke it from orbit! it's the only way to be sure!
         p_dist = self._dir_prj / M.S_DIR_DIST
         if p_dist.is_dir():
@@ -631,19 +628,23 @@ class PyBaker:
         # copy files/folders
         src = self._dict_pub_dist
         dst = p_dist
+
+        # for each key, val (src, dst)
         for k, v in src.items():
+
+            # get src/dst rel to prj dir/dist dir
             new_src = self._dir_prj / k
-            new_dst = dst / v / new_src.name
-            # print("dst", dst)
-            # new_dst_parent = new_dst.parent
-            # if not new_dst_parent.exists():
-            #     new_dst_parent.mkdir(dirs_exist_ok=True)
+            new_dst = dst / v
+
+            # if src is file and dst is folder, tack on file name
+            if new_src.is_file() and new_dst.is_dir():
+                new_dst = new_dst / new_src.name
+
+            # do the copy
             if new_src.exists() and new_src.is_dir():
                 shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
             elif new_src.exists() and new_src.is_file():
                 shutil.copy2(new_src, new_dst)
-
-            print(f"copy {new_src} to {new_dst}")
 
         # done copying project files
         print(M.S_ACTION_DONE)
