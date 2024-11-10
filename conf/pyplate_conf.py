@@ -35,7 +35,6 @@ B_CMD_VENV = True
 B_CMD_DOCS = True
 # do i18n
 B_CMD_I18N = True
-B_CMD_CHANGELOG = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -85,7 +84,6 @@ S_ACTION_BEFORE = "Do before fix... "
 S_ACTION_FIX = "Do fix... "
 S_ACTION_GIT = "Do git... "
 S_ACTION_VENV = "Do venv... "
-S_ACTION_CHANGE = "Do CHANGELOG... "
 S_ACTION_PURGE = "Do purge... "
 S_ACTION_AFTER = "Do after fix... "
 S_ACTION_I18N = "Do i18n... "
@@ -301,10 +299,6 @@ S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
 S_ERR_PRJ_DIR_NONE = "Project dir not provided"
 S_ERR_PRJ_DIR_IS_PP = "Cannot run pymaker/pybaker on pyplate dir"
-
-# changelog
-S_CHANGELOG = "CHANGELOG.md"
-S_CHANGELOG_CMD = f"git log --pretty='%ad - %s' > {S_CHANGELOG}"
 
 # pyproject.toml
 S_TOML_VERSION_SEARCH = (
@@ -647,7 +641,6 @@ D_PUB_DIST = {
     "lib": S_DIR_ASSETS,
     S_DIR_README: S_DIR_ASSETS,
     S_DIR_SRC: S_DIR_ASSETS,
-    S_CHANGELOG: S_DIR_ASSETS,
     S_FILE_LICENSE: S_DIR_ASSETS,
     S_FILE_README: S_DIR_ASSETS,
     S_FILE_INSTALL: "",
@@ -699,7 +692,6 @@ D_PUB_BL = {
     S_KEY_SKIP_CODE: [
         "MANIFEST.in",
         ".gitignore",
-        S_CHANGELOG,
     ],
     # fix header, fix text, skip path (1 1 0)
     # NB: not really useful, since we always want to fix paths with dunders,

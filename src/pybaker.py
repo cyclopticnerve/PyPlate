@@ -236,7 +236,6 @@ class PyBaker:
             M.B_CMD_I18N = False
             M.B_CMD_DOCS = False
             M.B_CMD_TREE = False
-            M.B_CMD_CHANGELOG = False
 
         # set flag dicts to defaults
         self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
@@ -491,25 +490,6 @@ class PyBaker:
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
                 print(e)
-
-        # ----------------------------------------------------------------------
-        # update CHANGELOG
-
-        if M.B_CMD_CHANGELOG:
-            path_git = self._dir_prj / M.S_DIR_GIT
-            if path_git.exists():
-
-                print(M.S_ACTION_CHANGE, end="", flush=True)
-
-                # run the cmd
-                # NB: cmd will fail if there are no entries in git
-                cmd = M.S_CHANGELOG_CMD
-                try:
-                    F.sh(cmd, shell=True)
-                    print(M.S_ACTION_DONE)
-                except F.CNShellError as e:
-                    print(M.S_ACTION_FAIL)
-                    print(e.message)
 
         # ----------------------------------------------------------------------
         # call conf after fix
