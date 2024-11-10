@@ -22,13 +22,13 @@ run directly by the run_scripts method.
 
 #  global imports
 import json
-from pathlib import Path
+# from pathlib import Path
 # import shutil
-import sys
+# import sys
 
 # find paths to lib
-DIR_LIB = Path(__file__).parents[1].resolve()
-sys.path.append(str(DIR_LIB))
+# DIR_LIB = Path(__file__).parents[1].resolve()
+# sys.path.append(str(DIR_LIB))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -540,5 +540,80 @@ class CNInstall:
 #         # done
 #         print(S_MSG_DONE)
 
+
+# --------------------------------------------------------------------------
+
+# def _make_install(self):
+#     """
+#     docstring
+#     """
+
+#     dict_install = {
+#         "lib": ".local/share/cyclopticnerve",  # __PP_AUTHOR__
+#         "conf": ".config/CLIs_DEBUG",  # __PP_NAME_BIG__
+#         "src/clis_debug": ".local/bin",  # __PP_NAME_SMALL__
+#     }
+
+#     dst = Path(self._dir_prj) / "dist" / "inst_conf.json"
+#     with open(dst, "w", encoding="UTF-8") as a_file:
+#         json.dump(dict_install, a_file, indent=4)
+
+# # ------------------------------------------------------------------------------
+# # Replace text in the install file
+# # ------------------------------------------------------------------------------
+# def fix_install():
+#     """
+#     Replace text in the install file
+
+#     Replaces the system and Python dependencies in the install file.
+#     """
+
+#     # check if the file exists
+#     path_install = _DIR_PRJ / "install.py"
+#     if not path_install.exists():
+#         return
+
+#     # default text if we can't open file
+#     text = ""
+
+#     # open file and get content
+#     with open(path_install, "r", encoding="UTF-8") as a_file:
+#         text = a_file.read()
+
+#     # replace python dependencies array
+#     str_pattern = (
+#         r"(^\s*dict_install[\t ]*=\s*{)"
+#         r"(.*?)"
+#         r"(^\s*\'py_deps\'[\t ]*:)"
+#         r"(.*?\])"
+#     )
+
+#     # convert dict keys to string
+#     pp_py_deps = DICT_METADATA["__PP_PY_DEPS__"]
+#     str_pp_py_deps = ",".join(pp_py_deps.keys())
+
+#     # replace text
+#     str_rep = rf"\g<1>\g<2>\g<3> [\n\t\t{str_pp_py_deps}\n\t]"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # replace system dependencies array
+#     str_pattern = (
+#         r"(^\s*dict_install[\t ]*=)"
+#         r"(.*?)"
+#         r"(^\s*\'sys_deps\'[\t ]*:)"
+#         r"(.*?\])"
+#     )
+
+#     # convert dict to string
+#     pp_sys_deps = DICT_METADATA["__PP_SYS_DEPS__"]
+#     str_pp_sys_deps = ",".join(pp_sys_deps)
+
+#     # replace string
+#     str_rep = rf"\g<1>\g<2>\g<3> [\n\t\t{str_pp_sys_deps}\n\t]"
+#     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+#     # save file
+#     with open(path_install, "w", encoding="UTF-8") as a_file:
+#         a_file.write(text)
 
 # -)
