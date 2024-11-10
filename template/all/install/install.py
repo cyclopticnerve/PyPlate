@@ -74,7 +74,7 @@ def main():
     """
 
     # create an instance of the class
-    inst = C.CNInstall(FILE_INSTALL)
+    inst = C.CNInstall()
 
     # run the instance
     try:

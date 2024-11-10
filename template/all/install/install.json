@@ -1,11 +1,7 @@
 {
     "META": {
-        "NAME": "",
-        "VERSION": ""
+        "NAME": "__PP_NAME_BIG__",
+        "VERSION": "__PP_VERSION__"
     },
-    "PREFLIGHT": [],
-    "SYS_REQS": [],
-    "PY_REQS": [],
-    "CONTENT": [],
-    "POSTFLIGHT": []
+    "CONTENT": {},
 }

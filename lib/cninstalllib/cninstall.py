@@ -14,14 +14,12 @@ should have their executable bits set and also have a shebang, so they can be
 run directly by the run_scripts method.
 """
 
-# TODO: no pre/post, do that in final script
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 #  global imports
-import json
+# import json
 # from pathlib import Path
 # import shutil
 # import sys
@@ -46,6 +44,7 @@ import json
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
+
 # keys
 # S_KEY_SYS_REQS = "SYS_REQS"
 # S_KEY_PY_REQS = "PY_REQS"
@@ -56,16 +55,16 @@ S_KEY_VERSION = "VERSION"
 # S_KEY_POSTFLIGHT = "POSTFLIGHT"
 S_KEY_CONTENT = "CONTENT"
 # values
-S_VAL_PIP = "python3-pip"
+# S_VAL_PIP = "python3-pip"
 # cmds
-S_CMD_SUDO = "sudo echo -n"
+# S_CMD_SUDO = "sudo echo -n"
 
 # errors
 # NB: format param is file path
 S_ERR_INST_NOT_FOUND = "Install file {} not found"
 S_ERR_INST_NOT_JSON = "Install file {} is not a JSON file"
-S_ERR_INST_REQS_SYS = "Could not install system requirement {}"
-S_ERR_INST_REQS_PY = "Could not install python requirement {}"
+# S_ERR_INST_REQS_SYS = "Could not install system requirement {}"
+# S_ERR_INST_REQS_PY = "Could not install python requirement {}"
 # NB: format param is file path
 S_ERR_UNINST_NOT_FOUND = "UniInstall file {} not found"
 S_ERR_UNINST_NOT_JSON = "Uninstall file {} is not a JSON file"
@@ -75,38 +74,38 @@ S_ERR_UNINST_NOT_JSON = "Uninstall file {} is not a JSON file"
 # S_ERR_NO_SUDO = "Could not get sudo permission"
 
 # these strings make errors look nicer
-S_ERR_PREFLIGHT = "preflight"
-S_ERR_POSTFLIGHT = "postflight"
+# S_ERR_PREFLIGHT = "preflight"
+# S_ERR_POSTFLIGHT = "postflight"
 # NB: format params are one of the strings above and file path
-S_ERR_RUN_SCRIPT = (
-    "Could not run {} script {}. Make sure the script has its executable bit "
-    "set and has a shebang"
-)
+# S_ERR_RUN_SCRIPT = (
+#     "Could not run {} script {}. Make sure the script has its executable bit "
+#     "set and has a shebang"
+# )
 
 # NB: format params are prog_name nad prog_version
 S_MSG_INST_START = "Installing {} version {}"
 # NB: format params are prog_name
 S_MSG_INST_END = "{} installed"
-S_MSG_INST_SYS = "Installing system requirements"
-S_MSG_INST_PY = "Installing Python requirements"
+# S_MSG_INST_SYS = "Installing system requirements"
+# S_MSG_INST_PY = "Installing Python requirements"
 # NB: format param is item name
-S_MSG_INST_ONE = "Installing {}... "
+# S_MSG_INST_ONE = "Installing {}... "
 
 # NB: format params are prog_name nad prog_version
 S_MSG_UNINST_START = "Uninstalling {} version {}"
 # NB: format params are prog_name
 S_MSG_UNINST_END = "{} uninstalled"
-S_MSG_UNINST_SYS = "Uninstalling system requirements"
-S_MSG_UNINST_PY = "Uninstalling Python requirements"
-# NB: format param is item name
+# S_MSG_UNINST_SYS = "Uninstalling system requirements"
+# S_MSG_UNINST_PY = "Uninstalling Python requirements"
+# # NB: format param is item name
 S_MSG_UNINST_ONE = "Uninstalling {}... "
 
-S_MSG_INST_SYS_CMD = "sudo apt-get install {} -qq > /dev/null"
-S_MSG_INST_PY_CMD = "python -m pip install -q {} > /dev/null"
-# NB: format param is key
-S_MSG_RUN_SCRIPT = "Running {} scripts"
-# NB: format param is val
-S_MSG_RUN_SCRIPT_ONE = "Running {}... "
+# S_MSG_INST_SYS_CMD = "sudo apt-get install {} -qq > /dev/null"
+# S_MSG_INST_PY_CMD = "python -m pip install -q {} > /dev/null"
+# # NB: format param is key
+# S_MSG_RUN_SCRIPT = "Running {} scripts"
+# # NB: format param is val
+# S_MSG_RUN_SCRIPT_ONE = "Running {}... "
 S_MSG_DONE = "Done"
 
 # ------------------------------------------------------------------------------
@@ -169,26 +168,12 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # The default initialization of the class
     # --------------------------------------------------------------------------
-    def __init__(self, file_install):
+    def __init__(self):
         """
         The default initialization of the class
 
         Creates a new instance of the class and sets the initial properties.
         """
-
-        # new properties
-        # if not dir_assets:
-        #     dir_assets = ""
-        # self._dir_assets = dir_assets
-        # self._install = install
-        # self._debug = debug
-        try:
-            with open(file_install, "r", encoding="UTF-8") as a_file:
-                self._dict_install = json.load(a_file)
-        except FileNotFoundError:
-            pass
-        except json.JSONDecodeError:
-            pass
 
         # default properties
         self._dict_conf = {}
@@ -206,8 +191,8 @@ class CNInstall:
 
         Arguments:
             dict_install: Dictionary containing the program's install info
-            debug: If True, do not install, only print debug info. If False
-            (the default), install the program normally (default: False)
+            debug: If True, do not install, only print debug info. If False,
+            install the program normally (default: False)
 
         Installs the program on the user's computer
         """
@@ -221,11 +206,18 @@ class CNInstall:
 
         Arguments:
             dict_install: Dictionary containing the program's install info
-            debug: If True, do not uninstall, only print debug info. If False
-            (the default), uninstall the program normally (default: False)
+            debug: If True, do not uninstall, only print debug info. If False,
+            uninstall the program normally (default: False)
 
         Uninstalls the program on the user's computer
         """
+
+
+# -)
+
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 # the user dict
