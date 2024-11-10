@@ -197,22 +197,36 @@ class CNInstall:
     # Public methods
     # --------------------------------------------------------------------------
 
-    def install(self, dir_assets, debug=False):
+    # --------------------------------------------------------------------------
+    # Install the program
+    # --------------------------------------------------------------------------
+    def install(self, dict_install, debug=False):
         """
+        Install the program
 
         Arguments:
-            dir_assets: Path to the folder containing the program's files and
-            folders for install (default: None)
-            install: If True (the default), we are installing a program. If
-            False, we are uninstalling a program (default: True)
+            dict_install: Dictionary containing the program's install info
             debug: If True, do not install, only print debug info. If False
             (the default), install the program normally (default: False)
+
+        Installs the program on the user's computer
         """
 
-    def uninstall(self):
+    # --------------------------------------------------------------------------
+    # Uninstall the program
+    # --------------------------------------------------------------------------
+    def uninstall(self, dict_install, debug=False):
         """
-        docstring
+        Uninstall the program
+
+        Arguments:
+            dict_install: Dictionary containing the program's install info
+            debug: If True, do not uninstall, only print debug info. If False
+            (the default), uninstall the program normally (default: False)
+
+        Uninstalls the program on the user's computer
         """
+
 
 # the user dict
 # TODO: use dunders
