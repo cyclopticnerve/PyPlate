@@ -1,0 +1,145 @@
+Date : 2024-11-09 19:58:46
+Directory : /home/dana/Documents/Projects/Python/PyPlate
+Total : 77 files,  13288 codes, 4458 comments, 2468 blanks, all 20214 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| Markdown         |         22 |      8,268 |          0 |        170 |      8,438 |
+| Python           |         35 |      4,359 |      4,383 |      2,252 |     10,994 |
+| XML              |          2 |        335 |          3 |          2 |        340 |
+| JSON             |          8 |        135 |          0 |          0 |        135 |
+| TOML             |          4 |         99 |         40 |         22 |        161 |
+| HTML             |          2 |         54 |         24 |         16 |         94 |
+| pip requirements |          3 |         28 |          0 |          3 |         31 |
+| Desktop          |          1 |         10 |          8 |          3 |         21 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                               | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                  |         77 |     13,288 |      4,458 |      2,468 |     20,214 |
+| . (Files)                                                                                          |          3 |        138 |         10 |         31 |        179 |
+| .VSCodeCounter                                                                                     |         25 |      8,088 |          0 |        130 |      8,218 |
+| .VSCodeCounter/2024-04-17_08-36-35                                                                 |          5 |        109 |          0 |         26 |        135 |
+| .VSCodeCounter/2024-09-06_15-49-20                                                                 |          5 |        211 |          0 |         26 |        237 |
+| .VSCodeCounter/2024-09-29_10-54-55                                                                 |          5 |      1,447 |          0 |         26 |      1,473 |
+| .VSCodeCounter/2024-11-06_20-01-39                                                                 |          5 |      4,019 |          0 |         26 |      4,045 |
+| .VSCodeCounter/2024-11-06_20-02-03                                                                 |          5 |      2,302 |          0 |         26 |      2,328 |
+| TODO                                                                                               |          3 |         67 |         60 |         50 |        177 |
+| conf                                                                                               |          1 |        699 |        309 |        146 |      1,154 |
+| lib                                                                                                |         19 |      2,078 |      2,846 |      1,261 |      6,185 |
+| lib/cnapplib                                                                                       |          8 |        255 |      1,479 |        488 |      2,222 |
+| lib/cnapplib (Files)                                                                               |          4 |        255 |        212 |        133 |        600 |
+| lib/cnapplib/dead                                                                                  |          4 |          0 |      1,267 |        355 |      1,622 |
+| lib/cninstalllib                                                                                   |          3 |        518 |        577 |        252 |      1,347 |
+| lib/cnlib                                                                                          |          8 |      1,305 |        790 |        521 |      2,616 |
+| misc                                                                                               |          4 |        107 |        103 |         72 |        282 |
+| pyplate                                                                                            |          3 |        135 |         34 |         13 |        182 |
+| pyplate (Files)                                                                                    |          1 |         80 |          0 |          0 |         80 |
+| pyplate/private                                                                                    |          2 |         55 |         34 |         13 |        102 |
+| src                                                                                                |          2 |      1,207 |        758 |        560 |      2,525 |
+| template                                                                                           |         17 |        769 |        338 |        205 |      1,312 |
+| template/all                                                                                       |          8 |        229 |        139 |         75 |        443 |
+| template/all (Files)                                                                               |          3 |        126 |         10 |         21 |        157 |
+| template/all/install                                                                               |          3 |         60 |         83 |         33 |        176 |
+| template/all/misc                                                                                  |          1 |         27 |         12 |          8 |         47 |
+| template/all/pyplate                                                                               |          1 |         16 |         34 |         13 |         63 |
+| template/all/pyplate/private                                                                       |          1 |         16 |         34 |         13 |         63 |
+| template/gui                                                                                       |          6 |        498 |        115 |         82 |        695 |
+| template/gui (Files)                                                                               |          1 |          2 |          0 |          1 |          3 |
+| template/gui/conf                                                                                  |          5 |        496 |        115 |         81 |        692 |
+| template/gui/conf/desktop                                                                          |          1 |         10 |          8 |          3 |         21 |
+| template/gui/conf/python                                                                           |          2 |        151 |        104 |         76 |        331 |
+| template/gui/conf/ui                                                                               |          2 |        335 |          3 |          2 |        340 |
+| template/pkg                                                                                       |          3 |         42 |         84 |         48 |        174 |
+| template/pkg/src                                                                                   |          2 |         31 |         41 |         28 |        100 |
+| template/pkg/src/__PP_NAME_SMALL__                                                                 |          2 |         31 |         41 |         28 |        100 |
+| template/pkg/tests                                                                                 |          1 |         11 |         43 |         20 |         74 |
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                                                           | language         | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-04-17_08-36-35/details.md         | Markdown         |         48 |          0 |          6 |         54 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-04-17_08-36-35/diff-details.md    | Markdown         |          9 |          0 |          6 |         15 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-04-17_08-36-35/diff.md            | Markdown         |         12 |          0 |          7 |         19 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-04-17_08-36-35/results.json       | JSON             |          1 |          0 |          0 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-04-17_08-36-35/results.md         | Markdown         |         39 |          0 |          7 |         46 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-06_15-49-20/details.md         | Markdown         |         57 |          0 |          6 |         63 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-06_15-49-20/diff-details.md    | Markdown         |         59 |          0 |          6 |         65 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-06_15-49-20/diff.md            | Markdown         |         48 |          0 |          7 |         55 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-06_15-49-20/results.json       | JSON             |          1 |          0 |          0 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-06_15-49-20/results.md         | Markdown         |         46 |          0 |          7 |         53 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-29_10-54-55/details.md         | Markdown         |        597 |          0 |          6 |        603 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-29_10-54-55/diff-details.md    | Markdown         |        558 |          0 |          6 |        564 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-29_10-54-55/diff.md            | Markdown         |        136 |          0 |          7 |        143 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-29_10-54-55/results.json       | JSON             |          1 |          0 |          0 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-09-29_10-54-55/results.md         | Markdown         |        155 |          0 |          7 |        162 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-01-39/details.md         | Markdown         |      1,780 |          0 |          6 |      1,786 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-01-39/diff-details.md    | Markdown         |      1,325 |          0 |          6 |      1,331 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-01-39/diff.md            | Markdown         |        429 |          0 |          7 |        436 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-01-39/results.json       | JSON             |          1 |          0 |          0 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-01-39/results.md         | Markdown         |        484 |          0 |          7 |        491 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-02-03/details.md         | Markdown         |      1,785 |          0 |          6 |      1,791 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-02-03/diff-details.md    | Markdown         |         14 |          0 |          6 |         20 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-02-03/diff.md            | Markdown         |         17 |          0 |          7 |         24 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-02-03/results.json       | JSON             |          1 |          0 |          0 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/.VSCodeCounter/2024-11-06_20-02-03/results.md         | Markdown         |        485 |          0 |          7 |        492 |
+| /home/dana/Documents/Projects/Python/PyPlate/README.md                                             | Markdown         |        106 |          0 |         25 |        131 |
+| /home/dana/Documents/Projects/Python/PyPlate/TODO/collect_strings.py                               | Python           |          0 |          1 |          1 |          2 |
+| /home/dana/Documents/Projects/Python/PyPlate/TODO/guis_debug-gtk4.py                               | Python           |         67 |         57 |         48 |        172 |
+| /home/dana/Documents/Projects/Python/PyPlate/TODO/unused.py                                        | Python           |          0 |          2 |          1 |          3 |
+| /home/dana/Documents/Projects/Python/PyPlate/conf/pyplate_conf.py                                  | Python           |        699 |        309 |        146 |      1,154 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/cnapp.py                                 | Python           |        152 |        116 |         80 |        348 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/cnwindow.py                              | Python           |         72 |         65 |         45 |        182 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/dead/cnapp_with_state.py                 | Python           |          0 |        340 |         94 |        434 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/dead/cnappfunctions.py                   | Python           |          0 |        106 |         34 |        140 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/dead/cnwindow_junk.py                    | Python           |          0 |        347 |        100 |        447 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/dead/cnwindow_w_state.py                 | Python           |          0 |        474 |        127 |        601 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/pyproject.toml                           | TOML             |         23 |         10 |          6 |         39 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnapplib/state.py                                 | Python           |          8 |         21 |          2 |         31 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cninstalllib/cninstall copy.py                    | Python           |        237 |        121 |         85 |        443 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cninstalllib/cninstall.py                         | Python           |         96 |        349 |        100 |        545 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cninstalllib/cnuninstall.py                       | Python           |        185 |        107 |         67 |        359 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cncli.py                                    | Python           |        110 |         94 |         47 |        251 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnformatter.py                              | Python           |         16 |         18 |         10 |         44 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnfunctions.py                              | Python           |        306 |        143 |        130 |        579 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnpot.py                                    | Python           |        329 |        217 |        122 |        668 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnsphinx.py                                 | Python           |        141 |         65 |         48 |        254 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cntree.py                                   | Python           |        291 |        192 |        126 |        609 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/cnvenv.py                                   | Python           |         89 |         51 |         32 |        172 |
+| /home/dana/Documents/Projects/Python/PyPlate/lib/cnlib/pyproject.toml                              | TOML             |         23 |         10 |          6 |         39 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/checklist.html                                   | HTML             |         27 |         12 |          8 |         47 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/cnlibs.py                                        | Python           |         14 |         12 |         10 |         36 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/default_class.py                                 | Python           |         38 |         47 |         29 |        114 |
+| /home/dana/Documents/Projects/Python/PyPlate/misc/default_mod.py                                   | Python           |         28 |         32 |         25 |         85 |
+| /home/dana/Documents/Projects/Python/PyPlate/pyplate/private/private.json                          | JSON             |         39 |          0 |          0 |         39 |
+| /home/dana/Documents/Projects/Python/PyPlate/pyplate/private/pybaker.py                            | Python           |         16 |         34 |         13 |         63 |
+| /home/dana/Documents/Projects/Python/PyPlate/pyplate/project.json                                  | JSON             |         80 |          0 |          0 |         80 |
+| /home/dana/Documents/Projects/Python/PyPlate/pyproject.toml                                        | TOML             |         32 |         10 |          5 |         47 |
+| /home/dana/Documents/Projects/Python/PyPlate/requirements.txt                                      | pip requirements |          0 |          0 |          1 |          1 |
+| /home/dana/Documents/Projects/Python/PyPlate/src/pybaker.py                                        | Python           |        534 |        363 |        254 |      1,151 |
+| /home/dana/Documents/Projects/Python/PyPlate/src/pymaker.py                                        | Python           |        673 |        395 |        306 |      1,374 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/README.md                                | Markdown         |         79 |          0 |         15 |         94 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/install/install.json                     | JSON             |         11 |          0 |          0 |         11 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/install/install.py                       | Python           |         25 |         50 |         17 |         92 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/install/uninstall.py                     | Python           |         24 |         33 |         16 |         73 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/misc/checklist.html                      | HTML             |         27 |         12 |          8 |         47 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/pyplate/private/pybaker.py               | Python           |         16 |         34 |         13 |         63 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/pyproject.toml                           | TOML             |         21 |         10 |          5 |         36 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/all/requirements.txt                         | pip requirements |         26 |          0 |          1 |         27 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/conf/desktop/template.desktop            | Desktop          |         10 |          8 |          3 |         21 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/conf/python/appmain.py                   | Python           |         49 |         40 |         25 |        114 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/conf/python/windowmain.py                | Python           |        102 |         64 |         51 |        217 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/conf/ui/__PP_NAME_SMALL__Gtk3.ui         | XML              |        211 |          2 |          1 |        214 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/conf/ui/dialogs.ui                       | XML              |        124 |          1 |          1 |        126 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/gui/requirements.txt                         | pip requirements |          2 |          0 |          1 |          3 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/pkg/src/__PP_NAME_SMALL__/__PP_NAME_SEC__.py | Python           |         28 |         33 |         25 |         86 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/pkg/src/__PP_NAME_SMALL__/__init__.py        | Python           |          3 |          8 |          3 |         14 |
+| /home/dana/Documents/Projects/Python/PyPlate/template/pkg/tests/__PP_NAME_SMALL___test.py          | Python           |         11 |         43 |         20 |         74 |
+| Total                                                                                              |                  |     13,288 |      4,458 |      2,468 |     20,214 |
++----------------------------------------------------------------------------------------------------+------------------+------------+------------+------------+------------+

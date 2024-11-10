@@ -155,7 +155,7 @@ class PyBaker:
         self._dict_pub_dist = {}
         self._dict_pub_bl = {}
         self._dict_pub_i18n = {}
-        self._dict_pub_install = {}
+        # self._dict_pub_install = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -286,7 +286,7 @@ class PyBaker:
         self._dict_pub_meta = self._dict_pub[M.S_KEY_PUB_META]
         self._dict_pub_bl = self._dict_pub[M.S_KEY_PUB_BL]
         self._dict_pub_i18n = self._dict_pub[M.S_KEY_PUB_I18N]
-        self._dict_pub_install = self._dict_pub[M.S_KEY_PUB_INSTALL]
+        # self._dict_pub_install = self._dict_pub[M.S_KEY_PUB_INSTALL]
         self._dict_pub_dist = self._dict_pub[M.S_KEY_PUB_DIST]
 
     # --------------------------------------------------------------------------
@@ -452,7 +452,7 @@ class PyBaker:
         dict_pub = {
             M.S_KEY_PUB_BL: self._dict_pub_bl,
             M.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            M.S_KEY_PUB_INSTALL: self._dict_pub_install,
+            # M.S_KEY_PUB_INSTALL: self._dict_pub_install,
             M.S_KEY_PUB_DIST: self._dict_pub_dist,
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
@@ -614,11 +614,7 @@ class PyBaker:
 
             # get src/dst rel to prj dir/dist dir
             new_src = self._dir_prj / k
-            new_dst = dst / v
-
-            # if src is file and dst is folder, tack on file name
-            if new_src.is_file() and new_dst.is_dir():
-                new_dst = new_dst / new_src.name
+            new_dst = dst / v / new_src.name
 
             # do the copy
             if new_src.exists() and new_src.is_dir():

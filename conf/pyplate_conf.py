@@ -179,7 +179,7 @@ S_FILE_REQS = "requirements.txt"
 S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-S_FILE_INSTALL_CFG = f"{S_DIR_INSTALL}/install.json"
+# S_FILE_INSTALL_CFG = f"{S_DIR_INSTALL}/install.json"
 S_FILE_INSTALL = f"{S_DIR_INSTALL}/install.py"
 S_FILE_UNINSTALL = f"{S_DIR_INSTALL}/uninstall.py"
 S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
@@ -645,7 +645,7 @@ D_PUB_DIST = {
     S_FILE_README: S_DIR_ASSETS,
     S_FILE_INSTALL: "",
     S_FILE_UNINSTALL: S_DIR_ASSETS,
-    S_FILE_INSTALL_CFG: S_DIR_ASSETS,
+    # S_FILE_INSTALL_CFG: S_DIR_ASSETS,
 }
 
 # the lists of dirs/files we don't mess with while running pymaker
@@ -675,6 +675,7 @@ D_PUB_BL = {
         S_FILE_REQS,
         "**/__pycache__",
         "**/*.mo",
+        S_DIR_DIST,
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files

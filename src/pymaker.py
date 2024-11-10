@@ -495,7 +495,7 @@ class PyMaker:
         dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
+            # M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
             M.S_KEY_PUB_DIST: M.D_PUB_DIST,
             M.S_KEY_PUB_META: M.D_PUB_META,
         }
@@ -651,7 +651,7 @@ class PyMaker:
         dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
+            # M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
             M.S_KEY_PUB_DIST: M.D_PUB_DIST,
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
