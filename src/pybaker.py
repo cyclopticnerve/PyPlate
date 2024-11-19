@@ -21,6 +21,9 @@ Run pybaker -h for more options.
 
 # FIXME: if used as class, sep invoke or pymaker -b, or task to run directly,
 # or from private dir?
+# 1. run from terminal - pp(ok) and prj(ok)
+# 2. run from debugger - pp(ok) and prj(ok)
+# 3. run task - prj (prints activate cmd)
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -222,14 +225,7 @@ class PyBaker:
         properties.
         """
 
-        # ----------------------------------------------------------------------
-        # set pp cmd line stuff
-
-        # check for pos args and flags
-        # self._dir_prj = self._dict_args.get(S_PRJ_OPTION, "")
-        # self._debug = self._dict_args.get(S_DBG_OPTION, False)
-
-        # debug turns off some _do_extras features
+        # debug turns off some _do_after_fix features
         if self._debug:
             M.B_CMD_GIT = False
             M.B_CMD_VENV = False
@@ -541,7 +537,7 @@ class PyBaker:
         # if docs flag is set
         if M.B_CMD_DOCS:
 
-            print(M.S_ACTION_DOCS, end="", flush=True)
+            print(M.S_ACTION_DOCS, flush=True)
 
             # get path to project's venv
             venv = self._dict_prv_prj["__PP_NAME_VENV__"]

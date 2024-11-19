@@ -39,21 +39,11 @@ import sys
 # add custom import paths
 
 # find paths to dev or user
-DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PP_DEV_SRC__":
-    DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
-    DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
-else:
-    DIR_HOME = Path.home()
-    DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
-    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
-    DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
+DIR_PRJ = Path(__file__).parents[1].resolve()
+DIR_LIB = DIR_PRJ / "lib"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
-sys.path.append(str(DIR_SRC))
 
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
@@ -69,6 +59,7 @@ from cnlib.cncli import CNCli  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
+# NB: you may edit these by hand, but they will be overwritten by PyBaker
 S_PP_VERSION = "__PP_VERSION__"
 S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
@@ -108,15 +99,13 @@ class __PP_NAME_CLASS__(CNCli):
         new object.
         """
 
-        # call super init to initialize the base class
-        super().__init__()
-
-        # set default property values
-        # NB: commented props are from super
-        # self._d_args = {}   # from super
-        # self._dict_cfg = {}    # from super
-        # self._p_cfg = None  # from super
         self._debug = False
+
+        # path to r/w config file
+        self._dir_cfg = Path.home() / "__PP_USR_CONF__"
+
+        # default config stuff
+        self._dict_cfg = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -199,13 +188,15 @@ class __PP_NAME_CLASS__(CNCli):
         super()._run_parser()
 
         # get other options from command line
-        self._debug = self._dict_args[CNCli.ARG_DBG_DEST]
-
-        # the default config file
-        cfg_def = str(DIR_CFG / "__PP_NAME_SMALL__.json")
+        self._debug = self._dict_args.get(CNCli.ARG_DBG_DEST, False)
 
         # command line cfg is None or str
-        cfg_arg = self._dict_args[CNCli.ARG_CFG_DEST]
+        cfg_arg = self._dict_args.get(CNCli.ARG_CFG_DEST, None)
+        if cfg_arg is not None:
+            cfg_arg = Path(cfg_arg)
+
+        # the default config file
+        cfg_def = str(self._dir_cfg / "__PP_NAME_SMALL__.json")
 
         # load the config file
         # not using def path, using arg path
@@ -213,9 +204,7 @@ class __PP_NAME_CLASS__(CNCli):
         # using def path, not using arg path
         # super()._load_config(cfg_def, dict_def=self._dict_cfg)
         # using def path, using arg path, using internal
-        super()._load_config(
-            cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg
-        )
+        super()._load_config(path_arg=cfg_arg, path_def=cfg_def)
 
         # throw in a debug test
         if self._debug:

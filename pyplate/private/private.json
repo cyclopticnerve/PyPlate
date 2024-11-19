@@ -18,7 +18,6 @@
         "__PP_DEV_CONF__": "src/support/conf",
         "__PP_USR_APPS__": ".local/share/applications",
         "__PP_USR_BIN__": ".local/bin",
-        "__PP_SUPPORT__": "support",
         "__PP_IMAGES__": "images"
     },
     "PRV_PRJ": {

@@ -15,24 +15,6 @@ appropriate locations on the user's computer. It also provides for hooks to run
 Python (or other language) scripts before and after the actual install process.
 """
 
-# C.S_KEY_META: {
-#       "NAME": "__PP_NAME_BIG__",
-#       "VERSION": "__PP_VERSION__"
-# },
-# C.S_KEY_PREFLIGHT: ["preflight_script_1"],
-# C.S_KEY_SYS_REQS: ["sys_reqs_1"],
-# C.S_KEY_PY_REQS: ["py_reqs_1"],
-# C.S_KEY_CONTENT: {
-#     "conf": ".conf/__PP_NAME_SMALL__",
-#     "spaceoddity.py": ".__PP_NAME_SMALL__",
-#     "LICENSE": ".__PP_NAME_SMALL__",
-#     "VERSION": ".__PP_NAME_SMALL__",
-#     "uninstall.py": ".__PP_NAME_SMALL__",
-#     "uninstall.json": ".__PP_NAME_SMALL__",
-#     "cron_uninstall.py": ".config/.__PP_NAME_SMALL__",
-# },
-# C.S_KEY_POSTFLIGHT: ["postflight_script_1"],
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -50,9 +32,9 @@ import sys
 # add custom import paths
 
 DIR_SELF = Path(__file__).parent.resolve()
-DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
-DIR_LIB = DIR_ASSETS / "lib"
-FILE_INSTALL = DIR_ASSETS / "__PP_INST_FILE__"
+DIR_SRC = DIR_SELF / "__PP_INST_ASSETS__"
+FILE_CFG = DIR_SRC / "__PP_INST_FILE__"
+DIR_LIB = DIR_SRC / "lib"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -78,14 +60,14 @@ def main():
 
     # run the instance
     try:
-        inst.install(DIR_ASSETS, debug=True)
+        inst.install(DIR_SRC, FILE_CFG)
     except C.CNInstallError as e:
         print(e)
 
 # ------------------------------------------------------------------------------
 # Run the main class if we are not an import
 # ------------------------------------------------------------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 # -)

@@ -574,7 +574,7 @@ D_PRV_ALL = {
     # these paths are relative to the user's home dir
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
-    "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
+    # "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
     "__PP_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
 }
 
@@ -598,7 +598,7 @@ D_PRV_PRJ = {
     # dir
     "__PP_USR_CONF__": "",  # config dir
     # "__PP_USR_LIB__": "",  # location of cnlibs dir
-    "__PP_USR_SRC__": "",  # where the program will keep it's source
+    # "__PP_USR_SRC__": "",  # where the program will keep it's source
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,

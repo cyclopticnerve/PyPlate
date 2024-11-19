@@ -28,35 +28,35 @@ import sys
 # add custom import paths
 
 # find paths to dev or user
-DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PP_DEV_SRC__":
-    # DIR_PRJ = DIR_PARENT.parent
-    # DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
-    # DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
-else:
-    DIR_HOME = Path.home()
-    # DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
-    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
-    # DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
+DIR_PP = Path.home() / "Documents/Projects/Python/PyPlate"
 
 # add paths to import search
-sys.path.append(str(DIR_LIB))
-# sys.path.append(str(DIR_SRC))
+sys.path.append(str(DIR_PP))
 
 # import my stuff
-from cnlib import cnfunctions as F  # type: ignore
+from src import pybaker  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
-# get the project dir
-DIR_PRJ = Path(__file__).parents[2].resolve()
+# ------------------------------------------------------------------------------
+# Code to run when called from command line
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    # Code to run when called from command line
 
-# run the real pybaker with the prj dir
-cmd = f"python -m ~/__PP_DEV_PP__/src/pybaker.py {DIR_PRJ}"
-F.sh(cmd)
+    # This is the top level code of the program, called when the Python file is
+    # invoked from the command line.
+
+    # create object
+    pb = pybaker.PyBaker()
+
+    # get prj dir
+    dir_prj = Path(__file__).parents[2].resolve()
+
+    # call main
+    pb.main(dir_prj)
 
 # -)

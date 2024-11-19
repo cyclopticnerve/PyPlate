@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : CNLib                                                  /          \
-# Filename: cnclibase.py                                          |     ()     |
+# Filename: cncli.py                                              |     ()     |
 # Date    : 04/14/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -17,9 +17,6 @@ it. See PyPlate/template/cli/src/__PP_NAME_SMALL__ for an example.
 
 # system imports
 import argparse
-from pathlib import Path
-
-# pylint: disable=import-error
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -27,8 +24,8 @@ from pathlib import Path
 # pylint: disable=import-error
 
 # my imports
-from cnformatter import CNFormatter # type: ignore
-import cnfunctions as F  # type: ignore
+from cnlib import cnformatter  # type: ignore
+from cnlib import cnfunctions as F  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -86,7 +83,10 @@ class CNCli:
 
         # set defaults
         self._dict_args = {}
+        self._debug = False
+
         self._dict_cfg = {}
+        # self._path_arg = None
         self._path_cfg = None
 
     # --------------------------------------------------------------------------
@@ -106,7 +106,9 @@ class CNCli:
         """
 
         # create the command line parser
-        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+        parser = argparse.ArgumentParser(
+            formatter_class=cnformatter.CNFormatter
+        )
 
         # call the subclass method
         self._add_args(parser)
@@ -130,27 +132,27 @@ class CNCli:
         This method is empty, but is declared here because the subclass method
         is called from _run_parser.
         """
+
         # dummy method to be subclassed
 
     # --------------------------------------------------------------------------
     # Load config dict by combining several json files
     # --------------------------------------------------------------------------
-    def _load_config(self, path_def, path_arg=None, dict_def=None):
+    def _load_config(self, path_arg=None, path_def=None):
         """
         Load config dict by combining several json files
 
         Arguments:
-            path_def: The path to the default file (the one the program usually
-            uses)
-            path_arg: The path passed on the command line (default: None)
-            dict_def: A dictionary of defaults to start with (usually hard
-            coded in the program) (default: None)
+            path_arg: The path to a config file passed on the command line
+            (default: None)
+            path_def: The path to the existing config file (the one the program
+            usually uses) (default: None)
 
         This method loads config files from several sources, and combines the
         resulting dictionaries. The order of precedence is:
+        3. dict_def
         1. path_arg
         2. path_def
-        3. dict_def
         """
 
         # load config dict from arg file, def file, or just keep built-in
@@ -173,61 +175,66 @@ class CNCli:
         #     1    |     1     |     1     | both? |  arg
 
         # set some defaults
-        p_arg = None
-        arg_exists = False
-        p_def = None
-        def_exists = False
-        paths_load = []
+        # p_arg = None
+        # arg_exists = False
+        # p_def = None
+        # def_exists = False
+        # paths_load = []
 
-        # default return value
-        if dict_def is None:
-            dict_def = {}
+        has_arg = path_arg is not None and path_arg.exists()
+        has_def = path_def is not None and path_def.exists()
 
         # get the flags for the truth table
-        arg_set = path_arg is not None
-        if arg_set:
-            p_arg = Path(path_arg)
-            arg_exists = p_arg.exists()
-        def_set = path_def is not None
-        if def_set:
-            p_def = Path(path_def)
-            def_exists = p_def.exists()
+        # arg_set = path_arg is not None
+        # if arg_set:
+        #     p_arg = Path(path_arg)
+        #     arg_exists = p_arg.exists()
+        # def_set = path_def is not None
+        # if def_set:
+        #     p_def = Path(path_def)
+        #     def_exists = p_def.exists()
 
         # NB: we go from bottom up to avoid having to "not" everything
 
+        comb = []
+        if has_arg:
+            comb.append(path_arg)
+        if has_def:
+            comb.append(path_def)
+
         # there is an arg file
-        if arg_set:
-            # set the path to save
-            self._path_cfg = p_arg
-            # we got an arg
-            if arg_exists:
-                if def_exists:
-                    # load both
-                    paths_load = [p_def, p_arg]  # 1 1 1
-                else:
-                    # just load arg
-                    paths_load = [p_arg]  # 1 1 0
-            else:
-                if def_exists:
-                    # load def only
-                    paths_load = [p_def]  # 1 0 1
-                else:
-                    # load nothing
-                    paths_load = []  # 1 0 0
-        # there is no arg file
-        else:
-            # set the path to save
-            self._path_cfg = p_def
-            if def_exists:
-                # load def only
-                paths_load = [p_def]  # 0 X 1
-            else:
-                # load nothing
-                paths_load = []  # 0 X 0
+        # if arg_set:
+        #     # set the path to save
+        #     self._arg_cfg = p_arg
+        #     # we got an arg
+        #     if arg_exists:
+        #         if def_exists:
+        #             # load both
+        #             paths_load = [p_def, p_arg]  # 1 1 1
+        #         else:
+        #             # just load arg
+        #             paths_load = [p_arg]  # 1 1 0
+        #     else:
+        #         if def_exists:
+        #             # load def only
+        #             paths_load = [p_def]  # 1 0 1
+        #         else:
+        #             # load nothing
+        #             paths_load = []  # 1 0 0
+        # # there is no arg file
+        # else:
+        #     # set the path to save
+        #     self._arg_cfg = p_def
+        #     if def_exists:
+        #         # load def only
+        #         paths_load = [p_def]  # 0 X 1
+        #     else:
+        #         # load nothing
+        #         paths_load = []  # 0 X 0
 
         # load dict from path(s)
         # NB: paths_load is a list, no brackets
-        self._dict_cfg = F.load_dicts(paths_load, dict_def)
+        self._dict_cfg = F.load_dicts(comb, self._dict_cfg)
 
     # --------------------------------------------------------------------------
     # Save config file to one of several sources

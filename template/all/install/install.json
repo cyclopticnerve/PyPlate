@@ -1,7 +1,6 @@
 {
-    "META": {
-        "NAME": "__PP_NAME_BIG__",
-        "VERSION": "__PP_VERSION__"
-    },
-    "CONTENT": {},
+    "NAME": "__PP_NAME_BIG__",
+    "VERSION": "__PP_VERSION__",
+    "INSTALL": {},
+    "UNINSTALL": []
 }

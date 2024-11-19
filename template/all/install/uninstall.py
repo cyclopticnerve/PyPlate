@@ -33,7 +33,7 @@ import sys
 
 DIR_SELF = Path(__file__).parent.resolve()
 DIR_LIB = DIR_SELF / "lib"
-FILE_INSTALL = DIR_SELF / "__PP_INST_FILE__"
+FILE_CFG = DIR_SELF / "__PP_INST_FILE__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -55,11 +55,11 @@ def main():
     """
 
     # create an instance of the class
-    inst = C.CNInstall(FILE_INSTALL)
+    inst = C.CNInstall()
 
     # run the instance
     try:
-        inst.uninstall(debug=True)
+        inst.uninstall(FILE_CFG)
     except C.CNInstallError as e:
         print(e)
 

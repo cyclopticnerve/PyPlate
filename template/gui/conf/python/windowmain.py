@@ -25,6 +25,7 @@ from pathlib import Path
 import sys
 
 # find paths to dev or user
+# FIXME: WTF?
 DIR_PARENT = Path(__file__).parent.resolve()
 if DIR_PARENT.name == "__PP_DEV_SRC__":
     DIR_PRJ = DIR_PARENT.parent

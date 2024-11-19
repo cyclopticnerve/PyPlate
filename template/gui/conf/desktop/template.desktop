@@ -14,7 +14,7 @@ Terminal=false
 Path=__PP_USR_BIN__
 Exec=__PP_NAME_SMALL__
 Name=__PP_NAME_BIG__
-Icon=__PP_SUPPORT__/__PP_IMAGES__/__PP_NAME_BIG__.png
+Icon=__PP_USER_CONF__/__PP_IMAGES__/__PP_NAME_BIG__.png
 X-Desktop-File-Install-Version=0.26
 
 # -)
