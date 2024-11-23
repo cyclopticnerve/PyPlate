@@ -176,10 +176,11 @@ S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
+S_FILE_INST_JSON = "install.json"
 S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-# S_FILE_INSTALL_CFG = f"{S_DIR_INSTALL}/install.json"
+S_FILE_INSTALL_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_JSON}"
 S_FILE_INSTALL = f"{S_DIR_INSTALL}/install.py"
 S_FILE_UNINSTALL = f"{S_DIR_INSTALL}/uninstall.py"
 S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
@@ -562,6 +563,8 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # install stuff
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
+    "__PP_INST_ASSETS__": S_DIR_ASSETS,
+    "__PP_INST_CONF_FILE__": S_FILE_INST_JSON,
     "__PP_INST_FILE__": S_FILE_INSTALL,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
@@ -632,7 +635,7 @@ D_PUB_META = {
     "__PP_GUI_CATS__": [],
 }
 
-# dict of file to put in dist folder (defaults, written by pymaker, edited by
+# dict of files to put in dist folder (defaults, written by pymaker, edited by
 # hand, read by pybaker)
 # NB: key is src, rel to prj dir
 # NB: val is dst, rel to dist dir
@@ -645,7 +648,7 @@ D_PUB_DIST = {
     S_FILE_README: S_DIR_ASSETS,
     S_FILE_INSTALL: "",
     S_FILE_UNINSTALL: S_DIR_ASSETS,
-    # S_FILE_INSTALL_CFG: S_DIR_ASSETS,
+    S_FILE_INSTALL_CFG: S_DIR_ASSETS,
 }
 
 # the lists of dirs/files we don't mess with while running pymaker

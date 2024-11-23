@@ -32,8 +32,8 @@ import sys
 # add custom import paths
 
 DIR_SELF = Path(__file__).parent.resolve()
+FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__/__PP_NAME_SMALL__/__PP_INST_CONF_FILE__"
 DIR_LIB = DIR_SELF / "lib"
-FILE_CFG = DIR_SELF / "__PP_INST_FILE__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -59,7 +59,7 @@ def main():
 
     # run the instance
     try:
-        inst.uninstall(FILE_CFG)
+        inst.uninstall(FILE_CFG_OLD)
     except C.CNInstallError as e:
         print(e)
 

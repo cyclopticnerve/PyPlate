@@ -14,12 +14,6 @@ should have their executable bits set and also have a shebang, so they can be
 run directly by the run_scripts method.
 """
 
-# FIXME: version check - if already installed:
-# if inst version older, continue
-# if inst version newer - ask overwrite
-#       if yes - continue
-#       if no - print "aborted", exit
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -27,6 +21,7 @@ run directly by the run_scripts method.
 # global imports
 import json
 from pathlib import Path
+import re
 import shutil
 import sys
 
@@ -93,6 +88,11 @@ S_MSG_PY_END = "Python requirements done"
 # NB: format param is req name
 S_MSG_REQ_RUN = "  Installing {}... "
 
+# strings for version compare
+# NB: format param is prog name
+S_MSG_VER_SAME = "The current version of {} is already installed"
+S_MSG_VER_ABORT = "Installation aborted"
+
 # errors
 # NB: format param is cfg file path
 S_ERR_NOT_FOUND = "File {} not found"
@@ -104,6 +104,7 @@ S_ERR_RUN_SCRIPT = (
     "set and has a shebang"
 )
 S_ERR_REQ = "Could not install {}"
+S_ERR_VERSION = "One or both version numbers are invalid"
 
 # cmds
 S_CMD_SUDO = "sudo echo -n"
@@ -112,6 +113,18 @@ S_CMD_SYS_REQ = "sudo apt-get install {} -qq > /dev/null"
 # NB: format param is req name
 S_CMD_PY_REQ = "python -m pip install -q {} > /dev/null"
 
+# question to ask when installing older version
+S_ASK_OVER = (
+    "A newer version of this program is currently installed. Do you want to "
+    "overwrite? [y/N] "
+)
+S_ASK_CONFIRM = "y"
+
+# regex to compare version numbers
+R_VERSION = r"(\d).(\d).(\d)(.*)"
+R_VERSION_GROUP_MAJ = 1
+R_VERSION_GROUP_MIN = 2
+R_VERSION_GROUP_REV = 3
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -139,21 +152,35 @@ class CNInstallError(Exception):
     # --------------------------------------------------------------------------
     # Initialize the class
     # --------------------------------------------------------------------------
-    def __init__(self, exception, repr_str):
+    def __init__(self, message):
         """
         Initialize the class
 
         Arguments:
-            exception: The original exception
-            repr_str: A custom string to print for clarity.
+            message: A custom string to print for clarity.
 
         Creates a new instance of the object and initializes its properties.
         """
 
-        # set properties
-        self.exception = exception
-        self.__repr__ = repr_str
+        # call super constructor
+        super().__init__(message)
 
+        # set properties
+        self.message = message
+
+    # --------------------------------------------------------------------------
+    # Provide a human-readable error message when the object is printed
+    # --------------------------------------------------------------------------
+    def __str__(self):
+        """
+        Provide a human-readable error message when the object is printed
+
+        This method provides a string representation of the error object when
+        it is passed to the print() function.
+        """
+
+        # return the message string passed to the constructor
+        return self.message
 
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
@@ -183,116 +210,99 @@ class CNInstall:
 
         # set properties
         self._installing = True
-        self._debug = False
         self._path_assets = None
         self._dict_meta = {}
         self._dict_func = {}
+        self._debug = False
 
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Install using file path
+    # Install the program
     # --------------------------------------------------------------------------
-    def install_file(self, path_assets, path_conf, debug=False):
+    def install(
+            self, path_assets, path_conf_new, path_conf_old=None, debug=False
+        ):
         """
-        Install using file path
+        Install the program
 
         Arguments:
             path_assets: Path to the assets folder where all of the program
-            files are put in dist
-            path_conf: Path to the file that contains the install dict info
+            files are put in dist. This is the base source path to use when
+            copying files to the user's computer
+            path_conf_new: Path to the file that contains the current install
+            dict info
+            path_conf_old: Path to the currently installed program's install
+            dict info, or None if not installed (default: None)
             debug: If True, do not copy files, ony print the action (default:
             False)
 
-        Runs the installer using a file.
+        Runs the install operation.
         """
 
         # set properties
         self._installing = True
-        self._debug = debug
         self._path_assets = path_assets
+        self._debug = debug
 
-        # get dicts from file
-        dict_conf = self._get_dict_from_file(path_conf)
-        self._dict_meta = dict_conf[S_KEY_META]
-        self._dict_func = dict_conf[S_KEY_INSTALL]
+        # get dicts from files
+        dict_conf_new = self._get_dict_from_file(path_conf_new)
+        self._dict_meta = dict_conf_new[S_KEY_META]
+        self._dict_func = dict_conf_new[S_KEY_INSTALL]
+
+        # if we did pass an old conf, it must exist (if it doesn't, this could
+        # be the first install but we will want to check on later updates)
+        if path_conf_old and Path(path_conf_old).exists():
+            dict_conf_old = self._get_dict_from_file(path_conf_old)
+
+            # check versions
+            ver_old = dict_conf_old[S_KEY_META][S_KEY_VERSION]
+            ver_new = self._dict_meta[S_KEY_VERSION]
+            res = self._do_compare_versions(ver_old, ver_new)
+
+            # same version is installed
+            if res == 0:
+                prog_name = self._dict_meta[S_KEY_NAME]
+                print(S_MSG_VER_SAME.format(prog_name))
+                sys.exit(0)
+
+            # newer version is installed
+            elif res == -1:
+
+                # ask to install old version over newer
+                str_ask = input(S_ASK_OVER)
+
+                # user hit enter or typed anything else except "y"
+                if len(str_ask) == 0 or str_ask.lower()[0] != S_ASK_CONFIRM:
+                    print(S_MSG_VER_ABORT)
+                    sys.exit(0)
 
         # run dict
         self._run_dict()
 
     # --------------------------------------------------------------------------
-    # Install using dict
+    # Uninstall the program
     # --------------------------------------------------------------------------
-    def install_dict(self, path_assets, dict_conf, debug=False):
+    def uninstall(self, path_conf, debug=False):
         """
-        Install using dict
-
-        Arguments:
-            path_assets: Path to the assets folder where all of the program
-            files are put in dist
-            dict_conf: The install dict info
-            debug: If True, do not copy files, ony print the action (default:
-            False)
-
-        Runs the installer using a dict.
-        """
-
-        # set properties
-        self._installing = True
-        self._debug = debug
-        self._path_assets = path_assets
-        self._dict_meta = dict_conf[S_KEY_META]
-        self._dict_func = dict_conf[S_KEY_INSTALL]
-
-        # run dict
-        self._run_dict()
-
-    # --------------------------------------------------------------------------
-    # Uninstall using file path
-    # --------------------------------------------------------------------------
-    def uninstall_file(self, path_conf, debug=False):
-        """
-        Uninstall using file path
+        Uninstall the program
 
         Arguments:
             path_conf: Path to the file that contains the uninstall dict info
             debug: If True, do not remove files, ony print the action (default:
             False)
 
-        Runs the uninstaller using a file.
+        Runs the uninstall operation.
         """
 
         # set properties
         self._installing = False
         self._debug = debug
 
-        # set dicts from file
+        # get dict from file
         dict_conf = self._get_dict_from_file(path_conf)
-        self._dict_meta = dict_conf[S_KEY_META]
-        self._dict_func = dict_conf[S_KEY_UNINSTALL]
-
-        # run dict
-        self._run_dict()
-
-    # --------------------------------------------------------------------------
-    # Uninstall using dict
-    # --------------------------------------------------------------------------
-    def uninstall_dict(self, dict_conf, debug=False):
-        """
-        Uninstall using dict
-
-        Arguments:
-            dict_conf: The install dict info
-            debug: If True, do not remove files, ony print the action (default:
-            False)
-        Runs the uninstaller using a dict.
-        """
-
-        # set properties
-        self._installing = False
-        self._debug = debug
         self._dict_meta = dict_conf[S_KEY_META]
         self._dict_func = dict_conf[S_KEY_UNINSTALL]
 
@@ -304,37 +314,7 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Run the install process using a file path
-    # --------------------------------------------------------------------------
-    def _get_dict_from_file(self, path_conf):
-        """
-        Get the config dict using a file path
-
-        Arguments:
-            path_conf: Path to the file containing the install dict
-
-        Returns:
-            The dict contained in the file
-
-        Raises:
-            CNInstallError if something goes wrong
-
-        Opens the specified file and returns the config dict found in it.
-        """
-
-        # set conf dict
-        try:
-            with open(path_conf, "r", encoding="UTF-8") as a_file:
-                return json.load(a_file)
-        except FileNotFoundError as e:
-            error = CNInstallError(e, S_ERR_NOT_FOUND.format(path_conf))
-            raise error from e
-        except json.JSONDecodeError as e:
-            error = CNInstallError(e, S_ERR_NOT_JSON.format(path_conf))
-            raise error from e
-
-    # --------------------------------------------------------------------------
-    # Run the (un)install process using a dict
+    # Run the (un)install process using dicts
     # --------------------------------------------------------------------------
     def _run_dict(self):
         """
@@ -344,7 +324,9 @@ class CNInstall:
             CNInstallError if something went wrong
 
         Runs the (un)install process using a dict. The dict specification is in
-        the template file "template/all/install/install.json".
+        the template file "template/all/install/install.json". This is the meat
+        of the program, doing most of the work and/or delegating to sub
+        functions. 
         """
 
         # get prog name
@@ -354,6 +336,8 @@ class CNInstall:
         if self._installing:
             prog_version = self._dict_meta[S_KEY_VERSION]
             print(S_MSG_INST_START.format(prog_name, prog_version))
+
+        # we are uninstalling, just go for it
         else:
             print(S_MSG_UNINST_START.format(prog_name))
 
@@ -374,7 +358,7 @@ class CNInstall:
                     cmd = S_CMD_SUDO
                     F.sh(cmd)
                 except F.CNShellError as e:
-                    error = CNInstallError(e, S_ERR_NO_SUDO)
+                    error = CNInstallError(S_ERR_NO_SUDO)
                     raise error from e
 
         # do each part of conf dict
@@ -392,6 +376,40 @@ class CNInstall:
             print(S_MSG_INST_END.format(prog_name))
         else:
             print(S_MSG_UNINST_END.format(prog_name))
+
+    # --------------------------------------------------------------------------
+    # Open a json file and return the dict inside
+    # --------------------------------------------------------------------------
+    def _get_dict_from_file(self, path_conf):
+        """
+        Open a json file and return the dict inside
+
+        Arguments:
+            path_conf: Path to the file containing the dict
+
+        Returns:
+            The dict contained in the file
+
+        Raises:
+            CNInstallError if something goes wrong
+
+        Opens the specified file and returns the config dict found in it.
+        """
+
+        # set conf dict
+        try:
+            with open(path_conf, "r", encoding="UTF-8") as a_file:
+                return json.load(a_file)
+
+        # file not found
+        except FileNotFoundError as e:
+            error = CNInstallError(S_ERR_NOT_FOUND.format(path_conf))
+            raise error from e
+
+        # not valid json in file
+        except json.JSONDecodeError as e:
+            error = CNInstallError(S_ERR_NOT_JSON.format(path_conf))
+            raise error from e
 
     # --------------------------------------------------------------------------
     # Run the scripts from preflight or postflight
@@ -429,7 +447,7 @@ class CNInstall:
                     F.sh(item)
                     print(S_MSG_DONE, flush=True)
                 except F.CNShellError as e:
-                    error = CNInstallError(e, S_ERR_RUN_SCRIPT.format(item))
+                    error = CNInstallError(S_ERR_RUN_SCRIPT.format(item))
                     raise error from e
             else:
                 # print output for each script
@@ -470,7 +488,7 @@ class CNInstall:
                     F.sh(cmd)
                     print(S_MSG_DONE, flush=True)
                 except F.CNShellError as e:
-                    error = CNInstallError(e, S_ERR_REQ.format(item))
+                    error = CNInstallError(S_ERR_REQ.format(item))
                     raise error from e
             else:
                 # print output for each script
@@ -512,7 +530,7 @@ class CNInstall:
                     F.sh(cmd)
                     print(S_MSG_DONE, flush=True)
                 except F.CNShellError as e:
-                    error = CNInstallError(e, S_ERR_REQ.format(item))
+                    error = CNInstallError(S_ERR_REQ.format(item))
                     raise error from e
             else:
                 # print output for each script
@@ -604,20 +622,90 @@ class CNInstall:
                 else:
                     print(f"unlink {dst}")
 
+    # --------------------------------------------------------------------------
+    # Compare two version strings for relativity
+    # --------------------------------------------------------------------------
+    def _do_compare_versions(self, ver_old, ver_new):
+        """
+        Compare two version strings for relativity
 
-# ------------------------------------------------------------------------------
+        Arguments:
+            ver_old: Old version string
+            ver_new: New version string
+
+        Returns:
+            An integer representing the relativity of the two version strings.
+            0 means the two versions are equal,
+            1 means new_ver is newer than old_ver (or there is no old_ver), and
+            -1 means new_ver is newer than old_ver.
+
+        This method compares two version strings and determines which is older,
+        which is newer, or if they are equal. Note that this method converts
+        only the first three parts of a semantic version string
+        (https://semver.org/). It also converts the string parts to integers,
+        so the versions "0.0.1" and "0.0.01" are considered equal.
+        """
+
+        # test for new install (don't try to regex)
+        if ver_old == "":
+            return 1
+
+        # test for equal (just save some cpu cycles)
+        if ver_old == ver_new:
+            return 0
+
+        # compare version string parts (only x.x.x)
+        res_old = re.search(R_VERSION, ver_old)
+        res_new = re.search(R_VERSION, ver_new)
+
+        # if both version strings are valid
+        if res_old and res_new:
+
+            # make a list of groups to check
+            lst_groups = [
+                R_VERSION_GROUP_MAJ,
+                R_VERSION_GROUP_MIN,
+                R_VERSION_GROUP_REV,
+            ]
+
+            # for each part as int
+            for group in lst_groups:
+                old_val = int(res_old.group(group))
+                new_val = int(res_new.group(group))
+
+                # slide out at the first difference
+                if old_val < new_val:
+                    return 1
+                elif old_val > new_val:
+                    return -1
+        else:
+            raise CNInstallError(S_ERR_VERSION)
+
+        # return 0 if equal
+        return 0
+
 # ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
+
     # testing
-    test_self = Path(__file__).parent.resolve()
 
-    test_assets = test_self / "test/assets"
-    test_conf = test_assets / "test.json"
+    # get parent
+    test_parent = Path(__file__).parent.resolve()
 
+    # get paths to assets and conf for install
+    inst_assets = test_parent / "test/assets"
+    inst_conf = inst_assets / "test.json"
+
+    # get path to conf for uninstall
+    uninst_conf = test_parent / "test/.config/test/test.json"
+
+    # create object
     i = CNInstall()
-    # i.install_file(test_assets, test_conf, debug=True)
-    i.uninstall_file(test_conf, debug=True)
+
+    # call method
+    i.install(inst_assets, inst_conf, uninst_conf, debug=True)
+    # i.uninstall(inst_conf, debug=True)
 
 
 # -)

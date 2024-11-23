@@ -32,15 +32,16 @@ import sys
 # add custom import paths
 
 DIR_SELF = Path(__file__).parent.resolve()
-DIR_SRC = DIR_SELF / "__PP_INST_ASSETS__"
-FILE_CFG = DIR_SRC / "__PP_INST_FILE__"
-DIR_LIB = DIR_SRC / "lib"
+DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
+FILE_CFG_NEW = DIR_ASSETS / "__PP_INST_CONF_FILE__"
+FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__/__PP_NAME_SMALL__/__PP_INST_CONF_FILE__"
+DIR_LIB = DIR_ASSETS / "lib"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
 
 # import my stuff
-import cninstalllib.cninstall as C # type: ignore
+import cninstall as C # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -60,7 +61,7 @@ def main():
 
     # run the instance
     try:
-        inst.install(DIR_SRC, FILE_CFG)
+        inst.install(DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD)
     except C.CNInstallError as e:
         print(e)
 
