@@ -90,6 +90,7 @@ S_ACTION_I18N = "Do i18n... "
 S_ACTION_DOCS = "Do docs... "
 S_ACTION_TREE = "Do tree... "
 S_ACTION_COPY = "Do copy files... "
+S_ACTION_INST = "Make install file... "
 
 S_ACTION_DONE = "Done"
 S_ACTION_FAIL = "Failed"
@@ -321,6 +322,12 @@ S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=\s*)(.*)"
 S_META_SD_REPL = r'\g<1>"{}"'
 
+# debug option strings
+S_DBG_OPTION = "-d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
+
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
@@ -505,6 +512,10 @@ L_CATS = [
     "Shell",
 ]
 
+# dict to remove when uninstalling
+L_UNINSTALL = [
+    "__PP_USR_CONF__",
+]
 # ------------------------------------------------------------------------------
 # Dictionaries
 # ------------------------------------------------------------------------------
@@ -740,16 +751,6 @@ D_PUB_I18N = {
     S_KEY_WLANGS: ["en"],
 }
 
-# dict for install script
-D_PUB_INST = {
-    "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
-    "preflight": [],
-    "sys_reqs": [],
-    "py_reqs": [],
-    "content": {},
-    "postflight": [],
-}
-
 # ------------------------------------------------------------------------------
 # Other dictionaries
 # ------------------------------------------------------------------------------
@@ -767,6 +768,29 @@ D_COPY = {
     f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
     f"{S_DIR_MISC}/snippets.txt": f"{S_DIR_MISC}/snippets.txt",
     f"{S_DIR_MISC}/style.txt": f"{S_DIR_MISC}/style.txt",
+}
+
+# dict for install script
+# D_PUB_INST = {
+#     "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
+#     "preflight": [],
+#     "sys_reqs": [],
+#     "py_reqs": [],
+#     "content": {},
+#     "postflight": [],
+# }
+
+# dictionary of default stuff to put in install.json
+D_INSTALL = {
+    "__PP_NAME_VENV__": "__PP_USR_CONF__",
+    S_DIR_CONF: "__PP_USR_CONF__",
+    "lib": "__PP_USR_CONF__",
+    S_DIR_README: "__PP_USR_CONF__",
+    S_DIR_SRC: "__PP_USR_CONF__",
+    S_FILE_INST_JSON: "__PP_USR_CONF__",
+    S_FILE_LICENSE: "__PP_USR_CONF__",
+    S_FILE_README: "__PP_USR_CONF__",
+    S_FILE_UNINSTALL: "__PP_USR_CONF__",
 }
 
 # the info for matching/fixing lines in markup files

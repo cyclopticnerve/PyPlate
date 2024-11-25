@@ -19,10 +19,10 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: if used as class, sep invoke or pymaker -b, or task to run directly,
-# or from private dir?
-# 1. run from terminal - pp(ok) and prj(ok)
-# 2. run from debugger - pp(ok) and prj(ok)
+# FIXME:
+# 1. run from terminal - path to pb (-d) path
+# 2. run from debugger - path to pb (-d) path
+
 # 3. run task - prj (prints activate cmd)
 
 # ------------------------------------------------------------------------------
@@ -98,11 +98,6 @@ S_PP_ABOUT = (
 S_PRJ_OPTION = "<DIR>"  # key in dict_args
 S_PRJ_HELP = "the project directory to bake"  # display in help
 
-# debug option strings
-S_DBG_OPTION = "-d"  # display in help
-S_DBG_HELP = "enable debugging option"  # display in help
-S_DBG_ACTION = "store_true"
-
 # ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
@@ -139,8 +134,10 @@ class PyBaker:
         """
 
         # set the initial values of properties
-        self._dir_prj = Path()
+        self._dict_args = {}
         self._debug = False
+        self._dir_prj = Path()
+
         self._dict_rep = {}
         self._is_html = False
         self._dict_sw_block = {}
@@ -167,7 +164,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, dir_prj, debug=False):
+    def main(self):
         """
         The main method of the program
 
@@ -178,10 +175,6 @@ class PyBaker:
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
-
-        # store args
-        self._dir_prj = Path(dir_prj).resolve()
-        self._debug = debug
 
         # ----------------------------------------------------------------------
         #  do the work
@@ -224,6 +217,17 @@ class PyBaker:
         Perform some mundane stuff like checking the arg parser and setting
         properties.
         """
+
+        # ----------------------------------------------------------------------
+        # set pp cmd line stuff
+
+        # get cmd line args
+        self._run_parser()
+
+        # store args
+        self._debug = self._dict_args.get(M.S_DBG_DEST, False)
+        dir_prj = self._dict_args.get(S_PRJ_OPTION, None)
+        self._dir_prj = Path(dir_prj).resolve()
 
         # debug turns off some _do_after_fix features
         if self._debug:
@@ -448,18 +452,25 @@ class PyBaker:
         dict_pub = {
             M.S_KEY_PUB_BL: self._dict_pub_bl,
             M.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            # M.S_KEY_PUB_INSTALL: self._dict_pub_install,
             M.S_KEY_PUB_DIST: self._dict_pub_dist,
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # fix dunders in bl/i18n/install
+        # fix dunders in bl/i18n
         self._fix_content(path_pub, False, False)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
+
+        # ----------------------------------------------------------------------
+        # fix dunders in install
+        path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+        self._fix_content(path_inst, False, False)
+
+        # reload dict from fixed file
+        # dict_pub = F.load_dicts([path_pub])
 
         # ----------------------------------------------------------------------
         # save meta
@@ -624,6 +635,62 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Set up and run the command line parser
+    # --------------------------------------------------------------------------
+    def _run_parser(self):
+        """
+        Set up and run the command line parser
+
+        Returns:
+            [dict]: The dict of command line options
+
+        This method sets up and runs the command line parser to minimize code
+        in the main method.
+        """
+
+        # create the command line parser
+        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+
+        # add args
+        self._add_args(parser)
+
+        # get namespace object
+        args = parser.parse_args()
+
+        # convert namespace to dict
+        self._dict_args = vars(args)
+
+    # ------------------------------------------------------------------------------
+    # Add arguments to argparse parser
+    # ------------------------------------------------------------------------------
+    def _add_args(self, parser):
+        """
+        Add arguments to argparse parser
+
+        Arguments:
+            parser: The parser for which to add arguments
+
+        This method is teased out for better code maintenance.
+        """
+
+        # set help string
+        parser.description = S_PP_ABOUT
+
+        # add debug option
+        parser.add_argument(
+            M.S_DBG_OPTION,
+            action=M.S_DBG_ACTION,
+            dest=M.S_DBG_DEST,
+            help=M.S_DBG_HELP,
+        )
+
+        # add project dir
+        parser.add_argument(
+            S_PRJ_OPTION,  # args key
+            help=S_PRJ_HELP,
+        )
 
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
@@ -980,72 +1047,6 @@ class PyBaker:
         # no valid switch found
         return False
 
-
-# ------------------------------------------------------------------------------
-# Private functions
-# ------------------------------------------------------------------------------
-
-
-# ------------------------------------------------------------------------------
-# Add arguments to argparse parser
-# ------------------------------------------------------------------------------
-def _add_args(parser):
-    """
-    Add arguments to argparse parser
-
-    Arguments:
-        parser: The parser for which to add arguments
-
-    This method is teased out for better code maintenance.
-    """
-
-    # set help string
-    parser.description = S_PP_ABOUT
-
-    # add project dir
-    parser.add_argument(
-        S_PRJ_OPTION,  # args key
-        help=S_PRJ_HELP,
-    )
-
-    # add debug option
-    parser.add_argument(
-        S_DBG_OPTION,  # args key
-        help=S_DBG_HELP,
-        action=S_DBG_ACTION,
-    )
-
-
-# --------------------------------------------------------------------------
-# Set up and run the command line parser
-# --------------------------------------------------------------------------
-def _run_parser():
-    """
-    Set up and run the command line parser
-
-    Returns:
-        [dict]: The dict of command line options
-
-    This method sets up and runs the command line parser to minimize code
-    in the main method.
-    """
-
-    # create the command line parser
-    parser = argparse.ArgumentParser(formatter_class=CNFormatter)
-
-    # add args
-    _add_args(parser)
-
-    # get namespace object
-    args = parser.parse_args()
-
-    # convert namespace to dict
-    dict_args = vars(args)
-
-    # return the cmd line dict
-    return dict_args
-
-
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
@@ -1055,15 +1056,10 @@ if __name__ == "__main__":
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # get cmd line args
-    a_dict_args = _run_parser()
-    a_dir_prj = a_dict_args.get(S_PRJ_OPTION, "")
-    a_debug = a_dict_args.get(S_DBG_OPTION, False)
-
     # create object
     pb = PyBaker()
 
-    # call main
-    pb.main(a_dir_prj, a_debug)
+    # run main method
+    pb.main()
 
 # -)

@@ -32,14 +32,14 @@ import sys
 # add custom import paths
 
 DIR_SELF = Path(__file__).parent.resolve()
-FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__/__PP_NAME_SMALL__/__PP_INST_CONF_FILE__"
+FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__/__PP_INST_CONF_FILE__"
 DIR_LIB = DIR_SELF / "lib"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
 
 # import my stuff
-import cninstalllib.cninstall as C # type: ignore
+import cnlib.cninstall as C # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order

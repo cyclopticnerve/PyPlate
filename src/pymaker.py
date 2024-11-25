@@ -59,6 +59,7 @@ from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib.cnsphinx import CNSphinx  # type: ignore
+from cnlib import cninstall as I  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -91,12 +92,6 @@ S_PP_ABOUT = (
     f"{S_PP_VER_FMT}\n"
     f"https://www.github.com/cyclopticnerve/PyPlate"
 )
-
-# debug option strings
-S_DBG_OPTION = "-d"
-S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -137,6 +132,7 @@ class PyMaker:
         self._dict_args = {}
         self._debug = False
         self._dir_prj = Path()
+
         self._dict_rep = {}
         self._is_html = False
         self._dict_sw_block = {}
@@ -207,7 +203,7 @@ class PyMaker:
         self._run_parser()
 
         # check for flags
-        self._debug = self._dict_args.get(S_DBG_DEST, False)
+        self._debug = self._dict_args.get(M.S_DBG_DEST, False)
 
         # debug turns off some features to speed up project creation
         if self._debug:
@@ -658,7 +654,7 @@ class PyMaker:
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # fix dunders in bl/i18n/install
+        # fix dunders in bl/i18n/dist
         self._fix_content(path_pub, False, False)
 
         # reload dict from fixed file
@@ -813,6 +809,27 @@ class PyMaker:
 
             print(M.S_ACTION_DONE)
 
+        # ----------------------------------------------------------------------
+        # make install file
+
+        print(M.S_ACTION_INST, end="", flush=True)
+
+        name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
+        version = M.D_PUB_META["__PP_VERSION__"]
+        content_inst = M.D_INSTALL
+        content_uninst = M.L_UNINSTALL
+
+        inst = I.CNInstall()
+        dict_inst = inst.make_install_cfg(
+            name, version, content_inst, content_uninst
+        )
+
+        file_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+        F.save_dict(dict_inst, [file_inst])
+        self._fix_content(file_inst, False, False)
+
+        print(M.S_ACTION_DONE)
+
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
@@ -861,10 +878,10 @@ class PyMaker:
 
         # add debug option
         parser.add_argument(
-            S_DBG_OPTION,
-            action=S_DBG_ACTION,
-            dest=S_DBG_DEST,
-            help=S_DBG_HELP,
+            M.S_DBG_OPTION,
+            action=M.S_DBG_ACTION,
+            dest=M.S_DBG_DEST,
+            help=M.S_DBG_HELP,
         )
 
     # --------------------------------------------------------------------------
@@ -1366,8 +1383,10 @@ if __name__ == "__main__":
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # run main method
+    # create object
     pm = PyMaker()
+
+    # run main method
     pm.main()
 
 # -)

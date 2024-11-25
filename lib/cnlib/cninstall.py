@@ -87,6 +87,8 @@ S_MSG_PY_START = "Installing python requirements:"
 S_MSG_PY_END = "Python requirements done"
 # NB: format param is req name
 S_MSG_REQ_RUN = "  Installing {}... "
+S_MSG_COPY_START = "Copying files... "
+S_MSG_DELETE_START = "Deleting files... "
 
 # strings for version compare
 # NB: format param is prog name
@@ -218,6 +220,35 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
+
+    def make_install_cfg(self, name, version, content_inst=None, content_uninst=None):
+        """
+        foo
+        """
+        if content_inst is None:
+            content_inst = {}
+        if content_uninst is None:
+            content_uninst = []
+
+        dict_use = {
+            S_KEY_META: {
+                S_KEY_NAME: name,
+                S_KEY_VERSION: version,
+            },
+            S_KEY_INSTALL: {
+                S_KEY_PREFLIGHT: [],
+                S_KEY_POSTFLIGHT: [],
+                S_KEY_CONTENT: content_inst,
+                S_KEY_SYS_REQS: [],
+                S_KEY_PY_REQS: [],
+            },
+            S_KEY_UNINSTALL: {
+                S_KEY_PREFLIGHT: [],
+                S_KEY_POSTFLIGHT: [],
+                S_KEY_CONTENT: content_uninst,
+            }
+        }
+        return dict_use
 
     # --------------------------------------------------------------------------
     # Install the program
@@ -369,6 +400,7 @@ class CNInstall:
             self._do_install_content()
         else:
             self._do_uninstall_content()
+        print(S_MSG_DONE, flush=True)
         self._run_scripts(S_KEY_POSTFLIGHT)
 
         # done installing
@@ -547,6 +579,8 @@ class CNInstall:
         source to their final locations in the user's folder structure.
         """
 
+        print(S_MSG_COPY_START, end="", flush=True)
+
         # get source dir and user home
         inst_src = self._path_assets
         inst_home = Path.home()
@@ -559,7 +593,7 @@ class CNInstall:
 
             # get full paths of source / destination
             src = inst_src / k
-            dst = inst_home / v
+            dst = inst_home / v / src.name
 
             # if the source is a dir
             if src.is_dir():
@@ -587,6 +621,8 @@ class CNInstall:
         This method removes files and folders from various locations in the
         user's computer.
         """
+
+        print(S_MSG_DELETE_START, end="", flush=True)
 
         # get source dir and user home
         inst_home = Path.home()
