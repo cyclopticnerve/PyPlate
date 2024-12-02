@@ -146,13 +146,16 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self):
+    def main(self, debug=False):
         """
         The main method of the program
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
+
+        # set properties
+        self._debug = debug
 
         # ----------------------------------------------------------------------
         #  do the work
@@ -200,10 +203,10 @@ class PyMaker:
         # set pp cmd line stuff
 
         # get cmd line args
-        self._run_parser()
+        # self._run_parser()
 
         # check for flags
-        self._debug = self._dict_args.get(M.S_DBG_DEST, False)
+        # self._debug = self._dict_args.get(M.S_DBG_DEST, False)
 
         # debug turns off some features to speed up project creation
         if self._debug:
@@ -835,56 +838,6 @@ class PyMaker:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Set up and run the command line parser
-    # --------------------------------------------------------------------------
-    def _run_parser(self):
-        """
-        Set up and run the command line parser
-
-        Returns:
-            A dictionary of command line arguments
-
-        This method sets up and runs the command line parser to minimize code
-        in the main method.
-        """
-
-        # create the command line parser
-        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
-
-        # add args
-        self._add_args(parser)
-
-        # get namespace object
-        args = parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(args)
-
-    # --------------------------------------------------------------------------
-    # Add arguments to argparse parser
-    # --------------------------------------------------------------------------
-    def _add_args(self, parser):
-        """
-        Add arguments to argparse parser
-
-        Arguments:
-            parser: The parser for which to add arguments
-
-        This method is teased out for better code maintenance.
-        """
-
-        # set help string
-        parser.description = S_PP_ABOUT
-
-        # add debug option
-        parser.add_argument(
-            M.S_DBG_OPTION,
-            action=M.S_DBG_ACTION,
-            dest=M.S_DBG_DEST,
-            help=M.S_DBG_HELP,
-        )
-
-    # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
     # --------------------------------------------------------------------------
     def _fix_blacklist_paths(self):
@@ -1383,10 +1336,36 @@ if __name__ == "__main__":
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
+    # NB: argparse code placed here so we can run the script from the command
+    # line or use it as an object
+
+    # create the command line parser
+    parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+
+    # set help string
+    parser.description = S_PP_ABOUT
+
+    # add debug option
+    parser.add_argument(
+        M.S_DBG_OPTION,
+        action=M.S_DBG_ACTION,
+        dest=M.S_DBG_DEST,
+        help=M.S_DBG_HELP,
+    )
+
+    # get namespace object
+    args = parser.parse_args()
+
+    # convert namespace to dict
+    dict_args = vars(args)
+
+    # get the args
+    a_debug = dict_args.get(M.S_DBG_DEST, False)
+
     # create object
     pm = PyMaker()
 
-    # run main method
-    pm.main()
+    # run main method with args
+    pm.main(a_debug)
 
 # -)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: pybaker.py                                            |     ()     |
+# Filename: pybaker_task.py                                       |     ()     |
 # Date    : 09/29/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -9,6 +9,8 @@
 
 """
 A script to run the real pybaker.py in PyPlate src directory
+
+This file is used to implement the build task in VSCode.
 """
 
 # ------------------------------------------------------------------------------

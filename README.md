@@ -8,7 +8,7 @@
 
 # PyPlate
 
-## "It mostly works™"
+## "It mostly works ™©®"
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
 
@@ -18,13 +18,15 @@ A program for creating CLI/Package/GUI projects in Python from a template
 [Python 3.10+](https://www.python.org/)
 
 ## Installing
-1. Download the (hopefully stable) [latest
-release](https://github.com/cyclopticnerve/PyPlate/releases/latest) from the
-main branch. Select  either the 'tar.gz' or 'zip' file
-2. Extract/unzip the file.
-3. Go into the extracted folder and run the installer:
+You can download the (hopefully stable)
+[latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest)
+from the main branch.<br>
+Download either the 'tar.gz' or '.zip' file and extract it.
+
+Then install it:
 ```bash
-foo@bar:~/Documents/Downloads/PyPlate-<version>$ ./install.sh
+foo@bar:~$ cd ~/Downloads/PyPlate-<version>/dist
+foo@bar:~/Downloads/PyPlate-<version>/dist$ ./install.py
 ```
 
 Or you can clone the git repo to get the latest (and often broken) code from
@@ -32,15 +34,15 @@ the dev branch:
 ```bash
 foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
-foo@bar:~/Downloads$ cd ~/Documents/Downloads/PyPlate-<version>
+foo@bar:~/Downloads$ cd PyPlate-<version>/dist
 foo@bar:~/Documents/Downloads/PyPlate-<version>$ ./install.sh
 ```
 
 ## Uninstalling
 Go to the config folder for PyPlate and run the uninstaller:
 ```bash
-foo@bar:~$ cd ~/.config/pyplate/conf
-foo@bar:~/.config/pyplate/conf$ ./uninstall.sh
+foo@bar:~$ cd ~/.config/pyplate
+foo@bar:~/.config/pyplate$ ./uninstall.sh
 ```
 
 ## Usage
@@ -112,13 +114,13 @@ are placed here.
 The values in the ''pyplate/project.json' file can be edited at any time,
 followed by re-running 'pybaker.py'.
 
-Note that pybaer.py has one required parameter: the directory of the project
+Note that pybaker.py has one required parameter: the directory of the project
 you wish to bake:
 ```bash
 foo@bar:~$ pybaker.py ~/Documents/Projects/Python/MyApp
 ```
 but this should be easy to do with any tool you use.  
-When using VSCode, this is done for you.,
+When using VSCode, this is done for you.
 
 ## Notes
 If you make any changes to this template to better suit your own style/setup,

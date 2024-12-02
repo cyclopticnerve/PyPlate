@@ -39,14 +39,14 @@ import sys
 # add custom import paths
 
 # find paths to dev or user
-DIR_PRJ = Path(__file__).parents[1].resolve()
-DIR_LIB = DIR_PRJ / "lib"
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_LIB = P_DIR_PRJ / "lib"
 
 # add paths to import search
-sys.path.append(str(DIR_LIB))
+sys.path.append(str(P_DIR_LIB))
 
 # import my stuff
-from cnlib import cnfunctions as F  # type: ignore
+from cnlib import cncli  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -62,6 +62,26 @@ from cnlib.cncli import CNCli  # type: ignore
 # NB: you may edit these by hand, but they will be overwritten by PyBaker
 S_PP_VERSION = "__PP_VERSION__"
 S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
+
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# version string
+# NB: done in two steps to avoid linter errors
+S_VER_CFG = "__PP_VER_FMT__"
+S_VER_FMT = S_VER_CFG.format(S_PP_VERSION)
+
+# about string
+S_ABOUT = (
+    "__PP_NAME_BIG__\n"
+    f"{S_PP_SHORT_DESC}\n"
+    f"{S_VER_FMT}\n"
+    "__PP_URL__/__PP_NAME_BIG__"
+)
+
+# path to default config file
+P_CFG_DEF = None
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -82,30 +102,6 @@ class __PP_NAME_CLASS__(CNCli):
     command line options, loads/saves config files, and performs the operations
     required for the program.
     """
-
-    # --------------------------------------------------------------------------
-    # Class methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Initialize the new object
-    # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initialize the new object
-
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
-        new object.
-        """
-
-        self._debug = False
-
-        # path to r/w config file
-        self._dir_cfg = Path.home() / "__PP_USR_CONF__"
-
-        # default config stuff
-        self._dict_cfg = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -163,9 +159,6 @@ class __PP_NAME_CLASS__(CNCli):
         Long description (including HTML).
         """
 
-        # change a value in the config dict
-        self._dict_cfg["inside"] = "bar"
-
         # check for debug flag
         if self._debug:
             return "this is func (DEBUG)"
@@ -185,30 +178,10 @@ class __PP_NAME_CLASS__(CNCli):
         """
 
         # call to set up and run arg parser
-        super()._run_parser()
+        self._run_parser()
 
-        # get other options from command line
-        self._debug = self._dict_args.get(CNCli.ARG_DBG_DEST, False)
-
-        # command line cfg is None or str
-        cfg_arg = self._dict_args.get(CNCli.ARG_CFG_DEST, None)
-        if cfg_arg is not None:
-            cfg_arg = Path(cfg_arg)
-
-        # the default config file
-        cfg_def = str(self._dir_cfg / "__PP_NAME_SMALL__.json")
-
-        # load the config file
-        # not using def path, using arg path
-        # super()._load_config(None, cfg_arg, self._dict_cfg)
-        # using def path, not using arg path
-        # super()._load_config(cfg_def, dict_def=self._dict_cfg)
-        # using def path, using arg path, using internal
-        super()._load_config(path_arg=cfg_arg, path_def=cfg_def)
-
-        # throw in a debug test
-        if self._debug:
-            F.pp(self._dict_cfg, label="load cfg:")
+        # load config file (or not, if no param and not using -c)
+        self._load_config(P_CFG_DEF)
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -220,39 +193,27 @@ class __PP_NAME_CLASS__(CNCli):
         Arguments:
             parser: The ArgumentParser to add the args to
 
-        This method is teased out for better code maintenance.
+        This method is called by the superclass's _run_parser method, and
+        allows subclasses to add their own arguments to the parser.
         """
 
-        # formatted version
-        # NB: done in two steps to avoid linter warnings
-        ver_cfg = "__PP_VER_FMT__"
-        ver_fmt = ver_cfg.format(S_PP_VERSION)
-
-        # about string
-        s_about = (
-            "__PP_NAME_BIG__\n"
-            f"{S_PP_SHORT_DESC}\n"
-            f"{ver_fmt}\n"
-            "__PP_URL__/__PP_NAME_BIG__"
-        )
-
         # set help string
-        parser.description = s_about
+        parser.description = S_ABOUT
 
         # add debug option
         parser.add_argument(
-            CNCli.ARG_DBG_OPTION,
-            action=CNCli.ARG_DBG_ACTION,
-            dest=CNCli.ARG_DBG_DEST,
-            help=CNCli.ARG_DBG_HELP,
+            cncli.S_ARG_DBG_OPTION,
+            action=cncli.S_ARG_DBG_ACTION,
+            dest=cncli.S_ARG_DBG_DEST,
+            help=cncli.S_ARG_DBG_HELP,
         )
 
         # add config (user dict) option
         parser.add_argument(
-            CNCli.ARG_CFG_OPTION,
-            dest=CNCli.ARG_CFG_DEST,
-            help=CNCli.ARG_CFG_HELP,
-            metavar=CNCli.ARG_CFG_METAVAR,
+            cncli.S_ARG_CFG_OPTION,
+            dest=cncli.S_ARG_CFG_DEST,
+            help=cncli.S_ARG_CFG_HELP,
+            metavar=cncli.S_ARG_CFG_METAVAR,
         )
 
     # --------------------------------------------------------------------------
@@ -265,12 +226,8 @@ class __PP_NAME_CLASS__(CNCli):
         Perform some mundane stuff like saving config files.
         """
 
-        # throw in a debug test
-        if self._debug:
-            F.pp(self._dict_cfg, label="save cfg:")
-
         # call to save config
-        super()._save_config()
+        self._save_config()
 
 
 # ------------------------------------------------------------------------------
@@ -284,6 +241,9 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    __PP_NAME_CLASS__().main()
+    obj = __PP_NAME_CLASS__()
+
+    # run the new object
+    obj.main()
 
 # -)
