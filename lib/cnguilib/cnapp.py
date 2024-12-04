@@ -32,10 +32,10 @@ import sys
 
 # find paths to lib
 # NB: this assumes cnlib is a "sister" folder to cnapplib
-DIR_CNLIB = Path(__file__).parents[1].resolve()
+P_DIR_LIB = Path(__file__).parents[1].resolve()
 
 # add paths to import search
-sys.path.append(str(DIR_CNLIB))
+sys.path.append(str(P_DIR_LIB))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order

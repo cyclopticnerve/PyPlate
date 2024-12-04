@@ -575,7 +575,7 @@ D_PRV_ALL = {
     # install stuff
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
-    "__PP_INST_CONF_FILE__": S_FILE_INST_JSON,
+    "__PP_INST_CONF_FILE__": S_FILE_INSTALL_CFG,
     "__PP_INST_FILE__": S_FILE_INSTALL,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
@@ -658,8 +658,8 @@ D_PUB_DIST = {
     S_FILE_LICENSE: S_DIR_ASSETS,
     S_FILE_README: S_DIR_ASSETS,
     S_FILE_INSTALL: "",
-    S_FILE_UNINSTALL: S_DIR_ASSETS,
-    S_FILE_INSTALL_CFG: S_DIR_ASSETS,
+    S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+    S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
 }
 
 # the lists of dirs/files we don't mess with while running pymaker
@@ -762,7 +762,7 @@ D_PUB_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
-    "lib": "lib",
+    # "lib": "lib",
     f"{S_DIR_MISC}/cnlibs.py": f"{S_DIR_MISC}/cnlibs.py",
     f"{S_DIR_MISC}/default_class.py": f"{S_DIR_MISC}/default_class.py",
     f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
@@ -770,15 +770,14 @@ D_COPY = {
     f"{S_DIR_MISC}/style.txt": f"{S_DIR_MISC}/style.txt",
 }
 
-# dict for install script
-# D_PUB_INST = {
-#     "meta": {"name": "__PP_NAME_BIG__", "version": "__PP_VERSION__"},
-#     "preflight": [],
-#     "sys_reqs": [],
-#     "py_reqs": [],
-#     "content": {},
-#     "postflight": [],
-# }
+# which libs to add to which type of project
+# key is prj short type
+# val is list of libs to add to prj type
+D_COPY_LIB = {
+    "c": ["cnlib"],
+    "p": [""],
+    "g": ["cnlib", "cnguilib"],
+}
 
 # dictionary of default stuff to put in install.json
 D_INSTALL = {
@@ -787,10 +786,9 @@ D_INSTALL = {
     "lib": "__PP_USR_CONF__",
     S_DIR_README: "__PP_USR_CONF__",
     S_DIR_SRC: "__PP_USR_CONF__",
-    S_FILE_INST_JSON: "__PP_USR_CONF__",
     S_FILE_LICENSE: "__PP_USR_CONF__",
     S_FILE_README: "__PP_USR_CONF__",
-    S_FILE_UNINSTALL: "__PP_USR_CONF__",
+    S_DIR_INSTALL: "__PP_USR_CONF__",
 }
 
 # the info for matching/fixing lines in markup files

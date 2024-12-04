@@ -137,7 +137,7 @@ def dpretty(dict_print, indent_size=4, indent_level=0, label=None):
 
     # print label
     if label is not None:
-        out += label + "\n"
+        out += label + ": "
 
     # convert indent_size to string and multiply by indent_level
     indent_str = (" " * indent_size) * (indent_level)
@@ -200,7 +200,7 @@ def dpretty(dict_print, indent_size=4, indent_level=0, label=None):
     indent_str = (" " * indent_size) * indent_level
 
     # # add closing bracket
-    out += indent_str + "},"
+    out += indent_str + "}"
 
     # return result
     return out
@@ -237,7 +237,7 @@ def lpretty(list_print, indent_size=4, indent_level=0, label=None):
 
     # print label
     if label is not None:
-        out += label + "\n"
+        out += label + ": "
 
     # convert indent_size to string and multiply by indent_level
     indent_str = (" " * indent_size) * (indent_level)
@@ -295,7 +295,7 @@ def lpretty(list_print, indent_size=4, indent_level=0, label=None):
     indent_str = (" " * indent_size) * indent_level
 
     # # add closing bracket
-    out += indent_str + "],"
+    out += indent_str + "]"
 
     # return result
     return out

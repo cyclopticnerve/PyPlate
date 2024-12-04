@@ -54,7 +54,7 @@ S_KEY_NAME = "NAME"
 S_KEY_VERSION = "VERSION"
 S_KEY_PREFLIGHT = "PREFLIGHT"
 S_KEY_POSTFLIGHT = "POSTFLIGHT"
-S_KEY_CONTENT = "CONTENT"
+S_KEY_ASSETS = "ASSETS"
 S_KEY_SYS_REQS = "SYS_REQS"
 S_KEY_PY_REQS = "PY_REQS"
 
@@ -221,15 +221,33 @@ class CNInstall:
     # Public methods
     # --------------------------------------------------------------------------
 
-    def make_install_cfg(self, name, version, content_inst=None, content_uninst=None):
+    # --------------------------------------------------------------------------
+    # Make install file
+    # --------------------------------------------------------------------------
+    def make_install_cfg(self, name, version, assets_inst=None, assets_uninst=None):
         """
-        foo
-        """
-        if content_inst is None:
-            content_inst = {}
-        if content_uninst is None:
-            content_uninst = []
+        Make install file
 
+        Arguments:
+            name: The program name
+            version: The program version
+            assets_inst: the dict of assets to install (default: None)
+            assets_uninst: The list of assets to uninstall (default: None)
+
+        Returns:
+            A properly formatted install config dict to save to a file
+
+        This method creates a config file for use by both install.py and
+        uninstall.py. The dict format can be found below.
+        """
+
+        # set default props
+        if assets_inst is None:
+            assets_inst = {}
+        if assets_uninst is None:
+            assets_uninst = []
+
+        # create the dict using args
         dict_use = {
             S_KEY_META: {
                 S_KEY_NAME: name,
@@ -238,16 +256,18 @@ class CNInstall:
             S_KEY_INSTALL: {
                 S_KEY_PREFLIGHT: [],
                 S_KEY_POSTFLIGHT: [],
-                S_KEY_CONTENT: content_inst,
+                S_KEY_ASSETS: assets_inst,
                 S_KEY_SYS_REQS: [],
                 S_KEY_PY_REQS: [],
             },
             S_KEY_UNINSTALL: {
                 S_KEY_PREFLIGHT: [],
                 S_KEY_POSTFLIGHT: [],
-                S_KEY_CONTENT: content_uninst,
-            }
+                S_KEY_ASSETS: assets_uninst,
+            },
         }
+
+        # return the formatted dict
         return dict_use
 
     # --------------------------------------------------------------------------
@@ -586,7 +606,7 @@ class CNInstall:
         inst_home = Path.home()
 
         # content list from dict
-        content = self._dict_func.get(S_KEY_CONTENT, {})
+        content = self._dict_func.get(S_KEY_ASSETS, {})
 
         # for each key, value
         for k, v in content.items():
@@ -628,7 +648,7 @@ class CNInstall:
         inst_home = Path.home()
 
         # content list from dict
-        content = self._dict_func.get(S_KEY_CONTENT, {})
+        content = self._dict_func.get(S_KEY_ASSETS, {})
 
         # create a list of all content dests as well as extras
         l_un = [v for v in content]

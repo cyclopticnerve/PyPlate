@@ -38,7 +38,7 @@ import sys
 # my imports
 # add custom import paths
 
-# find paths to dev or user
+# find path to lib
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_LIB = P_DIR_PRJ / "lib"
 
@@ -79,6 +79,10 @@ S_ABOUT = (
     f"{S_VER_FMT}\n"
     "__PP_URL__/__PP_NAME_BIG__"
 )
+
+# ------------------------------------------------------------------------------
+# Paths
+# ------------------------------------------------------------------------------
 
 # path to default config file
 P_CFG_DEF = None

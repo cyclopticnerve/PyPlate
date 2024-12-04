@@ -463,6 +463,31 @@ class PyMaker:
                 shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
+        # do copy lib dict
+
+        # go through dict to find list
+        for key, val in M.D_COPY_LIB.items():
+
+            # this is our type
+            if key == M.D_PRV_PRJ["__PP_TYPE_PRJ__"]:
+
+                # get list
+                list_lib = val
+
+                # copy libs
+                for item in list_lib:
+
+                    # get src/dst
+                    src = P_DIR_PYPLATE / "lib" / item
+                    dst = self._dir_prj / "lib" / item
+
+                    # copy dir/file
+                    if src.is_dir():
+                        shutil.copytree(src, dst)
+                    else:
+                        shutil.copy2(src, dst)
+
+        # ----------------------------------------------------------------------
         # combine any reqs files
         # NB: this combines initial reqs from the "all" template folder and the
         # "type" template folder. these will then be installed during
@@ -650,7 +675,6 @@ class PyMaker:
         dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            # M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
             M.S_KEY_PUB_DIST: M.D_PUB_DIST,
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
@@ -658,7 +682,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # fix dunders in bl/i18n/dist
-        self._fix_content(path_pub, False, False)
+        self._fix_content(path_pub)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
@@ -669,6 +693,13 @@ class PyMaker:
         # put in metadata and save back to file
         dict_pub[M.S_KEY_PUB_META] = M.D_PUB_META
         F.save_dict(dict_pub, [path_pub])
+
+        # ----------------------------------------------------------------------
+        # call conf after fix
+
+        print(M.S_ACTION_AFTER, end="", flush=True)
+        M.do_after_fix(self._dir_prj, dict_prv, dict_pub)
+        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # git
@@ -705,13 +736,6 @@ class PyMaker:
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
                 print(e.message)
-
-        # ----------------------------------------------------------------------
-        # call conf after fix
-
-        print(M.S_ACTION_AFTER, end="", flush=True)
-        M.do_after_fix(self._dir_prj, dict_prv, dict_pub)
-        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -815,22 +839,27 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # make install file
 
+        # show info
         print(M.S_ACTION_INST, end="", flush=True)
 
+        # get params
         name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
         version = M.D_PUB_META["__PP_VERSION__"]
         content_inst = M.D_INSTALL
         content_uninst = M.L_UNINSTALL
 
+        # create a template instal cfg file
         inst = I.CNInstall()
         dict_inst = inst.make_install_cfg(
             name, version, content_inst, content_uninst
         )
 
-        file_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
-        F.save_dict(dict_inst, [file_inst])
-        self._fix_content(file_inst, False, False)
+        # fix dunders in inst cfg file
+        path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+        F.save_dict(dict_inst, [path_inst])
+        self._fix_content(path_inst)
 
+        # show info
         print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
@@ -895,14 +924,16 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_content(self, path, bl_hdr, bl_code):
+    def _fix_content(self, path, bl_hdr=False, bl_code=False):
         """
         Fix header or code for each line in a file
 
         Arguments:
             path: Path for replacing text
-            bl_hdr: Whether the file is blacklisted for header lines
-            bl_code: Whether the file is blacklisted for code lines
+            bl_hdr: Whether the file is blacklisted for header lines (default:
+            False)
+            bl_code: Whether the file is blacklisted for code lines (default:
+            False)
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.

@@ -19,6 +19,8 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# FIXME: run pybaker from prj dir
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -447,18 +449,10 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # fix dunders in bl/i18n
-        self._fix_content(path_pub, False, False)
+        self._fix_content(path_pub)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
-
-        # ----------------------------------------------------------------------
-        # fix dunders in install
-        path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
-        self._fix_content(path_inst, False, False)
-
-        # reload dict from fixed file
-        # dict_pub = F.load_dicts([path_pub])
 
         # ----------------------------------------------------------------------
         # save meta
@@ -466,6 +460,13 @@ class PyBaker:
         # put in metadata and save back to file
         dict_pub[M.S_KEY_PUB_META] = self._dict_pub_meta
         F.save_dict(dict_pub, [path_pub])
+
+        # ----------------------------------------------------------------------
+        # call conf after fix
+
+        print(M.S_ACTION_AFTER, end="", flush=True)
+        M.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
+        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # freeze requirements
@@ -485,12 +486,6 @@ class PyBaker:
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
                 print(e)
-
-        # ----------------------------------------------------------------------
-        # call conf after fix
-        print(M.S_ACTION_AFTER, end="", flush=True)
-        M.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
-        print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -582,6 +577,11 @@ class PyBaker:
 
             print(M.S_ACTION_DONE)
 
+        # ----------------------------------------------------------------------
+        # fix dunders in install
+        path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+        self._fix_content(path_inst)
+
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
@@ -609,7 +609,10 @@ class PyBaker:
 
             # get src/dst rel to prj dir/dist dir
             new_src = self._dir_prj / k
-            new_dst = dst / v / new_src.name
+            new_dst = dst / v
+            if not new_dst.exists():
+                Path.mkdir(new_dst, parents=True)
+            new_dst = new_dst / new_src.name
 
             # do the copy
             if new_src.exists() and new_src.is_dir():
@@ -682,14 +685,16 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_content(self, path, bl_hdr, bl_code):
+    def _fix_content(self, path, bl_hdr=False, bl_code=False):
         """
         Fix header or code for each line in a file
 
         Arguments:
             path: Path for replacing text
-            bl_hdr: Whether the file is blacklisted for header lines
-            bl_code: Whether the file is blacklisted for code lines
+            bl_hdr: Whether the file is blacklisted for header lines (default:
+            False)
+            bl_code: Whether the file is blacklisted for code lines (default:
+            False)
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.

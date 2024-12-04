@@ -200,7 +200,7 @@ class CNCli:
         # add a debug message
         if self._debug:
             print("load cfg from:", self._path_cfg)
-            print(F.pp(self._dict_cfg))
+            F.pp(self._dict_cfg, label="cfg")
 
     # --------------------------------------------------------------------------
     # Save config file to one of several sources
@@ -219,6 +219,6 @@ class CNCli:
         # add a debug message
         if self._debug:
             print("save cfg to:", self._path_cfg)
-            print(F.pp(self._dict_cfg))
+            F.pp(self._dict_cfg, label="cfg")
 
 # -)

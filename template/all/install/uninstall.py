@@ -31,8 +31,8 @@ import sys
 # my imports
 # add custom import paths
 
-DIR_SELF = Path(__file__).parent.resolve()
-FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__/__PP_INST_CONF_FILE__"
+DIR_SELF = Path(__file__).parents[1].resolve()
+FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__" / "__PP_INST_CONF_FILE__"
 DIR_LIB = DIR_SELF / "lib"
 
 # add paths to import search

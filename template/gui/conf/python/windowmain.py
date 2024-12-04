@@ -24,24 +24,12 @@ private functions declared here.
 from pathlib import Path
 import sys
 
-# find paths to dev or user
-# FIXME: WTF?
-DIR_PARENT = Path(__file__).parent.resolve()
-if DIR_PARENT.name == "__PP_DEV_SRC__":
-    DIR_PRJ = DIR_PARENT.parent
-    DIR_CFG = DIR_PRJ / "__PP_DEV_CONF__"
-    DIR_LIB = Path.home() / "__PP_DEV_PP__" / "lib"
-    DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_SUPPORT__"
-else:
-    DIR_HOME = Path.home()
-    DIR_CFG = DIR_HOME / "__PP_USR_CONF__"
-    DIR_LIB = DIR_HOME / "__PP_USR_LIB__"
-    DIR_SRC = DIR_HOME / "__PP_USR_SRC__"
+# find path to lib
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_LIB = P_DIR_PRJ / "lib"
 
 # add paths to import search
-sys.path.append(str(DIR_LIB))
-sys.path.append(str(DIR_SRC))
-
+sys.path.append(str(P_DIR_LIB))
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 # pylint: disable=no-name-in-module
@@ -92,7 +80,7 @@ class WindowMain(CNWindow):
 
         # props necessary tro create a basic window
         ui_file = (
-            DIR_PARENT / "__PP_SUPPORT__" / "ui" / "__PP_NAME_SMALL__Gtk3.ui"
+            P_DIR_PRJ / "__PP_SUPPORT__" / "ui" / "__PP_NAME_SMALL__Gtk3.ui"
         )
         ui_path = Path(ui_file).resolve()
         ui_name = "win_main"
@@ -118,7 +106,7 @@ class WindowMain(CNWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        dlg_file = DIR_PARENT / "__PP_SUPPORT__" / "ui" / "dialogs.ui"
+        dlg_file = P_DIR_PRJ / "__PP_SUPPORT__" / "ui" / "dialogs.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "dlg_about")
 
