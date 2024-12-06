@@ -15,6 +15,8 @@ Remember to connect all the appropriate window events in your ui file to the
 private functions declared here.
 """
 
+# FIXME: take out strings
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -25,18 +27,19 @@ from pathlib import Path
 import sys
 
 # find path to lib
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_PRJ = Path(__file__).parents[2].resolve()
 P_DIR_LIB = P_DIR_PRJ / "lib"
 
 # add paths to import search
 sys.path.append(str(P_DIR_LIB))
+
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
 # my imports
-from cnapplib.cnwindow import CNWindow  # type: ignore
+from cnguilib.cnwindow import CNWindow  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -80,7 +83,7 @@ class WindowMain(CNWindow):
 
         # props necessary tro create a basic window
         ui_file = (
-            P_DIR_PRJ / "__PP_SUPPORT__" / "ui" / "__PP_NAME_SMALL__Gtk3.ui"
+            P_DIR_PRJ / "gui" / "ui" / "__PP_NAME_SMALL___gtk3.ui"
         )
         ui_path = Path(ui_file).resolve()
         ui_name = "win_main"
@@ -106,7 +109,7 @@ class WindowMain(CNWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        dlg_file = P_DIR_PRJ / "__PP_SUPPORT__" / "ui" / "dialogs.ui"
+        dlg_file = P_DIR_PRJ / "gui" / "ui" / "dialogs.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "dlg_about")
 

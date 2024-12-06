@@ -20,43 +20,30 @@ from pathlib import Path
 import sys
 
 # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
 # my imports
 # add custom import paths
 
-# NB: package names below will give pylance error when viewed in the template
-# DO NOT IGNORE THEM! WE NEED TO CHECK THE REPLACEMENT NAMES IN FINAL PROJECT!
-# once you are sure the name is correct, you can add "# type: ignore" to the
-# line to ignore the error
-
 # ------------------------------------------------------------------------------
 # option 1:
 
 # path to dir above <package name>
-DIR_PRJ = Path(__file__).parents[1].resolve()
-DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__"
-sys.path.append(str(DIR_SRC))
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_SRC = P_DIR_PRJ / "__PP_DEV_SRC__"
 
-# from <package name> import <module name>
-from __PP_NAME_SMALL__ import __PP_NAME_SEC__
+# add paths to import search
+sys.path.append(str(P_DIR_SRC))
 
-# ------------------------------------------------------------------------------
-# option 2:
-
-# # path to <package name>
-# DIR_PRJ = Path(__file__).parents[1].resolve()
-# DIR_SRC = DIR_PRJ / "__PP_DEV_SRC__" / "__PP_NAME_SMALL__"
-# sys.path.append(str(DIR_SRC))
-
-# # import <module name>
-# import __PP_NAME_SEC__
-
-# ------------------------------------------------------------------------------
+# import my stuff
+from __PP_NAME_SMALL__ import __PP_NAME_SEC__  # type: ignore
 
 # pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=no-name-in-module
 # pylint: enable=import-error
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -68,6 +55,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    __PP_NAME_SEC__.func()  # type: ignore
+    res = __PP_NAME_SEC__.func()
+    print(res)
 
 # -)

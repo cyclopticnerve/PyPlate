@@ -27,9 +27,11 @@ import sys
 # find path to lib
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_LIB = P_DIR_PRJ / "lib"
+P_DIR_GUI = P_DIR_PRJ / "gui"
 
 # add paths to import search
 sys.path.append(str(P_DIR_LIB))
+sys.path.append(str(P_DIR_GUI))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -37,8 +39,8 @@ sys.path.append(str(P_DIR_LIB))
 # pylint: disable=import-error
 
 # my imports
-from cnapplib.cnapp import CNApp  # type: ignore
-from windowmain import WindowMain
+from cnguilib.cnapp import CNApp  # type: ignore
+from python.window_main import WindowMain
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order

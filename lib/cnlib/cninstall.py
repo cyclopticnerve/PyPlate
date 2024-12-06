@@ -159,7 +159,7 @@ class CNInstallError(Exception):
         Initialize the class
 
         Arguments:
-            message: A custom string to print for clarity.
+            message: A custom string to print for clarity
 
         Creates a new instance of the object and initializes its properties.
         """

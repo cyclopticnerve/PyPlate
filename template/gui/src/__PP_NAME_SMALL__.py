@@ -41,14 +41,17 @@ import sys
 # find path to lib
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_LIB = P_DIR_PRJ / "lib"
+P_DIR_GUI = P_DIR_PRJ / "gui"
 
 # add paths to import search
 sys.path.append(str(P_DIR_LIB))
+sys.path.append(str(P_DIR_GUI))
 
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
+import cnlib.cncli as C  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
-from appmain import AppMain  # type: ignore
+from python.app_main import AppMain  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -166,27 +169,27 @@ class __PP_NAME_CLASS__(CNCli):
         super()._run_parser()
 
         # get other options from command line
-        self._debug = self._dict_args[CNCli.ARG_DBG_DEST]
+        self._debug = self._dict_args[C.S_ARG_DBG_DEST]
 
-        # the default config file
-        cfg_def = str(DIR_CFG / "__PP_NAME_SMALL__.json")
+        # # the default config file
+        # cfg_def = str(DIR_CFG / "__PP_NAME_SMALL__.json")
 
-        # command line cfg is None or str
-        cfg_arg = self._dict_args[CNCli.ARG_CFG_DEST]
+        # # command line cfg is None or str
+        # cfg_arg = self._dict_args[C.S_ARG_CFG_DEST]
 
-        # load the config file
-        # not using def path, using arg path
-        # super()._load_config(None, cfg_arg, self._d_cfg)
-        # using def path, not using arg path
-        # super()._load_config(cfg_def, dict_def=self._d_cfg)
-        # using def path, using arg path, using internal
-        super()._load_config(
-            cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg
-        )
+        # # load the config file
+        # # not using def path, using arg path
+        # # super()._load_config(None, cfg_arg, self._d_cfg)
+        # # using def path, not using arg path
+        # # super()._load_config(cfg_def, dict_def=self._d_cfg)
+        # # using def path, using arg path, using internal
+        # super()._load_config(
+        #     cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg
+        # )
 
-        # throw in a debug test
-        if self._debug:
-            F.pp(self._dict_cfg, label="load cfg:")
+        # # throw in a debug test
+        # if self._debug:
+        #     F.pp(self._dict_cfg, label="load cfg:")
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -219,18 +222,18 @@ class __PP_NAME_CLASS__(CNCli):
 
         # add debug option
         parser.add_argument(
-            CNCli.ARG_DBG_OPTION,
-            action=CNCli.ARG_DBG_ACTION,
-            dest=CNCli.ARG_DBG_DEST,
-            help=CNCli.ARG_DBG_HELP,
+            C.S_ARG_DBG_OPTION,
+            action=C.S_ARG_DBG_ACTION,
+            dest=C.S_ARG_DBG_DEST,
+            help=C.S_ARG_DBG_HELP,
         )
 
         # add config (user dict) option
         parser.add_argument(
-            CNCli.ARG_CFG_OPTION,
-            dest=CNCli.ARG_CFG_DEST,
-            help=CNCli.ARG_CFG_HELP,
-            metavar=CNCli.ARG_CFG_METAVAR,
+            C.S_ARG_CFG_OPTION,
+            dest=C.S_ARG_CFG_DEST,
+            help=C.S_ARG_CFG_HELP,
+            metavar=C.S_ARG_CFG_METAVAR,
         )
 
     # --------------------------------------------------------------------------

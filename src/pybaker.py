@@ -175,7 +175,7 @@ class PyBaker:
         #  do the work
 
         # store properties
-        self._dir_prj = dir_prj
+        self._dir_prj = Path(dir_prj)
         self._debug = debug
 
         # print about info
@@ -186,7 +186,7 @@ class PyBaker:
         self._setup()
 
         # load current metadata from conf or user input
-        self._get_project_info()\
+        self._get_project_info()
 
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_before_fix()
@@ -485,7 +485,7 @@ class PyBaker:
                 print(M.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
-                print(e)
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -531,7 +531,7 @@ class PyBaker:
         # if docs flag is set
         if M.B_CMD_DOCS:
 
-            print(M.S_ACTION_DOCS, flush=True)
+            print(M.S_ACTION_DOCS, end="", flush=True)
 
             # get path to project's venv
             venv = self._dict_prv_prj["__PP_NAME_VENV__"]
@@ -543,7 +543,7 @@ class PyBaker:
                 print(M.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
-                print(e)
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # tree
@@ -580,7 +580,8 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # fix dunders in install
         path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
-        self._fix_content(path_inst)
+        if path_inst.exists():
+            self._fix_content(path_inst)
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -600,25 +601,21 @@ class PyBaker:
             shutil.rmtree(p_dist)
         Path.mkdir(p_dist, parents=True)
 
-        # copy files/folders
-        src = self._dict_pub_dist
-        dst = p_dist
-
-        # for each key, val (src, dst)
-        for k, v in src.items():
+        # for each key, val (type, dict)
+        for key, val in self._dict_pub_dist.items():
 
             # get src/dst rel to prj dir/dist dir
-            new_src = self._dir_prj / k
-            new_dst = dst / v
-            if not new_dst.exists():
-                Path.mkdir(new_dst, parents=True)
-            new_dst = new_dst / new_src.name
+            src = self._dir_prj / key
+            dst = p_dist / val
+            if not dst.exists():
+                Path.mkdir(dst, parents=True)
+            dst = dst / src.name
 
             # do the copy
-            if new_src.exists() and new_src.is_dir():
-                shutil.copytree(new_src, new_dst, dirs_exist_ok=True)
-            elif new_src.exists() and new_src.is_file():
-                shutil.copy2(new_src, new_dst)
+            if src.exists() and src.is_dir():
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            elif src.exists() and src.is_file():
+                shutil.copy2(src, dst)
 
         # done copying project files
         print(M.S_ACTION_DONE)
@@ -1021,6 +1018,8 @@ if __name__ == "__main__":
 
     # convert namespace to dict
     dict_args = vars(args)
+
+    # --------------------------------------------------------------------------
 
     # get the args
     a_dir_prj = dict_args.get(S_PRJ_OPTION, None)

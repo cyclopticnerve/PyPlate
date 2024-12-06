@@ -651,15 +651,38 @@ D_PUB_META = {
 # NB: key is src, rel to prj dir
 # NB: val is dst, rel to dist dir
 D_PUB_DIST = {
-    S_DIR_CONF: S_DIR_ASSETS,
-    "lib": S_DIR_ASSETS,
-    S_DIR_README: S_DIR_ASSETS,
-    S_DIR_SRC: S_DIR_ASSETS,
-    S_FILE_LICENSE: S_DIR_ASSETS,
-    S_FILE_README: S_DIR_ASSETS,
-    S_FILE_INSTALL: "",
-    S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-    S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+    "c": {
+        S_DIR_SRC: S_DIR_ASSETS,
+        S_DIR_README: S_DIR_ASSETS,
+        S_FILE_LICENSE: S_DIR_ASSETS,
+        S_FILE_README: S_DIR_ASSETS,
+        #
+        S_DIR_CONF: S_DIR_ASSETS,
+        "lib": S_DIR_ASSETS,
+        S_FILE_INSTALL: "",
+        S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+    },
+    "p": {
+        S_DIR_SRC: "",
+        S_DIR_README: "",
+        S_FILE_LICENSE: "",
+        S_FILE_README: "",
+    },
+    "g": {
+        S_DIR_SRC: S_DIR_ASSETS,
+        S_DIR_README: S_DIR_ASSETS,
+        S_FILE_LICENSE: S_DIR_ASSETS,
+        S_FILE_README: S_DIR_ASSETS,
+        #
+        S_DIR_CONF: S_DIR_ASSETS,
+        "lib": S_DIR_ASSETS,
+        S_FILE_INSTALL: "",
+        S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        #
+        S_DIR_IMAGES: S_DIR_ASSETS,
+    },
 }
 
 # the lists of dirs/files we don't mess with while running pymaker
@@ -775,21 +798,28 @@ D_COPY = {
 # val is list of libs to add to prj type
 D_COPY_LIB = {
     "c": ["cnlib"],
-    "p": [""],
+    "p": [],
     "g": ["cnlib", "cnguilib"],
 }
 
-# dictionary of default stuff to put in install.json
-D_INSTALL = {
-    "__PP_NAME_VENV__": "__PP_USR_CONF__",
-    S_DIR_CONF: "__PP_USR_CONF__",
-    "lib": "__PP_USR_CONF__",
-    S_DIR_README: "__PP_USR_CONF__",
-    S_DIR_SRC: "__PP_USR_CONF__",
-    S_FILE_LICENSE: "__PP_USR_CONF__",
-    S_FILE_README: "__PP_USR_CONF__",
-    S_DIR_INSTALL: "__PP_USR_CONF__",
-}
+# # which prj types need an install.json?
+# D_MAKE_INSTALL = {
+#     "c": True,
+#     "p": False,
+#     "g": True,
+# }
+
+# # dictionary of default stuff to put in install.json
+# D_INSTALL = {
+#     "__PP_NAME_VENV__": "__PP_USR_CONF__",
+#     S_DIR_CONF: "__PP_USR_CONF__",
+#     "lib": "__PP_USR_CONF__",
+#     S_DIR_README: "__PP_USR_CONF__",
+#     S_DIR_SRC: "__PP_USR_CONF__",
+#     S_FILE_LICENSE: "__PP_USR_CONF__",
+#     S_FILE_README: "__PP_USR_CONF__",
+#     S_DIR_INSTALL: "__PP_USR_CONF__",
+# }
 
 # the info for matching/fixing lines in markup files
 D_MU_REPL = {
@@ -853,15 +883,16 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub):
+def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     """
     Do any work before fix
 
 
     Arguments:
-        dir_prj: The root of the new project
+        dir_prj: The root of the new project (reserved for future use)
         dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data
+        dict_pub: The dictionary containing public project data (reserved for
+        future use)
 
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
@@ -876,7 +907,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
 
     # get sub-dicts we need
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    dict_pub_dist = dict_pub[S_KEY_PUB_DIST]
+    # dict_pub_dist = dict_pub[S_KEY_PUB_DIST]
 
     # get values after pymaker has set them
     # author = D_PRV_ALL["__PP_AUTHOR__"]
@@ -887,13 +918,17 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     # dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
     dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
-    # add venv name to dunders
-    dict_prv_prj["__PP_NAME_VENV__"] = S_VENV_FMT_NAME.format(name_small)
+    # get venv name
+    # name_venv = S_VENV_FMT_NAME.format(name_small)
 
-    # add venv to dist list
-    # NB: we do this here to avoid having to handle globs in L_DIST
-    name_venv = dict_prv_prj["__PP_NAME_VENV__"]
-    dict_pub_dist[name_venv] = S_DIR_ASSETS
+    # type_prj = dict_prv_prj["__PP_TYPE_PRJ__"]
+    # if type_prj in dict_prv_prj:
+    #     # add venv name to dunders
+    #     dict_prv_prj["__PP_NAME_VENV__"] = name_venv
+
+    #     # add venv to dist list
+    #     dict_pub_dist[name_venv] = S_DIR_ASSETS
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1010,16 +1045,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
         f"[{key}]({val})" if val != "" else key for key, val in d_py_deps
     ]
 
-    #        | 1 | |  2  | | 3| | 4 | |    5    |
-    # lst = [res_a if cond else res_b for x in xx]
-
-    # lst = []
-    # for x in xx:              5
-    #   if cond:                2
-    #       lst.append(res_a)   1
-    #   else:                   3
-    #       lst.append(res_b)   4
-
+    # get rm deps as links
     s_rm_deps = "<br>\n".join(l_rm_deps)
     if len(s_rm_deps) == 0:
         s_rm_deps = "None"

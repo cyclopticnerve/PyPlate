@@ -471,11 +471,8 @@ class PyMaker:
             # this is our type
             if key == M.D_PRV_PRJ["__PP_TYPE_PRJ__"]:
 
-                # get list
-                list_lib = val
-
                 # copy libs
-                for item in list_lib:
+                for item in val:
 
                     # get src/dst
                     src = P_DIR_PYPLATE / "lib" / item
@@ -516,11 +513,12 @@ class PyMaker:
         }
 
         # save editable settings (blacklist/i18n etc.)
+        type_prj = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
             # M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
-            M.S_KEY_PUB_DIST: M.D_PUB_DIST,
+            M.S_KEY_PUB_DIST: M.D_PUB_DIST[type_prj],
             M.S_KEY_PUB_META: M.D_PUB_META,
         }
 
@@ -672,10 +670,11 @@ class PyMaker:
         F.save_dict(dict_prv, [path_prv])
 
         # save editable settings (blacklist/i18n etc.)
+        type_prj = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            M.S_KEY_PUB_DIST: M.D_PUB_DIST,
+            M.S_KEY_PUB_DIST: M.D_PUB_DIST[type_prj],
         }
         path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
@@ -839,28 +838,37 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # make install file
 
-        # show info
-        print(M.S_ACTION_INST, end="", flush=True)
+        # # check if we need it
+        # prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        # cont = M.D_MAKE_INSTALL.get(prj_type, False)
 
-        # get params
-        name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
-        version = M.D_PUB_META["__PP_VERSION__"]
-        content_inst = M.D_INSTALL
-        content_uninst = M.L_UNINSTALL
+        # # we need it
+        # if cont:
 
-        # create a template instal cfg file
-        inst = I.CNInstall()
-        dict_inst = inst.make_install_cfg(
-            name, version, content_inst, content_uninst
-        )
+        #     # show info
+        #     print(M.S_ACTION_INST, end="", flush=True)
 
-        # fix dunders in inst cfg file
-        path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
-        F.save_dict(dict_inst, [path_inst])
-        self._fix_content(path_inst)
+        #     # get params
+        #     name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
+        #     version = M.D_PUB_META["__PP_VERSION__"]
+        #     content_inst = M.D_INSTALL
+        #     content_uninst = M.L_UNINSTALL
 
-        # show info
-        print(M.S_ACTION_DONE)
+        #     # create a template instal cfg file
+        #     inst = I.CNInstall()
+        #     dict_inst = inst.make_install_cfg(
+        #         name, version, content_inst, content_uninst
+        #     )
+
+        #     # fix dunders in inst cfg file
+        #     path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+        #     if not path_inst.exists():
+        #         Path.mkdir(path_inst, parents=True)
+        #     F.save_dict(dict_inst, [path_inst])
+        #     self._fix_content(path_inst)
+
+        #     # show info
+        #     print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -1389,6 +1397,8 @@ if __name__ == "__main__":
 
     # convert namespace to dict
     dict_args = vars(args)
+
+    # --------------------------------------------------------------------------
 
     # get the args
     a_debug = dict_args.get(M.S_DBG_DEST, False)

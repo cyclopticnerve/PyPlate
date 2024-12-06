@@ -51,19 +51,22 @@ class CNShellError(Exception):
     # --------------------------------------------------------------------------
     # Initialize the class
     # --------------------------------------------------------------------------
-    def __init__(self, exception, repr_str):
+    def __init__(self, message):
         """
         Initialize the class
 
         Arguments:
+            message: A custom string to print for clarity
             exception: The original exception
-            repr_str: A custom string to print for clarity.
 
         Creates a new instance of the object and initializes its properties.
         """
 
-        self.exception = exception
-        self.__repr__ = repr_str
+        # call super constructor
+        super().__init__(message)
+
+        # set properties
+        self.message = message
 
 
 # ------------------------------------------------------------------------------
@@ -445,12 +448,12 @@ def sh(cmd, shell=False):
     # this is the return code check
     except subprocess.CalledProcessError as e:
         # bubble up the error to the calling function
-        new_err = CNShellError(e, e.stderr)
+        new_err = CNShellError(e.stderr)
         raise new_err from e
     # this is everything else
     except Exception as e:
         # bubble up the error to the calling function
-        new_err = CNShellError(e, e.__repr__)
+        new_err = CNShellError(e.__repr__)
         raise new_err from e
 
     # return the result
