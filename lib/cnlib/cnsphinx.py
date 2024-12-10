@@ -81,7 +81,7 @@ class CNSphinx:
         # if param is not abs, make abs rel to prj dir
         self._dir_src = Path(dir_src)
         if not self._dir_src.is_absolute():
-            self._dir_src = Path(self._dir_prj) / dir_src
+            self._dir_src = self._dir_prj / dir_src
 
         # if param is not abs, make abs rel to prj dir
         self._dir_docs = Path(dir_docs)

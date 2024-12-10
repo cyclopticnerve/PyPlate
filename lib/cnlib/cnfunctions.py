@@ -494,20 +494,15 @@ def load_dicts(paths, start_dict=None):
     for path in paths:
 
         # sanity check
-        path = Path(path)
+        path = Path(path).resolve()
 
         # sanity check
-        if path is None:
+        if path is None or not path.exists():
             print(err_not_exist.format(path))
             continue
 
         # try each option
         try:
-
-            # make sure path is absolute
-            if not path.is_absolute():
-                print(err_not_exist.format(path))
-                continue
 
             # open the file
             with open(path, "r", encoding="UTF-8") as a_file:

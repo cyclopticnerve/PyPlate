@@ -415,8 +415,8 @@ class CNInstall:
         # do each part of conf dict
         self._run_scripts(S_KEY_PREFLIGHT)
         if self._installing:
-            self._do_sys_reqs()
-            self._do_py_reqs()
+            # self._do_sys_reqs()
+            # self._do_py_reqs()
             self._do_install_content()
         else:
             self._do_uninstall_content()
@@ -508,85 +508,93 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Install system requirements
     # --------------------------------------------------------------------------
-    def _do_sys_reqs(self):
-        """
-        Install system requirements
+    # def _do_sys_reqs(self):
+    #     """
+    #     Install system requirements
 
-        Raises:
-            CNInstallError: If something went wrong
+    #     Raises:
+    #         CNInstallError: If something went wrong
 
-        This method uses the conf dict to install any system requirements
-        (i.e. non-python packages) necessary to run your program.
-        """
+    #     This method uses the conf dict to install any system requirements
+    #     (i.e. non-python packages) necessary to run your program.
+    #     """
 
-        # check for empty/no list
-        items = self._dict_func.get(S_KEY_SYS_REQS, [])
-        if len(items) == 0:
-            return
+    #     # check for empty/no list
+    #     items = self._dict_func.get(S_KEY_SYS_REQS, [])
+    #     if len(items) == 0:
+    #         return
 
-        # show some text
-        print(S_MSG_SYS_START, flush=True)
+    #     # show some text
+    #     print(S_MSG_SYS_START, flush=True)
 
-        # get system requirements
-        for item in items:
+    #     # get system requirements
+    #     for item in items:
 
-            # show that we are doing something
-            print(S_MSG_REQ_RUN.format(item), end="", flush=True)
+    #         # show that we are doing something
+    #         print(S_MSG_REQ_RUN.format(item), end="", flush=True)
 
-            # install apt reqs
-            if not self._debug:
-                try:
-                    cmd = S_CMD_SYS_REQ.format(item)
-                    F.sh(cmd)
-                    print(S_MSG_DONE, flush=True)
-                except F.CNShellError as e:
-                    error = CNInstallError(S_ERR_REQ.format(item))
-                    raise error from e
-            else:
-                # print output for each script
-                print(S_MSG_DONE, flush=True)
+    #         # install apt reqs
+    #         if not self._debug:
+    #             try:
+    #                 cmd = S_CMD_SYS_REQ.format(item)
+    #                 F.sh(cmd)
+    #                 print(S_MSG_DONE, flush=True)
+    #             except F.CNShellError as e:
+    #                 error = CNInstallError(S_ERR_REQ.format(item))
+    #                 raise error from e
+    #         else:
+    #             # print output for each script
+    #             print(S_MSG_DONE, flush=True)
 
     # --------------------------------------------------------------------------
     # Install Python requirements
     # --------------------------------------------------------------------------
-    def _do_py_reqs(self):
-        """
-        Install Python requirements
+    # def _do_py_reqs(self):
+    #     """
+    #     Install Python requirements
 
-        Raises:
-            CNInstallError: If something went wrong
+    #     Raises:
+    #         CNInstallError: If something went wrong
 
-        This method uses the conf dict to install any python requirements
-        (i.e. installed with pip) necessary to run your program.
-        """
+    #     This method uses the conf dict to install any python requirements
+    #     (i.e. installed with pip) necessary to run your program.
+    #     """
 
-        # check for empty/no list
-        items = self._dict_func.get(S_KEY_PY_REQS, [])
-        if len(items) == 0:
-            return
+    #     # check for empty/no list
+    #     items = self._dict_func.get(S_KEY_PY_REQS, [])
+    #     if len(items) == 0:
+    #         return
 
-        # show some text
-        print(S_MSG_PY_START, flush=True)
+    #     # show some text
+    #     print(S_MSG_PY_START, flush=True)
 
-        # get python requirements
-        for item in items:
+    #     # get python requirements
+    #     for item in items:
 
-            # show that we are doing something
-            print(S_MSG_REQ_RUN.format(item), end="", flush=True)
+    #         # show that we are doing something
+    #         print(S_MSG_REQ_RUN.format(item), end="", flush=True)
 
-            # install pip reqs
-            if not self._debug:
-                try:
-                    # FIXME: activate venv
-                    cmd = S_CMD_PY_REQ.format(item)
-                    F.sh(cmd)
-                    print(S_MSG_DONE, flush=True)
-                except F.CNShellError as e:
-                    error = CNInstallError(S_ERR_REQ.format(item))
-                    raise error from e
-            else:
-                # print output for each script
-                print(S_MSG_DONE, flush=True)
+    #         # install pip reqs
+    #         if not self._debug:
+    #             try:
+    #                 # TODO: activate venv to install reqs in venv
+    #                 cmd = (
+    #                     f"cd {dir_venv.parent};",
+    #                     f". {dir_venv.name}/bin/activate;",
+    #                     f"cd {self._path_assets};",
+    #                     S_CMD_PY_REQ.format(item)
+    #                 )
+    #                 F.sh(cmd)
+    #                 print(S_MSG_DONE, flush=True)
+    #             except F.CNShellError as e:
+    #                 error = CNInstallError(S_ERR_REQ.format(item))
+    #                 raise error from e
+    #         else:
+    #             # print output for each script
+    #             print(S_MSG_DONE, flush=True)
+
+    # # show some text
+    # print(S_MSG_PY_START, flush=True)
 
     # --------------------------------------------------------------------------
     # Copy source files/folders
@@ -614,6 +622,10 @@ class CNInstall:
             # get full paths of source / destination
             src = inst_src / k
             dst = inst_home / v / src.name
+
+            # debug may omit certain assets
+            if not src.exists():
+                continue
 
             # if the source is a dir
             if src.is_dir():
@@ -742,26 +754,26 @@ class CNInstall:
 
 # ------------------------------------------------------------------------------
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # testing
+#     # testing
 
-    # get parent
-    test_parent = Path(__file__).parent.resolve()
+#     # get parent
+#     test_parent = Path(__file__).parent.resolve()
 
-    # get paths to assets and conf for install
-    inst_assets = test_parent / "test/assets"
-    inst_conf = inst_assets / "test.json"
+#     # get paths to assets and conf for install
+#     inst_assets = test_parent / "test/assets"
+#     inst_conf = inst_assets / "test.json"
 
-    # get path to conf for uninstall
-    uninst_conf = test_parent / "test/.config/test/test.json"
+#     # get path to conf for uninstall
+#     uninst_conf = test_parent / "test/.config/test/test.json"
 
-    # create object
-    i = CNInstall()
+#     # create object
+#     i = CNInstall()
 
-    # call method
-    i.install(inst_assets, inst_conf, uninst_conf, debug=True)
-    # i.uninstall(inst_conf, debug=True)
+#     # call method
+#     i.install(inst_assets, inst_conf, uninst_conf, debug=True)
+#     # i.uninstall(inst_conf, debug=True)
 
 
 # -)

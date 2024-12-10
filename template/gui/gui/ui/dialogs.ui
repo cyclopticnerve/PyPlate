@@ -5,20 +5,20 @@
   <object class="GtkAboutDialog" id="dlg_about">
     <property name="can-focus">False</property>
     <property name="window-position">center-on-parent</property>
-    <property name="icon">../images/__PP_NAME_BIG__.png</property>
+    <property name="icon">../../images/__PP_NAME_BIG__.png</property>
     <property name="type-hint">dialog</property>
     <property name="program-name">__PP_NAME_BIG__</property>
     <property name="version">__PP_VERSION__</property>
-    <property name="comments" translatable="yes" context="context for program desription translation" comments="comment for program description translation">__PP_SHORT_DESC__</property>
+    <property name="comments" translatable="yes" context="context for program description translation" comments="comment for program description translation">__PP_SHORT_DESC__</property>
     <property name="website">https://github.com/__PP_AUTHOR__/__PP_NAME_BIG__</property>
     <property name="website-label" translatable="yes" context="context for website" comments="Github repository translation">GitHub repository</property>
     <property name="license">__PP_LICENSE_NAME__
-    __PP_LICENSE_LINK__</property>
+    __PP_LICENSE_URL__</property>
     <property name="authors">__PP_AUTHOR__&lt;__PP_EMAIL__&gt;</property>
-    <property name="logo">../images/__PP_NAME_BIG__.png</property>
+    <property name="logo">../../images/__PP_NAME_BIG__.png</property>
     <property name="license-type">custom</property>
     <child internal-child="vbox">
-      <object class="GtkBox" id="dlg_abou">
+      <object class="GtkBox" id="dlg_about_box">
         <property name="name">dlg_about</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>

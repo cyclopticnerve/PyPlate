@@ -15,7 +15,7 @@ Remember to connect all the appropriate window events in your ui file to the
 private functions declared here.
 """
 
-# FIXME: take out strings
+# TODO: take out strings
 
 # ------------------------------------------------------------------------------
 # Imports

@@ -20,7 +20,9 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: run pymaker from anywhere, use curr dir as parent of proj dir
+# FIXME: run pymaker from anywhere
+# put in postflight script:
+# ln -s $HOME/Documents/Projects/Python/PyPlate/src/pymaker.py $HOME/.local/bin/pymaker
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -29,6 +31,7 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
+import os
 from pathlib import Path
 import re
 import shutil
@@ -42,10 +45,12 @@ import sys
 # my imports
 # add custom import paths
 
-# path to this project
-# parent is src, parents[1] is PyPlate
+# paths to important dirs
 # NB: needed to get imports from conf (bootstrap)
-P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
+# NB: this is hardcoded so ln -s will work
+# FIXME: fix this in dist
+# P_DIR_PYPLATE = Path.home() / ".config/pyplate"
+P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
 sys.path.append(str(P_DIR_PP_CONF))
@@ -129,10 +134,10 @@ class PyMaker:
         """
 
         # set the initial values of properties
-        self._dict_args = {}
-        self._debug = False
         self._dir_prj = Path()
+        self._debug = False
 
+        self._dir_current = Path()
         self._dict_rep = {}
         self._is_html = False
         self._dict_sw_block = {}
@@ -146,15 +151,20 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, debug=False):
+    def main(self, dir_current, debug=False):
         """
         The main method of the program
+
+        Arguments:
+            dir_prj: Path to dir where the project is being created
+            debug: If True, run in debug mode (default: false)
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
 
         # set properties
+        self._dir_current = Path(dir_current).resolve()
         self._debug = debug
 
         # ----------------------------------------------------------------------
@@ -171,7 +181,7 @@ class PyMaker:
         self._get_project_info()
 
         # copy template
-        self._do_copy()
+        self._do_template()
 
         # call before fix
         self._do_before_fix()
@@ -195,18 +205,8 @@ class PyMaker:
         """
         Boilerplate to use at the start of main
 
-        Perform some mundane stuff like running the arg parser and setting
-        properties.
+        Perform some mundane stuff like setting properties.
         """
-
-        # ----------------------------------------------------------------------
-        # set pp cmd line stuff
-
-        # get cmd line args
-        # self._run_parser()
-
-        # check for flags
-        # self._debug = self._dict_args.get(M.S_DBG_DEST, False)
 
         # debug turns off some features to speed up project creation
         if self._debug:
@@ -252,7 +252,6 @@ class PyMaker:
 
         # sanity check
         prj_type = ""
-        dir_prj_type = ""
 
         # build the input question
         types = []
@@ -276,12 +275,6 @@ class PyMaker:
                 # at this point, type is valid so exit loop
                 break
 
-        # get output subdir
-        for item in M.L_TYPES:
-            if item[0] == prj_type:
-                dir_prj_type = item[3]
-                break
-
         # ----------------------------------------------------------------------
         # next question is name
 
@@ -292,14 +285,22 @@ class PyMaker:
         # if in debug mode
         if self._debug:
 
-            # get debug name of project
-            prj_name = f"{dir_prj_type}_DEBUG"
+            # get long name
+            for item in M.L_TYPES:
+                if item[0] == prj_type:
+                    # get debug name of project
+                    prj_name = f"{item[1]}_DEBUG"
 
             # set up for existence check
-            tmp_dir = Path(M.S_DIR_PRJ.format(dir_prj_type, prj_name))
+            tmp_dir = self._dir_current / prj_name
 
             # check if project already exists
             if tmp_dir.exists():
+
+                # if it does exist, "nuke it from orbit! it's the only way to
+                # be sure!"
+                # NB: yes i know ive used this joke more than once... FUCK YOU
+                # ITS FUNNY
                 shutil.rmtree(tmp_dir)
 
         # not debug
@@ -316,7 +317,7 @@ class PyMaker:
                 if self._check_name(prj_name):
 
                     # set up for existence check
-                    tmp_dir = Path(M.S_DIR_PRJ.format(dir_prj_type, prj_name))
+                    tmp_dir = self._dir_current / prj_name
 
                     # check if project already exists
                     if tmp_dir.exists():
@@ -333,12 +334,8 @@ class PyMaker:
         name_small = prj_name.lower()
 
         # ----------------------------------------------------------------------
-        # get short description
-
-        if self._debug:
-            new_desc = "debug desc"
-        else:
-            new_desc = input(M.S_ASK_DESC)
+        # print spacer line
+        print()
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -406,12 +403,11 @@ class PyMaker:
         M.D_PRV_PRJ["__PP_DATE__"] = info_date
         s = M.S_VENV_FMT_NAME.format(name_small)
         M.D_PRV_PRJ["__PP_NAME_VENV__"] = s
-        M.D_PUB_META["__PP_SHORT_DESC__"] = new_desc
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
-    def _do_copy(self):
+    def _do_template(self):
         """
         Copy template files to final location
 
@@ -517,7 +513,6 @@ class PyMaker:
         dict_pub = {
             M.S_KEY_PUB_BL: M.D_PUB_BL,
             M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            # M.S_KEY_PUB_INSTALL: M.D_PUB_INST,
             M.S_KEY_PUB_DIST: M.D_PUB_DIST[type_prj],
             M.S_KEY_PUB_META: M.D_PUB_META,
         }
@@ -724,13 +719,13 @@ class PyMaker:
 
             # get name ov venv folder and reqs file
             dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
-            file_reqs = M.S_FILE_REQS
+            file_reqs = self._dir_prj / M.S_FILE_REQS
 
             # do the thing with the thing
-            cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
+            cv = CNVenv(self._dir_prj, dir_venv)
             try:
                 cv.create()
-                cv.install()
+                cv.install(file_reqs)
                 print(M.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(M.S_ACTION_FAIL)
@@ -764,16 +759,33 @@ class PyMaker:
             # make .pot, .po, and .mo files
             potpy.main()
 
+            # we are done
+            print(M.S_ACTION_DONE)
+
             # make .desktop file
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
             path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
-            if path_desk.is_dir() and path_template.is_file():
+
+            if (
+                path_desk.exists()
+                and path_desk.is_dir()
+                and path_template.exists()
+                and path_template.is_file()
+            ):
+
+                # fix .desktop file
+                print(M.S_ACTION_DESK, end="", flush=True)
+
                 name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = self._dir_prj / path_out_name
                 potpy.make_desktop(path_template, path_out)
 
-            print(M.S_ACTION_DONE)
+                # this .pot, .po, and .mo files
+                potpy.main()
+
+                # we are done
+                print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
@@ -786,7 +798,6 @@ class PyMaker:
             name = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
             author = M.D_PRV_ALL["__PP_AUTHOR__"]
             version = M.D_PUB_META["__PP_VERSION__"]
-            # revision = "0.0.0"
 
             # do the thing with the thing
             cs = CNSphinx(self._dir_prj, M.S_DIR_SRC, M.S_DIR_DOCS)
@@ -838,37 +849,34 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # make install file
 
-        # # check if we need it
-        # prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
-        # cont = M.D_MAKE_INSTALL.get(prj_type, False)
+        # check if we need it
+        prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
 
-        # # we need it
-        # if cont:
+        # we need it
+        if prj_type in M.L_MAKE_INSTALL:
 
-        #     # show info
-        #     print(M.S_ACTION_INST, end="", flush=True)
+            # show info
+            print(M.S_ACTION_INST, end="", flush=True)
 
-        #     # get params
-        #     name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
-        #     version = M.D_PUB_META["__PP_VERSION__"]
-        #     content_inst = M.D_INSTALL
-        #     content_uninst = M.L_UNINSTALL
+            # get params
+            name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
+            version = M.D_PUB_META["__PP_VERSION__"]
+            content_inst = M.D_INSTALL
+            content_uninst = M.L_UNINSTALL
 
-        #     # create a template instal cfg file
-        #     inst = I.CNInstall()
-        #     dict_inst = inst.make_install_cfg(
-        #         name, version, content_inst, content_uninst
-        #     )
+            # create a template instal cfg file
+            inst = I.CNInstall()
+            dict_inst = inst.make_install_cfg(
+                name, version, content_inst, content_uninst
+            )
 
-        #     # fix dunders in inst cfg file
-        #     path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
-        #     if not path_inst.exists():
-        #         Path.mkdir(path_inst, parents=True)
-        #     F.save_dict(dict_inst, [path_inst])
-        #     self._fix_content(path_inst)
+            # fix dunders in inst cfg file
+            path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+            F.save_dict(dict_inst, [path_inst])
+            self._fix_content(path_inst)
 
-        #     # show info
-        #     print(M.S_ACTION_DONE)
+            # show info
+            print(M.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -1401,12 +1409,13 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
+    a_dir_cur = os.getcwd()
     a_debug = dict_args.get(M.S_DBG_DEST, False)
 
     # create object
     pm = PyMaker()
 
     # run main method with args
-    pm.main(a_debug)
+    pm.main(a_dir_cur, a_debug)
 
 # -)

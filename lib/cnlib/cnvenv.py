@@ -57,7 +57,7 @@ class CNVenv:
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, dir_prj, dir_venv, file_reqs):
+    def __init__(self, dir_prj, dir_venv):
         """
         Initialize the new object
 
@@ -80,11 +80,6 @@ class CNVenv:
         self._dir_venv = Path(dir_venv)
         if not self._dir_venv.is_absolute():
             self._dir_venv = Path(self._dir_prj) / dir_venv
-
-        # if param is not abs, make abs rel to prj dir
-        self._file_reqs = Path(file_reqs)
-        if not self._file_reqs.is_absolute():
-            self._reqs_file = Path(self._dir_prj) / file_reqs
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -113,9 +108,12 @@ class CNVenv:
     # --------------------------------------------------------------------------
     # Install packages to venv from the reqs_file property
     # --------------------------------------------------------------------------
-    def install(self):
+    def install(self, file_reqs):
         """
         Install packages to venv from the reqs_file property
+
+        Arguments:
+            file_reqs: File to load requirements
 
         Raises:
             cnfunctions.CNShellError if an error occurs
@@ -124,13 +122,17 @@ class CNVenv:
         them in the dir_venv property.
         """
 
+        # if param is not abs, make abs rel to prj dir
+        file_reqs = Path(file_reqs)
+        if not file_reqs.is_absolute():
+            file_reqs = Path(self._dir_prj) / file_reqs
+
         # the command to install packages to venv from reqs
         cmd = (
             f"cd {self._dir_venv.parent}; "
             f". ./{self._dir_venv.name}/bin/activate; "
-            f"python "
-            "-m pip install "
-            f"-r {self._file_reqs}"
+            "python -m pip install "
+            f"-r {file_reqs}"
         )
         try:
             F.sh(cmd, shell=True)
@@ -140,32 +142,41 @@ class CNVenv:
     # --------------------------------------------------------------------------
     # Freeze packages in the venv folder to the file_reqs property
     # --------------------------------------------------------------------------
-    def freeze(self):
-        """
-        Freeze packages in the venv folder to the file_reqs property
+    # def freeze(self, file_reqs):
+    #     """
+    #     Freeze packages in the venv folder to the file_reqs property
 
-        Raises:
-            cnfunctions.CNShellError if an error occurs
+    #     Arguments:
+    #         file_reqs: File to save requirements
 
-        Freezes current packages in the venv dir into a file for easy
-        installation.
-        """
+    #     Raises:
+    #         cnfunctions.CNShellError if an error occurs
 
-        # the command to freeze a venv
-        cmd = (
-            f"cd {self._dir_venv.parent}; "
-            f". ./{self._dir_venv.name}/bin/activate; "
-            "python "
-            "-Xfrozen_modules=off "
-            "-m pip freeze "
-            "-l --exclude-editable "
-            "--require-virtualenv "
-            "> "
-            f"{self._file_reqs}"
-        )
-        try:
-            F.sh(cmd, shell=True)
-        except F.CNShellError as e:
-            raise e
+    #     Freezes current packages in the venv dir into a file for easy
+    #     installation.
+    #     """
+
+    #     # if param is not abs, make abs rel to prj dir
+    #     file_reqs = Path(file_reqs)
+    #     if not file_reqs.is_absolute():
+    #         file_reqs = Path(self._dir_prj) / file_reqs
+
+    #     # the command to freeze a venv
+    #     cmd = (
+    #         f"cd {self._dir_venv.parent}; "
+    #         f". ./{self._dir_venv.name}/bin/activate; "
+    #         "python "
+    #         "-Xfrozen_modules=off "
+    #         "-m pip freeze "
+    #         "-l --exclude-editable "
+    #         "--require-virtualenv "
+    #         "> "
+    #         f"{file_reqs}"
+    #     )
+    #     try:
+    #         F.sh(cmd, shell=True)
+    #     except F.CNShellError as e:
+    #         raise e
+
 
 # -)

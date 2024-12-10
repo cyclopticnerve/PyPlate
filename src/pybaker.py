@@ -20,6 +20,8 @@ Run pybaker -h for more options.
 """
 
 # FIXME: run pybaker from prj dir
+# put in postflight script:
+# ln -s $HOME/Documents/Projects/Python/PyPlate/src/pybaker.py $HOME/.local/bin/pybaker
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -27,6 +29,7 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
+import os
 from pathlib import Path
 import re
 import shutil
@@ -41,9 +44,11 @@ import sys
 # add custom import paths
 
 # path to this project
-# parent is src, parents[1] is PyPlate
 # NB: needed to get imports from conf (bootstrap)
-P_DIR_PYPLATE = Path(__file__).parents[1].resolve()
+# NB: this is hardcoded so ln -s will work
+# FIXME: fix this in dist
+# P_DIR_PYPLATE = Path.home() / ".config/pyplate"
+P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
 sys.path.append(str(P_DIR_PP_CONF))
@@ -55,7 +60,7 @@ from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
-from cnlib.cnvenv import CNVenv  # type: ignore
+# from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -89,10 +94,6 @@ S_PP_ABOUT = (
     f"{S_PP_VER_FMT}\n"
     f"https://www.github.com/cyclopticnerve/PyPlate"
 )
-
-# folder positional strings
-S_PRJ_OPTION = "DIR"  # key in dict_args
-S_PRJ_HELP = "the project directory to bake"  # display in help
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -130,9 +131,8 @@ class PyBaker:
         """
 
         # set the initial values of properties
-        self._dict_args = {}
-        self._debug = False
         self._dir_prj = Path()
+        self._debug = False
 
         self._dict_rep = {}
         self._is_html = False
@@ -159,7 +159,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, dir_prj, debug=False):
+    def main(self, dir_current, debug=False):
         """
         The main method of the program
 
@@ -171,12 +171,12 @@ class PyBaker:
         program, and performing its steps.
         """
 
+        # store properties
+        self._dir_prj = Path(dir_current).resolve()
+        self._debug = debug
+
         # ----------------------------------------------------------------------
         #  do the work
-
-        # store properties
-        self._dir_prj = Path(dir_prj)
-        self._debug = debug
 
         # print about info
         print(S_PP_ABOUT)
@@ -198,7 +198,7 @@ class PyBaker:
         self._do_after_fix()
 
         # copy project files into dist folder
-        self._do_copy()
+        self._do_dist()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -244,6 +244,8 @@ class PyBaker:
         if self._dir_prj and not self._dir_prj.exists():
             print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
             sys.exit(-1)
+
+        # do not run pybaker on pyplate (we are not that meta YET...)
         if "pyplate" in str(self._dir_prj).lower():
             print(M.S_ERR_PRJ_DIR_IS_PP)
             sys.exit(-1)
@@ -276,7 +278,6 @@ class PyBaker:
         self._dict_pub_meta = self._dict_pub[M.S_KEY_PUB_META]
         self._dict_pub_bl = self._dict_pub[M.S_KEY_PUB_BL]
         self._dict_pub_i18n = self._dict_pub[M.S_KEY_PUB_I18N]
-        # self._dict_pub_install = self._dict_pub[M.S_KEY_PUB_INSTALL]
         self._dict_pub_dist = self._dict_pub[M.S_KEY_PUB_DIST]
 
     # --------------------------------------------------------------------------
@@ -334,7 +335,7 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # do the fixes
-        # note that root is a full path, dirs and files are relative to root
+        # NB: root is a full path, dirs and files are relative to root
         for root, root_dirs, root_files in self._dir_prj.walk():
 
             # skip dir if in skip_all
@@ -470,22 +471,22 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # freeze requirements
-        if M.B_CMD_VENV:
+        # if M.B_CMD_VENV:
 
-            print(M.S_ACTION_VENV, end="", flush=True)
+        #     print(M.S_ACTION_VENV, end="", flush=True)
 
-            # get name ov venv folder and reqs file
-            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-            file_reqs = M.S_FILE_REQS
+        #     # get name ov venv folder and reqs file
+        #     dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+        #     file_reqs = M.S_FILE_REQS
 
-            # do the thing with the thing
-            cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
-            try:
-                cv.freeze()
-                print(M.S_ACTION_DONE)
-            except F.CNShellError as e:
-                print(M.S_ACTION_FAIL)
-                print(e.message)
+        #     # do the thing with the thing
+        #     cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
+        #     try:
+        #         cv.freeze()
+        #         print(M.S_ACTION_DONE)
+        #     except F.CNShellError as e:
+        #         print(M.S_ACTION_FAIL)
+        #         print(e.message)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -513,17 +514,32 @@ class PyBaker:
             # this .pot, .po, and .mo files
             potpy.main()
 
+            # we are done
+            print(M.S_ACTION_DONE)
+
             # make .desktop file
             path_desk = self._dir_prj / M.S_DIR_DESKTOP
-            if path_desk.exists():
-                path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
+            path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
+
+            if (
+                path_desk.exists()
+                and path_desk.is_dir()
+                and path_template.exists()
+                and path_template.is_file()
+            ):
+
+                # fix .desktop file
+                print(M.S_ACTION_DESK, end="", flush=True)
+
                 name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
                 path_out_name = M.S_FILE_DESK_OUT.format(name_small)
                 path_out = self._dir_prj / path_out_name
+
+                # update desktop file
                 potpy.make_desktop(path_template, path_out)
 
-            # we are done
-            print(M.S_ACTION_DONE)
+                # we are done
+                print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
@@ -586,14 +602,14 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
-    def _do_copy(self):
+    def _do_dist(self):
         """
         Copy fixed files to final location
 
         Gets dirs/files from project and copies them to the dist/assets dir.
         """
 
-        print(M.S_ACTION_COPY, end="", flush=True)
+        print(M.S_ACTION_DIST, end="", flush=True)
 
         # find old dist? nuke it from orbit! it's the only way to be sure!
         p_dist = self._dir_prj / M.S_DIR_DIST
@@ -616,6 +632,11 @@ class PyBaker:
                 shutil.copytree(src, dst, dirs_exist_ok=True)
             elif src.exists() and src.is_file():
                 shutil.copy2(src, dst)
+
+        # ----------------------------------------------------------------------
+        # call conf after dist
+
+        M.do_after_dist(self._dir_prj, self._dict_prv, self._dict_pub)
 
         # done copying project files
         print(M.S_ACTION_DONE)
@@ -1007,12 +1028,6 @@ if __name__ == "__main__":
         help=M.S_DBG_HELP,
     )
 
-    # add project dir
-    parser.add_argument(
-        S_PRJ_OPTION,  # args key
-        help=S_PRJ_HELP,
-    )
-
     # get namespace object
     args = parser.parse_args()
 
@@ -1022,13 +1037,13 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_dir_prj = dict_args.get(S_PRJ_OPTION, None)
+    a_dir_cur = os.getcwd()
     a_debug = dict_args.get(M.S_DBG_DEST, False)
 
     # create object
     pb = PyBaker()
 
     # run main method with args
-    pb.main(a_dir_prj, a_debug)
+    pb.main(a_dir_cur, a_debug)
 
 # -)

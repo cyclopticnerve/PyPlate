@@ -20,6 +20,8 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # system imports
 from pathlib import Path
 import re
+import shutil
+import tarfile
 
 # ------------------------------------------------------------------------------
 # Bools
@@ -50,7 +52,7 @@ I_SW_FALSE = 0
 # ------------------------------------------------------------------------------
 
 # base dir for project type folders, relative to dev home
-S_DIR_PRJ_BASE = "Documents/Projects/Python"
+# S_DIR_PRJ_BASE = "Documents/Projects/Python"
 
 # date format
 S_DATE_FMT = "%m/%d/%Y"
@@ -80,18 +82,19 @@ S_ERR_MID = (
 S_ERR_EXIST = 'Project "{}" already exists'
 
 # output msg for steps
+S_ACTION_COPY = "Copy template files... "
 S_ACTION_BEFORE = "Do before fix... "
 S_ACTION_FIX = "Do fix... "
-S_ACTION_GIT = "Do git... "
-S_ACTION_VENV = "Do venv... "
-S_ACTION_PURGE = "Do purge... "
 S_ACTION_AFTER = "Do after fix... "
-S_ACTION_I18N = "Do i18n... "
-S_ACTION_DOCS = "Do docs... "
-S_ACTION_TREE = "Do tree... "
-S_ACTION_COPY = "Do copy files... "
+S_ACTION_GIT = "Make git folder... "
+S_ACTION_VENV = "Make venv folder... "
+# S_ACTION_PURGE = "Do purge... "
+S_ACTION_I18N = "Make i18n folder... "
+S_ACTION_DESK = "Fixing desktop file... "
+S_ACTION_DOCS = "Make docs folder... "
+S_ACTION_TREE = "Make tree file... "
+S_ACTION_DIST = "Make dist folder... "
 S_ACTION_INST = "Make install file... "
-
 S_ACTION_DONE = "Done"
 S_ACTION_FAIL = "Failed"
 
@@ -144,6 +147,9 @@ S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
 S_KEY_NAME_MID = "S_KEY_NAME_MID"
 
+S_KEY_ZIP_EXT = "ext"
+S_KEY_ZIP_MODE = "mode"
+
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
 # and make any appropriate changes
@@ -170,7 +176,7 @@ S_DIR_SCRATCH = "scratch"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
-# S_DIR_INST_CONF = f"{S_DIR_INST_ASSETS}/{S_DIR_CONF}"
+S_DIR_GUI = "gui"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -191,8 +197,8 @@ S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/" + "{}.desktop"
 # initial location of project (to check for dups)
 # /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
 # NB: format params are project type and project name
-S_DIR_BASE = str(Path.home() / S_DIR_PRJ_BASE)
-S_DIR_PRJ = S_DIR_BASE + "/{}/{}"
+# S_DIR_BASE = str(Path.home() / S_DIR_PRJ_BASE)
+# S_DIR_PRJ = S_DIR_BASE + "/{}/{}"
 
 # paths relative to end user home only
 S_USR_CONF = ".config"  # __PP_NAME_SMALL__ will be appended
@@ -232,17 +238,8 @@ S_CMD_GIT = "git init {} -q"
 # cmds for venv
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
-# NB: path to venv create/install/freeze scripts for venv, relative to prj dir
-# NB: format param is __PP_NAME_VENV__
-# S_VENV_CREATE = f"{S_PRJ_PRV_DIR}/{S_DIR_VENV}/venv_create.sh" " {}"
-# S_VENV_INSTALL = f"{S_PRJ_PRV_DIR}/{S_DIR_VENV}/venv_install.sh"
-# S_VENV_FREEZE = f"{S_PRJ_PRV_DIR}/{S_DIR_VENV}/venv_freeze.sh"
 
-# path to docs script
-# S_DOCS_CREATE = f"{S_PRJ_PRV_DIR}/{S_DIR_DOCS}/docs_create.sh"
-# S_DOCS_MODIFY = f"{S_PRJ_PRV_DIR}/{S_DIR_DOCS}/docs_modify.py"
-# S_DOCS_RUN = f"{S_PRJ_PRV_DIR}/{S_DIR_DOCS}/docs_run.sh"
-
+# sphinx theme name
 S_DOCS_THEME = "sphinx_rtd_theme"
 
 # fix readme
@@ -336,12 +333,10 @@ S_DBG_HELP = "enable debugging option"
 # val[0] is the char to enter in the cli (short, display only)
 # val[1] is the display name in the cli (long, display only)
 # val[2] is the template folder to use (template/subdir)
-# val[3] is the name of the folder under S_DIR_PRJ_BASE in which to place the
-# project (prj_dir)
 L_TYPES = [
-    ["c", "CLI", "cli", "CLIs"],
-    ["g", "GUI", "gui", "GUIs"],
-    ["p", "PKG", "pkg", "PKGs"],
+    ["c", "CLI", "cli",],
+    ["g", "GUI", "gui",],
+    ["p", "PKG", "pkg",],
 ]
 
 # list of file types to use md/html/xml fixer
@@ -360,7 +355,7 @@ L_EXT_GTK = [".ui", ".glade"]
 # files to remove after the project is done
 # paths are relative to project dir
 L_PURGE = [
-    Path(S_DIR_SRC) / "ABOUT",
+    "ABOUT",
 ]
 
 # get list of approved categories
@@ -516,6 +511,13 @@ L_CATS = [
 L_UNINSTALL = [
     "__PP_USR_CONF__",
 ]
+
+# which prj types need an install.json?
+L_MAKE_INSTALL = [
+    "c", 
+    "g",
+]
+
 # ------------------------------------------------------------------------------
 # Dictionaries
 # ------------------------------------------------------------------------------
@@ -541,14 +543,16 @@ D_PRV_ALL = {
     "__PP_EMAIL__": "cyclopticnerve@gmail.com",
     # the license name, used in headers and pyproject.toml
     "__PP_LICENSE_NAME__": "WTFPLv2",
+    # the license url, used in gui about dialog
+    "__PP_LICENSE_URL__": "http://www.wtfpl.net",
     # the license image/link to use in __PP_README_FILE__
     "__PP_RM_LICENSE__": (
         "[!"
         "[License: WTFPLv2]"
         "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg "
-        '"http://www.wtfpl.net")'
+        "http://www.wtfpl.net"
         "]"
-        "(http://www.wtfpl.net)"
+        "http://www.wtfpl.net"
     ),
     # dummy value to use in headers
     "__PP_DUMMY__": "",
@@ -590,6 +594,7 @@ D_PRV_ALL = {
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
     # "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
     "__PP_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
+    "__PP_DIR_GUI__": S_DIR_GUI,
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -656,31 +661,36 @@ D_PUB_DIST = {
         S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
-        #
         S_DIR_CONF: S_DIR_ASSETS,
         "lib": S_DIR_ASSETS,
         S_FILE_INSTALL: "",
         S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_FILE_REQS: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
     },
     "p": {
-        S_DIR_SRC: "",
+        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
         S_DIR_README: "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
+        #
+        S_FILE_TOML: "__PP_NAME_SMALL__",
     },
     "g": {
         S_DIR_SRC: S_DIR_ASSETS,
         S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
-        #
         S_DIR_CONF: S_DIR_ASSETS,
         "lib": S_DIR_ASSETS,
         S_FILE_INSTALL: "",
         S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_FILE_REQS: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         #
+        S_DIR_GUI: S_DIR_ASSETS,
         S_DIR_IMAGES: S_DIR_ASSETS,
     },
 }
@@ -702,7 +712,7 @@ D_PUB_BL = {
         # ".vscode",
         ".VSCodeCounter",
         # NB: dist will have install.py in it, needs dunders
-        # S_DIR_DIST,
+        S_DIR_DIST,
         S_DIR_DOCS,
         f"**/{S_DIR_LOCALE}",
         f"**/{S_DIR_PO}",
@@ -712,7 +722,6 @@ D_PUB_BL = {
         S_FILE_REQS,
         "**/__pycache__",
         "**/*.mo",
-        S_DIR_DIST,
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -802,24 +811,27 @@ D_COPY_LIB = {
     "g": ["cnlib", "cnguilib"],
 }
 
-# # which prj types need an install.json?
-# D_MAKE_INSTALL = {
-#     "c": True,
-#     "p": False,
-#     "g": True,
-# }
+# dictionary of default stuff to put in install.json
+D_INSTALL = {
+    "__PP_NAME_VENV__": "__PP_USR_CONF__",
+    S_DIR_CONF: "__PP_USR_CONF__",
+    "lib": "__PP_USR_CONF__",
+    S_DIR_README: "__PP_USR_CONF__",
+    S_DIR_SRC: "__PP_USR_CONF__",
+    S_FILE_LICENSE: "__PP_USR_CONF__",
+    S_FILE_README: "__PP_USR_CONF__",
+    S_DIR_INSTALL: "__PP_USR_CONF__",
+    S_DIR_IMAGES: "__PP_USR_CONF__",
+    S_DIR_GUI: "__PP_USR_CONF__",
+}
 
-# # dictionary of default stuff to put in install.json
-# D_INSTALL = {
-#     "__PP_NAME_VENV__": "__PP_USR_CONF__",
-#     S_DIR_CONF: "__PP_USR_CONF__",
-#     "lib": "__PP_USR_CONF__",
-#     S_DIR_README: "__PP_USR_CONF__",
-#     S_DIR_SRC: "__PP_USR_CONF__",
-#     S_FILE_LICENSE: "__PP_USR_CONF__",
-#     S_FILE_README: "__PP_USR_CONF__",
-#     S_DIR_INSTALL: "__PP_USR_CONF__",
-# }
+# src dirs to zip in dist
+D_ZIP_DIST = {
+    "p": {
+        S_KEY_ZIP_EXT: ".tar.gz",
+        S_KEY_ZIP_MODE: "w:gz",
+    }
+}
 
 # the info for matching/fixing lines in markup files
 D_MU_REPL = {
@@ -987,6 +999,68 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
                 if suffix in L_EXT_GTK:
                     _fix_gtk(item, dict_pub_meta)
 
+# ------------------------------------------------------------------------------
+# Do any work after making dist
+# ------------------------------------------------------------------------------
+def do_after_dist(dir_prj, dict_prv, _dict_pub):
+    """
+    Do any work after making dist
+
+    Arguments:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data (reserved for
+        future use)
+
+    Do any work on the dist folder after it is created. Currently, this method
+    purges any "ABOUT" file used as placeholders for github syncing. It also
+    tars the source folder if it is a package, making for one (or two) less
+    steps in the user's install process.
+    """
+
+    # get dist dir for all operations
+    p_dist = dir_prj / S_DIR_DIST
+
+    # --------------------------------------------------------------------------
+
+    # first purge all dummy files
+    for root, _root_dirs, root_files in p_dist.walk():
+
+        # convert files into Paths
+        files = [root / f for f in root_files]
+
+        # for each file item
+        for item in files:
+
+            # if it is in purge list, delete it
+            if item.name in L_PURGE:
+                Path.unlink(item)
+
+    # --------------------------------------------------------------------------
+
+    # check for compression in dist
+
+    # get prj type
+    type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
+    # if we want to compress
+    if type_prj in D_ZIP_DIST:
+
+        dict_prj = D_ZIP_DIST[type_prj]
+
+        # get folder name, folder loc, compressed file name
+        name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
+        ext = dict_prj[S_KEY_ZIP_EXT]
+        mode = dict_prj[S_KEY_ZIP_MODE]
+        in_dir = p_dist / name_small
+        out_file = p_dist / f"{name_small}{ext}"
+
+        # run tar (or your favorite utility)
+        with tarfile.open(out_file, mode=mode) as tar:
+            tar.add(in_dir, arcname=Path(in_dir).name)
+
+        # remove old dir
+        shutil.rmtree(in_dir)
 
 # ------------------------------------------------------------------------------
 # Private functions
