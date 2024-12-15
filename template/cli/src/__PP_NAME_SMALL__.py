@@ -39,7 +39,7 @@ import sys
 # add custom import paths
 
 # find path to lib
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_PRJ = Path.home() / "__PP_USR_CONF__"
 P_DIR_LIB = P_DIR_PRJ / "lib"
 
 # add paths to import search

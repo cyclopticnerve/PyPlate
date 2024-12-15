@@ -9,7 +9,7 @@
 """
 The class to use for installing/uninstalling
 
-Note that scripts in the preflight and postflight sections of the conf dict
+Note that scripts in the preflight and postflight sections of the cfg dict
 should have their executable bits set and also have a shebang, so they can be
 run directly by the run_scripts method.
 """
@@ -22,7 +22,8 @@ run directly by the run_scripts method.
 import json
 from pathlib import Path
 import re
-import shutil
+
+# import shutil
 import sys
 
 # find paths to lib
@@ -47,26 +48,22 @@ from cnlib import cnfunctions as F  # type: ignore
 # ------------------------------------------------------------------------------
 
 # keys
-S_KEY_META = "META"
-S_KEY_INSTALL = "INSTALL"
-S_KEY_UNINSTALL = "UNINSTALL"
 S_KEY_NAME = "NAME"
 S_KEY_VERSION = "VERSION"
-S_KEY_PREFLIGHT = "PREFLIGHT"
-S_KEY_POSTFLIGHT = "POSTFLIGHT"
-S_KEY_ASSETS = "ASSETS"
-S_KEY_SYS_REQS = "SYS_REQS"
-S_KEY_PY_REQS = "PY_REQS"
-
-# values
-S_VAL_PIP = "python3-pip"
+S_KEY_DIR_PRE = "DIR_PRE"
+S_KEY_DIR_POST = "DIR_POST"
+# S_KEY_DIR_ASSETS = "DIR_ASSETS"
+S_KEY_DICT_INSTALL = "DICT_INSTALL"
+S_KEY_LIST_UNINST = "LIST_UNINST"
 
 # messages
-# NB: format params are prog_name nad prog_version
+# NB: format params are prog_name and prog_version
 S_MSG_INST_START = "Installing {} version {}"
 # NB: format param is prog_name
-S_MSG_INST_END = "{} installed"  #
+S_MSG_INST_END = "{} installed"
+# NB: format param is prog_name
 S_MSG_UNINST_START = "Uninstalling {}"
+# NB: format param is prog_name
 S_MSG_UNINST_END = "{} uninstalled"
 
 # general "done" message
@@ -80,15 +77,10 @@ S_MSG_SCRIPTS_END = "{} scripts done"
 S_MSG_SCRIPT_RUN = "  Running {}... "
 
 # strings for system requirements
-S_MSG_SYS_START = "Installing system requirements:"
-S_MSG_SYS_END = "System requirements done"
-# strings for python requirements
-S_MSG_PY_START = "Installing python requirements:"
-S_MSG_PY_END = "Python requirements done"
 # NB: format param is req name
-S_MSG_REQ_RUN = "  Installing {}... "
-S_MSG_COPY_START = "Copying files... "
-S_MSG_DELETE_START = "Deleting files... "
+# S_MSG_REQ_RUN = "  Installing {}... "
+S_MSG_INST_START = "Copying files... "
+S_MSG_UNINST_START = "Deleting files... "
 
 # strings for version compare
 # NB: format param is prog name
@@ -107,13 +99,6 @@ S_ERR_RUN_SCRIPT = (
 )
 S_ERR_REQ = "Could not install {}"
 S_ERR_VERSION = "One or both version numbers are invalid"
-
-# cmds
-S_CMD_SUDO = "sudo echo -n"
-# NB: format param is req name
-S_CMD_SYS_REQ = "sudo apt-get install {} -qq > /dev/null"
-# NB: format param is req name
-S_CMD_PY_REQ = "python -m pip install -q {} > /dev/null"
 
 # question to ask when installing older version
 S_ASK_OVER = (
@@ -170,19 +155,6 @@ class CNInstallError(Exception):
         # set properties
         self.message = message
 
-    # --------------------------------------------------------------------------
-    # Provide a human-readable error message when the object is printed
-    # --------------------------------------------------------------------------
-    def __str__(self):
-        """
-        Provide a human-readable error message when the object is printed
-
-        This method provides a string representation of the error object when
-        it is passed to the print() function.
-        """
-
-        # return the message string passed to the constructor
-        return self.message
 
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
@@ -191,7 +163,7 @@ class CNInstall:
     """
     The class to use for installing/uninstalling
 
-    Note that scripts in the preflight and postflight sections of the conf dict
+    Note that scripts in the preflight and postflight sections of the cfg dict
     should have their executable bits set and also have a shebang, so they can
     be run directly by the run_scripts method.
     """
@@ -211,11 +183,10 @@ class CNInstall:
         """
 
         # set properties
-        self._installing = True
-        self._path_assets = None
-        self._dict_meta = {}
-        self._dict_func = {}
+        self._dir_assets = Path()
         self._debug = False
+        self._installing = True
+        self._dict_cfg = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -224,47 +195,62 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Make install file
     # --------------------------------------------------------------------------
-    def make_install_cfg(self, name, version, assets_inst=None, assets_uninst=None):
+    def make_install_cfg(self, name, version, dir_pre, dir_post, dict_install):
         """
         Make install file
 
         Arguments:
-            name: The program name
-            version: The program version
-            assets_inst: the dict of assets to install (default: None)
-            assets_uninst: The list of assets to uninstall (default: None)
+            name: Program name
+            version: Program version
+            dir_pre: Path to preflight script dir
+            dir_post: Path th postflight script dir
+            dict_install: Dict of assets to install
 
         Returns:
             A properly formatted install config dict to save to a file
 
-        This method creates a config file for use by both install.py and
-        uninstall.py. The dict format can be found below.
+        This method creates a config file for use by install.py. The dict
+        format can be found below.
         """
-
-        # set default props
-        if assets_inst is None:
-            assets_inst = {}
-        if assets_uninst is None:
-            assets_uninst = []
 
         # create the dict using args
         dict_use = {
-            S_KEY_META: {
-                S_KEY_NAME: name,
-                S_KEY_VERSION: version,
-            },
-            S_KEY_INSTALL: {
-                S_KEY_PREFLIGHT: [],
-                S_KEY_POSTFLIGHT: [],
-                S_KEY_ASSETS: assets_inst,
-                S_KEY_SYS_REQS: [],
-                S_KEY_PY_REQS: [],
-            },
-            S_KEY_UNINSTALL: {
-                S_KEY_PREFLIGHT: [],
-                S_KEY_POSTFLIGHT: [],
-                S_KEY_ASSETS: assets_uninst,
-            },
+            S_KEY_NAME: name,
+            S_KEY_VERSION: version,
+            S_KEY_DIR_PRE: dir_pre,
+            S_KEY_DIR_POST: dir_post,
+            S_KEY_DICT_INSTALL: dict_install,
+        }
+
+        # return the formatted dict
+        return dict_use
+
+    # --------------------------------------------------------------------------
+    # Make uninstall file
+    # --------------------------------------------------------------------------
+    def make_uninstall_cfg(self, name, dir_pre, dir_post, list_uninst):
+        """
+        Make uninstall file
+
+        Arguments:
+            name: Program name
+            dir_pre: Path to preflight script dir
+            dir_post: Path th postflight script dir
+            list_uninstall: List of assets to uninstall
+
+        Returns:
+            A properly formatted uninstall config dict to save to a file
+
+        This method creates a config file for use by uninstall.py. The dict
+        format can be found below.
+        """
+
+        # create the dict using args
+        dict_use = {
+            S_KEY_NAME: name,
+            S_KEY_DIR_PRE: dir_pre,
+            S_KEY_DIR_POST: dir_post,
+            S_KEY_LIST_UNINST: list_uninst,
         }
 
         # return the formatted dict
@@ -273,19 +259,17 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Install the program
     # --------------------------------------------------------------------------
-    def install(
-            self, path_assets, path_conf_new, path_conf_old=None, debug=False
-        ):
+    def install(self, dir_assets, path_cfg_new, path_cfg_old, debug=False):
         """
         Install the program
 
         Arguments:
-            path_assets: Path to the assets folder where all of the program
+            dir_assets: Path to the assets folder where all of the program
             files are put in dist. This is the base source path to use when
             copying files to the user's computer
-            path_conf_new: Path to the file that contains the current install
+            path_cfg_new: Path to the file that contains the current install
             dict info
-            path_conf_old: Path to the currently installed program's install
+            path_cfg_old: Path to the currently installed program's install
             dict info, or None if not installed (default: None)
             debug: If True, do not copy files, ony print the action (default:
             False)
@@ -294,28 +278,26 @@ class CNInstall:
         """
 
         # set properties
-        self._installing = True
-        self._path_assets = path_assets
+        self._dir_assets = Path(dir_assets).resolve()
         self._debug = debug
+        self._installing = True
 
         # get dicts from files
-        dict_conf_new = self._get_dict_from_file(path_conf_new)
-        self._dict_meta = dict_conf_new[S_KEY_META]
-        self._dict_func = dict_conf_new[S_KEY_INSTALL]
+        dict_cfg_new = self._get_dict_from_file(path_cfg_new)
 
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
-        if path_conf_old and Path(path_conf_old).exists():
-            dict_conf_old = self._get_dict_from_file(path_conf_old)
+        if path_cfg_old and Path(path_cfg_old).exists():
+            dict_cfg_old = self._get_dict_from_file(path_cfg_old)
 
             # check versions
-            ver_old = dict_conf_old[S_KEY_META][S_KEY_VERSION]
-            ver_new = self._dict_meta[S_KEY_VERSION]
+            ver_old = dict_cfg_old[S_KEY_VERSION]
+            ver_new = dict_cfg_new[S_KEY_VERSION]
             res = self._do_compare_versions(ver_old, ver_new)
 
             # same version is installed
             if res == 0:
-                prog_name = self._dict_meta[S_KEY_NAME]
+                prog_name = dict_cfg_new[S_KEY_NAME]
                 print(S_MSG_VER_SAME.format(prog_name))
                 sys.exit(0)
 
@@ -331,17 +313,18 @@ class CNInstall:
                     sys.exit(0)
 
         # run dict
+        self._dict_cfg = dict_cfg_new
         self._run_dict()
 
     # --------------------------------------------------------------------------
     # Uninstall the program
     # --------------------------------------------------------------------------
-    def uninstall(self, path_conf, debug=False):
+    def uninstall(self, path_cfg, debug=False):
         """
         Uninstall the program
 
         Arguments:
-            path_conf: Path to the file that contains the uninstall dict info
+            path_cfg: Path to the file that contains the uninstall dict info
             debug: If True, do not remove files, ony print the action (default:
             False)
 
@@ -349,13 +332,11 @@ class CNInstall:
         """
 
         # set properties
-        self._installing = False
         self._debug = debug
+        self._installing = False
 
         # get dict from file
-        dict_conf = self._get_dict_from_file(path_conf)
-        self._dict_meta = dict_conf[S_KEY_META]
-        self._dict_func = dict_conf[S_KEY_UNINSTALL]
+        self._dict_cfg = self._get_dict_from_file(path_cfg)
 
         # run dict
         self._run_dict()
@@ -377,51 +358,34 @@ class CNInstall:
         Runs the (un)install process using a dict. The dict specification is in
         the template file "template/all/install/install.json". This is the meat
         of the program, doing most of the work and/or delegating to sub
-        functions. 
+        functions.
         """
 
         # get prog name
-        prog_name = self._dict_meta[S_KEY_NAME]
+        prog_name = self._dict_cfg[S_KEY_NAME]
 
         # show some progress
         if self._installing:
-            prog_version = self._dict_meta[S_KEY_VERSION]
+            prog_version = self._dict_cfg[S_KEY_VERSION]
             print(S_MSG_INST_START.format(prog_name, prog_version))
 
         # we are uninstalling, just go for it
         else:
             print(S_MSG_UNINST_START.format(prog_name))
 
-        # fix py/sys reqs, get sudo
-        if self._installing:
-
-            # check if pip necessary
-            sys_reqs = self._dict_func.get(S_KEY_SYS_REQS, [])
-            py_reqs = self._dict_func.get(S_KEY_PY_REQS, [])
-            # TODO: don't need this if venv activated
-            if len(py_reqs):
-                sys_reqs.append(S_VAL_PIP)
-
-            # check if we need sudo password
-            # TODO: don't need len(py_reqs) if venv activated
-            if len(sys_reqs) or len(py_reqs):
-                try:
-                    cmd = S_CMD_SUDO
-                    F.sh(cmd)
-                except F.CNShellError as e:
-                    error = CNInstallError(S_ERR_NO_SUDO)
-                    raise error from e
-
         # do each part of conf dict
-        self._run_scripts(S_KEY_PREFLIGHT)
+
+        # run preflight
+        self._run_scripts(S_KEY_DIR_PRE)
+
+        # run content
         if self._installing:
-            # self._do_sys_reqs()
-            # self._do_py_reqs()
             self._do_install_content()
         else:
             self._do_uninstall_content()
-        print(S_MSG_DONE, flush=True)
-        self._run_scripts(S_KEY_POSTFLIGHT)
+
+        # run postflight
+        self._run_scripts(S_KEY_DIR_POST)
 
         # done installing
         if self._installing:
@@ -432,12 +396,12 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Open a json file and return the dict inside
     # --------------------------------------------------------------------------
-    def _get_dict_from_file(self, path_conf):
+    def _get_dict_from_file(self, path_cfg):
         """
         Open a json file and return the dict inside
 
         Arguments:
-            path_conf: Path to the file containing the dict
+            path_cfg: Path to the file containing the dict
 
         Returns:
             The dict contained in the file
@@ -450,17 +414,17 @@ class CNInstall:
 
         # set conf dict
         try:
-            with open(path_conf, "r", encoding="UTF-8") as a_file:
+            with open(path_cfg, "r", encoding="UTF-8") as a_file:
                 return json.load(a_file)
 
         # file not found
         except FileNotFoundError as e:
-            error = CNInstallError(S_ERR_NOT_FOUND.format(path_conf))
+            error = CNInstallError(S_ERR_NOT_FOUND.format(path_cfg))
             raise error from e
 
         # not valid json in file
         except json.JSONDecodeError as e:
-            error = CNInstallError(S_ERR_NOT_JSON.format(path_conf))
+            error = CNInstallError(S_ERR_NOT_JSON.format(path_cfg))
             raise error from e
 
     # --------------------------------------------------------------------------
@@ -478,123 +442,51 @@ class CNInstall:
         scripts in the order they are specified.
         """
 
-        # check for empty/no list
-        items = self._dict_func.get(key, [])
-        if len(items) == 0:
-            return
+        # lowercase the key for better printing
+        key = key.lower()
 
-        # show some text
-        out = key.lower()
-        print(S_MSG_SCRIPTS_START.format(out), flush=True)
+        # FIXME: hard coded install dir
+        # and then uninstall
 
-        # for each script item
-        for item in items:
+        # get the subdir for the key
+        # dir_key = self._path_assets / "install" / key
 
-            # show that we are doing something
-            print(S_MSG_SCRIPT_RUN.format(item), end="", flush=True)
+        # scan install key dir
+        # for root, _root_dirs, root_files in dir_key.walk():
 
-            # run script entry
-            if not self._debug:
-                try:
-                    F.sh(item)
-                    print(S_MSG_DONE, flush=True)
-                except F.CNShellError as e:
-                    error = CNInstallError(S_ERR_RUN_SCRIPT.format(item))
-                    raise error from e
-            else:
-                # print output for each script
-                print(S_MSG_DONE, flush=True)
+        #     # convert files into Paths
+        #     files = [root / f for f in root_files]
 
-    # --------------------------------------------------------------------------
-    # Install system requirements
-    # --------------------------------------------------------------------------
-    # def _do_sys_reqs(self):
-    #     """
-    #     Install system requirements
+        #     # if no files, skip
+        #     if len(files) == 0:
+        #         continue
 
-    #     Raises:
-    #         CNInstallError: If something went wrong
+        #     # show some text
+        #     print(S_MSG_SCRIPTS_START.format(key), flush=True)
 
-    #     This method uses the conf dict to install any system requirements
-    #     (i.e. non-python packages) necessary to run your program.
-    #     """
+        #     # for each script item
+        #     for file in files:
 
-    #     # check for empty/no list
-    #     items = self._dict_func.get(S_KEY_SYS_REQS, [])
-    #     if len(items) == 0:
-    #         return
+        #         # show that we are doing something
+        #         print(S_MSG_SCRIPT_RUN.format(file.name), end="", flush=True)
 
-    #     # show some text
-    #     print(S_MSG_SYS_START, flush=True)
+        #         # get full path rel to assets
+        #         new_item = str(file)
 
-    #     # get system requirements
-    #     for item in items:
-
-    #         # show that we are doing something
-    #         print(S_MSG_REQ_RUN.format(item), end="", flush=True)
-
-    #         # install apt reqs
-    #         if not self._debug:
-    #             try:
-    #                 cmd = S_CMD_SYS_REQ.format(item)
-    #                 F.sh(cmd)
-    #                 print(S_MSG_DONE, flush=True)
-    #             except F.CNShellError as e:
-    #                 error = CNInstallError(S_ERR_REQ.format(item))
-    #                 raise error from e
-    #         else:
-    #             # print output for each script
-    #             print(S_MSG_DONE, flush=True)
-
-    # --------------------------------------------------------------------------
-    # Install Python requirements
-    # --------------------------------------------------------------------------
-    # def _do_py_reqs(self):
-    #     """
-    #     Install Python requirements
-
-    #     Raises:
-    #         CNInstallError: If something went wrong
-
-    #     This method uses the conf dict to install any python requirements
-    #     (i.e. installed with pip) necessary to run your program.
-    #     """
-
-    #     # check for empty/no list
-    #     items = self._dict_func.get(S_KEY_PY_REQS, [])
-    #     if len(items) == 0:
-    #         return
-
-    #     # show some text
-    #     print(S_MSG_PY_START, flush=True)
-
-    #     # get python requirements
-    #     for item in items:
-
-    #         # show that we are doing something
-    #         print(S_MSG_REQ_RUN.format(item), end="", flush=True)
-
-    #         # install pip reqs
-    #         if not self._debug:
-    #             try:
-    #                 # TODO: activate venv to install reqs in venv
-    #                 cmd = (
-    #                     f"cd {dir_venv.parent};",
-    #                     f". {dir_venv.name}/bin/activate;",
-    #                     f"cd {self._path_assets};",
-    #                     S_CMD_PY_REQ.format(item)
-    #                 )
-    #                 F.sh(cmd)
-    #                 print(S_MSG_DONE, flush=True)
-    #             except F.CNShellError as e:
-    #                 error = CNInstallError(S_ERR_REQ.format(item))
-    #                 raise error from e
-    #         else:
-    #             # print output for each script
-    #             print(S_MSG_DONE, flush=True)
-
-    # # show some text
-    # print(S_MSG_PY_START, flush=True)
+        #         # run script entry
+        #         if not self._debug:
+        #             try:
+        #                 F.sh(new_item)
+        #                 # print output for each script
+        #                 print(S_MSG_DONE, flush=True)
+        #             except F.CNShellError as e:
+        #                 error = CNInstallError(
+        #                     S_ERR_RUN_SCRIPT.format(new_item)
+        #                 )
+        #                 raise error from e
+        #         else:
+        #             # print output for each script
+        #             print(S_MSG_DONE, flush=True)
 
     # --------------------------------------------------------------------------
     # Copy source files/folders
@@ -607,41 +499,43 @@ class CNInstall:
         source to their final locations in the user's folder structure.
         """
 
-        print(S_MSG_COPY_START, end="", flush=True)
+        # print(S_MSG_INST_START, end="", flush=True)
 
-        # get source dir and user home
-        inst_src = self._path_assets
-        inst_home = Path.home()
+        # # get source dir and user home
+        # inst_src = self._path_assets
+        # inst_home = Path.home()
 
-        # content list from dict
-        content = self._dict_func.get(S_KEY_ASSETS, {})
+        # # content list from dict
+        # content = self._dict_conf.get(S_KEY_ASSETS, {})
 
-        # for each key, value
-        for k, v in content.items():
+        # # for each key, value
+        # for k, v in content.items():
 
-            # get full paths of source / destination
-            src = inst_src / k
-            dst = inst_home / v / src.name
+        #     # get full paths of source / destination
+        #     src = inst_src / k
+        #     dst = inst_home / v / src.name
 
-            # debug may omit certain assets
-            if not src.exists():
-                continue
+        #     # debug may omit certain assets
+        #     if not src.exists():
+        #         continue
 
-            # if the source is a dir
-            if src.is_dir():
-                if not self._debug:
-                    # copy dir
-                    shutil.copytree(src, dst, dirs_exist_ok=True)
-                else:
-                    print(f"copytree {src} to {dst}")
+        #     # if the source is a dir
+        #     if src.is_dir():
+        #         if not self._debug:
+        #             # copy dir
+        #             shutil.copytree(src, dst, dirs_exist_ok=True)
+        #         else:
+        #             print(f"copytree {src} to {dst}")
 
-            # if the source is a file
-            else:
-                if not self._debug:
-                    # copy file
-                    shutil.copy(src, dst)
-                else:
-                    print(f"copy {src} to {dst}")
+        #     # if the source is a file
+        #     else:
+        #         if not self._debug:
+        #             # copy file
+        #             shutil.copy(src, dst)
+        #         else:
+        #             print(f"copy {src} to {dst}")
+
+        # print(S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Remove source files/folders
@@ -654,41 +548,43 @@ class CNInstall:
         user's computer.
         """
 
-        print(S_MSG_DELETE_START, end="", flush=True)
+        # print(S_MSG_UNINST_START, end="", flush=True)
 
-        # get source dir and user home
-        inst_home = Path.home()
+        # # get source dir and user home
+        # inst_home = Path.home()
 
-        # content list from dict
-        content = self._dict_func.get(S_KEY_ASSETS, {})
+        # # content list from dict
+        # content = self._dict_conf.get(S_KEY_ASSETS, {})
 
-        # create a list of all content dests as well as extras
-        l_un = [v for v in content]
-        extras = self._dict_func.get(S_KEY_UNINSTALL, [])
-        for item in extras:
-            l_un.append(item)
+        # # create a list of all content dests as well as extras
+        # l_un = [v for v in content]
+        # extras = self._dict_conf.get(S_KEY_ASSETS, [])
+        # for item in extras:
+        #     l_un.append(item)
 
-        # for each key, value
-        for item in l_un:
+        # # for each key, value
+        # for item in l_un:
 
-            # get full path of destination
-            dst = inst_home / item
+        #     # get full path of destination
+        #     dst = inst_home / item
 
-            # if the source is a dir
-            if dst.is_dir():
-                if not self._debug:
-                    # copy dir
-                    shutil.rmtree(dst)
-                else:
-                    print(f"rmtree {dst}")
+        #     # if the source is a dir
+        #     if dst.is_dir():
+        #         if not self._debug:
+        #             # copy dir
+        #             shutil.rmtree(dst)
+        #         else:
+        #             print(f"rmtree {dst}")
 
-            # if the source is a file
-            else:
-                if not self._debug:
-                    # copy file
-                    Path.unlink(dst)
-                else:
-                    print(f"unlink {dst}")
+        #     # if the source is a file
+        #     else:
+        #         if not self._debug:
+        #             # copy file
+        #             Path.unlink(dst)
+        #         else:
+        #             print(f"unlink {dst}")
+
+        # print(S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Compare two version strings for relativity
@@ -752,28 +648,49 @@ class CNInstall:
         # return 0 if equal
         return 0
 
+
 # ------------------------------------------------------------------------------
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     # testing
+    # testing
 
-#     # get parent
-#     test_parent = Path(__file__).parent.resolve()
+    # get parent
+    test_parent = Path(__file__).parent.resolve()  # cnlib
+    test_prj = test_parent / "cninstall_test"
+    test_dist = test_prj / "dist"
+    test_assets = test_dist / "assets"
 
-#     # get paths to assets and conf for install
-#     inst_assets = test_parent / "test/assets"
-#     inst_conf = inst_assets / "test.json"
+    test_install = test_assets / "install"
+    test_inst_pre = test_install / "preflight"
+    test_inst_post = test_install / "postflight"
 
-#     # get path to conf for uninstall
-#     uninst_conf = test_parent / "test/.config/test/test.json"
+    test_uninstall = test_assets / "uninstall"
+    test_uninst_pre = test_uninstall / "preflight"
+    test_uninst_post = test_uninstall / "postflight"
 
-#     # create object
-#     i = CNInstall()
+    # create object
+    i = CNInstall()
 
-#     # call method
-#     i.install(inst_assets, inst_conf, uninst_conf, debug=True)
-#     # i.uninstall(inst_conf, debug=True)
+    # make inst cfg dict
+    test_install_dict = i.make_install_cfg(
+        "test", "0.0.0", test_inst_pre, test_inst_post, {"test.py": "test.py"}
+    )
+
+    # print inst cfg dict
+    F.pp(test_install_dict, label="inst")
+
+    # make inst cfg dict
+    test_uninst_dict = i.make_uninstall_cfg(
+        "test", test_uninst_pre, test_uninst_post, ["test.py"]
+    )
+
+    # print inst cfg dict
+    F.pp(test_uninst_dict, label="uninst")
+
+    # call methods
+    # i.install(inst_assets, inst_cfg, None, debug=True)
+    # i.uninstall(inst_cfg, debug=True)
 
 
 # -)

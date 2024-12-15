@@ -245,6 +245,12 @@ class PyBaker:
             print(M.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
             sys.exit(-1)
 
+        # check if dir_prj has pyplate folder, if not, not a valid prj
+        path_pyplate = self._dir_prj / "pyplate"
+        if not path_pyplate.exists():
+            print(M.S_ERR_NOT_PRJ)
+            sys.exit(-1)
+
         # do not run pybaker on pyplate (we are not that meta YET...)
         if "pyplate" in str(self._dir_prj).lower():
             print(M.S_ERR_PRJ_DIR_IS_PP)
@@ -594,8 +600,11 @@ class PyBaker:
             print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
-        # fix dunders in install
-        path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+        # fix dunders in install/uninstall
+        path_inst = self._dir_prj / M.S_FILE_INST_CFG
+        if path_inst.exists():
+            self._fix_content(path_inst)
+        path_inst = self._dir_prj / M.S_FILE_UNINST_CFG
         if path_inst.exists():
             self._fix_content(path_inst)
 

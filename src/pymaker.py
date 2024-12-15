@@ -271,6 +271,7 @@ class PyMaker:
 
             # check for valid type
             if self._check_type(prj_type):
+                prj_type = prj_type.lower()
 
                 # at this point, type is valid so exit loop
                 break
@@ -332,10 +333,6 @@ class PyMaker:
 
         # calculate small name
         name_small = prj_name.lower()
-
-        # ----------------------------------------------------------------------
-        # print spacer line
-        print()
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -401,8 +398,10 @@ class PyMaker:
         M.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
         M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
         M.D_PRV_PRJ["__PP_DATE__"] = info_date
-        s = M.S_VENV_FMT_NAME.format(name_small)
-        M.D_PRV_PRJ["__PP_NAME_VENV__"] = s
+        M.D_PRV_PRJ["__PP_NAME_VENV__"] = M.S_VENV_FMT_NAME.format(name_small)
+
+        # blank line before printing progress
+        print()
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -847,7 +846,7 @@ class PyMaker:
             print(M.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
-        # make install file
+        # make install/uninstall cfg files
 
         # check if we need it
         prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
@@ -861,19 +860,42 @@ class PyMaker:
             # get params
             name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
             version = M.D_PUB_META["__PP_VERSION__"]
-            content_inst = M.D_INSTALL
-            content_uninst = M.L_UNINSTALL
 
-            # create a template instal cfg file
+            # get an install instance
             inst = I.CNInstall()
+
+            # create a template install cfg file
             dict_inst = inst.make_install_cfg(
-                name, version, content_inst, content_uninst
+                name,
+                version,
+                M.S_DIR_INST_PRE,
+                M.S_DIR_INST_POST,
+                # these are the defaults spec'd in pyplate_conf
+                # they can be edited in prj/install/install.json before running
+                # pybaker
+                M.D_INSTALL,
             )
 
             # fix dunders in inst cfg file
-            path_inst = self._dir_prj / M.S_FILE_INSTALL_CFG
+            path_inst = self._dir_prj / M.S_FILE_INST_CFG
             F.save_dict(dict_inst, [path_inst])
             self._fix_content(path_inst)
+
+            # create a template uninstall cfg file
+            dict_uninst = inst.make_uninstall_cfg(
+                name,
+                M.S_DIR_UNINST_PRE,
+                M.S_DIR_UNINST_POST,
+                # these are the defaults spec'd in pyplate_conf
+                # they can be edited in prj/uninstall/uninstall.json before running
+                # pybaker
+                M.L_UNINSTALL,
+            )
+
+            # fix dunders in inst cfg file
+            path_uninst = self._dir_prj / M.S_FILE_UNINST_CFG
+            F.save_dict(dict_uninst, [path_uninst])
+            self._fix_content(path_uninst)
 
             # show info
             print(M.S_ACTION_DONE)

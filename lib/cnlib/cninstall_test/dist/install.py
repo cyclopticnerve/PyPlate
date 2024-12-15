@@ -1,16 +1,16 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: uninstall.py                                          |     ()     |
+# Filename: install.py                                            |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
-The uninstall script for this project
+The install script for this project
 
-THis module uninstalls the project, removing its files and folders to the
+THis module installs the project, copying its files and folders to the
 appropriate locations on the user's computer. It also provides for hooks to run
 Python (or other language) scripts before and after the actual install process.
 """
@@ -31,9 +31,11 @@ import sys
 # my imports
 # add custom import paths
 
-DIR_SELF = Path(__file__).parents[1].resolve()
+DIR_SELF = Path(__file__).parent.resolve()
+DIR_ASSETS = DIR_SELF / "assets"
+FILE_CFG_NEW = DIR_ASSETS / "__PP_INST_CONF_FILE__"
 FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__" / "__PP_INST_CONF_FILE__"
-DIR_LIB = DIR_SELF / "lib"
+DIR_LIB = DIR_ASSETS / "lib"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -59,14 +61,14 @@ def main():
 
     # run the instance
     try:
-        inst.uninstall(FILE_CFG_OLD)
+        inst.install(DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD)
     except C.CNInstallError as e:
         print(e)
 
 # ------------------------------------------------------------------------------
 # Run the main class if we are not an import
 # ------------------------------------------------------------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 # -)

@@ -1,4 +1,5 @@
 This file is here to make sure git includes this directory in the repo because 
 git does not currently allow empty directories to be synced.
 
-This directory will be filled with install files.
+This directory will be filled with postflight install files for the current
+project.

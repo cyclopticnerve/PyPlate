@@ -80,6 +80,10 @@ S_ERR_MID = (
 )
 # NB: format param arise dir_type/(proj type dir)
 S_ERR_EXIST = 'Project "{}" already exists'
+S_ERR_NOT_PRJ = (
+    "This folder does not have a 'pyplate' folder.\n"
+    "Are you sure this is a PyPlate project?"
+)
 
 # output msg for steps
 S_ACTION_COPY = "Copy template files... "
@@ -147,8 +151,8 @@ S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
 S_KEY_NAME_MID = "S_KEY_NAME_MID"
 
-S_KEY_ZIP_EXT = "ext"
-S_KEY_ZIP_MODE = "mode"
+S_KEY_TAR_EXT = "ext"
+S_KEY_TAR_MODE = "mode"
 
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
@@ -173,9 +177,6 @@ S_DIR_LOCALE = f"{S_DIR_I18N}/locale"
 S_DIR_PO = f"{S_DIR_I18N}/po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
-S_DIR_DIST = "dist"
-S_DIR_ASSETS = "assets"
-S_DIR_INSTALL = "install"
 S_DIR_GUI = "gui"
 
 # common file names, rel to prj dir or pyplate dir
@@ -183,16 +184,30 @@ S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
-S_FILE_INST_JSON = "install.json"
 S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-S_FILE_INSTALL_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_JSON}"
-S_FILE_INSTALL = f"{S_DIR_INSTALL}/install.py"
-S_FILE_UNINSTALL = f"{S_DIR_INSTALL}/uninstall.py"
 S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
 # NB: format param is __PP_NAME_SMALL__
 S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/" + "{}.desktop"
+
+# ------------------------------------------------------------------------------
+
+S_DIR_DIST = "dist"
+S_DIR_ASSETS = "assets"
+S_DIR_INSTALL = "install"
+S_DIR_UNINSTALL = "uninstall"
+S_DIR_INST_PRE = f"{S_DIR_INSTALL}/preflight"
+S_DIR_INST_POST = f"{S_DIR_INSTALL}/postflight"
+S_DIR_UNINST_PRE = f"{S_DIR_UNINSTALL}/preflight"
+S_DIR_UNINST_POST = f"{S_DIR_UNINSTALL}/postflight"
+
+S_FILE_INST_CFG = f"{S_DIR_INSTALL}/install.json"
+S_FILE_UNINST_CFG = f"{S_DIR_UNINSTALL}/uninstall.json"
+S_FILE_INST_PY = f"{S_DIR_INSTALL}/install.py"
+S_FILE_UNINST_PY = f"{S_DIR_UNINSTALL}/uninstall.py"
+
+# ------------------------------------------------------------------------------
 
 # initial location of project (to check for dups)
 # /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
@@ -334,9 +349,21 @@ S_DBG_HELP = "enable debugging option"
 # val[1] is the display name in the cli (long, display only)
 # val[2] is the template folder to use (template/subdir)
 L_TYPES = [
-    ["c", "CLI", "cli",],
-    ["g", "GUI", "gui",],
-    ["p", "PKG", "pkg",],
+    [
+        "c",
+        "CLI",
+        "cli",
+    ],
+    [
+        "g",
+        "GUI",
+        "gui",
+    ],
+    [
+        "p",
+        "PKG",
+        "pkg",
+    ],
 ]
 
 # list of file types to use md/html/xml fixer
@@ -514,7 +541,7 @@ L_UNINSTALL = [
 
 # which prj types need an install.json?
 L_MAKE_INSTALL = [
-    "c", 
+    "c",
     "g",
 ]
 
@@ -579,8 +606,12 @@ D_PRV_ALL = {
     # install stuff
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
-    "__PP_INST_CONF_FILE__": S_FILE_INSTALL_CFG,
-    "__PP_INST_FILE__": S_FILE_INSTALL,
+    "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    "__PP_DIR_UNINSTALL__": S_DIR_UNINSTALL,
+    "__PP_INST_CONF_FILE__": S_FILE_INST_CFG,
+    "__PP_INST_FILE__": S_FILE_INST_PY,
+    "__PP_UNINST_CONF_FILE__": S_FILE_UNINST_CFG,
+    "__PP_UNINST_FILE__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
@@ -661,13 +692,16 @@ D_PUB_DIST = {
         S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
+        #
         S_DIR_CONF: S_DIR_ASSETS,
         "lib": S_DIR_ASSETS,
-        S_FILE_INSTALL: "",
-        S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_DIR_I18N: S_DIR_ASSETS,
-        S_FILE_REQS: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        #
+        S_FILE_INST_PY: "",
+        S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_FILE_INST_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_DIR_UNINSTALL: S_DIR_ASSETS,
     },
     "p": {
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
@@ -682,16 +716,19 @@ D_PUB_DIST = {
         S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
+        #
         S_DIR_CONF: S_DIR_ASSETS,
         "lib": S_DIR_ASSETS,
-        S_FILE_INSTALL: "",
-        S_FILE_UNINSTALL: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        S_FILE_INSTALL_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_DIR_I18N: S_DIR_ASSETS,
-        S_FILE_REQS: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         #
-        S_DIR_GUI: S_DIR_ASSETS,
+        S_FILE_INST_PY: "",
+        S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_FILE_INST_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        S_DIR_UNINSTALL: S_DIR_ASSETS,
+        #
         S_DIR_IMAGES: S_DIR_ASSETS,
+        S_DIR_GUI: S_DIR_ASSETS,
     },
 }
 
@@ -812,6 +849,9 @@ D_COPY_LIB = {
 }
 
 # dictionary of default stuff to put in install.json
+# NB: key is rel to prj, val is rel to home
+# these are the defaults, they can be edited in prj/install/install.json before
+# running pybaker
 D_INSTALL = {
     "__PP_NAME_VENV__": "__PP_USR_CONF__",
     S_DIR_CONF: "__PP_USR_CONF__",
@@ -825,11 +865,13 @@ D_INSTALL = {
     S_DIR_GUI: "__PP_USR_CONF__",
 }
 
-# src dirs to zip in dist
-D_ZIP_DIST = {
+# src dirs to tar in dist
+# NB: key is prj short type, val is dict
+# NB: used in do_after_fix, only used to move strings up here
+D_TAR_DIST = {
     "p": {
-        S_KEY_ZIP_EXT: ".tar.gz",
-        S_KEY_ZIP_MODE: "w:gz",
+        S_KEY_TAR_EXT: ".tar.gz",
+        S_KEY_TAR_MODE: "w:gz",
     }
 }
 
@@ -999,6 +1041,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
                 if suffix in L_EXT_GTK:
                     _fix_gtk(item, dict_pub_meta)
 
+
 # ------------------------------------------------------------------------------
 # Do any work after making dist
 # ------------------------------------------------------------------------------
@@ -1044,14 +1087,14 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # if we want to compress
-    if type_prj in D_ZIP_DIST:
+    if type_prj in D_TAR_DIST:
 
-        dict_prj = D_ZIP_DIST[type_prj]
+        dict_prj = D_TAR_DIST[type_prj]
 
         # get folder name, folder loc, compressed file name
         name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
-        ext = dict_prj[S_KEY_ZIP_EXT]
-        mode = dict_prj[S_KEY_ZIP_MODE]
+        ext = dict_prj[S_KEY_TAR_EXT]
+        mode = dict_prj[S_KEY_TAR_MODE]
         in_dir = p_dist / name_small
         out_file = p_dist / f"{name_small}{ext}"
 
@@ -1061,6 +1104,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
 
         # remove old dir
         shutil.rmtree(in_dir)
+
 
 # ------------------------------------------------------------------------------
 # Private functions
