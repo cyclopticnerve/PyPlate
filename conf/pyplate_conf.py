@@ -1123,19 +1123,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     # get prj type
     type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
-    if type_prj in ["c", "g"]:
-
-        in_dir = p_dist
-        out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
-
-        with tarfile.open(out_file, mode="w:gz") as tar:
-            tar.add(in_dir, arcname=Path(in_dir).name)
-
-        # chuck the origin dir
-        if not B_DEBUG:
-            shutil.rmtree(p_dist)
-
-    elif type_prj == "p":
+    if type_prj == "p":
 
         # first tar inner pkg
         name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
@@ -1147,18 +1135,18 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
 
         # chuck the origin dir
         if not B_DEBUG:
-            shutil.rmtree(p_dist)
+            shutil.rmtree(in_dir)
 
-        # now do normal dist tar
-        in_dir = p_dist
-        out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
+    # now do normal dist tar
+    in_dir = p_dist
+    out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
 
-        with tarfile.open(out_file, mode="w:gz") as tar:
-            tar.add(in_dir, arcname=Path(in_dir).name)
+    with tarfile.open(out_file, mode="w:gz") as tar:
+        tar.add(in_dir, arcname=Path(in_dir).name)
 
-        # chuck the origin dir
-        if not B_DEBUG:
-            shutil.rmtree(p_dist)
+    # chuck the origin dir
+    if not B_DEBUG:
+        shutil.rmtree(in_dir)
 
 # ------------------------------------------------------------------------------
 # Private functions
