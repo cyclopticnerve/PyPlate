@@ -100,6 +100,12 @@ S_ERR_RUN_SCRIPT = (
 S_ERR_REQ = "Could not install {}"
 S_ERR_VERSION = "One or both version numbers are invalid"
 
+# debug option strings
+S_DBG_OPTION = "-d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
+
 # question to ask when installing older version
 S_ASK_OVER = (
     "A newer version of this program is currently installed. Do you want to "
@@ -195,13 +201,12 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Make install file
     # --------------------------------------------------------------------------
-    def make_install_cfg(self, name, version, dir_pre, dir_post, dict_install):
+    def make_install_cfg(self, name, dir_pre, dir_post, dict_install):
         """
         Make install file
 
         Arguments:
             name: Program name
-            version: Program version
             dir_pre: Path to preflight script dir
             dir_post: Path th postflight script dir
             dict_install: Dict of assets to install
@@ -216,7 +221,7 @@ class CNInstall:
         # create the dict using args
         dict_use = {
             S_KEY_NAME: name,
-            S_KEY_VERSION: version,
+            # S_KEY_VERSION: "0.0.0",
             S_KEY_DIR_PRE: dir_pre,
             S_KEY_DIR_POST: dir_post,
             S_KEY_DICT_INSTALL: dict_install,
@@ -674,7 +679,7 @@ if __name__ == "__main__":
 
     # make inst cfg dict
     test_install_dict = i.make_install_cfg(
-        "test", "0.0.0", test_inst_pre, test_inst_post, {"test.py": "test.py"}
+        "test", test_inst_pre, test_inst_post, {"test.py": "test.py"}
     )
 
     # print inst cfg dict

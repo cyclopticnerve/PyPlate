@@ -39,8 +39,10 @@ import sys
 # add custom import paths
 
 # find path to lib
-P_DIR_PRJ = Path.home() / "__PP_USR_CONF__"
-P_DIR_LIB = P_DIR_PRJ / "lib"
+# FIXME: if we make a symlink, we need the abs path to the REAL py file
+# PP_DIR_PRJ = Path.home() / "__PP_USER_CONF__/__PP_NAME_SMALL__"
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
 
 # add paths to import search
 sys.path.append(str(P_DIR_LIB))

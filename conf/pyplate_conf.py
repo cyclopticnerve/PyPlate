@@ -27,6 +27,8 @@ import tarfile
 # Bools
 # ------------------------------------------------------------------------------
 
+B_DEBUG = False
+
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
 # create a git using S_CMD_GIT
@@ -68,6 +70,7 @@ S_ASK_NAME = "Project name: "
 S_ASK_DESC = "Short description: "
 # NB: format params are D_TYPE_SEC[prj_type], __PP_NAME_SMALL__
 S_ASK_SEC = "{} name (default: {}): "
+S_ASK_VERS = "Version (default: {}): "
 
 # error strings
 S_ERR_TYPE = "Type must be one of {}"
@@ -84,6 +87,7 @@ S_ERR_NOT_PRJ = (
     "This folder does not have a 'pyplate' folder.\n"
     "Are you sure this is a PyPlate project?"
 )
+S_ERR_VERS = "Version must be n.n.n(xxx)"
 
 # output msg for steps
 S_ACTION_COPY = "Copy template files... "
@@ -151,8 +155,8 @@ S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
 S_KEY_NAME_MID = "S_KEY_NAME_MID"
 
-S_KEY_TAR_EXT = "ext"
-S_KEY_TAR_MODE = "mode"
+# S_KEY_TAR_EXT = "ext"
+# S_KEY_TAR_MODE = "mode"
 
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
@@ -161,6 +165,7 @@ S_KEY_TAR_MODE = "mode"
 # pymaker won't touch them
 S_DIR_TEMPLATE = "template"
 S_DIR_ALL = f"{S_DIR_TEMPLATE}/all"
+S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = "venv"
@@ -220,10 +225,6 @@ S_USR_CONF = ".config"  # __PP_NAME_SMALL__ will be appended
 S_USR_SRC = ".local/share"  # __PP_NAME_SMALL__ will be appended
 S_USR_APPS = ".local/share/applications"  # for .desktop file
 S_USR_BIN = ".local/bin"  # where to put the binary
-
-# this is where the user libs will go
-# S_USR_LIB_NAME = "lib"
-# S_USR_LIB = ".local/share"  # __PP_AUTHOR__/S_USR_LIB_NAME will be appended
 
 # formats for tree
 S_TREE_NAME = "tree.txt"
@@ -602,6 +603,7 @@ D_PRV_ALL = {
     "__PP_README_FILE__": S_FILE_README,
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
+    "__PP_DIR_LIB__": S_DIR_LIB,
     # --------------------------------------------------------------------------
     # install stuff
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
@@ -649,6 +651,7 @@ D_PRV_PRJ = {
     "__PP_USR_CONF__": "",  # config dir
     # "__PP_USR_LIB__": "",  # location of cnlibs dir
     # "__PP_USR_SRC__": "",  # where the program will keep it's source
+    "__PP_DIST_FMT__" : "",
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
@@ -692,9 +695,10 @@ D_PUB_DIST = {
         S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
+        "__PP_NAME_VENV__": S_DIR_ASSETS,
         #
         S_DIR_CONF: S_DIR_ASSETS,
-        "lib": S_DIR_ASSETS,
+        S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         #
         S_FILE_INST_PY: "",
@@ -703,22 +707,15 @@ D_PUB_DIST = {
         S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_DIR_UNINSTALL: S_DIR_ASSETS,
     },
-    "p": {
-        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
-        S_DIR_README: "",
-        S_FILE_LICENSE: "",
-        S_FILE_README: "",
-        #
-        S_FILE_TOML: "__PP_NAME_SMALL__",
-    },
     "g": {
         S_DIR_SRC: S_DIR_ASSETS,
         S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
+        "__PP_NAME_VENV__": S_DIR_ASSETS,
         #
         S_DIR_CONF: S_DIR_ASSETS,
-        "lib": S_DIR_ASSETS,
+        S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         #
         S_FILE_INST_PY: "",
@@ -729,6 +726,15 @@ D_PUB_DIST = {
         #
         S_DIR_IMAGES: S_DIR_ASSETS,
         S_DIR_GUI: S_DIR_ASSETS,
+    },
+    "p": {
+        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
+        S_DIR_README: "",
+        S_FILE_LICENSE: "",
+        S_FILE_README: "",
+        #
+        S_FILE_TOML: "__PP_NAME_SMALL__",
+        # S_DIR_TESTS: "",
     },
 }
 
@@ -831,7 +837,6 @@ D_PUB_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
-    # "lib": "lib",
     f"{S_DIR_MISC}/cnlibs.py": f"{S_DIR_MISC}/cnlibs.py",
     f"{S_DIR_MISC}/default_class.py": f"{S_DIR_MISC}/default_class.py",
     f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
@@ -855,7 +860,7 @@ D_COPY_LIB = {
 D_INSTALL = {
     "__PP_NAME_VENV__": "__PP_USR_CONF__",
     S_DIR_CONF: "__PP_USR_CONF__",
-    "lib": "__PP_USR_CONF__",
+    S_DIR_LIB: "__PP_USR_CONF__",
     S_DIR_README: "__PP_USR_CONF__",
     S_DIR_SRC: "__PP_USR_CONF__",
     S_FILE_LICENSE: "__PP_USR_CONF__",
@@ -865,15 +870,15 @@ D_INSTALL = {
     S_DIR_GUI: "__PP_USR_CONF__",
 }
 
-# src dirs to tar in dist
-# NB: key is prj short type, val is dict
-# NB: used in do_after_fix, only used to move strings up here
-D_TAR_DIST = {
-    "p": {
-        S_KEY_TAR_EXT: ".tar.gz",
-        S_KEY_TAR_MODE: "w:gz",
-    }
-}
+# # src dirs to tar in dist
+# # NB: key is prj short type, val is dict
+# # NB: used in do_after_fix, only used to move strings up here
+# D_TAR_DIST = {
+#     "p": {
+#         S_KEY_TAR_EXT: ".tar.gz",
+#         S_KEY_TAR_MODE: "w:gz",
+#     }
+# }
 
 # the info for matching/fixing lines in markup files
 D_MU_REPL = {
@@ -969,7 +974,6 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
 
     # paths relative to the end user's (or dev's) useful folders
     dict_prv_prj["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    # dict_prv_prj["__PP_USR_LIB__"] = f"{S_USR_LIB}/{author}/{"lib"}"
     dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
 
     # get venv name
@@ -1043,6 +1047,35 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
 
 
 # ------------------------------------------------------------------------------
+# Do any work before making dist
+# ------------------------------------------------------------------------------
+def do_before_dist(_dir_prj, dict_prv, dict_pub):
+    """
+    Do any work before making dist
+
+    Arguments:
+        dir_prj: The root of the new project (reserved for future use)
+        dict_prv: The dictionary containing private pyplate data (reserved for
+        future use)
+        dict_pub: The dictionary containing public project data (reserved for
+        future use)
+
+    Do any work on the dist folder before it is created.
+    """
+
+    # get small name and version
+    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
+    version = dict_pub[S_KEY_PUB_META]["__PP_VERSION__"]
+
+    # replace all dots with dashes in ver
+    version = version.replace(".", "-")
+
+    # format dist dir name with prj and ver
+    name_fmt = f"{name_small}_{version}"
+    dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_FMT__"] = name_fmt
+
+
+# ------------------------------------------------------------------------------
 # Do any work after making dist
 # ------------------------------------------------------------------------------
 def do_after_dist(dir_prj, dict_prv, _dict_pub):
@@ -1050,7 +1083,8 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     Do any work after making dist
 
     Arguments:
-        dir_prj: The root of the new project
+        dir_prj: The root of the new project (reserved for
+        future use)
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data (reserved for
         future use)
@@ -1062,7 +1096,9 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     """
 
     # get dist dir for all operations
-    p_dist = dir_prj / S_DIR_DIST
+    dist = Path(dir_prj) / S_DIR_DIST
+    name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_FMT__"]
+    p_dist = dist / name_fmt
 
     # --------------------------------------------------------------------------
 
@@ -1080,31 +1116,49 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
                 Path.unlink(item)
 
     # --------------------------------------------------------------------------
-
     # check for compression in dist
+
+    ext = ".tar.gz"
 
     # get prj type
     type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
-    # if we want to compress
-    if type_prj in D_TAR_DIST:
+    if type_prj in ["c", "g"]:
 
-        dict_prj = D_TAR_DIST[type_prj]
+        in_dir = p_dist
+        out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
 
-        # get folder name, folder loc, compressed file name
-        name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
-        ext = dict_prj[S_KEY_TAR_EXT]
-        mode = dict_prj[S_KEY_TAR_MODE]
-        in_dir = p_dist / name_small
-        out_file = p_dist / f"{name_small}{ext}"
-
-        # run tar (or your favorite utility)
-        with tarfile.open(out_file, mode=mode) as tar:
+        with tarfile.open(out_file, mode="w:gz") as tar:
             tar.add(in_dir, arcname=Path(in_dir).name)
 
-        # remove old dir
-        shutil.rmtree(in_dir)
+        # chuck the origin dir
+        if not B_DEBUG:
+            shutil.rmtree(p_dist)
 
+    elif type_prj == "p":
+
+        # first tar inner pkg
+        name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
+        in_dir = p_dist / name_small
+        out_file = p_dist / f"{in_dir}{ext}"
+
+        with tarfile.open(out_file, mode="w:gz") as tar:
+            tar.add(in_dir, arcname=Path(in_dir).name)
+
+        # chuck the origin dir
+        if not B_DEBUG:
+            shutil.rmtree(p_dist)
+
+        # now do normal dist tar
+        in_dir = p_dist
+        out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
+
+        with tarfile.open(out_file, mode="w:gz") as tar:
+            tar.add(in_dir, arcname=Path(in_dir).name)
+
+        # chuck the origin dir
+        if not B_DEBUG:
+            shutil.rmtree(p_dist)
 
 # ------------------------------------------------------------------------------
 # Private functions

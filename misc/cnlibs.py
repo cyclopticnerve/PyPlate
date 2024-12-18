@@ -15,7 +15,7 @@ import sys
 
 # find path to lib
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-P_DIR_LIB = P_DIR_PRJ / "lib"
+P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
 
 # add lib path to import search
 sys.path.append(str(P_DIR_LIB))

@@ -20,6 +20,7 @@ Python (or other language) scripts before and after the actual install process.
 # ------------------------------------------------------------------------------
 
 # system imports
+import argparse
 from pathlib import Path
 import sys
 
@@ -33,13 +34,14 @@ import sys
 
 DIR_SELF = Path(__file__).parents[2].resolve()
 FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__" / "__PP_UNINST_CONF_FILE__"
-DIR_LIB = DIR_SELF / "lib"
+DIR_LIB = DIR_SELF / "__PP_DIR_LIB__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
 
 # import my stuff
 import cnlib.cninstall as C # type: ignore
+from cnlib import CNFormatter # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -49,9 +51,14 @@ import cnlib.cninstall as C # type: ignore
 # ------------------------------------------------------------------------------
 # Run the main function
 # ------------------------------------------------------------------------------
-def main():
+def main(debug=False):
     """
     Run the main function
+
+    Arguments:
+        debug: If True, run ijn debug mode (default: False)
+
+    The main entry point for the program.
     """
 
     # create an instance of the class
@@ -59,14 +66,49 @@ def main():
 
     # run the instance
     try:
-        inst.uninstall(FILE_CFG_OLD)
+        inst.uninstall(FILE_CFG_OLD, debug=debug)
     except C.CNInstallError as e:
         print(e)
 
 # ------------------------------------------------------------------------------
-# Run the main class if we are not an import
+# Code to run when called from command line
 # ------------------------------------------------------------------------------
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    # Code to run when called from command line
+
+    # This is the top level code of the program, called when the Python file is
+    # invoked from the command line.
+
+    # NB: argparse code placed here so we can run the script from the command
+    # line or use it as an object
+
+    # create the parser
+    parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+
+    # set help string
+    # parser.description = S_PP_ABOUT
+
+    # add debug option
+    parser.add_argument(
+        C.S_DBG_OPTION,
+        action=C.S_DBG_ACTION,
+        dest=C.S_DBG_DEST,
+        help=C.S_DBG_HELP,
+    )
+
+    # get namespace object
+    args = parser.parse_args()
+
+    # convert namespace to dict
+    dict_args = vars(args)
+
+    # --------------------------------------------------------------------------
+
+    # get the args
+    # a_dir_cur = os.getcwd()
+    a_debug = dict_args.get(C.S_DBG_DEST, False)
+
+    # run main function
+    main(a_debug)
 
 # -)

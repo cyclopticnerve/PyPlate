@@ -34,6 +34,10 @@ import sys
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_SRC = P_DIR_PRJ / "__PP_DEV_SRC__"
 
+# NB: this fixes a glitch when the folder layout changes in dist
+if not P_DIR_SRC.exists():
+    P_DIR_SRC = P_DIR_PRJ
+
 # add paths to import search
 sys.path.append(str(P_DIR_SRC))
 

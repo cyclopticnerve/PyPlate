@@ -21,7 +21,7 @@
 
 # TODO: pull in a fresh copy of libs on every run and put it in dist
 # we need to get the location of PyPlate from settings (src)
-# we need the name of the "lib" folder from settings (dst)
+# we need the name of the "__PP_DIR_LIB__" folder from settings (dst)
 # TODO: any time pybaker encounters a file with __PP_DATE__ still in the
 # header, make sure to use today's date, not the one stored in a config dict
 # TODO: install script must install libs, src, etc. into proper folders

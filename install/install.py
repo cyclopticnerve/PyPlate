@@ -35,7 +35,7 @@ DIR_SELF = Path(__file__).parent.resolve()
 DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
 FILE_CFG_NEW = DIR_ASSETS / "__PP_INST_CONF_FILE__"
 FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__" / "__PP_INST_CONF_FILE__"
-DIR_LIB = DIR_ASSETS / "lib"
+DIR_LIB = DIR_ASSETS / "_PP_DIR_LIB__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))

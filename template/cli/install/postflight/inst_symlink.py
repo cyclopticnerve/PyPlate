@@ -1,18 +1,18 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: symlink.py                                            |     ()     |
+# Filename: inst_symlink.py                                       |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
-Standard CLI uninstall postflight script
+Standard CLI install postflight script
 
-This is the standard uninstall postflight script for a CLI program. It removes
-a symlink in the ~/.local/bin folder, which points to the real script, usually
-located in ~/.config/<PROJECT>/src.
+This is the standard postflight script for a CLI program. It places a symlink
+in the ~/.local/bin folder, which points to the real script, usually located in
+~/.config/<PROJECT>/src.
 """
 
 # ------------------------------------------------------------------------------
@@ -28,8 +28,10 @@ import subprocess
 
 # construct soft link cmd
 CMD = (
-    "rm "
-    # the symlink to remove
+    "ln -s "
+    # the real script to run
+    "$HOME/__PP_USR_CONF__/__PP_DEV_SRC__/__PP_NAME_SMALL__.py "
+    # the symlinked script
     "$HOME/__PP_USR_BIN__/__PP_NAME_SMALL__"
 )
 

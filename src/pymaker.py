@@ -57,7 +57,7 @@ sys.path.append(str(P_DIR_PP_CONF))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
-import pyplate_conf as M  # type: ignore
+import pyplate_conf as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
@@ -167,6 +167,8 @@ class PyMaker:
         self._dir_current = Path(dir_current).resolve()
         self._debug = debug
 
+        C.B_DEBUG = debug
+        
         # ----------------------------------------------------------------------
         #  do the work
 
@@ -210,22 +212,22 @@ class PyMaker:
 
         # debug turns off some features to speed up project creation
         if self._debug:
-            M.B_CMD_GIT = False
-            M.B_CMD_VENV = False
-            M.B_CMD_I18N = False
-            M.B_CMD_DOCS = False
-            M.B_CMD_TREE = False
+            C.B_CMD_GIT = False
+            C.B_CMD_VENV = False
+            C.B_CMD_I18N = False
+            C.B_CMD_DOCS = False
+            C.B_CMD_TREE = False
 
         # set switch dicts to defaults
-        self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
-        self._dict_sw_line = dict(M.D_SW_LINE_DEF)
+        self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
+        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
         # remove home dir from PyPlate path
         h = str(Path.home())
         p = str(P_DIR_PYPLATE)
         p = p.lstrip(h).strip("/")
         # NB: change global val
-        M.D_PRV_PRJ["__PP_DEV_PP__"] = p
+        C.D_PRV_PRJ["__PP_DEV_PP__"] = p
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -235,7 +237,7 @@ class PyMaker:
         Get project info
 
         Asks the user for project info, such as type and name, to be saved to
-        M.D_PRV_PRJ.
+        C.D_PRV_PRJ.
         """
 
         # ----------------------------------------------------------------------
@@ -244,7 +246,7 @@ class PyMaker:
         if self._debug:
 
             # yup, yell
-            print(M.S_ERR_DEBUG)
+            print(C.S_ERR_DEBUG)
 
         # ----------------------------------------------------------------------
         # first question is type
@@ -255,13 +257,13 @@ class PyMaker:
 
         # build the input question
         types = []
-        for item in M.L_TYPES:
-            s = M.S_TYPE_FMT.format(item[0], item[1])
+        for item in C.L_TYPES:
+            s = C.S_TYPE_FMT.format(item[0], item[1])
             types.append(s)
-        str_types = M.S_TYPE_JOIN.join(types)
+        str_types = C.S_TYPE_JOIN.join(types)
 
         # format the question
-        in_type = M.S_ASK_TYPE.format(str_types)
+        in_type = C.S_ASK_TYPE.format(str_types)
 
         # loop forever until we get a valid type
         while True:
@@ -287,7 +289,7 @@ class PyMaker:
         if self._debug:
 
             # get long name
-            for item in M.L_TYPES:
+            for item in C.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
                     prj_name = f"{item[1]}_DEBUG"
@@ -311,7 +313,7 @@ class PyMaker:
             while True:
 
                 # ask for name of project
-                prj_name = input(M.S_ASK_NAME)
+                prj_name = input(C.S_ASK_NAME)
                 prj_name = prj_name.strip(" ")
 
                 # check for valid name
@@ -324,7 +326,7 @@ class PyMaker:
                     if tmp_dir.exists():
 
                         # tell the user that the old name exists
-                        print(M.S_ERR_EXIST.format(tmp_dir))
+                        print(C.S_ERR_EXIST.format(tmp_dir))
                     else:
                         break
 
@@ -346,11 +348,11 @@ class PyMaker:
         name_sec = def_name_sec
 
         # if not debug, if need second name, ask for it
-        if not self._debug and prj_type in M.D_NAME_SEC:
+        if not self._debug and prj_type in C.D_NAME_SEC:
 
             # format question for second name
-            s_name_sec = M.D_NAME_SEC[prj_type]
-            s_sec_fmt = M.S_ASK_SEC.format(s_name_sec, def_name_sec)
+            s_name_sec = C.D_NAME_SEC[prj_type]
+            s_sec_fmt = C.S_ASK_SEC.format(s_name_sec, def_name_sec)
 
             # loop forever until we get a valid name or empty string
             while True:
@@ -385,20 +387,20 @@ class PyMaker:
 
         # get current date and format it according to dev fmt
         now = datetime.now()
-        fmt_date = M.S_DATE_FMT
+        fmt_date = C.S_DATE_FMT
         info_date = now.strftime(fmt_date)
 
         # ----------------------------------------------------------------------
         # save stuff to prj/meta dicts
 
         # save project stuff
-        M.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
-        M.D_PRV_PRJ["__PP_NAME_BIG__"] = prj_name
-        M.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
-        M.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
-        M.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
-        M.D_PRV_PRJ["__PP_DATE__"] = info_date
-        M.D_PRV_PRJ["__PP_NAME_VENV__"] = M.S_VENV_FMT_NAME.format(name_small)
+        C.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
+        C.D_PRV_PRJ["__PP_NAME_BIG__"] = prj_name
+        C.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
+        C.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
+        C.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
+        C.D_PRV_PRJ["__PP_DATE__"] = info_date
+        C.D_PRV_PRJ["__PP_NAME_VENV__"] = C.S_VENV_FMT_NAME.format(name_small)
 
         # blank line before printing progress
         print()
@@ -413,13 +415,13 @@ class PyMaker:
         Gets dirs/files from template and copies them to the project dir.
         """
 
-        print(M.S_ACTION_COPY, end="", flush=True)
+        print(C.S_ACTION_COPY, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
 
         # copy template/all
-        src = P_DIR_PYPLATE / M.S_DIR_ALL
+        src = P_DIR_PYPLATE / C.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst)
 
@@ -427,17 +429,17 @@ class PyMaker:
         # copy template/type
 
         # get some paths
-        prj_type_short = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        prj_type_short = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         prj_type_long = ""
 
         # get parent of project
-        for item in M.L_TYPES:
+        for item in C.L_TYPES:
             if item[0] == prj_type_short:
                 prj_type_long = item[2]
                 break
 
         # get the src dir in the template dir
-        src = P_DIR_PYPLATE / M.S_DIR_TEMPLATE / prj_type_long
+        src = P_DIR_PYPLATE / C.S_DIR_TEMPLATE / prj_type_long
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -445,7 +447,7 @@ class PyMaker:
         # do copy dict
 
         # copy linked files
-        for key, val in M.D_COPY.items():
+        for key, val in C.D_COPY.items():
 
             # get src/dst
             src = P_DIR_PYPLATE / key
@@ -461,17 +463,17 @@ class PyMaker:
         # do copy lib dict
 
         # go through dict to find list
-        for key, val in M.D_COPY_LIB.items():
+        for key, val in C.D_COPY_LIB.items():
 
             # this is our type
-            if key == M.D_PRV_PRJ["__PP_TYPE_PRJ__"]:
+            if key == C.D_PRV_PRJ["__PP_TYPE_PRJ__"]:
 
                 # copy libs
                 for item in val:
 
                     # get src/dst
                     src = P_DIR_PYPLATE / "lib" / item
-                    dst = self._dir_prj / "lib" / item
+                    dst = self._dir_prj / C.S_DIR_LIB / item
 
                     # copy dir/file
                     if src.is_dir():
@@ -486,7 +488,7 @@ class PyMaker:
         # _do_after_fix, after the venv is created
         self._fix_reqs(prj_type_long)
 
-        print(M.S_ACTION_DONE)
+        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -499,27 +501,27 @@ class PyMaker:
         is used to call the do_before_fix method in pyplate_conf.py.
         """
 
-        print(M.S_ACTION_BEFORE, end="", flush=True)
+        print(C.S_ACTION_BEFORE, end="", flush=True)
 
         # save fixed settings
         dict_prv = {
-            M.S_KEY_PRV_ALL: M.D_PRV_ALL,
-            M.S_KEY_PRV_PRJ: M.D_PRV_PRJ,
+            C.S_KEY_PRV_ALL: C.D_PRV_ALL,
+            C.S_KEY_PRV_PRJ: C.D_PRV_PRJ,
         }
 
         # save editable settings (blacklist/i18n etc.)
-        type_prj = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        type_prj = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
         dict_pub = {
-            M.S_KEY_PUB_BL: M.D_PUB_BL,
-            M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            M.S_KEY_PUB_DIST: M.D_PUB_DIST[type_prj],
-            M.S_KEY_PUB_META: M.D_PUB_META,
+            C.S_KEY_PUB_BL: C.D_PUB_BL,
+            C.S_KEY_PUB_I18N: C.D_PUB_I18N,
+            C.S_KEY_PUB_DIST: C.D_PUB_DIST[type_prj],
+            C.S_KEY_PUB_META: C.D_PUB_META,
         }
 
         # call public before fix function
-        M.do_before_fix(self._dir_prj, dict_prv, dict_pub)
+        C.do_before_fix(self._dir_prj, dict_prv, dict_pub)
 
-        print(M.S_ACTION_DONE)
+        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -533,14 +535,14 @@ class PyMaker:
         needs fixing based on its appearance in the blacklist.
         """
 
-        print(M.S_ACTION_FIX, end="", flush=True)
+        print(C.S_ACTION_FIX, end="", flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
             [
-                M.D_PRV_ALL,
-                M.D_PRV_PRJ,
-                M.D_PUB_META,
+                C.D_PRV_ALL,
+                C.D_PRV_PRJ,
+                C.D_PUB_META,
             ],
             self._dict_rep,
         )
@@ -550,11 +552,11 @@ class PyMaker:
         dict_paths = self._fix_blacklist_paths()
 
         # just shorten the names
-        skip_all = dict_paths[M.S_KEY_SKIP_ALL]
-        skip_contents = dict_paths[M.S_KEY_SKIP_CONTENTS]
-        skip_header = dict_paths[M.S_KEY_SKIP_HEADER]
-        skip_code = dict_paths[M.S_KEY_SKIP_CODE]
-        skip_path = dict_paths[M.S_KEY_SKIP_PATH]
+        skip_all = dict_paths[C.S_KEY_SKIP_ALL]
+        skip_contents = dict_paths[C.S_KEY_SKIP_CONTENTS]
+        skip_header = dict_paths[C.S_KEY_SKIP_HEADER]
+        skip_code = dict_paths[C.S_KEY_SKIP_CODE]
+        skip_path = dict_paths[C.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -581,8 +583,8 @@ class PyMaker:
                 if root not in skip_contents and item not in skip_contents:
 
                     # for each new file, reset block and line switches to def
-                    self._dict_sw_block = dict(M.D_SW_BLOCK_DEF)
-                    self._dict_sw_line = dict(M.D_SW_LINE_DEF)
+                    self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
+                    self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
                     # check for header in blacklist
                     bl_hdr = True
@@ -595,14 +597,14 @@ class PyMaker:
                         bl_code = False
 
                     # do md/html/xml separately (needs special handling)
-                    self._dict_type_rep = M.D_PY_REPL
+                    self._dict_type_rep = C.D_PY_REPL
                     suffix = (
                         f".{item.suffix}"
                         if not item.suffix.startswith(".")
                         else item.suffix
                     )
-                    if suffix in M.L_EXT_MARKUP:
-                        self._dict_type_rep = M.D_MU_REPL
+                    if suffix in C.L_EXT_MARKUP:
+                        self._dict_type_rep = C.D_MU_REPL
 
                     # fix content with appropriate dict
                     self._fix_content(item, bl_hdr, bl_code)
@@ -638,7 +640,42 @@ class PyMaker:
             if root not in skip_path:
                 self._fix_path(root)
 
-        print(M.S_ACTION_DONE)
+        # ----------------------------------------------------------------------
+        # save project settings
+
+        # save fixed settings
+        dict_prv = {
+            C.S_KEY_PRV_ALL: C.D_PRV_ALL,
+            C.S_KEY_PRV_PRJ: C.D_PRV_PRJ,
+        }
+        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+        F.save_dict(dict_prv, [path_prv])
+
+        # save editable settings (blacklist/i18n etc.)
+        type_prj = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        dict_pub = {
+            C.S_KEY_PUB_BL: C.D_PUB_BL,
+            C.S_KEY_PUB_I18N: C.D_PUB_I18N,
+            C.S_KEY_PUB_DIST: C.D_PUB_DIST[type_prj],
+        }
+        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        F.save_dict(dict_pub, [path_pub])
+
+        # ----------------------------------------------------------------------
+        # fix dunders in bl/i18n/dist
+        self._fix_content(path_pub)
+
+        # reload dict from fixed file
+        dict_pub = F.load_dicts([path_pub])
+
+        # ----------------------------------------------------------------------
+        # save meta
+
+        # put in metadata and save back to file
+        dict_pub[C.S_KEY_PUB_META] = C.D_PUB_META
+        F.save_dict(dict_pub, [path_pub])
+
+        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
@@ -653,117 +690,87 @@ class PyMaker:
         """
 
         # ----------------------------------------------------------------------
-        # save project settings
-
-        # save fixed settings
-        dict_prv = {
-            M.S_KEY_PRV_ALL: M.D_PRV_ALL,
-            M.S_KEY_PRV_PRJ: M.D_PRV_PRJ,
-        }
-        path_prv = self._dir_prj / M.S_PRJ_PRV_CFG
-        F.save_dict(dict_prv, [path_prv])
-
-        # save editable settings (blacklist/i18n etc.)
-        type_prj = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
-        dict_pub = {
-            M.S_KEY_PUB_BL: M.D_PUB_BL,
-            M.S_KEY_PUB_I18N: M.D_PUB_I18N,
-            M.S_KEY_PUB_DIST: M.D_PUB_DIST[type_prj],
-        }
-        path_pub = self._dir_prj / M.S_PRJ_PUB_CFG
-        F.save_dict(dict_pub, [path_pub])
-
-        # ----------------------------------------------------------------------
-        # fix dunders in bl/i18n/dist
-        self._fix_content(path_pub)
-
-        # reload dict from fixed file
-        dict_pub = F.load_dicts([path_pub])
-
-        # ----------------------------------------------------------------------
-        # save meta
-
-        # put in metadata and save back to file
-        dict_pub[M.S_KEY_PUB_META] = M.D_PUB_META
-        F.save_dict(dict_pub, [path_pub])
-
-        # ----------------------------------------------------------------------
         # call conf after fix
 
-        print(M.S_ACTION_AFTER, end="", flush=True)
-        M.do_after_fix(self._dir_prj, dict_prv, dict_pub)
-        print(M.S_ACTION_DONE)
+        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+        dict_prv = F.load_dicts([path_prv])
+        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        dict_pub = F.load_dicts([path_pub])
+
+        print(C.S_ACTION_AFTER, end="", flush=True)
+        C.do_after_fix(self._dir_prj, dict_prv, dict_pub)
+        print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # git
 
         # if git flag
-        if M.B_CMD_GIT:
+        if C.B_CMD_GIT:
 
-            print(M.S_ACTION_GIT, end="", flush=True)
+            print(C.S_ACTION_GIT, end="", flush=True)
 
             # add git dir
-            str_cmd = M.S_CMD_GIT.format(self._dir_prj)
+            str_cmd = C.S_CMD_GIT.format(self._dir_prj)
             F.sh(str_cmd)
 
-            print(M.S_ACTION_DONE)
+            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # venv
 
         # if venv flag is set
-        if M.B_CMD_VENV:
+        if C.B_CMD_VENV:
 
-            print(M.S_ACTION_VENV, end="", flush=True)
+            print(C.S_ACTION_VENV, end="", flush=True)
 
             # get name ov venv folder and reqs file
-            dir_venv = M.D_PRV_PRJ["__PP_NAME_VENV__"]
-            file_reqs = self._dir_prj / M.S_FILE_REQS
+            dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
+            file_reqs = self._dir_prj / C.S_FILE_REQS
 
             # do the thing with the thing
             cv = CNVenv(self._dir_prj, dir_venv)
             try:
                 cv.create()
                 cv.install(file_reqs)
-                print(M.S_ACTION_DONE)
+                print(C.S_ACTION_DONE)
             except F.CNShellError as e:
-                print(M.S_ACTION_FAIL)
+                print(C.S_ACTION_FAIL)
                 print(e.message)
 
         # ----------------------------------------------------------------------
         # i18n
 
         # if i18n flag is set
-        if M.B_CMD_I18N:
+        if C.B_CMD_I18N:
 
-            print(M.S_ACTION_I18N, end="", flush=True)
+            print(C.S_ACTION_I18N, end="", flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
-                dir_src=self._dir_prj / M.S_DIR_SRC,
-                str_appname=M.D_PRV_PRJ["__PP_NAME_BIG__"],
-                str_version=M.D_PUB_META["__PP_VERSION__"],
-                str_author=M.D_PRV_ALL["__PP_AUTHOR__"],
-                str_email=M.D_PRV_ALL["__PP_EMAIL__"],
-                dir_locale=self._dir_prj / M.S_DIR_LOCALE,
-                dir_po=self._dir_prj / M.S_DIR_PO,
-                str_domain=M.D_PRV_PRJ["__PP_NAME_SMALL__"],
+                dir_src=self._dir_prj / C.S_DIR_SRC,
+                str_appname=C.D_PRV_PRJ["__PP_NAME_BIG__"],
+                str_version=C.D_PUB_META["__PP_VERSION__"],
+                str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
+                str_email=C.D_PRV_ALL["__PP_EMAIL__"],
+                dir_locale=self._dir_prj / C.S_DIR_LOCALE,
+                dir_po=self._dir_prj / C.S_DIR_PO,
+                str_domain=C.D_PRV_PRJ["__PP_NAME_SMALL__"],
                 # NB: use dict_pub here b/c dunders have been fixed
-                dict_clangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CLANGS],
-                dict_no_ext=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_NO_EXT],
-                list_wlangs=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_WLANGS],
-                charset=dict_pub[M.S_KEY_PUB_I18N][M.S_KEY_CHARSET],
+                dict_clangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CLANGS],
+                dict_no_ext=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_NO_EXT],
+                list_wlangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_WLANGS],
+                charset=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CHARSET],
             )
 
             # make .pot, .po, and .mo files
             potpy.main()
 
             # we are done
-            print(M.S_ACTION_DONE)
+            print(C.S_ACTION_DONE)
 
             # make .desktop file
-            path_desk = self._dir_prj / M.S_DIR_DESKTOP
-            path_template = self._dir_prj / M.S_FILE_DESK_TEMPLATE
+            path_desk = self._dir_prj / C.S_DIR_DESKTOP
+            path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
             if (
                 path_desk.exists()
@@ -773,10 +780,10 @@ class PyMaker:
             ):
 
                 # fix .desktop file
-                print(M.S_ACTION_DESK, end="", flush=True)
+                print(C.S_ACTION_DESK, end="", flush=True)
 
-                name_small = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
-                path_out_name = M.S_FILE_DESK_OUT.format(name_small)
+                name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+                path_out_name = C.S_FILE_DESK_OUT.format(name_small)
                 path_out = self._dir_prj / path_out_name
                 potpy.make_desktop(path_template, path_out)
 
@@ -784,33 +791,33 @@ class PyMaker:
                 potpy.main()
 
                 # we are done
-                print(M.S_ACTION_DONE)
+                print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
 
         # if docs flag is set
-        if M.B_CMD_DOCS:
+        if C.B_CMD_DOCS:
 
-            print(M.S_ACTION_DOCS, end="", flush=True)
+            print(C.S_ACTION_DOCS, end="", flush=True)
 
-            name = M.D_PRV_PRJ["__PP_NAME_SMALL__"]
-            author = M.D_PRV_ALL["__PP_AUTHOR__"]
-            version = M.D_PUB_META["__PP_VERSION__"]
-
+            name = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+            author = C.D_PRV_ALL["__PP_AUTHOR__"]
+            version = C.D_PUB_META["__PP_VERSION__"]
+            lib = C.D_PRV_ALL["__PP_DIR_LIB__"]
             # do the thing with the thing
-            cs = CNSphinx(self._dir_prj, M.S_DIR_SRC, M.S_DIR_DOCS)
+            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
             try:
                 cs.create(
                     name,
                     author,
                     version,
-                    dirs_import=["lib"],
-                    theme=M.S_DOCS_THEME,
+                    dirs_import=[lib],
+                    theme=C.S_DOCS_THEME,
                 )
-                print(M.S_ACTION_DONE)
+                print(C.S_ACTION_DONE)
             except F.CNShellError as e:
-                print(M.S_ACTION_FAIL)
+                print(C.S_ACTION_FAIL)
                 print(e.message)
 
         # ----------------------------------------------------------------------
@@ -819,12 +826,12 @@ class PyMaker:
         # NB: this will wipe out all previous checks (maybe good?)
 
         # if tree flag is set
-        if M.B_CMD_TREE:
+        if C.B_CMD_TREE:
 
-            print(M.S_ACTION_TREE, end="", flush=True)
+            print(C.S_ACTION_TREE, end="", flush=True)
 
             # get path to tree
-            file_tree = self._dir_prj / M.S_TREE_FILE
+            file_tree = self._dir_prj / C.S_TREE_FILE
 
             # create the file so it includes itself
             with open(file_tree, "w", encoding="UTF-8") as a_file:
@@ -834,32 +841,32 @@ class PyMaker:
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 str(self._dir_prj),
-                filter_list=M.D_PUB_BL[M.S_KEY_SKIP_TREE],
-                dir_format=M.S_TREE_DIR_FORMAT,
-                file_format=M.S_TREE_FILE_FORMAT,
+                filter_list=C.D_PUB_BL[C.S_KEY_SKIP_TREE],
+                dir_format=C.S_TREE_DIR_FORMAT,
+                file_format=C.S_TREE_FILE_FORMAT,
             )
 
             # write to file
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
-            print(M.S_ACTION_DONE)
+            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # make install/uninstall cfg files
 
         # check if we need it
-        prj_type = M.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        prj_type = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
 
         # we need it
-        if prj_type in M.L_MAKE_INSTALL:
+        if prj_type in C.L_MAKE_INSTALL:
 
             # show info
-            print(M.S_ACTION_INST, end="", flush=True)
+            print(C.S_ACTION_INST, end="", flush=True)
 
             # get params
-            name = M.D_PRV_PRJ["__PP_NAME_BIG__"]
-            version = M.D_PUB_META["__PP_VERSION__"]
+            name = C.D_PRV_PRJ["__PP_NAME_BIG__"]
+            # version = C.D_PUB_META["__PP_VERSION__"]
 
             # get an install instance
             inst = I.CNInstall()
@@ -867,38 +874,38 @@ class PyMaker:
             # create a template install cfg file
             dict_inst = inst.make_install_cfg(
                 name,
-                version,
-                M.S_DIR_INST_PRE,
-                M.S_DIR_INST_POST,
+                # version,
+                C.S_DIR_INST_PRE,
+                C.S_DIR_INST_POST,
                 # these are the defaults spec'd in pyplate_conf
                 # they can be edited in prj/install/install.json before running
                 # pybaker
-                M.D_INSTALL,
+                C.D_INSTALL,
             )
 
             # fix dunders in inst cfg file
-            path_inst = self._dir_prj / M.S_FILE_INST_CFG
+            path_inst = self._dir_prj / C.S_FILE_INST_CFG
             F.save_dict(dict_inst, [path_inst])
             self._fix_content(path_inst)
 
             # create a template uninstall cfg file
             dict_uninst = inst.make_uninstall_cfg(
                 name,
-                M.S_DIR_UNINST_PRE,
-                M.S_DIR_UNINST_POST,
+                C.S_DIR_UNINST_PRE,
+                C.S_DIR_UNINST_POST,
                 # these are the defaults spec'd in pyplate_conf
                 # they can be edited in prj/uninstall/uninstall.json before running
                 # pybaker
-                M.L_UNINSTALL,
+                C.L_UNINSTALL,
             )
 
             # fix dunders in inst cfg file
-            path_uninst = self._dir_prj / M.S_FILE_UNINST_CFG
+            path_uninst = self._dir_prj / C.S_FILE_UNINST_CFG
             F.save_dict(dict_uninst, [path_uninst])
             self._fix_content(path_uninst)
 
             # show info
-            print(M.S_ACTION_DONE)
+            print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -920,16 +927,16 @@ class PyMaker:
         # remove path separators
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
-        l_bl = M.D_PUB_BL
+        l_bl = C.D_PUB_BL
         for key in l_bl:
             l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
-        M.D_PUB_BL = l_bl
+        C.D_PUB_BL = l_bl
 
         # support for absolute/relative/glob
         # NB: taken from cntree.py
 
         # for each section of blacklist
-        for key, val in M.D_PUB_BL.items():
+        for key, val in C.D_PUB_BL.items():
             # convert all items in list to Path objects
             paths = [Path(item) for item in val]
 
@@ -1009,7 +1016,7 @@ class PyMaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = self._dict_type_rep[M.S_KEY_HDR]
+                str_pattern = self._dict_type_rep[C.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
@@ -1022,7 +1029,7 @@ class PyMaker:
             # ------------------------------------------------------------------
             # skip any other comment lines
 
-            str_pattern = self._dict_type_rep[M.S_KEY_COMM]
+            str_pattern = self._dict_type_rep[C.S_KEY_COMM]
             if re.search(str_pattern, line):
                 continue
 
@@ -1059,15 +1066,15 @@ class PyMaker:
         """
 
         # sanity check
-        str_pattern = self._dict_type_rep[M.S_KEY_HDR]
+        str_pattern = self._dict_type_rep[C.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
         # pull out lead, val, and pad using group match values from M
-        lead = res.group(self._dict_type_rep[M.S_KEY_LEAD])
-        val = res.group(self._dict_type_rep[M.S_KEY_VAL])
-        pad = res.group(self._dict_type_rep[M.S_KEY_PAD])
+        lead = res.group(self._dict_type_rep[C.S_KEY_LEAD])
+        val = res.group(self._dict_type_rep[C.S_KEY_VAL])
+        pad = res.group(self._dict_type_rep[C.S_KEY_PAD])
 
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
@@ -1120,8 +1127,8 @@ class PyMaker:
         comm = ""
 
         # do the split, checking each match to see if we get a trailing comment
-        split = self._dict_type_rep[M.S_KEY_SPLIT]
-        split_index = self._dict_type_rep[M.S_KEY_SPLIT_INDEX]
+        split = self._dict_type_rep[C.S_KEY_SPLIT]
+        split_index = self._dict_type_rep[C.S_KEY_SPLIT_INDEX]
         matches = re.finditer(split, line)
         for match in matches:
             # if there is a match group for comment (meaning we found a
@@ -1137,7 +1144,7 @@ class PyMaker:
         # check for line switches
 
         # for each line, reset line dict
-        self._dict_sw_line = dict(M.D_SW_LINE_DEF)
+        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
         # do the check
         self._check_switches(comm, False)
@@ -1147,9 +1154,9 @@ class PyMaker:
         # check for block or line replace switch
         repl = False
         if (
-            self._dict_sw_block[M.S_SW_REPLACE]
-            and self._dict_sw_line[M.S_SW_REPLACE] != M.I_SW_FALSE
-            or self._dict_sw_line[M.S_SW_REPLACE] == M.I_SW_TRUE
+            self._dict_sw_block[C.S_SW_REPLACE]
+            and self._dict_sw_line[C.S_SW_REPLACE] != C.I_SW_FALSE
+            or self._dict_sw_line[C.S_SW_REPLACE] == C.I_SW_TRUE
         ):
             repl = True
 
@@ -1165,15 +1172,15 @@ class PyMaker:
         line = code + comm
 
         # replace version
-        ver = M.D_PUB_META["__PP_VERSION__"]
-        str_sch = M.S_META_VER_SEARCH
-        str_rep = M.S_META_VER_REPL.format(ver)
+        ver = C.D_PUB_META["__PP_VERSION__"]
+        str_sch = C.S_META_VER_SEARCH
+        str_rep = C.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
-        desc = M.D_PUB_META["__PP_SHORT_DESC__"]
-        str_sch = M.S_META_SD_SEARCH
-        str_rep = M.S_META_SD_REPL.format(desc)
+        desc = C.D_PUB_META["__PP_SHORT_DESC__"]
+        str_sch = C.S_META_SD_SEARCH
+        str_rep = C.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
 
         # return the (maybe replaced) line
@@ -1227,15 +1234,15 @@ class PyMaker:
         """
 
         # get sources and filter out items that don't exist
-        reqs_prj = M.S_FILE_REQS_TYPE.format(prj_type_long)
+        reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
         src = [
-            P_DIR_PYPLATE / M.S_FILE_REQS_ALL,
+            P_DIR_PYPLATE / C.S_FILE_REQS_ALL,
             P_DIR_PYPLATE / reqs_prj,
         ]
         src = [str(item) for item in src if item.exists()]
 
         # get dst to put file lines
-        dst = self._dir_prj / M.S_FILE_REQS
+        dst = self._dir_prj / C.S_FILE_REQS
 
         # # the new set of lines for requirements.txt
         new_file = []
@@ -1274,7 +1281,7 @@ class PyMaker:
         """
 
         # match  switches ('#|<!-- python: enable=replace', etc)
-        match = re.match(self._dict_type_rep[M.S_KEY_SWITCH], line)
+        match = re.match(self._dict_type_rep[C.S_KEY_SWITCH], line)
         if not match:
             return False
 
@@ -1295,11 +1302,11 @@ class PyMaker:
             return False
 
         # test for specific values, in case it is malformed
-        if val == M.S_SW_ENABLE:
-            dict_to_check[key] = M.I_SW_TRUE
+        if val == C.S_SW_ENABLE:
+            dict_to_check[key] = C.I_SW_TRUE
             return True
-        if val == M.S_SW_DISABLE:
-            dict_to_check[key] = M.I_SW_FALSE
+        if val == C.S_SW_DISABLE:
+            dict_to_check[key] = C.I_SW_FALSE
             return True
 
         # no valid switch found
@@ -1326,17 +1333,17 @@ class PyMaker:
         first_char = prj_type[0].lower()
 
         # we got a valid type
-        for item in M.L_TYPES:
+        for item in C.L_TYPES:
             if first_char == item[0]:
                 return True
 
         # nope, fail
         types = []
         s = ""
-        for item in M.L_TYPES:
+        for item in C.L_TYPES:
             types.append(item[0])
         s = ", ".join(types)
-        print(M.S_ERR_TYPE.format(s))
+        print(C.S_ERR_TYPE.format(s))
         return False
 
     # --------------------------------------------------------------------------
@@ -1368,28 +1375,28 @@ class PyMaker:
 
         # check for name length
         if len(prj_name.strip(" ")) < 2:
-            print(M.S_ERR_LEN)
+            print(C.S_ERR_LEN)
             return False
 
         # match start or return false
-        pattern = M.D_NAME[M.S_KEY_NAME_START]
+        pattern = C.D_NAME[C.S_KEY_NAME_START]
         res = re.search(pattern, prj_name)
         if not res:
-            print(M.S_ERR_START)
+            print(C.S_ERR_START)
             return False
 
         # match end or return false
-        pattern = M.D_NAME[M.S_KEY_NAME_END]
+        pattern = C.D_NAME[C.S_KEY_NAME_END]
         res = re.search(pattern, prj_name)
         if not res:
-            print(M.S_ERR_END)
+            print(C.S_ERR_END)
             return False
 
         # match middle or return false
-        pattern = M.D_NAME[M.S_KEY_NAME_MID]
+        pattern = C.D_NAME[C.S_KEY_NAME_MID]
         res = re.search(pattern, prj_name)
         if not res:
-            print(M.S_ERR_MID)
+            print(C.S_ERR_MID)
             return False
 
         # if we made it this far, return true
@@ -1416,10 +1423,10 @@ if __name__ == "__main__":
 
     # add debug option
     parser.add_argument(
-        M.S_DBG_OPTION,
-        action=M.S_DBG_ACTION,
-        dest=M.S_DBG_DEST,
-        help=M.S_DBG_HELP,
+        C.S_DBG_OPTION,
+        action=C.S_DBG_ACTION,
+        dest=C.S_DBG_DEST,
+        help=C.S_DBG_HELP,
     )
 
     # get namespace object
@@ -1432,7 +1439,7 @@ if __name__ == "__main__":
 
     # get the args
     a_dir_cur = os.getcwd()
-    a_debug = dict_args.get(M.S_DBG_DEST, False)
+    a_debug = dict_args.get(C.S_DBG_DEST, False)
 
     # create object
     pm = PyMaker()

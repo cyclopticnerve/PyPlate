@@ -33,7 +33,7 @@ import sys
 
 DIR_SELF = Path(__file__).parents[2].resolve()
 FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__" / "__PP_INST_CONF_FILE__"
-DIR_LIB = DIR_SELF / "lib"
+DIR_LIB = DIR_SELF / "__PP_DIR_LIB__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
