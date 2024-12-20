@@ -202,10 +202,10 @@ S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
 S_DIR_UNINSTALL = "uninstall"
-S_DIR_INST_PRE = f"{S_DIR_INSTALL}/preflight"
-S_DIR_INST_POST = f"{S_DIR_INSTALL}/postflight"
-S_DIR_UNINST_PRE = f"{S_DIR_UNINSTALL}/preflight"
-S_DIR_UNINST_POST = f"{S_DIR_UNINSTALL}/postflight"
+# S_DIR_INST_PRE = f"{S_DIR_INSTALL}/preflight"
+# S_DIR_INST_POST = f"{S_DIR_INSTALL}/postflight"
+# S_DIR_UNINST_PRE = f"{S_DIR_UNINSTALL}/preflight"
+# S_DIR_UNINST_POST = f"{S_DIR_UNINSTALL}/postflight"
 
 S_FILE_INST_CFG = f"{S_DIR_INSTALL}/install.json"
 S_FILE_UNINST_CFG = f"{S_DIR_UNINSTALL}/uninstall.json"
@@ -608,12 +608,12 @@ D_PRV_ALL = {
     # install stuff
     # "__PP_INST_CONF__": S_DIR_INST_CONF,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
-    "__PP_DIR_INSTALL__": S_DIR_INSTALL,
-    "__PP_DIR_UNINSTALL__": S_DIR_UNINSTALL,
+    # "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    # "__PP_DIR_UNINSTALL__": S_DIR_UNINSTALL,
     "__PP_INST_CONF_FILE__": S_FILE_INST_CFG,
-    "__PP_INST_FILE__": S_FILE_INST_PY,
+    # "__PP_INST_FILE__": S_FILE_INST_PY,
     "__PP_UNINST_CONF_FILE__": S_FILE_UNINST_CFG,
-    "__PP_UNINST_FILE__": S_FILE_UNINST_PY,
+    # "__PP_UNINST_FILE__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
@@ -651,7 +651,7 @@ D_PRV_PRJ = {
     "__PP_USR_CONF__": "",  # config dir
     # "__PP_USR_LIB__": "",  # location of cnlibs dir
     # "__PP_USR_SRC__": "",  # where the program will keep it's source
-    "__PP_DIST_FMT__" : "",
+    "__PP_DIST_FMT__": "",
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
@@ -702,9 +702,9 @@ D_PUB_DIST = {
         S_DIR_I18N: S_DIR_ASSETS,
         #
         S_FILE_INST_PY: "",
-        S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        # S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_FILE_INST_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        # S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_DIR_UNINSTALL: S_DIR_ASSETS,
     },
     "g": {
@@ -719,9 +719,9 @@ D_PUB_DIST = {
         S_DIR_I18N: S_DIR_ASSETS,
         #
         S_FILE_INST_PY: "",
-        S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        # S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_FILE_INST_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        # S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
         S_DIR_UNINSTALL: S_DIR_ASSETS,
         #
         S_DIR_IMAGES: S_DIR_ASSETS,
@@ -866,6 +866,7 @@ D_INSTALL = {
     S_FILE_LICENSE: "__PP_USR_CONF__",
     S_FILE_README: "__PP_USR_CONF__",
     S_DIR_INSTALL: "__PP_USR_CONF__",
+    S_DIR_UNINSTALL: "__PP_USR_CONF__",
     S_DIR_IMAGES: "__PP_USR_CONF__",
     S_DIR_GUI: "__PP_USR_CONF__",
 }
@@ -1147,6 +1148,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     # chuck the origin dir
     if not B_DEBUG:
         shutil.rmtree(in_dir)
+
 
 # ------------------------------------------------------------------------------
 # Private functions

@@ -48,13 +48,20 @@ import sys
 # paths to important dirs
 # NB: needed to get imports from conf (bootstrap)
 # NB: this is hardcoded so ln -s will work
-# FIXME: fix this in dist
-# P_DIR_PYPLATE = Path.home() / ".config/pyplate"
+P_DIR_PYPLATE_INST = Path.home() / ".config/pyplate"
 P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
+
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
+
+P_DIR_PP_CONF_INST = P_DIR_PYPLATE / "conf"
+P_DIR_PP_LIB_INST = P_DIR_PYPLATE / "lib"
+
 sys.path.append(str(P_DIR_PP_CONF))
 sys.path.append(str(P_DIR_PP_LIB))
+
+sys.path.append(str(P_DIR_PP_CONF_INST))
+sys.path.append(str(P_DIR_PP_LIB_INST))
 
 # local imports
 import pyplate_conf as C  # type: ignore
@@ -168,7 +175,7 @@ class PyMaker:
         self._debug = debug
 
         C.B_DEBUG = debug
-        
+
         # ----------------------------------------------------------------------
         #  do the work
 
@@ -209,6 +216,13 @@ class PyMaker:
 
         Perform some mundane stuff like setting properties.
         """
+
+        # do not run pybaker on pyplate (we are not that meta YET...)
+        if "pyplate" in str(self._dir_current).lower():
+            print(C.S_ERR_PRJ_DIR_IS_PP)
+            sys.exit(-1)
+
+        # ----------------------------------------------------------------------
 
         # debug turns off some features to speed up project creation
         if self._debug:
@@ -866,7 +880,7 @@ class PyMaker:
 
             # get params
             name = C.D_PRV_PRJ["__PP_NAME_BIG__"]
-            # version = C.D_PUB_META["__PP_VERSION__"]
+            version = C.D_PUB_META["__PP_VERSION__"]
 
             # get an install instance
             inst = I.CNInstall()
@@ -874,9 +888,7 @@ class PyMaker:
             # create a template install cfg file
             dict_inst = inst.make_install_cfg(
                 name,
-                # version,
-                C.S_DIR_INST_PRE,
-                C.S_DIR_INST_POST,
+                version,
                 # these are the defaults spec'd in pyplate_conf
                 # they can be edited in prj/install/install.json before running
                 # pybaker
@@ -891,8 +903,6 @@ class PyMaker:
             # create a template uninstall cfg file
             dict_uninst = inst.make_uninstall_cfg(
                 name,
-                C.S_DIR_UNINST_PRE,
-                C.S_DIR_UNINST_POST,
                 # these are the defaults spec'd in pyplate_conf
                 # they can be edited in prj/uninstall/uninstall.json before running
                 # pybaker
@@ -1328,6 +1338,9 @@ class PyMaker:
         Checks the passed type to see if it is one of the allowed project
         types.
         """
+
+        if len(prj_type) == 0:
+            return False
 
         # get first char and lower case it
         first_char = prj_type[0].lower()

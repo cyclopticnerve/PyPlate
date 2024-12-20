@@ -22,11 +22,11 @@ run directly by the run_scripts method.
 import json
 from pathlib import Path
 import re
-
-# import shutil
+import shutil
 import sys
 
 # find paths to lib
+DIR_SELF = Path(__file__).parent.resolve()
 DIR_LIB = Path(__file__).parents[1].resolve()
 sys.path.append(str(DIR_LIB))
 
@@ -50,9 +50,9 @@ from cnlib import cnfunctions as F  # type: ignore
 # keys
 S_KEY_NAME = "NAME"
 S_KEY_VERSION = "VERSION"
-S_KEY_DIR_PRE = "DIR_PRE"
-S_KEY_DIR_POST = "DIR_POST"
-# S_KEY_DIR_ASSETS = "DIR_ASSETS"
+# S_KEY_DIR_PRE = "DIR_PRE"
+# S_KEY_DIR_POST = "DIR_POST"
+# S_KEY_ASSETS = "ASSETS"
 S_KEY_DICT_INSTALL = "DICT_INSTALL"
 S_KEY_LIST_UNINST = "LIST_UNINST"
 
@@ -68,19 +68,19 @@ S_MSG_UNINST_END = "{} uninstalled"
 
 # general "done" message
 S_MSG_DONE = "Done"
+S_MSG_PREFLIGHT = "preflight"
+S_MSG_POSTFLIGHT = "postflight"
 
-# NB: format param is preflight/postflight key
-S_MSG_SCRIPTS_START = "Running {} scripts:"
-# NB: format param is preflight/postflight key
-S_MSG_SCRIPTS_END = "{} scripts done"
-# NB: format param is name of script
-S_MSG_SCRIPT_RUN = "  Running {}... "
+# # NB: format param is preflight/postflight key
+# S_MSG_SCRIPTS_START = "Running {} scripts:"
+# # NB: format param is preflight/postflight key
+# S_MSG_SCRIPTS_END = "{} scripts done"
+# # NB: format param is name of script
+# S_MSG_SCRIPT_RUN = "  Running {}... "
 
 # strings for system requirements
-# NB: format param is req name
-# S_MSG_REQ_RUN = "  Installing {}... "
-S_MSG_INST_START = "Copying files... "
-S_MSG_UNINST_START = "Deleting files... "
+S_MSG_COPY_START = "Copying files... "
+S_MSG_DEL_START = "Deleting files... "
 
 # strings for version compare
 # NB: format param is prog name
@@ -189,7 +189,7 @@ class CNInstall:
         """
 
         # set properties
-        self._dir_assets = Path()
+        self._dir_base = Path()
         self._debug = False
         self._installing = True
         self._dict_cfg = {}
@@ -201,12 +201,19 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Make install file
     # --------------------------------------------------------------------------
-    def make_install_cfg(self, name, dir_pre, dir_post, dict_install):
+    def make_install_cfg(
+        self,
+        name,
+        version,
+        # dir_pre, dir_post,
+        dict_install,
+    ):
         """
         Make install file
 
         Arguments:
             name: Program name
+            version: Initial program version from pyplate_conf.py
             dir_pre: Path to preflight script dir
             dir_post: Path th postflight script dir
             dict_install: Dict of assets to install
@@ -221,9 +228,9 @@ class CNInstall:
         # create the dict using args
         dict_use = {
             S_KEY_NAME: name,
-            # S_KEY_VERSION: "0.0.0",
-            S_KEY_DIR_PRE: dir_pre,
-            S_KEY_DIR_POST: dir_post,
+            S_KEY_VERSION: version,
+            # S_KEY_DIR_PRE: dir_pre,
+            # S_KEY_DIR_POST: dir_post,
             S_KEY_DICT_INSTALL: dict_install,
         }
 
@@ -233,7 +240,9 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Make uninstall file
     # --------------------------------------------------------------------------
-    def make_uninstall_cfg(self, name, dir_pre, dir_post, list_uninst):
+    def make_uninstall_cfg(self, name,
+                           # dir_pre, dir_post,
+                           list_uninst):
         """
         Make uninstall file
 
@@ -253,8 +262,8 @@ class CNInstall:
         # create the dict using args
         dict_use = {
             S_KEY_NAME: name,
-            S_KEY_DIR_PRE: dir_pre,
-            S_KEY_DIR_POST: dir_post,
+            # S_KEY_DIR_PRE: dir_pre,
+            # S_KEY_DIR_POST: dir_post,
             S_KEY_LIST_UNINST: list_uninst,
         }
 
@@ -264,12 +273,12 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Install the program
     # --------------------------------------------------------------------------
-    def install(self, dir_assets, path_cfg_new, path_cfg_old, debug=False):
+    def install(self, dir_base, path_cfg_new, path_cfg_old, debug=False):
         """
         Install the program
 
         Arguments:
-            dir_assets: Path to the assets folder where all of the program
+            dir_base: Path to the assets folder where all of the program
             files are put in dist. This is the base source path to use when
             copying files to the user's computer
             path_cfg_new: Path to the file that contains the current install
@@ -283,7 +292,7 @@ class CNInstall:
         """
 
         # set properties
-        self._dir_assets = Path(dir_assets).resolve()
+        self._dir_base = Path(dir_base).resolve()
         self._debug = debug
         self._installing = True
 
@@ -381,7 +390,7 @@ class CNInstall:
         # do each part of conf dict
 
         # run preflight
-        self._run_scripts(S_KEY_DIR_PRE)
+        # self._run_scripts(S_KEY_DIR_PRE)
 
         # run content
         if self._installing:
@@ -390,7 +399,7 @@ class CNInstall:
             self._do_uninstall_content()
 
         # run postflight
-        self._run_scripts(S_KEY_DIR_POST)
+        # self._run_scripts(S_KEY_DIR_POST)
 
         # done installing
         if self._installing:
@@ -433,67 +442,6 @@ class CNInstall:
             raise error from e
 
     # --------------------------------------------------------------------------
-    # Run the scripts from preflight or postflight
-    # --------------------------------------------------------------------------
-    def _run_scripts(self, key):
-        """
-        Run the scripts from preflight or postflight
-
-        Arguments:
-            key: The step to run, either S_KEY_PREFLIGHT or S_KEY_POSTFLIGHT
-
-        This method is the common code for running preflight/postflight
-        scripts. It takes the step (specified by the key name) and runs the
-        scripts in the order they are specified.
-        """
-
-        # lowercase the key for better printing
-        key = key.lower()
-
-        # FIXME: hard coded install dir
-        # and then uninstall
-
-        # get the subdir for the key
-        # dir_key = self._path_assets / "install" / key
-
-        # scan install key dir
-        # for root, _root_dirs, root_files in dir_key.walk():
-
-        #     # convert files into Paths
-        #     files = [root / f for f in root_files]
-
-        #     # if no files, skip
-        #     if len(files) == 0:
-        #         continue
-
-        #     # show some text
-        #     print(S_MSG_SCRIPTS_START.format(key), flush=True)
-
-        #     # for each script item
-        #     for file in files:
-
-        #         # show that we are doing something
-        #         print(S_MSG_SCRIPT_RUN.format(file.name), end="", flush=True)
-
-        #         # get full path rel to assets
-        #         new_item = str(file)
-
-        #         # run script entry
-        #         if not self._debug:
-        #             try:
-        #                 F.sh(new_item)
-        #                 # print output for each script
-        #                 print(S_MSG_DONE, flush=True)
-        #             except F.CNShellError as e:
-        #                 error = CNInstallError(
-        #                     S_ERR_RUN_SCRIPT.format(new_item)
-        #                 )
-        #                 raise error from e
-        #         else:
-        #             # print output for each script
-        #             print(S_MSG_DONE, flush=True)
-
-    # --------------------------------------------------------------------------
     # Copy source files/folders
     # --------------------------------------------------------------------------
     def _do_install_content(self):
@@ -504,43 +452,43 @@ class CNInstall:
         source to their final locations in the user's folder structure.
         """
 
-        # print(S_MSG_INST_START, end="", flush=True)
+        print(S_MSG_COPY_START, end="", flush=True)
 
-        # # get source dir and user home
-        # inst_src = self._path_assets
-        # inst_home = Path.home()
+        # get source dir and user home
+        inst_src = self._dir_base
+        inst_home = Path.home()
 
-        # # content list from dict
-        # content = self._dict_conf.get(S_KEY_ASSETS, {})
+        # content list from dict
+        content = self._dict_cfg.get(S_KEY_DICT_INSTALL, {})
 
-        # # for each key, value
-        # for k, v in content.items():
+        # for each key, value
+        for k, v in content.items():
 
-        #     # get full paths of source / destination
-        #     src = inst_src / k
-        #     dst = inst_home / v / src.name
+            # get full paths of source / destination
+            src = inst_src / k
+            dst = inst_home / v / src.name
 
-        #     # debug may omit certain assets
-        #     if not src.exists():
-        #         continue
+            # debug may omit certain assets
+            if not src.exists():
+                continue
 
-        #     # if the source is a dir
-        #     if src.is_dir():
-        #         if not self._debug:
-        #             # copy dir
-        #             shutil.copytree(src, dst, dirs_exist_ok=True)
-        #         else:
-        #             print(f"copytree {src} to {dst}")
+            # if the source is a dir
+            if src.is_dir():
+                if not self._debug:
+                    # copy dir
+                    shutil.copytree(src, dst, dirs_exist_ok=True)
+                else:
+                    print(f"copy dir {src} to {dst}")
 
-        #     # if the source is a file
-        #     else:
-        #         if not self._debug:
-        #             # copy file
-        #             shutil.copy(src, dst)
-        #         else:
-        #             print(f"copy {src} to {dst}")
+            # if the source is a file
+            else:
+                if not self._debug:
+                    # copy file
+                    shutil.copy(src, dst)
+                else:
+                    print(f"copy file {src} to {dst}")
 
-        # print(S_MSG_DONE)
+        print(S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Remove source files/folders
@@ -553,43 +501,109 @@ class CNInstall:
         user's computer.
         """
 
-        # print(S_MSG_UNINST_START, end="", flush=True)
+        print(S_MSG_DEL_START, end="", flush=True)
 
-        # # get source dir and user home
-        # inst_home = Path.home()
+        # get source dir and user home
+        inst_home = Path.home()
 
-        # # content list from dict
-        # content = self._dict_conf.get(S_KEY_ASSETS, {})
+        # content list from dict
+        content = self._dict_cfg.get(S_KEY_LIST_UNINST, {})
 
-        # # create a list of all content dests as well as extras
-        # l_un = [v for v in content]
-        # extras = self._dict_conf.get(S_KEY_ASSETS, [])
-        # for item in extras:
-        #     l_un.append(item)
+        # for each key, value
+        for item in content:
 
-        # # for each key, value
-        # for item in l_un:
+            # get full path of destination
+            dst = inst_home / item
 
-        #     # get full path of destination
-        #     dst = inst_home / item
+            # if the source is a dir
+            if dst.is_dir():
+                if not self._debug:
+                    # copy dir
+                    shutil.rmtree(dst)
+                else:
+                    print(f"rmtree {dst}")
 
-        #     # if the source is a dir
-        #     if dst.is_dir():
-        #         if not self._debug:
-        #             # copy dir
-        #             shutil.rmtree(dst)
-        #         else:
-        #             print(f"rmtree {dst}")
+            # if the source is a file
+            else:
+                if not self._debug:
+                    # copy file
+                    Path.unlink(dst)
+                else:
+                    print(f"unlink {dst}")
 
-        #     # if the source is a file
-        #     else:
-        #         if not self._debug:
-        #             # copy file
-        #             Path.unlink(dst)
-        #         else:
-        #             print(f"unlink {dst}")
+        print(S_MSG_DONE)
 
-        # print(S_MSG_DONE)
+    # --------------------------------------------------------------------------
+    # Run the scripts from preflight or postflight
+    # --------------------------------------------------------------------------
+    # def _run_scripts(self, key):
+    #     """
+    #     Run the scripts from preflight or postflight
+
+    #     Arguments:
+    #         key: The step to run, either S_KEY_PREFLIGHT or S_KEY_POSTFLIGHT
+
+    #     This method is the common code for running preflight/postflight
+    #     scripts. It takes the step (specified by the key name) and runs the
+    #     scripts in the order they are specified.
+    #     """
+
+    #     print("1")
+
+    #     # get the subdir for the key
+    #     path_scripts = self._dict_cfg.get(key, "")
+    #     if path_scripts != "":
+    #         path_scripts = Path(path_scripts).resolve()
+    #     else:
+    #         return
+
+    #     print(path_scripts)
+
+    #     # scan key dir
+    #     for root, _root_dirs, root_files in path_scripts.walk():
+
+    #         # convert files into Paths
+    #         files = [root / f for f in root_files]
+
+    #         # if no files, skip
+    #         if len(files) == 0:
+    #             continue
+
+    #         # show some text
+    #         print(S_MSG_SCRIPTS_START.format(key), flush=True)
+
+    #         # for each script item
+    #         for file in files:
+
+    #             full_file = file.resolve()
+
+    #             # run script entry
+    #             if not self._debug:
+
+    #                 # show that we are doing something
+    #                 print(
+    #                     S_MSG_SCRIPT_RUN.format(full_file.name),
+    #                     end="",
+    #                     flush=True,
+    #                 )
+
+    #                 # get full path rel to assets
+    #                 new_item = str(full_file)
+
+    #                 try:
+    #                     F.sh(new_item)
+    #                     # print output for each script
+    #                     print(S_MSG_DONE, flush=True)
+    #                 except F.CNShellError as e:
+    #                     error = CNInstallError(
+    #                         S_ERR_RUN_SCRIPT.format(new_item)
+    #                     )
+    #                     raise error from e
+
+    #             else:
+    #                 # print output for each script
+    #                 print(f"run script: {full_file}")
+    #                 print(S_MSG_DONE, flush=True)
 
     # --------------------------------------------------------------------------
     # Compare two version strings for relativity
@@ -679,7 +693,9 @@ if __name__ == "__main__":
 
     # make inst cfg dict
     test_install_dict = i.make_install_cfg(
-        "test", test_inst_pre, test_inst_post, {"test.py": "test.py"}
+        "test", "0.0.1",
+        #test_inst_pre, test_inst_post,
+        {"test.py": "test.py"}
     )
 
     # print inst cfg dict
@@ -687,7 +703,9 @@ if __name__ == "__main__":
 
     # make inst cfg dict
     test_uninst_dict = i.make_uninstall_cfg(
-        "test", test_uninst_pre, test_uninst_post, ["test.py"]
+        "test",
+        # test_uninst_pre, test_uninst_post,
+        ["test.py"]
     )
 
     # print inst cfg dict

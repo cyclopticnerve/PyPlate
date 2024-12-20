@@ -25,7 +25,7 @@
 # TODO: any time pybaker encounters a file with __PP_DATE__ still in the
 # header, make sure to use today's date, not the one stored in a config dict
 # TODO: install script must install libs, src, etc. into proper folders
-# TODO: installer for pkg should move pkg to __PP_USER_LIB__
+# TODO: installer for pkg should move pkg to __PP_USR_LIB__
 
 TODO: change __RM_XXX and _xxx_readme to 'mx/MX' (for markup/markdown)
 TODO: fix README instuctions for installing (like where it gets

@@ -31,7 +31,7 @@ sys.path.append(str(DIR_LIB))
 
 # my imports
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib import cnformatter  # type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -119,7 +119,7 @@ class CNCli:
 
         # create the command line parser
         parser = argparse.ArgumentParser(
-            formatter_class=cnformatter.CNFormatter
+            formatter_class=CNFormatter
         )
 
         # call the subclass method

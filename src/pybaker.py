@@ -60,6 +60,8 @@ from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib import cninstall  # type: ignore
+# from cnlib.cninstall import CNInstall  # type: ignore
 # from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib.cnsphinx import CNSphinx  # type: ignore
 
@@ -219,6 +221,22 @@ class PyBaker:
         properties.
         """
 
+        # check for folder
+        if self._dir_prj and not self._dir_prj.exists():
+            print(C.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
+            sys.exit(-1)
+
+        # check if dir_prj has pyplate folder, if not, not a valid prj
+        path_pyplate = self._dir_prj / "pyplate"
+        if not path_pyplate.exists():
+            print(C.S_ERR_NOT_PRJ)
+            sys.exit(-1)
+
+        # do not run pybaker on pyplate (we are not that meta YET...)
+        if "pyplate" in str(self._dir_prj).lower():
+            print(C.S_ERR_PRJ_DIR_IS_PP)
+            sys.exit(-1)
+
         # ----------------------------------------------------------------------
 
         # debug turns off some _do_after_fix features
@@ -239,24 +257,6 @@ class PyBaker:
         p = p.lstrip(h).strip("/")
         # NB: change global val
         C.D_PRV_PRJ["__PP_DEV_PP__"] = p
-
-        # ----------------------------------------------------------------------
-
-        # check for folder
-        if self._dir_prj and not self._dir_prj.exists():
-            print(C.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
-            sys.exit(-1)
-
-        # check if dir_prj has pyplate folder, if not, not a valid prj
-        path_pyplate = self._dir_prj / "pyplate"
-        if not path_pyplate.exists():
-            print(C.S_ERR_NOT_PRJ)
-            sys.exit(-1)
-
-        # do not run pybaker on pyplate (we are not that meta YET...)
-        if "pyplate" in str(self._dir_prj).lower():
-            print(C.S_ERR_PRJ_DIR_IS_PP)
-            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -327,6 +327,8 @@ class PyBaker:
         C.do_before_fix(self._dir_prj, self._dict_prv, self._dict_pub)
 
         print(C.S_ACTION_DONE)
+
+        # version = self._dict_pub_meta["__PP_VERSION__"]
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -443,6 +445,20 @@ class PyBaker:
             # fix current dir path
             if root not in skip_path:
                 self._fix_path(root)
+
+        # ----------------------------------------------------------------------
+        # fix install.json version
+
+        # get version from project.json
+        version = self._dict_pub_meta["__PP_VERSION__"]
+
+        # get install cfg
+        a_file = Path(C.S_FILE_INST_CFG).resolve()
+
+        # load/change/save
+        a_dict = F.load_dicts([a_file])
+        a_dict[cninstall.S_KEY_VERSION] = version
+        F.save_dict(a_dict, [a_file])
 
         # ----------------------------------------------------------------------
         # save project settings
@@ -661,6 +677,16 @@ class PyBaker:
         name_fmt = self._dict_prv_prj["__PP_DIST_FMT__"]
         p_dist = a_dist / name_fmt
         Path.mkdir(p_dist, parents=True)
+
+        # fix version in install.json
+        # inst_cfg = self._dict_pub_dist[C.S_FILE_INST_CFG]
+        # inst_cfg = Path(inst_cfg).resolve()
+
+        # dict_cfg = F.load_dicts([inst_cfg], {})
+
+        # new_version = self._dict_pub_meta["__PP_VERSION__"]
+        # dict_cfg[cninstall.S_KEY_VERSION] = new_version
+        # F.save_dict(dict_cfg, [inst_cfg])
 
         # for each key, val (type, dict)
         for key, val in self._dict_pub_dist.items():
