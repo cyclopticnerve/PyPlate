@@ -213,7 +213,6 @@ class CNInstall:
 
         Arguments:
             name: Program name
-            version: Initial program version from pyplate_conf.py
             dir_pre: Path to preflight script dir
             dir_post: Path th postflight script dir
             dict_install: Dict of assets to install
@@ -240,14 +239,20 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Make uninstall file
     # --------------------------------------------------------------------------
-    def make_uninstall_cfg(self, name,
-                           # dir_pre, dir_post,
-                           list_uninst):
+    def make_uninstall_cfg(
+            self,
+            name,
+            version,
+            # dir_pre,
+            # dir_post,
+            list_uninst
+        ):
         """
         Make uninstall file
 
         Arguments:
             name: Program name
+            version: Initial program version from pyplate_conf.py
             dir_pre: Path to preflight script dir
             dir_post: Path th postflight script dir
             list_uninstall: List of assets to uninstall
@@ -262,6 +267,7 @@ class CNInstall:
         # create the dict using args
         dict_use = {
             S_KEY_NAME: name,
+            S_KEY_VERSION: version,
             # S_KEY_DIR_PRE: dir_pre,
             # S_KEY_DIR_POST: dir_post,
             S_KEY_LIST_UNINST: list_uninst,
@@ -354,6 +360,39 @@ class CNInstall:
 
         # run dict
         self._run_dict()
+
+    # --------------------------------------------------------------------------
+    # Fix desktop abs path to icon
+    # --------------------------------------------------------------------------
+    def fix_desktop_icon(self, desk_file):
+        """
+        Fix desktop abs path to icon
+
+        Arguments:
+            desk_file: abs path to desktop file
+
+        Fixes the abs path to the desktop file's icon based on installed user's
+        home dir.
+        """
+
+        # get installed user's home
+        home = Path.home()
+
+        # open file
+        with open(desk_file, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
+
+            # scan and fix icon path
+            for index, line in enumerate(lines):
+                if line.startswith("Icon="):
+                    icon_rel_path = line.split("=")[1]
+                    icon_abs_path = home / icon_rel_path
+                    line = "Icon=" + str(icon_abs_path)
+                    lines[index] = line
+
+        # save file
+        with open(desk_file, "w", encoding="UTF-8") as a_file:
+            a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -693,8 +732,10 @@ if __name__ == "__main__":
 
     # make inst cfg dict
     test_install_dict = i.make_install_cfg(
-        "test", "0.0.1",
-        #test_inst_pre, test_inst_post,
+        "test",
+        "0.0.1",
+        #test_inst_pre,
+        # test_inst_post,
         {"test.py": "test.py"}
     )
 
@@ -704,8 +745,10 @@ if __name__ == "__main__":
     # make inst cfg dict
     test_uninst_dict = i.make_uninstall_cfg(
         "test",
-        # test_uninst_pre, test_uninst_post,
-        ["test.py"]
+        "0.0.1",
+        # test_uninst_pre,
+        # test_uninst_post,
+        ["test.py"],
     )
 
     # print inst cfg dict

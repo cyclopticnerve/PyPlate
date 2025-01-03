@@ -16,7 +16,7 @@ __PP_RM_LICENSE__
 __PP_SHORT_DESC__
 <!-- __PP_SHORT_DESC__ -->
 
-![alt-text](README/screenshot.png "screenshot")
+<!-- ![alt-text](README/screenshot.png "screenshot") -->
 
 ## Requirements
 <!-- __PP_RM_DEPS__ -->

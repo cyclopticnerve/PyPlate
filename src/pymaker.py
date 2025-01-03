@@ -20,6 +20,8 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
+# FIXME: multiple concats in paths (see bookmarks)
+
 # FIXME: run pymaker from anywhere
 # put in postflight script:
 # ln -s $HOME/Documents/Projects/Python/PyPlate/src/pymaker.py $HOME/.local/bin/pymaker
@@ -48,20 +50,20 @@ import sys
 # paths to important dirs
 # NB: needed to get imports from conf (bootstrap)
 # NB: this is hardcoded so ln -s will work
-P_DIR_PYPLATE_INST = Path.home() / ".config/pyplate"
+P_DIR_PYPLATE_INST = Path.home() / "local/share/pyplate"
 P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
 
+P_DIR_PP_CONF_INST = P_DIR_PYPLATE_INST / "conf"
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
+
+P_DIR_PP_LIB_INST = P_DIR_PYPLATE_INST / "lib"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
 
-P_DIR_PP_CONF_INST = P_DIR_PYPLATE / "conf"
-P_DIR_PP_LIB_INST = P_DIR_PYPLATE / "lib"
-
-sys.path.append(str(P_DIR_PP_CONF))
-sys.path.append(str(P_DIR_PP_LIB))
-
 sys.path.append(str(P_DIR_PP_CONF_INST))
+sys.path.append(str(P_DIR_PP_CONF))
+
 sys.path.append(str(P_DIR_PP_LIB_INST))
+sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
 import pyplate_conf as C  # type: ignore
@@ -171,8 +173,11 @@ class PyMaker:
         """
 
         # set properties
-        self._dir_current = Path(dir_current).resolve()
         self._debug = debug
+        if debug:
+            self._dir_current = P_DIR_PYPLATE.parent.resolve()
+        else:
+            self._dir_current = Path(dir_current).resolve()
 
         C.B_DEBUG = debug
 
@@ -220,6 +225,7 @@ class PyMaker:
         # do not run pybaker on pyplate (we are not that meta YET...)
         if "pyplate" in str(self._dir_current).lower():
             print(C.S_ERR_PRJ_DIR_IS_PP)
+            print(self._dir_current)
             sys.exit(-1)
 
         # ----------------------------------------------------------------------
@@ -287,7 +293,7 @@ class PyMaker:
 
             # check for valid type
             if self._check_type(prj_type):
-                prj_type = prj_type.lower()
+                prj_type = prj_type[0].lower()
 
                 # at this point, type is valid so exit loop
                 break
@@ -297,6 +303,9 @@ class PyMaker:
 
         # sanity check
         prj_name = ""
+        name_disp = ""
+        name_big = ""
+        name_small = ""
         tmp_dir = ""
 
         # if in debug mode
@@ -306,10 +315,15 @@ class PyMaker:
             for item in C.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
-                    prj_name = f"{item[1]}_DEBUG"
+                    prj_name = f"{item[1]} DEBUG"
+                    break
+
+            name_disp = prj_name  # CLI DEBUG
+            name_big = name_disp.replace(" ", "_")  # CLI_DEBUG
+            name_small = name_big.lower()  # cli_debug
 
             # set up for existence check
-            tmp_dir = self._dir_current / prj_name
+            tmp_dir = self._dir_current / name_big  # /home/cn/Doc/Prj/Py/CLI_DEBUG
 
             # check if project already exists
             if tmp_dir.exists():
@@ -333,22 +347,26 @@ class PyMaker:
                 # check for valid name
                 if self._check_name(prj_name):
 
+                    name_disp = prj_name  # CLI Test
+                    name_big = name_disp.replace(" ", "_")  # CLI_Test
+                    name_small = name_big.lower()  # cli_test
+
                     # set up for existence check
-                    tmp_dir = self._dir_current / prj_name
+                    tmp_dir = self._dir_current / name_big
 
                     # check if project already exists
                     if tmp_dir.exists():
 
                         # tell the user that the old name exists
-                        print(C.S_ERR_EXIST.format(tmp_dir))
+                        print(C.S_ERR_EXIST.format(name_big))
                     else:
                         break
 
+            # if prj_type in C.L_DISP_NAME:
+            #     name_disp = input(C.S_ASK_DISP.format(prj_name))
+
         # save global property
         self._dir_prj = tmp_dir
-
-        # calculate small name
-        name_small = prj_name.lower()
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -409,7 +427,8 @@ class PyMaker:
 
         # save project stuff
         C.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
-        C.D_PRV_PRJ["__PP_NAME_BIG__"] = prj_name
+        C.D_PRV_PRJ["__PP_NAME_DISP__"] = name_disp
+        C.D_PRV_PRJ["__PP_NAME_BIG__"] = name_big
         C.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
         C.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
         C.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
@@ -435,7 +454,7 @@ class PyMaker:
         # do template/all
 
         # copy template/all
-        src = P_DIR_PYPLATE / C.S_DIR_ALL
+        src = P_DIR_PYPLATE / C.S_DIR_TEMPLATE / C.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst)
 
@@ -782,30 +801,29 @@ class PyMaker:
             # we are done
             print(C.S_ACTION_DONE)
 
-            # make .desktop file
-            path_desk = self._dir_prj / C.S_DIR_DESKTOP
-            path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
+            # # make .desktop file
+            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
+            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
-            if (
-                path_desk.exists()
-                and path_desk.is_dir()
-                and path_template.exists()
-                and path_template.is_file()
-            ):
+            # if (
+            #     path_desk.exists()
+            #     and path_desk.is_dir()
+            #     and path_template.exists()
+            #     and path_template.is_file()
+            # ):
 
-                # fix .desktop file
-                print(C.S_ACTION_DESK, end="", flush=True)
+            #     # fix .desktop file
+            #     print(C.S_ACTION_DESK, end="", flush=True)
 
-                name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
-                path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-                path_out = self._dir_prj / path_out_name
-                potpy.make_desktop(path_template, path_out)
+            #     name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
+            #     path_out = self._dir_prj / path_out_name
 
-                # this .pot, .po, and .mo files
-                potpy.main()
+            #     # update desktop file
+            #     potpy.make_desktop(path_template, path_out)
 
-                # we are done
-                print(C.S_ACTION_DONE)
+            #     # we are done
+            #     print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
@@ -892,25 +910,28 @@ class PyMaker:
                 # these are the defaults spec'd in pyplate_conf
                 # they can be edited in prj/install/install.json before running
                 # pybaker
-                C.D_INSTALL,
+                C.D_INSTALL[prj_type],
             )
 
             # fix dunders in inst cfg file
-            path_inst = self._dir_prj / C.S_FILE_INST_CFG
+            path_inst = self._dir_prj / C.S_DIR_INSTALL / C.S_FILE_INST_CFG
             F.save_dict(dict_inst, [path_inst])
             self._fix_content(path_inst)
 
             # create a template uninstall cfg file
             dict_uninst = inst.make_uninstall_cfg(
                 name,
+                version,
                 # these are the defaults spec'd in pyplate_conf
-                # they can be edited in prj/uninstall/uninstall.json before running
-                # pybaker
-                C.L_UNINSTALL,
+                # they can be edited in prj/uninstall/uninstall.json before
+                # running pybaker
+                C.D_UNINSTALL[prj_type],
             )
 
             # fix dunders in inst cfg file
-            path_uninst = self._dir_prj / C.S_FILE_UNINST_CFG
+            path_uninst = (
+                self._dir_prj / C.S_DIR_UNINSTALL / C.S_FILE_UNINST_CFG
+            )
             F.save_dict(dict_uninst, [path_uninst])
             self._fix_content(path_uninst)
 

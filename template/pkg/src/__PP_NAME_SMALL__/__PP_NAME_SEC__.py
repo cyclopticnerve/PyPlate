@@ -82,4 +82,18 @@ def _func():
     return "this is _func"
 
 
+# ------------------------------------------------------------------------------
+# Code to run when called from command line
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+    # Code to run when called from command line
+
+    # This is the top level code of the program, called when the Python file is
+    # invoked from the command line. In a package, it is used to test function
+    # inputs and outputs.
+
+    # run main function
+    RES = func()
+    print(RES)
+
 # -)

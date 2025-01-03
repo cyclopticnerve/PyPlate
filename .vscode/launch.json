@@ -5,15 +5,17 @@
             "name": "PM",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pymaker.py",
-            "console": "integratedTerminal"
+            "program": "PyPlate/src/pymaker.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/.."
         },
         {
             "name": "PM Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pymaker.py",
+            "program": "PyPlate/src/pymaker.py",
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/..",
             "args": [
                 "-d"
             ]
@@ -22,19 +24,19 @@
             "name": "PB",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pybaker.py",
+            "program": "PyPlate/src/pybaker.py",
             "console": "integratedTerminal",
-            "args": "${command:pickArgs}"
+            "cwd": "${workspaceFolder}/.."
         },
         {
             "name": "PB Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/pybaker.py",
+            "program": "PyPlate/src/pybaker.py",
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/..",
             "args": [
-                "-d",
-                "${command:pickArgs}"
+                "-d"
             ]
         },
     ]

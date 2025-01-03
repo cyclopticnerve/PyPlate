@@ -59,7 +59,7 @@ I_SW_FALSE = 0
 # date format
 S_DATE_FMT = "%m/%d/%Y"
 
-# NB: format params are keys in L_TYPES[0] and L_TYPES[1]
+# NB: format params are keys in L_TYPES[item][0] and L_TYPES[item][1]
 S_TYPE_FMT = "{} ({})"
 # join each project type with this
 S_TYPE_JOIN = " | "
@@ -67,6 +67,7 @@ S_TYPE_JOIN = " | "
 # NB: format param is joined list of project types
 S_ASK_TYPE = "Project type [{}]: "
 S_ASK_NAME = "Project name: "
+S_ASK_DISP = "Display name [{}]: "
 S_ASK_DESC = "Short description: "
 # NB: format params are D_TYPE_SEC[prj_type], __PP_NAME_SMALL__
 S_ASK_SEC = "{} name (default: {}): "
@@ -95,13 +96,13 @@ S_ACTION_BEFORE = "Do before fix... "
 S_ACTION_FIX = "Do fix... "
 S_ACTION_AFTER = "Do after fix... "
 S_ACTION_GIT = "Make git folder... "
-S_ACTION_VENV = "Make venv folder... "
+S_ACTION_VENV = "Make venv folder (takes a long time!)... "
 # S_ACTION_PURGE = "Do purge... "
 S_ACTION_I18N = "Make i18n folder... "
 S_ACTION_DESK = "Fixing desktop file... "
 S_ACTION_DOCS = "Make docs folder... "
 S_ACTION_TREE = "Make tree file... "
-S_ACTION_DIST = "Make dist folder... "
+S_ACTION_DIST = "Make dist folder (takes a long time!)... "
 S_ACTION_INST = "Make install file... "
 S_ACTION_DONE = "Done"
 S_ACTION_FAIL = "Failed"
@@ -164,7 +165,7 @@ S_KEY_NAME_MID = "S_KEY_NAME_MID"
 # also make sure that these names don't appear in the blacklist, or else
 # pymaker won't touch them
 S_DIR_TEMPLATE = "template"
-S_DIR_ALL = f"{S_DIR_TEMPLATE}/all"
+S_DIR_ALL = "all"
 S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
@@ -174,43 +175,45 @@ S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
 S_DIR_SUPPORT = "support"
-S_DIR_DESKTOP = f"{S_DIR_CONF}/desktop"
 S_DIR_UI = "ui"
 S_DIR_I18N = "i18n"
 S_DIR_IMAGES = "images"
-S_DIR_LOCALE = f"{S_DIR_I18N}/locale"
-S_DIR_PO = f"{S_DIR_I18N}/po"
+S_DIR_LOCALE = "locale"
+S_DIR_PO = "po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
 S_DIR_GUI = "gui"
+S_DIR_DESKTOP = "desktop"
+S_DIR_DIST = "dist"
+S_DIR_ASSETS = "assets"
+S_DIR_INSTALL = "install"
+S_DIR_UNINSTALL = "uninstall"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
-S_FILE_REQS_ALL = f"{S_DIR_ALL}/{S_FILE_REQS}"
-# NB: format param is L_TYPES[2] (long prj type, subdir in template)
+S_FILE_DESKTOP = "__PP_NAME_BIG__.desktop"
+S_FILE_INST_CFG = "install.json"
+S_FILE_UNINST_CFG = "uninstall.json"
+S_FILE_INST_PY = "install.py"
+S_FILE_UNINST_PY = "uninstall.py"
+
+# TODO: do we need this? using .venv seems redundant
+S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
+# NB: format param is L_TYPES[item][2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/template.desktop"
-# NB: format param is __PP_NAME_SMALL__
-S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/" + "{}.desktop"
+
+# S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
 
 # ------------------------------------------------------------------------------
 
-S_DIR_DIST = "dist"
-S_DIR_ASSETS = "assets"
-S_DIR_INSTALL = "install"
-S_DIR_UNINSTALL = "uninstall"
 # S_DIR_INST_PRE = f"{S_DIR_INSTALL}/preflight"
 # S_DIR_INST_POST = f"{S_DIR_INSTALL}/postflight"
 # S_DIR_UNINST_PRE = f"{S_DIR_UNINSTALL}/preflight"
 # S_DIR_UNINST_POST = f"{S_DIR_UNINSTALL}/postflight"
 
-S_FILE_INST_CFG = f"{S_DIR_INSTALL}/install.json"
-S_FILE_UNINST_CFG = f"{S_DIR_UNINSTALL}/uninstall.json"
-S_FILE_INST_PY = f"{S_DIR_INSTALL}/install.py"
-S_FILE_UNINST_PY = f"{S_DIR_UNINSTALL}/uninstall.py"
 
 # ------------------------------------------------------------------------------
 
@@ -220,9 +223,10 @@ S_FILE_UNINST_PY = f"{S_DIR_UNINSTALL}/uninstall.py"
 # S_DIR_BASE = str(Path.home() / S_DIR_PRJ_BASE)
 # S_DIR_PRJ = S_DIR_BASE + "/{}/{}"
 
+# S_USR_HOME = str(Path.home())
 # paths relative to end user home only
-S_USR_CONF = ".config"  # __PP_NAME_SMALL__ will be appended
-S_USR_SRC = ".local/share"  # __PP_NAME_SMALL__ will be appended
+S_USR_SHARE = ".local/share"  # bulk of the program goes here
+# S_USR_SRC = ".local/share"  # __PP_NAME_SMALL__ will be appended
 S_USR_APPS = ".local/share/applications"  # for .desktop file
 S_USR_BIN = ".local/bin"  # where to put the binary
 
@@ -535,15 +539,15 @@ L_CATS = [
     "Shell",
 ]
 
-# dict to remove when uninstalling
-L_UNINSTALL = [
-    "__PP_USR_CONF__",
-]
-
 # which prj types need an install.json?
 L_MAKE_INSTALL = [
     "c",
     "g",
+]
+
+# proj types that have a display name (i.e. GUI)
+L_DISP_NAME = [
+    "g"
 ]
 
 # ------------------------------------------------------------------------------
@@ -575,12 +579,11 @@ D_PRV_ALL = {
     "__PP_LICENSE_URL__": "http://www.wtfpl.net",
     # the license image/link to use in __PP_README_FILE__
     "__PP_RM_LICENSE__": (
-        "[!"
-        "[License: WTFPLv2]"
-        "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg "
-        "http://www.wtfpl.net"
-        "]"
-        "http://www.wtfpl.net"
+        "[!"  # open image tag
+        "[License: WTFPLv2]"  # alt text
+        "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg)"  # img src
+        "]"  # close image tag
+        "(http://www.wtfpl.net)"  # click url
     ),
     # dummy value to use in headers
     "__PP_DUMMY__": "",
@@ -610,24 +613,26 @@ D_PRV_ALL = {
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
     # "__PP_DIR_INSTALL__": S_DIR_INSTALL,
     # "__PP_DIR_UNINSTALL__": S_DIR_UNINSTALL,
-    "__PP_INST_CONF_FILE__": S_FILE_INST_CFG,
+    "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
     # "__PP_INST_FILE__": S_FILE_INST_PY,
-    "__PP_UNINST_CONF_FILE__": S_FILE_UNINST_CFG,
+    "__PP_UNINST_CONF_FILE__": f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}",
     # "__PP_UNINST_FILE__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
     # location of src files
-    "__PP_DEV_SRC__": S_DIR_SRC,
+    "__PP_DIR_SRC__": S_DIR_SRC,
     # location of config files
-    "__PP_DEV_CONF__": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
+    # "__PP_DEV_CONF__": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
+    # "__PP_USR_HOME__": S_USR_HOME,
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
     # "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
-    "__PP_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
+    "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     "__PP_DIR_GUI__": S_DIR_GUI,
+    "__PP_FILE_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DESKTOP}",
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -636,8 +641,9 @@ D_PRV_ALL = {
 # project is created, as pybaker.py will not update them
 D_PRV_PRJ = {
     "__PP_TYPE_PRJ__": "",  # 'c'
-    "__PP_NAME_BIG__": "",  # PyPlate
-    "__PP_NAME_SMALL__": "",  # pyplate
+    "__PP_NAME_DISP__": "",  # My Project
+    "__PP_NAME_BIG__": "",  # My_Project
+    "__PP_NAME_SMALL__": "",  # my_project
     "__PP_NAME_SEC__": "",  # module1.py
     "__PP_NAME_CLASS__": "",  # Pascal case name for classes
     "__PP_DATE__": "",  # the date each file was created, updated every time
@@ -692,44 +698,36 @@ D_PUB_META = {
 D_PUB_DIST = {
     "c": {
         S_DIR_SRC: S_DIR_ASSETS,
-        S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
-        "__PP_NAME_VENV__": S_DIR_ASSETS,
         #
+        "__PP_NAME_VENV__": S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
         S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
-        #
-        S_FILE_INST_PY: "",
-        # S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        S_FILE_INST_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        # S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
+        "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
     },
     "g": {
         S_DIR_SRC: S_DIR_ASSETS,
-        S_DIR_README: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
-        "__PP_NAME_VENV__": S_DIR_ASSETS,
         #
+        "__PP_NAME_VENV__": S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
         S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
-        #
-        S_FILE_INST_PY: "",
-        # S_DIR_INST_PRE: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        S_FILE_INST_CFG: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
-        # S_DIR_INST_POST: str(Path(S_DIR_ASSETS) / S_DIR_INSTALL),
+        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
+        "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
         #
-        S_DIR_IMAGES: S_DIR_ASSETS,
-        S_DIR_GUI: S_DIR_ASSETS,
+        S_DIR_README: S_DIR_ASSETS,
+        # S_DIR_IMAGES: S_DIR_ASSETS,
+        # S_DIR_GUI: S_DIR_ASSETS,
     },
     "p": {
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
-        S_DIR_README: "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
         #
@@ -757,8 +755,8 @@ D_PUB_BL = {
         # NB: dist will have install.py in it, needs dunders
         S_DIR_DIST,
         S_DIR_DOCS,
-        f"**/{S_DIR_LOCALE}",
-        f"**/{S_DIR_PO}",
+        f"**/{S_DIR_I18N}/{S_DIR_LOCALE}",
+        f"**/{S_DIR_I18N}/{S_DIR_PO}",
         S_DIR_MISC,
         S_DIR_README,
         S_FILE_LICENSE,
@@ -858,17 +856,47 @@ D_COPY_LIB = {
 # these are the defaults, they can be edited in prj/install/install.json before
 # running pybaker
 D_INSTALL = {
-    "__PP_NAME_VENV__": "__PP_USR_CONF__",
-    S_DIR_CONF: "__PP_USR_CONF__",
-    S_DIR_LIB: "__PP_USR_CONF__",
-    S_DIR_README: "__PP_USR_CONF__",
-    S_DIR_SRC: "__PP_USR_CONF__",
-    S_FILE_LICENSE: "__PP_USR_CONF__",
-    S_FILE_README: "__PP_USR_CONF__",
-    S_DIR_INSTALL: "__PP_USR_CONF__",
-    S_DIR_UNINSTALL: "__PP_USR_CONF__",
-    S_DIR_IMAGES: "__PP_USR_CONF__",
-    S_DIR_GUI: "__PP_USR_CONF__",
+    "c": {
+        "__PP_NAME_VENV__": "__PP_USR_INST__",
+        S_DIR_CONF: "__PP_USR_INST__",
+        S_DIR_LIB: "__PP_USR_INST__",
+        S_DIR_README: "__PP_USR_INST__",
+        S_DIR_SRC: "__PP_USR_INST__",
+        S_FILE_LICENSE: "__PP_USR_INST__",
+        S_FILE_README: "__PP_USR_INST__",
+        # S_DIR_INSTALL: "__PP_USR_INST__",
+        S_DIR_UNINSTALL: "__PP_USR_INST__",
+        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
+    },
+    "g": {
+        "__PP_NAME_VENV__": "__PP_USR_INST__",
+        S_DIR_CONF: "__PP_USR_INST__",
+        S_DIR_LIB: "__PP_USR_INST__",
+        S_DIR_README: "__PP_USR_INST__",
+        S_DIR_SRC: "__PP_USR_INST__",
+        S_FILE_LICENSE: "__PP_USR_INST__",
+        S_FILE_README: "__PP_USR_INST__",
+        # S_DIR_INSTALL: "__PP_USR_INST__",
+        S_DIR_UNINSTALL: "__PP_USR_INST__",
+        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
+        #
+        # S_DIR_IMAGES: "__PP_USR_INST__",
+        S_DIR_GUI: "__PP_USR_INST__",
+        "__PP_FILE_DESK__": S_USR_APPS,
+    },
+}
+
+# dict to remove when uninstalling
+D_UNINSTALL = {
+    "c": [
+        "__PP_USR_INST__",
+        "__PP_USR_BIN__/__PP_NAME_SMALL__",
+    ],
+    "g": [
+        "__PP_USR_INST__",
+        "__PP_USR_BIN__/__PP_NAME_SMALL__",
+        f"{S_USR_APPS}/{S_FILE_DESKTOP}",
+    ],
 }
 
 # # src dirs to tar in dist
@@ -932,7 +960,7 @@ D_SW_LINE_DEF = {
 D_NAME = {
     S_KEY_NAME_START: r"(^[a-zA-Z])",
     S_KEY_NAME_END: r"([a-zA-Z\d]$)",
-    S_KEY_NAME_MID: r"(^[a-zA-Z\d\-_]*$)",
+    S_KEY_NAME_MID: r"(^[a-zA-Z\d\-_ ]*$)",
 }
 
 # ------------------------------------------------------------------------------
@@ -967,27 +995,19 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
 
     # get sub-dicts we need
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    # dict_pub_dist = dict_pub[S_KEY_PUB_DIST]
 
     # get values after pymaker has set them
-    # author = D_PRV_ALL["__PP_AUTHOR__"]
     name_small = dict_prv_prj["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    dict_prv_prj["__PP_USR_CONF__"] = f"{S_USR_CONF}/{name_small}"
-    dict_prv_prj["__PP_USR_SRC__"] = f"{S_USR_SRC}/{name_small}"
+    s_usr_inst = f"{S_USR_SHARE}/{name_small}"
+    dict_prv_prj["__PP_USR_INST__"] = s_usr_inst
 
-    # get venv name
-    # name_venv = S_VENV_FMT_NAME.format(name_small)
 
-    # type_prj = dict_prv_prj["__PP_TYPE_PRJ__"]
-    # if type_prj in dict_prv_prj:
-    #     # add venv name to dunders
-    #     dict_prv_prj["__PP_NAME_VENV__"] = name_venv
-
-    #     # add venv to dist list
-    #     dict_pub_dist[name_venv] = S_DIR_ASSETS
-
+    s_name_big = dict_prv_prj["__PP_NAME_BIG__"]
+    dict_prv_prj["__PP_DESK_ICON__"] = (
+        f"{s_usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{s_name_big}.png"
+    )
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1281,8 +1301,8 @@ def _fix_desktop(path, dict_pub_meta):
         path: Path for the file to modify text
         dict_pub_meta: the dict of metadata to replace in the file
 
-    Replaces the desc, exec, icon, path, and category text in a .desktop
-    file for programs that use this.
+    Replaces the description (comment) and category text in a .desktop file for
+    programs that use this.
     """
 
     # validate wanted categories into approved categories

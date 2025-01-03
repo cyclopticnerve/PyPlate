@@ -14,11 +14,11 @@
         "__PP_TOML_FILE__": "pyproject.toml",
         "__PP_REQS_FILE__": "requirements.txt",
         "__PP_INST_FILE__": "conf/install.json",
-        "__PP_DEV_SRC__": "src",
+        "__PP_DIR_SRC__": "src",
         "__PP_DEV_CONF__": "src/support/conf",
         "__PP_USR_APPS__": ".local/share/applications",
         "__PP_USR_BIN__": ".local/bin",
-        "__PP_IMAGES__": "images"
+        "__PP_DIR_IMAGES__": "images"
     },
     "PRV_PRJ": {
         "__PP_TYPE_PRJ__": "c",

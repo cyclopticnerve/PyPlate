@@ -19,6 +19,8 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# FIXME: multiple concats in paths
+
 # FIXME: run pybaker from prj dir
 # put in postflight script:
 # ln -s $HOME/Documents/Projects/Python/PyPlate/src/pybaker.py $HOME/.local/bin/pybaker
@@ -46,12 +48,19 @@ import sys
 # path to this project
 # NB: needed to get imports from conf (bootstrap)
 # NB: this is hardcoded so ln -s will work
-# FIXME: fix this in dist
-# P_DIR_PYPLATE = Path.home() / ".config/pyplate"
+P_DIR_PYPLATE_INST = Path.home() / "local/share/pyplate"
 P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
+
+P_DIR_PP_CONF_INST = P_DIR_PYPLATE_INST / "conf"
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
+
+P_DIR_PP_LIB_INST = P_DIR_PYPLATE_INST / "lib"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
+
+sys.path.append(str(P_DIR_PP_CONF_INST))
 sys.path.append(str(P_DIR_PP_CONF))
+
+sys.path.append(str(P_DIR_PP_LIB_INST))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
@@ -61,6 +70,7 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib import cninstall  # type: ignore
+
 # from cnlib.cninstall import CNInstall  # type: ignore
 # from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib.cnsphinx import CNSphinx  # type: ignore
@@ -174,9 +184,9 @@ class PyBaker:
         """
 
         # store properties
-        self._dir_prj = Path(dir_current).resolve()
         self._debug = debug
 
+        # set global prop in conf
         C.B_DEBUG = debug
 
         # ----------------------------------------------------------------------
@@ -185,6 +195,17 @@ class PyBaker:
         # print about info
         print(S_PP_ABOUT)
         print()
+
+        # ask for prj rel to pyplate if debug
+        if debug:
+            prj_name = ""
+            while prj_name == "":
+                prj_name = input("Project name: ")
+            self._dir_prj = P_DIR_PYPLATE / ".." / prj_name
+
+        # if not debug, use cwd
+        else:
+            self._dir_prj = Path(dir_current).resolve()
 
         # call boilerplate code
         self._setup()
@@ -234,8 +255,9 @@ class PyBaker:
 
         # do not run pybaker on pyplate (we are not that meta YET...)
         if "pyplate" in str(self._dir_prj).lower():
-            print(C.S_ERR_PRJ_DIR_IS_PP)
-            sys.exit(-1)
+            if not self._debug:
+                print(C.S_ERR_PRJ_DIR_IS_PP)
+                sys.exit(-1)
 
         # ----------------------------------------------------------------------
 
@@ -243,7 +265,7 @@ class PyBaker:
         if self._debug:
             C.B_CMD_GIT = False
             C.B_CMD_VENV = False
-            C.B_CMD_I18N = False
+            # C.B_CMD_I18N = False
             C.B_CMD_DOCS = False
             C.B_CMD_TREE = False
 
@@ -294,7 +316,7 @@ class PyBaker:
         version_old = self._dict_pub_meta["__PP_VERSION__"]
         version_new = ""
 
-        # loop forever until we get a valid version
+        # # loop forever until we get a valid version
         while True:
 
             # ask for  new version
@@ -306,9 +328,10 @@ class PyBaker:
             # check for valid version
             if self._check_version(version_new):
                 self._dict_pub_meta["__PP_VERSION__"] = version_new
-                break
-            else:
-                print(C.S_ERR_VERS)
+                return
+
+            # not a valid version
+            print(C.S_ERR_VERS)
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -453,7 +476,20 @@ class PyBaker:
         version = self._dict_pub_meta["__PP_VERSION__"]
 
         # get install cfg
-        a_file = Path(C.S_FILE_INST_CFG).resolve()
+        a_file = self._dir_prj / C.S_DIR_INSTALL / C.S_FILE_INST_CFG
+
+        # load/change/save
+        a_dict = F.load_dicts([a_file])
+        a_dict[cninstall.S_KEY_VERSION] = version
+        F.save_dict(a_dict, [a_file])
+
+        # fix uninstall.json version
+
+        # get version from project.json
+        # version = self._dict_pub_meta["__PP_VERSION__"]
+
+        # get install cfg
+        a_file = self._dir_prj / C.S_DIR_UNINSTALL / C.S_FILE_UNINST_CFG
 
         # load/change/save
         a_dict = F.load_dicts([a_file])
@@ -536,6 +572,7 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # i18n
+
         # if i18n flag is set
         if C.B_CMD_I18N:
 
@@ -551,6 +588,7 @@ class PyBaker:
                 dir_locale=self._dir_prj / C.S_DIR_LOCALE,
                 dir_po=self._dir_prj / C.S_DIR_PO,
                 str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
+                # NB: use dict_pub here b/c dunders have been fixed
                 dict_clangs=self._dict_pub_i18n[C.S_KEY_CLANGS],
                 dict_no_ext=self._dict_pub_i18n[C.S_KEY_NO_EXT],
                 list_wlangs=self._dict_pub_i18n[C.S_KEY_WLANGS],
@@ -563,29 +601,29 @@ class PyBaker:
             # we are done
             print(C.S_ACTION_DONE)
 
-            # make .desktop file
-            path_desk = self._dir_prj / C.S_DIR_DESKTOP
-            path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
+            # # make .desktop file
+            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
+            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
-            if (
-                path_desk.exists()
-                and path_desk.is_dir()
-                and path_template.exists()
-                and path_template.is_file()
-            ):
+            # if (
+            #     path_desk.exists()
+            #     and path_desk.is_dir()
+            #     and path_template.exists()
+            #     and path_template.is_file()
+            # ):
 
-                # fix .desktop file
-                print(C.S_ACTION_DESK, end="", flush=True)
+            #     # fix .desktop file
+            #     print(C.S_ACTION_DESK, end="", flush=True)
 
-                name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-                path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-                path_out = self._dir_prj / path_out_name
+            #     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
+            #     path_out = self._dir_prj / path_out_name
 
-                # update desktop file
-                potpy.make_desktop(path_template, path_out)
+            #     # update desktop file
+            #     potpy.make_desktop(path_template, path_out)
 
-                # we are done
-                print(C.S_ACTION_DONE)
+            #     # we are done
+            #     print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # update docs
@@ -1093,6 +1131,7 @@ class PyBaker:
         # match semantic version from start of string
         pattern = r"(\d).(\d).(\d)(.*)"
         return re.match(pattern, version)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

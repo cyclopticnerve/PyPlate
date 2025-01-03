@@ -35,14 +35,14 @@ import sys
 DIR_SELF = Path(__file__).parent.resolve()
 DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
 FILE_CFG_NEW = DIR_ASSETS / "__PP_INST_CONF_FILE__"
-FILE_CFG_OLD = Path.home() / "__PP_USR_CONF__" / "__PP_INST_CONF_FILE__"
+FILE_CFG_OLD = Path.home() / "__PP_USR_INST__" / "__PP_UNINST_CONF_FILE__"
 DIR_LIB = DIR_ASSETS / "__PP_DIR_LIB__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
 
 # import my stuff
-import cnlib.cnfunctions as F  # type: ignore
+# import cnlib.cnfunctions as F  # type: ignore
 import cnlib.cninstall as C # type: ignore
 from cnlib.cnformatter import CNFormatter # type: ignore
 
@@ -50,14 +50,6 @@ from cnlib.cnformatter import CNFormatter # type: ignore
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
-
-# ------------------------------------------------------------------------------
-# Required for pybaker
-# ------------------------------------------------------------------------------
-
-# globals for pb to find
-# NB: you may edit these by hand, but they will be overwritten by PyBaker
-# S_PP_VERSION = "__PP_VERSION__"
 
 # ------------------------------------------------------------------------------
 # Run the main function
@@ -80,46 +72,6 @@ def main(debug=False):
         inst.install(DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD, debug=debug)
     except C.CNInstallError as e:
         print(e)
-
-    # make symlink
-    cmd = (
-        "ln -s "
-        # the real script to run
-        "$HOME/__PP_USR_CONF__/__PP_DEV_SRC__/__PP_NAME_SMALL__.py "
-        # the symlinked script
-        "$HOME/__PP_USR_BIN__/__PP_NAME_SMALL__"
-    )
-
-    # get result of running the shell command or bubble up an error
-    try:
-        F.sh(cmd, shell=True)
-    except F.CNShellError as e:
-        print(e.message)
-
-    # get result of running the shell command or bubble up an error
-    # try:
-    #     res = subprocess.run(
-    #         # the array of commands produced by shlex.split
-    #         CMD,
-    #         # if check is True, an exception will be raised if the return code
-    #         # is not 0
-    #         # if check is False, no exception is raised but res will be None,
-    #         # meaning you have to test for it in the calling function
-    #         # but that also means you have no information on WHY it failed
-    #         check=True,
-    #         # convert stdout/stderr from bytes to text
-    #         text=True,
-    #         # put stdout/stderr into res
-    #         capture_output=True,
-    #         # whether the call is a file w/ params (False) or a direct shell
-    #         # input (True)
-    #         shell=True,
-    #     )
-
-    # # this is the return code check
-    # except subprocess.CalledProcessError as e:
-    #     print(e)
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
