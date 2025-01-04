@@ -20,8 +20,6 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: multiple concats in paths (see bookmarks)
-
 # FIXME: run pymaker from anywhere
 # put in postflight script:
 # ln -s $HOME/Documents/Projects/Python/PyPlate/src/pymaker.py $HOME/.local/bin/pymaker
@@ -318,9 +316,8 @@ class PyMaker:
                     prj_name = f"{item[1]} DEBUG"
                     break
 
-            name_disp = prj_name  # CLI DEBUG
-            name_big = name_disp.replace(" ", "_")  # CLI_DEBUG
-            name_small = name_big.lower()  # cli_debug
+            # dir name, no spaces
+            name_big = prj_name.replace(" ", "_")  # CLI_DEBUG
 
             # set up for existence check
             tmp_dir = self._dir_current / name_big  # /home/cn/Doc/Prj/Py/CLI_DEBUG
@@ -347,9 +344,8 @@ class PyMaker:
                 # check for valid name
                 if self._check_name(prj_name):
 
-                    name_disp = prj_name  # CLI Test
-                    name_big = name_disp.replace(" ", "_")  # CLI_Test
-                    name_small = name_big.lower()  # cli_test
+                    # dir name, no spaces
+                    name_big = prj_name.replace(" ", "_")  # CLI_Test
 
                     # set up for existence check
                     tmp_dir = self._dir_current / name_big
@@ -362,11 +358,10 @@ class PyMaker:
                     else:
                         break
 
-            # if prj_type in C.L_DISP_NAME:
-            #     name_disp = input(C.S_ASK_DISP.format(prj_name))
-
         # save global property
         self._dir_prj = tmp_dir
+        name_disp = prj_name  # CLI DEBUG
+        name_small = name_big.lower()  # cli_debug
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -454,7 +449,7 @@ class PyMaker:
         # do template/all
 
         # copy template/all
-        src = P_DIR_PYPLATE / C.S_DIR_TEMPLATE / C.S_DIR_ALL
+        src = P_DIR_PYPLATE / C.S_PATH_TMP_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst)
 
@@ -505,7 +500,7 @@ class PyMaker:
                 for item in val:
 
                     # get src/dst
-                    src = P_DIR_PYPLATE / "lib" / item
+                    src = P_DIR_PYPLATE / C.S_DIR_LIB / item
                     dst = self._dir_prj / C.S_DIR_LIB / item
 
                     # copy dir/file
@@ -519,7 +514,7 @@ class PyMaker:
         # NB: this combines initial reqs from the "all" template folder and the
         # "type" template folder. these will then be installed during
         # _do_after_fix, after the venv is created
-        self._fix_reqs(prj_type_long)
+        # self._fix_reqs(prj_type_long)
 
         print(C.S_ACTION_DONE)
 
@@ -771,6 +766,33 @@ class PyMaker:
                 print(e.message)
 
         # ----------------------------------------------------------------------
+        # update docs
+
+        # if docs flag is set
+        if C.B_CMD_DOCS:
+
+            print(C.S_ACTION_DOCS, end="", flush=True)
+
+            name = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+            author = C.D_PRV_ALL["__PP_AUTHOR__"]
+            version = C.D_PUB_META["__PP_VERSION__"]
+            lib = C.D_PRV_ALL["__PP_DIR_LIB__"]
+            # do the thing with the thing
+            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
+            try:
+                cs.create(
+                    name,
+                    author,
+                    version,
+                    dirs_import=[lib],
+                    theme=C.S_DOCS_THEME,
+                )
+                print(C.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(C.S_ACTION_FAIL)
+                print(e.message)
+
+        # ----------------------------------------------------------------------
         # i18n
 
         # if i18n flag is set
@@ -824,33 +846,6 @@ class PyMaker:
 
             #     # we are done
             #     print(C.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
-        # update docs
-
-        # if docs flag is set
-        if C.B_CMD_DOCS:
-
-            print(C.S_ACTION_DOCS, end="", flush=True)
-
-            name = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
-            author = C.D_PRV_ALL["__PP_AUTHOR__"]
-            version = C.D_PUB_META["__PP_VERSION__"]
-            lib = C.D_PRV_ALL["__PP_DIR_LIB__"]
-            # do the thing with the thing
-            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
-            try:
-                cs.create(
-                    name,
-                    author,
-                    version,
-                    dirs_import=[lib],
-                    theme=C.S_DOCS_THEME,
-                )
-                print(C.S_ACTION_DONE)
-            except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
-                print(e.message)
 
         # ----------------------------------------------------------------------
         # tree
@@ -914,7 +909,7 @@ class PyMaker:
             )
 
             # fix dunders in inst cfg file
-            path_inst = self._dir_prj / C.S_DIR_INSTALL / C.S_FILE_INST_CFG
+            path_inst = self._dir_prj / C.S_PATH_INST_CFG
             F.save_dict(dict_inst, [path_inst])
             self._fix_content(path_inst)
 
@@ -929,9 +924,7 @@ class PyMaker:
             )
 
             # fix dunders in inst cfg file
-            path_uninst = (
-                self._dir_prj / C.S_DIR_UNINSTALL / C.S_FILE_UNINST_CFG
-            )
+            path_uninst = self._dir_prj / C.S_PATH_UNINST_CFG
             F.save_dict(dict_uninst, [path_uninst])
             self._fix_content(path_uninst)
 
@@ -1253,42 +1246,42 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
-    def _fix_reqs(self, prj_type_long):
-        """
-        Combine reqs from template/all and template/prj_type
+    # def _fix_reqs(self, prj_type_long):
+    #     """
+    #     Combine reqs from template/all and template/prj_type
 
-        Arguments:
-            prj_type_long: the folder in template for the current project type
+    #     Arguments:
+    #         prj_type_long: the folder in template for the current project type
 
-        This method combines reqs from the all dir used by all projects, and
-        those used by specific project type (gui needs pygobject, etc).
-        """
+    #     This method combines reqs from the all dir used by all projects, and
+    #     those used by specific project type (gui needs pygobject, etc).
+    #     """
 
-        # get sources and filter out items that don't exist
-        reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
-        src = [
-            P_DIR_PYPLATE / C.S_FILE_REQS_ALL,
-            P_DIR_PYPLATE / reqs_prj,
-        ]
-        src = [str(item) for item in src if item.exists()]
+    #     # get sources and filter out items that don't exist
+    #     reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
+    #     src = [
+    #         P_DIR_PYPLATE / C.S_FILE_REQS_ALL,
+    #         P_DIR_PYPLATE / reqs_prj,
+    #     ]
+    #     src = [str(item) for item in src if item.exists()]
 
-        # get dst to put file lines
-        dst = self._dir_prj / C.S_FILE_REQS
+    #     # get dst to put file lines
+    #     dst = self._dir_prj / C.S_FILE_REQS
 
-        # # the new set of lines for requirements.txt
-        new_file = []
+    #     # # the new set of lines for requirements.txt
+    #     new_file = []
 
-        # read reqs files and put in result
-        for item in src:
-            with open(item, "r", encoding="UTF-8") as a_file:
-                old_file = a_file.readlines()
-                old_file = [line.rstrip() for line in old_file]
-                new_file = new_file + old_file
+    #     # read reqs files and put in result
+    #     for item in src:
+    #         with open(item, "r", encoding="UTF-8") as a_file:
+    #             old_file = a_file.readlines()
+    #             old_file = [line.rstrip() for line in old_file]
+    #             new_file = new_file + old_file
 
-        # put combined reqs into final file
-        joint = "\n".join(new_file)
-        with open(dst, "w", encoding="UTF-8") as a_file:
-            a_file.writelines(joint)
+    #     # put combined reqs into final file
+    #     joint = "\n".join(new_file)
+    #     with open(dst, "w", encoding="UTF-8") as a_file:
+    #         a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch

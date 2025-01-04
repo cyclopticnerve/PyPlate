@@ -80,8 +80,8 @@ class CNSphinx:
 
         # if param is not abs, make abs rel to prj dir
         self._dir_src = Path(dir_src)
-        if not self._dir_src.is_absolute():
-            self._dir_src = self._dir_prj / dir_src
+        # if not self._dir_src.is_absolute():
+        #     self._dir_src = self._dir_prj / dir_src
 
         # if param is not abs, make abs rel to prj dir
         self._dir_docs = Path(dir_docs)
@@ -215,14 +215,14 @@ class CNSphinx:
 
         # first do src folder
         str_imports += (
-            f"dir_src = Path('{self._dir_src}')\n"
+            f"dir_src = Path.home() / {self._dir_src}\n"
             "sys.path.insert(0, str(dir_src))\n"
         )
 
         # next do imports
         for dir_import in dirs_import:
             str_imports += (
-                f"dir_src = Path('{dir_import}')\n"
+                f"dir_src = Path.home() / {dir_import}\n"
                 "sys.path.insert(0, str(dir_src))\n"
             )
         str_imports += "\n"

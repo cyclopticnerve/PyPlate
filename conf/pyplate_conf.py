@@ -200,10 +200,14 @@ S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 
-# TODO: do we need this? using .venv seems redundant
-S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
+# concatenate some paths
+S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
+S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
+S_PATH_UNINST_CFG = f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}"
+
+# S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[item][2] (long prj type, subdir in template)
-S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
+# S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
 # S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
 
@@ -213,7 +217,6 @@ S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 # S_DIR_INST_POST = f"{S_DIR_INSTALL}/postflight"
 # S_DIR_UNINST_PRE = f"{S_DIR_UNINSTALL}/preflight"
 # S_DIR_UNINST_POST = f"{S_DIR_UNINSTALL}/postflight"
-
 
 # ------------------------------------------------------------------------------
 
@@ -543,11 +546,6 @@ L_CATS = [
 L_MAKE_INSTALL = [
     "c",
     "g",
-]
-
-# proj types that have a display name (i.e. GUI)
-L_DISP_NAME = [
-    "g"
 ]
 
 # ------------------------------------------------------------------------------

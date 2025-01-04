@@ -19,7 +19,7 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: multiple concats in paths
+# FIXME: version number in docs
 
 # FIXME: run pybaker from prj dir
 # put in postflight script:
@@ -201,7 +201,7 @@ class PyBaker:
             prj_name = ""
             while prj_name == "":
                 prj_name = input("Project name: ")
-            self._dir_prj = P_DIR_PYPLATE / ".." / prj_name
+            self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name).resolve()
 
         # if not debug, use cwd
         else:
@@ -476,7 +476,7 @@ class PyBaker:
         version = self._dict_pub_meta["__PP_VERSION__"]
 
         # get install cfg
-        a_file = self._dir_prj / C.S_DIR_INSTALL / C.S_FILE_INST_CFG
+        a_file = self._dir_prj / C.S_PATH_INST_CFG
 
         # load/change/save
         a_dict = F.load_dicts([a_file])
@@ -489,7 +489,7 @@ class PyBaker:
         # version = self._dict_pub_meta["__PP_VERSION__"]
 
         # get install cfg
-        a_file = self._dir_prj / C.S_DIR_UNINSTALL / C.S_FILE_UNINST_CFG
+        a_file = self._dir_prj / C.S_PATH_UNINST_CFG
 
         # load/change/save
         a_dict = F.load_dicts([a_file])
@@ -550,6 +550,26 @@ class PyBaker:
         print(C.S_ACTION_AFTER, end="", flush=True)
         C.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
         print(C.S_ACTION_DONE)
+
+        # ----------------------------------------------------------------------
+        # update docs
+
+        # if docs flag is set
+        if C.B_CMD_DOCS:
+
+            print(C.S_ACTION_DOCS, end="", flush=True)
+
+            # get path to project's venv
+            venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+
+            # do the thing with the thing
+            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
+            try:
+                cs.build(venv)
+                print(C.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(C.S_ACTION_FAIL)
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # freeze requirements
@@ -624,26 +644,6 @@ class PyBaker:
 
             #     # we are done
             #     print(C.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
-        # update docs
-
-        # if docs flag is set
-        if C.B_CMD_DOCS:
-
-            print(C.S_ACTION_DOCS, end="", flush=True)
-
-            # get path to project's venv
-            venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-
-            # do the thing with the thing
-            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
-            try:
-                cs.build(venv)
-                print(C.S_ACTION_DONE)
-            except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
-                print(e.message)
 
         # ----------------------------------------------------------------------
         # tree
