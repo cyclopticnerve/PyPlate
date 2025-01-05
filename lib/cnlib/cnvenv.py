@@ -142,41 +142,41 @@ class CNVenv:
     # --------------------------------------------------------------------------
     # Freeze packages in the venv folder to the file_reqs property
     # --------------------------------------------------------------------------
-    # def freeze(self, file_reqs):
-    #     """
-    #     Freeze packages in the venv folder to the file_reqs property
+    def freeze(self, file_reqs):
+        """
+        Freeze packages in the venv folder to the file_reqs property
 
-    #     Arguments:
-    #         file_reqs: File to save requirements
+        Arguments:
+            file_reqs: File to save requirements
 
-    #     Raises:
-    #         cnfunctions.CNShellError if an error occurs
+        Raises:
+            cnfunctions.CNShellError if an error occurs
 
-    #     Freezes current packages in the venv dir into a file for easy
-    #     installation.
-    #     """
+        Freezes current packages in the venv dir into a file for easy
+        installation.
+        """
 
-    #     # if param is not abs, make abs rel to prj dir
-    #     file_reqs = Path(file_reqs)
-    #     if not file_reqs.is_absolute():
-    #         file_reqs = Path(self._dir_prj) / file_reqs
+        # if param is not abs, make abs rel to prj dir
+        file_reqs = Path(file_reqs)
+        if not file_reqs.is_absolute():
+            file_reqs = Path(self._dir_prj) / file_reqs
 
-    #     # the command to freeze a venv
-    #     cmd = (
-    #         f"cd {self._dir_venv.parent}; "
-    #         f". ./{self._dir_venv.name}/bin/activate; "
-    #         "python "
-    #         "-Xfrozen_modules=off "
-    #         "-m pip freeze "
-    #         "-l --exclude-editable "
-    #         "--require-virtualenv "
-    #         "> "
-    #         f"{file_reqs}"
-    #     )
-    #     try:
-    #         F.sh(cmd, shell=True)
-    #     except F.CNShellError as e:
-    #         raise e
+        # the command to freeze a venv
+        cmd = (
+            f"cd {self._dir_venv.parent}; "
+            f". ./{self._dir_venv.name}/bin/activate; "
+            "python "
+            "-Xfrozen_modules=off "
+            "-m pip freeze "
+            "-l --exclude-editable "
+            "--require-virtualenv "
+            "> "
+            f"{file_reqs}"
+        )
+        try:
+            F.sh(cmd, shell=True)
+        except F.CNShellError as e:
+            raise e
 
 
 # -)

@@ -19,6 +19,7 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# FIXME: remove ext of main src file after install
 # FIXME: version number in docs
 
 # FIXME: run pybaker from prj dir
@@ -73,7 +74,7 @@ from cnlib import cninstall  # type: ignore
 
 # from cnlib.cninstall import CNInstall  # type: ignore
 # from cnlib.cnvenv import CNVenv  # type: ignore
-from cnlib.cnsphinx import CNSphinx  # type: ignore
+# from cnlib.cnsphinx import CNSphinx  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -560,16 +561,23 @@ class PyBaker:
             print(C.S_ACTION_DOCS, end="", flush=True)
 
             # get path to project's venv
-            venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+            dir_venv = Path(dir_venv)
+            if not dir_venv.is_absolute():
+                dir_venv = self._dir_prj / dir_venv
 
-            # do the thing with the thing
-            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
+            # the command to run sphinx-apidoc and make
+            cmd = (
+                f"cd {dir_venv.parent};"
+                f". {dir_venv.name}/bin/activate; "
+                f"pdoc --html -o {C.S_DIR_DOCS} ."
+            )
             try:
-                cs.build(venv)
-                print(C.S_ACTION_DONE)
+                res = F.sh(cmd, shell=True)
+                print(res.stdout)
+                print(res.stderr)
             except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
-                print(e.message)
+                raise e
 
         # ----------------------------------------------------------------------
         # freeze requirements

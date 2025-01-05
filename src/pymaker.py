@@ -68,9 +68,9 @@ import pyplate_conf as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
-from cnlib.cnpot import CNPotPy  # type: ignore
+# from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
-from cnlib.cnsphinx import CNSphinx  # type: ignore
+# from cnlib.cnsphinx import CNSphinx  # type: ignore
 from cnlib import cninstall as I  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -514,7 +514,7 @@ class PyMaker:
         # NB: this combines initial reqs from the "all" template folder and the
         # "type" template folder. these will then be installed during
         # _do_after_fix, after the venv is created
-        # self._fix_reqs(prj_type_long)
+        self._fix_reqs(prj_type_long)
 
         print(C.S_ACTION_DONE)
 
@@ -769,59 +769,59 @@ class PyMaker:
         # update docs
 
         # if docs flag is set
-        if C.B_CMD_DOCS:
+        # if C.B_CMD_DOCS:
 
-            print(C.S_ACTION_DOCS, end="", flush=True)
+        #     print(C.S_ACTION_DOCS, end="", flush=True)
 
-            name = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
-            author = C.D_PRV_ALL["__PP_AUTHOR__"]
-            version = C.D_PUB_META["__PP_VERSION__"]
-            lib = C.D_PRV_ALL["__PP_DIR_LIB__"]
-            # do the thing with the thing
-            cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
-            try:
-                cs.create(
-                    name,
-                    author,
-                    version,
-                    dirs_import=[lib],
-                    theme=C.S_DOCS_THEME,
-                )
-                print(C.S_ACTION_DONE)
-            except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
-                print(e.message)
+        #     name = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+        #     author = C.D_PRV_ALL["__PP_AUTHOR__"]
+        #     version = C.D_PUB_META["__PP_VERSION__"]
+        #     lib = C.D_PRV_ALL["__PP_DIR_LIB__"]
+        #     # do the thing with the thing
+        #     cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
+        #     try:
+        #         cs.create(
+        #             name,
+        #             author,
+        #             version,
+        #             dirs_import=[lib],
+        #             theme=C.S_DOCS_THEME,
+        #         )
+        #         print(C.S_ACTION_DONE)
+        #     except F.CNShellError as e:
+        #         print(C.S_ACTION_FAIL)
+        #         print(e.message)
 
         # ----------------------------------------------------------------------
         # i18n
 
         # if i18n flag is set
-        if C.B_CMD_I18N:
+        # if C.B_CMD_I18N:
 
-            print(C.S_ACTION_I18N, end="", flush=True)
+        #     print(C.S_ACTION_I18N, end="", flush=True)
 
-            # create CNPotPy object
-            potpy = CNPotPy(
-                dir_src=self._dir_prj / C.S_DIR_SRC,
-                str_appname=C.D_PRV_PRJ["__PP_NAME_BIG__"],
-                str_version=C.D_PUB_META["__PP_VERSION__"],
-                str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
-                str_email=C.D_PRV_ALL["__PP_EMAIL__"],
-                dir_locale=self._dir_prj / C.S_DIR_LOCALE,
-                dir_po=self._dir_prj / C.S_DIR_PO,
-                str_domain=C.D_PRV_PRJ["__PP_NAME_SMALL__"],
-                # NB: use dict_pub here b/c dunders have been fixed
-                dict_clangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CLANGS],
-                dict_no_ext=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_NO_EXT],
-                list_wlangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_WLANGS],
-                charset=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CHARSET],
-            )
+        #     # create CNPotPy object
+        #     potpy = CNPotPy(
+        #         dir_src=self._dir_prj / C.S_DIR_SRC,
+        #         str_appname=C.D_PRV_PRJ["__PP_NAME_BIG__"],
+        #         str_version=C.D_PUB_META["__PP_VERSION__"],
+        #         str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
+        #         str_email=C.D_PRV_ALL["__PP_EMAIL__"],
+        #         dir_locale=self._dir_prj / C.S_DIR_LOCALE,
+        #         dir_po=self._dir_prj / C.S_DIR_PO,
+        #         str_domain=C.D_PRV_PRJ["__PP_NAME_SMALL__"],
+        #         # NB: use dict_pub here b/c dunders have been fixed
+        #         dict_clangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CLANGS],
+        #         dict_no_ext=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_NO_EXT],
+        #         list_wlangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_WLANGS],
+        #         charset=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CHARSET],
+        #     )
 
-            # make .pot, .po, and .mo files
-            potpy.main()
+        #     # make .pot, .po, and .mo files
+        #     potpy.main()
 
-            # we are done
-            print(C.S_ACTION_DONE)
+        #     # we are done
+        #     print(C.S_ACTION_DONE)
 
             # # make .desktop file
             # path_desk = self._dir_prj / C.S_DIR_DESKTOP
@@ -1246,42 +1246,42 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
-    # def _fix_reqs(self, prj_type_long):
-    #     """
-    #     Combine reqs from template/all and template/prj_type
+    def _fix_reqs(self, prj_type_long):
+        """
+        Combine reqs from template/all and template/prj_type
 
-    #     Arguments:
-    #         prj_type_long: the folder in template for the current project type
+        Arguments:
+            prj_type_long: the folder in template for the current project type
 
-    #     This method combines reqs from the all dir used by all projects, and
-    #     those used by specific project type (gui needs pygobject, etc).
-    #     """
+        This method combines reqs from the all dir used by all projects, and
+        those used by specific project type (gui needs pygobject, etc).
+        """
 
-    #     # get sources and filter out items that don't exist
-    #     reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
-    #     src = [
-    #         P_DIR_PYPLATE / C.S_FILE_REQS_ALL,
-    #         P_DIR_PYPLATE / reqs_prj,
-    #     ]
-    #     src = [str(item) for item in src if item.exists()]
+        # get sources and filter out items that don't exist
+        reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
+        src = [
+            P_DIR_PYPLATE / C.S_FILE_REQS_ALL,
+            P_DIR_PYPLATE / reqs_prj,
+        ]
+        src = [str(item) for item in src if item.exists()]
 
-    #     # get dst to put file lines
-    #     dst = self._dir_prj / C.S_FILE_REQS
+        # get dst to put file lines
+        dst = self._dir_prj / C.S_FILE_REQS
 
-    #     # # the new set of lines for requirements.txt
-    #     new_file = []
+        # # the new set of lines for requirements.txt
+        new_file = []
 
-    #     # read reqs files and put in result
-    #     for item in src:
-    #         with open(item, "r", encoding="UTF-8") as a_file:
-    #             old_file = a_file.readlines()
-    #             old_file = [line.rstrip() for line in old_file]
-    #             new_file = new_file + old_file
+        # read reqs files and put in result
+        for item in src:
+            with open(item, "r", encoding="UTF-8") as a_file:
+                old_file = a_file.readlines()
+                old_file = [line.rstrip() for line in old_file]
+                new_file = new_file + old_file
 
-    #     # put combined reqs into final file
-    #     joint = "\n".join(new_file)
-    #     with open(dst, "w", encoding="UTF-8") as a_file:
-    #         a_file.writelines(joint)
+        # put combined reqs into final file
+        joint = "\n".join(new_file)
+        with open(dst, "w", encoding="UTF-8") as a_file:
+            a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
