@@ -68,9 +68,9 @@ import pyplate_conf as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
+
 # from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
-# from cnlib.cnsphinx import CNSphinx  # type: ignore
 from cnlib import cninstall as I  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -233,8 +233,9 @@ class PyMaker:
             C.B_CMD_GIT = False
             C.B_CMD_VENV = False
             C.B_CMD_I18N = False
-            C.B_CMD_DOCS = False
             C.B_CMD_TREE = False
+            C.B_CMD_DOCS = False
+            C.B_CMD_INST = False
 
         # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
@@ -320,7 +321,9 @@ class PyMaker:
             name_big = prj_name.replace(" ", "_")  # CLI_DEBUG
 
             # set up for existence check
-            tmp_dir = self._dir_current / name_big  # /home/cn/Doc/Prj/Py/CLI_DEBUG
+            tmp_dir = (
+                self._dir_current / name_big
+            )  # /home/cn/Doc/Prj/Py/CLI_DEBUG
 
             # check if project already exists
             if tmp_dir.exists():
@@ -718,18 +721,6 @@ class PyMaker:
         """
 
         # ----------------------------------------------------------------------
-        # call conf after fix
-
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-        dict_prv = F.load_dicts([path_prv])
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-        dict_pub = F.load_dicts([path_pub])
-
-        print(C.S_ACTION_AFTER, end="", flush=True)
-        C.do_after_fix(self._dir_prj, dict_prv, dict_pub)
-        print(C.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
         # git
 
         # if git flag
@@ -769,28 +760,32 @@ class PyMaker:
         # update docs
 
         # if docs flag is set
-        # if C.B_CMD_DOCS:
+        if C.B_CMD_DOCS:
 
-        #     print(C.S_ACTION_DOCS, end="", flush=True)
+            print(C.S_ACTION_DOCS, end="", flush=True)
 
-        #     name = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
-        #     author = C.D_PRV_ALL["__PP_AUTHOR__"]
-        #     version = C.D_PUB_META["__PP_VERSION__"]
-        #     lib = C.D_PRV_ALL["__PP_DIR_LIB__"]
-        #     # do the thing with the thing
-        #     cs = CNSphinx(self._dir_prj, C.S_DIR_SRC, C.S_DIR_DOCS)
-        #     try:
-        #         cs.create(
-        #             name,
-        #             author,
-        #             version,
-        #             dirs_import=[lib],
-        #             theme=C.S_DOCS_THEME,
-        #         )
-        #         print(C.S_ACTION_DONE)
-        #     except F.CNShellError as e:
-        #         print(C.S_ACTION_FAIL)
-        #         print(e.message)
+            # get path to project's venv
+            dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
+            dir_venv = Path(dir_venv)
+            if not dir_venv.is_absolute():
+                dir_venv = self._dir_prj / dir_venv
+
+            # get template and output dirs
+            dir_docs = self._dir_prj / C.S_DIR_DOCS
+            cmd_docs = C.S_CMD_DOC.format(dir_docs)
+
+            # the command to run pdoc
+            cmd = (
+                f"cd {dir_venv.parent};"
+                f". {dir_venv.name}/bin/activate;"
+                f"{cmd_docs}"
+            )
+            try:
+                F.sh(cmd, shell=True)
+            except F.CNShellError as e:
+                raise e
+
+            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -823,29 +818,29 @@ class PyMaker:
         #     # we are done
         #     print(C.S_ACTION_DONE)
 
-            # # make .desktop file
-            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
-            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
+        # # make .desktop file
+        # path_desk = self._dir_prj / C.S_DIR_DESKTOP
+        # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
-            # if (
-            #     path_desk.exists()
-            #     and path_desk.is_dir()
-            #     and path_template.exists()
-            #     and path_template.is_file()
-            # ):
+        # if (
+        #     path_desk.exists()
+        #     and path_desk.is_dir()
+        #     and path_template.exists()
+        #     and path_template.is_file()
+        # ):
 
-            #     # fix .desktop file
-            #     print(C.S_ACTION_DESK, end="", flush=True)
+        #     # fix .desktop file
+        #     print(C.S_ACTION_DESK, end="", flush=True)
 
-            #     name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
-            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-            #     path_out = self._dir_prj / path_out_name
+        #     name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+        #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
+        #     path_out = self._dir_prj / path_out_name
 
-            #     # update desktop file
-            #     potpy.make_desktop(path_template, path_out)
+        #     # update desktop file
+        #     potpy.make_desktop(path_template, path_out)
 
-            #     # we are done
-            #     print(C.S_ACTION_DONE)
+        #     # we are done
+        #     print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # tree
@@ -882,54 +877,69 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # make install/uninstall cfg files
 
-        # check if we need it
-        prj_type = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        # if install flag is set
+        if C.B_CMD_INST:
 
-        # we need it
-        if prj_type in C.L_MAKE_INSTALL:
+            # check if we need it
+            prj_type = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
 
-            # show info
-            print(C.S_ACTION_INST, end="", flush=True)
+            # we need it
+            if prj_type in C.L_MAKE_INSTALL:
 
-            # get params
-            name = C.D_PRV_PRJ["__PP_NAME_BIG__"]
-            version = C.D_PUB_META["__PP_VERSION__"]
+                # show info
+                print(C.S_ACTION_INST, end="", flush=True)
 
-            # get an install instance
-            inst = I.CNInstall()
+                # get params
+                name = C.D_PRV_PRJ["__PP_NAME_BIG__"]
+                version = C.D_PUB_META["__PP_VERSION__"]
 
-            # create a template install cfg file
-            dict_inst = inst.make_install_cfg(
-                name,
-                version,
-                # these are the defaults spec'd in pyplate_conf
-                # they can be edited in prj/install/install.json before running
-                # pybaker
-                C.D_INSTALL[prj_type],
-            )
+                # get an install instance
+                inst = I.CNInstall()
 
-            # fix dunders in inst cfg file
-            path_inst = self._dir_prj / C.S_PATH_INST_CFG
-            F.save_dict(dict_inst, [path_inst])
-            self._fix_content(path_inst)
+                # create a template install cfg file
+                dict_inst = inst.make_install_cfg(
+                    name,
+                    version,
+                    # these are the defaults spec'd in pyplate_conf
+                    # they can be edited in prj/install/install.json before running
+                    # pybaker
+                    C.D_INSTALL[prj_type],
+                )
 
-            # create a template uninstall cfg file
-            dict_uninst = inst.make_uninstall_cfg(
-                name,
-                version,
-                # these are the defaults spec'd in pyplate_conf
-                # they can be edited in prj/uninstall/uninstall.json before
-                # running pybaker
-                C.D_UNINSTALL[prj_type],
-            )
+                # fix dunders in inst cfg file
+                path_inst = self._dir_prj / C.S_PATH_INST_CFG
+                F.save_dict(dict_inst, [path_inst])
+                self._fix_content(path_inst)
 
-            # fix dunders in inst cfg file
-            path_uninst = self._dir_prj / C.S_PATH_UNINST_CFG
-            F.save_dict(dict_uninst, [path_uninst])
-            self._fix_content(path_uninst)
+                # create a template uninstall cfg file
+                dict_uninst = inst.make_uninstall_cfg(
+                    name,
+                    version,
+                    # these are the defaults spec'd in pyplate_conf
+                    # they can be edited in prj/uninstall/uninstall.json before
+                    # running pybaker
+                    C.D_UNINSTALL[prj_type],
+                )
 
-            # show info
-            print(C.S_ACTION_DONE)
+                # fix dunders in inst cfg file
+                path_uninst = self._dir_prj / C.S_PATH_UNINST_CFG
+                F.save_dict(dict_uninst, [path_uninst])
+                self._fix_content(path_uninst)
+
+                # show info
+                print(C.S_ACTION_DONE)
+
+        # ----------------------------------------------------------------------
+        # call conf after fix
+
+        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+        dict_prv = F.load_dicts([path_prv])
+        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        dict_pub = F.load_dicts([path_pub])
+
+        print(C.S_ACTION_AFTER, end="", flush=True)
+        C.do_after_fix(self._dir_prj, dict_prv, dict_pub)
+        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps

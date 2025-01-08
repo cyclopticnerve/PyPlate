@@ -29,16 +29,18 @@ import tarfile
 
 B_DEBUG = False
 
-# create a tree and save it to S_TREE_FILE
-B_CMD_TREE = True
 # create a git using S_CMD_GIT
 B_CMD_GIT = True
 # create a venv using S_VENV_CREATE
 B_CMD_VENV = True
-# create docs
-B_CMD_DOCS = True
 # do i18n
 B_CMD_I18N = True
+# create a tree and save it to S_TREE_FILE
+B_CMD_TREE = True
+# create docs
+B_CMD_DOCS = True
+# do install/uninstall
+B_CMD_INST = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -56,6 +58,7 @@ I_SW_FALSE = 0
 # base dir for project type folders, relative to dev home
 # S_DIR_PRJ_BASE = "Documents/Projects/Python"
 
+S_ASK_NAME = "Project name: "
 # date format
 S_DATE_FMT = "%m/%d/%Y"
 
@@ -171,6 +174,7 @@ S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = "venv"
 S_DIR_DOCS = "docs"
+S_DIR_PDOC = "pdoc"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -254,16 +258,19 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 # ------------------------------------------------------------------------------
 # commands for _do_extras
 
-# cmds for git
+# cmd for git
 # NB: format param is proj dir
 S_CMD_GIT = "git init {} -q"
-
-# cmds for venv
+# cmd for pdoc3
+# NB: format params are S_DIR_PDOC, S_DIR_DOCS
+# S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} ."
+S_CMD_DOC = "pdoc --html --force -o {} ."
+# cmd for venv
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
 
 # sphinx theme name
-S_DOCS_THEME = "sphinx_rtd_theme"
+# S_DOCS_THEME = "sphinx_rtd_theme"
 
 # fix readme
 S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
@@ -288,7 +295,6 @@ S_DESK_ERR_CAT = (
     'In metadata categories, "{}" is not valid, see '
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
 )
-
 S_DESK_CAT_SCH = (
     r"(^\s*\[Desktop Entry\]\s*$)"
     r"(.*?)"
@@ -314,6 +320,10 @@ S_GTK_VER_SCH = (
     r"(</property>.*)"
 )
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
+
+# fix docs version number
+# S_DOC_VER_SCH = r"(<img.*>.*v\. .*?)(.*)"
+# S_DOC_VER_REP = r"\g<1>{}"
 
 # ------------------------------------------------------------------------------
 # pybaker stuff
@@ -567,6 +577,7 @@ L_MAKE_INSTALL = [
 D_PRV_ALL = {
     # the author name, used in headers and pyproject.toml
     "__PP_AUTHOR__": "cyclopticnerve",
+    # "__PP_DOCS_LOGO__": "cyclopticnerve.png",
     # the base url for all projects, used in pyproject.toml and GUI about dlg
     "__PP_URL__": "https://github.com/cyclopticnerve",
     # the author's email, used in headers and pyproject.toml
@@ -587,6 +598,7 @@ D_PRV_ALL = {
     "__PP_DUMMY__": "",
     # docs folder
     "__PP_NAME_DOCS__": S_DIR_DOCS,
+    "__PP_NAME_PDOC__": f"{S_DIR_DOCS}/{S_DIR_PDOC}",
     # version format string for command line
     # NB: format param is __PP_VERSION__ from metadata
     "__PP_VER_FMT__": "Version {}",
@@ -620,6 +632,7 @@ D_PRV_ALL = {
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
     # location of src files
     "__PP_DIR_SRC__": S_DIR_SRC,
+    "__PP_DIR_PDOC__": S_DIR_PDOC,
     # location of config files
     # "__PP_DEV_CONF__": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
     # --------------------------------------------------------------------------
@@ -760,7 +773,7 @@ D_PUB_BL = {
         S_FILE_LICENSE,
         S_FILE_REQS,
         "**/__pycache__",
-        "**/*.mo",
+        # "**/*.mo",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -973,7 +986,6 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     """
     Do any work before fix
 
-
     Arguments:
         dir_prj: The root of the new project (reserved for future use)
         dict_prv: The dictionary containing private pyplate data
@@ -1001,11 +1013,11 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     s_usr_inst = f"{S_USR_SHARE}/{name_small}"
     dict_prv_prj["__PP_USR_INST__"] = s_usr_inst
 
-
     s_name_big = dict_prv_prj["__PP_NAME_BIG__"]
     dict_prv_prj["__PP_DESK_ICON__"] = (
         f"{s_usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{s_name_big}.png"
     )
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1027,42 +1039,68 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
+    a_file = dir_prj / D_PRV_ALL["__PP_README_FILE__"]
+    if a_file.exists():
+        _fix_readme(a_file, dict_prv_prj, dict_pub_meta)
+
+    a_file = dir_prj / D_PRV_ALL["__PP_TOML_FILE__"]
+    if a_file.exists():
+        _fix_pyproject(a_file, dict_prv_prj, dict_pub_meta)
+
+    # dir_docs = dir_prj / S_DIR_DOCS
+    # if dir_docs.exists():
+    #     _fix_docs(dir_docs, dict_prv_prj, dict_pub_meta)
+
     # scan project dir
-    for root, _root_dirs, root_files in dir_prj.walk():
+    # for root, _root_dirs, root_files in dir_prj.walk():
 
-        # convert files into Paths
-        files = [root / f for f in root_files]
+    #     # convert files into Paths
+    #     files = [root / f for f in root_files]
 
-        # check if readme
-        if root == dir_prj:
-            # for each file item
-            for item in files:
-                if item.name == D_PRV_ALL["__PP_README_FILE__"]:
-                    _fix_readme(item, dict_prv_prj, dict_pub_meta)
-                if item.name == D_PRV_ALL["__PP_TOML_FILE__"]:
-                    _fix_pyproject(item, dict_pub_meta)
+    #     # check if top level
+    #     if root == dir_prj:
 
-        if root.name == S_DIR_DESKTOP:
-            # for each file item
-            for item in files:
-                suffix = (
-                    f".{item.suffix}"
-                    if not item.suffix.startswith(".")
-                    else item.suffix
-                )
-                if suffix in L_EXT_DESKTOP:
-                    _fix_desktop(item, dict_pub_meta)
+    #         # for each file item
+    #         for item in files:
 
-        if root.name == S_DIR_UI:
-            # for each file item
-            for item in files:
-                suffix = (
-                    f".{item.suffix}"
-                    if not item.suffix.startswith(".")
-                    else item.suffix
-                )
-                if suffix in L_EXT_GTK:
-                    _fix_gtk(item, dict_pub_meta)
+    #             # README.md is a top level file
+    #             if item.name == D_PRV_ALL["__PP_README_FILE__"]:
+    #                 _fix_readme(item, dict_prv_prj, dict_pub_meta)
+
+    #             # pyproject.toml is a top level file
+    #             if item.name == D_PRV_ALL["__PP_TOML_FILE__"]:
+    #                 _fix_pyproject(item, dict_prv_prj, dict_pub_meta)
+
+    # check if docs folder
+    # if root.name == S_DIR_DOCS:
+    #     print("Found docs at:", root.name)
+    # prj_name = D_PRV_ALL["__PP_NAME_BIG__"]
+    # for each file item
+    # for item in files:
+    #     print("fix docs:", item)
+    # _fix_docs(item, dict_prv_prj, dict_pub_meta)
+
+    # if item.name == S_DIR_DESKTOP:
+    #     # for each file item
+    #     # for item in files:
+    #     #     suffix = (
+    #     #         f".{item.suffix}"
+    #     #         if not item.suffix.startswith(".")
+    #     #         else item.suffix
+    #     #     )
+    #     #     if suffix in L_EXT_DESKTOP:
+    #     _fix_desktop(item, dict_pub_meta)
+
+    # if item.name == S_DIR_UI:
+    #     # for each file item
+    #     # for item in files:
+    #     suffix = (
+    #         f".{item.suffix}"
+    #         if not item.suffix.startswith(".")
+    #         else item.suffix
+    #     )
+    #     if suffix in L_EXT_GTK:
+    #         _fix_ui(item, dict_pub_meta)
 
 
 # ------------------------------------------------------------------------------
@@ -1141,11 +1179,11 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
 
     # get prj type
     type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
 
     if type_prj == "p":
 
         # first tar inner pkg
-        name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
         in_dir = p_dist / name_small
         out_file = p_dist / f"{in_dir}{ext}"
 
@@ -1155,6 +1193,11 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
         # chuck the origin dir
         if not B_DEBUG:
             shutil.rmtree(in_dir)
+
+    # remove ext from bin file
+    old_bin = p_dist / S_DIR_ASSETS / S_DIR_SRC / f"{name_small}.py"
+    new_bin = p_dist / S_DIR_ASSETS / S_DIR_SRC / f"{name_small}"
+    old_bin.rename(new_bin)
 
     # now do normal dist tar
     in_dir = p_dist
@@ -1228,7 +1271,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     # get rm deps as links
     s_rm_deps = "<br>\n".join(l_rm_deps)
     if len(s_rm_deps) == 0:
-        s_rm_deps = "None"
+        s_rm_deps = "None\n"
 
     # replace dependencies array
     str_pattern = S_RM_DEPS_SCH
@@ -1243,12 +1286,13 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
 # --------------------------------------------------------------------------
 # Replace text in the pyproject file
 # --------------------------------------------------------------------------
-def _fix_pyproject(path, dict_pub_meta):
+def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the pyproject file
 
     Arguments:
         path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict (reserved for future use)
         dict_pub_meta: the dict of metadata to replace in the file
 
     Replaces things like the keywords, requirements, etc. in the toml file.
@@ -1289,14 +1333,52 @@ def _fix_pyproject(path, dict_pub_meta):
 
 
 # ------------------------------------------------------------------------------
+# Replace text in the doc files
+# ------------------------------------------------------------------------------
+# def _fix_docs(_path, _dict_prv_prj, _dict_pub_meta):
+#     """
+#     Replace text in the docs files
+
+#     Arguments:
+#         path: Path for the docs folder to modify
+#         dict_prv_prj: Private calculated proj dict (reserved for future use)
+#         dict_pub_meta: the dict of metadata to replace in the file (reserved
+#         for future use)
+
+#     Replace version number in the docs files.
+#     """
+
+# print(f"called _fix_docs on {path}")
+
+# default text if we can't open file
+# text = ""
+
+# # open file and get contents
+# with open(path, "r", encoding="UTF-8") as a_file:
+#     text = a_file.read()
+
+# # replace short description
+# str_pattern = S_DOC_VER_SCH
+# pp_version = dict_pub_meta["__PP_VERSION__"]
+# print(pp_version)
+# str_rep = S_DOC_VER_REP.format(pp_version)
+# text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+# # save file
+# with open(path, "w", encoding="UTF-8") as a_file:
+#     a_file.write(text)
+
+
+# ------------------------------------------------------------------------------
 # Replace text in the desktop file
 # ------------------------------------------------------------------------------
-def _fix_desktop(path, dict_pub_meta):
+def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the desktop file
 
     Arguments:
         path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict (reserved for future use)
         dict_pub_meta: the dict of metadata to replace in the file
 
     Replaces the description (comment) and category text in a .desktop file for
@@ -1346,12 +1428,13 @@ def _fix_desktop(path, dict_pub_meta):
 # ------------------------------------------------------------------------------
 # Replace text in the UI files
 # ------------------------------------------------------------------------------
-def _fix_gtk(path, dict_pub_meta):
+def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the UI files
 
     Arguments:
         path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict (reserved for future use)
         dict_pub_meta: the dict of metadata to replace in the file
 
     Replace description and version number in the UI file.

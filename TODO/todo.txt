@@ -1,4 +1,6 @@
 
+# TODO: prg image in docs
+# TODO: prg version in docs
 # TODO: multiple switches on one line: # pyplate: disable=foo disable=bar
 # TODO: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
 # dunder that is not in comment

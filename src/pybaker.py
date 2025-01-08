@@ -19,9 +19,6 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: remove ext of main src file after install
-# FIXME: version number in docs
-
 # FIXME: run pybaker from prj dir
 # put in postflight script:
 # ln -s $HOME/Documents/Projects/Python/PyPlate/src/pybaker.py $HOME/.local/bin/pybaker
@@ -71,10 +68,7 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib import cninstall  # type: ignore
-
-# from cnlib.cninstall import CNInstall  # type: ignore
-# from cnlib.cnvenv import CNVenv  # type: ignore
-# from cnlib.cnsphinx import CNSphinx  # type: ignore
+from cnlib.cnvenv import CNVenv  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -201,7 +195,7 @@ class PyBaker:
         if debug:
             prj_name = ""
             while prj_name == "":
-                prj_name = input("Project name: ")
+                prj_name = input(C.S_ASK_NAME)
             self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name).resolve()
 
         # if not debug, use cwd
@@ -266,7 +260,7 @@ class PyBaker:
         if self._debug:
             C.B_CMD_GIT = False
             C.B_CMD_VENV = False
-            # C.B_CMD_I18N = False
+            C.B_CMD_I18N = False
             C.B_CMD_DOCS = False
             C.B_CMD_TREE = False
 
@@ -351,8 +345,6 @@ class PyBaker:
         C.do_before_fix(self._dir_prj, self._dict_prv, self._dict_pub)
 
         print(C.S_ACTION_DONE)
-
-        # version = self._dict_pub_meta["__PP_VERSION__"]
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -449,6 +441,7 @@ class PyBaker:
 
             # skip dir if in skip_all
             if root in skip_all:
+                # NB: do not recurse
                 root_dirs.clear()
                 continue
 
@@ -483,11 +476,6 @@ class PyBaker:
         a_dict = F.load_dicts([a_file])
         a_dict[cninstall.S_KEY_VERSION] = version
         F.save_dict(a_dict, [a_file])
-
-        # fix uninstall.json version
-
-        # get version from project.json
-        # version = self._dict_pub_meta["__PP_VERSION__"]
 
         # get install cfg
         a_file = self._dir_prj / C.S_PATH_UNINST_CFG
@@ -546,13 +534,6 @@ class PyBaker:
         """
 
         # ----------------------------------------------------------------------
-        # call conf after fix
-
-        print(C.S_ACTION_AFTER, end="", flush=True)
-        C.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
-        print(C.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
         # update docs
 
         # if docs flag is set
@@ -566,37 +547,46 @@ class PyBaker:
             if not dir_venv.is_absolute():
                 dir_venv = self._dir_prj / dir_venv
 
-            # the command to run sphinx-apidoc and make
+            # get template and output dirs
+            dir_docs = self._dir_prj / C.S_DIR_DOCS
+ 
+            # cmd_docs = C.S_CMD_DOC.format(dir_pdoc, dir_docs)
+            cmd_docs = C.S_CMD_DOC.format(dir_docs)
+
+            # the command to run pdoc
             cmd = (
                 f"cd {dir_venv.parent};"
-                f". {dir_venv.name}/bin/activate; "
-                f"pdoc --html -o {C.S_DIR_DOCS} ."
+                f". {dir_venv.name}/bin/activate;"
+                f"{cmd_docs}"
             )
             try:
-                res = F.sh(cmd, shell=True)
-                print(res.stdout)
-                print(res.stderr)
+                F.sh(cmd, shell=True)
             except F.CNShellError as e:
                 raise e
 
+            print(C.S_ACTION_DONE)
+
         # ----------------------------------------------------------------------
         # freeze requirements
-        # if C.B_CMD_VENV:
+        # NB: not really needed, as any reqs should be installed with the venv
+        # that you are sending to final user
+        # but still nice to have
+        if C.B_CMD_VENV:
 
-        #     print(C.S_ACTION_VENV, end="", flush=True)
+            print(C.S_ACTION_VENV, end="", flush=True)
 
-        #     # get name ov venv folder and reqs file
-        #     dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-        #     file_reqs = C.S_FILE_REQS
+            # get name ov venv folder and reqs file
+            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+            file_reqs = C.S_FILE_REQS
 
-        #     # do the thing with the thing
-        #     cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
-        #     try:
-        #         cv.freeze()
-        #         print(C.S_ACTION_DONE)
-        #     except F.CNShellError as e:
-        #         print(C.S_ACTION_FAIL)
-        #         print(e.message)
+            # do the thing with the thing
+            cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
+            try:
+                cv.freeze()
+                print(C.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(C.S_ACTION_FAIL)
+                print(e.message)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -688,12 +678,19 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # fix dunders in install/uninstall
 
-        path_inst = self._dir_prj / C.S_FILE_INST_CFG
-        if path_inst.exists():
-            self._fix_content(path_inst)
-        path_inst = self._dir_prj / C.S_FILE_UNINST_CFG
-        if path_inst.exists():
-            self._fix_content(path_inst)
+        a_path = self._dir_prj / C.S_FILE_INST_CFG
+        if a_path.exists():
+            self._fix_content(a_path)
+        a_path = self._dir_prj / C.S_FILE_UNINST_CFG
+        if a_path.exists():
+            self._fix_content(a_path)
+
+        # ----------------------------------------------------------------------
+        # call conf after fix
+
+        print(C.S_ACTION_AFTER, end="", flush=True)
+        C.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
+        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -723,16 +720,6 @@ class PyBaker:
         name_fmt = self._dict_prv_prj["__PP_DIST_FMT__"]
         p_dist = a_dist / name_fmt
         Path.mkdir(p_dist, parents=True)
-
-        # fix version in install.json
-        # inst_cfg = self._dict_pub_dist[C.S_FILE_INST_CFG]
-        # inst_cfg = Path(inst_cfg).resolve()
-
-        # dict_cfg = F.load_dicts([inst_cfg], {})
-
-        # new_version = self._dict_pub_meta["__PP_VERSION__"]
-        # dict_cfg[cninstall.S_KEY_VERSION] = new_version
-        # F.save_dict(dict_cfg, [inst_cfg])
 
         # for each key, val (type, dict)
         for key, val in self._dict_pub_dist.items():

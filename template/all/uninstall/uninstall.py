@@ -57,7 +57,7 @@ def main(debug=False):
     Run the main function
 
     Arguments:
-        debug: If True, run ijn debug mode (default: False)
+        debug: If True, run in debug mode (default: False)
 
     The main entry point for the program.
     """
