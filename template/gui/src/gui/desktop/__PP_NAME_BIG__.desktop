@@ -11,7 +11,6 @@ Encoding=UTF-8
 Version=1.0
 Type=Application
 Terminal=false
-# Path=__PP_USR_CONF__/__PP_DIR_SRC__
 Exec=__PP_NAME_SMALL__
 Name=__PP_NAME_DISP__
 Icon=__PP_DESK_ICON__

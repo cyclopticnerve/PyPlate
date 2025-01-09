@@ -124,8 +124,8 @@ class CNApp(Gtk.Application):
 
         # NB: some useless shit i found on the interwebs (doesn't do anything)
         # maybe for dbus?
-        GLib.set_prgname("__PP_NAME_BIG__")
-        GLib.set_application_name("__PP_NAME_BIG__")
+        # GLib.set_prgname("__PP_NAME_BIG__")
+        # GLib.set_application_name("__PP_NAME_BIG__")
 
         # ----------------------------------------------------------------------
         # connections

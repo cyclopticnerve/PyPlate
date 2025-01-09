@@ -27,8 +27,8 @@ import tarfile
 # Bools
 # ------------------------------------------------------------------------------
 
+# global debug flag
 B_DEBUG = False
-
 # create a git using S_CMD_GIT
 B_CMD_GIT = True
 # create a venv using S_VENV_CREATE
@@ -100,7 +100,6 @@ S_ACTION_FIX = "Do fix... "
 S_ACTION_AFTER = "Do after fix... "
 S_ACTION_GIT = "Make git folder... "
 S_ACTION_VENV = "Make venv folder (takes a long time!)... "
-# S_ACTION_PURGE = "Do purge... "
 S_ACTION_I18N = "Make i18n folder... "
 S_ACTION_DESK = "Fixing desktop file... "
 S_ACTION_DOCS = "Make docs folder... "
@@ -159,9 +158,6 @@ S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
 S_KEY_NAME_MID = "S_KEY_NAME_MID"
 
-# S_KEY_TAR_EXT = "ext"
-# S_KEY_TAR_MODE = "mode"
-
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
 # and make any appropriate changes
@@ -172,7 +168,7 @@ S_DIR_ALL = "all"
 S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
-S_DIR_VENV = "venv"
+S_DIR_VENV = ".venv"
 S_DIR_DOCS = "docs"
 S_DIR_PDOC = "pdoc"
 S_DIR_MISC = "misc"
@@ -209,32 +205,22 @@ S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
 S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
 S_PATH_UNINST_CFG = f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}"
 
+# fix reqs cmds
 S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
 # NB: format param is L_TYPES[item][2] (long prj type, subdir in template)
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
-# S_FILE_DESK_TEMPLATE = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
+# .desktop stuff
+S_FILE_DESK_TMP = f"{S_DIR_DESKTOP}/template_.desktop"
+S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
 
-# ------------------------------------------------------------------------------
+# I18N stuff
+S_PATH_LOCALE = Path(S_DIR_I18N) / S_DIR_LOCALE
+S_PATH_PO = Path(S_DIR_I18N) / S_DIR_PO
 
-# S_DIR_INST_PRE = f"{S_DIR_INSTALL}/preflight"
-# S_DIR_INST_POST = f"{S_DIR_INSTALL}/postflight"
-# S_DIR_UNINST_PRE = f"{S_DIR_UNINSTALL}/preflight"
-# S_DIR_UNINST_POST = f"{S_DIR_UNINSTALL}/postflight"
-
-# ------------------------------------------------------------------------------
-
-# initial location of project (to check for dups)
-# /home/<dev>/<S_DIR_PRJ_BASE>/<prj_type>/<prj_name>
-# NB: format params are project type and project name
-# S_DIR_BASE = str(Path.home() / S_DIR_PRJ_BASE)
-# S_DIR_PRJ = S_DIR_BASE + "/{}/{}"
-
-# S_USR_HOME = str(Path.home())
 # paths relative to end user home only
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
-# S_USR_SRC = ".local/share"  # __PP_NAME_SMALL__ will be appended
-S_USR_APPS = ".local/share/applications"  # for .desktop file
+S_USR_APPS = ".local/share/applications"  # for .desktop out file
 S_USR_BIN = ".local/bin"  # where to put the binary
 
 # formats for tree
@@ -262,15 +248,11 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 # NB: format param is proj dir
 S_CMD_GIT = "git init {} -q"
 # cmd for pdoc3
-# NB: format params are S_DIR_PDOC, S_DIR_DOCS
-# S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} ."
-S_CMD_DOC = "pdoc --html --force -o {} ."
+# NB: format param is S_DIR_DOCS
+S_CMD_DOC = "pdoc --html --force -o {} ."  # --template-dir {}
 # cmd for venv
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
-
-# sphinx theme name
-# S_DOCS_THEME = "sphinx_rtd_theme"
 
 # fix readme
 S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
@@ -320,10 +302,6 @@ S_GTK_VER_SCH = (
     r"(</property>.*)"
 )
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
-
-# fix docs version number
-# S_DOC_VER_SCH = r"(<img.*>.*v\. .*?)(.*)"
-# S_DOC_VER_REP = r"\g<1>{}"
 
 # ------------------------------------------------------------------------------
 # pybaker stuff
@@ -617,30 +595,18 @@ D_PRV_ALL = {
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
     "__PP_DIR_LIB__": S_DIR_LIB,
-    # --------------------------------------------------------------------------
-    # install stuff
-    # "__PP_INST_CONF__": S_DIR_INST_CONF,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
-    # "__PP_DIR_INSTALL__": S_DIR_INSTALL,
-    # "__PP_DIR_UNINSTALL__": S_DIR_UNINSTALL,
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
-    # "__PP_INST_FILE__": S_FILE_INST_PY,
     "__PP_UNINST_CONF_FILE__": f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}",
-    # "__PP_UNINST_FILE__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
     # location of src files
     "__PP_DIR_SRC__": S_DIR_SRC,
-    "__PP_DIR_PDOC__": S_DIR_PDOC,
-    # location of config files
-    # "__PP_DEV_CONF__": f"{S_DIR_SUPPORT}/{S_DIR_CONF}",
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    # "__PP_USR_HOME__": S_USR_HOME,
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
-    # "__PP_SUPPORT__": S_DIR_SUPPORT,  # where is rest of code
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     "__PP_DIR_GUI__": S_DIR_GUI,
     "__PP_FILE_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DESKTOP}",
@@ -666,8 +632,6 @@ D_PRV_PRJ = {
     # these paths are calculated in do_before_fix, relative to the user's home
     # dir
     "__PP_USR_CONF__": "",  # config dir
-    # "__PP_USR_LIB__": "",  # location of cnlibs dir
-    # "__PP_USR_SRC__": "",  # where the program will keep it's source
     "__PP_DIST_FMT__": "",
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
@@ -712,30 +676,30 @@ D_PUB_DIST = {
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
         #
-        "__PP_NAME_VENV__": S_DIR_ASSETS,
+        # "__PP_NAME_VENV__": S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
         S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
+        S_FILE_REQS: f"{S_DIR_INSTALL}",
     },
     "g": {
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
         #
-        "__PP_NAME_VENV__": S_DIR_ASSETS,
+        # "__PP_NAME_VENV__": S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
         S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
+        S_FILE_REQS: f"{S_DIR_INSTALL}",
         #
         S_DIR_README: S_DIR_ASSETS,
-        # S_DIR_IMAGES: S_DIR_ASSETS,
-        # S_DIR_GUI: S_DIR_ASSETS,
     },
     "p": {
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
@@ -743,7 +707,6 @@ D_PUB_DIST = {
         S_FILE_README: "",
         #
         S_FILE_TOML: "__PP_NAME_SMALL__",
-        # S_DIR_TESTS: "",
     },
 }
 
@@ -760,20 +723,16 @@ D_PUB_BL = {
     S_KEY_SKIP_ALL: [
         ".git",
         "**/.venv*",
-        # NB: tasks.json needs dunders
-        # ".vscode",
         ".VSCodeCounter",
         # NB: dist will have install.py in it, needs dunders
         S_DIR_DIST,
         S_DIR_DOCS,
-        f"**/{S_DIR_I18N}/{S_DIR_LOCALE}",
-        f"**/{S_DIR_I18N}/{S_DIR_PO}",
+        S_DIR_I18N,
         S_DIR_MISC,
         S_DIR_README,
         S_FILE_LICENSE,
         S_FILE_REQS,
         "**/__pycache__",
-        # "**/*.mo",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -802,7 +761,6 @@ D_PUB_BL = {
     S_KEY_SKIP_TREE: [
         ".git",
         "**/.venv*",
-        # ".vscode",
         ".VSCodeCounter",
         "**/__pycache__",
     ],
@@ -868,30 +826,27 @@ D_COPY_LIB = {
 # running pybaker
 D_INSTALL = {
     "c": {
-        "__PP_NAME_VENV__": "__PP_USR_INST__",
+        # "__PP_NAME_VENV__": "__PP_USR_INST__",
         S_DIR_CONF: "__PP_USR_INST__",
         S_DIR_LIB: "__PP_USR_INST__",
         S_DIR_README: "__PP_USR_INST__",
         S_DIR_SRC: "__PP_USR_INST__",
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
-        # S_DIR_INSTALL: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
     },
     "g": {
-        "__PP_NAME_VENV__": "__PP_USR_INST__",
+        # "__PP_NAME_VENV__": "__PP_USR_INST__",
         S_DIR_CONF: "__PP_USR_INST__",
         S_DIR_LIB: "__PP_USR_INST__",
         S_DIR_README: "__PP_USR_INST__",
         S_DIR_SRC: "__PP_USR_INST__",
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
-        # S_DIR_INSTALL: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
         #
-        # S_DIR_IMAGES: "__PP_USR_INST__",
         S_DIR_GUI: "__PP_USR_INST__",
         "__PP_FILE_DESK__": S_USR_APPS,
     },
@@ -906,19 +861,10 @@ D_UNINSTALL = {
     "g": [
         "__PP_USR_INST__",
         "__PP_USR_BIN__/__PP_NAME_SMALL__",
+        #
         f"{S_USR_APPS}/{S_FILE_DESKTOP}",
     ],
 }
-
-# # src dirs to tar in dist
-# # NB: key is prj short type, val is dict
-# # NB: used in do_after_fix, only used to move strings up here
-# D_TAR_DIST = {
-#     "p": {
-#         S_KEY_TAR_EXT: ".tar.gz",
-#         S_KEY_TAR_MODE: "w:gz",
-#     }
-# }
 
 # the info for matching/fixing lines in markup files
 D_MU_REPL = {
@@ -1039,6 +985,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
+    # fix top level files
     a_file = dir_prj / D_PRV_ALL["__PP_README_FILE__"]
     if a_file.exists():
         _fix_readme(a_file, dict_prv_prj, dict_pub_meta)
@@ -1047,61 +994,22 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     if a_file.exists():
         _fix_pyproject(a_file, dict_prv_prj, dict_pub_meta)
 
-    # dir_docs = dir_prj / S_DIR_DOCS
-    # if dir_docs.exists():
-    #     _fix_docs(dir_docs, dict_prv_prj, dict_pub_meta)
+    # fix deep files
+    for root, _root_dirs, root_files in dir_prj.walk():
 
-    # scan project dir
-    # for root, _root_dirs, root_files in dir_prj.walk():
+        # get full path to file
+        items = [root / f for f in root_files]
 
-    #     # convert files into Paths
-    #     files = [root / f for f in root_files]
+        # test each file
+        for item in items:
 
-    #     # check if top level
-    #     if root == dir_prj:
+            # fix ui files
+            if item.suffix in L_EXT_GTK:
+                _fix_ui(item, dict_prv_prj, dict_pub_meta)
 
-    #         # for each file item
-    #         for item in files:
-
-    #             # README.md is a top level file
-    #             if item.name == D_PRV_ALL["__PP_README_FILE__"]:
-    #                 _fix_readme(item, dict_prv_prj, dict_pub_meta)
-
-    #             # pyproject.toml is a top level file
-    #             if item.name == D_PRV_ALL["__PP_TOML_FILE__"]:
-    #                 _fix_pyproject(item, dict_prv_prj, dict_pub_meta)
-
-    # check if docs folder
-    # if root.name == S_DIR_DOCS:
-    #     print("Found docs at:", root.name)
-    # prj_name = D_PRV_ALL["__PP_NAME_BIG__"]
-    # for each file item
-    # for item in files:
-    #     print("fix docs:", item)
-    # _fix_docs(item, dict_prv_prj, dict_pub_meta)
-
-    # if item.name == S_DIR_DESKTOP:
-    #     # for each file item
-    #     # for item in files:
-    #     #     suffix = (
-    #     #         f".{item.suffix}"
-    #     #         if not item.suffix.startswith(".")
-    #     #         else item.suffix
-    #     #     )
-    #     #     if suffix in L_EXT_DESKTOP:
-    #     _fix_desktop(item, dict_pub_meta)
-
-    # if item.name == S_DIR_UI:
-    #     # for each file item
-    #     # for item in files:
-    #     suffix = (
-    #         f".{item.suffix}"
-    #         if not item.suffix.startswith(".")
-    #         else item.suffix
-    #     )
-    #     if suffix in L_EXT_GTK:
-    #         _fix_ui(item, dict_pub_meta)
-
+            # fix ,desktop files
+            if item.suffix in L_EXT_DESKTOP:
+                _fix_desktop(item, dict_prv_prj, dict_pub_meta)
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1330,44 +1238,6 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     # save file
     with open(path, "w", encoding="UTF-8") as a_file:
         a_file.write(text)
-
-
-# ------------------------------------------------------------------------------
-# Replace text in the doc files
-# ------------------------------------------------------------------------------
-# def _fix_docs(_path, _dict_prv_prj, _dict_pub_meta):
-#     """
-#     Replace text in the docs files
-
-#     Arguments:
-#         path: Path for the docs folder to modify
-#         dict_prv_prj: Private calculated proj dict (reserved for future use)
-#         dict_pub_meta: the dict of metadata to replace in the file (reserved
-#         for future use)
-
-#     Replace version number in the docs files.
-#     """
-
-# print(f"called _fix_docs on {path}")
-
-# default text if we can't open file
-# text = ""
-
-# # open file and get contents
-# with open(path, "r", encoding="UTF-8") as a_file:
-#     text = a_file.read()
-
-# # replace short description
-# str_pattern = S_DOC_VER_SCH
-# pp_version = dict_pub_meta["__PP_VERSION__"]
-# print(pp_version)
-# str_rep = S_DOC_VER_REP.format(pp_version)
-# text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-# # save file
-# with open(path, "w", encoding="UTF-8") as a_file:
-#     a_file.write(text)
-
 
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file

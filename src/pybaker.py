@@ -549,14 +549,14 @@ class PyBaker:
 
             # get template and output dirs
             dir_docs = self._dir_prj / C.S_DIR_DOCS
- 
+
             # cmd_docs = C.S_CMD_DOC.format(dir_pdoc, dir_docs)
             cmd_docs = C.S_CMD_DOC.format(dir_docs)
 
             # the command to run pdoc
             cmd = (
-                f"cd {dir_venv.parent};"
-                f". {dir_venv.name}/bin/activate;"
+                # f"cd {dir_venv.parent};"
+                # f". {dir_venv.name}/bin/activate;"
                 f"{cmd_docs}"
             )
             try:
@@ -580,9 +580,9 @@ class PyBaker:
             file_reqs = C.S_FILE_REQS
 
             # do the thing with the thing
-            cv = CNVenv(self._dir_prj, dir_venv, file_reqs)
+            cv = CNVenv(self._dir_prj, dir_venv)
             try:
-                cv.freeze()
+                cv.freeze(file_reqs)
                 print(C.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(C.S_ACTION_FAIL)
@@ -603,45 +603,45 @@ class PyBaker:
                 str_version=self._dict_pub_meta["__PP_VERSION__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
-                dir_locale=self._dir_prj / C.S_DIR_LOCALE,
-                dir_po=self._dir_prj / C.S_DIR_PO,
+                dir_locale=self._dir_prj / C.S_PATH_LOCALE,
+                dir_po=self._dir_prj / C.S_PATH_PO,
                 str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
                 # NB: use dict_pub here b/c dunders have been fixed
                 dict_clangs=self._dict_pub_i18n[C.S_KEY_CLANGS],
                 dict_no_ext=self._dict_pub_i18n[C.S_KEY_NO_EXT],
                 list_wlangs=self._dict_pub_i18n[C.S_KEY_WLANGS],
-                charset="UTF-8",
+                charset=self._dict_pub_i18n[C.S_KEY_CHARSET],
             )
 
             # this .pot, .po, and .mo files
             potpy.main()
 
+        # # i18n-ify .desktop file
+        # path_desk = self._dir_prj / C.S_DIR_DESKTOP
+        # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
+
+        # if (
+        #     path_desk.exists()
+        #     and path_desk.is_dir()
+        #     and path_template.exists()
+        #     and path_template.is_file()
+        # ):
+
+        #     # fix .desktop file
+        #     print(C.S_ACTION_DESK, end="", flush=True)
+
+        #     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+        #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
+        #     path_out = self._dir_prj / path_out_name
+
+        #     # update desktop file
+        #     potpy.make_desktop(path_template, path_out)
+
+        #     # we are done
+        #     print(C.S_ACTION_DONE)
+
             # we are done
             print(C.S_ACTION_DONE)
-
-            # # make .desktop file
-            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
-            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
-
-            # if (
-            #     path_desk.exists()
-            #     and path_desk.is_dir()
-            #     and path_template.exists()
-            #     and path_template.is_file()
-            # ):
-
-            #     # fix .desktop file
-            #     print(C.S_ACTION_DESK, end="", flush=True)
-
-            #     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-            #     path_out = self._dir_prj / path_out_name
-
-            #     # update desktop file
-            #     potpy.make_desktop(path_template, path_out)
-
-            #     # we are done
-            #     print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # tree

@@ -66,8 +66,6 @@ class CNVenv:
             Path object)
             dir_venv: The path or name of the resulting venv folder (can be a
             string or a Path object, absolute or relative to dir_prj)
-            file_reqs: The path or name of the requirements file ((can be a
-            string or a Path object, absolute or relative to dir_prj)
 
         Initializes a new instance of the class, setting the default values of
         its properties, and any other code needed to create a new object.

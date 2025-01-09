@@ -113,7 +113,7 @@ class CNPotPy:
             dir_locale: Where to put output locale files (default:
             dir_src/"locale")
             dir_po: Where to put new .po files that are waiting to be merged
-            (default: dir_src/"po")
+            (default: dir_src/dir_locale/"po")
             str_domain: THe name of the domain (base name) for output files
             (default: "messages")
                 This creates files like "<str_domain>.pot", "<str_domain>.po",
@@ -349,6 +349,7 @@ class CNPotPy:
                 f"--package-version {self._str_version} "
                 # author email
                 f"--msgid-bugs-address {self._str_email} "
+                "--no-location "
                 # sort entries by file
                 "-F "
                 # append existing file

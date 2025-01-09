@@ -27,7 +27,7 @@ from pathlib import Path
 import sys
 
 # find path to lib
-P_DIR_PRJ = Path(__file__).parents[2].resolve()
+P_DIR_PRJ = Path(__file__).parents[3].resolve()
 P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
 
 # add paths to import search
@@ -82,8 +82,9 @@ class WindowMain(CNWindow):
         """
 
         # props necessary tro create a basic window
+        # TODO: use dunders
         ui_file = (
-            P_DIR_PRJ / "gui" / "ui" / "__PP_NAME_SMALL___gtk3.ui"
+            P_DIR_PRJ / "src" / "gui" / "ui" / "__PP_NAME_SMALL___gtk3.ui"
         )
         ui_path = Path(ui_file).resolve()
         ui_name = "win_main"
@@ -109,7 +110,8 @@ class WindowMain(CNWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        dlg_file = P_DIR_PRJ / "gui" / "ui" / "dialogs.ui"
+        # TODO: use dunders
+        dlg_file = P_DIR_PRJ / "src" / "gui" / "ui" / "dialogs.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "dlg_about")
 

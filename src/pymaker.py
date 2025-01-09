@@ -68,8 +68,7 @@ import pyplate_conf as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
-
-# from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib import cninstall as I  # type: ignore
 
@@ -737,7 +736,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # venv
 
-        # if venv flag is set
+        #if venv flag is set
         if C.B_CMD_VENV:
 
             print(C.S_ACTION_VENV, end="", flush=True)
@@ -764,20 +763,13 @@ class PyMaker:
 
             print(C.S_ACTION_DOCS, end="", flush=True)
 
-            # get path to project's venv
-            dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
-            dir_venv = Path(dir_venv)
-            if not dir_venv.is_absolute():
-                dir_venv = self._dir_prj / dir_venv
-
             # get template and output dirs
             dir_docs = self._dir_prj / C.S_DIR_DOCS
             cmd_docs = C.S_CMD_DOC.format(dir_docs)
 
             # the command to run pdoc
             cmd = (
-                f"cd {dir_venv.parent};"
-                f". {dir_venv.name}/bin/activate;"
+                f"cd {self._dir_prj};"
                 f"{cmd_docs}"
             )
             try:
@@ -791,56 +783,56 @@ class PyMaker:
         # i18n
 
         # if i18n flag is set
-        # if C.B_CMD_I18N:
+        if C.B_CMD_I18N:
 
-        #     print(C.S_ACTION_I18N, end="", flush=True)
+            print(C.S_ACTION_I18N, end="", flush=True)
 
-        #     # create CNPotPy object
-        #     potpy = CNPotPy(
-        #         dir_src=self._dir_prj / C.S_DIR_SRC,
-        #         str_appname=C.D_PRV_PRJ["__PP_NAME_BIG__"],
-        #         str_version=C.D_PUB_META["__PP_VERSION__"],
-        #         str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
-        #         str_email=C.D_PRV_ALL["__PP_EMAIL__"],
-        #         dir_locale=self._dir_prj / C.S_DIR_LOCALE,
-        #         dir_po=self._dir_prj / C.S_DIR_PO,
-        #         str_domain=C.D_PRV_PRJ["__PP_NAME_SMALL__"],
-        #         # NB: use dict_pub here b/c dunders have been fixed
-        #         dict_clangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CLANGS],
-        #         dict_no_ext=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_NO_EXT],
-        #         list_wlangs=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_WLANGS],
-        #         charset=dict_pub[C.S_KEY_PUB_I18N][C.S_KEY_CHARSET],
-        #     )
+            # create CNPotPy object
+            potpy = CNPotPy(
+                dir_src=self._dir_prj / C.S_DIR_SRC,
+                str_appname=C.D_PRV_PRJ["__PP_NAME_BIG__"],
+                str_version=C.D_PUB_META["__PP_VERSION__"],
+                str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
+                str_email=C.D_PRV_ALL["__PP_EMAIL__"],
+                dir_locale=self._dir_prj / C.S_PATH_LOCALE,
+                dir_po=self._dir_prj / C.S_PATH_PO,
+                str_domain=C.D_PRV_PRJ["__PP_NAME_SMALL__"],
+                # NB: use dict_pub here b/c dunders have been fixed
+                dict_clangs=C.D_PUB_I18N[C.S_KEY_CLANGS],
+                dict_no_ext=C.D_PUB_I18N[C.S_KEY_NO_EXT],
+                list_wlangs=C.D_PUB_I18N[C.S_KEY_WLANGS],
+                charset=C.D_PUB_I18N[C.S_KEY_CHARSET],
+            )
 
-        #     # make .pot, .po, and .mo files
-        #     potpy.main()
+            # make .pot, .po, and .mo files
+            potpy.main()
 
-        #     # we are done
-        #     print(C.S_ACTION_DONE)
+            # # i18n-ify .desktop file
+            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
+            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
-        # # make .desktop file
-        # path_desk = self._dir_prj / C.S_DIR_DESKTOP
-        # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
+            # if (
+            #     path_desk.exists()
+            #     and path_desk.is_dir()
+            #     and path_template.exists()
+            #     and path_template.is_file()
+            # ):
 
-        # if (
-        #     path_desk.exists()
-        #     and path_desk.is_dir()
-        #     and path_template.exists()
-        #     and path_template.is_file()
-        # ):
+            #     # fix .desktop file
+            #     print(C.S_ACTION_DESK, end="", flush=True)
 
-        #     # fix .desktop file
-        #     print(C.S_ACTION_DESK, end="", flush=True)
+            #     name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
+            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
+            #     path_out = self._dir_prj / path_out_name
 
-        #     name_small = C.D_PRV_PRJ["__PP_NAME_SMALL__"]
-        #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-        #     path_out = self._dir_prj / path_out_name
+            #     # update desktop file
+            #     potpy.make_desktop(path_template, path_out)
 
-        #     # update desktop file
-        #     potpy.make_desktop(path_template, path_out)
+            #     # we are done
+            #     print(C.S_ACTION_DONE)
 
-        #     # we are done
-        #     print(C.S_ACTION_DONE)
+            # we are done
+            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # tree

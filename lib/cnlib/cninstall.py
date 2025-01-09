@@ -37,6 +37,7 @@ sys.path.append(str(DIR_LIB))
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
+# from cnlib.cnvenv import CNVenv ## type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -68,8 +69,8 @@ S_MSG_UNINST_END = "{} uninstalled"
 
 # general "done" message
 S_MSG_DONE = "Done"
-S_MSG_PREFLIGHT = "preflight"
-S_MSG_POSTFLIGHT = "postflight"
+# S_MSG_PREFLIGHT = "preflight"
+# S_MSG_POSTFLIGHT = "postflight"
 
 # # NB: format param is preflight/postflight key
 # S_MSG_SCRIPTS_START = "Running {} scripts:"
@@ -81,6 +82,7 @@ S_MSG_POSTFLIGHT = "postflight"
 # strings for system requirements
 S_MSG_COPY_START = "Copying files... "
 S_MSG_DEL_START = "Deleting files... "
+S_MSG_VENV_START = "Making virtual environment... "
 
 # strings for version compare
 # NB: format param is prog name
@@ -571,6 +573,33 @@ class CNInstall:
                     print(f"unlink {dst}")
 
         print(S_MSG_DONE)
+
+    # --------------------------------------------------------------------------
+    #
+    # --------------------------------------------------------------------------
+    def _make_venv(self):
+        """docstring"""
+
+        # print(S_MSG_VENV_START, flush=True, end="")
+
+        # # FIXME: make venv and install reqs on USER'S computer
+
+        # # get name ov venv folder and reqs file
+        # dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
+        # file_reqs = C.D_PRV_PRJ["__PP_PATH_REQS__"]
+        # file_reqs = self._dir_prj / C.S_FILE_REQS
+
+        # # do the thing with the thing
+        # cv = CNVenv(self._dir_prj, dir_venv)
+        # try:
+        #     cv.create()
+        #     cv.install(file_reqs)
+        #     print(C.S_ACTION_DONE)
+        # except F.CNShellError as e:
+        #     print(C.S_ACTION_FAIL)
+        #     print(e.message)
+
+        # print(S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Run the scripts from preflight or postflight
