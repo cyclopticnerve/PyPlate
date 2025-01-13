@@ -30,6 +30,7 @@ from pathlib import Path
 import shlex
 import subprocess
 
+
 # ------------------------------------------------------------------------------
 # A class to wrap errors from the sh function
 # ------------------------------------------------------------------------------
@@ -55,7 +56,7 @@ class CNShellError(Exception):
         """
         Initialize the class
 
-        Arguments:
+        Args:
             message: A custom string to print for clarity
             exception: The original exception
 
@@ -76,7 +77,7 @@ def do_bool(val):
     """
     Convert other values, like integers or strings, to bools
 
-    Arguments:
+    Args:
         val: The value to convert to a bool
 
     Returns:
@@ -117,7 +118,7 @@ def dpretty(dict_print, indent_size=4, indent_level=0, label=None):
     """
     Pretty print a dict
 
-    Arguments:
+    Args:
         dict_print: The dictionary to print
         indent_size: The number of spaces to use for each indent level
         (default: 4)
@@ -216,7 +217,7 @@ def lpretty(list_print, indent_size=4, indent_level=0, label=None):
     """
     Pretty print a list
 
-    Arguments:
+    Args:
         list_print: The list to print
         indent_size: The number of spaces to use for each indent level
         (default: 4)
@@ -311,7 +312,7 @@ def pp(obj, indent_size=4, label=None):
     """
     Pretty print a dictionary or list
 
-    Arguments:
+    Args:
         obj: The dictionary or list to print
         indent_size: The number of spaces to use for each indent level
         (default: 4)
@@ -344,7 +345,7 @@ def combine_dicts(dicts_new, dict_old):
     """
     Update a dictionary with entries from another dict
 
-    Arguments:
+    Args:
         dicts_new: A list of dictionaries containing new keys/values to be
         updated in the old dictionary
         dict_old: The dictionary defined as the one to receive updates
@@ -401,7 +402,7 @@ def sh(cmd, shell=False):
     """
     Run a program or command string in the shell
 
-    Arguments:
+    Args:
         cmd: The command line to run
         shell: If False (the default), run the cmd as one long string. If True,
         split the cmd into separate arguments
@@ -467,7 +468,7 @@ def load_dicts(paths, start_dict=None):
     """
     Combines dictionaries from all found paths
 
-    Arguments:
+    Args:
         paths: The list of file paths to load
         start_dict: The starting dict and final dict after combining (default:
         None)
@@ -531,7 +532,7 @@ def save_dict(a_dict, paths):
     """
     Save a dictionary to all paths
 
-    Arguments:
+    Args:
         a_dict: the dictionary to save to the file
         paths: the list of file paths to save to
 

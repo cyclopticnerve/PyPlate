@@ -93,7 +93,7 @@ class CNApp(Gtk.Application):
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             app_id: The reverse dot notation id of the app (ie.
             "org.cyclopticnerve.foobar")
 
@@ -124,8 +124,8 @@ class CNApp(Gtk.Application):
 
         # NB: some useless shit i found on the interwebs (doesn't do anything)
         # maybe for dbus?
-        # GLib.set_prgname("__PP_NAME_BIG__")
-        # GLib.set_application_name("__PP_NAME_BIG__")
+        GLib.set_prgname("__PP_NAME_BIG__")
+        GLib.set_application_name("__PP_NAME_BIG__")
 
         # ----------------------------------------------------------------------
         # connections
@@ -147,7 +147,7 @@ class CNApp(Gtk.Application):
         """
         Add a new window instance with the specified name
 
-        Arguments:
+        Args:
             name_win: The unique name to store in the instance dict
             inst_win: The CNWindow subclass instance
 
@@ -178,7 +178,7 @@ class CNApp(Gtk.Application):
         """
         Remove the specified window instance from the internal list
 
-        Arguments:
+        Args:
             name_win: The name of the window instance to remove
 
         Removes a window instance from the internal list. Note that this does
@@ -252,7 +252,7 @@ class CNApp(Gtk.Application):
         """
         A convenience method for subclasses to show a dialog
 
-        Arguments:
+        Args:
             dlg_file: The .ui file containing the dialog
             dlg_name: The name of the dialog in the ui file
             parent: The owner of the dialog, or None if it is a global dialog
@@ -307,7 +307,7 @@ class CNApp(Gtk.Application):
         """
         Called when the Application is activated
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The Application is about to start. Any windows in self._dict_inst will
@@ -334,7 +334,7 @@ class CNApp(Gtk.Application):
         Called when the Application is stopped (ie. last window is closed, dock
         menu quit, top bar quit, etc.)
 
-        Arguments:
+        Args:
             _obj: Not used
 
         This method is called after all windows have been closed. It is used to

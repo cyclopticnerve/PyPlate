@@ -56,7 +56,7 @@ def main(debug=False):
     """
     Run the main function
 
-    Arguments:
+    Args:
         debug: If True, run in debug mode (default: False)
 
     The main entry point for the program.

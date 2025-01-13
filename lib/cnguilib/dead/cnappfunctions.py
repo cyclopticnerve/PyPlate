@@ -38,7 +38,7 @@
 #     A convenience method to return the type of a control, parsed from the
 #     class control set
 
-#     Arguments:
+#     Args:
 #         class_dict: the dict of common class properties
 #         ctl_name: the control whose type we want to know
 
@@ -67,7 +67,7 @@
 #     Called when a gui dict is passed in, to ensure all values are of
 #     the correct type
 
-#     Arguments:
+#     Args:
 #         dict_class: The dict_app entry for this window's class
 #         dict_gui: The dict to sanitize
 

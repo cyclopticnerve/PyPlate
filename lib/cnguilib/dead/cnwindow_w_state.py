@@ -98,7 +98,7 @@
 #         """
 #         Initialize the new object
 
-#         Arguments:
+#         Args:
 #             app: The calling Application object
 #             name_win: The name of the window in the app's instance list
 #             ui_file: The ui file that contains the window for this class
@@ -223,7 +223,7 @@
 #         """
 #         Sets the window title without borking modified indicator
 
-#         Arguments:
+#         Args:
 #             new_title: The new title of the window
 
 #         Set the new window title and apply the modified indicator (if needed).
@@ -308,7 +308,7 @@
 #         """
 #         A convenience method for subclasses to show a dialog
 
-#         Arguments:
+#         Args:
 #             ui_file: The file containing the dialog description in xml
 #             dlg_name: The name of the dialog in the ui file
 
@@ -352,7 +352,7 @@
 #         A convenience method to format and set the title when the modified
 #         status changes
 
-#         Arguments:
+#         Args:
 #             is_modified: Whether to the window controls have been modified
 
 #         Change the window title when the window title changes, and incorporate
@@ -561,7 +561,7 @@
 #         """
 #         Called when the main window is closed by the 'X' button
 
-#         Arguments:
+#         Args:
 #             _obj: Not used
 #             _event: Not used
 
@@ -587,7 +587,7 @@
 #         """
 #         Called after the window is destroyed
 
-#         Arguments:
+#         Args:
 #             _obj: Not used
 
 #         This method is called after the window is destroyed. It is used to

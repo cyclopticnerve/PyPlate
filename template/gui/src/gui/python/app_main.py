@@ -76,7 +76,7 @@ class AppMain(CNApp):
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             dict_args: The arguments passed to the calling CLI script
 
         Initializes a new instance of the class, setting the default values of

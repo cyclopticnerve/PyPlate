@@ -43,22 +43,14 @@ import sys
 # my imports
 # add custom import paths
 
-# path to this project
-# NB: needed to get imports from conf (bootstrap)
-# NB: this is hardcoded so ln -s will work
-P_DIR_PYPLATE_INST = Path.home() / "local/share/pyplate"
-P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
-
-P_DIR_PP_CONF_INST = P_DIR_PYPLATE_INST / "conf"
+# first check for inst loc
+P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
+if not P_DIR_PYPLATE.exists():
+    # fall back to dev loc
+    P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
-
-P_DIR_PP_LIB_INST = P_DIR_PYPLATE_INST / "lib"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-
-sys.path.append(str(P_DIR_PP_CONF_INST))
 sys.path.append(str(P_DIR_PP_CONF))
-
-sys.path.append(str(P_DIR_PP_LIB_INST))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
@@ -86,6 +78,7 @@ from cnlib.cnvenv import CNVenv  # type: ignore
 
 # name and desc for cmd line help
 S_PP_NAME_BIG = "PyBaker"
+S_PP_NAME_SMALL = "pybaker"
 S_PP_SHORT_DESC = (
     "A program to set the metadata of a PyPlate project and create a dist"
 )
@@ -101,6 +94,9 @@ S_PP_ABOUT = (
     f"{S_PP_VER_FMT}\n"
     f"https://www.github.com/cyclopticnerve/PyPlate"
 )
+
+# our venv name
+S_PP_VENV = ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -140,6 +136,7 @@ class PyBaker:
         # set the initial values of properties
         self._dir_prj = Path()
         self._debug = False
+        self._force = False
 
         self._dict_rep = {}
         self._is_html = False
@@ -166,13 +163,15 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, dir_current, debug=False):
+    def main(self, dir_current, debug=False, force=False):
         """
         The main method of the program
 
-        Arguments:
+        Args:
             dir_prj: Path to the project dir
             debug: Whether to run in debug mode (default: False)
+            force: Whether we should ask questions as we go. Mostly used to
+            make tasks work. (default: False)
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
@@ -180,6 +179,7 @@ class PyBaker:
 
         # store properties
         self._debug = debug
+        self._force = force
 
         # set global prop in conf
         C.B_DEBUG = debug
@@ -192,7 +192,7 @@ class PyBaker:
         print()
 
         # ask for prj rel to pyplate if debug
-        if debug:
+        if self._debug:
             prj_name = ""
             while prj_name == "":
                 prj_name = input(C.S_ASK_NAME)
@@ -268,13 +268,6 @@ class PyBaker:
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
-        # remove home dir from PyPlate path
-        h = str(Path.home())
-        p = str(P_DIR_PYPLATE)
-        p = p.lstrip(h).strip("/")
-        # NB: change global val
-        C.D_PRV_PRJ["__PP_DEV_PP__"] = p
-
     # --------------------------------------------------------------------------
     # Get project info
     # --------------------------------------------------------------------------
@@ -307,26 +300,38 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
 
+        if self._force:
+            return
+
         # ask for new version
-        version_old = self._dict_pub_meta["__PP_VERSION__"]
-        version_new = ""
+        # version_old = self._dict_pub_meta["__PP_VERSION__"]
+        # version_new = ""
 
-        # # loop forever until we get a valid version
-        while True:
+        # # # loop forever until we get a valid version
+        # while True:
 
-            # ask for  new version
-            version_new = input(C.S_ASK_VERS.format(version_old))
-            version_new = version_new.strip(" ")
-            if version_new == "":
-                version_new = version_old
+        #     # ask for  new version
+        #     version_new = input(C.S_ASK_VERS.format(version_old))
+        #     version_new = version_new.strip(" ")
+        #     if version_new == "":
+        #         version_new = version_old
 
-            # check for valid version
-            if self._check_version(version_new):
-                self._dict_pub_meta["__PP_VERSION__"] = version_new
-                return
+        #     # check for valid version
+        #     if self._check_version(version_new):
+        #         self._dict_pub_meta["__PP_VERSION__"] = version_new
+        #         return
 
-            # not a valid version
-            print(C.S_ERR_VERS)
+        #     # not a valid version
+        #     print(C.S_ERR_VERS)
+
+        # ask about meta
+        ask_str = C.S_ASK_PROPS
+        ask_in = input(ask_str)
+        if ask_in.lower().startswith(C.S_ASK_PROPS_DEF) or ask_in == "":
+            return
+        else:
+            print(C.S_ASK_PROPS_ABORT)
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -471,19 +476,21 @@ class PyBaker:
 
         # get install cfg
         a_file = self._dir_prj / C.S_PATH_INST_CFG
+        if a_file.exists():
 
-        # load/change/save
-        a_dict = F.load_dicts([a_file])
-        a_dict[cninstall.S_KEY_VERSION] = version
-        F.save_dict(a_dict, [a_file])
+            # load/change/save
+            a_dict = F.load_dicts([a_file])
+            a_dict[cninstall.S_KEY_VERSION] = version
+            F.save_dict(a_dict, [a_file])
 
         # get install cfg
         a_file = self._dir_prj / C.S_PATH_UNINST_CFG
+        if a_file.exists():
 
-        # load/change/save
-        a_dict = F.load_dicts([a_file])
-        a_dict[cninstall.S_KEY_VERSION] = version
-        F.save_dict(a_dict, [a_file])
+            # load/change/save
+            a_dict = F.load_dicts([a_file])
+            a_dict[cninstall.S_KEY_VERSION] = version
+            F.save_dict(a_dict, [a_file])
 
         # ----------------------------------------------------------------------
         # save project settings
@@ -519,6 +526,12 @@ class PyBaker:
         dict_pub[C.S_KEY_PUB_META] = self._dict_pub_meta
         F.save_dict(dict_pub, [path_pub])
 
+        # ----------------------------------------------------------------------
+        # fix docs
+
+        self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
+
+        # done
         print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
@@ -533,47 +546,11 @@ class PyBaker:
         modification here.
         """
 
-        # ----------------------------------------------------------------------
-        # update docs
-
-        # if docs flag is set
-        if C.B_CMD_DOCS:
-
-            print(C.S_ACTION_DOCS, end="", flush=True)
-
-            # get path to project's venv
-            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-            dir_venv = Path(dir_venv)
-            if not dir_venv.is_absolute():
-                dir_venv = self._dir_prj / dir_venv
-
-            # get template and output dirs
-            dir_docs = self._dir_prj / C.S_DIR_DOCS
-
-            # cmd_docs = C.S_CMD_DOC.format(dir_pdoc, dir_docs)
-            cmd_docs = C.S_CMD_DOC.format(dir_docs)
-
-            # the command to run pdoc
-            cmd = (
-                # f"cd {dir_venv.parent};"
-                # f". {dir_venv.name}/bin/activate;"
-                f"{cmd_docs}"
-            )
-            try:
-                F.sh(cmd, shell=True)
-            except F.CNShellError as e:
-                raise e
-
-            print(C.S_ACTION_DONE)
+        # TODO: maybe git update/push here?
 
         # ----------------------------------------------------------------------
         # freeze requirements
-        # NB: not really needed, as any reqs should be installed with the venv
-        # that you are sending to final user
-        # but still nice to have
         if C.B_CMD_VENV:
-
-            print(C.S_ACTION_VENV, end="", flush=True)
 
             # get name ov venv folder and reqs file
             dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
@@ -583,10 +560,47 @@ class PyBaker:
             cv = CNVenv(self._dir_prj, dir_venv)
             try:
                 cv.freeze(file_reqs)
-                print(C.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(C.S_ACTION_FAIL)
                 print(e.message)
+
+        # ----------------------------------------------------------------------
+        # update docs
+
+        # if docs flag is set
+        if C.B_CMD_DOCS:
+
+            # TODO: put this in lib/cnpdoc
+            print(C.S_ACTION_DOCS, end="", flush=True)
+
+            # update version number in pdoc3/
+            # activate cmd for pyplate's venv
+            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+                str(P_DIR_PYPLATE), S_PP_VENV
+            )
+
+            # get template and output dirs
+            dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
+            dir_docs = self._dir_prj / C.S_DIR_DOCS
+
+            # nuke old docs
+            if dir_docs.exists():
+                shutil.rmtree(dir_docs)
+                Path.mkdir(dir_docs, parents=True)
+
+            # format cmd using abs prj docs dir (output) and abs prj dir (input)
+            cmd_docs = C.S_CMD_DOC.format(
+                dir_template, dir_docs, self._dir_prj
+            )
+
+            # the command to run pdoc
+            cmd = f"{cmd_activate};" f"{cmd_docs}"
+            try:
+                F.sh(cmd, shell=True)
+            except F.CNShellError as e:
+                raise e
+
+            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
@@ -616,29 +630,29 @@ class PyBaker:
             # this .pot, .po, and .mo files
             potpy.main()
 
-        # # i18n-ify .desktop file
-        # path_desk = self._dir_prj / C.S_DIR_DESKTOP
-        # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
+            # # i18n-ify .desktop file
+            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
+            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
-        # if (
-        #     path_desk.exists()
-        #     and path_desk.is_dir()
-        #     and path_template.exists()
-        #     and path_template.is_file()
-        # ):
+            # if (
+            #     path_desk.exists()
+            #     and path_desk.is_dir()
+            #     and path_template.exists()
+            #     and path_template.is_file()
+            # ):
 
-        #     # fix .desktop file
-        #     print(C.S_ACTION_DESK, end="", flush=True)
+            #     # fix .desktop file
+            #     print(C.S_ACTION_DESK, end="", flush=True)
 
-        #     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-        #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-        #     path_out = self._dir_prj / path_out_name
+            #     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
+            #     path_out = self._dir_prj / path_out_name
 
-        #     # update desktop file
-        #     potpy.make_desktop(path_template, path_out)
+            #     # update desktop file
+            #     potpy.make_desktop(path_template, path_out)
 
-        #     # we are done
-        #     print(C.S_ACTION_DONE)
+            #     # we are done
+            #     print(C.S_ACTION_DONE)
 
             # we are done
             print(C.S_ACTION_DONE)
@@ -678,12 +692,14 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # fix dunders in install/uninstall
 
-        a_path = self._dir_prj / C.S_FILE_INST_CFG
-        if a_path.exists():
-            self._fix_content(a_path)
-        a_path = self._dir_prj / C.S_FILE_UNINST_CFG
-        if a_path.exists():
-            self._fix_content(a_path)
+        # if install flag is set
+        if C.B_CMD_INST:
+            a_path = self._dir_prj / C.S_FILE_INST_CFG
+            if a_path.exists():
+                self._fix_content(a_path)
+            a_path = self._dir_prj / C.S_FILE_UNINST_CFG
+            if a_path.exists():
+                self._fix_content(a_path)
 
         # ----------------------------------------------------------------------
         # call conf after fix
@@ -811,7 +827,7 @@ class PyBaker:
         """
         Fix header or code for each line in a file
 
-        Arguments:
+        Args:
             path: Path for replacing text
             bl_hdr: Whether the file is blacklisted for header lines (default:
             False)
@@ -891,7 +907,7 @@ class PyBaker:
         """
         Replace dunders inside a file header
 
-        Arguments:
+        Args:
             line: The line of the file to replace text in
 
         Returns:
@@ -939,7 +955,7 @@ class PyBaker:
         """
         Replace dunders inside a markup file's contents
 
-        Arguments:
+        Args:
             line: The line of the file to replace text in
 
         Returns:
@@ -1025,11 +1041,13 @@ class PyBaker:
         """
         Rename dirs/files in the project
 
-        Arguments:
+        Args:
             path: Path for dir/file to be renamed
 
-        Returns: A bool indication whether the name changed (Note that this
-        does not mean the file was renamed, only that it should be)
+        Returns:
+            A bool indication whether the name changed (Note that this
+            does not mean the file was renamed, only that it should be).
+
         Rename dirs/files. Given a path, it renames the dir/file by replacing
         dunders in the path with their appropriate replacements from
         self._dict_rep.
@@ -1054,13 +1072,28 @@ class PyBaker:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
+    # Fix various stuff in docs
+    # --------------------------------------------------------------------------
+    def _fix_docs(self, path):
+        """
+        Fix various stuff in docs
+
+        Args:
+            path: Path for docs dir to be fixed
+
+        Fix various stuff in docs.
+        """
+
+        # path_logo = path / "logo.mako"
+
+    # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(self, line, block):
         """
         Check if line or trailing comment is a switch
 
-        Arguments:
+        Args:
             line: The line to check for block switches
             block: True if we want to check a block switch, False if we want
             to check a line switch
@@ -1113,7 +1146,7 @@ class PyBaker:
         """
         Check if new version number is semantic
 
-        Arguments:
+        Args:
             version: New version number to check
 
         Returns:
@@ -1124,7 +1157,7 @@ class PyBaker:
         """
 
         # match semantic version from start of string
-        pattern = r"(\d).(\d).(\d)(.*)"
+        pattern = C.S_SEMVER_VALID
         return re.match(pattern, version)
 
 
@@ -1154,6 +1187,14 @@ if __name__ == "__main__":
         help=C.S_DBG_HELP,
     )
 
+    # add debug option
+    parser.add_argument(
+        C.S_FRC_OPTION,
+        action=C.S_FRC_ACTION,
+        dest=C.S_FRC_DEST,
+        help=C.S_FRC_HELP,
+    )
+
     # get namespace object
     args = parser.parse_args()
 
@@ -1165,11 +1206,12 @@ if __name__ == "__main__":
     # get the args
     a_dir_cur = os.getcwd()
     a_debug = dict_args.get(C.S_DBG_DEST, False)
+    a_force = dict_args.get(C.S_FRC_DEST, False)
 
     # create object
     pb = PyBaker()
 
     # run main method with args
-    pb.main(a_dir_cur, a_debug)
+    pb.main(a_dir_cur, debug=a_debug, force=a_force)
 
 # -)

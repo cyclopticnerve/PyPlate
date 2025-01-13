@@ -59,6 +59,6 @@ if __name__ == "__main__":
     pb = pybaker.PyBaker()
 
     # call main
-    pb.main(dir_prj)
+    pb.main(dir_prj, force=True)
 
 # -)

@@ -38,7 +38,7 @@
 #     A convenience method to return the type of a control, parsed from the
 #     class control set
 
-#     Arguments:
+#     Args:
 #         class_dict: the dict of common class properties
 #         ctl_name: the control whose type we want to know
 
@@ -48,7 +48,7 @@
 #     """
 
 #     # get controls for class
-# Arguments:
+# Args:
 #     ui_file: The file containing the dialog description in xml
 #     dlg_name: The name of the dialog in the ui file
 #     class_ctls = class_dict.get(AC.KEY_CLS_CTLS, {})
@@ -69,7 +69,7 @@
 #     Called when a gui dict is passed in, to ensure all values are of
 #     the correct type
 
-#     Arguments:
+#     Args:
 #         dict_class: The dict_app entry for this window's class
 #         dict_gui: The dict to sanitize
 
@@ -144,7 +144,7 @@
 #     """
 #     A convenience method to set the value of the specified control
 
-#     Arguments:
+#     Args:
 #         ctl_name: The name of the control in the UI file
 #         value: The new value for the control
 
@@ -171,7 +171,7 @@
 #     """
 #     A convenience method to return the value of the specified control
 
-#     Arguments:
+#     Args:
 #         ctl_name: The name of the control in the UI file
 
 #     Returns the value of a window control as named in the UI file.
@@ -200,7 +200,7 @@
 #     """
 #     Sets the values of all controls before window is shown
 
-#     Arguments:
+#     Args:
 #         dict_ctls: The dict containing the values for each control
 
 #     Set the values of all controls from the specified dict when this
@@ -262,7 +262,7 @@
 #     Update the backing dict of a particular window, saving its size and
 #     control values
 
-#     Arguments:
+#     Args:
 #         name_win: The name of the window to save the GUI for
 #         dict_state: The current state of the window's GUI, to be saved in
 #         the global backing store

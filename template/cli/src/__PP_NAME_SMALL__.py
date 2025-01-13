@@ -155,7 +155,7 @@ class __PP_NAME_CLASS__(CNCli):
         """
         Short description
 
-        Arguments:
+        Args:
             var_name: Short description
 
         Returns:
@@ -198,7 +198,7 @@ class __PP_NAME_CLASS__(CNCli):
         """
         Add arguments to argparse parser
 
-        Arguments:
+        Args:
             parser: The ArgumentParser to add the args to
 
         This method is called by the superclass's _run_parser method, and

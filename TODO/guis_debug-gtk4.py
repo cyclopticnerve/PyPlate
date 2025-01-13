@@ -103,7 +103,7 @@ def add_args(_argparser):
     """
     Adds command line args to the parser
 
-    Arguments:
+    Args:
         argparser: The argparse object to add args to
 
     This function adds arguments to the parser. It is teased out to make

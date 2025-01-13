@@ -34,6 +34,7 @@ from cnlib import cnfunctions as F  # type: ignore
 # Public classes
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # A class to make handling of venv folders easier
 # ------------------------------------------------------------------------------
@@ -61,7 +62,7 @@ class CNVenv:
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             dir_prj: The path to the project's root dir (can be a string or a
             Path object)
             dir_venv: The path or name of the resulting venv folder (can be a
@@ -110,7 +111,7 @@ class CNVenv:
         """
         Install packages to venv from the reqs_file property
 
-        Arguments:
+        Args:
             file_reqs: File to load requirements
 
         Raises:
@@ -144,7 +145,7 @@ class CNVenv:
         """
         Freeze packages in the venv folder to the file_reqs property
 
-        Arguments:
+        Args:
             file_reqs: File to save requirements
 
         Raises:

@@ -62,7 +62,7 @@ class CNSphinx:
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             dir_prj: Path to the project's root dir (can be a string or a Path
             object)
             dir_src: Path or name of the dir where your source files are
@@ -91,13 +91,11 @@ class CNSphinx:
     # --------------------------------------------------------------------------
     # Create a new docs setup given the params
     # --------------------------------------------------------------------------
-    def create(
-        self, name, author, version, dirs_import=None, theme=""
-    ):
+    def create(self, name, author, version, dirs_import=None, theme=""):
         """
         Create a new docs setup given the params
 
-        Arguments:
+        Args:
             name: Name of the program (usually camel cased)
             author: Author of the program
             version: Version of the program as a string
@@ -160,7 +158,7 @@ class CNSphinx:
         """
         Build the docs and create html files
 
-        Arguments:
+        Args:
             dir_venv: Location of the project's .venv folder, so that it uses
             the project's virtual environment version of sphinx
 
@@ -250,4 +248,6 @@ class CNSphinx:
         # save file
         with open(path_conf, "w", encoding="UTF-8") as a_file:
             a_file.writelines(lines)
+
+
 # -)

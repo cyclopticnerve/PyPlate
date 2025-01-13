@@ -105,7 +105,7 @@
 #         """
 #         Initialize the new object
 
-#         Arguments:
+#         Args:
 #             app_id: The reverse-notation id of the app (ie.
 #             "org.cyclopticnerve.foobar")
 #             path_state: The path to the state file for loading/saving
@@ -202,7 +202,7 @@
 #         """
 #         Add a new window instance with the specified name, class, and state
 
-#         Arguments:
+#         Args:
 #             class_win: The subclass of CNWindow to create, passed as a string
 #             in the form of "module_name.Class_Name"
 #             name_win: The unique name to store in the backing dict
@@ -279,7 +279,7 @@
 #         """
 #         Remove the specified window instance from the internal list
 
-#         Arguments:
+#         Args:
 #             name_win: The name of the window instance to remove
 
 #         Removes a window instance from the internal list. Note that this does
@@ -362,7 +362,7 @@
 #         """
 #         Called when the Application is activated (ie. first window is shown)
 
-#         Arguments:
+#         Args:
 #             _obj: Not used
 
 #         The Application is about to start. Show default window(s) or possibly
@@ -393,7 +393,7 @@
 #         Called when the Application is stopped (ie. last window is closed, dock
 #         menu quit, top bar quit, etc.)
 
-#         Arguments:
+#         Args:
 #             _obj: Not used
 
 #         This method removes any windows left in the list when tha application

@@ -38,7 +38,7 @@ def func():
     """
     Short description
 
-    Arguments:
+    Args:
         var_name: Description
 
     Returns:
@@ -67,7 +67,7 @@ def _func():
     """
     Short description
 
-    Arguments:
+    Args:
         var_name: Description
 
     Returns:

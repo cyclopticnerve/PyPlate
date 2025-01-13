@@ -73,7 +73,7 @@ class WindowMain(CNWindow):
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             app: The calling Application object
             name_win: The name of the window in the app's instance list
 
@@ -103,7 +103,7 @@ class WindowMain(CNWindow):
         """
         Called when the About button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The About button was clicked, show the About dialog.
@@ -122,7 +122,7 @@ class WindowMain(CNWindow):
         """
         Called when the New button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The New button was clicked, add the new window.
@@ -137,7 +137,7 @@ class WindowMain(CNWindow):
         """
         Called when the Title button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The Title button was clicked, change the window title.
@@ -152,7 +152,7 @@ class WindowMain(CNWindow):
         """
         Called when the Save button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The Save button was clicked.
@@ -167,7 +167,7 @@ class WindowMain(CNWindow):
         """
         Called when the Cancel button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The Cancel button was clicked.
@@ -182,7 +182,7 @@ class WindowMain(CNWindow):
         """
         Called when the OK button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The OK button was clicked.
@@ -197,7 +197,7 @@ class WindowMain(CNWindow):
         """
         Called when the Close button is clicked
 
-        Arguments:
+        Args:
             _obj: Not used
 
         The OK button was clicked.

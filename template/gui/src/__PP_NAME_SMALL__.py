@@ -205,7 +205,7 @@ class __PP_NAME_CLASS__(CNCli):
         """
         Add arguments to argparse parser
 
-        Arguments:
+        Args:
             parser: The ArgumentParser to add the args to
 
         This method is teased out for better code maintenance.

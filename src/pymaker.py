@@ -45,22 +45,14 @@ import sys
 # my imports
 # add custom import paths
 
-# paths to important dirs
-# NB: needed to get imports from conf (bootstrap)
-# NB: this is hardcoded so ln -s will work
-P_DIR_PYPLATE_INST = Path.home() / "local/share/pyplate"
-P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
-
-P_DIR_PP_CONF_INST = P_DIR_PYPLATE_INST / "conf"
+# first check for inst loc
+P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
+if not P_DIR_PYPLATE.exists():
+    # fall back to dev loc
+    P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
 P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
-
-P_DIR_PP_LIB_INST = P_DIR_PYPLATE_INST / "lib"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-
-sys.path.append(str(P_DIR_PP_CONF_INST))
 sys.path.append(str(P_DIR_PP_CONF))
-
-sys.path.append(str(P_DIR_PP_LIB_INST))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
@@ -88,6 +80,7 @@ from cnlib import cninstall as I  # type: ignore
 
 # name and desc for cmd line help
 S_PP_NAME_BIG = "PyMaker"
+S_PP_NAME_SMALL = "pymaker"
 S_PP_SHORT_DESC = (
     "A program for creating CLI/Package/GUI projects in Python from a template"
 )
@@ -103,6 +96,9 @@ S_PP_ABOUT = (
     f"{S_PP_VER_FMT}\n"
     f"https://www.github.com/cyclopticnerve/PyPlate"
 )
+
+# our venv name
+S_PP_VENV = ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -161,7 +157,7 @@ class PyMaker:
         """
         The main method of the program
 
-        Arguments:
+        Args:
             dir_prj: Path to dir where the project is being created
             debug: If True, run in debug mode (default: false)
 
@@ -239,13 +235,6 @@ class PyMaker:
         # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(C.D_SW_LINE_DEF)
-
-        # remove home dir from PyPlate path
-        h = str(Path.home())
-        p = str(P_DIR_PYPLATE)
-        p = p.lstrip(h).strip("/")
-        # NB: change global val
-        C.D_PRV_PRJ["__PP_DEV_PP__"] = p
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -432,6 +421,13 @@ class PyMaker:
         C.D_PRV_PRJ["__PP_DATE__"] = info_date
         C.D_PRV_PRJ["__PP_NAME_VENV__"] = C.S_VENV_FMT_NAME.format(name_small)
 
+        # remove home dir from PyPlate path
+        h = str(Path.home())
+        p = str(P_DIR_PYPLATE)
+        p = p.lstrip(h).strip("/")
+        # NB: change global val
+        C.D_PRV_PRJ["__PP_DEV_PP__"] = p
+
         # blank line before printing progress
         print()
 
@@ -507,7 +503,7 @@ class PyMaker:
 
                     # copy dir/file
                     if src.is_dir():
-                        shutil.copytree(src, dst)
+                        shutil.copytree(src, dst, dirs_exist_ok=True)
                     else:
                         shutil.copy2(src, dst)
 
@@ -728,15 +724,15 @@ class PyMaker:
             print(C.S_ACTION_GIT, end="", flush=True)
 
             # add git dir
-            str_cmd = C.S_CMD_GIT.format(self._dir_prj)
-            F.sh(str_cmd)
+            cmd = C.S_CMD_GIT_CREATE.format(self._dir_prj)
+            F.sh(cmd)
 
             print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # venv
 
-        #if venv flag is set
+        # if venv flag is set
         if C.B_CMD_VENV:
 
             print(C.S_ACTION_VENV, end="", flush=True)
@@ -761,17 +757,30 @@ class PyMaker:
         # if docs flag is set
         if C.B_CMD_DOCS:
 
+            # TODO: put this in lib/cnpdoc
             print(C.S_ACTION_DOCS, end="", flush=True)
 
+            # activate cmd for pyplate's venv
+            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+                str(P_DIR_PYPLATE), S_PP_VENV
+            )
+
             # get template and output dirs
+            dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
             dir_docs = self._dir_prj / C.S_DIR_DOCS
-            cmd_docs = C.S_CMD_DOC.format(dir_docs)
+
+            # nuke old docs
+            if dir_docs.exists():
+                shutil.rmtree(dir_docs)
+                Path.mkdir(dir_docs, parents=True)
+
+            # format cmd using abs prj docs dir (output) and abs prj dir (input)
+            cmd_docs = C.S_CMD_DOC.format(
+                dir_template, dir_docs, self._dir_prj
+            )
 
             # the command to run pdoc
-            cmd = (
-                f"cd {self._dir_prj};"
-                f"{cmd_docs}"
-            )
+            cmd = f"{cmd_activate};" f"{cmd_docs}"
             try:
                 F.sh(cmd, shell=True)
             except F.CNShellError as e:
@@ -999,7 +1008,7 @@ class PyMaker:
         """
         Fix header or code for each line in a file
 
-        Arguments:
+        Args:
             path: Path for replacing text
             bl_hdr: Whether the file is blacklisted for header lines (default:
             False)
@@ -1080,7 +1089,7 @@ class PyMaker:
         """
         Replace dunders inside a file header
 
-        Arguments:
+        Args:
             line: The header line of the file in which to replace text
 
         Returns:
@@ -1131,7 +1140,7 @@ class PyMaker:
         """
         Replace dunders inside a file's contents
 
-        Arguments:
+        Args:
             line: The line of the file to replace text in
 
         Returns:
@@ -1219,7 +1228,7 @@ class PyMaker:
         """
         Rename dirs/files in the project
 
-        Arguments:
+        Args:
             path: Path for dir/file to be renamed
 
         Rename dirs/files. Given a path, it renames the dir/file by replacing
@@ -1252,7 +1261,7 @@ class PyMaker:
         """
         Combine reqs from template/all and template/prj_type
 
-        Arguments:
+        Args:
             prj_type_long: the folder in template for the current project type
 
         This method combines reqs from the all dir used by all projects, and
@@ -1292,7 +1301,7 @@ class PyMaker:
         """
         Check if line or trailing comment is a switch
 
-        Arguments:
+        Args:
             line: The line to check for block switches
             block: True if we want to check a block switch, False if we want
             to check a line switch
@@ -1345,7 +1354,7 @@ class PyMaker:
         """
         Check project type for allowed characters
 
-        Arguments:
+        Args:
             prj_type: Type to check for allowed characters
 
         Returns:
@@ -1382,7 +1391,7 @@ class PyMaker:
         """
         Check project name for allowed characters
 
-        Arguments:
+        Args:
             prj_name: Name to check for allowed characters
 
         Returns:
@@ -1474,6 +1483,6 @@ if __name__ == "__main__":
     pm = PyMaker()
 
     # run main method with args
-    pm.main(a_dir_cur, a_debug)
+    pm.main(a_dir_cur, debug=a_debug)
 
 # -)

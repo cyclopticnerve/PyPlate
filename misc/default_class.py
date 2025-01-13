@@ -97,7 +97,7 @@ class Main:
         """
         Sets the new value of zaz
 
-        Arguments:
+        Args:
             new_zaz: The new value of zaz
 
         Long description (including HTML).

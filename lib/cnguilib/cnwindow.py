@@ -77,7 +77,7 @@ class CNWindow:
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             app: The calling Application object
             name_win: The name of the window in the CNApp's instance list
             ui_file: The ui file that contains the window for this class
@@ -137,7 +137,7 @@ class CNWindow:
         """
         Called when the main window is closed by the 'X' button
 
-        Arguments:
+        Args:
             _obj: Not used
             _event: Not used
 
@@ -165,7 +165,7 @@ class CNWindow:
         """
         Called after the window is destroyed
 
-        Arguments:
+        Args:
             _obj: Not used
 
         This method is called after the window is destroyed. It is used to

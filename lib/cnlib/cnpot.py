@@ -105,7 +105,7 @@ class CNPotPy:
         """
         Initialize the new object
 
-        Arguments:
+        Args:
             dir_src: Where to start looking for input files
             str_appname: Name to use in .pot/.po header
             str_version: Version info to use in .pot/.po header
@@ -240,7 +240,7 @@ class CNPotPy:
         """
         Localize the desktop file using all available wlangs
 
-        Arguments:
+        Args:
             dt_template: File containing the default information to include in
             the desktop file
             dt_out: Location of the i18n'ed desktop file
@@ -452,7 +452,7 @@ class CNPotPy:
         """
         Scan the source dir for files with certain extensions
 
-        Arguments:
+        Args:
             dict_clangs: The dictionary of clang names / clang extensions to
             scan for
             dict_no_ext: An optional dictionary mapping files with no extension
@@ -623,7 +623,7 @@ class CNPotPy:
         """
         Set the charset for the pot which will carry over to each po
 
-        Arguments:
+        Args:
             file_pot: the path object representing the pot file to fix
 
         Fix the charset in the pot file to a known value so that msgfmt does
@@ -642,7 +642,9 @@ class CNPotPy:
         text = re.sub(str_pattern, str_rep, text)
 
         # replace copyright
-        str_pattern = r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
+        str_pattern = (
+            r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
+        )
         year = date.today().year
         str_rep = rf"\g<1>{year}\g<3>{self._str_author}"
         text = re.sub(str_pattern, str_rep, text)

@@ -1,4 +1,7 @@
 
+# TODO: CNInstall help str
+# TODO: for pkg, after fix, activate prj venv and install pkg as editable
+# then change test to use installed pkg, not local dir
 # TODO: prg image in docs
 # TODO: prg version in docs
 # TODO: multiple switches on one line: # pyplate: disable=foo disable=bar

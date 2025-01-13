@@ -31,7 +31,7 @@ class CNFormatter(
     """
     A dummy class to combine multiple argparse formatters
 
-    Arguments:
+    Args:
         RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
         including argument descriptions.
         RawDescriptionHelpFormatter: Indicates that description and epilog are
@@ -40,5 +40,5 @@ class CNFormatter(
     A dummy class to combine multiple argparse formatters.
     """
 
+
 # -)
-    

@@ -53,6 +53,7 @@ from pathlib import Path
 # # custom sorting order
 # SORT_ORDER = "_."  # sort first char of name in this order (above ord)
 
+
 # ------------------------------------------------------------------------------
 # Generate a file tree in text format with the names formatted according to some
 # format strings
@@ -197,7 +198,7 @@ class CNTree:
         name, will be left-trimmed to make the tree start at the first
         column.
 
-        Arguments:
+        Args:
             start_dir: String or Path to the root directory of the tree
             (default: "")
             filter_list: List of directory/file names to filter out (default:
@@ -276,7 +277,7 @@ class CNTree:
         """
         Sanitizes the start_dir parameter
 
-        Arguments:
+        Args:
             start_dir: start_dir parameter from build_tree (Can be a string or
             Path object)
 
@@ -309,7 +310,7 @@ class CNTree:
         """
         Sanitizes the filter_list parameter
 
-        Arguments:
+        Args:
             filter_list: filter_list parameter from build_tree
 
         Converts entries in filter_list to absolute Path objects relative
@@ -350,7 +351,7 @@ class CNTree:
         """
         Sanitizes the dir_format and file_format arguments
 
-        Arguments:
+        Args:
             dir_format: Format to use for directory names
             file_format: Format to use for file names
 
@@ -458,7 +459,7 @@ class CNTree:
         """
         Enumerates the given directory and adds its contents to the tree
 
-        Arguments:
+        Args:
             item: Path object we are adding
             prefix: Current prefix (combination of pipes/blanks) to show
             the level of indentation
@@ -534,7 +535,7 @@ class CNTree:
         """
         Does some extra stuff when adding a directory
 
-        Arguments:
+        Args:
             item: Path object to add
             prefix: Prefix for the last Path object added
             count: Total number of objects in the parent (for prefix)
@@ -582,7 +583,7 @@ class CNTree:
         """
         Sorts items in the item list according to the item name
 
-        Arguments:
+        Args:
             item: Path object to sort
 
         Returns:

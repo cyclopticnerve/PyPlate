@@ -118,9 +118,7 @@ class CNCli:
         """
 
         # create the command line parser
-        parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter
-        )
+        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
         # call the subclass method
         self._add_args(parser)
@@ -148,7 +146,7 @@ class CNCli:
         """
         This method does nothing, it is for subclassing
 
-        Arguments:
+        Args:
             parser: The ArgumentParser to add the args to
 
         This method is empty, but is declared here because the subclass method
@@ -165,7 +163,7 @@ class CNCli:
         """
         Load config dict from a json file
 
-        Arguments:
+        Args:
             path_def: The path to the existing config file (the one the program
             usually uses) (default: None)
 
@@ -220,5 +218,6 @@ class CNCli:
         if self._debug:
             print("save cfg to:", self._path_cfg)
             F.pp(self._dict_cfg, label="cfg")
+
 
 # -)

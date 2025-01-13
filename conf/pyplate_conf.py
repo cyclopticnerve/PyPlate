@@ -99,12 +99,12 @@ S_ACTION_BEFORE = "Do before fix... "
 S_ACTION_FIX = "Do fix... "
 S_ACTION_AFTER = "Do after fix... "
 S_ACTION_GIT = "Make git folder... "
-S_ACTION_VENV = "Make venv folder (takes a long time!)... "
+S_ACTION_VENV = "Make venv folder... "
 S_ACTION_I18N = "Make i18n folder... "
 S_ACTION_DESK = "Fixing desktop file... "
 S_ACTION_DOCS = "Make docs folder... "
 S_ACTION_TREE = "Make tree file... "
-S_ACTION_DIST = "Make dist folder (takes a long time!)... "
+S_ACTION_DIST = "Make dist folder... "
 S_ACTION_INST = "Make install file... "
 S_ACTION_DONE = "Done"
 S_ACTION_FAIL = "Failed"
@@ -170,6 +170,7 @@ S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = ".venv"
 S_DIR_DOCS = "docs"
+S_DIR_PDOC_TMP = "pdoc3"
 S_DIR_PDOC = "pdoc"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
@@ -246,10 +247,11 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # cmd for git
 # NB: format param is proj dir
-S_CMD_GIT = "git init {} -q"
+S_CMD_GIT_CREATE = "git init {} -q"
+S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
 # cmd for pdoc3
-# NB: format param is S_DIR_DOCS
-S_CMD_DOC = "pdoc --html --force -o {} ."  # --template-dir {}
+# NB: format params are pdoc3 dir, pyplate dir, project's S_DIR_DOCS and project dir
+S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} {}"
 # cmd for venv
 # NB: format param is __PP_NAME_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
@@ -330,11 +332,26 @@ S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=\s*)(.*)"
 S_META_SD_REPL = r'\g<1>"{}"'
 
+# make sure ver num entered in pybaker is valid
+S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
+
 # debug option strings
 S_DBG_OPTION = "-d"
 S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
+
+# force option strings
+S_FRC_OPTION = "-f"
+S_FRC_ACTION = "store_true"
+S_FRC_DEST = "FRC_DEST"
+S_FRC_HELP = "disable asking questions, just bake"
+
+S_ASK_PROPS = (
+    "Have you checked all properties in pyplate/project.json/PUB_META? [Y/n]: "
+)
+S_ASK_PROPS_DEF = "y"
+S_ASK_PROPS_ABORT = "Abort"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -683,7 +700,7 @@ D_PUB_DIST = {
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
-        S_FILE_REQS: f"{S_DIR_INSTALL}",
+        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
     },
     "g": {
         S_DIR_SRC: S_DIR_ASSETS,
@@ -697,7 +714,7 @@ D_PUB_DIST = {
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
-        S_FILE_REQS: f"{S_DIR_INSTALL}",
+        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         #
         S_DIR_README: S_DIR_ASSETS,
     },
@@ -816,8 +833,11 @@ D_COPY = {
 # val is list of libs to add to prj type
 D_COPY_LIB = {
     "c": ["cnlib"],
-    "p": [],
     "g": ["cnlib", "cnguilib"],
+    # NB: this should not be needed, but it breaks pdoc when doing misc folder
+    # specifically, the cnlibs.py file
+    # "p": ["cnlib"],
+    "p": [],
 }
 
 # dictionary of default stuff to put in install.json
@@ -932,7 +952,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     """
     Do any work before fix
 
-    Arguments:
+    Args:
         dir_prj: The root of the new project (reserved for future use)
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data (reserved for
@@ -972,7 +992,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     """
     Do any work after fix
 
-    Arguments:
+    Args:
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
@@ -1011,6 +1031,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_DESKTOP:
                 _fix_desktop(item, dict_prv_prj, dict_pub_meta)
 
+
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
@@ -1018,7 +1039,7 @@ def do_before_dist(_dir_prj, dict_prv, dict_pub):
     """
     Do any work before making dist
 
-    Arguments:
+    Args:
         dir_prj: The root of the new project (reserved for future use)
         dict_prv: The dictionary containing private pyplate data (reserved for
         future use)
@@ -1047,7 +1068,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     """
     Do any work after making dist
 
-    Arguments:
+    Args:
         dir_prj: The root of the new project (reserved for
         future use)
         dict_prv: The dictionary containing private pyplate data
@@ -1105,7 +1126,8 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     # remove ext from bin file
     old_bin = p_dist / S_DIR_ASSETS / S_DIR_SRC / f"{name_small}.py"
     new_bin = p_dist / S_DIR_ASSETS / S_DIR_SRC / f"{name_small}"
-    old_bin.rename(new_bin)
+    if old_bin.exists():
+        old_bin.rename(new_bin)
 
     # now do normal dist tar
     in_dir = p_dist
@@ -1131,7 +1153,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     """
     Remove/replace parts of the main README file
 
-    Arguments:
+    Args:
         path: Path for the README to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
@@ -1198,7 +1220,7 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the pyproject file
 
-    Arguments:
+    Args:
         path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict (reserved for future use)
         dict_pub_meta: the dict of metadata to replace in the file
@@ -1239,6 +1261,7 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     with open(path, "w", encoding="UTF-8") as a_file:
         a_file.write(text)
 
+
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file
 # ------------------------------------------------------------------------------
@@ -1246,7 +1269,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the desktop file
 
-    Arguments:
+    Args:
         path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict (reserved for future use)
         dict_pub_meta: the dict of metadata to replace in the file
@@ -1302,7 +1325,7 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the UI files
 
-    Arguments:
+    Args:
         path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict (reserved for future use)
         dict_pub_meta: the dict of metadata to replace in the file

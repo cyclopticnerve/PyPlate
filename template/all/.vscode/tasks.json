@@ -6,7 +6,7 @@
         {
             "label": "PyBaker",
             "type": "shell",
-            "command": "./pybaker_task.py",
+            "command": "./pybaker_task.py -f",
             "options": {
                 "cwd": "pyplate/private"
             },
