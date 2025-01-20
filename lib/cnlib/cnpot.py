@@ -70,8 +70,15 @@ class CNPotPy:
     DEF_DIR_LOCALE = "locale"
     # default po dir under src
     DEF_DIR_PO = "po"
+    # default domain
+    DEF_DOMAIN = "messages"
     # default encoding for .pot and .po files
     DEF_CHARSET = "UTF-8"
+
+    # default file extensions
+    DEF_POT_EXT = ".pot"
+    DEF_PO_EXT = ".po"
+    DEF_MO_EXT = ".mo"
 
     # this is the default subdir for GNU
     # NB: DO NOT CHANGE THIS! i only put it here because it is a string
@@ -79,6 +86,29 @@ class CNPotPy:
     # the file to store all wlangs for bulk operations
     # NB: DO NOT CHANGE THIS! i only put it here because it is a string
     FILE_LINGUAS = "LINGUAS"
+
+    # header regex
+    REG_TITLE_SCH = r"# SOME DESCRIPTIVE TITLE."
+    REG_TITLE_REP = r"# {} translation template"
+
+    REG_COPY_SCH = (
+        r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
+    )
+    REG_COPY_REP = r"\g<1>{}\g<3>{}"
+
+    REG_EMAIL_SCH = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
+    REG_EMAIL_REP = r"\g<1>{}\g<3>{}"
+
+    REG_CHAR_SCH = r"(\"Content-Type: text/plain; charset=)(CHARSET)(.*)"
+    REG_CHAR_REP = r"\g<1>{}\g<3>"
+
+    # shell commands to make po/mo
+    # NB: params are po_file and pot_file
+    S_CMD_POS = "msgmerge --update {} {}"
+    # NB: params are mo_file and wlang_po
+    S_CMD_MOS = "msgfmt -o {} {}"
+    # params are po dir, template file, final file
+    S_CMD_DSK = "msgfmt --desktop -d {} --template={} -o {}"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -89,14 +119,21 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     def __init__(
         self,
-        dir_src,
+        # header
         str_appname,
         str_version,
         str_author,
         str_email,
+        # out
+        dir_pot,
+        # in
+        dir_prj,
+        # optional out
         dir_locale=None,
         dir_po=None,
-        str_domain="messages",
+        str_domain=None,
+        # optional in
+        str_tag=None,
         dict_clangs=None,
         dict_no_ext=None,
         list_wlangs=None,
@@ -114,11 +151,14 @@ class CNPotPy:
             dir_src/"locale")
             dir_po: Where to put new .po files that are waiting to be merged
             (default: dir_src/dir_locale/"po")
-            str_domain: THe name of the domain (base name) for output files
+            str_domain: The name of the domain (base name) for output files
             (default: "messages")
                 This creates files like "<str_domain>.pot", "<str_domain>.po",
                 and "<str_domain>.mo", and is used in the .py scripts to bind a
                 domain to a locale folder
+            str_tag: Tag that starts a context comment (default: "")
+                If this string is empty, all comments above an entry are
+                included as context
             dict_clangs: The dictionary of file extensions to scan for each
             clang
             dict_no_ext: An optional dict mapping files with no extension
@@ -166,31 +206,39 @@ class CNPotPy:
         its properties, and any other code needed to create a new object.
         """
 
-        # set private props from params
-        self._dir_src = Path(dir_src)
-
         # header info
         self._str_appname = str_appname
         self._str_version = str_version
         self._str_author = str_author
         self._str_email = str_email
 
+        # set private props from params
+        self._dir_pot = Path(dir_pot).resolve()
+        self._dir_prj = Path(dir_prj).resolve()
+
         # fix up dir_locale
         if dir_locale is None:
-            dir_locale = self._dir_src / self.DEF_DIR_LOCALE
+            dir_locale = self._dir_prj / self.DEF_DIR_LOCALE
         elif not dir_locale.is_absolute():
-            dir_locale = self._dir_src / dir_locale
+            dir_locale = self._dir_prj / dir_locale
         self._dir_locale = dir_locale
 
         # fix up dir_po
         if dir_po is None:
-            dir_po = self._dir_src / self.DEF_DIR_PO
+            dir_po = self._dir_prj / self.DEF_DIR_PO
         elif not dir_po.is_absolute():
-            dir_po = self._dir_src / dir_po
+            dir_po = self._dir_prj / dir_po
         self._dir_po = dir_po
 
-        # set str_domain
+        # fix up domain
+        if str_domain is None:
+            str_domain = self.DEF_DOMAIN
         self._str_domain = str_domain
+
+        # set comment tag
+        if str_tag is None:
+            str_tag = ""
+        self._str_tag = str_tag
 
         # fix up dict_clangs
         if dict_clangs is None:
@@ -229,9 +277,9 @@ class CNPotPy:
         # ----------------------------------------------------------------------
         # do the steps
 
-        self.make_pot()
-        self.make_pos()
-        self.make_mos()
+        self._make_pot()
+        self._make_pos()
+        self._make_mos()
 
     # --------------------------------------------------------------------------
     # Localize the desktop file using all available wlangs
@@ -243,17 +291,22 @@ class CNPotPy:
         Args:
             dt_template: File containing the default information to include in
             the desktop file
+            This is the file that pymaker/pybaker modify using metadata
             dt_out: Location of the i18n'ed desktop file
+            This is the file that will be distributed with your app
 
         Takes a template desktop file and applies all i18n'ed info from all .po
         files in the po folder and creates a final .desktop file.
         """
 
+        # sanity check
+        if not dt_template.is_absolute():
+            dt_template = self._dir_prj / dt_template
+        if not dt_out.is_absolute():
+            dt_out = self._dir_prj / dt_out
+
         # build the command as a string
-        cmd = (
-            f"msgfmt --desktop --template={dt_template} -d {self._dir_po} "
-            f"-o {dt_out}"
-        )
+        cmd = self.S_CMD_DSK.format(self._dir_po, dt_template, dt_out)
 
         # run the command
         F.sh(cmd)
@@ -265,7 +318,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Create a .pot file in the locale folder
     # --------------------------------------------------------------------------
-    def make_pot(self):
+    def _make_pot(self):
         """
         Create a .pot file in the locale folder
 
@@ -305,7 +358,7 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get path to pot file
-        pot_file = self._dir_po / f"{self._str_domain}.pot"
+        pot_file = self._dir_pot / f"{self._str_domain}{self.DEF_POT_EXT}"
 
         # delete the existing .pot file (if it exists)
         Path.unlink(pot_file, missing_ok=True)
@@ -328,10 +381,11 @@ class CNPotPy:
 
             # get initial cmd
             cmd = (
+                f"cd {self._dir_prj}; "
                 "xgettext "
                 # add any comments above string (or msgctxt in ui files)
                 # NB: check that all files have appropriate contexts/comments
-                "-c "
+                f"-c{self._str_tag} "
                 # fix some header values (the rest should be fixed in
                 # _fix_header)
                 # NB: if blank, file is public domain
@@ -349,7 +403,7 @@ class CNPotPy:
                 f"--package-version {self._str_version} "
                 # author email
                 f"--msgid-bugs-address {self._str_email} "
-                "--no-location "
+                # "--no-location "
                 # sort entries by file
                 "-F "
                 # append existing file
@@ -371,7 +425,7 @@ class CNPotPy:
                 cmd += f"{item} "
 
             # do the final command
-            F.sh(cmd)
+            F.sh(cmd, shell=True)
 
         # fix CHARSET in pot
         self._fix_pot_header(pot_file)
@@ -379,7 +433,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Merge any .po files in the pos folder with existing .po files
     # --------------------------------------------------------------------------
-    def make_pos(self):
+    def _make_pos(self):
         """
         Merge any .po files in the pos folder with existing .po files
 
@@ -393,13 +447,17 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get the pot file we made in the last step
-        pot_file = self._dir_po / f"{self._str_domain}.pot"
+        pot_file = self._dir_pot / f"{self._str_domain}{self.DEF_POT_EXT}"
 
         # for each wlang in the po folder
         for wlang in self._list_wlangs:
 
             # create or update the .po file
-            po_file = self._dir_po / f"{wlang}.po"
+            po_file = (
+                self._dir_po
+                / f"{wlang}"
+                / f"{self._str_domain}{self.DEF_PO_EXT}"
+            )
             if not po_file.exists():
 
                 # no po file, copy pot
@@ -407,13 +465,13 @@ class CNPotPy:
             else:
 
                 # update existing po file using latest pot
-                cmd = f"msgmerge --update {po_file} {pot_file}"
+                cmd = self.S_CMD_POS.format(po_file, pot_file)
                 F.sh(cmd)
 
     # --------------------------------------------------------------------------
     # Create .mo files for all .po files in the locale folder
     # --------------------------------------------------------------------------
-    def make_mos(self):
+    def _make_mos(self):
         """
         Create .mo files for all .po files in the locale folder
 
@@ -425,25 +483,21 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get all wlangs to output
-        wlangs_pos = list(self._dir_po.glob("*.po"))
+        wlangs_pos = list(self._dir_po.glob(f"**/*{self.DEF_PO_EXT}"))
 
         # for each wlang
         for wlang_po in wlangs_pos:
 
             # get wlang name
-            wlang_name = wlang_po.stem  # es
+            wlang_name = wlang_po.parent.stem  # es
 
             # get .mo file (output)
             mo_dir = self._dir_locale / wlang_name / self.DIR_MESSAGES
-            mo_file = mo_dir / f"{self._str_domain}.mo"
+            mo_file = mo_dir / f"{self._str_domain}{self.DEF_MO_EXT}"
 
             # do the command
-            cmd = f"msgfmt -o {mo_file} {wlang_po}"
+            cmd = self.S_CMD_MOS.format(mo_file, wlang_po)
             F.sh(cmd)
-
-    # --------------------------------------------------------------------------
-    # Private functions
-    # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Scan the source dir for files with certain extensions
@@ -487,7 +541,7 @@ class CNPotPy:
         # generally only one item, while a list contains all results
         # calling list() on a generator causes the generator to give ALL it's
         # generated results to the final list
-        paths = list(self._dir_src.rglob("*"))
+        paths = list(self._dir_prj.rglob("*"))
 
         # for each clang name / list of exts
         for clang, ext_list in dict_clangs.items():
@@ -501,6 +555,7 @@ class CNPotPy:
 
             # get all paths that match file ext
             files = [f for f in paths if f.suffix in exts]
+            files = [f.relative_to(self._dir_prj) for f in files]
 
             # make sure the key exists
             if not clang in dict_res:
@@ -516,6 +571,7 @@ class CNPotPy:
             # NB: the is_file() check here is to make sure we only add files
             # that have no ext, not dirs (which have no ext, obvs)
             files = [f for f in paths if f.name in name_list if f.is_file()]
+            files = [f.relative_to(self._dir_prj) for f in files]
 
             # make sure the key exists
             if not clang in dict_res:
@@ -523,6 +579,8 @@ class CNPotPy:
 
             # add results to langs that have extensions
             dict_res[clang].extend(files)
+
+        # make all paths rel to src (to remove home dir from location)
 
         # return result
         return dict_res
@@ -616,6 +674,13 @@ class CNPotPy:
         with open(linguas_path, "w", encoding="UTF8") as f:
             f.write(linguas)
 
+        # go through the wlang list
+        for wlang in self._list_wlangs:
+
+            # make the locale/lang/LC_MESSAGES dir
+            d = self._dir_po / wlang
+            Path.mkdir(d, parents=True, exist_ok=True)
+
     # --------------------------------------------------------------------------
     # Set the charset for the pot which will carry over to each po
     # --------------------------------------------------------------------------
@@ -637,29 +702,27 @@ class CNPotPy:
             text = a_file.read()
 
         # replace short description
-        str_pattern = r"# SOME DESCRIPTIVE TITLE."
-        str_rep = f"# {self._str_appname} translation template"
+        str_pattern = self.REG_TITLE_SCH
+        str_rep = self.REG_TITLE_REP.format(self._str_appname)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace copyright
-        str_pattern = (
-            r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
-        )
+        str_pattern = self.REG_COPY_SCH
         year = date.today().year
-        str_rep = rf"\g<1>{year}\g<3>{self._str_author}"
+        str_rep = self.REG_COPY_REP.format(year, self._str_author)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace author's email
-        str_pattern = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
+        str_pattern = self.REG_EMAIL_SCH
         email = self._str_email
         year = date.today().year
-        str_rep = rf"\g<1>{email}\g<3>{year}"
+        str_rep = self.REG_EMAIL_REP.format(email, year)
         text = re.sub(str_pattern, str_rep, text)
 
         # NB: if the specific phrase "CHARSET" is not found, nothing will be
         # changed
-        str_pattern = r"(\"Content-Type: text/plain; charset=)(CHARSET)(.*)"
-        str_rep = rf"\g<1>{self._charset}\g<3>"
+        str_pattern = self.REG_CHAR_SCH
+        str_rep = self.REG_CHAR_REP.format(self._charset)
         text = re.sub(str_pattern, str_rep, text, flags=re.M)
 
         # save file

@@ -27,6 +27,7 @@ Typical usage is show in the main() method.
 # ------------------------------------------------------------------------------
 
 # system imports
+import gettext
 from pathlib import Path
 import sys
 
@@ -66,6 +67,12 @@ from cnlib.cncli import CNCli  # type: ignore
 # NB: you may edit these by hand, but they will be overwritten by PyBaker
 S_PP_VERSION = "__PP_VERSION__"
 S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
+
+# ------------------------------------------------------------------------------
+# gettext macro
+# ------------------------------------------------------------------------------
+
+_ = gettext.gettext
 
 # ------------------------------------------------------------------------------
 # Strings
@@ -169,10 +176,10 @@ class __PP_NAME_CLASS__(CNCli):
 
         # check for debug flag
         if self._debug:
-            return "this is func (DEBUG)"
+            return _("this is func (DEBUG)")
 
         # no debug, return normal result
-        return "this is func"
+        return _("this is func")
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main

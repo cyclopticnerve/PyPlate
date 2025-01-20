@@ -1,4 +1,5 @@
 
+# TODO: make -u option for cli/gui to uninstall
 # TODO: CNInstall help str
 # TODO: for pkg, after fix, activate prj venv and install pkg as editable
 # then change test to use installed pkg, not local dir

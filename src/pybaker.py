@@ -570,7 +570,6 @@ class PyBaker:
         # if docs flag is set
         if C.B_CMD_DOCS:
 
-            # TODO: put this in lib/cnpdoc
             print(C.S_ACTION_DOCS, end="", flush=True)
 
             # update version number in pdoc3/
@@ -612,14 +611,21 @@ class PyBaker:
 
             # create CNPotPy object
             potpy = CNPotPy(
-                dir_src=self._dir_prj / C.S_DIR_SRC,
+                # header
                 str_appname=self._dict_prv_prj["__PP_NAME_BIG__"],
                 str_version=self._dict_pub_meta["__PP_VERSION__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
+                # out
+                dir_pot=self._dir_prj / C.S_PATH_PO,
+                # in
+                dir_prj=self._dir_prj,
+                # optional out
                 dir_locale=self._dir_prj / C.S_PATH_LOCALE,
                 dir_po=self._dir_prj / C.S_PATH_PO,
                 str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
+                # optional in
+                str_tag=C.S_I18N_TAG,
                 # NB: use dict_pub here b/c dunders have been fixed
                 dict_clangs=self._dict_pub_i18n[C.S_KEY_CLANGS],
                 dict_no_ext=self._dict_pub_i18n[C.S_KEY_NO_EXT],

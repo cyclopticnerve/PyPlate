@@ -137,7 +137,7 @@ S_KEY_SKIP_TREE = "SKIP_TREE"
 
 # keys for i18n
 S_KEY_CHARSET = "CHARSET"
-S_KEY_TYPES = "TYPES"
+# S_KEY_TYPES = "TYPES"
 S_KEY_CLANGS = "CLANGS"
 S_KEY_WLANGS = "WLANGS"
 S_KEY_NO_EXT = "NO_EXT"
@@ -195,7 +195,7 @@ S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
-S_FILE_DESKTOP = "__PP_NAME_BIG__.desktop"
+# S_FILE_DESKTOP = "__PP_NAME_BIG__.desktop"
 S_FILE_INST_CFG = "install.json"
 S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
@@ -212,8 +212,8 @@ S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
 # .desktop stuff
-S_FILE_DESK_TMP = f"{S_DIR_DESKTOP}/template_.desktop"
-S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
+# S_FILE_DESK_TMP = f"{S_DIR_DESKTOP}/template_.desktop"
+# S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
 
 # I18N stuff
 S_PATH_LOCALE = Path(S_DIR_I18N) / S_DIR_LOCALE
@@ -352,6 +352,8 @@ S_ASK_PROPS = (
 )
 S_ASK_PROPS_DEF = "y"
 S_ASK_PROPS_ABORT = "Abort"
+
+S_I18N_TAG = "I18N"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -613,6 +615,7 @@ D_PRV_ALL = {
     "__PP_REQS_FILE__": S_FILE_REQS,
     "__PP_DIR_LIB__": S_DIR_LIB,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
+    "__PP_DIR_INSTALL__": S_DIR_INSTALL,
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
     "__PP_UNINST_CONF_FILE__": f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}",
     # --------------------------------------------------------------------------
@@ -626,7 +629,8 @@ D_PRV_ALL = {
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     "__PP_DIR_GUI__": S_DIR_GUI,
-    "__PP_FILE_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DESKTOP}",
+    # final desk file, not template
+    # "__PP_FILE_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DESKTOP}",
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -788,7 +792,7 @@ D_PUB_I18N = {
     # default charset for .pot/.po files
     S_KEY_CHARSET: "UTF-8",
     # the types of projects that will have i18n applied
-    S_KEY_TYPES: ["g"],
+    # S_KEY_TYPES: ["g"],
     # computer languages
     S_KEY_CLANGS: {
         "Python": [
@@ -882,7 +886,7 @@ D_UNINSTALL = {
         "__PP_USR_INST__",
         "__PP_USR_BIN__/__PP_NAME_SMALL__",
         #
-        f"{S_USR_APPS}/{S_FILE_DESKTOP}",
+        # f"{S_USR_APPS}/{S_FILE_DESKTOP}",
     ],
 }
 

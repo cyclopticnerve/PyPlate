@@ -26,7 +26,6 @@ import shutil
 import sys
 
 # find paths to lib
-# DIR_SELF = Path(__file__).parent.resolve()
 DIR_LIB = Path(__file__).parents[1].resolve()
 sys.path.append(str(DIR_LIB))
 
@@ -249,21 +248,90 @@ class CNInstall:
         return dict_use
 
     # --------------------------------------------------------------------------
+    # Fix .desktop stuff
+    # --------------------------------------------------------------------------
+    def fix_desktop_file(self, desk_file):
+        """
+        Fix .desktop stuff
+
+        Args:
+            desk_file: abs path to desktop file
+
+        Fixes entries in the .desktop file (absolute paths, etc.)
+        """
+
+        # sanity check
+        # NB: in a cli or pkg, this file will not exist
+        if not desk_file.exists():
+            return
+
+        # get installed user's home
+        home = Path.home()
+
+        # open file
+        with open(desk_file, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
+
+            # TODO: use regex search/replace
+            # scan and fix icon path
+            for index, line in enumerate(lines):
+                if line.startswith("Icon="):
+                    icon_rel_path = line.split("=")[1]
+                    icon_abs_path = home / icon_rel_path
+                    line = "Icon=" + str(icon_abs_path)
+                    lines[index] = line
+
+        # save file
+        with open(desk_file, "w", encoding="UTF-8") as a_file:
+            a_file.writelines(lines)
+
+    # --------------------------------------------------------------------------
+    # Make venv for this program on user's computer
+    # --------------------------------------------------------------------------
+    def make_venv(self, dir_usr_inst, dir_venv, path_reqs):
+        """
+        Make venv for this program on user's computer
+
+        Args:
+            dir_usr_inst: The program's install folder in which to make a venv
+            folder.
+            dir_venv: The path tp the venv folder to create.
+            path_reqs: Path to the requirements.txt file to add requirements to
+            the venv.
+
+        Makes a .venv-XXX folder on the user's computer, and installs the
+        required libs.
+        """
+
+        # show progress
+        print(S_MSG_VENV_START, flush=True, end="")
+
+        # do the thing with the thing
+        cv = CNVenv(dir_usr_inst, dir_venv)
+        try:
+            if not self._debug:
+                cv.create()
+                cv.install(path_reqs)
+            print(S_MSG_DONE)
+        except F.CNShellError as e:
+            print(S_MSG_FAIL)
+            print(e.message)
+
+    # --------------------------------------------------------------------------
     # Install the program
     # --------------------------------------------------------------------------
-    def install(self, dir_base, path_cfg_new, path_cfg_old, desk_file=None, debug=False):
+    def install(self, dir_assets, path_cfg_new, path_cfg_old, debug=False):
         """
         Install the program
 
         Args:
-            dir_base: Path to the assets folder where all of the program
+            dir_assets: Path to the assets folder where all of the program
             files are put in dist. This is the base source path to use when
             copying files to the user's computer
             path_cfg_new: Path to the file that contains the current install
             dict info
             path_cfg_old: Path to the currently installed program's install
             dict info
-            desk_file: Path to desktop file, to set absolute icon path
             debug: If True, do not copy files, ony print the action (default:
             False)
 
@@ -313,11 +381,7 @@ class CNInstall:
 
         # print, install, make venv, print
         print(S_MSG_INST_START.format(prog_name))
-        # desk file is in assets, fix before moving
-        if desk_file:
-            self._fix_desk_file(desk_file)
-        self._do_install_content(dir_base)
-        self._make_venv(dir_base)
+        self._do_install_content(dir_assets)
         print(S_MSG_INST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
@@ -348,44 +412,6 @@ class CNInstall:
         print(S_MSG_UNINST_START.format(prog_name))
         self._do_uninstall_content()
         print(S_MSG_UNINST_END.format(prog_name))
-
-    # --------------------------------------------------------------------------
-    # Fix desktop abs path to icon
-    # --------------------------------------------------------------------------
-    def _fix_desk_file(self, desk_file):
-        """
-        Fix desktop abs path to icon
-
-        Args:
-            desk_file: abs path to desktop file
-
-        Fixes the abs path to the desktop file's icon based on installed user's
-        home dir.
-        """
-
-        # sanity check
-        # NB: in a cli, this file will not exist
-        if not desk_file.exists():
-            return
-
-        # get installed user's home
-        home = Path.home()
-
-        # open file
-        with open(desk_file, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
-
-            # scan and fix icon path
-            for index, line in enumerate(lines):
-                if line.startswith("Icon="):
-                    icon_rel_path = line.split("=")[1]
-                    icon_abs_path = home / icon_rel_path
-                    line = "Icon=" + str(icon_abs_path)
-                    lines[index] = line
-
-        # save file
-        with open(desk_file, "w", encoding="UTF-8") as a_file:
-            a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -428,12 +454,12 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Copy source files/folders
     # --------------------------------------------------------------------------
-    def _do_install_content(self, dir_base):
+    def _do_install_content(self, dir_assets):
         """
         Copy source files/folders
 
         Args:
-            dir_base: The base dir from which to find install files
+            dir_assets: The base dir from which to find install files
 
         This method copies files and folders from the assets folder of the
         source to their final locations in the user's folder structure.
@@ -451,7 +477,7 @@ class CNInstall:
         for k, v in content.items():
 
             # get full paths of source / destination
-            src = dir_base / k
+            src = dir_assets / k
             dst = inst_home / v / src.name
 
             # debug may omit certain assets
@@ -524,44 +550,6 @@ class CNInstall:
         print(S_MSG_DONE)
 
     # --------------------------------------------------------------------------
-    # Make venv on user's computer (in ~/.local/share/__PP_NAME_SMALL__ folder)
-    # --------------------------------------------------------------------------
-    def _make_venv(self, dir_base, name_small):
-        """
-        Make venv on user's computer (in ~/.local/share/__PP_NAME_SMALL__ folder)
-
-        Args:
-            dir_base: The base folder in which to make a venv folder.
-
-        Makes a .venv-XXX folder on the user's comp, and installs the required
-        libs.
-        """
-
-        print(S_MSG_VENV_START, flush=True, end="")
-
-        # FIXME: make venv and install reqs on USER'S computer
-
-        # # get name of venv folder and reqs file
-        # dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
-        # file_reqs = C.D_PRV_PRJ["__PP_PATH_REQS__"]
-        # file_reqs = self._dir_prj / C.S_FILE_REQS
-
-        dir_prj = Path.home() / ".local/share/cli_test"
-        dir_venv = dir_prj / ".venv-cli_test"
-        file_reqs = dir_base / "install" / "requirements.txt"
-
-        # do the thing with the thing
-        cv = CNVenv(dir_prj, dir_venv)
-        try:
-            if not self._debug:
-                cv.create()
-                cv.install(file_reqs)
-            print(S_MSG_DONE)
-        except F.CNShellError as e:
-            print(S_MSG_FAIL)
-            print(e.message)
-
-    # --------------------------------------------------------------------------
     # Compare two version strings for relativity
     # --------------------------------------------------------------------------
     def _do_compare_versions(self, ver_old, ver_new):
@@ -581,8 +569,7 @@ class CNInstall:
         This method compares two version strings and determines which is older,
         which is newer, or if they are equal. Note that this method converts
         only the first three parts of a semantic version string
-        (https://semver.org/). It also converts the string parts to integers,
-        so the versions "0.0.1" and "0.0.01" are considered equal.
+        (https://semver.org/).
         """
 
         # test for new install (don't try to regex)
@@ -622,54 +609,5 @@ class CNInstall:
 
         # return 0 if equal
         return 0
-
-
-# ------------------------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    # testing
-
-    # get parent
-    test_parent = Path(__file__).parent.resolve()  # cnlib
-    test_prj = test_parent / "cninstall_test"
-    test_dist = test_prj / "dist"
-    test_assets = test_dist / "assets"
-
-    test_install = test_assets / "install"
-    test_inst_pre = test_install / "preflight"
-    test_inst_post = test_install / "postflight"
-
-    test_uninstall = test_assets / "uninstall"
-    test_uninst_pre = test_uninstall / "preflight"
-    test_uninst_post = test_uninstall / "postflight"
-
-    # create object
-    i = CNInstall()
-
-    # make inst cfg dict
-    test_install_dict = i.make_install_cfg(
-        "test",
-        "0.0.1",
-        {"test.py": "test.py"},
-    )
-
-    # print inst cfg dict
-    F.pp(test_install_dict, label="inst")
-
-    # make inst cfg dict
-    test_uninst_dict = i.make_uninstall_cfg(
-        "test",
-        "0.0.1",
-        ["test.py"],
-    )
-
-    # print inst cfg dict
-    F.pp(test_uninst_dict, label="uninst")
-
-    # call methods
-    # i.install(inst_assets, inst_cfg, None, debug=True)
-    # i.uninstall(inst_cfg, debug=True)
-
 
 # -)

@@ -33,10 +33,15 @@ import sys
 
 DIR_SELF = Path(__file__).parent.resolve()
 DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
+
 FILE_CFG_NEW = DIR_ASSETS / "__PP_INST_CONF_FILE__"
-FILE_CFG_OLD = Path.home() / "__PP_USR_INST__" / "__PP_UNINST_CONF_FILE__"
 FILE_DESK = DIR_ASSETS / "__PP_FILE_DESK__"
+FILE_REQS = DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
 DIR_LIB = DIR_ASSETS / "__PP_DIR_LIB__"
+
+DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+DIR_VENV = DIR_USR_INST / "__PP_NAME_VENV__"
+FILE_CFG_OLD = DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -69,9 +74,16 @@ def main(debug=False):
 
     # run the instance
     try:
-        inst.install(
-            DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD, FILE_DESK, debug=debug
-        )
+        # NB: ORDER IS IMPORTANT! (at least for .desktop)
+        # you must fix the .desktop file before install b/c path to .desktop is
+        # rel to assets
+
+        # gui
+        inst.fix_desktop_file(FILE_DESK)
+        # gui, cli
+        inst.make_venv(DIR_USR_INST, DIR_VENV, FILE_REQS)
+        # gui, cli
+        inst.install(DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD, debug=debug)
     except C.CNInstallError as e:
         print(e)
 
