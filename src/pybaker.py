@@ -546,8 +546,6 @@ class PyBaker:
         modification here.
         """
 
-        # TODO: maybe git update/push here?
-
         # ----------------------------------------------------------------------
         # freeze requirements
         if C.B_CMD_VENV:
@@ -636,29 +634,21 @@ class PyBaker:
             # this .pot, .po, and .mo files
             potpy.main()
 
+            # ------------------------------------------------------------------
+
             # # i18n-ify .desktop file
-            # path_desk = self._dir_prj / C.S_DIR_DESKTOP
-            # path_template = self._dir_prj / C.S_FILE_DESK_TEMPLATE
 
-            # if (
-            #     path_desk.exists()
-            #     and path_desk.is_dir()
-            #     and path_template.exists()
-            #     and path_template.is_file()
-            # ):
+            # path to template
+            path_dsk_tmp = self._dir_prj / C.S_FILE_DSK_TMP
+            # path to output
+            path_dsk_out = self._dir_prj / C.S_FILE_DSK_OUT
 
-            #     # fix .desktop file
-            #     print(C.S_ACTION_DESK, end="", flush=True)
+            if path_dsk_tmp.exists():
+                # make new desktop file
+                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
-            #     name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
-            #     path_out_name = C.S_FILE_DESK_OUT.format(name_small)
-            #     path_out = self._dir_prj / path_out_name
-
-            #     # update desktop file
-            #     potpy.make_desktop(path_template, path_out)
-
-            #     # we are done
-            #     print(C.S_ACTION_DONE)
+            # we are done
+            print(C.S_ACTION_DONE)
 
             # we are done
             print(C.S_ACTION_DONE)

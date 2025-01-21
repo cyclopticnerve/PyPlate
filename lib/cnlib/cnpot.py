@@ -300,8 +300,10 @@ class CNPotPy:
         """
 
         # sanity check
+        dt_template = Path(dt_template)
         if not dt_template.is_absolute():
             dt_template = self._dir_prj / dt_template
+        dt_out = Path(dt_out)
         if not dt_out.is_absolute():
             dt_out = self._dir_prj / dt_out
 
@@ -455,8 +457,8 @@ class CNPotPy:
             # create or update the .po file
             po_file = (
                 self._dir_po
-                / f"{wlang}"
-                / f"{self._str_domain}{self.DEF_PO_EXT}"
+                # / f"{wlang}"
+                / f"{wlang}{self.DEF_PO_EXT}"
             )
             if not po_file.exists():
 
@@ -483,13 +485,13 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get all wlangs to output
-        wlangs_pos = list(self._dir_po.glob(f"**/*{self.DEF_PO_EXT}"))
+        wlangs_pos = list(self._dir_po.glob(f"*{self.DEF_PO_EXT}"))
 
         # for each wlang
         for wlang_po in wlangs_pos:
 
             # get wlang name
-            wlang_name = wlang_po.parent.stem  # es
+            wlang_name = wlang_po.stem  # en, etc
 
             # get .mo file (output)
             mo_dir = self._dir_locale / wlang_name / self.DIR_MESSAGES
@@ -619,13 +621,14 @@ class CNPotPy:
         locale_wlangs = [item.name for item in locale_wlangs]
 
         # sweep po folder for wlangs and reduce to ISO name
-        po_wlangs_glob = self._dir_po.glob("*")
+        # po_wlangs_glob = self._dir_po.glob("*")
+        po_wlangs_glob = list(self._dir_po.glob(f"*{self.DEF_PO_EXT}"))
         # convert generator to list
         po_wlangs = list(po_wlangs_glob)
         # only dirs
-        po_wlangs = [item for item in po_wlangs if item.is_dir()]
+        po_wlangs = [item for item in po_wlangs if item.is_file()]
         # only names (last path component)
-        po_wlangs = [item.name for item in po_wlangs]
+        po_wlangs = [item.stem for item in po_wlangs]
 
         # combine locale and po wlangs (whatever we found on disk)
         list_on_dir = locale_wlangs + po_wlangs
@@ -674,12 +677,12 @@ class CNPotPy:
         with open(linguas_path, "w", encoding="UTF8") as f:
             f.write(linguas)
 
-        # go through the wlang list
-        for wlang in self._list_wlangs:
+        # # go through the wlang list
+        # for wlang in self._list_wlangs:
 
-            # make the locale/lang/LC_MESSAGES dir
-            d = self._dir_po / wlang
-            Path.mkdir(d, parents=True, exist_ok=True)
+        #     # make the locale/lang/LC_MESSAGES dir
+        #     d = self._dir_po / wlang
+        #     Path.mkdir(d, parents=True, exist_ok=True)
 
     # --------------------------------------------------------------------------
     # Set the charset for the pot which will carry over to each po

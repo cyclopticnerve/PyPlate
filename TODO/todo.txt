@@ -1,4 +1,6 @@
 
+
+# TODO: maybe git update/push in pybaker after fix?
 # TODO: make -u option for cli/gui to uninstall
 # TODO: CNInstall help str
 # TODO: for pkg, after fix, activate prj venv and install pkg as editable

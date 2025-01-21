@@ -272,7 +272,7 @@ class CNInstall:
         with open(desk_file, "r", encoding="UTF-8") as a_file:
             lines = a_file.readlines()
 
-            # TODO: use regex search/replace
+            # FIXME: use regex search/replace
             # scan and fix icon path
             for index, line in enumerate(lines):
                 if line.startswith("Icon="):

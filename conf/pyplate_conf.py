@@ -212,8 +212,10 @@ S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
 # .desktop stuff
-# S_FILE_DESK_TMP = f"{S_DIR_DESKTOP}/template_.desktop"
-# S_FILE_DESK_OUT = f"{S_DIR_DESKTOP}/__PP_NAME_SMALL__.desktop"
+S_FILE_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/template.desktop"
+S_FILE_DSK_OUT = (
+    f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/__PP_NAME_BIG__.desktop"
+)
 
 # I18N stuff
 S_PATH_LOCALE = Path(S_DIR_I18N) / S_DIR_LOCALE
