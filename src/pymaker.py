@@ -20,10 +20,6 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: run pymaker from anywhere
-# put in postflight script:
-# ln -s $HOME/Documents/Projects/Python/PyPlate/src/pymaker.py $HOME/.local/bin/pymaker
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -31,7 +27,6 @@ Run pymaker -h for more options.
 # system imports
 import argparse
 from datetime import datetime
-import os
 from pathlib import Path
 import re
 import shutil
@@ -46,6 +41,7 @@ import sys
 # add custom import paths
 
 # first check for inst loc
+# NB: explicit path cuz symlink
 P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
 if not P_DIR_PYPLATE.exists():
     # fall back to dev loc
@@ -59,10 +55,10 @@ sys.path.append(str(P_DIR_PP_LIB))
 import pyplate_conf as C  # type: ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
-from cnlib.cntree import CNTree  # type: ignore
+from cnlib.cninstall import CNInstall  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
-from cnlib import cninstall as I  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -76,7 +72,7 @@ from cnlib import cninstall as I  # type: ignore
 # ------------------------------------------------------------------------------
 # this is our metadata bootstrap
 # NB: these should be the only strings in this file, as they should NOT be
-# changed by dev
+# changed by anyone but me
 
 # name and desc for cmd line help
 S_PP_NAME_BIG = "PyMaker"
@@ -94,11 +90,17 @@ S_PP_ABOUT = (
     f"{S_PP_NAME_BIG}\n"
     f"{S_PP_SHORT_DESC}\n"
     f"{S_PP_VER_FMT}\n"
-    f"https://www.github.com/cyclopticnerve/PyPlate"
+    f"https://www.github.com/cyclopticnerve/PyPlate\n"
 )
 
 # our venv name
 S_PP_VENV = ".venv-pyplate"
+
+# debug option strings
+S_DBG_OPTION = "-d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -136,15 +138,18 @@ class PyMaker:
         """
 
         # set the initial values of properties
-        self._dir_prj = Path()
+
+        # command line options
         self._debug = False
 
-        self._dir_current = Path()
+        # internal props
+        self._dir_current = Path.cwd()
         self._dict_rep = {}
-        self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}
         self._dict_type_rep = {}
+        self._dir_prj = Path()
+        self._is_html = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -153,13 +158,12 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, dir_current, debug=False):
+    def main(self, debug=False):  # , dir_current
         """
         The main method of the program
 
         Args:
-            dir_prj: Path to dir where the project is being created
-            debug: If True, run in debug mode (default: false)
+            debug: Whether to run in debug mode (default: False)
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
@@ -167,19 +171,23 @@ class PyMaker:
 
         # set properties
         self._debug = debug
-        if debug:
-            self._dir_current = P_DIR_PYPLATE.parent.resolve()
-        else:
-            self._dir_current = Path(dir_current).resolve()
 
+        # set global prop in conf
         C.B_DEBUG = debug
+
+        # ----------------------------------------------------------------------
+        # maybe yell
+
+        if self._debug:
+
+            # yup, yell
+            print(C.S_ERR_DEBUG)
 
         # ----------------------------------------------------------------------
         #  do the work
 
         # print about info
         print(S_PP_ABOUT)
-        print()
 
         # call boilerplate code
         self._setup()
@@ -215,22 +223,20 @@ class PyMaker:
         Perform some mundane stuff like setting properties.
         """
 
-        # do not run pybaker on pyplate (we are not that meta YET...)
+        # do not run pymaker on pyplate (we are not that meta YET...)
         if "pyplate" in str(self._dir_current).lower():
             print(C.S_ERR_PRJ_DIR_IS_PP)
             print(self._dir_current)
             sys.exit(-1)
 
-        # ----------------------------------------------------------------------
-
         # debug turns off some features to speed up project creation
         if self._debug:
-            C.B_CMD_GIT = False
-            C.B_CMD_VENV = False
-            # C.B_CMD_I18N = False
-            C.B_CMD_TREE = False
             C.B_CMD_DOCS = False
+            C.B_CMD_GIT = False
             C.B_CMD_INST = False
+            C.B_CMD_I18N = False
+            C.B_CMD_TREE = False
+            C.B_CMD_VENV = False
 
         # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
@@ -246,14 +252,6 @@ class PyMaker:
         Asks the user for project info, such as type and name, to be saved to
         C.D_PRV_PRJ.
         """
-
-        # ----------------------------------------------------------------------
-        # maybe yell
-
-        if self._debug:
-
-            # yup, yell
-            print(C.S_ERR_DEBUG)
 
         # ----------------------------------------------------------------------
         # first question is type
@@ -306,7 +304,7 @@ class PyMaker:
                     break
 
             # dir name, no spaces
-            name_big = prj_name.replace(" ", "_")  # CLI_DEBUG
+            name_big = prj_name.replace(" ", "_")  # CLI_DEBUG, GUI_DEBUG, etc.
 
             # set up for existence check
             tmp_dir = (
@@ -701,6 +699,7 @@ class PyMaker:
         dict_pub[C.S_KEY_PUB_META] = C.D_PUB_META
         F.save_dict(dict_pub, [path_pub])
 
+        # done
         print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
@@ -785,10 +784,18 @@ class PyMaker:
             except F.CNShellError as e:
                 raise e
 
+            # TODO: fix icon/version number
+            self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
+
             print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
+
+        # path to desktop template
+        path_dsk_tmp = self._dir_prj / C.S_FILE_DSK_TMP
+        # path to desktop output
+        path_dsk_out = self._dir_prj / C.D_PRV_PRJ["__PP_FILE_DESK__"]
 
         # if i18n flag is set
         if C.B_CMD_I18N:
@@ -803,7 +810,7 @@ class PyMaker:
                 str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
                 str_email=C.D_PRV_ALL["__PP_EMAIL__"],
                 # out
-                dir_pot=self._dir_prj / C.S_PATH_PO,
+                dir_pot=self._dir_prj / C.S_DIR_I18N,
                 # in
                 dir_prj=self._dir_prj,
                 # optional out
@@ -822,22 +829,17 @@ class PyMaker:
             # make .pot, .po, and .mo files
             potpy.main()
 
-            # ------------------------------------------------------------------
-
-            # # i18n-ify .desktop file
-
-            # path to template
-            path_dsk_tmp = self._dir_prj / C.S_FILE_DSK_TMP
-            # path to output
-            # FIXME: set name of output file (not dunder)
-            path_dsk_out = self._dir_prj / C.S_FILE_DSK_OUT
-
+            # i18n-ify .desktop file
             if path_dsk_tmp.exists():
-                # make new desktop file
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
             print(C.S_ACTION_DONE)
+
+        # if no i18n, copy .desktop
+        else:
+            if path_dsk_tmp.exists():
+                shutil.copy(path_dsk_tmp, path_dsk_out)
 
         # ----------------------------------------------------------------------
         # tree
@@ -869,6 +871,7 @@ class PyMaker:
             with open(file_tree, "w", encoding="UTF-8") as a_file:
                 a_file.write(tree_str)
 
+            # we are done
             print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
@@ -891,15 +894,15 @@ class PyMaker:
                 version = C.D_PUB_META["__PP_VERSION__"]
 
                 # get an install instance
-                inst = I.CNInstall()
+                inst = CNInstall()
 
                 # create a template install cfg file
                 dict_inst = inst.make_install_cfg(
                     name,
                     version,
                     # these are the defaults spec'd in pyplate_conf
-                    # they can be edited in prj/install/install.json before running
-                    # pybaker
+                    # they can be edited in prj/install/install.json before
+                    # running pybaker
                     C.D_INSTALL[prj_type],
                 )
 
@@ -917,6 +920,11 @@ class PyMaker:
                     # running pybaker
                     C.D_UNINSTALL[prj_type],
                 )
+
+                # fix dunders in inst cfg file
+                path_inst = self._dir_prj / C.S_PATH_INST_CFG
+                F.save_dict(dict_inst, [path_inst])
+                self._fix_content(path_inst)
 
                 # fix dunders in inst cfg file
                 path_uninst = self._dir_prj / C.S_PATH_UNINST_CFG
@@ -1251,6 +1259,21 @@ class PyMaker:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
+    # Fix various stuff in docs
+    # --------------------------------------------------------------------------
+    def _fix_docs(self, path):
+        """
+        Fix various stuff in docs
+
+        Args:
+            path: Path for docs dir to be fixed
+
+        Fix various stuff in docs.
+        """
+
+        # path_logo = path / "logo.mako"
+
+    # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
     def _fix_reqs(self, prj_type_long):
@@ -1311,7 +1334,7 @@ class PyMaker:
         self._dict_sw_line and returns True.
         """
 
-        # match  switches ('#|<!-- python: enable=replace', etc)
+        # match  switches ('#|<!-- pyplate: enable=replace', etc)
         match = re.match(self._dict_type_rep[C.S_KEY_SWITCH], line)
         if not match:
             return False
@@ -1457,10 +1480,10 @@ if __name__ == "__main__":
 
     # add debug option
     parser.add_argument(
-        C.S_DBG_OPTION,
-        action=C.S_DBG_ACTION,
-        dest=C.S_DBG_DEST,
-        help=C.S_DBG_HELP,
+        S_DBG_OPTION,
+        action=S_DBG_ACTION,
+        dest=S_DBG_DEST,
+        help=S_DBG_HELP,
     )
 
     # get namespace object
@@ -1472,13 +1495,12 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_dir_cur = os.getcwd()
-    a_debug = dict_args.get(C.S_DBG_DEST, False)
+    a_debug = dict_args.get(S_DBG_DEST, False)
 
     # create object
     pm = PyMaker()
 
     # run main method with args
-    pm.main(a_dir_cur, debug=a_debug)
+    pm.main(debug=a_debug)
 
 # -)

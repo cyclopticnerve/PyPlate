@@ -457,7 +457,6 @@ class CNPotPy:
             # create or update the .po file
             po_file = (
                 self._dir_po
-                # / f"{wlang}"
                 / f"{wlang}{self.DEF_PO_EXT}"
             )
             if not po_file.exists():

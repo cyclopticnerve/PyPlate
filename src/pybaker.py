@@ -19,9 +19,7 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: run pybaker from prj dir
-# put in postflight script:
-# ln -s $HOME/Documents/Projects/Python/PyPlate/src/pybaker.py $HOME/.local/bin/pybaker
+# FIXME: run pybaker from prj dir or vscode run/debug or vscode task
 
 # ------------------------------------------------------------------------------
 # Imports
@@ -29,7 +27,6 @@ Run pybaker -h for more options.
 
 # system imports
 import argparse
-import os
 from pathlib import Path
 import re
 import shutil
@@ -44,6 +41,7 @@ import sys
 # add custom import paths
 
 # first check for inst loc
+# NB: explicit path cuz symlink
 P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
 if not P_DIR_PYPLATE.exists():
     # fall back to dev loc
@@ -57,9 +55,9 @@ sys.path.append(str(P_DIR_PP_LIB))
 import pyplate_conf as C  # type:ignore
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
-from cnlib.cntree import CNTree  # type: ignore
+from cnlib.cninstall import CNInstall  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
-from cnlib import cninstall  # type: ignore
+from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -92,11 +90,29 @@ S_PP_ABOUT = (
     f"{S_PP_NAME_BIG}\n"
     f"{S_PP_SHORT_DESC}\n"
     f"{S_PP_VER_FMT}\n"
-    f"https://www.github.com/cyclopticnerve/PyPlate"
+    f"https://www.github.com/cyclopticnerve/PyPlate\n"
 )
 
 # our venv name
 S_PP_VENV = ".venv-pyplate"
+
+# debug option strings
+S_DBG_OPTION = "-d"
+S_DBG_ACTION = "store_true"
+S_DBG_DEST = "DBG_DEST"
+S_DBG_HELP = "enable debugging option"
+
+# ide option strings
+# S_IDE_OPTION = "-i"
+# S_IDE_ACTION = "store_true"
+# S_IDE_DEST = "IDE_DEST"
+# S_IDE_HELP = "ask for project folder when running in IDE"
+
+# task option strings
+# S_TSK_OPTION = "-t"
+# S_TSK_ACTION = "store_true"
+# S_TSK_DEST = "TSK_DEST"
+# S_TSK_HELP = "disable asking questions, just bake"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -133,16 +149,19 @@ class PyBaker:
         new object.
         """
 
-        # set the initial values of properties
-        self._dir_prj = Path()
+        # command line options
         self._debug = False
-        self._force = False
+        # self._ide = False
+        # self._task = False
 
+        # internal props
+        self._dir_current = Path.cwd()
         self._dict_rep = {}
-        self._is_html = False
         self._dict_sw_block = {}
         self._dict_sw_line = {}
         self._dict_type_rep = {}
+        self._dir_prj = Path()
+        self._is_html = False
 
         # private.json dicts
         self._dict_prv = {}
@@ -151,10 +170,10 @@ class PyBaker:
 
         # project.json dicts
         self._dict_pub = {}
-        self._dict_pub_meta = {}
-        self._dict_pub_dist = {}
         self._dict_pub_bl = {}
+        self._dict_pub_dist = {}
         self._dict_pub_i18n = {}
+        self._dict_pub_meta = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -163,44 +182,76 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, dir_current, debug=False, force=False):
+    def main(self, debug=False):#), ide=False):#, task=False):
         """
         The main method of the program
 
         Args:
-            dir_prj: Path to the project dir
+            dir_prj: Path to the project dir to bake
             debug: Whether to run in debug mode (default: False)
-            force: Whether we should ask questions as we go. Mostly used to
+            ide: Whether we are running in the ide (vscode launch.json)
+            (default: False)
+            task: Whether we should ask questions as we go. Mostly used to
             make tasks work. (default: False)
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
 
-        # store properties
+        # self._dir_current = Path(dir_current).resolve()
         self._debug = debug
-        self._force = force
+        # self._ide = ide
 
         # set global prop in conf
         C.B_DEBUG = debug
+
+        self._dir_prj = Path.cwd().resolve()
+        print(self._dir_prj)
+        sys.exit(0)
+
+        # ----------------------------------------------------------------------
+
+        # run in ide
+        # cwd is above pyplate, ask for prj
+        # if self._ide:
+        #     print(f"running internal, self._dir_prj={self._dir_prj}")
+        #     prj_name = ""
+        #     while prj_name == "":
+        #         prj_name = input(C.S_ASK_NAME)
+        #     self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name).resolve()
+        # else:
+        #     print(f"running external, self._dir_prj={Path.cwd()}")
+
+        # in ide, dir_current = ~/Documents/Projects/Python
+        # in wild, dir_current = cwd
+        # print(dir_current)
+        # sys.exit(0)
+
+        # run as task
+
+        # if debug:
+        #     self._dir_current = P_DIR_PYPLATE.parent.resolve()
+        # else:
+        #     self._dir_prj = Path(dir_current).resolve()
+
+        # self._task = task
+
+        # if not self._task:
+
+        #     # ask for prj rel to pyplate parent if debug or running in ide
+        #     if self._ide:
+
+        # # if not debug, use cwd
+        # else:
+        #     self._dir_prj = Path(dir_current).resolve()
+
+        # set global prop in conf
 
         # ----------------------------------------------------------------------
         #  do the work
 
         # print about info
         print(S_PP_ABOUT)
-        print()
-
-        # ask for prj rel to pyplate if debug
-        if self._debug:
-            prj_name = ""
-            while prj_name == "":
-                prj_name = input(C.S_ASK_NAME)
-            self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name).resolve()
-
-        # if not debug, use cwd
-        else:
-            self._dir_prj = Path(dir_current).resolve()
 
         # call boilerplate code
         self._setup()
@@ -242,7 +293,7 @@ class PyBaker:
             print(C.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
             sys.exit(-1)
 
-        # check if dir_prj has pyplate folder, if not, not a valid prj
+        # check if dir_prj has pyplate folder for a valid prj
         path_pyplate = self._dir_prj / "pyplate"
         if not path_pyplate.exists():
             print(C.S_ERR_NOT_PRJ)
@@ -250,21 +301,20 @@ class PyBaker:
 
         # do not run pybaker on pyplate (we are not that meta YET...)
         if "pyplate" in str(self._dir_prj).lower():
-            if not self._debug:
-                print(C.S_ERR_PRJ_DIR_IS_PP)
-                sys.exit(-1)
-
-        # ----------------------------------------------------------------------
+            print(C.S_ERR_PRJ_DIR_IS_PP)
+            print(self._dir_prj)
+            sys.exit(-1)
 
         # debug turns off some _do_after_fix features
         if self._debug:
-            C.B_CMD_GIT = False
-            C.B_CMD_VENV = False
-            C.B_CMD_I18N = False
             C.B_CMD_DOCS = False
+            C.B_CMD_GIT = False
+            C.B_CMD_INST = False
+            C.B_CMD_I18N = False
             C.B_CMD_TREE = False
+            C.B_CMD_VENV = False
 
-        # set flag dicts to defaults
+        # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
@@ -300,8 +350,12 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
 
-        if self._force:
-            return
+        # don't ask questions, just make
+        # NB: used for pybaker_task.py (questions break task)
+        # if self._task:
+        #     return
+
+        # ----------------------------------------------------------------------
 
         # ask for new version
         # version_old = self._dict_pub_meta["__PP_VERSION__"]
@@ -480,7 +534,7 @@ class PyBaker:
 
             # load/change/save
             a_dict = F.load_dicts([a_file])
-            a_dict[cninstall.S_KEY_VERSION] = version
+            a_dict[CNInstall.S_KEY_VERSION] = version
             F.save_dict(a_dict, [a_file])
 
         # get install cfg
@@ -489,7 +543,7 @@ class PyBaker:
 
             # load/change/save
             a_dict = F.load_dicts([a_file])
-            a_dict[cninstall.S_KEY_VERSION] = version
+            a_dict[CNInstall.S_KEY_VERSION] = version
             F.save_dict(a_dict, [a_file])
 
         # ----------------------------------------------------------------------
@@ -550,6 +604,8 @@ class PyBaker:
         # freeze requirements
         if C.B_CMD_VENV:
 
+            print(C.S_ACTION_VENV, end="", flush=True)
+
             # get name ov venv folder and reqs file
             dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
             file_reqs = C.S_FILE_REQS
@@ -558,6 +614,7 @@ class PyBaker:
             cv = CNVenv(self._dir_prj, dir_venv)
             try:
                 cv.freeze(file_reqs)
+                print(C.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(C.S_ACTION_FAIL)
                 print(e.message)
@@ -597,10 +654,18 @@ class PyBaker:
             except F.CNShellError as e:
                 raise e
 
+            # TODO: fix icon/version number
+            self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
+
             print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # i18n
+
+        # path to template
+        path_dsk_tmp = self._dir_prj / C.S_FILE_DSK_TMP
+        # path to output
+        path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
 
         # if i18n flag is set
         if C.B_CMD_I18N:
@@ -615,7 +680,7 @@ class PyBaker:
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
                 # out
-                dir_pot=self._dir_prj / C.S_PATH_PO,
+                dir_pot=self._dir_prj / C.S_DIR_I18N,
                 # in
                 dir_prj=self._dir_prj,
                 # optional out
@@ -634,24 +699,17 @@ class PyBaker:
             # this .pot, .po, and .mo files
             potpy.main()
 
-            # ------------------------------------------------------------------
-
-            # # i18n-ify .desktop file
-
-            # path to template
-            path_dsk_tmp = self._dir_prj / C.S_FILE_DSK_TMP
-            # path to output
-            path_dsk_out = self._dir_prj / C.S_FILE_DSK_OUT
-
+            # i18n-ify .desktop file
             if path_dsk_tmp.exists():
-                # make new desktop file
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
             print(C.S_ACTION_DONE)
 
-            # we are done
-            print(C.S_ACTION_DONE)
+        # if no i18n, copy .desktop
+        else:
+            if path_dsk_tmp.exists():
+                shutil.copy(path_dsk_tmp, path_dsk_out)
 
         # ----------------------------------------------------------------------
         # tree
@@ -1177,19 +1235,27 @@ if __name__ == "__main__":
 
     # add debug option
     parser.add_argument(
-        C.S_DBG_OPTION,
-        action=C.S_DBG_ACTION,
-        dest=C.S_DBG_DEST,
-        help=C.S_DBG_HELP,
+        S_DBG_OPTION,
+        action=S_DBG_ACTION,
+        dest=S_DBG_DEST,
+        help=S_DBG_HELP,
     )
 
-    # add debug option
-    parser.add_argument(
-        C.S_FRC_OPTION,
-        action=C.S_FRC_ACTION,
-        dest=C.S_FRC_DEST,
-        help=C.S_FRC_HELP,
-    )
+    # add ide option
+    # parser.add_argument(
+    #     S_IDE_OPTION,
+    #     action=S_IDE_ACTION,
+    #     dest=S_IDE_DEST,
+    #     help=S_IDE_HELP,
+    # )
+
+    # add task option
+    # parser.add_argument(
+    #     S_TSK_OPTION,
+    #     action=S_TSK_ACTION,
+    #     dest=S_TSK_DEST,
+    #     help=S_TSK_HELP,
+    # )
 
     # get namespace object
     args = parser.parse_args()
@@ -1200,14 +1266,16 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_dir_cur = os.getcwd()
-    a_debug = dict_args.get(C.S_DBG_DEST, False)
-    a_force = dict_args.get(C.S_FRC_DEST, False)
+    a_dir_cur = Path.cwd()
+    a_debug = dict_args.get(S_DBG_DEST, False)
+    # a_ide = dict_args.get(S_IDE_DEST, False)
+    # a_task = dict_args.get(S_TSK_DEST, False)
 
     # create object
     pb = PyBaker()
 
     # run main method with args
-    pb.main(a_dir_cur, debug=a_debug, force=a_force)
+    # pb.main(a_dir_cur, ide=a_ide, task=a_task)
+    pb.main(debug=a_debug)
 
 # -)

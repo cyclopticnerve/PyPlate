@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "PyPlate/src/pymaker.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/.."
+            "cwd": "${workspaceFolder}/..",
         },
         {
             "name": "PM Debug",
@@ -17,7 +17,7 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/..",
             "args": [
-                "-d"
+                "-d",
             ]
         },
         {
@@ -36,7 +36,8 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/..",
             "args": [
-                "-d"
+                "-d",
+                // "-i"
             ]
         },
     ]

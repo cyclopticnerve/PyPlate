@@ -111,7 +111,6 @@ S_ACTION_FAIL = "Failed"
 
 # debug-specific strings
 S_ERR_DEBUG = (
-    "\n"
     "WARNING! YOU ARE IN DEBUG MODE!\n"
     "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
 )
@@ -195,7 +194,6 @@ S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
-# S_FILE_DESKTOP = "__PP_NAME_BIG__.desktop"
 S_FILE_INST_CFG = "install.json"
 S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
@@ -213,9 +211,6 @@ S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
 # .desktop stuff
 S_FILE_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/template.desktop"
-S_FILE_DSK_OUT = (
-    f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/__PP_NAME_BIG__.desktop"
-)
 
 # I18N stuff
 S_PATH_LOCALE = Path(S_DIR_I18N) / S_DIR_LOCALE
@@ -307,6 +302,9 @@ S_GTK_VER_SCH = (
 )
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
+# i18n stuff
+S_I18N_TAG = "I18N"
+
 # ------------------------------------------------------------------------------
 # pybaker stuff
 
@@ -337,25 +335,12 @@ S_META_SD_REPL = r'\g<1>"{}"'
 # make sure ver num entered in pybaker is valid
 S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
 
-# debug option strings
-S_DBG_OPTION = "-d"
-S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
-
-# force option strings
-S_FRC_OPTION = "-f"
-S_FRC_ACTION = "store_true"
-S_FRC_DEST = "FRC_DEST"
-S_FRC_HELP = "disable asking questions, just bake"
-
+# ask about metadata
 S_ASK_PROPS = (
     "Have you checked all properties in pyplate/project.json/PUB_META? [Y/n]: "
 )
 S_ASK_PROPS_DEF = "y"
 S_ASK_PROPS_ABORT = "Abort"
-
-S_I18N_TAG = "I18N"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -631,8 +616,6 @@ D_PRV_ALL = {
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     "__PP_DIR_GUI__": S_DIR_GUI,
-    # final desk file, not template
-    # "__PP_FILE_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DESKTOP}",
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -662,6 +645,8 @@ D_PRV_PRJ = {
     # only use metadata to recalculate these on every build
     "__PP_KW_STR__": "",  # fix up keywords list for pyproject.toml
     "__PP_RM_DEPS__": "",  # fix up deps for README.md
+    # final desk file, not template
+    "__PP_FILE_DESK__": "",
 }
 
 # ------------------------------------------------------------------------------
@@ -888,7 +873,7 @@ D_UNINSTALL = {
         "__PP_USR_INST__",
         "__PP_USR_BIN__/__PP_NAME_SMALL__",
         #
-        # f"{S_USR_APPS}/{S_FILE_DESKTOP}",
+        f"{S_USR_APPS}/__PP_NAME_BIG__.desktop",
     ],
 }
 
@@ -989,7 +974,9 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     dict_prv_prj["__PP_DESK_ICON__"] = (
         f"{s_usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{s_name_big}.png"
     )
-
+    dict_prv_prj["__PP_FILE_DESK__"] = (
+        f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{s_name_big}.desktop"
+    )
 
 # ------------------------------------------------------------------------------
 # Do any work after fix

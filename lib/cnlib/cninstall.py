@@ -47,71 +47,6 @@ from cnlib.cnvenv import CNVenv  ## type: ignore
 # Constants
 # ------------------------------------------------------------------------------
 
-# keys
-S_KEY_NAME = "NAME"
-S_KEY_VERSION = "VERSION"
-S_KEY_DICT_INSTALL = "DICT_INSTALL"
-S_KEY_LIST_UNINST = "LIST_UNINST"
-
-# messages
-# NB: format params are prog_name and prog_version
-S_MSG_INST_START = "Installing {}"
-# NB: format param is prog_name
-S_MSG_INST_END = "{} installed"
-# NB: format param is prog_name
-S_MSG_UNINST_START = "Uninstalling {}"
-# NB: format param is prog_name
-S_MSG_UNINST_END = "{} uninstalled"
-# general "done" message
-S_MSG_DONE = "Done"
-# general "fail" message
-S_MSG_FAIL = "Fail"
-
-# strings for system requirements
-S_MSG_COPY_START = "Copying files... "
-S_MSG_DEL_START = "Deleting files... "
-S_MSG_VENV_START = "Making venv folder... "
-
-# strings for version compare
-# NB: format param is prog name
-S_ASK_VER_SAME = (
-    "The current version of this program is already installed. Do you want to "
-    "overwrite? [y/N]"
-)
-S_MSG_VER_ABORT = "Installation aborted"
-
-# errors
-# NB: format param is cfg file path
-S_ERR_NOT_FOUND = "File {} not found"
-S_ERR_NOT_JSON = "File {} is not a JSON file"
-S_ERR_NO_SUDO = "Could not get sudo permission"
-# NB: format param is script file path
-S_ERR_RUN_SCRIPT = (
-    "Could not run script {}. Make sure the script has its executable bit "
-    "set and has a shebang"
-)
-S_ERR_REQ = "Could not install {}"
-S_ERR_VERSION = "One or both version numbers are invalid"
-
-# debug option strings
-S_DBG_OPTION = "-d"
-S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
-
-# question to ask when installing older version
-S_ASK_VER_OLDER = (
-    "A newer version of this program is currently installed. Do you want to "
-    "overwrite? [y/N] "
-)
-S_ASK_CONFIRM = "y"
-
-# regex to compare version numbers
-R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
-R_VERSION_GROUP_MAJ = 1
-R_VERSION_GROUP_MIN = 2
-R_VERSION_GROUP_REV = 3
-
 # ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
@@ -167,6 +102,75 @@ class CNInstall:
     be run directly by the run_scripts method.
     """
 
+    # keys
+    S_KEY_NAME = "NAME"
+    S_KEY_VERSION = "VERSION"
+    S_KEY_DICT_INSTALL = "DICT_INSTALL"
+    S_KEY_LIST_UNINST = "LIST_UNINST"
+
+    # messages
+    # NB: format params are prog_name and prog_version
+    S_MSG_INST_START = "Installing {}"
+    # NB: format param is prog_name
+    S_MSG_INST_END = "{} installed"
+    # NB: format param is prog_name
+    S_MSG_UNINST_START = "Uninstalling {}"
+    # NB: format param is prog_name
+    S_MSG_UNINST_END = "{} uninstalled"
+    # general "done" message
+    S_MSG_DONE = "Done"
+    # general "fail" message
+    S_MSG_FAIL = "Fail"
+
+    # strings for system requirements
+    S_MSG_COPY_START = "Copying files... "
+    S_MSG_DEL_START = "Deleting files... "
+    S_MSG_VENV_START = "Making venv folder... "
+
+    # strings for version compare
+    # NB: format param is prog name
+    S_ASK_VER_SAME = (
+        "The current version of this program is already installed. Do you want to "
+        "overwrite? [y/N]"
+    )
+    S_MSG_VER_ABORT = "Installation aborted"
+
+    # errors
+    # NB: format param is cfg file path
+    S_ERR_NOT_FOUND = "File {} not found"
+    S_ERR_NOT_JSON = "File {} is not a JSON file"
+    S_ERR_NO_SUDO = "Could not get sudo permission"
+    # NB: format param is script file path
+    S_ERR_RUN_SCRIPT = (
+        "Could not run script {}. Make sure the script has its executable bit "
+        "set and has a shebang"
+    )
+    S_ERR_REQ = "Could not install {}"
+    S_ERR_VERSION = "One or both version numbers are invalid"
+
+    # debug option strings
+    S_DBG_OPTION = "-d"
+    S_DBG_ACTION = "store_true"
+    S_DBG_DEST = "DBG_DEST"
+    S_DBG_HELP = "enable debugging option"
+
+    # question to ask when installing older version
+    S_ASK_VER_OLDER = (
+        "A newer version of this program is currently installed. Do you want to "
+        "overwrite? [y/N] "
+    )
+    S_ASK_CONFIRM = "y"
+
+    # regex to compare version numbers
+    R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
+    R_VERSION_GROUP_MAJ = 1
+    R_VERSION_GROUP_MIN = 2
+    R_VERSION_GROUP_REV = 3
+
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)"
+    R_ICON_REP = r"\g<1>{}\g<2>"
+
     # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
@@ -210,9 +214,9 @@ class CNInstall:
 
         # create the dict using args
         dict_use = {
-            S_KEY_NAME: name,
-            S_KEY_VERSION: version,
-            S_KEY_DICT_INSTALL: dict_install,
+            self.S_KEY_NAME: name,
+            self.S_KEY_VERSION: version,
+            self.S_KEY_DICT_INSTALL: dict_install,
         }
 
         # return the formatted dict
@@ -239,9 +243,9 @@ class CNInstall:
 
         # create the dict using args
         dict_use = {
-            S_KEY_NAME: name,
-            S_KEY_VERSION: version,
-            S_KEY_LIST_UNINST: list_uninst,
+            self.S_KEY_NAME: name,
+            self.S_KEY_VERSION: version,
+            self.S_KEY_LIST_UNINST: list_uninst,
         }
 
         # return the formatted dict
@@ -258,6 +262,7 @@ class CNInstall:
             desk_file: abs path to desktop file
 
         Fixes entries in the .desktop file (absolute paths, etc.)
+        Currently only fixes absolute path to icon.
         """
 
         # sanity check
@@ -267,23 +272,36 @@ class CNInstall:
 
         # get installed user's home
         home = Path.home()
+        r_icon_rep = self.R_ICON_REP.format(home)
 
         # open file
         with open(desk_file, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
+            text = a_file.read()
 
-            # FIXME: use regex search/replace
-            # scan and fix icon path
-            for index, line in enumerate(lines):
-                if line.startswith("Icon="):
-                    icon_rel_path = line.split("=")[1]
-                    icon_abs_path = home / icon_rel_path
-                    line = "Icon=" + str(icon_abs_path)
-                    lines[index] = line
+            # find icon line and fix
+            res = re.match(self.R_ICON_SCH, text)
+            if res:
+                re.sub(self.R_ICON_SCH, r_icon_rep, text)
 
-        # save file
+        # write fixed text back to file
         with open(desk_file, "w", encoding="UTF-8") as a_file:
-            a_file.writelines(lines)
+            a_file.write(text)
+
+        # with open(desk_file, "r", encoding="UTF-8") as a_file:
+        #     lines = a_file.readlines()
+
+        #     # FIXME: use regex search/replace
+        #     # scan and fix icon path
+        #     for index, line in enumerate(lines):
+        #         if line.startswith("Icon="):
+        #             icon_rel_path = line.split("=")[1]
+        #             icon_abs_path = home / icon_rel_path
+        #             line = "Icon=" + str(icon_abs_path)
+        #             lines[index] = line
+
+        # # save file
+        # with open(desk_file, "w", encoding="UTF-8") as a_file:
+        #     a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -304,7 +322,7 @@ class CNInstall:
         """
 
         # show progress
-        print(S_MSG_VENV_START, flush=True, end="")
+        print(self.S_MSG_VENV_START, flush=True, end="")
 
         # do the thing with the thing
         cv = CNVenv(dir_usr_inst, dir_venv)
@@ -312,9 +330,9 @@ class CNInstall:
             if not self._debug:
                 cv.create()
                 cv.install(path_reqs)
-            print(S_MSG_DONE)
+            print(self.S_MSG_DONE)
         except F.CNShellError as e:
-            print(S_MSG_FAIL)
+            print(self.S_MSG_FAIL)
             print(e.message)
 
     # --------------------------------------------------------------------------
@@ -345,7 +363,7 @@ class CNInstall:
         self._dict_cfg = self._get_dict_from_file(path_cfg_new)
 
         # get prg name
-        prog_name = self._dict_cfg[S_KEY_NAME]
+        prog_name = self._dict_cfg[self.S_KEY_NAME]
 
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
@@ -353,36 +371,42 @@ class CNInstall:
             dict_cfg_old = self._get_dict_from_file(path_cfg_old)
 
             # check versions
-            ver_old = dict_cfg_old[S_KEY_VERSION]
-            ver_new = self._dict_cfg[S_KEY_VERSION]
+            ver_old = dict_cfg_old[self.S_KEY_VERSION]
+            ver_new = self._dict_cfg[self.S_KEY_VERSION]
             res = self._do_compare_versions(ver_old, ver_new)
 
             # same version is installed
             if res == 0:
 
                 # ask to install same version
-                str_ask = input(S_ASK_VER_SAME)
+                str_ask = input(self.S_ASK_VER_SAME)
 
                 # user hit enter or typed anything else except "y"
-                if len(str_ask) == 0 or str_ask.lower()[0] != S_ASK_CONFIRM:
-                    print(S_MSG_VER_ABORT)
+                if (
+                    len(str_ask) == 0
+                    or str_ask.lower()[0] != self.S_ASK_CONFIRM
+                ):
+                    print(self.S_MSG_VER_ABORT)
                     sys.exit(0)
 
             # newer version is installed
             elif res == -1:
 
                 # ask to install old version over newer
-                str_ask = input(S_ASK_VER_OLDER)
+                str_ask = input(self.S_ASK_VER_OLDER)
 
                 # user hit enter or typed anything else except "y"
-                if len(str_ask) == 0 or str_ask.lower()[0] != S_ASK_CONFIRM:
-                    print(S_MSG_VER_ABORT)
+                if (
+                    len(str_ask) == 0
+                    or str_ask.lower()[0] != self.S_ASK_CONFIRM
+                ):
+                    print(self.S_MSG_VER_ABORT)
                     sys.exit(0)
 
         # print, install, make venv, print
-        print(S_MSG_INST_START.format(prog_name))
+        print(self.S_MSG_INST_START.format(prog_name))
         self._do_install_content(dir_assets)
-        print(S_MSG_INST_END.format(prog_name))
+        print(self.S_MSG_INST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
     # Uninstall the program
@@ -406,12 +430,12 @@ class CNInstall:
         self._dict_cfg = self._get_dict_from_file(path_cfg)
 
         # get prg name
-        prog_name = self._dict_cfg[S_KEY_NAME]
+        prog_name = self._dict_cfg[self.S_KEY_NAME]
 
         # print, uninstall, print
-        print(S_MSG_UNINST_START.format(prog_name))
+        print(self.S_MSG_UNINST_START.format(prog_name))
         self._do_uninstall_content()
-        print(S_MSG_UNINST_END.format(prog_name))
+        print(self.S_MSG_UNINST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -443,12 +467,12 @@ class CNInstall:
 
         # file not found
         except FileNotFoundError as e:
-            error = CNInstallError(S_ERR_NOT_FOUND.format(path_cfg))
+            error = CNInstallError(self.S_ERR_NOT_FOUND.format(path_cfg))
             raise error from e
 
         # not valid json in file
         except json.JSONDecodeError as e:
-            error = CNInstallError(S_ERR_NOT_JSON.format(path_cfg))
+            error = CNInstallError(self.S_ERR_NOT_JSON.format(path_cfg))
             raise error from e
 
     # --------------------------------------------------------------------------
@@ -465,13 +489,13 @@ class CNInstall:
         source to their final locations in the user's folder structure.
         """
 
-        print(S_MSG_COPY_START, end="", flush=True)
+        print(self.S_MSG_COPY_START, end="", flush=True)
 
         # get source dir and user home
         inst_home = Path.home()
 
         # content list from dict
-        content = self._dict_cfg.get(S_KEY_DICT_INSTALL, {})
+        content = self._dict_cfg.get(self.S_KEY_DICT_INSTALL, {})
 
         # for each key, value
         for k, v in content.items():
@@ -500,7 +524,7 @@ class CNInstall:
                 else:
                     print(f"copy file {src} to {dst}")
 
-        print(S_MSG_DONE)
+        print(self.S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Remove source files/folders
@@ -513,13 +537,13 @@ class CNInstall:
         user's computer.
         """
 
-        print(S_MSG_DEL_START, end="", flush=True)
+        print(self.S_MSG_DEL_START, end="", flush=True)
 
         # get source dir and user home
         inst_home = Path.home()
 
         # content list from dict
-        content = self._dict_cfg.get(S_KEY_LIST_UNINST, [])
+        content = self._dict_cfg.get(self.S_KEY_LIST_UNINST, [])
 
         # for each key, value
         for item in content:
@@ -547,7 +571,7 @@ class CNInstall:
                 else:
                     print(f"unlink {dst}")
 
-        print(S_MSG_DONE)
+        print(self.S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Compare two version strings for relativity
@@ -581,17 +605,17 @@ class CNInstall:
             return 0
 
         # compare version string parts (only x.x.x)
-        res_old = re.search(R_VERSION, ver_old)
-        res_new = re.search(R_VERSION, ver_new)
+        res_old = re.search(self.R_VERSION, ver_old)
+        res_new = re.search(self.R_VERSION, ver_new)
 
         # if both version strings are valid
         if res_old and res_new:
 
             # make a list of groups to check
             lst_groups = [
-                R_VERSION_GROUP_MAJ,
-                R_VERSION_GROUP_MIN,
-                R_VERSION_GROUP_REV,
+                self.R_VERSION_GROUP_MAJ,
+                self.R_VERSION_GROUP_MIN,
+                self.R_VERSION_GROUP_REV,
             ]
 
             # for each part as int
@@ -605,9 +629,10 @@ class CNInstall:
                 elif old_val > new_val:
                     return -1
         else:
-            raise CNInstallError(S_ERR_VERSION)
+            raise CNInstallError(self.S_ERR_VERSION)
 
         # return 0 if equal
         return 0
+
 
 # -)

@@ -174,6 +174,13 @@ class __PP_NAME_CLASS__(CNCli):
         Long description (including HTML).
         """
 
+        # sample of using repl switch
+        # pyplate: disable=replace
+        _leave_alone = "__PP_NAME_BIG__"
+        # pyplate: enable=replace
+        _fix_me = "__PP_NAME_BIG__"
+        _leave_it = "__PP_NAME_BIG__" # pyplate: disable=replace
+
         # check for debug flag
         if self._debug:
             return _("this is func (DEBUG)")
