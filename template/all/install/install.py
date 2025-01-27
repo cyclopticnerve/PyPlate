@@ -42,6 +42,7 @@ DIR_LIB = DIR_ASSETS / "__PP_DIR_LIB__"
 DIR_USR_INST = Path.home() / "__PP_USR_INST__"
 DIR_VENV = DIR_USR_INST / "__PP_NAME_VENV__"
 FILE_CFG_OLD = DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
+FILE_DESK_ICON = Path.home() / "__PP_DESK_ICON__"
 
 # add paths to import search
 sys.path.append(str(DIR_LIB))
@@ -79,7 +80,7 @@ def main(debug=False):
         # rel to assets
 
         # gui
-        inst.fix_desktop_file(FILE_DESK)
+        inst.fix_desktop_file(FILE_DESK, FILE_DESK_ICON)
         # gui, cli
         inst.make_venv(DIR_USR_INST, DIR_VENV, FILE_REQS)
         # gui, cli
@@ -105,10 +106,10 @@ if __name__ == "__main__":
 
     # add debug option
     parser.add_argument(
-        C.S_DBG_OPTION,
-        action=C.S_DBG_ACTION,
-        dest=C.S_DBG_DEST,
-        help=C.S_DBG_HELP,
+        C.CNInstall.S_DBG_OPTION,
+        action=C.CNInstall.S_DBG_ACTION,
+        dest=C.CNInstall.S_DBG_DEST,
+        help=C.CNInstall.S_DBG_HELP,
     )
 
     # get namespace object
@@ -120,7 +121,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_debug = dict_args.get(C.S_DBG_DEST, False)
+    a_debug = dict_args.get(C.CNInstall.S_DBG_DEST, False)
 
     # run main function
     main(a_debug)

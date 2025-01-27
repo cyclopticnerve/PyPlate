@@ -26,7 +26,10 @@
             "request": "launch",
             "program": "PyPlate/src/pybaker.py",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/.."
+            "cwd": "${workspaceFolder}/..",
+            "args": [
+                "-i"
+            ]
         },
         {
             "name": "PB Debug",
@@ -37,7 +40,7 @@
             "cwd": "${workspaceFolder}/..",
             "args": [
                 "-d",
-                // "-i"
+                "-i"
             ]
         },
     ]

@@ -19,8 +19,6 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: run pybaker from prj dir or vscode run/debug or vscode task
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -103,16 +101,13 @@ S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
 
 # ide option strings
-# S_IDE_OPTION = "-i"
-# S_IDE_ACTION = "store_true"
-# S_IDE_DEST = "IDE_DEST"
-# S_IDE_HELP = "ask for project folder when running in IDE"
+S_IDE_OPTION = "-i"
+S_IDE_ACTION = "store_true"
+S_IDE_DEST = "IDE_DEST"
+S_IDE_HELP = "ask for project folder when running in IDE"
 
-# task option strings
-# S_TSK_OPTION = "-t"
-# S_TSK_ACTION = "store_true"
-# S_TSK_DEST = "TSK_DEST"
-# S_TSK_HELP = "disable asking questions, just bake"
+# look for pp in dir struct
+S_LOOK_FOR_PP = "pyplate"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -151,11 +146,9 @@ class PyBaker:
 
         # command line options
         self._debug = False
-        # self._ide = False
-        # self._task = False
+        self._ide = False
 
         # internal props
-        self._dir_current = Path.cwd()
         self._dict_rep = {}
         self._dict_sw_block = {}
         self._dict_sw_line = {}
@@ -182,76 +175,25 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, debug=False):#), ide=False):#, task=False):
+    def main(self, debug=False, ide=False):
         """
         The main method of the program
 
         Args:
-            dir_prj: Path to the project dir to bake
             debug: Whether to run in debug mode (default: False)
-            ide: Whether we are running in the ide (vscode launch.json)
+            ide: Whether we are running in the ide, i.e. vscode launch.json
             (default: False)
-            task: Whether we should ask questions as we go. Mostly used to
-            make tasks work. (default: False)
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
 
-        # self._dir_current = Path(dir_current).resolve()
+        # set properties
         self._debug = debug
-        # self._ide = ide
-
-        # set global prop in conf
-        C.B_DEBUG = debug
-
-        self._dir_prj = Path.cwd().resolve()
-        print(self._dir_prj)
-        sys.exit(0)
-
-        # ----------------------------------------------------------------------
-
-        # run in ide
-        # cwd is above pyplate, ask for prj
-        # if self._ide:
-        #     print(f"running internal, self._dir_prj={self._dir_prj}")
-        #     prj_name = ""
-        #     while prj_name == "":
-        #         prj_name = input(C.S_ASK_NAME)
-        #     self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name).resolve()
-        # else:
-        #     print(f"running external, self._dir_prj={Path.cwd()}")
-
-        # in ide, dir_current = ~/Documents/Projects/Python
-        # in wild, dir_current = cwd
-        # print(dir_current)
-        # sys.exit(0)
-
-        # run as task
-
-        # if debug:
-        #     self._dir_current = P_DIR_PYPLATE.parent.resolve()
-        # else:
-        #     self._dir_prj = Path(dir_current).resolve()
-
-        # self._task = task
-
-        # if not self._task:
-
-        #     # ask for prj rel to pyplate parent if debug or running in ide
-        #     if self._ide:
-
-        # # if not debug, use cwd
-        # else:
-        #     self._dir_prj = Path(dir_current).resolve()
-
-        # set global prop in conf
+        self._ide = ide
 
         # ----------------------------------------------------------------------
         #  do the work
-
-        # print about info
-        print(S_PP_ABOUT)
 
         # call boilerplate code
         self._setup()
@@ -284,24 +226,42 @@ class PyBaker:
         """
         Boilerplate to use at the start of main
 
-        Perform some mundane stuff like checking the arg parser and setting
-        properties.
+        Perform some mundane stuff like setting properties.
         """
 
-        # check for folder
-        if self._dir_prj and not self._dir_prj.exists():
-            print(C.S_ERR_PRJ_DIR_NO_EXIST.format(self._dir_prj))
+        # print about info
+        print(S_PP_ABOUT)
+
+        # set global prop in conf
+        C.B_DEBUG = self._debug
+
+        # assume we are running in the project dir
+        # this is used in a lot of places, so just shorthand it
+        self._dir_prj = Path.cwd()
+
+        # check if we are running in ide
+        # if yes, ask for prj name
+        if self._ide:
+            prj_name = ""
+            while prj_name == "":
+                prj_name = input(C.S_ASK_NAME)
+
+            # if running in ide, cwd is pyplate prj dir, so move up and down
+            self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name)
+
+        # get abs path either way
+        self._dir_prj = self._dir_prj.resolve()
+
+        # do not run pybaker on pyplate (we are not that meta YET...)
+        if S_LOOK_FOR_PP in str(self._dir_prj).lower():
+            print(C.S_ERR_PRJ_DIR_IS_PP)
+            print(self._dir_prj)
             sys.exit(-1)
 
         # check if dir_prj has pyplate folder for a valid prj
-        path_pyplate = self._dir_prj / "pyplate"
+        path_pyplate = self._dir_prj / S_LOOK_FOR_PP
         if not path_pyplate.exists():
             print(C.S_ERR_NOT_PRJ)
-            sys.exit(-1)
-
-        # do not run pybaker on pyplate (we are not that meta YET...)
-        if "pyplate" in str(self._dir_prj).lower():
-            print(C.S_ERR_PRJ_DIR_IS_PP)
             print(self._dir_prj)
             sys.exit(-1)
 
@@ -318,22 +278,6 @@ class PyBaker:
         self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(C.D_SW_LINE_DEF)
 
-    # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        Get required config files and load them into the dictionaries required
-        by the program. These files may sometimes be edited by users, so we
-        need to check that they:
-        1. exist
-        and
-        2. are valid JSON.\n
-        Both of these are handled by F.load_dicts.
-        """
-
         # get global and calculated settings dict in private.json
         path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
         self._dict_prv = F.load_dicts([path_prv], {})
@@ -348,44 +292,25 @@ class PyBaker:
         self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
         self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
 
-        # ----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # Get project info
+    # --------------------------------------------------------------------------
+    def _get_project_info(self):
+        """
+        Get project info
 
-        # don't ask questions, just make
-        # NB: used for pybaker_task.py (questions break task)
-        # if self._task:
-        #     return
+        Here we just make sure the user has edited the appropriate config
+        files.
+        """
 
-        # ----------------------------------------------------------------------
-
-        # ask for new version
-        # version_old = self._dict_pub_meta["__PP_VERSION__"]
-        # version_new = ""
-
-        # # # loop forever until we get a valid version
-        # while True:
-
-        #     # ask for  new version
-        #     version_new = input(C.S_ASK_VERS.format(version_old))
-        #     version_new = version_new.strip(" ")
-        #     if version_new == "":
-        #         version_new = version_old
-
-        #     # check for valid version
-        #     if self._check_version(version_new):
-        #         self._dict_pub_meta["__PP_VERSION__"] = version_new
-        #         return
-
-        #     # not a valid version
-        #     print(C.S_ERR_VERS)
-
-        # ask about meta
-        ask_str = C.S_ASK_PROPS
-        ask_in = input(ask_str)
+        # ask questions
+        ask_in = input(C.S_ASK_PROPS)
         if ask_in.lower().startswith(C.S_ASK_PROPS_DEF) or ask_in == "":
             return
-        else:
-            print(C.S_ASK_PROPS_ABORT)
-            sys.exit(-1)
+
+        # if answer is anything but default or blank, we bail
+        print(C.S_ASK_PROPS_ABORT)
+        sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -627,7 +552,7 @@ class PyBaker:
 
             print(C.S_ACTION_DOCS, end="", flush=True)
 
-            # update version number in pdoc3/
+            # update version number in pdoc3
             # activate cmd for pyplate's venv
             cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
                 str(P_DIR_PYPLATE), S_PP_VENV
@@ -1242,20 +1167,12 @@ if __name__ == "__main__":
     )
 
     # add ide option
-    # parser.add_argument(
-    #     S_IDE_OPTION,
-    #     action=S_IDE_ACTION,
-    #     dest=S_IDE_DEST,
-    #     help=S_IDE_HELP,
-    # )
-
-    # add task option
-    # parser.add_argument(
-    #     S_TSK_OPTION,
-    #     action=S_TSK_ACTION,
-    #     dest=S_TSK_DEST,
-    #     help=S_TSK_HELP,
-    # )
+    parser.add_argument(
+        S_IDE_OPTION,
+        action=S_IDE_ACTION,
+        dest=S_IDE_DEST,
+        help=S_IDE_HELP,
+    )
 
     # get namespace object
     args = parser.parse_args()
@@ -1266,16 +1183,13 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_dir_cur = Path.cwd()
     a_debug = dict_args.get(S_DBG_DEST, False)
-    # a_ide = dict_args.get(S_IDE_DEST, False)
-    # a_task = dict_args.get(S_TSK_DEST, False)
+    a_ide = dict_args.get(S_IDE_DEST, False)
 
     # create object
     pb = PyBaker()
 
     # run main method with args
-    # pb.main(a_dir_cur, ide=a_ide, task=a_task)
-    pb.main(debug=a_debug)
+    pb.main(debug=a_debug, ide=a_ide)
 
 # -)

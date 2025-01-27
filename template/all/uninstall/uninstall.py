@@ -91,10 +91,10 @@ if __name__ == "__main__":
 
     # add debug option
     parser.add_argument(
-        C.S_DBG_OPTION,
-        action=C.S_DBG_ACTION,
-        dest=C.S_DBG_DEST,
-        help=C.S_DBG_HELP,
+        C.CNInstall.S_DBG_OPTION,
+        action=C.CNInstall.S_DBG_ACTION,
+        dest=C.CNInstall.S_DBG_DEST,
+        help=C.CNInstall.S_DBG_HELP,
     )
 
     # get namespace object
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
     # get the args
     # a_dir_cur = os.getcwd()
-    a_debug = dict_args.get(C.S_DBG_DEST, False)
+    a_debug = dict_args.get(C.CNInstall.S_DBG_DEST, False)
 
     # run main function
     main(a_debug)

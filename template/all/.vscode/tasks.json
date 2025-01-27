@@ -7,9 +7,9 @@
             "label": "PyBaker",
             "type": "shell",
             "command": "${userHome}/__PP_DEV_PP__/src/pybaker.py",
+            "problemMatcher": [],
             "options": {
-                "cwd": "${workspaceFolder}",
-                "args": ["-t"]
+                "cwd": "${workspaceFolder}"
             },
             "group": {
                 "kind": "build",

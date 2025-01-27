@@ -102,6 +102,9 @@ S_DBG_ACTION = "store_true"
 S_DBG_DEST = "DBG_DEST"
 S_DBG_HELP = "enable debugging option"
 
+# look for pp in dir struct
+S_LOOK_FOR_PP = "pyplate"
+
 # ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
@@ -143,7 +146,6 @@ class PyMaker:
         self._debug = False
 
         # internal props
-        self._dir_current = Path.cwd()
         self._dict_rep = {}
         self._dict_sw_block = {}
         self._dict_sw_line = {}
@@ -158,7 +160,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # The main method of the program
     # --------------------------------------------------------------------------
-    def main(self, debug=False):  # , dir_current
+    def main(self, debug=False):
         """
         The main method of the program
 
@@ -172,22 +174,8 @@ class PyMaker:
         # set properties
         self._debug = debug
 
-        # set global prop in conf
-        C.B_DEBUG = debug
-
-        # ----------------------------------------------------------------------
-        # maybe yell
-
-        if self._debug:
-
-            # yup, yell
-            print(C.S_ERR_DEBUG)
-
         # ----------------------------------------------------------------------
         #  do the work
-
-        # print about info
-        print(S_PP_ABOUT)
 
         # call boilerplate code
         self._setup()
@@ -223,10 +211,25 @@ class PyMaker:
         Perform some mundane stuff like setting properties.
         """
 
+        # print about info
+        print(S_PP_ABOUT)
+
+        # set global prop in conf
+        C.B_DEBUG = self._debug
+
+        # ----------------------------------------------------------------------
+        # maybe yell
+
+        if self._debug:
+
+            # yup, yell
+            print(C.S_ERR_DEBUG)
+
         # do not run pymaker on pyplate (we are not that meta YET...)
-        if "pyplate" in str(self._dir_current).lower():
+        cwd = Path.cwd()
+        if S_LOOK_FOR_PP in str(cwd).lower():
             print(C.S_ERR_PRJ_DIR_IS_PP)
-            print(self._dir_current)
+            print(cwd)
             sys.exit(-1)
 
         # debug turns off some features to speed up project creation
@@ -287,6 +290,7 @@ class PyMaker:
         # next question is name
 
         # sanity check
+        cwd = Path.cwd()
         prj_name = ""
         name_disp = ""
         name_big = ""
@@ -307,9 +311,8 @@ class PyMaker:
             name_big = prj_name.replace(" ", "_")  # CLI_DEBUG, GUI_DEBUG, etc.
 
             # set up for existence check
-            tmp_dir = (
-                self._dir_current / name_big
-            )  # /home/cn/Doc/Prj/Py/CLI_DEBUG
+            # i.e. /home/cyclopticnerve/Documents/Projects/Python/CLI_DEBUG
+            tmp_dir = cwd / name_big
 
             # check if project already exists
             if tmp_dir.exists():
@@ -337,7 +340,7 @@ class PyMaker:
                     name_big = prj_name.replace(" ", "_")  # CLI_Test
 
                     # set up for existence check
-                    tmp_dir = self._dir_current / name_big
+                    tmp_dir = cwd / name_big
 
                     # check if project already exists
                     if tmp_dir.exists():

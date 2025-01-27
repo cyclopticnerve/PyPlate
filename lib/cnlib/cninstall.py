@@ -168,8 +168,8 @@ class CNInstall:
     R_VERSION_GROUP_REV = 3
 
     # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)"
-    R_ICON_REP = r"\g<1>{}\g<2>"
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g<1>{}" # Icon=<home/__PP_DESK_ICON__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -254,12 +254,13 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Fix .desktop stuff
     # --------------------------------------------------------------------------
-    def fix_desktop_file(self, desk_file):
+    def fix_desktop_file(self, desk_file, path_icon):
         """
         Fix .desktop stuff
 
         Args:
             desk_file: abs path to desktop file
+            path_icon: path to icon, rel to user home
 
         Fixes entries in the .desktop file (absolute paths, etc.)
         Currently only fixes absolute path to icon.
@@ -270,38 +271,29 @@ class CNInstall:
         if not desk_file.exists():
             return
 
-        # get installed user's home
-        home = Path.home()
-        r_icon_rep = self.R_ICON_REP.format(home)
-
         # open file
+        text = ""
         with open(desk_file, "r", encoding="UTF-8") as a_file:
             text = a_file.read()
 
-            # find icon line and fix
-            res = re.match(self.R_ICON_SCH, text)
-            if res:
-                re.sub(self.R_ICON_SCH, r_icon_rep, text)
+        # ----------------------------------------------------------------------
+
+        # get installed user's home
+        path_icon = Path.home() / path_icon
+
+        # fix abs path to icon
+        r_icon_rep = self.R_ICON_REP.format(path_icon)
+
+        # find icon line and fix
+        res = re.search(self.R_ICON_SCH, text, flags=re.M)
+        if res:
+            text = re.sub(self.R_ICON_SCH, r_icon_rep, text, flags=re.M)
+
+        # ----------------------------------------------------------------------
 
         # write fixed text back to file
         with open(desk_file, "w", encoding="UTF-8") as a_file:
             a_file.write(text)
-
-        # with open(desk_file, "r", encoding="UTF-8") as a_file:
-        #     lines = a_file.readlines()
-
-        #     # FIXME: use regex search/replace
-        #     # scan and fix icon path
-        #     for index, line in enumerate(lines):
-        #         if line.startswith("Icon="):
-        #             icon_rel_path = line.split("=")[1]
-        #             icon_abs_path = home / icon_rel_path
-        #             line = "Icon=" + str(icon_abs_path)
-        #             lines[index] = line
-
-        # # save file
-        # with open(desk_file, "w", encoding="UTF-8") as a_file:
-        #     a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
