@@ -78,7 +78,7 @@ if P_DIR_PRJ_INST.exists():
     LOCALE_DIR = P_DIR_PRJ_INST / "__PP_PATH_LOCALE__"
 else:
     LOCALE_DIR = P_DIR_PRJ / "__PP_PATH_LOCALE__"
-TRANSLATION = gettext.translation(DOMAIN, LOCALE_DIR)
+TRANSLATION = gettext.translation(DOMAIN, LOCALE_DIR, fallback=True)
 _ = TRANSLATION.gettext
 
 # ------------------------------------------------------------------------------
