@@ -754,45 +754,6 @@ class PyMaker:
                 print(e.message)
 
         # ----------------------------------------------------------------------
-        # update docs
-
-        # if docs flag is set
-        if C.B_CMD_DOCS:
-
-            print(C.S_ACTION_DOCS, end="", flush=True)
-
-            # activate cmd for pyplate's venv
-            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
-                str(P_DIR_PYPLATE), S_PP_VENV
-            )
-
-            # get template and output dirs
-            dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
-            dir_docs = self._dir_prj / C.S_DIR_DOCS
-
-            # nuke old docs
-            if dir_docs.exists():
-                shutil.rmtree(dir_docs)
-                Path.mkdir(dir_docs, parents=True)
-
-            # format cmd using abs prj docs dir (output) and abs prj dir (input)
-            cmd_docs = C.S_CMD_DOC.format(
-                dir_template, dir_docs, self._dir_prj
-            )
-
-            # the command to run pdoc
-            cmd = f"{cmd_activate};" f"{cmd_docs}"
-            try:
-                F.sh(cmd, shell=True)
-            except F.CNShellError as e:
-                raise e
-
-            # TODO: fix icon/version number
-            self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
-
-            print(C.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
         # i18n
 
         # path to desktop template
@@ -843,6 +804,45 @@ class PyMaker:
         else:
             if path_dsk_tmp.exists():
                 shutil.copy(path_dsk_tmp, path_dsk_out)
+
+        # ----------------------------------------------------------------------
+        # update docs
+
+        # if docs flag is set
+        if C.B_CMD_DOCS:
+
+            print(C.S_ACTION_DOCS, end="", flush=True)
+
+            # activate cmd for pyplate's venv
+            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+                str(P_DIR_PYPLATE), S_PP_VENV
+            )
+
+            # get template and output dirs
+            dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
+            dir_docs = self._dir_prj / C.S_DIR_DOCS
+
+            # nuke old docs
+            if dir_docs.exists():
+                shutil.rmtree(dir_docs)
+                Path.mkdir(dir_docs, parents=True)
+
+            # format cmd using abs prj docs dir (output) and abs prj dir (input)
+            cmd_docs = C.S_CMD_DOC.format(
+                dir_template, dir_docs, self._dir_prj
+            )
+
+            # the command to run pdoc
+            cmd = f"{cmd_activate};" f"{cmd_docs}"
+            try:
+                F.sh(cmd, shell=True)
+            except F.CNShellError as e:
+                raise e
+
+            # TODO: fix icon/version number
+            self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
+
+            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # tree

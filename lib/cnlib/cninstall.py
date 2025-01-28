@@ -296,41 +296,9 @@ class CNInstall:
             a_file.write(text)
 
     # --------------------------------------------------------------------------
-    # Make venv for this program on user's computer
-    # --------------------------------------------------------------------------
-    def make_venv(self, dir_usr_inst, dir_venv, path_reqs):
-        """
-        Make venv for this program on user's computer
-
-        Args:
-            dir_usr_inst: The program's install folder in which to make a venv
-            folder.
-            dir_venv: The path tp the venv folder to create.
-            path_reqs: Path to the requirements.txt file to add requirements to
-            the venv.
-
-        Makes a .venv-XXX folder on the user's computer, and installs the
-        required libs.
-        """
-
-        # show progress
-        print(self.S_MSG_VENV_START, flush=True, end="")
-
-        # do the thing with the thing
-        cv = CNVenv(dir_usr_inst, dir_venv)
-        try:
-            if not self._debug:
-                cv.create()
-                cv.install(path_reqs)
-            print(self.S_MSG_DONE)
-        except F.CNShellError as e:
-            print(self.S_MSG_FAIL)
-            print(e.message)
-
-    # --------------------------------------------------------------------------
     # Install the program
     # --------------------------------------------------------------------------
-    def install(self, dir_assets, path_cfg_new, path_cfg_old, debug=False):
+    def install(self, dir_assets, path_cfg_new, path_cfg_old, dir_usr_inst, dir_venv, path_reqs, debug=False):
         """
         Install the program
 
@@ -348,14 +316,20 @@ class CNInstall:
         Runs the install operation.
         """
 
-        # set properties
-        self._debug = debug
-
         # get dicts from files
         self._dict_cfg = self._get_dict_from_file(path_cfg_new)
 
         # get prg name
         prog_name = self._dict_cfg[self.S_KEY_NAME]
+
+        # print start msg
+        print(self.S_MSG_INST_START.format(prog_name))
+
+        # set properties
+        self._debug = debug
+
+        # make the venv on the user's comp
+        self._make_venv(dir_usr_inst, dir_venv, path_reqs)
 
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
@@ -396,7 +370,6 @@ class CNInstall:
                     sys.exit(0)
 
         # print, install, make venv, print
-        print(self.S_MSG_INST_START.format(prog_name))
         self._do_install_content(dir_assets)
         print(self.S_MSG_INST_END.format(prog_name))
 
@@ -432,6 +405,38 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Make venv for this program on user's computer
+    # --------------------------------------------------------------------------
+    def _make_venv(self, dir_usr_inst, dir_venv, path_reqs):
+        """
+        Make venv for this program on user's computer
+
+        Args:
+            dir_usr_inst: The program's install folder in which to make a venv
+            folder.
+            dir_venv: The path tp the venv folder to create.
+            path_reqs: Path to the requirements.txt file to add requirements to
+            the venv.
+
+        Makes a .venv-XXX folder on the user's computer, and installs the
+        required libs.
+        """
+
+        # show progress
+        print(self.S_MSG_VENV_START, flush=True, end="")
+
+        # do the thing with the thing
+        cv = CNVenv(dir_usr_inst, dir_venv)
+        try:
+            if not self._debug:
+                cv.create()
+                cv.install(path_reqs)
+            print(self.S_MSG_DONE)
+        except F.CNShellError as e:
+            print(self.S_MSG_FAIL)
+            print(e.message)
 
     # --------------------------------------------------------------------------
     # Open a json file and return the dict inside

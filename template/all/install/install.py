@@ -82,9 +82,9 @@ def main(debug=False):
         # gui
         inst.fix_desktop_file(FILE_DESK, FILE_DESK_ICON)
         # gui, cli
-        inst.make_venv(DIR_USR_INST, DIR_VENV, FILE_REQS)
+        # inst.make_venv(DIR_USR_INST, DIR_VENV, FILE_REQS)
         # gui, cli
-        inst.install(DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD, debug=debug)
+        inst.install(DIR_ASSETS, FILE_CFG_NEW, FILE_CFG_OLD, DIR_USR_INST, DIR_VENV, FILE_REQS, debug=debug)
     except C.CNInstallError as e:
         print(e)
 

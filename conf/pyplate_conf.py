@@ -213,7 +213,7 @@ S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 S_FILE_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/template.desktop"
 
 # I18N stuff
-S_PATH_LOCALE = Path(S_DIR_I18N) / S_DIR_LOCALE
+S_PATH_LOCALE = str(Path(S_DIR_I18N) / S_DIR_LOCALE)
 S_PATH_PO = Path(S_DIR_I18N) / S_DIR_PO
 
 # paths relative to end user home only
@@ -610,6 +610,7 @@ D_PRV_ALL = {
     # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
     # location of src files
     "__PP_DIR_SRC__": S_DIR_SRC,
+    "__PP_PATH_LOCALE__": S_PATH_LOCALE,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
@@ -680,40 +681,45 @@ D_PUB_META = {
 # NB: val is dst, rel to dist dir
 D_PUB_DIST = {
     "c": {
+        # basic stuff (put in assets folder)
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
-        #
-        # "__PP_NAME_VENV__": S_DIR_ASSETS,
+        # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
         S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
-        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
+        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
+        # install.json in assets/install folder
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
+        # requirements.txt in assets/install folder
         S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
     },
     "g": {
+        # basic stuff (put in assets folder)
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
-        #
-        # "__PP_NAME_VENV__": S_DIR_ASSETS,
+        # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
         S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
-        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",
+        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
+        # install.json in assets/install folder
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
         S_DIR_UNINSTALL: S_DIR_ASSETS,
+        # requirements.txt in assets/install folder
         S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-        #
+        # extended readme folder (screenshots, etc.)
         S_DIR_README: S_DIR_ASSETS,
     },
     "p": {
+        # basic stuff (put at top level)
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
-        #
+        # toml file in subdir with same name as pkg
         S_FILE_TOML: "__PP_NAME_SMALL__",
     },
 }
@@ -837,22 +843,22 @@ D_COPY_LIB = {
 # running pybaker
 D_INSTALL = {
     "c": {
-        # "__PP_NAME_VENV__": "__PP_USR_INST__",
         S_DIR_CONF: "__PP_USR_INST__",
         S_DIR_LIB: "__PP_USR_INST__",
         S_DIR_README: "__PP_USR_INST__",
         S_DIR_SRC: "__PP_USR_INST__",
+        S_DIR_I18N: "__PP_USR_INST__",
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
         f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
     },
     "g": {
-        # "__PP_NAME_VENV__": "__PP_USR_INST__",
         S_DIR_CONF: "__PP_USR_INST__",
         S_DIR_LIB: "__PP_USR_INST__",
         S_DIR_README: "__PP_USR_INST__",
         S_DIR_SRC: "__PP_USR_INST__",
+        S_DIR_I18N: "__PP_USR_INST__",
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",

@@ -72,7 +72,14 @@ S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 # gettext macro
 # ------------------------------------------------------------------------------
 
-_ = gettext.gettext
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_SMALL__.py
+DOMAIN = "__PP_NAME_SMALL__"
+if P_DIR_PRJ_INST.exists():
+    LOCALE_DIR = P_DIR_PRJ_INST / "__PP_PATH_LOCALE__"
+else:
+    LOCALE_DIR = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+TRANSLATION = gettext.translation(DOMAIN, LOCALE_DIR)
+_ = TRANSLATION.gettext
 
 # ------------------------------------------------------------------------------
 # Strings
