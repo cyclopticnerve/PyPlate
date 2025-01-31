@@ -38,7 +38,6 @@ sys.path.append(str(DIR_CNLIB))
 
 # my imports
 import gi  # type: ignore
-
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk  # type: ignore
 
@@ -105,7 +104,7 @@ class CNWindow:
         self._builder = Gtk.Builder()
 
         # I18N: set the builder to point to domain
-        self._builder.set_translation_domain(self._app.app_id)
+        self._builder.set_translation_domain(self._app.i18n_domain)
 
         # get class's ui file and add to builder
         # NB: cast in case it is a Path object
@@ -120,11 +119,12 @@ class CNWindow:
         # connections
 
         # connect default operations for a new window
+        # NB: NOT STRINGS!!!
         self.window.connect("delete-event", self._evt_win_delete)
         self.window.connect("destroy", self._evt_win_destroy)
 
         # connect all subclass methods
-        self._builder.connect_signals(self)
+        self._builder.connect_signals(self)  # pylint: disable=no-member
 
     # --------------------------------------------------------------------------
     # Window events

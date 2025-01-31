@@ -55,9 +55,6 @@ I_SW_FALSE = 0
 # Strings
 # ------------------------------------------------------------------------------
 
-# base dir for project type folders, relative to dev home
-# S_DIR_PRJ_BASE = "Documents/Projects/Python"
-
 S_ASK_NAME = "Project name: "
 # date format
 S_DATE_FMT = "%m/%d/%Y"
@@ -136,7 +133,6 @@ S_KEY_SKIP_TREE = "SKIP_TREE"
 
 # keys for i18n
 S_KEY_CHARSET = "CHARSET"
-# S_KEY_TYPES = "TYPES"
 S_KEY_CLANGS = "CLANGS"
 S_KEY_WLANGS = "WLANGS"
 S_KEY_NO_EXT = "NO_EXT"
@@ -341,6 +337,11 @@ S_ASK_PROPS = (
 )
 S_ASK_PROPS_DEF = "y"
 S_ASK_PROPS_ABORT = "Abort"
+
+# gui stuff
+S_UI_NAME = "win_main"
+S_DLG_FILE = "dialogs.ui"
+S_DLG_ABOUT = "dlg_about"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -561,7 +562,6 @@ L_MAKE_INSTALL = [
 D_PRV_ALL = {
     # the author name, used in headers and pyproject.toml
     "__PP_AUTHOR__": "cyclopticnerve",
-    # "__PP_DOCS_LOGO__": "cyclopticnerve.png",
     # the base url for all projects, used in pyproject.toml and GUI about dlg
     "__PP_URL__": "https://github.com/cyclopticnerve",
     # the author's email, used in headers and pyproject.toml
@@ -616,7 +616,12 @@ D_PRV_ALL = {
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
-    "__PP_DIR_GUI__": S_DIR_GUI,
+    # --------------------------------------------------------------------------
+    # gui stuff
+    "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
+    "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
+    "__PP_DLG_FILE_": "dialogs.ui",
+    "__PP_DLG_ABOUT__": "dlg_about",
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -742,6 +747,7 @@ D_PUB_BL = {
         S_DIR_DIST,
         S_DIR_DOCS,
         S_DIR_I18N,
+        S_DIR_LIB,
         S_DIR_MISC,
         S_DIR_README,
         S_FILE_LICENSE,
@@ -784,8 +790,6 @@ D_PUB_BL = {
 D_PUB_I18N = {
     # default charset for .pot/.po files
     S_KEY_CHARSET: "UTF-8",
-    # the types of projects that will have i18n applied
-    # S_KEY_TYPES: ["g"],
     # computer languages
     S_KEY_CLANGS: {
         "Python": [
@@ -818,6 +822,7 @@ D_PUB_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
+    f"{S_DIR_MISC}/i18n.txt": f"{S_DIR_MISC}/i18n.txt",
     f"{S_DIR_MISC}/cnlibs.py": f"{S_DIR_MISC}/cnlibs.py",
     f"{S_DIR_MISC}/default_class.py": f"{S_DIR_MISC}/default_class.py",
     f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
@@ -831,10 +836,6 @@ D_COPY = {
 D_COPY_LIB = {
     "c": ["cnlib"],
     "g": ["cnlib", "cnguilib"],
-    # NB: this should not be needed, but it breaks pdoc when doing misc folder
-    # specifically, the cnlibs.py file
-    # "p": ["cnlib"],
-    "p": [],
 }
 
 # dictionary of default stuff to put in install.json

@@ -44,14 +44,20 @@ sys.path.append(str(P_DIR_LIB))
 
 # my imports
 import gi  # type: ignore
-
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib  # type: ignore
+from gi.repository import Gtk  # , GLib  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
+
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+S_ERR_WIN_EXIST = "window name exists"
+S_ERR_WIN_NOT_EXIST = "window name does not exist"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -66,8 +72,8 @@ class CNApp(Gtk.Application):
     A subclass of Gtk.Application to suit our needs
 
     Properties:
-        app_id: The reverse dot notation id of the app (ie.
-        "org.cyclopticnerve.foobar")
+        i18n_domain: the domain name for i18n (usually the value of
+        "__PP_NAME_SMALL__")
 
     Methods:
         add_window: Add a new window instance
@@ -89,48 +95,42 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, app_id):
+    def __init__(self, app_id, i18n_domain):
         """
         Initialize the new object
 
         Args:
             app_id: The reverse dot notation id of the app (ie.
             "org.cyclopticnerve.foobar")
+            i18n_domain: the domain name for i18n (usually the value of
+            "__PP_NAME_SMALL__")
 
         Initializes a new instance of the class, setting the default values of
         its properties, and any other code needed to create a new object.
         """
 
         # ----------------------------------------------------------------------
-        # app_id
+        # super
 
-        # simple assignment
-        # NB: this is prop'd and public for window classes to use as i18n
-        # domain (window subclasses are where the i18n stuff is done)
-        self.app_id = app_id
+        # call super init to initialize the base class
+        super().__init__(application_id=app_id)
 
         # ----------------------------------------------------------------------
-        # _dict_inst
+        # set properties
+
+        # NB: this is prop'd and public for window classes to use as i18n
+        # domain (window subclasses are where the i18n stuff is done)
+        self.i18n_domain = i18n_domain
 
         # create the default list of known windows (keys are window names,
         # values are window instances)
         self._dict_inst = {}
 
         # ----------------------------------------------------------------------
-        # setup
-
-        # call super init to initialize the base class
-        super().__init__(application_id=self.app_id)
-
-        # NB: some useless shit i found on the interwebs (doesn't do anything)
-        # maybe for dbus?
-        GLib.set_prgname("__PP_NAME_BIG__")
-        GLib.set_application_name("__PP_NAME_BIG__")
-
-        # ----------------------------------------------------------------------
         # connections
 
         # connect default operations for a new application
+        # NB: NOT STRINGS!!!
         self.connect("activate", self._evt_app_activate)
         self.connect("shutdown", self._evt_app_shutdown)
 
@@ -165,7 +165,7 @@ class CNApp(Gtk.Application):
 
         # sanity check
         if name_win in self._dict_inst:
-            print("window name exists")
+            print(S_ERR_WIN_EXIST)
             return
 
         # add to internal list
@@ -189,7 +189,7 @@ class CNApp(Gtk.Application):
 
         # sanity check
         if not name_win in self._dict_inst:
-            print("window name does not exist")
+            print(S_ERR_WIN_NOT_EXIST)
             return
 
         # get handler
@@ -275,7 +275,7 @@ class CNApp(Gtk.Application):
         dlg_builder = Gtk.Builder()
 
         # I18N: set the builder to point to domain
-        dlg_builder.set_translation_domain(self.app_id)
+        dlg_builder.set_translation_domain(self.i18n_domain)
 
         # get class's ui file and add to builder
         # NB: cast in case it is a Path object

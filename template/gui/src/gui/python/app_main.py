@@ -27,7 +27,7 @@ import sys
 # find path to lib
 P_DIR_PRJ = Path(__file__).parents[3].resolve()
 P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
-P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_SRC__" / "__PP_DIR_GUI__"
+P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_GUI__"
 
 # add paths to import search
 sys.path.append(str(P_DIR_LIB))
@@ -72,7 +72,7 @@ class AppMain(CNApp):
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, dict_args=None):
+    def __init__(self, i18n_domain, dict_args=None):
         """
         Initialize the new object
 
@@ -88,17 +88,15 @@ class AppMain(CNApp):
             dict_args = {}
         self._dict_args = dict_args
 
-        # app props
+        # call super with our props
         app_id = "org.__PP_AUTHOR__.__PP_NAME_SMALL__"
+        i18n_domain = "__PP_NAME_SMALL__"
+        super().__init__(app_id, i18n_domain)
+
+        # create an instance of a window and add to app
+        # FIXME: change this to dunder?
         name_win = "default_window"
-
-        # call super with our custom args
-        super().__init__(app_id)
-
-        # create an instance of a window
         inst_win = WindowMain(self, name_win)
-
-        # add a window to the app
         super().add_window(name_win, inst_win)
 
 

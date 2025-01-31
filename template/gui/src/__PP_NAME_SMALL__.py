@@ -27,6 +27,8 @@ Typical usage is show in the main() method.
 # ------------------------------------------------------------------------------
 
 # system imports
+import gettext
+import locale
 from pathlib import Path
 import sys
 
@@ -45,8 +47,8 @@ P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_LIB_INST = P_DIR_PRJ_INST / "__PP_DIR_LIB__"
 P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
 
-P_DIR_GUI_INST = P_DIR_PRJ_INST / "__PP_DIR_SRC__/__PP_DIR_GUI__"
-P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_SRC__/__PP_DIR_GUI__"
+P_DIR_GUI_INST = P_DIR_PRJ_INST / "__PP_DIR_GUI__"
+P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_GUI__"
 
 # add paths to import search
 sys.path.append(str(P_DIR_LIB_INST))
@@ -56,8 +58,7 @@ sys.path.append(str(P_DIR_GUI))
 
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
-import cnlib.cncli as C  # type: ignore
-from cnlib.cncli import CNCli  # type: ignore
+from cnlib import cncli as C  # type: ignore
 from python.app_main import AppMain  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -70,9 +71,50 @@ from python.app_main import AppMain  # type: ignore
 # ------------------------------------------------------------------------------
 
 # globals for pb to find
+# NB: you may edit these by hand, but they will be overwritten by PyBaker
 S_PP_VERSION = "__PP_VERSION__"
 S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI
+# ------------------------------------------------------------------------------
+
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_SMALL__.py
+DOMAIN = "__PP_NAME_SMALL__"
+if P_DIR_PRJ_INST.exists():
+    DIR_LOCALE = P_DIR_PRJ_INST / "__PP_PATH_LOCALE__"
+else:
+    DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+TRANSLATION = gettext.translation(DOMAIN, DIR_LOCALE, fallback=True)
+_ = TRANSLATION.gettext
+
+# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# use for CLI in the interest of common code)
+locale.bindtextdomain(DOMAIN, DIR_LOCALE)
+
+# ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# version string
+# NB: done in two steps to avoid linter errors
+S_VER_CFG = "__PP_VER_FMT__"
+S_VER_FMT = S_VER_CFG.format(S_PP_VERSION)
+
+# about string
+S_ABOUT = (
+    "__PP_NAME_BIG__\n"
+    f"{S_PP_SHORT_DESC}\n"
+    f"{S_VER_FMT}\n"
+    "__PP_URL__/__PP_NAME_BIG__\n"
+)
+
+# ------------------------------------------------------------------------------
+# Paths
+# ------------------------------------------------------------------------------
+
+# path to default config file
+P_CFG_DEF = None
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -82,7 +124,7 @@ S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__(CNCli):
+class __PP_NAME_CLASS__(C.CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -92,36 +134,7 @@ class __PP_NAME_CLASS__(CNCli):
     This class does the most of the work of a typical CLI program. It parses
     command line options, loads/saves config files, and performs the operations
     required for the program.
-
-    It also checks for the GUI option on the command line and, if found,
-    creates an object from another script to handle the GUI.
     """
-
-    # --------------------------------------------------------------------------
-    # Class methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Initialize the new object
-    # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initialize the new object
-
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
-        new object.
-        """
-
-        # call super init to initialize the base class
-        super().__init__()
-
-        # set default property values
-        # NB: commented props are from super
-        # self._dict_args = {}   # set in super
-        # self._dict_cfg = {}    # set in super
-        # self._path_cfg = None  # set in super
-        self._debug = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -172,31 +185,18 @@ class __PP_NAME_CLASS__(CNCli):
         config files.
         """
 
-        # call to set up and run arg parser
+        # print the about string
+        print(S_ABOUT)
+
+        # call to super run arg parser
         super()._run_parser()
 
-        # get other options from command line
-        self._debug = self._dict_args[C.S_ARG_DBG_DEST]
+        # super load config file (or not, if no param and not using -c)
+        super()._load_config(P_CFG_DEF)
 
-        # # the default config file
-        # cfg_def = str(DIR_CFG / "__PP_NAME_SMALL__.json")
-
-        # # command line cfg is None or str
-        # cfg_arg = self._dict_args[C.S_ARG_CFG_DEST]
-
-        # # load the config file
-        # # not using def path, using arg path
-        # # super()._load_config(None, cfg_arg, self._d_cfg)
-        # # using def path, not using arg path
-        # # super()._load_config(cfg_def, dict_def=self._d_cfg)
-        # # using def path, using arg path, using internal
-        # super()._load_config(
-        #     cfg_def, path_arg=cfg_arg, dict_def=self._dict_cfg
-        # )
-
-        # # throw in a debug test
-        # if self._debug:
-        #     F.pp(self._dict_cfg, label="load cfg:")
+        # throw in a debug test
+        if self._debug:
+            F.pp(self._dict_cfg, label="load cfg:")
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -208,24 +208,12 @@ class __PP_NAME_CLASS__(CNCli):
         Args:
             parser: The ArgumentParser to add the args to
 
-        This method is teased out for better code maintenance.
+        This method is called by the superclass's _run_parser method, and
+        allows subclasses to add their own arguments to the parser.
         """
 
-        # formatted version
-        # NB: done in two steps to avoid linter warnings
-        ver_cfg = "__PP_VER_FMT__"
-        ver_fmt = ver_cfg.format(S_PP_VERSION)
-
-        # about string
-        s_about = (
-            "__PP_NAME_BIG__\n"
-            f"{S_PP_SHORT_DESC}\n"
-            f"{ver_fmt}\n"
-            "__PP_URL__/__PP_NAME_BIG__"
-        )
-
         # set help string
-        parser.description = s_about
+        parser.description = S_ABOUT
 
         # add debug option
         parser.add_argument(
@@ -258,7 +246,7 @@ class __PP_NAME_CLASS__(CNCli):
             F.pp(self._dict_cfg, label="save cfg:")
 
         # call to save config
-        super()._save_config()
+        self._save_config()
 
 
 # ------------------------------------------------------------------------------
@@ -272,6 +260,9 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    __PP_NAME_CLASS__().main()
+    obj = __PP_NAME_CLASS__()
+
+    # run the new object
+    obj.main()
 
 # -)

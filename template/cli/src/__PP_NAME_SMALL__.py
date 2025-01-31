@@ -28,6 +28,7 @@ Typical usage is show in the main() method.
 
 # system imports
 import gettext
+import locale
 from pathlib import Path
 import sys
 
@@ -51,8 +52,8 @@ sys.path.append(str(P_DIR_LIB_INST))
 sys.path.append(str(P_DIR_LIB))
 
 # import my stuff
-from cnlib import cncli  # type: ignore
-from cnlib.cncli import CNCli  # type: ignore
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib import cncli as C  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -69,17 +70,21 @@ S_PP_VERSION = "__PP_VERSION__"
 S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
 # ------------------------------------------------------------------------------
-# gettext macro
+# gettext stuff for CLI
 # ------------------------------------------------------------------------------
 
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_SMALL__.py
 DOMAIN = "__PP_NAME_SMALL__"
 if P_DIR_PRJ_INST.exists():
-    LOCALE_DIR = P_DIR_PRJ_INST / "__PP_PATH_LOCALE__"
+    DIR_LOCALE = P_DIR_PRJ_INST / "__PP_PATH_LOCALE__"
 else:
-    LOCALE_DIR = P_DIR_PRJ / "__PP_PATH_LOCALE__"
-TRANSLATION = gettext.translation(DOMAIN, LOCALE_DIR, fallback=True)
+    DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+TRANSLATION = gettext.translation(DOMAIN, DIR_LOCALE, fallback=True)
 _ = TRANSLATION.gettext
+
+# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# use for CLI in the interest of common code)
+locale.bindtextdomain(DOMAIN, DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Strings
@@ -95,7 +100,7 @@ S_ABOUT = (
     "__PP_NAME_BIG__\n"
     f"{S_PP_SHORT_DESC}\n"
     f"{S_VER_FMT}\n"
-    "__PP_URL__/__PP_NAME_BIG__"
+    "__PP_URL__/__PP_NAME_BIG__\n"
 )
 
 # ------------------------------------------------------------------------------
@@ -113,7 +118,7 @@ P_CFG_DEF = None
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__(CNCli):
+class __PP_NAME_CLASS__(C.CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -206,11 +211,18 @@ class __PP_NAME_CLASS__(CNCli):
         config files.
         """
 
-        # call to set up and run arg parser
-        self._run_parser()
+        # print the about string
+        print(S_ABOUT)
 
-        # load config file (or not, if no param and not using -c)
-        self._load_config(P_CFG_DEF)
+        # call to super run arg parser
+        super()._run_parser()
+
+        # super load config file (or not, if no param and not using -c)
+        super()._load_config(P_CFG_DEF)
+
+        # throw in a debug test
+        if self._debug:
+            F.pp(self._dict_cfg, label="load cfg:")
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -231,18 +243,18 @@ class __PP_NAME_CLASS__(CNCli):
 
         # add debug option
         parser.add_argument(
-            cncli.S_ARG_DBG_OPTION,
-            action=cncli.S_ARG_DBG_ACTION,
-            dest=cncli.S_ARG_DBG_DEST,
-            help=cncli.S_ARG_DBG_HELP,
+            C.S_ARG_DBG_OPTION,
+            action=C.S_ARG_DBG_ACTION,
+            dest=C.S_ARG_DBG_DEST,
+            help=C.S_ARG_DBG_HELP,
         )
 
         # add config (user dict) option
         parser.add_argument(
-            cncli.S_ARG_CFG_OPTION,
-            dest=cncli.S_ARG_CFG_DEST,
-            help=cncli.S_ARG_CFG_HELP,
-            metavar=cncli.S_ARG_CFG_METAVAR,
+            C.S_ARG_CFG_OPTION,
+            dest=C.S_ARG_CFG_DEST,
+            help=C.S_ARG_CFG_HELP,
+            metavar=C.S_ARG_CFG_METAVAR,
         )
 
     # --------------------------------------------------------------------------
@@ -254,6 +266,10 @@ class __PP_NAME_CLASS__(CNCli):
 
         Perform some mundane stuff like saving config files.
         """
+
+        # throw in a debug test
+        if self._debug:
+            F.pp(self._dict_cfg, label="save cfg:")
 
         # call to save config
         self._save_config()

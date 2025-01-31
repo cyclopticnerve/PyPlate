@@ -471,7 +471,7 @@ class PyMaker:
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
         # ----------------------------------------------------------------------
-        # do copy dict
+        # do copy miksc
 
         # copy linked files
         for key, val in C.D_COPY.items():

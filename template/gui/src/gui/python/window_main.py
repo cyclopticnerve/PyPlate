@@ -15,23 +15,29 @@ Remember to connect all the appropriate window events in your ui file to the
 private functions declared here.
 """
 
-# TODO: take out strings
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
-# from datetime import datetime
 from pathlib import Path
 import sys
 
 # find path to lib
+P_DIR_PRJ_INST = Path.home() / "__PP_USR_INST__"
 P_DIR_PRJ = Path(__file__).parents[3].resolve()
+
+P_DIR_LIB_INST = P_DIR_PRJ_INST / "__PP_DIR_LIB__"
 P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
 
+P_DIR_GUI_INST = P_DIR_PRJ_INST / "__PP_DIR_GUI__"
+P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_GUI__"
+
 # add paths to import search
+sys.path.append(str(P_DIR_LIB_INST))
 sys.path.append(str(P_DIR_LIB))
+sys.path.append(str(P_DIR_GUI_INST))
+sys.path.append(str(P_DIR_GUI))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -82,11 +88,11 @@ class WindowMain(CNWindow):
         """
 
         # props necessary tro create a basic window
-        # TODO: use dunders
         ui_file = (
-            P_DIR_PRJ / "src" / "gui" / "ui" / "__PP_NAME_SMALL___gtk3.ui"
+            P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_NAME_SMALL___gtk3.ui"
         )
         ui_path = Path(ui_file).resolve()
+        # FIXME: use dunders
         ui_name = "win_main"
 
         # create a basic window
@@ -110,10 +116,9 @@ class WindowMain(CNWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        # TODO: use dunders
-        dlg_file = P_DIR_PRJ / "src" / "gui" / "ui" / "dialogs.ui"
+        dlg_file = P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE_"
         dlg_path = Path(dlg_file).resolve()
-        self._app.show_dialog(dlg_path, "dlg_about")
+        self._app.show_dialog(dlg_path, "__PP_DLG_ABOUT__")
 
     # --------------------------------------------------------------------------
     # Called when the New button is clicked

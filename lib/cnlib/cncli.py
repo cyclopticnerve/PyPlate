@@ -7,8 +7,10 @@
 # ------------------------------------------------------------------------------
 
 """
-This is the base class for a CLI program. The template CLI program subclasses
-it. See PyPlate/template/cli/src/__PP_NAME_SMALL__ for an example.
+This is the base class for a CLI program. The template CLI and GUI programs
+subclass it.
+
+See PyPlate/template/cli/src/__PP_NAME_SMALL__.py for an example.
 """
 
 # ------------------------------------------------------------------------------
@@ -96,7 +98,7 @@ class CNCli:
 
         # set defaults
         self._dict_args = {}
-        self._debug = True
+        self._debug = False
         self._path_cfg_arg = None
         self._path_cfg = None
         self._dict_cfg = {}
