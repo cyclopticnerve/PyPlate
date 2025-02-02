@@ -1,5 +1,8 @@
 
 
+
+# TODO: swap ui file paths for templates
+# TODO: docs: fix icon/version number
 # TODO: maybe git update/push in pybaker after fix?
 # TODO: make -u option for cli/gui to uninstall
 # TODO: CNInstall help str

@@ -94,16 +94,15 @@ class CNWindow:
         self._app = app
 
         # public props
-        self.name = name_win
+        self.name_win = name_win
 
         # ----------------------------------------------------------------------
         # ui_file/ui_name
 
         # create the builder
-        # NEXT: remove for templates
         self._builder = Gtk.Builder()
 
-        # I18N: set the builder to point to domain
+        # set the builder to point to domain
         self._builder.set_translation_domain(self._app.i18n_domain)
 
         # get class's ui file and add to builder
@@ -119,7 +118,7 @@ class CNWindow:
         # connections
 
         # connect default operations for a new window
-        # NB: NOT STRINGS!!!
+        # NB: NOT STRINGS!!! DO NOT DUMB!!!
         self.window.connect("delete-event", self._evt_win_delete)
         self.window.connect("destroy", self._evt_win_destroy)
 
@@ -153,7 +152,7 @@ class CNWindow:
         around since _can_close returns a boolean value.
         """
 
-        print(self.name, ": _evt_win_delete")
+        print(f"{self.name_win}: _evt_win_delete")
 
         # close window
         return False
@@ -172,10 +171,10 @@ class CNWindow:
         remove the window from the app's internal list.
         """
 
-        print(self.name, ": _evt_win_destroy")
+        print(f"{self.name_win}: _evt_win_destroy")
 
         # remove the window from app list
-        self._app.remove_window(self.name)
+        self._app.remove_window(self.name_win)
 
 
 # -)

@@ -1,4 +1,4 @@
-add a language to CLI:
+add a language to an app:
 
 add lang to pyplate/project.json
 run pybaker to create folders/files

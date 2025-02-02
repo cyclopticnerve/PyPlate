@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: windowmain.py                                         |     ()     |
+# Filename: win_main.py                                           |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -53,6 +53,14 @@ from cnguilib.cnwindow import CNWindow  # type: ignore
 # pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# the name of the window in the ui file
+# NB: if you change the name in the ui file, change it here as well
+UI_WIN_NAME = "win_main"
+
+# ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
 
@@ -60,7 +68,7 @@ from cnguilib.cnwindow import CNWindow  # type: ignore
 # ------------------------------------------------------------------------------
 # A class to wrap a specific window object in the ui file
 # ------------------------------------------------------------------------------
-class WindowMain(CNWindow):
+class WinMain(CNWindow):
     """
     A class to wrap a specific window object in the ui file
 
@@ -88,15 +96,13 @@ class WindowMain(CNWindow):
         """
 
         # props necessary tro create a basic window
-        ui_file = (
-            P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_NAME_SMALL___gtk3.ui"
-        )
+        ui_file = P_DIR_PRJ / "__PP_DIR_UI__" / f"{UI_WIN_NAME}.ui"
         ui_path = Path(ui_file).resolve()
-        # FIXME: use dunders
-        ui_name = "win_main"
+
+        # ui_name = "win_main"
 
         # create a basic window
-        super().__init__(app, name_win, ui_path, ui_name)
+        super().__init__(app, name_win, ui_path, UI_WIN_NAME)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -133,7 +139,7 @@ class WindowMain(CNWindow):
         The New button was clicked, add the new window.
         """
 
-        print("btn_new", ": not implemented")
+        print("btn_new: not implemented")
 
     # --------------------------------------------------------------------------
     # Called when the Title button is clicked
@@ -148,7 +154,7 @@ class WindowMain(CNWindow):
         The Title button was clicked, change the window title.
         """
 
-        print("btn_title", ": not implemented")
+        print("btn_title: not implemented")
 
     # --------------------------------------------------------------------------
     # Called when the Save button is clicked
@@ -163,7 +169,7 @@ class WindowMain(CNWindow):
         The Save button was clicked.
         """
 
-        print("btn_save", ": not implemented")
+        print("btn_save: not implemented")
 
     # --------------------------------------------------------------------------
     # Called when the Cancel button is clicked
@@ -178,7 +184,7 @@ class WindowMain(CNWindow):
         The Cancel button was clicked.
         """
 
-        print("btn_cancel", ": not implemented")
+        print("btn_cancel: not implemented")
 
     # --------------------------------------------------------------------------
     # Called when the OK button is clicked
@@ -193,7 +199,7 @@ class WindowMain(CNWindow):
         The OK button was clicked.
         """
 
-        print("btn_ok", ": not implemented")
+        print("btn_ok: not implemented")
 
     # --------------------------------------------------------------------------
     # Called when the Close button is clicked
@@ -205,7 +211,7 @@ class WindowMain(CNWindow):
         Args:
             _obj: Not used
 
-        The OK button was clicked.
+        The Close button was clicked.
         """
 
         # close the window as if by the 'X' button

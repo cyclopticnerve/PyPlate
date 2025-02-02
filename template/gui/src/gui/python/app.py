@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
-# Filename: appmain.py                                            |     ()     |
+# Filename: app.py                                                |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -40,7 +40,8 @@ sys.path.append(str(P_DIR_GUI))
 
 # my imports
 from cnguilib.cnapp import CNApp  # type: ignore
-from python.window_main import WindowMain
+# NB: this module name is hard-code to make my life easier
+from python.win_main import WinMain
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -55,7 +56,7 @@ from python.window_main import WindowMain
 # ------------------------------------------------------------------------------
 # The main file that runs the gui application
 # ------------------------------------------------------------------------------
-class AppMain(CNApp):
+class App(CNApp):
     """
     The main file that runs the gui application
 
@@ -72,7 +73,7 @@ class AppMain(CNApp):
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, i18n_domain, dict_args=None):
+    def __init__(self, _i18n_domain, dict_args=None):
         """
         Initialize the new object
 
@@ -94,10 +95,8 @@ class AppMain(CNApp):
         super().__init__(app_id, i18n_domain)
 
         # create an instance of a window and add to app
-        # FIXME: change this to dunder?
-        name_win = "default_window"
-        inst_win = WindowMain(self, name_win)
-        super().add_window(name_win, inst_win)
+        inst_win = WinMain(self, "__PP_DEF_WIN_NAME__")
+        super().add_window("__PP_DEF_WIN_NAME__", inst_win)
 
 
 # -)

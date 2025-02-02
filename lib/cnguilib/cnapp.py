@@ -15,9 +15,9 @@ and (possibly) setting/getting the backing dictionary of all window
 sizes/controls.
 """
 
-# TODO: quit from dock does not close all windows when one or more show
+# FIXME: quit from dock does not close all windows when one or more show
 # modified dialog
-# TODO: dock icon works in debugger, but not .desktop or terminal
+# FIXME: dock icon works in debugger, but not .desktop or terminal
 # this is a wayland thing, see here:
 # https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
 
@@ -45,7 +45,7 @@ sys.path.append(str(P_DIR_LIB))
 # my imports
 import gi  # type: ignore
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk  # , GLib  # type: ignore
+from gi.repository import Gtk  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -124,13 +124,13 @@ class CNApp(Gtk.Application):
 
         # create the default list of known windows (keys are window names,
         # values are window instances)
-        self._dict_inst = {}
+        self._dict_instances = {}
 
         # ----------------------------------------------------------------------
         # connections
 
         # connect default operations for a new application
-        # NB: NOT STRINGS!!!
+        # NB: NOT STRINGS!!! DO NOT DUMB!!!
         self.connect("activate", self._evt_app_activate)
         self.connect("shutdown", self._evt_app_shutdown)
 
@@ -164,12 +164,12 @@ class CNApp(Gtk.Application):
         # before the app is actually activated
 
         # sanity check
-        if name_win in self._dict_inst:
+        if name_win in self._dict_instances:
             print(S_ERR_WIN_EXIST)
             return
 
         # add to internal list
-        self._dict_inst[name_win] = inst_win
+        self._dict_instances[name_win] = inst_win
 
     # --------------------------------------------------------------------------
     # Remove the specified window instance from the internal list
@@ -188,16 +188,16 @@ class CNApp(Gtk.Application):
         """
 
         # sanity check
-        if not name_win in self._dict_inst:
+        if not name_win in self._dict_instances:
             print(S_ERR_WIN_NOT_EXIST)
             return
 
         # get handler
-        inst_win = self._dict_inst[name_win]
+        inst_win = self._dict_instances[name_win]
 
         # remove from super and us
         super().remove_window(inst_win.window)
-        self._dict_inst.pop(name_win)
+        self._dict_instances.pop(name_win)
 
     # --------------------------------------------------------------------------
     # Return the list of currently displayed windows
@@ -214,7 +214,7 @@ class CNApp(Gtk.Application):
         """
 
         # return the (read-only?) dict
-        return copy.deepcopy(self._dict_inst)
+        return copy.deepcopy(self._dict_instances)
 
     # --------------------------------------------------------------------------
     # Return a tuple of the CNWindow subclass name and instance for the active
@@ -238,7 +238,7 @@ class CNApp(Gtk.Application):
         active_win = super().get_active_window()
 
         # loop until we find handler for active window
-        for name, handler in self._dict_inst.items():
+        for name, handler in self._dict_instances.items():
             if handler.window == active_win:
                 return (name, handler)
 
@@ -274,7 +274,7 @@ class CNApp(Gtk.Application):
         # get a builder to load the dialog ui file
         dlg_builder = Gtk.Builder()
 
-        # I18N: set the builder to point to domain
+        # set the builder to point to domain
         dlg_builder.set_translation_domain(self.i18n_domain)
 
         # get class's ui file and add to builder
@@ -310,14 +310,12 @@ class CNApp(Gtk.Application):
         Args:
             _obj: Not used
 
-        The Application is about to start. Any windows in self._dict_inst will
+        The Application is about to start. Any windows in self._dict_instances will
         be added to the parent Application object and presented.
         """
 
-        print("activate")
-
         # for each window added by add_window
-        for _k, v in self._dict_inst.items():
+        for _k, v in self._dict_instances.items():
 
             # add it to super (must be done AFTER activation)
             super().add_window(v.window)
@@ -341,7 +339,7 @@ class CNApp(Gtk.Application):
         clean up the application by saving anything app-specific.
         """
 
-        print("shutdown")
-
+        # don't do anything special at quit, windows should handle that
+        # pass
 
 # -)

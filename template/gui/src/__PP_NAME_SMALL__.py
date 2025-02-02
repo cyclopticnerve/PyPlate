@@ -59,7 +59,7 @@ sys.path.append(str(P_DIR_GUI))
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib import cncli as C  # type: ignore
-from python.app_main import AppMain  # type: ignore
+from python.app import App  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -161,7 +161,7 @@ class __PP_NAME_CLASS__(C.CNCli):
         # main stuff
 
         # do the thing with the thing
-        app = AppMain(self._dict_args)
+        app = App(self._dict_args)
         app.run()
 
         # ----------------------------------------------------------------------

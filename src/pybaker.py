@@ -506,14 +506,6 @@ class PyBaker:
         dict_pub[C.S_KEY_PUB_META] = self._dict_pub_meta
         F.save_dict(dict_pub, [path_pub])
 
-        # ----------------------------------------------------------------------
-        # fix docs
-
-        self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
-
-        # done
-        print(C.S_ACTION_DONE)
-
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
@@ -631,9 +623,6 @@ class PyBaker:
                 F.sh(cmd, shell=True)
             except F.CNShellError as e:
                 raise e
-
-            # TODO: fix icon/version number
-            self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
 
             print(C.S_ACTION_DONE)
 
@@ -1050,21 +1039,6 @@ class PyBaker:
 
         # do rename
         path.rename(path_new)
-
-    # --------------------------------------------------------------------------
-    # Fix various stuff in docs
-    # --------------------------------------------------------------------------
-    def _fix_docs(self, path):
-        """
-        Fix various stuff in docs
-
-        Args:
-            path: Path for docs dir to be fixed
-
-        Fix various stuff in docs.
-        """
-
-        # path_logo = path / "logo.mako"
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch

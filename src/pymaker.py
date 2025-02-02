@@ -471,7 +471,7 @@ class PyMaker:
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
         # ----------------------------------------------------------------------
-        # do copy miksc
+        # do copy misc
 
         # copy linked files
         for key, val in C.D_COPY.items():
@@ -838,9 +838,6 @@ class PyMaker:
                 F.sh(cmd, shell=True)
             except F.CNShellError as e:
                 raise e
-
-            # TODO: fix icon/version number
-            self._fix_docs(self._dir_prj / C.S_DIR_PDOC_TMP)
 
             print(C.S_ACTION_DONE)
 
@@ -1260,21 +1257,6 @@ class PyMaker:
 
         # do rename
         path.rename(path_new)
-
-    # --------------------------------------------------------------------------
-    # Fix various stuff in docs
-    # --------------------------------------------------------------------------
-    def _fix_docs(self, path):
-        """
-        Fix various stuff in docs
-
-        Args:
-            path: Path for docs dir to be fixed
-
-        Fix various stuff in docs.
-        """
-
-        # path_logo = path / "logo.mako"
 
     # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type

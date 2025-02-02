@@ -339,7 +339,8 @@ S_ASK_PROPS_DEF = "y"
 S_ASK_PROPS_ABORT = "Abort"
 
 # gui stuff
-S_UI_NAME = "win_main"
+S_DEF_WIN_NAME = "default_window"
+S_DEF_UI_NAME = "win_main"
 S_DLG_FILE = "dialogs.ui"
 S_DLG_ABOUT = "dlg_about"
 
@@ -618,10 +619,12 @@ D_PRV_ALL = {
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     # --------------------------------------------------------------------------
     # gui stuff
+    "__PP_DEF_WIN_NAME__": S_DEF_WIN_NAME,
+    "__PP_DEF_UI_NAME__": S_DEF_UI_NAME,
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
     "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
-    "__PP_DLG_FILE_": "dialogs.ui",
-    "__PP_DLG_ABOUT__": "dlg_about",
+    "__PP_DLG_FILE_": S_DLG_FILE,
+    "__PP_DLG_ABOUT__": S_DLG_ABOUT,
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -974,15 +977,14 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     name_small = dict_prv_prj["__PP_NAME_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    s_usr_inst = f"{S_USR_SHARE}/{name_small}"
-    dict_prv_prj["__PP_USR_INST__"] = s_usr_inst
+    usr_inst = f"{S_USR_SHARE}/{name_small}"
+    dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
-    s_name_big = dict_prv_prj["__PP_NAME_BIG__"]
     dict_prv_prj["__PP_DESK_ICON__"] = (
-        f"{s_usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{s_name_big}.png"
+        f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.png"
     )
     dict_prv_prj["__PP_FILE_DESK__"] = (
-        f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{s_name_big}.desktop"
+        f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.desktop"
     )
 
 # ------------------------------------------------------------------------------
