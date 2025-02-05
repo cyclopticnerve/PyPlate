@@ -718,6 +718,18 @@ class PyMaker:
         """
 
         # ----------------------------------------------------------------------
+        # call conf after fix
+
+        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+        dict_prv = F.load_dicts([path_prv])
+        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        dict_pub = F.load_dicts([path_pub])
+
+        print(C.S_ACTION_AFTER, end="", flush=True)
+        C.do_after_fix(self._dir_prj, dict_prv, dict_pub)
+        print(C.S_ACTION_DONE)
+
+        # ----------------------------------------------------------------------
         # git
 
         # if git flag
@@ -962,18 +974,6 @@ class PyMaker:
             except F.CNShellError as e:
                 print(C.S_ACTION_FAIL)
                 raise e
-
-        # ----------------------------------------------------------------------
-        # call conf after fix
-
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-        dict_prv = F.load_dicts([path_prv])
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-        dict_pub = F.load_dicts([path_pub])
-
-        print(C.S_ACTION_AFTER, end="", flush=True)
-        C.do_after_fix(self._dir_prj, dict_prv, dict_pub)
-        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps

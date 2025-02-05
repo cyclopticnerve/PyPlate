@@ -255,14 +255,12 @@ class PyBaker:
         # do not run pybaker on pyplate (we are not that meta YET...)
         if S_LOOK_FOR_PP in str(self._dir_prj).lower():
             print(C.S_ERR_PRJ_DIR_IS_PP)
-            print(self._dir_prj)
             sys.exit(-1)
 
         # check if dir_prj has pyplate folder for a valid prj
         path_pyplate = self._dir_prj / S_LOOK_FOR_PP
         if not path_pyplate.exists():
             print(C.S_ERR_NOT_PRJ)
-            print(self._dir_prj)
             sys.exit(-1)
 
         # debug turns off some _do_after_fix features
@@ -521,6 +519,13 @@ class PyBaker:
         """
 
         # ----------------------------------------------------------------------
+        # call conf after fix
+
+        print(C.S_ACTION_AFTER, end="", flush=True)
+        C.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
+        print(C.S_ACTION_DONE)
+
+        # ----------------------------------------------------------------------
         # freeze requirements
         if C.B_CMD_VENV:
 
@@ -699,13 +704,6 @@ class PyBaker:
             except F.CNShellError as e:
                 print(C.S_ACTION_FAIL)
                 raise e
-
-        # ----------------------------------------------------------------------
-        # call conf after fix
-
-        print(C.S_ACTION_AFTER, end="", flush=True)
-        C.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
-        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location

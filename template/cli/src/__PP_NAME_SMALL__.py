@@ -225,6 +225,9 @@ class __PP_NAME_CLASS__(CNCli):
         # call to super run arg parser
         self._run_parser()
 
+        # print about msg on every run (but only after checking for -h)
+        print(S_ABOUT)
+
         # super load config file (or not, if no param and not using -c)
         # NB: first param is path to us (for rel path)
         # NB: second param is path to def file or none
