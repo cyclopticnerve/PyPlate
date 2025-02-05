@@ -101,6 +101,7 @@ S_ACTION_I18N = "Make i18n folder... "
 S_ACTION_DESK = "Fixing desktop file... "
 S_ACTION_DOCS = "Make docs folder... "
 S_ACTION_TREE = "Make tree file... "
+S_ACTION_INST_PKG = "Installing package in local venv... "
 S_ACTION_DIST = "Make dist folder... "
 S_ACTION_INST = "Make install file... "
 S_ACTION_DONE = "Done"
@@ -242,6 +243,7 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 # NB: format param is proj dir
 S_CMD_GIT_CREATE = "git init {} -q"
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
+S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ."
 # cmd for pdoc3
 # NB: format params are pdoc3 dir, pyplate dir, project's S_DIR_DOCS and project dir
 S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} {}"
@@ -313,6 +315,7 @@ S_TOML_VERSION_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
 )
 S_TOML_VERSION_REPL = r'\g<1>\g<2>\g<3>"{}"'
+
 S_TOML_SHORT_DESC_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*description[\t ]*=[\t ]*)(.*?$)"
 )
@@ -536,6 +539,11 @@ L_CATS = [
     "TrayIcon",
     "Applet",
     "Shell",
+]
+
+# install pkg in venv after making
+L_INSTALL_AS_PKG = [
+    "p"
 ]
 
 # which prj types need an install.json?
@@ -1241,13 +1249,13 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     str_pattern = S_TOML_VERSION_SEARCH
     pp_version = dict_pub_meta["__PP_VERSION__"]
     str_rep = S_TOML_VERSION_REPL.format(pp_version)
-    text = re.sub(str_pattern, str_rep, text)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
     str_pattern = S_TOML_SHORT_DESC_SEARCH
     pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
     str_rep = S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
-    text = re.sub(str_pattern, str_rep, text)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # fix keywords for pyproject.toml
     l_keywords = dict_pub_meta["__PP_KEYWORDS__"]

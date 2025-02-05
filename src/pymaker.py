@@ -814,6 +814,7 @@ class PyMaker:
             print(C.S_ACTION_DOCS, end="", flush=True)
 
             # activate cmd for pyplate's venv
+            # (so we don't need to install pdoc in every project)
             cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
                 str(P_DIR_PYPLATE), S_PP_VENV
             )
@@ -933,6 +934,34 @@ class PyMaker:
 
                 # show info
                 print(C.S_ACTION_DONE)
+
+        # ----------------------------------------------------------------------
+        # if it's a package, install it
+
+        # check prj type
+        prj_type = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        if prj_type in C.L_INSTALL_AS_PKG:
+
+            # let user know
+            print(C.S_ACTION_INST_PKG, end="", flush=True)
+
+            # need to activate prj venv
+            dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
+            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+                self._dir_prj, dir_venv
+            )
+
+            # cmd to install
+            cmd_install = C.S_CMD_INSTALL_PKG.format(self._dir_prj)
+
+            # the command to install pkg
+            cmd = f"{cmd_activate};" f"{cmd_install}"
+            try:
+                F.sh(cmd, shell=True)
+                print(C.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(C.S_ACTION_FAIL)
+                raise e
 
         # ----------------------------------------------------------------------
         # call conf after fix

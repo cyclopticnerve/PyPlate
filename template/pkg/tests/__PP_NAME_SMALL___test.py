@@ -8,45 +8,18 @@
 # ------------------------------------------------------------------------------
 
 """
-A quick and dirty script to test a package
+A simple script to test a package
 """
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
-# system imports
-from pathlib import Path
-import sys
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
 # pylint: disable=import-error
-
-# my imports
-# add custom import paths
-
-# ------------------------------------------------------------------------------
-# option 1:
-
-# path to dir above <package name>
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-P_DIR_SRC = P_DIR_PRJ / "__PP_DIR_SRC__"
-
-# NB: this fixes a glitch when the folder layout changes in dist
-if not P_DIR_SRC.exists():
-    P_DIR_SRC = P_DIR_PRJ
-
-# add paths to import search
-sys.path.append(str(P_DIR_SRC))
 
 # import my stuff
 from __PP_NAME_SMALL__ import __PP_NAME_SEC__  # type: ignore
 
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------

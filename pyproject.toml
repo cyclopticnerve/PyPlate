@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 # NB: some of these values would normally come from pymaker, but since this IS
 # pymaker, we need to enter it manually (aka bootstrap)
 name = "pyplate"
-version = "0.0.1"
+version = "0.0.0"
 description = "A program for creating CLI/Package/GUI projects in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 readme = "README.md"
