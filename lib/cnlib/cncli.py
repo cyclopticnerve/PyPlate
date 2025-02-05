@@ -41,25 +41,6 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# debug option strings
-S_ARG_DBG_OPTION = "-d"
-S_ARG_DBG_ACTION = "store_true"
-S_ARG_DBG_DEST = "DBG_DEST"
-S_ARG_DBG_HELP = "enable debugging option"
-
-# config option strings
-S_ARG_CFG_OPTION = "-c"
-S_ARG_CFG_DEST = "CFG_DEST"
-S_ARG_CFG_HELP = "load configuration from file"
-S_ARG_CFG_METAVAR = "FILE"
-
-# error messages
-S_ERR_IMPL = "This method must be implemented by a subclass"
-
-# ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
 
@@ -81,6 +62,25 @@ class CNCli:
     """
 
     # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    # config option strings
+    S_ARG_CFG_OPTION = "-c"
+    S_ARG_CFG_DEST = "CFG_DEST"
+    S_ARG_CFG_HELP = "load configuration from file"
+    S_ARG_CFG_METAVAR = "FILE"
+
+    # debug option strings
+    S_ARG_DBG_OPTION = "-d"
+    S_ARG_DBG_ACTION = "store_true"
+    S_ARG_DBG_DEST = "DBG_DEST"
+    S_ARG_DBG_HELP = "enable debugging option"
+
+    # error messages
+    S_ERR_IMPL = "This method must be implemented by a subclass"
+
+    # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
 
@@ -99,9 +99,9 @@ class CNCli:
         # set defaults
         self._dict_args = {}
         self._debug = False
-        self._path_cfg_arg = None
-        self._path_cfg = None
         self._dict_cfg = {}
+        self._path_cfg = None
+        self._path_cfg_arg = None
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -132,10 +132,10 @@ class CNCli:
         self._dict_args = vars(args)
 
         # set debug if flag is present, else leave init default
-        self._debug = self._dict_args.get(S_ARG_DBG_DEST, self._debug)
+        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
 
         # set cfg path if flag is present, else leave init default
-        cfg_arg = self._dict_args.get(S_ARG_CFG_DEST, self._path_cfg_arg)
+        cfg_arg = self._dict_args.get(self.S_ARG_CFG_DEST, self._path_cfg_arg)
 
         # try to make cfg_arg a Path (always a string/None coming from dict)
         if cfg_arg:
@@ -156,16 +156,17 @@ class CNCli:
         """
 
         # dummy method to be subclassed
-        raise NotImplementedError(S_ERR_IMPL)
+        raise NotImplementedError(self.S_ERR_IMPL)
 
-    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Load config dict from a json file
-    # --------------------------------------------------------------------
-    def _load_config(self, path_def=None):
+    # --------------------------------------------------------------------------
+    def _load_config(self, path_cli, path_def=None):
         """
         Load config dict from a json file
 
         Args:
+            path_cli: The path to the subclass cli, for relative paths
             path_def: The path to the existing config file (the one the program
             usually uses) (default: None)
 
@@ -182,8 +183,23 @@ class CNCli:
         """
 
         # accept path or str
+        path_cli = Path(path_cli)
+
+        # accept path or str
         if path_def:
             path_def = Path(path_def)
+            if not path_def.is_absolute():
+                # make abs rel to subclass
+                path_def = path_cli / path_def
+
+        # accept path or str
+        if self._path_cfg_arg:
+            self._path_cfg_arg = Path(self._path_cfg_arg)
+            if not self._path_cfg_arg.is_absolute():
+                # make abs rel to subclass
+                self._path_cfg_arg = path_cli / self._path_cfg_arg
+
+        # ----------------------------------------------------------------------
 
         # if cmd line
         if self._path_cfg_arg and self._path_cfg_arg.exists():
@@ -193,8 +209,10 @@ class CNCli:
         elif path_def and path_def.exists():
             self._path_cfg = path_def
 
+        # ----------------------------------------------------------------------
+
         # if one or the other, load it
-        if self._path_cfg:
+        if self._path_cfg and self._path_cfg.exists():
             self._dict_cfg = F.load_dicts([self._path_cfg], self._dict_cfg)
 
         # add a debug message
