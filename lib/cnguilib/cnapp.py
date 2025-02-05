@@ -20,6 +20,7 @@ sizes/controls.
 # FIXME: dock icon works in debugger, but not .desktop or terminal
 # this is a wayland thing, see here:
 # https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
+# test after install
 
 # ------------------------------------------------------------------------------
 # Imports
