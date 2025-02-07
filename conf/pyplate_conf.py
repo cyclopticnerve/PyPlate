@@ -344,8 +344,12 @@ S_ASK_PROPS_ABORT = "Abort"
 # gui stuff
 S_DEF_WIN_NAME = "default_window"
 S_DEF_UI_NAME = "win_main"
-S_DLG_FILE = "dialogs.ui"
+S_DLG_UI_FILE = "dialogs"
 S_DLG_ABOUT = "dlg_about"
+
+S_APP_FILE_FMT = "{}_app"
+S_WIN_FILE_FMT = "{}_win"
+S_APP_ID_FMT = "org.{}.{}"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -627,11 +631,12 @@ D_PRV_ALL = {
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     # --------------------------------------------------------------------------
     # gui stuff
-    "__PP_DEF_WIN_NAME__": S_DEF_WIN_NAME,
-    "__PP_DEF_UI_NAME__": S_DEF_UI_NAME,
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
     "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
-    "__PP_DLG_FILE_": S_DLG_FILE,
+    #
+    "__PP_DEF_WIN_NAME__": S_DEF_WIN_NAME,
+    "__PP_DEF_UI_NAME__": S_DEF_UI_NAME,
+    "__PP_DLG_FILE__": S_DLG_UI_FILE,
     "__PP_DLG_ABOUT__": S_DLG_ABOUT,
 }
 
@@ -979,6 +984,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     # changed by dev
 
     # get sub-dicts we need
+    dict_prv_all = dict_prv[S_KEY_PRV_ALL]
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
 
     # get values after pymaker has set them
@@ -994,6 +1000,12 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     dict_prv_prj["__PP_FILE_DESK__"] = (
         f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.desktop"
     )
+
+    dict_prv_prj["__PP_APP_FILE_FMT__"] = S_APP_FILE_FMT.format(name_small)
+    name_sec = dict_prv_prj["__PP_NAME_SEC__"]
+    dict_prv_prj["__PP_WIN_FILE_FMT__"] = S_WIN_FILE_FMT.format(name_sec)
+    author = dict_prv_all["__PP_AUTHOR__"]
+    dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
 
 # ------------------------------------------------------------------------------
 # Do any work after fix

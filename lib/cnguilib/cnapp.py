@@ -15,13 +15,6 @@ and (possibly) setting/getting the backing dictionary of all window
 sizes/controls.
 """
 
-# FIXME: quit from dock does not close all windows when one or more show
-# modified dialog
-# FIXME: dock icon works in debugger, but not .desktop or terminal
-# this is a wayland thing, see here:
-# https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
-# test after install
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -56,6 +49,9 @@ from gi.repository import Gtk  # type: ignore
 # ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
+
+S_ACTION_ACTIVATE = "activate"
+S_ACTION_SHUTDOWN = "shutdown"
 
 S_ERR_WIN_EXIST = "window name exists"
 S_ERR_WIN_NOT_EXIST = "window name does not exist"
@@ -132,8 +128,8 @@ class CNApp(Gtk.Application):
 
         # connect default operations for a new application
         # NB: NOT STRINGS!!! DO NOT DUMB!!!
-        self.connect("activate", self._evt_app_activate)
-        self.connect("shutdown", self._evt_app_shutdown)
+        self.connect(S_ACTION_ACTIVATE, self._evt_app_activate)
+        self.connect(S_ACTION_SHUTDOWN, self._evt_app_shutdown)
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -311,8 +307,8 @@ class CNApp(Gtk.Application):
         Args:
             _obj: Not used
 
-        The Application is about to start. Any windows in self._dict_instances will
-        be added to the parent Application object and presented.
+        The Application is about to start. Any windows in self._dict_instances
+        will be added to the parent Application object and presented.
         """
 
         # for each window added by add_window

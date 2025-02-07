@@ -85,7 +85,7 @@ locale.bindtextdomain(DOMAIN, DIR_LOCALE)
 # NB: you may edit these by hand, but they will be overwritten by PyBaker
 S_PP_VERSION = "__PP_VERSION__"
 # I18N: short description
-S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
 # ------------------------------------------------------------------------------
 # Strings
@@ -259,7 +259,7 @@ class __PP_NAME_CLASS__(CNCli):
         parser.add_argument(
             CNCli.S_ARG_CFG_OPTION,
             dest=CNCli.S_ARG_CFG_DEST,
-            help=_(CNCli.S_ARG_CFG_HELP),
+            help=CNCli.S_ARG_CFG_HELP,
             metavar=CNCli.S_ARG_CFG_METAVAR,
         )
 
@@ -268,7 +268,7 @@ class __PP_NAME_CLASS__(CNCli):
             CNCli.S_ARG_DBG_OPTION,
             action=CNCli.S_ARG_DBG_ACTION,
             dest=CNCli.S_ARG_DBG_DEST,
-            help=_(CNCli.S_ARG_DBG_HELP),
+            help=CNCli.S_ARG_DBG_HELP,
         )
 
     # --------------------------------------------------------------------------

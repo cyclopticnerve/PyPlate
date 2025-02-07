@@ -835,10 +835,10 @@ class PyMaker:
             dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
             dir_docs = self._dir_prj / C.S_DIR_DOCS
 
-            # nuke old docs
-            if dir_docs.exists():
-                shutil.rmtree(dir_docs)
-                Path.mkdir(dir_docs, parents=True)
+            # # nuke old docs
+            # if dir_docs.exists():
+            #     shutil.rmtree(dir_docs)
+            #     Path.mkdir(dir_docs, parents=True)
 
             # format cmd using abs prj docs dir (output) and abs prj dir (input)
             cmd_docs = C.S_CMD_DOC.format(
@@ -849,10 +849,10 @@ class PyMaker:
             cmd = f"{cmd_activate};" f"{cmd_docs}"
             try:
                 F.sh(cmd, shell=True)
+                print(C.S_ACTION_DONE)
             except F.CNShellError as e:
+                print(C.S_ACTION_FAIL)
                 raise e
-
-            print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # tree

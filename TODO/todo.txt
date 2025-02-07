@@ -1,6 +1,7 @@
 
-
-
+# TODO: dock icon only works after install, and only for global (not src)
+# this might be a wayland thing, see here:
+# https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
 # TODO: swap ui file paths for templates
 # TODO: docs: fix icon/version number
 # TODO: maybe git update/push in pybaker after fix?

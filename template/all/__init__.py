@@ -11,8 +11,11 @@ This module specifies folders to ignore while generating pdoc3 documentation.
 This will be automated in a future release.
 """
 
+# TODO: walk top level and exclude everything
+# then add includes as needed
+
 # dunder to specify ignored dirs/modules
-__pdoc__={
+__pdoc__ = {
     "__PP_NAME_BIG__.install": False,
     "__PP_NAME_BIG__.lib": False,
     "__PP_NAME_BIG__.misc": False,

@@ -58,22 +58,13 @@ sys.path.append(str(P_DIR_GUI))
 
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib import cncli as C  # type: ignore
+from cnlib.cncli import CNCli  # type: ignore
 from python.app import App  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
-
-# ------------------------------------------------------------------------------
-# Required for pybaker
-# ------------------------------------------------------------------------------
-
-# globals for pb to find
-# NB: you may edit these by hand, but they will be overwritten by PyBaker
-S_PP_VERSION = "__PP_VERSION__"
-S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -93,19 +84,29 @@ _ = TRANSLATION.gettext
 locale.bindtextdomain(DOMAIN, DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
+# Required for pybaker
+# ------------------------------------------------------------------------------
+
+# globals for pb to find
+# NB: you may edit these by hand, but they will be overwritten by PyBaker
+S_PP_VERSION = "__PP_VERSION__"
+# I18N: short description
+S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
+
+# ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
 
 # version string
 # NB: done in two steps to avoid linter errors
-S_VER_CFG = "__PP_VER_FMT__"
-S_VER_FMT = S_VER_CFG.format(S_PP_VERSION)
+S_VER_FMT = "__PP_VER_FMT__"
+S_VER_OUT = S_VER_FMT.format(S_PP_VERSION)
 
 # about string
 S_ABOUT = (
     "__PP_NAME_BIG__\n"
     f"{S_PP_SHORT_DESC}\n"
-    f"{S_VER_FMT}\n"
+    f"{S_VER_OUT}\n"
     "__PP_URL__/__PP_NAME_BIG__\n"
 )
 
@@ -124,7 +125,7 @@ P_CFG_DEF = None
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__(C.CNCli):
+class __PP_NAME_CLASS__(CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -185,18 +186,21 @@ class __PP_NAME_CLASS__(C.CNCli):
         config files.
         """
 
-        # print the about string
+        # call to super run arg parser
+        self._run_parser()
+
+        # print about msg on every run (but only after checking for -h)
         print(S_ABOUT)
 
-        # call to super run arg parser
-        super()._run_parser()
-
         # super load config file (or not, if no param and not using -c)
-        super()._load_config(P_CFG_DEF)
+        # NB: first param is path to us (for rel path)
+        # NB: second param is path to def file or none
+        parent_dir = Path(__file__).parent.resolve()
+        self._load_config(parent_dir, P_CFG_DEF)
 
         # throw in a debug test
         if self._debug:
-            F.pp(self._dict_cfg, label="load cfg:")
+            F.pp(self._dict_cfg, label="load cfg")
 
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
@@ -215,20 +219,20 @@ class __PP_NAME_CLASS__(C.CNCli):
         # set help string
         parser.description = S_ABOUT
 
-        # add debug option
-        parser.add_argument(
-            C.S_ARG_DBG_OPTION,
-            action=C.S_ARG_DBG_ACTION,
-            dest=C.S_ARG_DBG_DEST,
-            help=C.S_ARG_DBG_HELP,
-        )
-
         # add config (user dict) option
         parser.add_argument(
-            C.S_ARG_CFG_OPTION,
-            dest=C.S_ARG_CFG_DEST,
-            help=C.S_ARG_CFG_HELP,
-            metavar=C.S_ARG_CFG_METAVAR,
+            CNCli.S_ARG_CFG_OPTION,
+            dest=CNCli.S_ARG_CFG_DEST,
+            help=CNCli.S_ARG_CFG_HELP,
+            metavar=CNCli.S_ARG_CFG_METAVAR,
+        )
+
+        # add debug option
+        parser.add_argument(
+            CNCli.S_ARG_DBG_OPTION,
+            action=CNCli.S_ARG_DBG_ACTION,
+            dest=CNCli.S_ARG_DBG_DEST,
+            help=CNCli.S_ARG_DBG_HELP,
         )
 
     # --------------------------------------------------------------------------
@@ -243,7 +247,7 @@ class __PP_NAME_CLASS__(C.CNCli):
 
         # throw in a debug test
         if self._debug:
-            F.pp(self._dict_cfg, label="save cfg:")
+            F.pp(self._dict_cfg, label="save cfg")
 
         # call to save config
         self._save_config()

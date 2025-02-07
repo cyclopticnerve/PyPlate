@@ -625,7 +625,7 @@ class PyBaker:
             )
 
             # the command to run pdoc
-            cmd = f"{cmd_activate};" f"{cmd_docs}"
+            cmd = f"{cmd_activate};{cmd_docs}"
             try:
                 F.sh(cmd, shell=True)
             except F.CNShellError as e:

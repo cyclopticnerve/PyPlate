@@ -41,7 +41,7 @@ sys.path.append(str(P_DIR_GUI))
 # my imports
 from cnguilib.cnapp import CNApp  # type: ignore
 # NB: this module name is hard-code to make my life easier
-from python.win_main import WinMain
+from python.__PP_WIN_FILE_FMT__ import __PP_NAME_CLASS__
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -67,6 +67,12 @@ class App(CNApp):
     """
 
     # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    DEF_WIN_NAME = "__PP_DEF_WIN_NAME__"
+
+    # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
 
@@ -90,13 +96,13 @@ class App(CNApp):
         self._dict_args = dict_args
 
         # call super with our props
-        app_id = "org.__PP_AUTHOR__.__PP_NAME_SMALL__"
+        app_id = "__PP_APP_ID__"
         i18n_domain = "__PP_NAME_SMALL__"
         super().__init__(app_id, i18n_domain)
 
         # create an instance of a window and add to app
-        inst_win = WinMain(self, "__PP_DEF_WIN_NAME__")
-        super().add_window("__PP_DEF_WIN_NAME__", inst_win)
+        inst_win = __PP_NAME_CLASS__(self, self.DEF_WIN_NAME)
+        super().add_window(self.DEF_WIN_NAME, inst_win)
 
 
 # -)

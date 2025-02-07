@@ -10,7 +10,7 @@
       <placeholder/>
     </child>
   </object>
-  <object class="GtkApplicationWindow" id="win_main">
+  <object class="GtkApplicationWindow" id="__PP_NAME_SEC__">
     <property name="can-focus">False</property>
     <property name="default-width">800</property>
     <property name="default-height">500</property>
