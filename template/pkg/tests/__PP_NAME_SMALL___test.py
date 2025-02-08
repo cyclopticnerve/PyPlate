@@ -15,7 +15,29 @@ A simple script to test a package
 # Imports
 # ------------------------------------------------------------------------------
 
+# system imports
+from pathlib import Path
+import sys
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
 # pylint: disable=import-error
+
+# my imports
+# add custom import paths
+
+# find path to lib
+P_DIR_PRJ_INST = Path.home() / "__PP_USR_INST__"
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+P_DIR_LIB_INST = P_DIR_PRJ_INST / "__PP_DIR_LIB__"
+P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
+
+# add paths to import search
+sys.path.append(str(P_DIR_LIB_INST))
+sys.path.append(str(P_DIR_LIB))
+
 
 # import my stuff
 from __PP_NAME_SMALL__ import __PP_NAME_SEC__  # type: ignore

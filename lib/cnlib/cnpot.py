@@ -32,18 +32,8 @@ from pathlib import Path
 import re
 import shutil
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
 # my imports
-from . import cnfunctions as F
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
+from cnlib import cnfunctions as F # pylint: disable=import-error
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -104,7 +94,7 @@ class CNPotPy:
 
     # shell commands to make po/mo
     # NB: params are po_file and pot_file
-    S_CMD_POS = "msgmerge --update {} {}"
+    S_CMD_POS = "msgmerge --update {} {} --backup=none"
     # NB: params are mo_file and wlang_po
     S_CMD_MOS = "msgfmt -o {} {}"
     # params are po dir, template file, final file
@@ -143,10 +133,16 @@ class CNPotPy:
         Initialize the new object
 
         Args:
-            dir_src: Where to start looking for input files
+
             str_appname: Name to use in .pot/.po header
             str_version: Version info to use in .pot/.po header
+            str_author: Author name to use in .pot/.po header
             str_email: Email to use in .pot/.po header
+
+            dir_pot: Directory to place master .pot file
+
+            dir_prj: Where to start looking for input files
+
             dir_locale: Where to put output locale files (default:
             dir_src/"locale")
             dir_po: Where to put new .po files that are waiting to be merged
@@ -156,6 +152,7 @@ class CNPotPy:
                 This creates files like "<str_domain>.pot", "<str_domain>.po",
                 and "<str_domain>.mo", and is used in the .py scripts to bind a
                 domain to a locale folder
+
             str_tag: Tag that starts a context comment (default: "")
                 If this string is empty, all comments above an entry are
                 included as context
@@ -387,6 +384,7 @@ class CNPotPy:
                 "xgettext "
                 # add any comments above string (or msgctxt in ui files)
                 # NB: check that all files have appropriate contexts/comments
+                # NB: also, no space after -c? weird right?
                 f"-c{self._str_tag} "
                 # fix some header values (the rest should be fixed in
                 # _fix_header)
@@ -405,7 +403,6 @@ class CNPotPy:
                 f"--package-version {self._str_version} "
                 # author email
                 f"--msgid-bugs-address {self._str_email} "
-                # "--no-location "
                 # sort entries by file
                 "-F "
                 # append existing file
@@ -526,7 +523,7 @@ class CNPotPy:
             {
                 "Python": [<Path>, ...],
                 "Glade": [<Path>, ...],
-                "Desktop": [<path>, ...],
+                "Desktop": [<Path>, ...],
             }
         so they can be passed to xgettext.
         """
@@ -556,6 +553,8 @@ class CNPotPy:
 
             # get all paths that match file ext
             files = [f for f in paths if f.suffix in exts]
+
+            # make all paths rel to src (to remove home dir from location)
             files = [f.relative_to(self._dir_prj) for f in files]
 
             # make sure the key exists
@@ -572,6 +571,8 @@ class CNPotPy:
             # NB: the is_file() check here is to make sure we only add files
             # that have no ext, not dirs (which have no ext, obvs)
             files = [f for f in paths if f.name in name_list if f.is_file()]
+
+            # make all paths rel to src (to remove home dir from location)
             files = [f.relative_to(self._dir_prj) for f in files]
 
             # make sure the key exists
@@ -580,8 +581,6 @@ class CNPotPy:
 
             # add results to langs that have extensions
             dict_res[clang].extend(files)
-
-        # make all paths rel to src (to remove home dir from location)
 
         # return result
         return dict_res
@@ -676,13 +675,6 @@ class CNPotPy:
         with open(linguas_path, "w", encoding="UTF8") as f:
             f.write(linguas)
 
-        # # go through the wlang list
-        # for wlang in self._list_wlangs:
-
-        #     # make the locale/lang/LC_MESSAGES dir
-        #     d = self._dir_po / wlang
-        #     Path.mkdir(d, parents=True, exist_ok=True)
-
     # --------------------------------------------------------------------------
     # Set the charset for the pot which will carry over to each po
     # --------------------------------------------------------------------------
@@ -700,7 +692,7 @@ class CNPotPy:
         """
 
         # open file and get contents
-        with open(file_pot, "r", encoding="UTF8") as a_file:
+        with open(file_pot, "r", encoding="UTF-8") as a_file:
             text = a_file.read()
 
         # replace short description
@@ -728,7 +720,7 @@ class CNPotPy:
         text = re.sub(str_pattern, str_rep, text, flags=re.M)
 
         # save file
-        with open(file_pot, "w", encoding="UTF8") as a_file:
+        with open(file_pot, "w", encoding="UTF-8") as a_file:
             a_file.write(text)
 
 

@@ -55,6 +55,9 @@ I_SW_FALSE = 0
 # Strings
 # ------------------------------------------------------------------------------
 
+S_NEW_LINE = "\n"
+S_ENCODING = "UTF-8"
+
 S_ASK_NAME = "Project name: "
 # date format
 S_DATE_FMT = "%m/%d/%Y"
@@ -245,7 +248,8 @@ S_CMD_GIT_CREATE = "git init {} -q"
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
 S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ."
 # cmd for pdoc3
-# NB: format params are pdoc3 dir, pyplate dir, project's S_DIR_DOCS and project dir
+# NB: format params are pdoc3 template dir, project's S_DIR_DOCS and project
+# dir
 S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} {}"
 # cmd for venv
 # NB: format param is __PP_NAME_SMALL__
@@ -805,7 +809,7 @@ D_PUB_BL = {
 # I18N stuff to be used in pybaker
 D_PUB_I18N = {
     # default charset for .pot/.po files
-    S_KEY_CHARSET: "UTF-8",
+    S_KEY_CHARSET: S_ENCODING,
     # computer languages
     S_KEY_CLANGS: {
         "Python": [
@@ -994,6 +998,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     usr_inst = f"{S_USR_SHARE}/{name_small}"
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
+    # k/v to fix desktop
     dict_prv_prj["__PP_DESK_ICON__"] = (
         f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.png"
     )
@@ -1001,6 +1006,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
         f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.desktop"
     )
 
+    # k/v to fix gui stuff
     dict_prv_prj["__PP_APP_FILE_FMT__"] = S_APP_FILE_FMT.format(name_small)
     name_sec = dict_prv_prj["__PP_NAME_SEC__"]
     dict_prv_prj["__PP_WIN_FILE_FMT__"] = S_WIN_FILE_FMT.format(name_sec)
@@ -1188,7 +1194,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding="UTF-8") as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # --------------------------------------------------------------------------
@@ -1231,7 +1237,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
-    with open(path, "w", encoding="UTF-8") as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1254,7 +1260,7 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding="UTF-8") as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
@@ -1280,7 +1286,7 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text)
 
     # save file
-    with open(path, "w", encoding="UTF-8") as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1321,7 +1327,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding="UTF-8") as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace categories
@@ -1336,7 +1342,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding="UTF-8") as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1359,7 +1365,7 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding="UTF-8") as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace short description
@@ -1375,7 +1381,7 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding="UTF-8") as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 

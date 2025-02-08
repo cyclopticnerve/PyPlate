@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: pymaker.py                                            |     ()     |
@@ -37,18 +36,13 @@ import sys
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
-# my imports
-# add custom import paths
-
 # first check for inst loc
 # NB: explicit path cuz symlink
 P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
 if not P_DIR_PYPLATE.exists():
     # fall back to dev loc
     P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
-P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-sys.path.append(str(P_DIR_PP_CONF))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
@@ -64,46 +58,6 @@ from cnlib.cnvenv import CNVenv  # type: ignore
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
-
-# ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# this is our metadata bootstrap
-# NB: these should be the only strings in this file, as they should NOT be
-# changed by anyone but me
-
-# name and desc for cmd line help
-S_PP_NAME_BIG = "PyMaker"
-S_PP_NAME_SMALL = "pymaker"
-S_PP_SHORT_DESC = (
-    "A program for creating CLI/Package/GUI projects in Python from a template"
-)
-S_PP_VERSION = "0.0.1"
-
-# formatted version
-S_PP_VER_FMT = f"Version {S_PP_VERSION}"
-
-# about string
-S_PP_ABOUT = (
-    f"{S_PP_NAME_BIG}\n"
-    f"{S_PP_SHORT_DESC}\n"
-    f"{S_PP_VER_FMT}\n"
-    f"https://www.github.com/cyclopticnerve/PyPlate\n"
-)
-
-# our venv name
-S_PP_VENV = ".venv-pyplate"
-
-# debug option strings
-S_DBG_OPTION = "-d"
-S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
-
-# look for pp in dir struct
-S_LOOK_FOR_PP = "pyplate"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -123,6 +77,46 @@ class PyMaker:
     This class implements all the needed functionality of PyMaker, to create a
     project from a template.
     """
+
+    # ------------------------------------------------------------------------------
+    # Class constants
+    # ------------------------------------------------------------------------------
+
+    # ------------------------------------------------------------------------------
+    # this is our metadata bootstrap
+    # NB: these should be the only strings in this file, as they should NOT be
+    # changed by anyone but me
+
+    # name and desc for cmd line help
+    S_PP_NAME_BIG = "PyMaker"
+    S_PP_NAME_SMALL = "pymaker"
+    S_PP_SHORT_DESC = (
+        "A program for creating CLI/Package/GUI projects in Python from a template"
+    )
+    S_PP_VERSION = "0.0.1"
+
+    # formatted version
+    S_PP_VER_FMT = f"Version {S_PP_VERSION}"
+
+    # about string
+    S_PP_ABOUT = (
+        f"{S_PP_NAME_BIG}\n"
+        f"{S_PP_SHORT_DESC}\n"
+        f"{S_PP_VER_FMT}\n"
+        f"https://www.github.com/cyclopticnerve/PyPlate\n"
+    )
+
+    # our venv name
+    S_PP_VENV = ".venv-pyplate"
+
+    # look for pp in dir struct
+    S_LOOK_FOR_PP = "pyplate"
+
+    # debug option strings
+    S_DBG_OPTION = "-d"
+    S_DBG_ACTION = "store_true"
+    S_DBG_DEST = "DBG_DEST"
+    S_DBG_HELP = "enable debugging option"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -151,7 +145,6 @@ class PyMaker:
         self._dict_sw_line = {}
         self._dict_type_rep = {}
         self._dir_prj = Path()
-        self._is_html = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -212,7 +205,7 @@ class PyMaker:
         """
 
         # print about info
-        print(S_PP_ABOUT)
+        print(self.S_PP_ABOUT)
 
         # set global prop in conf
         C.B_DEBUG = self._debug
@@ -227,7 +220,7 @@ class PyMaker:
 
         # do not run pymaker on pyplate (we are not that meta YET...)
         cwd = Path.cwd()
-        if S_LOOK_FOR_PP in str(cwd).lower():
+        if self.S_LOOK_FOR_PP in str(cwd).lower():
             print(C.S_ERR_PRJ_DIR_IS_PP)
             print(cwd)
             sys.exit(-1)
@@ -384,6 +377,7 @@ class PyMaker:
 
                 # check for valid name
                 if self._check_name(name_new):
+                    name_new = name_new.replace(" ", "_")
                     name_sec = name_new
                     break
 
@@ -392,7 +386,7 @@ class PyMaker:
         # class
 
         # do formatting
-        name_class = name_small
+        name_class = name_sec
         name_class = name_class.replace("_", " ")
         name_class = name_class.replace("-", " ")
         name_class = name_class.title()
@@ -426,6 +420,7 @@ class PyMaker:
         h = str(Path.home())
         p = str(P_DIR_PYPLATE)
         p = p.lstrip(h).strip("/")
+        p = p.lstrip(h).strip("\\")
         # NB: change global val
         C.D_PRV_PRJ["__PP_DEV_PP__"] = p
 
@@ -820,39 +815,34 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # update docs
 
-        # if docs flag is set
-        if C.B_CMD_DOCS:
+        # # if docs flag is set
+        # if C.B_CMD_DOCS:
 
-            print(C.S_ACTION_DOCS, end="", flush=True)
+        #     print(C.S_ACTION_DOCS, end="", flush=True)
 
-            # activate cmd for pyplate's venv
-            # (so we don't need to install pdoc in every project)
-            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
-                str(P_DIR_PYPLATE), S_PP_VENV
-            )
+        #     # activate cmd for pyplate's venv
+        #     # (so we don't need to install pdoc in every project)
+        #     cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+        #         str(P_DIR_PYPLATE), self.S_PP_VENV
+        #     )
 
-            # get template and output dirs
-            dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
-            dir_docs = self._dir_prj / C.S_DIR_DOCS
+        #     # get template and output dirs
+        #     dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
+        #     dir_docs = self._dir_prj / C.S_DIR_DOCS
 
-            # # nuke old docs
-            # if dir_docs.exists():
-            #     shutil.rmtree(dir_docs)
-            #     Path.mkdir(dir_docs, parents=True)
+        #     # format cmd using abs prj docs dir (output) and abs prj dir (input)
+        #     cmd_docs = C.S_CMD_DOC.format(
+        #         dir_template, dir_docs, self._dir_prj
+        #     )
 
-            # format cmd using abs prj docs dir (output) and abs prj dir (input)
-            cmd_docs = C.S_CMD_DOC.format(
-                dir_template, dir_docs, self._dir_prj
-            )
-
-            # the command to run pdoc
-            cmd = f"{cmd_activate};" f"{cmd_docs}"
-            try:
-                F.sh(cmd, shell=True)
-                print(C.S_ACTION_DONE)
-            except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
-                raise e
+        #     # the command to run pdoc
+        #     cmd = f"{cmd_activate};" f"{cmd_docs}"
+        #     try:
+        #         F.sh(cmd, shell=True)
+        #         print(C.S_ACTION_DONE)
+        #     except F.CNShellError as e:
+        #         print(C.S_ACTION_FAIL)
+        #         raise e
 
         # ----------------------------------------------------------------------
         # tree
@@ -868,7 +858,7 @@ class PyMaker:
             file_tree = self._dir_prj / C.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding="UTF-8") as a_file:
+            with open(file_tree, "w", encoding=C.S_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
@@ -881,7 +871,7 @@ class PyMaker:
             )
 
             # write to file
-            with open(file_tree, "w", encoding="UTF-8") as a_file:
+            with open(file_tree, "w", encoding=C.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -1056,7 +1046,7 @@ class PyMaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
+        with open(path, "r", encoding=C.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1112,7 +1102,7 @@ class PyMaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding="UTF-8") as a_file:
+        with open(path, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -1161,7 +1151,7 @@ class PyMaker:
         pad = " " * len_pad
 
         # put the header line back together, adjusting for the pad len
-        line = lead + tmp_val + pad + tmp_rat + "\n"
+        line = lead + tmp_val + pad + tmp_rat + C.S_NEW_LINE
 
         # return
         return line
@@ -1317,14 +1307,14 @@ class PyMaker:
 
         # read reqs files and put in result
         for item in src:
-            with open(item, "r", encoding="UTF-8") as a_file:
+            with open(item, "r", encoding=C.S_ENCODING) as a_file:
                 old_file = a_file.readlines()
                 old_file = [line.rstrip() for line in old_file]
                 new_file = new_file + old_file
 
         # put combined reqs into final file
-        joint = "\n".join(new_file)
-        with open(dst, "w", encoding="UTF-8") as a_file:
+        joint = C.S_NEW_LINE.join(new_file)
+        with open(dst, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
@@ -1490,14 +1480,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
     # set help string
-    parser.description = S_PP_ABOUT
+    parser.description = PyMaker.S_PP_ABOUT
 
     # add debug option
     parser.add_argument(
-        S_DBG_OPTION,
-        action=S_DBG_ACTION,
-        dest=S_DBG_DEST,
-        help=S_DBG_HELP,
+        PyMaker.S_DBG_OPTION,
+        action=PyMaker.S_DBG_ACTION,
+        dest=PyMaker.S_DBG_DEST,
+        help=PyMaker.S_DBG_HELP,
     )
 
     # get namespace object
@@ -1509,7 +1499,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_debug = dict_args.get(S_DBG_DEST, False)
+    a_debug = dict_args.get(PyMaker.S_DBG_DEST, False)
 
     # create object
     pm = PyMaker()

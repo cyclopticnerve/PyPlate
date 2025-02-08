@@ -17,18 +17,8 @@ A class to make handling of venv folders easier
 # system imports
 from pathlib import Path
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
 # my imports
-from cnlib import cnfunctions as F  # type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
+from cnlib import cnfunctions as F  # pylint: disable=import-error
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -51,6 +41,25 @@ class CNVenv:
     in the project's venv folder.
     """
 
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
+    S_CMD_INSTALL = (
+        "cd {};. ./{}/bin/activate;python -m pip install -r {}"
+    )
+    S_CMD_FREEZE = (
+        "cd {}; "
+        ". ./{}/bin/activate; "
+        "python "
+        "-Xfrozen_modules=off "
+        "-m pip freeze "
+        "-l --exclude-editable "
+        "--require-virtualenv "
+        "> "
+        "{}"
+    )
     # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
@@ -98,9 +107,9 @@ class CNVenv:
         """
 
         # the command to create a venv
-        cmd = f"python -Xfrozen_modules=off -m venv {self._dir_venv}"
+        cmd = self.S_CMD_CREATE.format(self._dir_venv)
         try:
-            F.sh(cmd)
+            F.sh(cmd, shell=True)
         except F.CNShellError as e:
             raise e
 
@@ -127,11 +136,8 @@ class CNVenv:
             file_reqs = Path(self._dir_prj) / file_reqs
 
         # the command to install packages to venv from reqs
-        cmd = (
-            f"cd {self._dir_venv.parent}; "
-            f". ./{self._dir_venv.name}/bin/activate; "
-            "python -m pip install "
-            f"-r {file_reqs}"
+        cmd = self.S_CMD_INSTALL.format(
+            self._dir_venv.parent, self._dir_venv.name, file_reqs
         )
         try:
             F.sh(cmd, shell=True)
@@ -161,16 +167,8 @@ class CNVenv:
             file_reqs = Path(self._dir_prj) / file_reqs
 
         # the command to freeze a venv
-        cmd = (
-            f"cd {self._dir_venv.parent}; "
-            f". ./{self._dir_venv.name}/bin/activate; "
-            "python "
-            "-Xfrozen_modules=off "
-            "-m pip freeze "
-            "-l --exclude-editable "
-            "--require-virtualenv "
-            "> "
-            f"{file_reqs}"
+        cmd = self.S_CMD_FREEZE.format(
+            self._dir_venv.parent, self._dir_venv.name, file_reqs
         )
         try:
             F.sh(cmd, shell=True)

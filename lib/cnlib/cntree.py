@@ -20,41 +20,6 @@ specified formats.
 from pathlib import Path
 
 # ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-# # console/terminal values for the individual prefix/connector chars
-# CHAR_VERT = "\u2502"  # vertical join (pipe)
-# CHAR_HORZ = "\u2500"  # horizontal join (full-width dash)
-# CHAR_TEE = "\u251C"  # tee join (not last item)
-# CHAR_ELL = "\u2514"  # elbow join (last item)
-# CHAR_SPACE = " "  # single space char
-
-# # char sequences for the prefix/connector char sets
-# # NB: these must always be equal length
-# PREFIX_VERT = f"{CHAR_VERT}{CHAR_SPACE}"  # next level ("| ")
-# PREFIX_NONE = f"{CHAR_SPACE}{CHAR_SPACE}"  # skip level ("  ")
-# CONNECTOR_TEE = f"{CHAR_TEE}{CHAR_HORZ}"  # next sub item ("T-")
-# CONNECTOR_ELL = f"{CHAR_ELL}{CHAR_HORZ}"  # last sub item ("L-")
-
-# # the default directory/file name formats
-# # NB: NAME alone is used for the top level directory name
-# # DIR is used for subdirectories and should have a leading space to separate it
-# # from the prefix and/or connector
-# # FILE has the same purpose as DIR, but for files (DUH!)
-# DEF_FORMAT_NAME = "$NAME"
-# DEF_FORMAT_DIR = f" {DEF_FORMAT_NAME}/"
-# DEF_FORMAT_FILE = f" {DEF_FORMAT_NAME}"
-
-# # custom error strings
-# # I18N: the specified value is not a directory
-# ERR_NOT_A_DIR = '"{}" is not a directory'
-
-# # custom sorting order
-# SORT_ORDER = "_."  # sort first char of name in this order (above ord)
-
-
-# ------------------------------------------------------------------------------
 # Generate a file tree in text format with the names formatted according to some
 # format strings
 # ------------------------------------------------------------------------------
@@ -69,6 +34,10 @@ class CNTree:
     This class builds the tree as a complete string, ready to be printed to
     stdout or a file.
     """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
 
     # console/terminal values for the individual prefix/connector chars
     CHAR_VERT = "\u2502"  # vertical join (pipe)
@@ -94,8 +63,7 @@ class CNTree:
     DEF_FORMAT_FILE = f" {DEF_FORMAT_NAME}"
 
     # custom error strings
-    # I18N: the specified value is not a directory
-    ERR_NOT_A_DIR = '"{}" is not a directory'
+    ERR_NOT_A_DIR = "{} is not a directory"
 
     # custom sorting order
     SORT_ORDER = "_."  # sort first char of name in this order (above ord)
@@ -115,9 +83,6 @@ class CNTree:
         of its properties, and any other code that needs to run to create a
         new object.
         """
-
-        # call super init to initialize the base class
-        super().__init__()
 
         # NB: something i learned the hard way from c++ coding: you want to do
         # AS LITTLE coding in the constructor method because the whole class may
@@ -545,8 +510,8 @@ class CNTree:
         needs to be appended with another pipe or more spaces. Also the line
         needs to account for the directory lead. Then, it needs to recurse
         back to _add_contents.
-        NOTE: This code CANNOT be included in _add_contents because changing the
-        prefix will break recursion (IDKWTF)
+        NOTE: This code CANNOT be included in _add_contents because changing
+        the prefix will break recursion (IDKWTF)
         """
 
         # add a vert or a blank

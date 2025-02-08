@@ -20,25 +20,10 @@ See PyPlate/template/cli/src/__PP_NAME_SMALL__.py for an example.
 # system imports
 import argparse
 from pathlib import Path
-import sys
-
-# find paths to lib
-DIR_LIB = Path(__file__).parents[1].resolve()
-sys.path.append(str(DIR_LIB))
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
 
 # my imports
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnformatter import CNFormatter  # type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
+from cnlib import cnfunctions as F  # pylint: disable=import-error
+from cnlib.cnformatter import CNFormatter  # pylint: disable=import-error
 
 # ------------------------------------------------------------------------------
 # Public classes

@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : CNInstallLib                                           /          \
+# Project : CNlLib                                                 /          \
 # Filename: cninstall.py                                          |     ()     |
 # Date    : 09/23/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -8,10 +8,6 @@
 
 """
 The class to use for installing/uninstalling
-
-Note that scripts in the preflight and postflight sections of the cfg dict
-should have their executable bits set and also have a shebang, so they can be
-run directly by the run_scripts method.
 """
 
 # ------------------------------------------------------------------------------
@@ -25,23 +21,9 @@ import re
 import shutil
 import sys
 
-# find paths to lib
-DIR_LIB = Path(__file__).parents[1].resolve()
-sys.path.append(str(DIR_LIB))
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
 # local imports
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnvenv import CNVenv  ## type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
+from cnlib import cnfunctions as F  # pylint: disable=import-error
+from cnlib.cnvenv import CNVenv  # pylint: disable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -102,6 +84,10 @@ class CNInstall:
     be run directly by the run_scripts method.
     """
 
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
     # keys
     S_KEY_NAME = "NAME"
     S_KEY_VERSION = "VERSION"
@@ -130,8 +116,8 @@ class CNInstall:
     # strings for version compare
     # NB: format param is prog name
     S_ASK_VER_SAME = (
-        "The current version of this program is already installed. Do you want to "
-        "overwrite? [y/N]"
+        "The current version of this program is already installed. Do you "
+        "want to overwrite? [y/N] "
     )
     S_MSG_VER_ABORT = "Installation aborted"
 
@@ -156,8 +142,8 @@ class CNInstall:
 
     # question to ask when installing older version
     S_ASK_VER_OLDER = (
-        "A newer version of this program is currently installed. Do you want to "
-        "overwrite? [y/N] "
+        "A newer version of this program is currently installed. Do you want "
+        "to overwrite? [y/N] "
     )
     S_ASK_CONFIRM = "y"
 
@@ -169,7 +155,7 @@ class CNInstall:
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}" # Icon=<home/__PP_DESK_ICON__>
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_DESK_ICON__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -298,7 +284,16 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Install the program
     # --------------------------------------------------------------------------
-    def install(self, dir_assets, path_cfg_new, path_cfg_old, dir_usr_inst, dir_venv, path_reqs, debug=False):
+    def install(
+        self,
+        dir_assets,
+        path_cfg_new,
+        path_cfg_old,
+        dir_usr_inst,
+        dir_venv,
+        path_reqs,
+        debug=False,
+    ):
         """
         Install the program
 

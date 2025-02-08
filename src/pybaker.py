@@ -35,18 +35,13 @@ import sys
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
-# my imports
-# add custom import paths
-
 # first check for inst loc
 # NB: explicit path cuz symlink
 P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
 if not P_DIR_PYPLATE.exists():
     # fall back to dev loc
     P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
-P_DIR_PP_CONF = P_DIR_PYPLATE / "conf"
 P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-sys.path.append(str(P_DIR_PP_CONF))
 sys.path.append(str(P_DIR_PP_LIB))
 
 # local imports
@@ -62,52 +57,6 @@ from cnlib.cnvenv import CNVenv  # type: ignore
 # pylint: enable=wrong-import-order
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error
-
-# ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# this is our metadata bootstrap
-# NB: these should be the only strings in this file, as they should NOT be
-# changed by dev
-
-# name and desc for cmd line help
-S_PP_NAME_BIG = "PyBaker"
-S_PP_NAME_SMALL = "pybaker"
-S_PP_SHORT_DESC = (
-    "A program to set the metadata of a PyPlate project and create a dist"
-)
-S_PP_VERSION = "0.0.1"
-
-# formatted version
-S_PP_VER_FMT = f"Version {S_PP_VERSION}"
-
-# about string
-S_PP_ABOUT = (
-    f"{S_PP_NAME_BIG}\n"
-    f"{S_PP_SHORT_DESC}\n"
-    f"{S_PP_VER_FMT}\n"
-    f"https://www.github.com/cyclopticnerve/PyPlate\n"
-)
-
-# our venv name
-S_PP_VENV = ".venv-pyplate"
-
-# debug option strings
-S_DBG_OPTION = "-d"
-S_DBG_ACTION = "store_true"
-S_DBG_DEST = "DBG_DEST"
-S_DBG_HELP = "enable debugging option"
-
-# ide option strings
-S_IDE_OPTION = "-i"
-S_IDE_ACTION = "store_true"
-S_IDE_DEST = "IDE_DEST"
-S_IDE_HELP = "ask for project folder when running in IDE"
-
-# look for pp in dir struct
-S_LOOK_FOR_PP = "pyplate"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -127,6 +76,52 @@ class PyBaker:
     This class implements all the needed functionality of PyBaker, to create a
     distribution of a project from a settings file.
     """
+
+    # ------------------------------------------------------------------------------
+    # Class constants
+    # ------------------------------------------------------------------------------
+
+    # ------------------------------------------------------------------------------
+    # this is our metadata bootstrap
+    # NB: these should be the only strings in this file, as they should NOT be
+    # changed by dev
+
+    # name and desc for cmd line help
+    S_PP_NAME_BIG = "PyBaker"
+    S_PP_NAME_SMALL = "pybaker"
+    S_PP_SHORT_DESC = (
+        "A program to set the metadata of a PyPlate project and create a dist"
+    )
+    S_PP_VERSION = "0.0.1"
+
+    # formatted version
+    S_PP_VER_FMT = f"Version {S_PP_VERSION}"
+
+    # about string
+    S_PP_ABOUT = (
+        f"{S_PP_NAME_BIG}\n"
+        f"{S_PP_SHORT_DESC}\n"
+        f"{S_PP_VER_FMT}\n"
+        f"https://www.github.com/cyclopticnerve/PyPlate\n"
+    )
+
+    # our venv name
+    S_PP_VENV = ".venv-pyplate"
+
+    # look for pp in dir struct
+    S_LOOK_FOR_PP = "pyplate"
+
+    # debug option strings
+    S_DBG_OPTION = "-d"
+    S_DBG_ACTION = "store_true"
+    S_DBG_DEST = "DBG_DEST"
+    S_DBG_HELP = "enable debugging option"
+
+    # ide option strings
+    S_IDE_OPTION = "-i"
+    S_IDE_ACTION = "store_true"
+    S_IDE_DEST = "IDE_DEST"
+    S_IDE_HELP = "ask for project folder when running in IDE"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -154,7 +149,6 @@ class PyBaker:
         self._dict_sw_line = {}
         self._dict_type_rep = {}
         self._dir_prj = Path()
-        self._is_html = False
 
         # private.json dicts
         self._dict_prv = {}
@@ -230,7 +224,7 @@ class PyBaker:
         """
 
         # print about info
-        print(S_PP_ABOUT)
+        print(self.S_PP_ABOUT)
 
         # set global prop in conf
         C.B_DEBUG = self._debug
@@ -253,12 +247,12 @@ class PyBaker:
         self._dir_prj = self._dir_prj.resolve()
 
         # do not run pybaker on pyplate (we are not that meta YET...)
-        if S_LOOK_FOR_PP in str(self._dir_prj).lower():
+        if self.S_LOOK_FOR_PP in str(self._dir_prj).lower():
             print(C.S_ERR_PRJ_DIR_IS_PP)
             sys.exit(-1)
 
         # check if dir_prj has pyplate folder for a valid prj
-        path_pyplate = self._dir_prj / S_LOOK_FOR_PP
+        path_pyplate = self._dir_prj / self.S_LOOK_FOR_PP
         if not path_pyplate.exists():
             print(C.S_ERR_NOT_PRJ)
             sys.exit(-1)
@@ -600,38 +594,38 @@ class PyBaker:
         # update docs
 
         # if docs flag is set
-        if C.B_CMD_DOCS:
+        # if C.B_CMD_DOCS:
 
-            print(C.S_ACTION_DOCS, end="", flush=True)
+        #     print(C.S_ACTION_DOCS, end="", flush=True)
 
-            # update version number in pdoc3
-            # activate cmd for pyplate's venv
-            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
-                str(P_DIR_PYPLATE), S_PP_VENV
-            )
+        #     # update version number in pdoc3
+        #     # activate cmd for pyplate's venv
+        #     cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+        #         str(P_DIR_PYPLATE), self.S_PP_VENV
+        #     )
 
-            # get template and output dirs
-            dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
-            dir_docs = self._dir_prj / C.S_DIR_DOCS
+        #     # get template and output dirs
+        #     dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
+        #     dir_docs = self._dir_prj / C.S_DIR_DOCS
 
-            # nuke old docs
-            if dir_docs.exists():
-                shutil.rmtree(dir_docs)
-                Path.mkdir(dir_docs, parents=True)
+        #     # nuke old docs
+        #     if dir_docs.exists():
+        #         shutil.rmtree(dir_docs)
+        #         Path.mkdir(dir_docs, parents=True)
 
-            # format cmd using abs prj docs dir (output) and abs prj dir (input)
-            cmd_docs = C.S_CMD_DOC.format(
-                dir_template, dir_docs, self._dir_prj
-            )
+        #     # format cmd using abs prj docs dir (output) and abs prj dir (input)
+        #     cmd_docs = C.S_CMD_DOC.format(
+        #         dir_template, dir_docs, self._dir_prj
+        #     )
 
-            # the command to run pdoc
-            cmd = f"{cmd_activate};{cmd_docs}"
-            try:
-                F.sh(cmd, shell=True)
-            except F.CNShellError as e:
-                raise e
+        #     # the command to run pdoc
+        #     cmd = f"{cmd_activate};{cmd_docs}"
+        #     try:
+        #         F.sh(cmd, shell=True)
+        #     except F.CNShellError as e:
+        #         raise e
 
-            print(C.S_ACTION_DONE)
+        #     print(C.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # tree
@@ -647,7 +641,7 @@ class PyBaker:
             file_tree = self._dir_prj / C.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding="UTF-8") as a_file:
+            with open(file_tree, "w", encoding=C.S_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
@@ -660,7 +654,7 @@ class PyBaker:
             )
 
             # write to file
-            with open(file_tree, "w", encoding="UTF-8") as a_file:
+            with open(file_tree, "w", encoding=C.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             print(C.S_ACTION_DONE)
@@ -839,7 +833,7 @@ class PyBaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding="UTF-8") as a_file:
+        with open(path, "r", encoding=C.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -894,7 +888,7 @@ class PyBaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding="UTF-8") as a_file:
+        with open(path, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -1159,22 +1153,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
     # set help string
-    parser.description = S_PP_ABOUT
+    parser.description = PyBaker.S_PP_ABOUT
 
     # add debug option
     parser.add_argument(
-        S_DBG_OPTION,
-        action=S_DBG_ACTION,
-        dest=S_DBG_DEST,
-        help=S_DBG_HELP,
+        PyBaker.S_DBG_OPTION,
+        action=PyBaker.S_DBG_ACTION,
+        dest=PyBaker.S_DBG_DEST,
+        help=PyBaker.S_DBG_HELP,
     )
 
     # add ide option
     parser.add_argument(
-        S_IDE_OPTION,
-        action=S_IDE_ACTION,
-        dest=S_IDE_DEST,
-        help=S_IDE_HELP,
+        PyBaker.S_IDE_OPTION,
+        action=PyBaker.S_IDE_ACTION,
+        dest=PyBaker.S_IDE_DEST,
+        help=PyBaker.S_IDE_HELP,
     )
 
     # get namespace object
@@ -1186,8 +1180,8 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_debug = dict_args.get(S_DBG_DEST, False)
-    a_ide = dict_args.get(S_IDE_DEST, False)
+    a_debug = dict_args.get(PyBaker.S_DBG_DEST, False)
+    a_ide = dict_args.get(PyBaker.S_IDE_DEST, False)
 
     # create object
     pb = PyBaker()

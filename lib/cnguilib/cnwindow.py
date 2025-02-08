@@ -47,13 +47,6 @@ from gi.repository import Gtk  # type: ignore
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-S_ACTION_DELETE_EVENT = "delete-event"
-S_ACTION_DESTROY = "destroy"
-
-# ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
 
@@ -71,6 +64,13 @@ class CNWindow:
 
     This class contains all the handler code for a typical window.
     """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    S_ACTION_DELETE_EVENT = "delete-event"
+    S_ACTION_DESTROY = "destroy"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -126,8 +126,8 @@ class CNWindow:
 
         # connect default operations for a new window
         # NB: NOT STRINGS!!! DO NOT DUMB!!!
-        self.window.connect(S_ACTION_DELETE_EVENT, self._evt_win_delete)
-        self.window.connect(S_ACTION_DESTROY, self._evt_win_destroy)
+        self.window.connect(self.S_ACTION_DELETE_EVENT, self._evt_win_delete)
+        self.window.connect(self.S_ACTION_DESTROY, self._evt_win_destroy)
 
         # connect all subclass methods
         self._builder.connect_signals(self)  # pylint: disable=no-member

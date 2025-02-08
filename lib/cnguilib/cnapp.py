@@ -47,16 +47,6 @@ from gi.repository import Gtk  # type: ignore
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-S_ACTION_ACTIVATE = "activate"
-S_ACTION_SHUTDOWN = "shutdown"
-
-S_ERR_WIN_EXIST = "window name exists"
-S_ERR_WIN_NOT_EXIST = "window name does not exist"
-
-# ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
 
@@ -84,6 +74,16 @@ class CNApp(Gtk.Application):
     A class that extends Gtk.Application to manage the GUI for the calling
     Python script.
     """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    S_ACTION_ACTIVATE = "activate"
+    S_ACTION_SHUTDOWN = "shutdown"
+
+    S_ERR_WIN_EXIST = "window name exists"
+    S_ERR_WIN_NOT_EXIST = "window name does not exist"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -128,8 +128,8 @@ class CNApp(Gtk.Application):
 
         # connect default operations for a new application
         # NB: NOT STRINGS!!! DO NOT DUMB!!!
-        self.connect(S_ACTION_ACTIVATE, self._evt_app_activate)
-        self.connect(S_ACTION_SHUTDOWN, self._evt_app_shutdown)
+        self.connect(self.S_ACTION_ACTIVATE, self._evt_app_activate)
+        self.connect(self.S_ACTION_SHUTDOWN, self._evt_app_shutdown)
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -162,7 +162,7 @@ class CNApp(Gtk.Application):
 
         # sanity check
         if name_win in self._dict_instances:
-            print(S_ERR_WIN_EXIST)
+            print(self.S_ERR_WIN_EXIST)
             return
 
         # add to internal list
@@ -186,7 +186,7 @@ class CNApp(Gtk.Application):
 
         # sanity check
         if not name_win in self._dict_instances:
-            print(S_ERR_WIN_NOT_EXIST)
+            print(self.S_ERR_WIN_NOT_EXIST)
             return
 
         # get handler

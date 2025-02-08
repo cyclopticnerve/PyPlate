@@ -98,17 +98,11 @@ def do_bool(val):
         "y",
     ]
 
-    # first convert it to a string (if it isn't already)
-    val = str(val)
-
-    # then lowercase it for easier matching
-    val = val.lower()
-
-    # find val in dict
-    res = val in rules_true
+    # lower all test vals
+    rules_true = [item.lower() for item in rules_true]
 
     # return result
-    return res
+    return str(val).lower() in rules_true
 
 
 # ------------------------------------------------------------------------------
