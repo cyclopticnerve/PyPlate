@@ -91,7 +91,6 @@ class __PP_NAME_CLASS__(CNCli):
     # NB: you may edit these by hand, but they will be overwritten by PyBaker
     S_PP_VERSION = "__PP_VERSION__"
 
-    # FIXME: why does this not end up as _("Short description")?
     # I18N: short description
     S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
@@ -183,6 +182,8 @@ class __PP_NAME_CLASS__(CNCli):
         # pyplate: disable=replace
         _fix = "__PP_NAME_BIG__"  # pyplate: enable=replace
         # pyplate: enable=replace
+
+        _desc = _("__PP_SHORT_DESC__")
 
         # check for debug flag
         if self._debug:

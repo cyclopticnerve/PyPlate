@@ -333,8 +333,8 @@ S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
 # global vars for cmd line help
 S_META_VER_SEARCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
 S_META_VER_REPL = r'\g<1>"{}"'
-S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=\s*)(.*)"
-S_META_SD_REPL = r'\g<1>"{}"'
+S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
+S_META_SD_REPL = r'\g<1>\g<2>{}\g<4>'
 
 # make sure ver num entered in pybaker is valid
 S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
