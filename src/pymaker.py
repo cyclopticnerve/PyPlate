@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: pymaker.py                                            |     ()     |
@@ -1054,8 +1055,6 @@ class PyMaker:
 
             # ------------------------------------------------------------------
             # skip blank lines
-
-            # skip blank lines, obvs
             if line.strip() == "":
                 continue
 

@@ -78,10 +78,6 @@ class CNInstallError(Exception):
 class CNInstall:
     """
     The class to use for installing/uninstalling
-
-    Note that scripts in the preflight and postflight sections of the cfg dict
-    should have their executable bits set and also have a shebang, so they can
-    be run directly by the run_scripts method.
     """
 
     # --------------------------------------------------------------------------
@@ -126,11 +122,6 @@ class CNInstall:
     S_ERR_NOT_FOUND = "File {} not found"
     S_ERR_NOT_JSON = "File {} is not a JSON file"
     S_ERR_NO_SUDO = "Could not get sudo permission"
-    # NB: format param is script file path
-    S_ERR_RUN_SCRIPT = (
-        "Could not run script {}. Make sure the script has its executable bit "
-        "set and has a shebang"
-    )
     S_ERR_REQ = "Could not install {}"
     S_ERR_VERSION = "One or both version numbers are invalid"
 

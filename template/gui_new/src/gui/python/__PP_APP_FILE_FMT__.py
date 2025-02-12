@@ -1,0 +1,108 @@
+# ------------------------------------------------------------------------------
+# Project : __PP_NAME_BIG__                                        /          \
+# Filename: app.py                                                |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
+# ------------------------------------------------------------------------------
+
+"""
+A class to manage a specific Application.
+
+This class manages the more advanced functions of an application, such as
+specific windows and system events.
+The purpose of this module is to offload as much GUI-specific code as possible
+from the main script, so that the main script remains as close to a CLI as
+possible.
+"""
+
+# ------------------------------------------------------------------------------
+# Imports
+# ------------------------------------------------------------------------------
+
+# system imports
+from pathlib import Path
+import sys
+
+# find path to lib
+P_DIR_PRJ = Path(__file__).parents[3].resolve()
+P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
+P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_GUI__"
+
+# add paths to import search
+sys.path.append(str(P_DIR_LIB))
+sys.path.append(str(P_DIR_GUI))
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
+
+# my imports
+from cnguilib.cnapp import CNApp  # type: ignore
+# NB: this module name is hard-code to make my life easier
+from python.__PP_WIN_FILE_FMT__ import __PP_NAME_CLASS__
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=no-name-in-module
+# pylint: enable=import-error
+
+# ------------------------------------------------------------------------------
+# Classes
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# The main file that runs the gui application
+# ------------------------------------------------------------------------------
+class App(CNApp):
+    """
+    The main file that runs the gui application
+
+    This script is called from the main script and should not be called
+    directly. The purpose of this script is to offload as much GUI-specific
+    code as possible from the main script, so that the main script remains as
+    close to a CLI as possible.
+    """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    DEF_WIN_NAME = "__PP_DEF_WIN_NAME__"
+
+    # --------------------------------------------------------------------------
+    # Class methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
+    def __init__(self, _i18n_domain, dict_args=None):
+        """
+        Initialize the new object
+
+        Args:
+            dict_args: The arguments passed to the calling CLI script
+
+        Initializes a new instance of the class, setting the default values of
+        its properties, and any other code needed to create a new object.
+        """
+
+        # NB: do something with args
+        if dict_args is None:
+            dict_args = {}
+        self._dict_args = dict_args
+
+        # call super with our props
+        app_id = "__PP_APP_ID__"
+        i18n_domain = "__PP_NAME_SMALL__"
+        super().__init__(app_id, i18n_domain)
+
+        # create an instance of a window and add to app
+        inst_win = __PP_NAME_CLASS__(self, self.DEF_WIN_NAME)
+        super().add_window(self.DEF_WIN_NAME, inst_win)
+
+
+# -)

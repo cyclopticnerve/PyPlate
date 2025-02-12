@@ -86,9 +86,6 @@ def do_bool(val):
     Converts integers and strings to boolean values based on the rules.
     """
 
-    # the default result
-    res = False
-
     # if it is in this list, it is True, else false
     # NB: strings here should be all lowercase
     rules_true = [

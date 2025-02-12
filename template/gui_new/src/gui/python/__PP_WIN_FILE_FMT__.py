@@ -53,6 +53,13 @@ from cnguilib.cnwindow import CNWindow  # type: ignore
 # pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
+# Strings
+# ------------------------------------------------------------------------------
+
+# the name of the window in the ui file
+UI_WIN_NAME = "__PP_NAME_SEC__"
+
+# ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
 
@@ -67,14 +74,6 @@ class __PP_NAME_CLASS__(CNWindow):
     This class contains all the handler code for a specific window and it's
     controls.
     """
-
-    # --------------------------------------------------------------------------
-    # Class constants
-    # --------------------------------------------------------------------------
-
-    # the name of the window in the ui file
-    UI_WIN_NAME = "__PP_NAME_SEC__"
-    UI_EXT = ".ui"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -96,13 +95,12 @@ class __PP_NAME_CLASS__(CNWindow):
         """
 
         # props necessary tro create a basic window
-        ui_file = (
-            P_DIR_PRJ / "__PP_DIR_UI__" / f"{self.UI_WIN_NAME}{self.UI_EXT}"
-        )
+        # NB: no ext (will find .ui, .glade, .xml...)
+        ui_file = P_DIR_PRJ / "__PP_DIR_UI__" / f"{UI_WIN_NAME}"
         ui_path = Path(ui_file).resolve()
 
         # create a basic window
-        super().__init__(app, name_win, ui_path, self.UI_WIN_NAME)
+        super().__init__(app, name_win, ui_path, UI_WIN_NAME)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -123,9 +121,7 @@ class __PP_NAME_CLASS__(CNWindow):
 
         # get dialog, run, hide (standard for reusable modal dialogs)
         # NB: no ext (will find .ui, .glade, .xml...)
-        dlg_file = (
-            P_DIR_PRJ / "__PP_DIR_UI__" / f"__PP_DLG_FILE__{self.UI_EXT}"
-        )
+        dlg_file = P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE__"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "__PP_DLG_ABOUT__")
 

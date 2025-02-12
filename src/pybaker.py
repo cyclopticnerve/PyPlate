@@ -841,8 +841,6 @@ class PyBaker:
 
             # ------------------------------------------------------------------
             # skip blank lines
-
-            # skip blank lines, obv
             if line.strip() == "":
                 continue
 

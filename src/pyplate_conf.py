@@ -164,6 +164,7 @@ S_KEY_NAME_MID = "S_KEY_NAME_MID"
 # pymaker won't touch them
 S_DIR_TEMPLATE = "template"
 S_DIR_ALL = "all"
+S_DIR_BIN = "bin"
 S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
@@ -550,9 +551,7 @@ L_CATS = [
 ]
 
 # install pkg in venv after making
-L_INSTALL_AS_PKG = [
-    "p"
-]
+L_INSTALL_AS_PKG = ["p"]
 
 # which prj types need an install.json?
 L_MAKE_INSTALL = [
@@ -707,6 +706,7 @@ D_PUB_META = {
 D_PUB_DIST = {
     "c": {
         # basic stuff (put in assets folder)
+        S_DIR_BIN: S_DIR_ASSETS,
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
@@ -723,6 +723,7 @@ D_PUB_DIST = {
     },
     "g": {
         # basic stuff (put in assets folder)
+        S_DIR_BIN: S_DIR_ASSETS,
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
@@ -872,7 +873,7 @@ D_INSTALL = {
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
-        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
+        f"{S_DIR_BIN}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
     },
     "g": {
         S_DIR_CONF: "__PP_USR_INST__",
@@ -883,7 +884,7 @@ D_INSTALL = {
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
-        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
+        f"{S_DIR_BIN}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
         #
         S_DIR_GUI: "__PP_USR_INST__",
         "__PP_FILE_DESK__": S_USR_APPS,
@@ -1002,8 +1003,9 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     dict_prv_prj["__PP_DESK_ICON__"] = (
         f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.png"
     )
+    name_big = dict_prv_prj["__PP_NAME_BIG__"]
     dict_prv_prj["__PP_FILE_DESK__"] = (
-        f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.desktop"
+        f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_big}.desktop"
     )
 
     # k/v to fix gui stuff
@@ -1012,6 +1014,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     dict_prv_prj["__PP_WIN_FILE_FMT__"] = S_WIN_FILE_FMT.format(name_sec)
     author = dict_prv_all["__PP_AUTHOR__"]
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1152,8 +1155,8 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
             shutil.rmtree(in_dir)
 
     # remove ext from bin file
-    old_bin = p_dist / S_DIR_ASSETS / S_DIR_SRC / f"{name_small}.py"
-    new_bin = p_dist / S_DIR_ASSETS / S_DIR_SRC / f"{name_small}"
+    old_bin = p_dist / S_DIR_ASSETS / S_DIR_BIN / f"{name_small}.py"
+    new_bin = p_dist / S_DIR_ASSETS / S_DIR_BIN / f"{name_small}"
     if old_bin.exists():
         old_bin.rename(new_bin)
 

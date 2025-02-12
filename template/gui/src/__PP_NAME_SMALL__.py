@@ -32,15 +32,7 @@ import locale
 from pathlib import Path
 import sys
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
-# my imports
-# add custom import paths
-
-# find path to lib
+# find path to prj/lib
 P_DIR_PRJ_INST = Path.home() / "__PP_USR_INST__"
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
@@ -56,14 +48,15 @@ sys.path.append(str(P_DIR_LIB))
 sys.path.append(str(P_DIR_GUI_INST))
 sys.path.append(str(P_DIR_GUI))
 
+# pylint: disable=wrong-import-position
+# pylint: disable=import-error
+
 # import my stuff
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cncli import CNCli  # type: ignore
-from python.app import App  # type: ignore
+from python.__PP_APP_FILE_FMT__ import App  # type: ignore
 
 # pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
 # pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
