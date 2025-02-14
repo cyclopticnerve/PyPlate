@@ -816,34 +816,37 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # update docs
 
-        # # if docs flag is set
-        # if C.B_CMD_DOCS:
+        # if docs flag is set
+        if C.B_CMD_DOCS:
 
-        #     print(C.S_ACTION_DOCS, end="", flush=True)
+            print(C.S_ACTION_DOCS, end="", flush=True)
 
-        #     # activate cmd for pyplate's venv
-        #     # (so we don't need to install pdoc in every project)
-        #     cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
-        #         str(P_DIR_PYPLATE), self.S_PP_VENV
-        #     )
+            # activate cmd for pyplate's venv
+            # (so we don't need to install pdoc in every project)
+            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+                str(P_DIR_PYPLATE), self.S_PP_VENV
+            )
 
-        #     # get template and output dirs
-        #     dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
-        #     dir_docs = self._dir_prj / C.S_DIR_DOCS
+            # get template and output dirs
+            dir_template = self._dir_prj / C.S_DIR_DOCS_TMP
+            dir_docs = self._dir_prj / C.S_DIR_DOCS
 
-        #     # format cmd using abs prj docs dir (output) and abs prj dir (input)
-        #     cmd_docs = C.S_CMD_DOC.format(
-        #         dir_template, dir_docs, self._dir_prj
-        #     )
+            # adjust doc start dir
+            doc_start = C.D_PRV_PRJ["__PP_PDOC_START__"]
 
-        #     # the command to run pdoc
-        #     cmd = f"{cmd_activate};" f"{cmd_docs}"
-        #     try:
-        #         F.sh(cmd, shell=True)
-        #         print(C.S_ACTION_DONE)
-        #     except F.CNShellError as e:
-        #         print(C.S_ACTION_FAIL)
-        #         raise e
+            # format cmd using pdoc template dir, output dir, and start dir
+            cmd_docs = C.S_CMD_DOC.format(
+                dir_template, dir_docs, self._dir_prj / doc_start
+            )
+
+            # the command to run pdoc
+            cmd = f"{cmd_activate};" f"{cmd_docs}"
+            try:
+                F.sh(cmd, shell=True)
+                print(C.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(C.S_ACTION_FAIL)
+                raise e
 
         # ----------------------------------------------------------------------
         # tree
@@ -884,11 +887,11 @@ class PyMaker:
         # if install flag is set
         if C.B_CMD_INST:
 
-            # check if we need it
+            # get project type
             prj_type = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
 
-            # we need it
-            if prj_type in C.L_MAKE_INSTALL:
+            # cli/gui
+            if prj_type in C.L_PRG_INSTALL:
 
                 # show info
                 print(C.S_ACTION_INST, end="", flush=True)
@@ -938,33 +941,29 @@ class PyMaker:
                 # show info
                 print(C.S_ACTION_DONE)
 
-        # ----------------------------------------------------------------------
-        # if it's a package, install it
+            # pkg
+            if prj_type in C.L_PKG_INSTALL:
 
-        # check prj type
-        prj_type = C.D_PRV_PRJ["__PP_TYPE_PRJ__"]
-        if prj_type in C.L_INSTALL_AS_PKG:
+                # let user know
+                print(C.S_ACTION_INST_PKG, end="", flush=True)
 
-            # let user know
-            print(C.S_ACTION_INST_PKG, end="", flush=True)
+                # need to activate prj venv
+                dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
+                cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
+                    self._dir_prj, dir_venv
+                )
 
-            # need to activate prj venv
-            dir_venv = C.D_PRV_PRJ["__PP_NAME_VENV__"]
-            cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
-                self._dir_prj, dir_venv
-            )
+                # cmd to install
+                cmd_install = C.S_CMD_INSTALL_PKG.format(self._dir_prj)
 
-            # cmd to install
-            cmd_install = C.S_CMD_INSTALL_PKG.format(self._dir_prj)
-
-            # the command to install pkg
-            cmd = f"{cmd_activate};" f"{cmd_install}"
-            try:
-                F.sh(cmd, shell=True)
-                print(C.S_ACTION_DONE)
-            except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
-                raise e
+                # the command to install pkg
+                cmd = f"{cmd_activate};" f"{cmd_install}"
+                try:
+                    F.sh(cmd, shell=True)
+                    print(C.S_ACTION_DONE)
+                except F.CNShellError as e:
+                    print(C.S_ACTION_FAIL)
+                    raise e
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps

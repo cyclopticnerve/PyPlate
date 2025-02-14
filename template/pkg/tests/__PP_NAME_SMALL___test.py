@@ -1,5 +1,4 @@
-#! ../.venv-__PP_NAME_SMALL__/bin/python
-# /usr/bin/env python
+#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_BIG__                                        /          \
 # Filename: __PP_NAME_SMALL___test.py                             |     ()     |
@@ -21,14 +20,10 @@ from pathlib import Path
 import sys
 
 # find path to prj/lib
-P_DIR_PRJ_INST = Path.home() / "__PP_USR_INST__"
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-P_DIR_LIB_INST = P_DIR_PRJ_INST / "__PP_DIR_LIB__"
 P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
 
 # add paths to import search
-sys.path.append(str(P_DIR_LIB_INST))
 sys.path.append(str(P_DIR_LIB))
 
 # pylint: disable=wrong-import-position

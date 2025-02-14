@@ -170,8 +170,7 @@ S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = ".venv"
 S_DIR_DOCS = "docs"
-S_DIR_PDOC_TMP = "pdoc3"
-S_DIR_PDOC = "pdoc"
+S_DIR_DOCS_TMP = "pdoc3"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -228,6 +227,10 @@ S_TREE_FILE = f"{S_DIR_MISC}/{S_TREE_NAME}"
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
+# format for venv
+# NB: format param is __PP_NAME_SMALL__
+S_VENV_FMT_NAME = ".venv-{}"
+
 # switch constants
 S_SW_ENABLE = "enable"
 S_SW_DISABLE = "disable"
@@ -246,27 +249,24 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 # cmd for git
 # NB: format param is proj dir
 S_CMD_GIT_CREATE = "git init {} -q"
+# NB: format params are prj dir and venv name
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
+# NB: format param is prj dir
 S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ."
 # cmd for pdoc3
 # NB: format params are pdoc3 template dir, project's S_DIR_DOCS and project
 # dir
 S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} {}"
-# cmd for venv
-# NB: format param is __PP_NAME_SMALL__
-S_VENV_FMT_NAME = ".venv-{}"
 
 # fix readme
 S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
 S_RM_APP = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
-
 S_RM_DESC_SCH = (
     r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
     r"(.*?)"
     r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
 )
 S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
-
 S_RM_DEPS_SCH = (
     r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
     r"(.*?)"
@@ -334,7 +334,7 @@ S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
 S_META_VER_SEARCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
 S_META_VER_REPL = r'\g<1>"{}"'
 S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
-S_META_SD_REPL = r'\g<1>\g<2>{}\g<4>'
+S_META_SD_REPL = r"\g<1>\g<2>{}\g<4>"
 
 # make sure ver num entered in pybaker is valid
 S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
@@ -346,7 +346,9 @@ S_ASK_PROPS = (
 S_ASK_PROPS_DEF = "y"
 S_ASK_PROPS_ABORT = "Abort"
 
+# ------------------------------------------------------------------------------
 # gui stuff
+
 S_DEF_WIN_NAME = "default_window"
 S_DEF_UI_NAME = "win_main"
 S_DLG_UI_FILE = "dialogs"
@@ -551,10 +553,10 @@ L_CATS = [
 ]
 
 # install pkg in venv after making
-L_INSTALL_AS_PKG = ["p"]
+L_PKG_INSTALL = ["p"]
 
 # which prj types need an install.json?
-L_MAKE_INSTALL = [
+L_PRG_INSTALL = [
     "c",
     "g",
 ]
@@ -596,9 +598,6 @@ D_PRV_ALL = {
     ),
     # dummy value to use in headers
     "__PP_DUMMY__": "",
-    # docs folder
-    "__PP_NAME_DOCS__": S_DIR_DOCS,
-    "__PP_NAME_PDOC__": f"{S_DIR_DOCS}/{S_DIR_PDOC}",
     # version format string for command line
     # NB: format param is __PP_VERSION__ from metadata
     "__PP_VER_FMT__": "Version {}",
@@ -663,15 +662,15 @@ D_PRV_PRJ = {
     # these paths are calculated in do_before_fix, relative to the user's home
     # dir
     "__PP_USR_CONF__": "",  # config dir
-    "__PP_DIST_FMT__": "",
+    "__PP_DIST_FMT__": "",  # format name of the dist ([name_small]_[version])
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
     "__PP_KW_STR__": "",  # fix up keywords list for pyproject.toml
     "__PP_RM_DEPS__": "",  # fix up deps for README.md
-    # final desk file, not template
-    "__PP_FILE_DESK__": "",
+    "__PP_FILE_DESK__": "",  # final desk file, not template
+    "__PP_PDOC_START__": "",  # start doc search at this folder
 }
 
 # ------------------------------------------------------------------------------
@@ -747,6 +746,7 @@ D_PUB_DIST = {
         S_FILE_README: "",
         # toml file in subdir with same name as pkg
         S_FILE_TOML: "__PP_NAME_SMALL__",
+        S_DIR_DOCS: "",
     },
 }
 
@@ -1015,6 +1015,13 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     author = dict_prv_all["__PP_AUTHOR__"]
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
 
+    # fix pdoc start point
+    # NB: not a fan of pdoc but it's easier to use than sphinx...
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
+    if prj_type == "p":
+        dict_prv_prj["__PP_PDOC_START__"] = (
+            f"{S_DIR_SRC}/{dict_prv_prj["__PP_NAME_SMALL__"]}"
+        )
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
