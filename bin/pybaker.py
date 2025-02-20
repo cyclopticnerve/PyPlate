@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__.py                                  |     ()     |
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -12,7 +12,7 @@ The main file that runs the program
 
 This file is executable and can be called from the terminal like:
 
-foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
+foo@bar:~$ __PP_NAME_PRJ_SMALL__ [cmd line]
 
 when placed in a folder that is in the default $PATH, ie:
 /usr/bin
@@ -20,7 +20,7 @@ when placed in a folder that is in the default $PATH, ie:
 etc.
 
 All command line options will be passed to the main class, usually located at
-~/.local/share/__PP_NAME_SMALL__/src/__PP_NAME_SMALL__.py. 
+~/.local/share/__PP_NAME_PRJ_SMALL__/src/__PP_NAME_PRJ_SMALL__.py. 
 
 Typical usage is show in the main() method.
 """
@@ -41,7 +41,7 @@ import sys
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__:
+class __PP_NAME_PRJ_PASCAL__:
     """
     The entry point class, responsible for launching the program
 
@@ -64,8 +64,8 @@ class __PP_NAME_CLASS__:
 
     # commands to run
     S_CMD_ACTIVATE = ". ./__PP_NAME_VENV__/bin/activate"
-    S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_SMALL__.py"
-    S_CMD_RUN_ARGS = "./__PP_DIR_SRC__/__PP_NAME_SMALL__.py {}"
+    S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
+    S_CMD_RUN_ARGS = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py {}"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    obj = __PP_NAME_CLASS__()
+    obj = __PP_NAME_PRJ_PASCAL__()
 
     # run the new object
     obj.main()

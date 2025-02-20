@@ -38,6 +38,7 @@ sys.path.append(str(P_DIR_LIB))
 
 # my imports
 import gi  # type: ignore
+
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk  # type: ignore
 
@@ -60,7 +61,7 @@ class CNApp(Gtk.Application):
 
     Properties:
         i18n_domain: the domain name for i18n (usually the value of
-        "__PP_NAME_SMALL__")
+        "__PP_NAME_PRJ_SMALL__")
 
     Methods:
         add_window: Add a new window instance
@@ -100,7 +101,7 @@ class CNApp(Gtk.Application):
             app_id: The reverse dot notation id of the app (ie.
             "org.cyclopticnerve.foobar")
             i18n_domain: the domain name for i18n (usually the value of
-            "__PP_NAME_SMALL__")
+            "__PP_NAME_PRJ_SMALL__")
 
         Initializes a new instance of the class, setting the default values of
         its properties, and any other code needed to create a new object.
@@ -338,5 +339,6 @@ class CNApp(Gtk.Application):
 
         # don't do anything special at quit, windows should handle that
         # pass
+
 
 # -)

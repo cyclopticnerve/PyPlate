@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SEC__.py                                    |     ()     |
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_NAME_SEC_SMALL__.py                              |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -43,7 +43,9 @@ def func():
     """
 
     # do the thing
-    return "this is func"
+    pub = "this is func"
+    prv = _func()
+    return f"{pub}\n{prv}"
 
 
 # ------------------------------------------------------------------------------
@@ -72,5 +74,6 @@ def _func():
 
     # do the thing
     return "this is _func"
+
 
 # -)

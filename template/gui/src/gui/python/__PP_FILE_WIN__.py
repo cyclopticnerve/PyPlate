@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SEC___win.py                                |     ()     |
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_FILE_WIN__.py                                    |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -21,43 +21,16 @@ private functions declared here.
 
 # system imports
 from pathlib import Path
-import sys
-
-# find path to lib
-P_DIR_PRJ_INST = Path.home() / "__PP_USR_INST__"
-P_DIR_PRJ = Path(__file__).parents[3].resolve()
-
-P_DIR_LIB_INST = P_DIR_PRJ_INST / "__PP_DIR_LIB__"
-P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
-
-P_DIR_GUI_INST = P_DIR_PRJ_INST / "__PP_DIR_GUI__"
-P_DIR_GUI = P_DIR_PRJ / "__PP_DIR_GUI__"
-
-# add paths to import search
-sys.path.append(str(P_DIR_LIB_INST))
-sys.path.append(str(P_DIR_LIB))
-sys.path.append(str(P_DIR_GUI_INST))
-sys.path.append(str(P_DIR_GUI))
 
 # pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
 
 # my imports
-from cnguilib.cnwindow import CNWindow  # type: ignore
+import gi  # type: ignore
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk  # type: ignore
 
 # pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=import-error
-# pylint: enable=no-name-in-module
-
-# ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# the name of the window in the ui file
-UI_WIN_NAME = "__PP_NAME_SEC__"
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -67,7 +40,7 @@ UI_WIN_NAME = "__PP_NAME_SEC__"
 # ------------------------------------------------------------------------------
 # A class to wrap a specific window object in the ui file
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__(CNWindow):
+class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     """
     A class to wrap a specific window object in the ui file
 
@@ -76,34 +49,61 @@ class __PP_NAME_CLASS__(CNWindow):
     """
 
     # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    # find path to self
+    P_DIR_PRJ = Path(__file__).parents[3].resolve()
+
+    # the name of the window in the ui file
+    # S_UI_WIN_NAME = "__PP_NAME_SEC__"
+
+    # window actions
+    S_ACTION_DELETE_EVENT = "delete-event"
+    S_ACTION_DESTROY = "destroy"
+
+    # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self, app, name_win):
+    def __init__(self, app):
         """
         Initialize the new object
 
         Args:
             app: The calling Application object
-            name_win: The name of the window in the app's instance list
 
         Initializes a new instance of the class, setting the default values of
         its properties, and any other code needed to create a new object.
         """
 
+        # set props
+        self._app = app
+
         # props necessary tro create a basic window
-        # NB: no ext (will find .ui, .glade, .xml...)
-        ui_file = P_DIR_PRJ / "__PP_DIR_UI__" / f"{UI_WIN_NAME}"
+        ui_file = self.P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
         ui_path = Path(ui_file).resolve()
 
-        # create a basic window
-        super().__init__(app, name_win, ui_path, UI_WIN_NAME)
+        # create a builder and set i18n domain
+        self.builder = Gtk.Builder()
+        self.builder.set_translation_domain(self._app._i18n_domain)
+
+        # load file and get window
+        self.builder.add_from_file(str(ui_path))
+        self.window = self.builder.get_object("__PP_CLASS_WIN__")
+
+        # connect all control signals
+        self.builder.connect_signals(self)  # pylint: disable=no-member
+
+        # connect window signals
+        self.window.connect(self.S_ACTION_DELETE_EVENT, self._evt_win_delete)
+        self.window.connect(self.S_ACTION_DESTROY, self._evt_win_destroy)
 
     # --------------------------------------------------------------------------
-    # Private methods
+    # Control signal methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -121,7 +121,7 @@ class __PP_NAME_CLASS__(CNWindow):
 
         # get dialog, run, hide (standard for reusable modal dialogs)
         # NB: no ext (will find .ui, .glade, .xml...)
-        dlg_file = P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE__"
+        dlg_file = self.P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE__.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "__PP_DLG_ABOUT__")
 
@@ -215,6 +215,54 @@ class __PP_NAME_CLASS__(CNWindow):
 
         # close the window as if by the 'X' button
         self.window.close()
+
+    # --------------------------------------------------------------------------
+    # Window signal methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Called when the main window is closed by the 'X' button
+    # --------------------------------------------------------------------------
+    def _evt_win_delete(self, _obj, _event):
+        """
+        Called when the main window is closed by the 'X' button
+
+        Args:
+            _obj: Not used
+            _event: Not used
+
+        Returns:
+            False to allow the window to close
+            True to keep the window open
+
+        The Window is about to close via the 'X' button (or some other system
+        event, like closing from the overview or the dock). Note that this
+        handler expects to return THE OPPOSITE of the _can_close method's
+        result. That is, returning False here lets the window close, while
+        returning True means the window will not close. This is easy to work
+        around since _can_close returns a boolean value.
+        """
+
+        print("_evt_win_delete")
+
+        # close window
+        return False
+
+    # --------------------------------------------------------------------------
+    # Called after the window is destroyed
+    # --------------------------------------------------------------------------
+    def _evt_win_destroy(self, _obj):
+        """
+        Called after the window is destroyed
+
+        Args:
+            _obj: Not used
+
+        This method is called after the window is destroyed. It is used to
+        remove the window from the app's internal list.
+        """
+
+        print("_evt_win_destroy")
 
 
 # -)

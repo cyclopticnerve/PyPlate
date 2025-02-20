@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL___test.py                             |     ()     |
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_NAME_PRJ_SMALL___test.py                         |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -9,30 +9,35 @@
 
 """
 A simple script to test a package
+
+Note that you will need to activate the project's venv to use this script.
+If you are working in VSCode, you should:
+1. Deactivate the current venv in the Terminal tab using the "deactivate"
+command
+2. Switch to the "Run and Debug" tab, and select the "Pkg Test" option
+3. Press the "Run" button to run the script. This will activate the project's
+venv for you
+
+If you are working in an external terminal, you should:
+1. Deactivate the current venv in the Terminal tab using the "deactivate"
+command
+2. cd to the project directory
+3*. Activate the project's venv using:
+"(source | .) .venv-__PP_NAME_PRJ_SMALL__/bin/activate"
+4. Run the script using:
+"./tests/__PP_NAME_PRJ_SMALL___test.py"
+
+* some shells accept the "source" command, while others accept the "." command.
 """
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
-# system imports
-from pathlib import Path
-import sys
-
-# find path to prj/lib
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
-
-# add paths to import search
-sys.path.append(str(P_DIR_LIB))
-
-# pylint: disable=wrong-import-position
 # pylint: disable=import-error
 
-# import my stuff
-from __PP_NAME_SMALL__ import __PP_NAME_SEC__  # type: ignore
+from __PP_NAME_PRJ_SMALL__ import __PP_NAME_SEC_SMALL__  # type: ignore
 
-# pylint: enable=wrong-import-position
 # pylint: enable=import-error
 
 
@@ -46,7 +51,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    res = __PP_NAME_SEC__.func()
+    res = __PP_NAME_SEC_SMALL__.func()
     print(res)
 
 # -)

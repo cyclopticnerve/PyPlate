@@ -38,7 +38,7 @@ B_CMD_I18N = True
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
 # create docs
-B_CMD_DOCS = True
+B_CMD_DOCS = False
 # do install/uninstall
 B_CMD_INST = True
 
@@ -70,11 +70,10 @@ S_TYPE_JOIN = " | "
 # NB: format param is joined list of project types
 S_ASK_TYPE = "Project type [{}]: "
 S_ASK_NAME = "Project name: "
-S_ASK_DISP = "Display name [{}]: "
-S_ASK_DESC = "Short description: "
-# NB: format params are D_TYPE_SEC[prj_type], __PP_NAME_SMALL__
-S_ASK_SEC = "{} name (default: {}): "
-S_ASK_VERS = "Version (default: {}): "
+S_ASK_SEC_P = "Module name (default: {}): "
+S_ASK_SEC_P_DEF = "{}"
+S_ASK_SEC_G = "Window class name (default: {}): "
+S_ASK_SEC_G_DEF = "{}_win"
 
 # error strings
 S_ERR_TYPE = "Type must be one of {}"
@@ -210,7 +209,8 @@ S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
 S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
 # .desktop stuff
-S_FILE_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/template.desktop"
+S_NAME_DSK_TMP = "template"
+S_FILE_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_NAME_DSK_TMP}.desktop"
 
 # I18N stuff
 S_PATH_LOCALE = str(Path(S_DIR_I18N) / S_DIR_LOCALE)
@@ -228,7 +228,7 @@ S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
 # format for venv
-# NB: format param is __PP_NAME_SMALL__
+# NB: format param is __PP_NAME_PRJ_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
 
 # switch constants
@@ -628,6 +628,7 @@ D_PRV_ALL = {
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
+    "__PP_NAME_DSK_TMP__": S_NAME_DSK_TMP,
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
@@ -648,13 +649,24 @@ D_PRV_ALL = {
 # project is created, as pybaker.py will not update them
 D_PRV_PRJ = {
     "__PP_TYPE_PRJ__": "",  # 'c'
-    "__PP_NAME_DISP__": "",  # My Project
-    "__PP_NAME_BIG__": "",  # My_Project
-    "__PP_NAME_SMALL__": "",  # my_project
-    "__PP_NAME_SEC__": "",  # module1.py
-    "__PP_NAME_CLASS__": "",  # Pascal case name for classes
+
+    "__PP_NAME_PRJ__": "",  # My Project
+    "__PP_NAME_PRJ_BIG__": "",  # My_Project
+    "__PP_NAME_PRJ_SMALL__": "",  # my_project
+    "__PP_NAME_PRJ_PASCAL__": "",  # MyProject
+
+    "__PP_NAME_SEC__": "",  # My Win
+    "__PP_NAME_SEC_BIG__": "",  # My_Win
+    "__PP_NAME_SEC_SMALL__": "",  # my_win
+    "__PP_NAME_SEC_PASCAL__": "",  # MyWin
+
     "__PP_DATE__": "",  # the date each file was created, updated every time
     "__PP_NAME_VENV__": "",  # venv folder name
+
+    "__PP_FILE_APP__": "",  # my_project_app
+    "__PP_CLASS_APP__": "",  # MyProjectApp
+    "__PP_FILE_WIN__": "",  # my_project_win
+    "__PP_CLASS_WIN__": "",  # MyProjectWin
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
     "__PP_DEV_PP__": "",  # location of PyPlate src dir, rel to dev home
@@ -741,11 +753,11 @@ D_PUB_DIST = {
     },
     "p": {
         # basic stuff (put at top level)
-        f"{S_DIR_SRC}/__PP_NAME_SMALL__": "",
+        f"{S_DIR_SRC}/__PP_NAME_PRJ_SMALL__": "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
         # toml file in subdir with same name as pkg
-        S_FILE_TOML: "__PP_NAME_SMALL__",
+        S_FILE_TOML: "__PP_NAME_PRJ_SMALL__",
         S_DIR_DOCS: "",
     },
 }
@@ -825,7 +837,7 @@ D_PUB_I18N = {
     # dict of clangs and no exts (ie file names)
     S_KEY_NO_EXT: {
         "Python": [
-            "__PP_NAME_SMALL__",
+            "__PP_NAME_PRJ_SMALL__",
         ],
     },
     # list of written languages that are available
@@ -856,7 +868,7 @@ D_COPY = {
 # val is list of libs to add to prj type
 D_COPY_LIB = {
     "c": ["cnlib"],
-    "g": ["cnlib", "cnguilib"],
+    "g": ["cnlib"],  # "cnguilib"],
 }
 
 # dictionary of default stuff to put in install.json
@@ -873,7 +885,7 @@ D_INSTALL = {
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
-        f"{S_DIR_BIN}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
+        f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
     },
     "g": {
         S_DIR_CONF: "__PP_USR_INST__",
@@ -884,7 +896,7 @@ D_INSTALL = {
         S_FILE_LICENSE: "__PP_USR_INST__",
         S_FILE_README: "__PP_USR_INST__",
         S_DIR_UNINSTALL: "__PP_USR_INST__",
-        f"{S_DIR_BIN}/__PP_NAME_SMALL__": "__PP_USR_BIN__",
+        f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
         #
         S_DIR_GUI: "__PP_USR_INST__",
         "__PP_FILE_DESK__": S_USR_APPS,
@@ -895,13 +907,13 @@ D_INSTALL = {
 D_UNINSTALL = {
     "c": [
         "__PP_USR_INST__",
-        "__PP_USR_BIN__/__PP_NAME_SMALL__",
+        "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
     ],
     "g": [
         "__PP_USR_INST__",
-        "__PP_USR_BIN__/__PP_NAME_SMALL__",
+        "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
         #
-        f"{S_USR_APPS}/__PP_NAME_BIG__.desktop",
+        f"{S_USR_APPS}/__PP_NAME_PRJ_BIG__.desktop",
     ],
 }
 
@@ -937,8 +949,8 @@ D_PY_REPL = {
 
 # the type of projects that will ask for a second name
 D_NAME_SEC = {
-    "p": "Module",
-    "g": "Window class",
+    "p": [S_ASK_SEC_P, S_ASK_SEC_P_DEF],
+    "g": [S_ASK_SEC_G, S_ASK_SEC_G_DEF],
 }
 
 # default dict of block-level switches (should be I_SW_TRUE or I_SW_FALSE)
@@ -962,7 +974,6 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Public functions
 # ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -993,7 +1004,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
 
     # get values after pymaker has set them
-    name_small = dict_prv_prj["__PP_NAME_SMALL__"]
+    name_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
     usr_inst = f"{S_USR_SHARE}/{name_small}"
@@ -1003,15 +1014,23 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     dict_prv_prj["__PP_DESK_ICON__"] = (
         f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.png"
     )
-    name_big = dict_prv_prj["__PP_NAME_BIG__"]
+    name_big = dict_prv_prj["__PP_NAME_PRJ_BIG__"]
     dict_prv_prj["__PP_FILE_DESK__"] = (
         f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_big}.desktop"
     )
 
     # k/v to fix gui stuff
-    dict_prv_prj["__PP_APP_FILE_FMT__"] = S_APP_FILE_FMT.format(name_small)
-    name_sec = dict_prv_prj["__PP_NAME_SEC__"]
-    dict_prv_prj["__PP_WIN_FILE_FMT__"] = S_WIN_FILE_FMT.format(name_sec)
+    # dict_prv_prj["__PP_APP_FILE_FMT__"] = S_APP_FILE_FMT.format(name_small)
+    # dict_prv_prj["__PP_APP_CLASS_FMT__"] = _pascal_case(
+    #     dict_prv_prj["__PP_APP_FILE_FMT__"]
+    # )
+
+    # name_sec = dict_prv_prj["__PP_NAME_SEC__"]
+    # dict_prv_prj["__PP_WIN_FILE_FMT__"] = S_WIN_FILE_FMT.format(name_sec)
+    # dict_prv_prj["__PP_WIN_CLASS_FMT__"] = _pascal_case(
+    #     dict_prv_prj["__PP_WIN_FILE_FMT__"]
+    # )
+
     author = dict_prv_all["__PP_AUTHOR__"]
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
 
@@ -1020,8 +1039,9 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
     if prj_type == "p":
         dict_prv_prj["__PP_PDOC_START__"] = (
-            f"{S_DIR_SRC}/{dict_prv_prj["__PP_NAME_SMALL__"]}"
+            f"{S_DIR_SRC}/{dict_prv_prj["__PP_NAME_PRJ_SMALL__"]}"
         )
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1088,7 +1108,7 @@ def do_before_dist(_dir_prj, dict_prv, dict_pub):
     """
 
     # get small name and version
-    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
+    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
     version = dict_pub[S_KEY_PUB_META]["__PP_VERSION__"]
 
     # replace all dots with dashes in ver
@@ -1146,7 +1166,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
 
     # get prj type
     type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_SMALL__"]
+    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
 
     if type_prj == "p":
 
@@ -1393,6 +1413,5 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
-
 
 # -)

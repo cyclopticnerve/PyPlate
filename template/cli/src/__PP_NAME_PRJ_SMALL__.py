@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_BIG__                                        /          \
-# Filename: __PP_NAME_SMALL__.py                                  |     ()     |
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -13,11 +13,11 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PP_NAME_SMALL__.py [cmd line]
+foo@bar:~[path to directory of this file]$ ./__PP_NAME_PRJ_SMALL__.py [cmd line]
 
 or if installed in a global location:
 
-foo@bar:~$ __PP_NAME_SMALL__ [cmd line]
+foo@bar:~$ __PP_NAME_PRJ_SMALL__ [cmd line]
 
 Typical usage is show in the main() method.
 """
@@ -32,19 +32,16 @@ import locale
 from pathlib import Path
 import sys
 
-# find path to prj/lib
+# find path to prj
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# add paths to import search
-P_DIR_LIB = P_DIR_PRJ / "__PP_DIR_LIB__"
-sys.path.append(str(P_DIR_LIB))
+sys.path.append(str(P_DIR_PRJ))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=import-error
 
 # import my stuff
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cncli import CNCli  # type: ignore
+from lib.cnlib import cnfunctions as F  # type: ignore
+from lib.cnlib.cncli import CNCli  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=import-error
@@ -53,8 +50,8 @@ from cnlib.cncli import CNCli  # type: ignore
 # gettext stuff for CLI
 # ------------------------------------------------------------------------------
 
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_SMALL__.py
-DOMAIN = "__PP_NAME_SMALL__"
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
+DOMAIN = "__PP_NAME_PRJ_SMALL__"
 DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
 TRANSLATION = gettext.translation(DOMAIN, DIR_LOCALE, fallback=True)
 _ = TRANSLATION.gettext
@@ -71,7 +68,7 @@ locale.bindtextdomain(DOMAIN, DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_CLASS__(CNCli):
+class __PP_NAME_PRJ_PASCAL__(CNCli):
     """
     The main class, responsible for the operation of the program
 
@@ -101,10 +98,10 @@ class __PP_NAME_CLASS__(CNCli):
 
     # about string
     S_ABOUT = (
-        "__PP_NAME_BIG__\n"
+        "__PP_NAME_PRJ__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_VER_OUT}\n"
-        "__PP_URL__/__PP_NAME_BIG__\n"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
     )
 
     # path to default config file
@@ -167,20 +164,20 @@ class __PP_NAME_CLASS__(CNCli):
         """
 
         # sample of using repl switch
-        _fix = "__PP_NAME_BIG__"
+        _fix = "__PP_NAME_PRJ_BIG__"
 
         # pyplate: disable=replace
-        _dont_fix = "__PP_NAME_BIG__"
+        _dont_fix = "__PP_NAME_PRJ_BIG__"
         # pyplate: enable=replace
 
-        _fix = "__PP_NAME_BIG__"
+        _fix = "__PP_NAME_PRJ_BIG__"
 
-        _dont_fix = "__PP_NAME_BIG__"  # pyplate: disable=replace
+        _dont_fix = "__PP_NAME_PRJ_BIG__"  # pyplate: disable=replace
 
-        _fix = "__PP_NAME_BIG__"
+        _fix = "__PP_NAME_PRJ_BIG__"
 
         # pyplate: disable=replace
-        _fix = "__PP_NAME_BIG__"  # pyplate: enable=replace
+        _fix = "__PP_NAME_PRJ_BIG__"  # pyplate: enable=replace
         # pyplate: enable=replace
 
         _desc = _("__PP_SHORT_DESC__")
@@ -206,7 +203,7 @@ class __PP_NAME_CLASS__(CNCli):
         """
 
         # call to super run arg parser
-        self._run_parser()
+        self._run_parser(self.S_ABOUT)
 
         # print about msg on every run (but only after checking for -h)
         print(self.S_ABOUT)
@@ -224,7 +221,7 @@ class __PP_NAME_CLASS__(CNCli):
     # --------------------------------------------------------------------------
     # Add arguments to argparse parser
     # --------------------------------------------------------------------------
-    def _add_args(self, parser):
+    def _add_args(self):
         """
         Add arguments to argparse parser
 
@@ -235,24 +232,9 @@ class __PP_NAME_CLASS__(CNCli):
         allows subclasses to add their own arguments to the parser.
         """
 
-        # set help string
-        parser.description = self.S_ABOUT
-
-        # add config (user dict) option
-        parser.add_argument(
-            CNCli.S_ARG_CFG_OPTION,
-            dest=CNCli.S_ARG_CFG_DEST,
-            help=CNCli.S_ARG_CFG_HELP,
-            metavar=CNCli.S_ARG_CFG_METAVAR,
-        )
-
-        # add debug option
-        parser.add_argument(
-            CNCli.S_ARG_DBG_OPTION,
-            action=CNCli.S_ARG_DBG_ACTION,
-            dest=CNCli.S_ARG_DBG_DEST,
-            help=CNCli.S_ARG_DBG_HELP,
-        )
+        # add the default args
+        self._add_cfg_arg()
+        self._add_dbg_arg()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
@@ -283,7 +265,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    obj = __PP_NAME_CLASS__()
+    obj = __PP_NAME_PRJ_PASCAL__()
 
     # run the new object
     obj.main()

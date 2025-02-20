@@ -71,6 +71,31 @@ class CNShellError(Exception):
 
 
 # ------------------------------------------------------------------------------
+# Pascal case a string
+# ------------------------------------------------------------------------------
+def pascal_case(a_str):
+    """
+    Format a string in Pascal case
+
+    Args:
+        a_str: A string to convert to Pascal case
+
+    Returns;
+        The Pascal cased string
+    """
+
+    # do formatting
+    name_pascal = a_str
+    name_pascal = name_pascal.replace("_", " ")
+    name_pascal = name_pascal.replace("-", " ")
+    name_pascal = name_pascal.title()
+    name_pascal = name_pascal.replace(" ", "")
+
+    # return result
+    return name_pascal
+
+
+# ------------------------------------------------------------------------------
 # A function to convert bools from other values, like integers or strings
 # ------------------------------------------------------------------------------
 def do_bool(val):

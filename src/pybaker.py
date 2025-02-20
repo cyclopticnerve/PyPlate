@@ -554,7 +554,7 @@ class PyBaker:
             # create CNPotPy object
             potpy = CNPotPy(
                 # header
-                str_appname=self._dict_prv_prj["__PP_NAME_BIG__"],
+                str_appname=self._dict_prv_prj["__PP_NAME_PRJ_BIG__"],
                 str_version=self._dict_pub_meta["__PP_VERSION__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
@@ -565,7 +565,7 @@ class PyBaker:
                 # optional out
                 dir_locale=self._dir_prj / C.S_PATH_LOCALE,
                 dir_po=self._dir_prj / C.S_PATH_PO,
-                str_domain=self._dict_prv_prj["__PP_NAME_SMALL__"],
+                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
                 # optional in
                 str_tag=C.S_I18N_TAG,
                 # NB: use dict_pub here b/c dunders have been fixed
@@ -687,7 +687,7 @@ class PyBaker:
         C.do_before_dist(self._dir_prj, self._dict_prv, self._dict_pub)
 
         # # get small name and format w/ version
-        # name_small = self._dict_prv_prj["__PP_NAME_SMALL__"]
+        # name_small = self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
         # version = self._dict_pub_meta["__PP_VERSION__"]
         # name_fmt = f"{name_small}_{version}"
         # find old dist? nuke it from orbit! it's the only way to be sure!
@@ -1126,20 +1126,20 @@ if __name__ == "__main__":
     parser.description = PyBaker.S_PP_ABOUT
 
     # add debug option
-    parser.add_argument(
-        PyBaker.S_DBG_OPTION,
-        action=PyBaker.S_DBG_ACTION,
-        dest=PyBaker.S_DBG_DEST,
-        help=PyBaker.S_DBG_HELP,
-    )
+    # parser.add_argument(
+    #     PyBaker.S_DBG_OPTION,
+    #     action=PyBaker.S_DBG_ACTION,
+    #     dest=PyBaker.S_DBG_DEST,
+    #     help=PyBaker.S_DBG_HELP,
+    # )
 
     # add ide option
-    parser.add_argument(
-        PyBaker.S_IDE_OPTION,
-        action=PyBaker.S_IDE_ACTION,
-        dest=PyBaker.S_IDE_DEST,
-        help=PyBaker.S_IDE_HELP,
-    )
+    # parser.add_argument(
+    #     PyBaker.S_IDE_OPTION,
+    #     action=PyBaker.S_IDE_ACTION,
+    #     dest=PyBaker.S_IDE_DEST,
+    #     help=PyBaker.S_IDE_HELP,
+    # )
 
     # get namespace object
     args = parser.parse_args()

@@ -10,7 +10,7 @@
 This is the base class for a CLI program. The template CLI and GUI programs
 subclass it.
 
-See PyPlate/template/cli/src/__PP_NAME_SMALL__.py for an example.
+See PyPlate/template/cli/src/__PP_NAME_PRJ_SMALL__.py for an example.
 """
 
 # ------------------------------------------------------------------------------
@@ -21,9 +21,13 @@ See PyPlate/template/cli/src/__PP_NAME_SMALL__.py for an example.
 import argparse
 from pathlib import Path
 
+# pylint: disable=import-error
+
 # my imports
-from cnlib import cnfunctions as F  # pylint: disable=import-error
-from cnlib.cnformatter import CNFormatter  # pylint: disable=import-error
+from cnlib import cnfunctions as F
+from cnlib.cnformatter import CNFormatter
+
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -60,7 +64,7 @@ class CNCli:
     S_ARG_DBG_OPTION = "-d"
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
-    S_ARG_DBG_HELP = "enable debugging option"
+    S_ARG_DBG_HELP = "enable debugging mode"
 
     # error messages
     S_ERR_IMPL = "This method must be implemented by a subclass"
@@ -82,6 +86,7 @@ class CNCli:
         """
 
         # set defaults
+        self._parser = None
         self._dict_args = {}
         self._debug = False
         self._dict_cfg = {}
@@ -95,9 +100,13 @@ class CNCli:
     # --------------------------------------------------------------------------
     # Set up and run the command line parser
     # --------------------------------------------------------------------------
-    def _run_parser(self):
+    def _run_parser(self, description):
         """
         Set up and run the command line parser
+
+        Args:
+            description: The description of the program to show when the -h
+            option is used
 
         This method sets up and runs the command line parser to minimize code
         in the subclass. It calls the subclass to add it's arguments, then it
@@ -105,13 +114,15 @@ class CNCli:
         """
 
         # create the command line parser
-        parser = argparse.ArgumentParser(formatter_class=CNFormatter)
+        self._parser = argparse.ArgumentParser(
+            description=description, formatter_class=CNFormatter
+        )
 
         # call the subclass method
-        self._add_args(parser)
+        self._add_args()
 
         # get namespace object
-        args = parser.parse_args()
+        args = self._parser.parse_args()
 
         # convert namespace to dict
         self._dict_args = vars(args)
@@ -129,19 +140,51 @@ class CNCli:
     # --------------------------------------------------------------------------
     # This method does nothing, it is for subclassing
     # --------------------------------------------------------------------------
-    def _add_args(self, parser):
+    def _add_args(self):
         """
         This method does nothing, it is for subclassing
 
-        Args:
-            parser: The ArgumentParser to add the args to
-
-        This method is empty, but is declared here because the subclass method
-        is called from _run_parser.
+        Do nothing here, only defer to subclass
         """
 
-        # dummy method to be subclassed
-        raise NotImplementedError(self.S_ERR_IMPL)
+        # shoe message that we do nothing, only subclass
+        raise NotImplementedError(CNCli.S_ERR_IMPL)
+
+    # --------------------------------------------------------------------------
+    # Add default cfg arg to parser
+    # --------------------------------------------------------------------------
+    def _add_cfg_arg(self):
+        """
+        Add default cfg arg to parser
+
+        Adds the default configuration option to the command line
+        """
+
+        if self._parser:
+            self._parser.add_argument(
+                CNCli.S_ARG_CFG_OPTION,
+                dest=CNCli.S_ARG_CFG_DEST,
+                help=CNCli.S_ARG_CFG_HELP,
+                metavar=CNCli.S_ARG_CFG_METAVAR,
+            )
+
+    # --------------------------------------------------------------------------
+    # Add default dbg arg to parser
+    # --------------------------------------------------------------------------
+    def _add_dbg_arg(self):
+        """
+        Add default dbg arg to parser
+
+        Adds the default debug option to the command line
+        """
+
+        if self._parser:
+            self._parser.add_argument(
+                CNCli.S_ARG_DBG_OPTION,
+                action=CNCli.S_ARG_DBG_ACTION,
+                dest=CNCli.S_ARG_DBG_DEST,
+                help=CNCli.S_ARG_DBG_HELP,
+            )
 
     # --------------------------------------------------------------------------
     # Load config dict from a json file

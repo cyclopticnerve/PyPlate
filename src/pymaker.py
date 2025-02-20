@@ -20,6 +20,8 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
+# FIXME: docs broken again
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -285,11 +287,6 @@ class PyMaker:
 
         # sanity check
         cwd = Path.cwd()
-        prj_name = ""
-        name_disp = ""
-        name_big = ""
-        name_small = ""
-        tmp_dir = ""
 
         # if in debug mode
         if self._debug:
@@ -298,15 +295,14 @@ class PyMaker:
             for item in C.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
-                    prj_name = f"{item[1]} DEBUG"
+                    name_prj = f"{item[1]} DEBUG"
                     break
 
             # dir name, no spaces
-            name_big = prj_name.replace(" ", "_")  # CLI_DEBUG, GUI_DEBUG, etc.
+            name_prj_big = name_prj.replace(" ", "_")
 
             # set up for existence check
-            # i.e. /home/cyclopticnerve/Documents/Projects/Python/CLI_DEBUG
-            tmp_dir = cwd / name_big
+            tmp_dir = cwd / name_prj_big
 
             # check if project already exists
             if tmp_dir.exists():
@@ -324,30 +320,32 @@ class PyMaker:
             while True:
 
                 # ask for name of project
-                prj_name = input(C.S_ASK_NAME)
-                prj_name = prj_name.strip(" ")
+                name_prj = input(C.S_ASK_NAME)
+                name_prj = name_prj.strip(" ")
 
                 # check for valid name
-                if self._check_name(prj_name):
+                if self._check_name(name_prj):
 
                     # dir name, no spaces
-                    name_big = prj_name.replace(" ", "_")  # CLI_Test
+                    name_prj_big = name_prj.replace(" ", "_")
 
                     # set up for existence check
-                    tmp_dir = cwd / name_big
+                    tmp_dir = cwd / name_prj_big
 
                     # check if project already exists
                     if tmp_dir.exists():
 
                         # tell the user that the old name exists
-                        print(C.S_ERR_EXIST.format(name_big))
+                        print(C.S_ERR_EXIST.format(name_prj_big))
                     else:
                         break
 
         # save global property
         self._dir_prj = tmp_dir
-        name_disp = prj_name  # CLI DEBUG
-        name_small = name_big.lower()  # cli_debug
+
+        # save other names
+        name_prj_small = name_prj_big.lower()
+        name_prj_pascal = F.pascal_case(name_prj_small)
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -356,42 +354,34 @@ class PyMaker:
         # for a gui we should ask for the main window class name
         # for a package we should ask for the module name
 
-        # sanity check
-        def_name_sec = name_small
-        name_sec = def_name_sec
-
         # if not debug, if need second name, ask for it
         if not self._debug and prj_type in C.D_NAME_SEC:
 
             # format question for second name
-            s_name_sec = C.D_NAME_SEC[prj_type]
-            s_sec_fmt = C.S_ASK_SEC.format(s_name_sec, def_name_sec)
+            s_sec_ask = C.D_NAME_SEC[prj_type][0]
+            s_sec_def = C.D_NAME_SEC[prj_type][1]
+            s_sec_def_fmt = s_sec_def.format(name_prj_small)
+            s_sec_ask_fmt = s_sec_ask.format(s_sec_def_fmt)
 
             # loop forever until we get a valid name or empty string
             while True:
 
                 # ask for second name
-                name_new = input(s_sec_fmt)
-                name_new = name_new.strip(" ")
-                if name_new == "":
-                    name_new = name_small
+                name_sec = input(s_sec_ask_fmt)
+                name_sec = name_sec.strip(" ")
+
+                # empty, keep default
+                if name_sec == "":
+                    name_sec = s_sec_def_fmt
 
                 # check for valid name
-                if self._check_name(name_new):
-                    name_new = name_new.replace(" ", "_")
-                    name_sec = name_new
+                if self._check_name(name_sec):
+                    name_sec_big = name_sec.replace(" ", "_")
                     break
 
-        # ----------------------------------------------------------------------
-        # here we figure out the Pascal cased project name for files with a
-        # class
-
-        # do formatting
-        name_class = name_sec
-        name_class = name_class.replace("_", " ")
-        name_class = name_class.replace("-", " ")
-        name_class = name_class.title()
-        name_class = name_class.replace(" ", "")
+        # save other names
+        name_sec_small = name_sec_big.lower()
+        name_sec_pascal = F.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
         # calculate initial project date
@@ -409,13 +399,31 @@ class PyMaker:
 
         # save project stuff
         C.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
-        C.D_PRV_PRJ["__PP_NAME_DISP__"] = name_disp
-        C.D_PRV_PRJ["__PP_NAME_BIG__"] = name_big
-        C.D_PRV_PRJ["__PP_NAME_SMALL__"] = name_small
+
+        C.D_PRV_PRJ["__PP_NAME_PRJ__"] = name_prj
+        C.D_PRV_PRJ["__PP_NAME_PRJ_BIG__"] = name_prj_big
+        C.D_PRV_PRJ["__PP_NAME_PRJ_SMALL__"] = name_prj_small
+        C.D_PRV_PRJ["__PP_NAME_PRJ_PASCAL__"] = name_prj_pascal
+
         C.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
-        C.D_PRV_PRJ["__PP_NAME_CLASS__"] = name_class
+        C.D_PRV_PRJ["__PP_NAME_SEC_BIG__"] = name_sec_big
+        C.D_PRV_PRJ["__PP_NAME_SEC_SMALL__"] = name_sec_small
+        C.D_PRV_PRJ["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
+
         C.D_PRV_PRJ["__PP_DATE__"] = info_date
-        C.D_PRV_PRJ["__PP_NAME_VENV__"] = C.S_VENV_FMT_NAME.format(name_small)
+        C.D_PRV_PRJ["__PP_NAME_VENV__"] = C.S_VENV_FMT_NAME.format(name_prj_small)
+
+        C.D_PRV_PRJ["__PP_FILE_APP__"] = C.S_APP_FILE_FMT.format(name_prj_small)
+        C.D_PRV_PRJ["__PP_CLASS_APP__"] = F.pascal_case(
+            C.D_PRV_PRJ["__PP_FILE_APP__"]
+        )
+
+        C.D_PRV_PRJ["__PP_FILE_WIN__"] = C.S_WIN_FILE_FMT.format(name_sec_small)
+        C.D_PRV_PRJ["__PP_CLASS_WIN__"] = F.pascal_case(
+            C.D_PRV_PRJ["__PP_FILE_WIN__"]
+        )
+
+        F.pp(C.D_PRV_PRJ)
 
         # remove home dir from PyPlate path
         h = str(Path.home())
@@ -485,24 +493,21 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # do copy lib dict
 
-        # go through dict to find list
-        for key, val in C.D_COPY_LIB.items():
+        # get list of libs for this prj type
+        val = C.D_COPY_LIB.get(prj_type_short, [])
 
-            # this is our type
-            if key == C.D_PRV_PRJ["__PP_TYPE_PRJ__"]:
+        # copy libs
+        for item in val:
 
-                # copy libs
-                for item in val:
+            # get src/dst
+            src = P_DIR_PYPLATE / C.S_DIR_LIB / item
+            dst = self._dir_prj / C.S_DIR_LIB / item
 
-                    # get src/dst
-                    src = P_DIR_PYPLATE / C.S_DIR_LIB / item
-                    dst = self._dir_prj / C.S_DIR_LIB / item
-
-                    # copy dir/file
-                    if src.is_dir():
-                        shutil.copytree(src, dst, dirs_exist_ok=True)
-                    else:
-                        shutil.copy2(src, dst)
+            # copy dir/file
+            if src.is_dir():
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
         # combine any reqs files
@@ -777,7 +782,7 @@ class PyMaker:
             # create CNPotPy object
             potpy = CNPotPy(
                 # header
-                str_appname=C.D_PRV_PRJ["__PP_NAME_BIG__"],
+                str_appname=C.D_PRV_PRJ["__PP_NAME_PRJ_BIG__"],
                 str_version=C.D_PUB_META["__PP_VERSION__"],
                 str_author=C.D_PRV_ALL["__PP_AUTHOR__"],
                 str_email=C.D_PRV_ALL["__PP_EMAIL__"],
@@ -788,7 +793,7 @@ class PyMaker:
                 # optional out
                 dir_locale=self._dir_prj / C.S_PATH_LOCALE,
                 dir_po=self._dir_prj / C.S_PATH_PO,
-                str_domain=C.D_PRV_PRJ["__PP_NAME_SMALL__"],
+                str_domain=C.D_PRV_PRJ["__PP_NAME_PRJ_SMALL__"],
                 # optional in
                 str_tag=C.S_I18N_TAG,
                 # NB: use dict_pub here b/c dunders have been fixed
@@ -897,7 +902,7 @@ class PyMaker:
                 print(C.S_ACTION_INST, end="", flush=True)
 
                 # get params
-                name = C.D_PRV_PRJ["__PP_NAME_BIG__"]
+                name = C.D_PRV_PRJ["__PP_NAME_PRJ__"]
                 version = C.D_PUB_META["__PP_VERSION__"]
 
                 # get an install instance
@@ -1408,12 +1413,12 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Check project name for allowed characters
     # --------------------------------------------------------------------------
-    def _check_name(self, prj_name):
+    def _check_name(self, name_prj):
         """
         Check project name for allowed characters
 
         Args:
-            prj_name: Name to check for allowed characters
+            name_prj: Name to check for allowed characters
 
         Returns:
             Whether the name is valid to use
@@ -1433,34 +1438,33 @@ class PyMaker:
         # steps where each step explains which part of the name is wrong.
 
         # check for name length
-        if len(prj_name.strip(" ")) < 2:
+        if len(name_prj.strip(" ")) < 2:
             print(C.S_ERR_LEN)
             return False
 
         # match start or return false
         pattern = C.D_NAME[C.S_KEY_NAME_START]
-        res = re.search(pattern, prj_name)
+        res = re.search(pattern, name_prj)
         if not res:
             print(C.S_ERR_START)
             return False
 
         # match end or return false
         pattern = C.D_NAME[C.S_KEY_NAME_END]
-        res = re.search(pattern, prj_name)
+        res = re.search(pattern, name_prj)
         if not res:
             print(C.S_ERR_END)
             return False
 
         # match middle or return false
         pattern = C.D_NAME[C.S_KEY_NAME_MID]
-        res = re.search(pattern, prj_name)
+        res = re.search(pattern, name_prj)
         if not res:
             print(C.S_ERR_MID)
             return False
 
         # if we made it this far, return true
         return True
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -1481,12 +1485,12 @@ if __name__ == "__main__":
     parser.description = PyMaker.S_PP_ABOUT
 
     # add debug option
-    parser.add_argument(
-        PyMaker.S_DBG_OPTION,
-        action=PyMaker.S_DBG_ACTION,
-        dest=PyMaker.S_DBG_DEST,
-        help=PyMaker.S_DBG_HELP,
-    )
+    # parser.add_argument(
+    #     PyMaker.S_DBG_OPTION,
+    #     action=PyMaker.S_DBG_ACTION,
+    #     dest=PyMaker.S_DBG_DEST,
+    #     help=PyMaker.S_DBG_HELP,
+    # )
 
     # get namespace object
     args = parser.parse_args()
