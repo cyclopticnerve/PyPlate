@@ -21,9 +21,15 @@ import re
 import shutil
 import sys
 
+# pylint: disable=import-error
+# pylint: disable=no-name-in-module
+
 # local imports
-from cnlib import cnfunctions as F  # pylint: disable=import-error
-from cnlib.cnvenv import CNVenv  # pylint: disable=import-error
+import cnfunctions as F
+from cnvenv import CNVenv
+
+# pylint: enable=import-error
+# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -208,7 +214,7 @@ class CNInstall:
 
         Args:
             name: Program name
-            version: Initial program version from pyplate_conf.py
+            version: Initial program version from pyplate.py
             list_uninstall: List of assets to uninstall
 
         Returns:

@@ -38,7 +38,8 @@ B_CMD_I18N = True
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
 # create docs
-B_CMD_DOCS = False
+# FIXME: docs broken by rel imports
+B_CMD_DOCS = True
 # do install/uninstall
 B_CMD_INST = True
 

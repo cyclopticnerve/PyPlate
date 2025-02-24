@@ -30,18 +30,18 @@ Typical usage is show in the main() method.
 import gettext
 import locale
 from pathlib import Path
-import sys
+# import sys
 
 # find path to prj
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
+# sys.path.append(str(P_DIR_PRJ))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=import-error
 
 # import my stuff
-from lib.cnlib import cnfunctions as F  # type: ignore
-from lib.cnlib.cncli import CNCli  # type: ignore
+import cnfunctions as F  # type: ignore
+from cncli import CNCli  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=import-error

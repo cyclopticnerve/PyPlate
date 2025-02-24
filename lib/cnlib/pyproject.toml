@@ -13,12 +13,12 @@ build-backend = "setuptools.build_meta"
 [project]
 # NB: some of these values would normally come from pymaker, but since this IS
 # pymaker, we need to enter it manually (aka bootstrap)
-name = "cnguilib"
+name = "cnlib"
 version = "0.0.0"
-description = "A package for helping create GUI projects in PyPlate"
+description = "A package for helping create projects in PyPlate"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
-readme = "README.md"
-license = { file = "LICENSE.txt" }
+# readme = "README.md"
+# license = { file = "LICENSE.txt" }
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
@@ -27,12 +27,15 @@ classifiers = [
 ]
 keywords = [
     "Python",
+    "cli",
     "gui",
+    "package",
     "gtk3",
     "gtk",
     "PyGObject",
     "PyGTK",
     "Python-GTK+",
+    "template",
     "app",
 ]
 dependencies = []

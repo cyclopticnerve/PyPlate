@@ -53,7 +53,7 @@ project as its development continues.
 Let us start with 'pymaker.py'.
 
 ## PyMaker.py
-Before you do anything, you should take a look at the 'pyplate_conf.py' file in
+Before you do anything, you should take a look at the 'pyplate.py' file in
 '~/.config/pyplate/conf'. This file contains A LOT of information that is used
 when creating/building a project. Most of these are string values and
 file/folder names used in the program, which you are free to change. PyPlate
@@ -63,7 +63,7 @@ have to enter it at install time.
 
 ### One important thing to note:  
 By default, PyPlate will create it's projects in '~/Documents/Projects/Python'.
-To change this, edit this value in ~/.conf/pyplate/conf/pyplate_conf.py:
+To change this, edit this value in ~/.conf/pyplate/conf/pyplate.py:
 
 ```python
 S_BASE_DIR = "~/Documents/Projects/Python"

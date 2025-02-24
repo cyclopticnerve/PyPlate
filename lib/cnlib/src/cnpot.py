@@ -32,8 +32,14 @@ from pathlib import Path
 import re
 import shutil
 
+# pylint: disable=import-error
+# pylint: disable=no-name-in-module
+
 # my imports
-from cnlib import cnfunctions as F # pylint: disable=import-error
+import cnfunctions as F
+
+# pylint: enable=import-error
+# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Public classes

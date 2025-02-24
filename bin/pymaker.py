@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pymaker.py                                            |     ()     |
+# Date    : 02/20/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -12,7 +12,7 @@ The main file that runs the program
 
 This file is executable and can be called from the terminal like:
 
-foo@bar:~$ __PP_NAME_PRJ_SMALL__ [cmd line]
+foo@bar:~$ pymaker [cmd line]
 
 when placed in a folder that is in the default $PATH, ie:
 /usr/bin
@@ -20,7 +20,7 @@ when placed in a folder that is in the default $PATH, ie:
 etc.
 
 All command line options will be passed to the main class, usually located at
-~/.local/share/__PP_NAME_PRJ_SMALL__/src/__PP_NAME_PRJ_SMALL__.py. 
+~/.local/share/pyplate/src/pymaker.py. 
 
 Typical usage is show in the main() method.
 """
@@ -41,7 +41,7 @@ import sys
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_PRJ_PASCAL__:
+class PyMaker:
     """
     The entry point class, responsible for launching the program
 
@@ -60,12 +60,13 @@ class __PP_NAME_PRJ_PASCAL__:
     # --------------------------------------------------------------------------
 
     # find path to prj/lib
-    P_DIR_PRJ_INST = Path.home() / "__PP_USR_INST__"
+    # P_DIR_PRJ = Path.home() / ".local/share/pyplate"
+    P_DIR_PRJ = Path.home() / "Documents/Projects/Python/PyPlate"
 
     # commands to run
-    S_CMD_ACTIVATE = ". ./__PP_NAME_VENV__/bin/activate"
-    S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
-    S_CMD_RUN_ARGS = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py {}"
+    S_CMD_ACTIVATE = f". {P_DIR_PRJ}/.venv-pyplate/bin/activate"
+    S_CMD_RUN = f"{P_DIR_PRJ}/src/pymaker.py"
+    S_CMD_RUN_ARGS = "{} {}"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -92,7 +93,7 @@ class __PP_NAME_PRJ_PASCAL__:
         # remove our path
         args = args[1:]
 
-        # quote an args with spaces
+        # quote any args with spaces
         args = [f'"{item}"' if " " in item else item for item in args]
 
         # put args back together with spaces
@@ -109,8 +110,6 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # build cmd
         cmd = (
-            # cd to inst
-            f"cd {self.P_DIR_PRJ_INST};"
             # activate venv
             f"{self.S_CMD_ACTIVATE};"
             # call src w/ args
@@ -119,6 +118,7 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # run cmd
         subprocess.run(cmd, shell=True, check=True)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    obj = __PP_NAME_PRJ_PASCAL__()
+    obj = PyMaker()
 
     # run the new object
     obj.main()

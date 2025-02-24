@@ -65,7 +65,7 @@ class __PP_NAME_PRJ_PASCAL__:
     # commands to run
     S_CMD_ACTIVATE = ". ./__PP_NAME_VENV__/bin/activate"
     S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
-    S_CMD_RUN_ARGS = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py {}"
+    S_CMD_RUN_ARGS = "{} {}"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -92,7 +92,7 @@ class __PP_NAME_PRJ_PASCAL__:
         # remove our path
         args = args[1:]
 
-        # quote an args with spaces
+        # quote any args with spaces
         args = [f'"{item}"' if " " in item else item for item in args]
 
         # put args back together with spaces
@@ -103,7 +103,7 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # add args if present
         if len(args) > 0:
-            src_run = self.S_CMD_RUN_ARGS.format(args)
+            src_run = self.S_CMD_RUN_ARGS.format(self.S_CMD_RUN, args)
 
         # ----------------------------------------------------------------------
 

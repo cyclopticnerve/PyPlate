@@ -35,23 +35,18 @@ import sys
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
-# first check for inst loc
-# NB: explicit path cuz symlink
-P_DIR_PYPLATE = Path.home() / ".local/share/pyplate"
-if not P_DIR_PYPLATE.exists():
-    # fall back to dev loc
-    P_DIR_PYPLATE = Path.home() / "Documents/Projects/Python/PyPlate"
-P_DIR_PP_LIB = P_DIR_PYPLATE / "lib"
-sys.path.append(str(P_DIR_PP_LIB))
+# find path to prj
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+sys.path.append(str(P_DIR_PRJ))
 
 # local imports
-import pyplate_conf as C  # type:ignore
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnformatter import CNFormatter  # type: ignore
-from cnlib.cninstall import CNInstall  # type: ignore
-from cnlib.cnpot import CNPotPy  # type: ignore
-from cnlib.cntree import CNTree  # type: ignore
-from cnlib.cnvenv import CNVenv  # type: ignore
+import pyplate as PP  # type:ignore
+from lib.cnlib import cnfunctions as F  # type: ignore
+from lib.cnlib.cnformatter import CNFormatter  # type: ignore
+from lib.cnlib.cninstall import CNInstall  # type: ignore
+from lib.cnlib.cnpot import CNPotPy  # type: ignore
+from lib.cnlib.cntree import CNTree  # type: ignore
+from lib.cnlib.cnvenv import CNVenv  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=wrong-import-order
@@ -103,6 +98,12 @@ class PyBaker:
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VER_FMT}\n"
         f"https://www.github.com/cyclopticnerve/PyPlate\n"
+    )
+
+    # instructions string
+    S_PP_EPILOG = (
+        "Run this program from the parent directory of the project you want "
+        "to build."
     )
 
     # our venv name
@@ -227,7 +228,7 @@ class PyBaker:
         print(self.S_PP_ABOUT)
 
         # set global prop in conf
-        C.B_DEBUG = self._debug
+        PP.B_DEBUG = self._debug
 
         # assume we are running in the project dir
         # this is used in a lot of places, so just shorthand it
@@ -238,51 +239,51 @@ class PyBaker:
         if self._ide:
             prj_name = ""
             while prj_name == "":
-                prj_name = input(C.S_ASK_NAME)
+                prj_name = input(PP.S_ASK_NAME)
 
             # if running in ide, cwd is pyplate prj dir, so move up and down
-            self._dir_prj = Path(P_DIR_PYPLATE / ".." / prj_name)
+            self._dir_prj = Path(P_DIR_PRJ / ".." / prj_name)
 
         # get abs path either way
         self._dir_prj = self._dir_prj.resolve()
 
         # do not run pybaker on pyplate (we are not that meta YET...)
         if self.S_LOOK_FOR_PP in str(self._dir_prj).lower():
-            print(C.S_ERR_PRJ_DIR_IS_PP)
+            print(PP.S_ERR_PRJ_DIR_IS_PP)
             sys.exit(-1)
 
         # check if dir_prj has pyplate folder for a valid prj
         path_pyplate = self._dir_prj / self.S_LOOK_FOR_PP
         if not path_pyplate.exists():
-            print(C.S_ERR_NOT_PRJ)
+            print(PP.S_ERR_NOT_PRJ)
             sys.exit(-1)
 
         # debug turns off some _do_after_fix features
         if self._debug:
-            C.B_CMD_DOCS = False
-            C.B_CMD_GIT = False
-            C.B_CMD_INST = False
-            C.B_CMD_I18N = False
-            C.B_CMD_TREE = False
-            C.B_CMD_VENV = False
+            PP.B_CMD_DOCS = False
+            PP.B_CMD_GIT = False
+            PP.B_CMD_INST = False
+            PP.B_CMD_I18N = False
+            PP.B_CMD_TREE = False
+            PP.B_CMD_VENV = False
 
         # set switch dicts to defaults
-        self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
-        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
+        self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
+        self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
         # get global and calculated settings dict in private.json
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+        path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
         self._dict_prv = F.load_dicts([path_prv], {})
-        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
+        self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[PP.S_KEY_PRV_PRJ]
 
         # get individual dicts in the public file
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         self._dict_pub = F.load_dicts([path_pub], {})
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
+        self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
+        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -296,13 +297,13 @@ class PyBaker:
         """
 
         # ask questions
-        ask_in = input(C.S_ASK_PROPS)
-        if ask_in.lower().startswith(C.S_ASK_PROPS_DEF) or ask_in == "":
+        ask_in = input(PP.S_ASK_PROPS)
+        if ask_in.lower().startswith(PP.S_ASK_PROPS_DEF) or ask_in == "":
             print()
             return
 
         # if answer is anything but default or blank, we bail
-        print(C.S_ASK_PROPS_ABORT)
+        print(PP.S_ASK_PROPS_ABORT)
         sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -313,15 +314,15 @@ class PyBaker:
         A function to do stuff before fix
 
         This function does some more changes before the actual fix. Mostly it
-        is used to call the do_before_fix method in pyplate_conf.py.
+        is used to call the do_before_fix method in pyplate.py.
         """
 
-        print(C.S_ACTION_BEFORE, end="", flush=True)
+        print(PP.S_ACTION_BEFORE, end="", flush=True)
 
         # call function to update kw/readme deps
-        C.do_before_fix(self._dir_prj, self._dict_prv, self._dict_pub)
+        PP.do_before_fix(self._dir_prj, self._dict_prv, self._dict_pub)
 
-        print(C.S_ACTION_DONE)
+        print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -335,7 +336,7 @@ class PyBaker:
         needs fixing based on its appearance in the blacklist.
         """
 
-        print(C.S_ACTION_FIX, end="", flush=True)
+        print(PP.S_ACTION_FIX, end="", flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -352,11 +353,11 @@ class PyBaker:
         dict_paths = self._fix_blacklist_paths()
 
         # just shorten the names
-        skip_all = dict_paths[C.S_KEY_SKIP_ALL]
-        skip_contents = dict_paths[C.S_KEY_SKIP_CONTENTS]
-        skip_header = dict_paths[C.S_KEY_SKIP_HEADER]
-        skip_code = dict_paths[C.S_KEY_SKIP_CODE]
-        skip_path = dict_paths[C.S_KEY_SKIP_PATH]
+        skip_all = dict_paths[PP.S_KEY_SKIP_ALL]
+        skip_contents = dict_paths[PP.S_KEY_SKIP_CONTENTS]
+        skip_header = dict_paths[PP.S_KEY_SKIP_HEADER]
+        skip_code = dict_paths[PP.S_KEY_SKIP_CODE]
+        skip_path = dict_paths[PP.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -383,8 +384,8 @@ class PyBaker:
                 if root not in skip_contents and item not in skip_contents:
 
                     # for each new file, reset block and line switches to def
-                    self._dict_sw_block = dict(C.D_SW_BLOCK_DEF)
-                    self._dict_sw_line = dict(C.D_SW_LINE_DEF)
+                    self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
+                    self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
                     # check for header bl
                     bl_hdr = True
@@ -397,14 +398,14 @@ class PyBaker:
                         bl_code = False
 
                     # do md/html/xml separately (needs special handling)
-                    self._dict_type_rep = C.D_PY_REPL
+                    self._dict_type_rep = PP.D_PY_REPL
                     suffix = (
                         f".{item.suffix}"
                         if not item.suffix.startswith(".")
                         else item.suffix
                     )
-                    if suffix in C.L_EXT_MARKUP:
-                        self._dict_type_rep = C.D_MU_REPL
+                    if suffix in PP.L_EXT_MARKUP:
+                        self._dict_type_rep = PP.D_MU_REPL
 
                     # fix content with appropriate dict
                     self._fix_content(item, bl_hdr, bl_code)
@@ -447,7 +448,7 @@ class PyBaker:
         version = self._dict_pub_meta["__PP_VERSION__"]
 
         # get install cfg
-        a_file = self._dir_prj / C.S_PATH_INST_CFG
+        a_file = self._dir_prj / PP.S_PATH_INST_CFG
         if a_file.exists():
 
             # load/change/save
@@ -456,7 +457,7 @@ class PyBaker:
             F.save_dict(a_dict, [a_file])
 
         # get install cfg
-        a_file = self._dir_prj / C.S_PATH_UNINST_CFG
+        a_file = self._dir_prj / PP.S_PATH_UNINST_CFG
         if a_file.exists():
 
             # load/change/save
@@ -469,19 +470,19 @@ class PyBaker:
 
         # save fixed settings
         dict_prv = {
-            C.S_KEY_PRV_ALL: self._dict_prv_all,
-            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
+            PP.S_KEY_PRV_ALL: self._dict_prv_all,
+            PP.S_KEY_PRV_PRJ: self._dict_prv_prj,
         }
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+        path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
         F.save_dict(dict_prv, [path_prv])
 
         # save editable settings (blacklist/i18n etc.)
         dict_pub = {
-            C.S_KEY_PUB_BL: self._dict_pub_bl,
-            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            C.S_KEY_PUB_DIST: self._dict_pub_dist,
+            PP.S_KEY_PUB_BL: self._dict_pub_bl,
+            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            PP.S_KEY_PUB_DIST: self._dict_pub_dist,
         }
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
@@ -495,10 +496,10 @@ class PyBaker:
         # save meta
 
         # put in metadata and save back to file
-        dict_pub[C.S_KEY_PUB_META] = self._dict_pub_meta
+        dict_pub[PP.S_KEY_PUB_META] = self._dict_pub_meta
         F.save_dict(dict_pub, [path_pub])
 
-        print(C.S_ACTION_DONE)
+        print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Make any necessary changes after all fixes have been done
@@ -515,41 +516,41 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # call conf after fix
 
-        print(C.S_ACTION_AFTER, end="", flush=True)
-        C.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
-        print(C.S_ACTION_DONE)
+        print(PP.S_ACTION_AFTER, end="", flush=True)
+        PP.do_after_fix(self._dir_prj, self._dict_prv, self._dict_pub)
+        print(PP.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # freeze requirements
-        if C.B_CMD_VENV:
+        if PP.B_CMD_VENV:
 
-            print(C.S_ACTION_VENV, end="", flush=True)
+            print(PP.S_ACTION_VENV, end="", flush=True)
 
             # get name ov venv folder and reqs file
             dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-            file_reqs = C.S_FILE_REQS
+            file_reqs = PP.S_FILE_REQS
 
             # do the thing with the thing
             cv = CNVenv(self._dir_prj, dir_venv)
             try:
                 cv.freeze(file_reqs)
-                print(C.S_ACTION_DONE)
+                print(PP.S_ACTION_DONE)
             except F.CNShellError as e:
-                print(C.S_ACTION_FAIL)
+                print(PP.S_ACTION_FAIL)
                 print(e.message)
 
         # ----------------------------------------------------------------------
         # i18n
 
         # path to template
-        path_dsk_tmp = self._dir_prj / C.S_FILE_DSK_TMP
+        path_dsk_tmp = self._dir_prj / PP.S_FILE_DSK_TMP
         # path to output
         path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
 
         # if i18n flag is set
-        if C.B_CMD_I18N:
+        if PP.B_CMD_I18N:
 
-            print(C.S_ACTION_I18N, end="", flush=True)
+            print(PP.S_ACTION_I18N, end="", flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
@@ -559,20 +560,20 @@ class PyBaker:
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
                 # out
-                dir_pot=self._dir_prj / C.S_DIR_I18N,
+                dir_pot=self._dir_prj / PP.S_DIR_I18N,
                 # in
                 dir_prj=self._dir_prj,
                 # optional out
-                dir_locale=self._dir_prj / C.S_PATH_LOCALE,
-                dir_po=self._dir_prj / C.S_PATH_PO,
+                dir_locale=self._dir_prj / PP.S_PATH_LOCALE,
+                dir_po=self._dir_prj / PP.S_PATH_PO,
                 str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
                 # optional in
-                str_tag=C.S_I18N_TAG,
+                str_tag=PP.S_I18N_TAG,
                 # NB: use dict_pub here b/c dunders have been fixed
-                dict_clangs=self._dict_pub_i18n[C.S_KEY_CLANGS],
-                dict_no_ext=self._dict_pub_i18n[C.S_KEY_NO_EXT],
-                list_wlangs=self._dict_pub_i18n[C.S_KEY_WLANGS],
-                charset=self._dict_pub_i18n[C.S_KEY_CHARSET],
+                dict_clangs=self._dict_pub_i18n[PP.S_KEY_CLANGS],
+                dict_no_ext=self._dict_pub_i18n[PP.S_KEY_NO_EXT],
+                list_wlangs=self._dict_pub_i18n[PP.S_KEY_WLANGS],
+                charset=self._dict_pub_i18n[PP.S_KEY_CHARSET],
             )
 
             # this .pot, .po, and .mo files
@@ -583,7 +584,7 @@ class PyBaker:
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
-            print(C.S_ACTION_DONE)
+            print(PP.S_ACTION_DONE)
 
         # if no i18n, copy .desktop
         else:
@@ -594,38 +595,41 @@ class PyBaker:
         # update docs
 
         # if docs flag is set
-        # if C.B_CMD_DOCS:
+        if PP.B_CMD_DOCS:
 
-        #     print(C.S_ACTION_DOCS, end="", flush=True)
+            print(PP.S_ACTION_DOCS, end="", flush=True)
 
-        #     # update version number in pdoc3
-        #     # activate cmd for pyplate's venv
-        #     cmd_activate = C.S_CMD_VENV_ACTIVATE.format(
-        #         str(P_DIR_PYPLATE), self.S_PP_VENV
-        #     )
+            # activate cmd for pyplate's venv
+            # (so we don't need to install pdoc in every project)
+            cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
+                str(P_DIR_PRJ), self.S_PP_VENV
+            )
 
-        #     # get template and output dirs
-        #     dir_template = self._dir_prj / C.S_DIR_PDOC_TMP
-        #     dir_docs = self._dir_prj / C.S_DIR_DOCS
+            # get template and output dirs
+            dir_docs_tmp = self._dir_prj / PP.S_DIR_DOCS_TMP
+            dir_docs_out = self._dir_prj / PP.S_DIR_DOCS
 
-        #     # nuke old docs
-        #     if dir_docs.exists():
-        #         shutil.rmtree(dir_docs)
-        #         Path.mkdir(dir_docs, parents=True)
+            # adjust doc start dir
+            doc_start = PP.D_PRV_PRJ["__PP_PDOC_START__"]
 
-        #     # format cmd using abs prj docs dir (output) and abs prj dir (input)
-        #     cmd_docs = C.S_CMD_DOC.format(
-        #         dir_template, dir_docs, self._dir_prj
-        #     )
+            # nuke old docs
+            if dir_docs_out.exists():
+                shutil.rmtree(dir_docs_out)
+                Path.mkdir(dir_docs_out, parents=True)
 
-        #     # the command to run pdoc
-        #     cmd = f"{cmd_activate};{cmd_docs}"
-        #     try:
-        #         F.sh(cmd, shell=True)
-        #     except F.CNShellError as e:
-        #         raise e
+            # format cmd using abs prj docs dir (output) and abs prj dir (input)
+            cmd_docs = PP.S_CMD_DOC.format(
+                dir_docs_tmp, dir_docs_out, self._dir_prj / doc_start
+            )
 
-        #     print(C.S_ACTION_DONE)
+            # the command to run pdoc
+            cmd = f"{cmd_activate};" f"{cmd_docs}"
+            try:
+                F.sh(cmd, shell=True)
+                print(PP.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(PP.S_ACTION_FAIL)
+                raise e
 
         # ----------------------------------------------------------------------
         # tree
@@ -633,41 +637,41 @@ class PyBaker:
         # NB: this will wipe out all previous checks (maybe good?)
 
         # if tree flag is set
-        if C.B_CMD_TREE:
+        if PP.B_CMD_TREE:
 
-            print(C.S_ACTION_TREE, end="", flush=True)
+            print(PP.S_ACTION_TREE, end="", flush=True)
 
             # get path to tree
-            file_tree = self._dir_prj / C.S_TREE_FILE
+            file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=C.S_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
             tree_obj = CNTree()
             tree_str = tree_obj.build_tree(
                 str(self._dir_prj),
-                filter_list=self._dict_pub_bl[C.S_KEY_SKIP_TREE],
-                dir_format=C.S_TREE_DIR_FORMAT,
-                file_format=C.S_TREE_FILE_FORMAT,
+                filter_list=self._dict_pub_bl[PP.S_KEY_SKIP_TREE],
+                dir_format=PP.S_TREE_DIR_FORMAT,
+                file_format=PP.S_TREE_FILE_FORMAT,
             )
 
             # write to file
-            with open(file_tree, "w", encoding=C.S_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
-            print(C.S_ACTION_DONE)
+            print(PP.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
         # fix dunders in install/uninstall
 
         # if install flag is set
-        if C.B_CMD_INST:
-            a_path = self._dir_prj / C.S_FILE_INST_CFG
+        if PP.B_CMD_INST:
+            a_path = self._dir_prj / PP.S_FILE_INST_CFG
             if a_path.exists():
                 self._fix_content(a_path)
-            a_path = self._dir_prj / C.S_FILE_UNINST_CFG
+            a_path = self._dir_prj / PP.S_FILE_UNINST_CFG
             if a_path.exists():
                 self._fix_content(a_path)
 
@@ -681,17 +685,17 @@ class PyBaker:
         Gets dirs/files from project and copies them to the dist/assets dir.
         """
 
-        print(C.S_ACTION_DIST, end="", flush=True)
+        print(PP.S_ACTION_DIST, end="", flush=True)
 
         # call conf before dist
-        C.do_before_dist(self._dir_prj, self._dict_prv, self._dict_pub)
+        PP.do_before_dist(self._dir_prj, self._dict_prv, self._dict_pub)
 
         # # get small name and format w/ version
         # name_small = self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
         # version = self._dict_pub_meta["__PP_VERSION__"]
         # name_fmt = f"{name_small}_{version}"
         # find old dist? nuke it from orbit! it's the only way to be sure!
-        a_dist = self._dir_prj / C.S_DIR_DIST
+        a_dist = self._dir_prj / PP.S_DIR_DIST
         if a_dist.is_dir():
             shutil.rmtree(a_dist)
 
@@ -719,10 +723,10 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # call conf after dist
 
-        C.do_after_dist(self._dir_prj, self._dict_prv, self._dict_pub)
+        PP.do_after_dist(self._dir_prj, self._dict_prv, self._dict_pub)
 
         # done copying project files
-        print(C.S_ACTION_DONE)
+        print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -805,7 +809,7 @@ class PyBaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=C.S_ENCODING) as a_file:
+        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -830,7 +834,7 @@ class PyBaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = self._dict_type_rep[C.S_KEY_HDR]
+                str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
@@ -843,7 +847,7 @@ class PyBaker:
             # ------------------------------------------------------------------
             # skip any other comment lines
 
-            str_pattern = self._dict_type_rep[C.S_KEY_COMM]
+            str_pattern = self._dict_type_rep[PP.S_KEY_COMM]
             if re.search(str_pattern, line):
                 continue
 
@@ -858,7 +862,7 @@ class PyBaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=C.S_ENCODING) as a_file:
+        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -881,15 +885,15 @@ class PyBaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = self._dict_type_rep[C.S_KEY_HDR]
+        str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
         # pull out lead, val, and pad (OXFORD COMMA FTW!)
-        lead = res.group(self._dict_type_rep[C.S_KEY_LEAD])
-        val = res.group(self._dict_type_rep[C.S_KEY_VAL])
-        pad = res.group(self._dict_type_rep[C.S_KEY_PAD])
+        lead = res.group(self._dict_type_rep[PP.S_KEY_LEAD])
+        val = res.group(self._dict_type_rep[PP.S_KEY_VAL])
+        pad = res.group(self._dict_type_rep[PP.S_KEY_PAD])
 
         tmp_val = str(val)
         old_val_len = len(tmp_val)
@@ -938,7 +942,7 @@ class PyBaker:
         comm = ""
 
         # do the split, checking each match to see if we get a trailing comment
-        matches = re.finditer(self._dict_type_rep[C.S_KEY_SPLIT], line)
+        matches = re.finditer(self._dict_type_rep[PP.S_KEY_SPLIT], line)
         for match in matches:
             # if there is a match group for hash mark (meaning we found a
             # trailing comment)
@@ -953,7 +957,7 @@ class PyBaker:
         # check for line switches
 
         # for each line, reset line dict
-        self._dict_sw_line = dict(C.D_SW_LINE_DEF)
+        self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
         # do the check
         self._check_switches(comm, False)
@@ -963,9 +967,9 @@ class PyBaker:
         # check for block or line replace switch
         repl = False
         if (
-            self._dict_sw_block[C.S_SW_REPLACE]
-            and self._dict_sw_line[C.S_SW_REPLACE] != C.I_SW_FALSE
-            or self._dict_sw_line[C.S_SW_REPLACE] == C.I_SW_TRUE
+            self._dict_sw_block[PP.S_SW_REPLACE]
+            and self._dict_sw_line[PP.S_SW_REPLACE] != PP.I_SW_FALSE
+            or self._dict_sw_line[PP.S_SW_REPLACE] == PP.I_SW_TRUE
         ):
             repl = True
 
@@ -982,14 +986,14 @@ class PyBaker:
 
         # replace version
         ver = self._dict_pub_meta["__PP_VERSION__"]
-        str_sch = C.S_META_VER_SEARCH
-        str_rep = C.S_META_VER_REPL.format(ver)
+        str_sch = PP.S_META_VER_SEARCH
+        str_rep = PP.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
         desc = self._dict_pub_meta["__PP_SHORT_DESC__"]
-        str_sch = C.S_META_SD_SEARCH
-        str_rep = C.S_META_SD_REPL.format(desc)
+        str_sch = PP.S_META_SD_SEARCH
+        str_rep = PP.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
 
         # return the (maybe replaced) line
@@ -1054,7 +1058,7 @@ class PyBaker:
         """
 
         # match  switches ('#|<!-- python: enable=replace', etc)
-        match = re.match(self._dict_type_rep[C.S_KEY_SWITCH], line)
+        match = re.match(self._dict_type_rep[PP.S_KEY_SWITCH], line)
         if not match:
             return False
 
@@ -1075,11 +1079,11 @@ class PyBaker:
             return False
 
         # test for specific values, in case it is malformed
-        if val == C.S_SW_ENABLE:
-            dict_to_check[key] = C.I_SW_TRUE
+        if val == PP.S_SW_ENABLE:
+            dict_to_check[key] = PP.I_SW_TRUE
             return True
-        if val == C.S_SW_DISABLE:
-            dict_to_check[key] = C.I_SW_FALSE
+        if val == PP.S_SW_DISABLE:
+            dict_to_check[key] = PP.I_SW_FALSE
             return True
 
         # no valid switch found
@@ -1103,7 +1107,7 @@ class PyBaker:
         """
 
         # match semantic version from start of string
-        pattern = C.S_SEMVER_VALID
+        pattern = PP.S_SEMVER_VALID
         return re.match(pattern, version)
 
 
@@ -1120,10 +1124,11 @@ if __name__ == "__main__":
     # line or use it as an object
 
     # create the parser
-    parser = argparse.ArgumentParser(formatter_class=CNFormatter)
-
-    # set help string
-    parser.description = PyBaker.S_PP_ABOUT
+    parser = argparse.ArgumentParser(
+        formatter_class=CNFormatter,
+        description=PyBaker.S_PP_ABOUT,
+        epilog=PyBaker.S_PP_EPILOG,
+    )
 
     # add debug option
     # parser.add_argument(

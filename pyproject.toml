@@ -17,8 +17,8 @@ name = "pyplate"
 version = "0.0.0"
 description = "A program for creating CLI/Package/GUI projects in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
-readme = "README.md"
-license = { file = "LICENSE.txt" }
+# readme = "README.md"
+# license = { file = "LICENSE.txt" }
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
@@ -34,6 +34,7 @@ keywords = [
     "gtk",
     "PyGObject",
     "PyGTK",
+    "Python-GTK+",
     "template",
     "app",
 ]
