@@ -60,7 +60,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
 
     # find path to prj/lib
-    # P_DIR_PRJ = Path.home() / "./local/share/pyplate"
+    # P_DIR_PRJ = Path.home() / ".local/share/pyplate"
     P_DIR_PRJ = Path.home() / "Documents/Projects/Python/PyPlate"
 
     # commands to run

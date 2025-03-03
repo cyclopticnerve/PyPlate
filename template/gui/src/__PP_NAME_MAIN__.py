@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
+# Filename: __PP_NAME_MAIN__.py                                   |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -30,21 +30,15 @@ Typical usage is show in the main() method.
 import gettext
 import locale
 from pathlib import Path
-# import sys
-
-# find path to prj
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-# sys.path.append(str(P_DIR_PRJ))
-
-# pylint: disable=wrong-import-position
-# pylint: disable=import-error
 
 # import my stuff
-import cnfunctions as F  # type: ignore
-from cncli import CNCli  # type: ignore
+import cnfunctions as F
+from cncli import CNCli
+from gui.python.__PP_FILE_APP__ import App  # type: ignore
 
-# pylint: enable=wrong-import-position
-# pylint: enable=import-error
+# find path to prj
+# NB: keep this global for i18n stuff
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -91,6 +85,9 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
     # I18N: short description
     S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
+    # help str
+    S_PP_HELP = "Use __PP_NAME_MAIN__ -h for more info"
+
     # version string
     # NB: done in two steps to avoid linter errors
     S_VER_FMT = "__PP_VER_FMT__"
@@ -102,6 +99,7 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         f"{S_PP_SHORT_DESC}\n"
         f"{S_VER_OUT}\n"
         "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        f"{S_PP_HELP}\n"
     )
 
     # path to default config file
@@ -132,7 +130,8 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         # main stuff
 
         # do the thing with the thing
-        print(self._func())
+        app = App(self._dict_args, self._dict_cfg)
+        app.run()
 
         # ----------------------------------------------------------------------
         # teardown
@@ -143,53 +142,6 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Short description
-    # --------------------------------------------------------------------------
-    def _func(self):
-        """
-        Short description
-
-        Args:
-            var_name: Short description
-
-        Returns:
-            Description
-
-        Raises:
-            exception_type(vars): Description
-
-        Long description (including HTML).
-        """
-
-        # sample of using repl switch
-        _fix = "__PP_NAME_PRJ_BIG__"
-
-        # pyplate: disable=replace
-        _dont_fix = "__PP_NAME_PRJ_BIG__"
-        # pyplate: enable=replace
-
-        _fix = "__PP_NAME_PRJ_BIG__"
-
-        _dont_fix = "__PP_NAME_PRJ_BIG__"  # pyplate: disable=replace
-
-        _fix = "__PP_NAME_PRJ_BIG__"
-
-        # pyplate: disable=replace
-        _fix = "__PP_NAME_PRJ_BIG__"  # pyplate: enable=replace
-        # pyplate: enable=replace
-
-        _desc = _("__PP_SHORT_DESC__")
-
-        # check for debug flag
-        if self._debug:
-            # I18N: context for this string
-            return _("this is func (DEBUG)")
-
-        # no debug, return normal result
-        # I18N: context for this string
-        return _("this is func")
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main

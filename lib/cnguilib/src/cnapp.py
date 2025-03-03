@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : CNAppLib                                               /          \
+# Project : CNGuiLib                                               /          \
 # Filename: cnapp.py                                              |     ()     |
 # Date    : 03/14/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -29,7 +29,7 @@ import sys
 P_DIR_LIB = Path(__file__).parents[1].resolve()
 
 # add paths to import search
-sys.path.append(str(P_DIR_LIB))
+# sys.path.append(str(P_DIR_LIB))
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order

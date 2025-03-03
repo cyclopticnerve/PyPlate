@@ -80,8 +80,8 @@ foo@bar:~$ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 <!-- __RM_APP_START__ -->
 Go to the uninstall folder for __PP_NAME_PRJ__ and run the uninstaller:
 ```bash
-foo@bar:~$ cd ~/.local/__PP_NAME_PRJ_BIG__/uninstall
-foo@bar:~/.local/__PP_NAME_PRJ_BIG__/uninstall$ ./uninstall.py
+foo@bar:~$ cd ~/.local/share/__PP_NAME_PRJ_BIG__/uninstall
+foo@bar:~/.local/share/__PP_NAME_PRJ_BIG__/uninstall$ ./uninstall.py
 ```
 <!-- __RM_APP_END__ -->
 

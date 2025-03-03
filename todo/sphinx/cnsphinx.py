@@ -214,14 +214,14 @@ class CNSphinx:
         # first do src folder
         str_imports += (
             f"dir_src = Path.home() / {self._dir_src}\n"
-            "sys.path.insert(0, str(dir_src))\n"
+            # "sys.path.insert(0, str(dir_src))\n"
         )
 
         # next do imports
         for dir_import in dirs_import:
             str_imports += (
                 f"dir_src = Path.home() / {dir_import}\n"
-                "sys.path.insert(0, str(dir_src))\n"
+                # "sys.path.insert(0, str(dir_src))\n"
             )
         str_imports += "\n"
 

@@ -6,7 +6,7 @@
         {
             "label": "PyBaker",
             "type": "shell",
-            "command": "${userHome}/__PP_DEV_PP__/src/pybaker.py",
+            "command": ". ${userHome}/__PP_DEV_PP__/.venv-pyplate/bin/activate;${userHome}/__PP_DEV_PP__/src/pybaker.py",
             "problemMatcher": [],
             "options": {
                 "cwd": "${workspaceFolder}"

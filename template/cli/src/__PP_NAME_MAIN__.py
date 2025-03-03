@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
+# Filename: __PP_NAME_MAIN__.py                                   |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
 # License : __PP_LICENSE_NAME__                                    \          /
@@ -13,7 +13,7 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PP_NAME_PRJ_SMALL__.py [cmd line]
+foo@bar:~[path to directory of this file]$ ./__PP_NAME_MAIN__.py [cmd line]
 
 or if installed in a global location:
 
@@ -30,24 +30,14 @@ Typical usage is show in the main() method.
 import gettext
 import locale
 from pathlib import Path
-import sys
-
-# find path to prj
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
-
-# pylint: disable=wrong-import-position
-# pylint: disable=import-error
-# pylint: disable=no-name-in-module
 
 # import my stuff
-from lib.cnlib import cnfunctions as F  # type: ignore
-from lib.cnlib.cncli import CNCli  # type: ignore
-from template.gui.src.gui.python.__PP_FILE_APP__ import App  # type: ignore
+import cnfunctions as F
+from cncli import CNCli
 
-# pylint: enable=wrong-import-position
-# pylint: enable=import-error
-# pylint: enable=no-name-in-module
+# find path to prj
+# NB: keep this global for i18n stuff
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -99,12 +89,16 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
     S_VER_FMT = "__PP_VER_FMT__"
     S_VER_OUT = S_VER_FMT.format(S_PP_VERSION)
 
+    # help str
+    S_PP_HELP = "Use __PP_NAME_MAIN__ -h for more info"
+
     # about string
     S_ABOUT = (
         "__PP_NAME_PRJ__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_VER_OUT}\n"
         "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        f"{S_PP_HELP}\n"
     )
 
     # path to default config file
@@ -135,8 +129,7 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         # main stuff
 
         # do the thing with the thing
-        app = App(self._dict_args, self._dict_cfg)
-        app.run()
+        print(self._func())
 
         # ----------------------------------------------------------------------
         # teardown
@@ -147,6 +140,53 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Short description
+    # --------------------------------------------------------------------------
+    def _func(self):
+        """
+        Short description
+
+        Args:
+            var_name: Short description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+        """
+
+        # sample of using repl switch
+        _fix = "__PP_NAME_PRJ_BIG__"
+
+        # pyplate: disable=replace
+        _dont_fix = "__PP_NAME_PRJ_BIG__"
+        # pyplate: enable=replace
+
+        _fix = "__PP_NAME_PRJ_BIG__"
+
+        _dont_fix = "__PP_NAME_PRJ_BIG__"  # pyplate: disable=replace
+
+        _fix = "__PP_NAME_PRJ_BIG__"
+
+        # pyplate: disable=replace
+        _fix = "__PP_NAME_PRJ_BIG__"  # pyplate: enable=replace
+        # pyplate: enable=replace
+
+        _desc = _("__PP_SHORT_DESC__")
+
+        # check for debug flag
+        if self._debug:
+            # I18N: context for this string
+            return _("this is func (DEBUG)")
+
+        # no debug, return normal result
+        # I18N: context for this string
+        return _("this is func")
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main

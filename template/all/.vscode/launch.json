@@ -5,14 +5,14 @@
             "name": "Project",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/__PP_NAME_PRJ_SMALL__.py",
+            "program": "src/__PP_NAME_MAIN__.py",
             "console": "integratedTerminal"
         },
         {
             "name": "Proj Args",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/__PP_NAME_PRJ_SMALL__.py",
+            "program": "src/__PP_NAME_MAIN__.py",
             "console": "integratedTerminal",
             "args": "${command:pickArgs}"
         },

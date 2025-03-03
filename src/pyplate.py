@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: pymaker_conf.py                                       |     ()     |
+# Filename: pyplate.py                                            |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -39,7 +39,7 @@ B_CMD_I18N = True
 B_CMD_TREE = True
 # create docs
 # FIXME: docs broken by rel imports
-B_CMD_DOCS = True
+B_CMD_DOCS = False
 # do install/uninstall
 B_CMD_INST = True
 
@@ -92,6 +92,9 @@ S_ERR_NOT_PRJ = (
     "Are you sure this is a PyPlate project?"
 )
 S_ERR_VERS = "Version must be n.n.n(xxx)"
+S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
+S_ERR_PRJ_DIR_NONE = "Project dir not provided"
+S_ERR_PRJ_DIR_IS_PP = "Cannot run pymaker/pybaker in PyPlate dir"
 
 # output msg for steps
 S_ACTION_COPY = "Copy template files... "
@@ -100,18 +103,19 @@ S_ACTION_FIX = "Do fix... "
 S_ACTION_AFTER = "Do after fix... "
 S_ACTION_GIT = "Make git folder... "
 S_ACTION_VENV = "Make venv folder... "
+S_ACTION_LIB = "Install libs in venv... "
 S_ACTION_I18N = "Make i18n folder... "
 S_ACTION_DESK = "Fixing desktop file... "
 S_ACTION_DOCS = "Make docs folder... "
 S_ACTION_TREE = "Make tree file... "
-S_ACTION_INST_PKG = "Installing package in local venv... "
+S_ACTION_INST_PKG = "Install package in venv... "
 S_ACTION_DIST = "Make dist folder... "
 S_ACTION_INST = "Make install file... "
 S_ACTION_DONE = "Done"
 S_ACTION_FAIL = "Failed"
 
 # debug-specific strings
-S_ERR_DEBUG = (
+S_MSG_DEBUG = (
     "WARNING! YOU ARE IN DEBUG MODE!\n"
     "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
 )
@@ -199,6 +203,8 @@ S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 
+S_NAME_MAIN = "main"
+
 # concatenate some paths
 S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
 S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
@@ -211,7 +217,9 @@ S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 
 # .desktop stuff
 S_NAME_DSK_TMP = "template"
-S_FILE_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_NAME_DSK_TMP}.desktop"
+S_FILE_DSK_TMP = (
+    f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_NAME_DSK_TMP}.desktop"
+)
 
 # I18N stuff
 S_PATH_LOCALE = str(Path(S_DIR_I18N) / S_DIR_LOCALE)
@@ -258,6 +266,7 @@ S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ."
 # NB: format params are pdoc3 template dir, project's S_DIR_DOCS and project
 # dir
 S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} {}"
+S_CMD_INST_LIB = "python -m pip install -e {}"
 
 # fix readme
 S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
@@ -308,13 +317,6 @@ S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
 # i18n stuff
 S_I18N_TAG = "I18N"
-
-# ------------------------------------------------------------------------------
-# pybaker stuff
-
-S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
-S_ERR_PRJ_DIR_NONE = "Project dir not provided"
-S_ERR_PRJ_DIR_IS_PP = "Cannot run pymaker/pybaker on pyplate dir"
 
 # pyproject.toml
 S_TOML_VERSION_SEARCH = (
@@ -642,6 +644,7 @@ D_PRV_ALL = {
     "__PP_DEF_UI_NAME__": S_DEF_UI_NAME,
     "__PP_DLG_FILE__": S_DLG_UI_FILE,
     "__PP_DLG_ABOUT__": S_DLG_ABOUT,
+    "__PP_NAME_MAIN__": S_NAME_MAIN,
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -650,20 +653,16 @@ D_PRV_ALL = {
 # project is created, as pybaker.py will not update them
 D_PRV_PRJ = {
     "__PP_TYPE_PRJ__": "",  # 'c'
-
     "__PP_NAME_PRJ__": "",  # My Project
     "__PP_NAME_PRJ_BIG__": "",  # My_Project
     "__PP_NAME_PRJ_SMALL__": "",  # my_project
     "__PP_NAME_PRJ_PASCAL__": "",  # MyProject
-
     "__PP_NAME_SEC__": "",  # My Win
     "__PP_NAME_SEC_BIG__": "",  # My_Win
     "__PP_NAME_SEC_SMALL__": "",  # my_win
     "__PP_NAME_SEC_PASCAL__": "",  # MyWin
-
     "__PP_DATE__": "",  # the date each file was created, updated every time
     "__PP_NAME_VENV__": "",  # venv folder name
-
     "__PP_FILE_APP__": "",  # my_project_app
     "__PP_CLASS_APP__": "",  # MyProjectApp
     "__PP_FILE_WIN__": "",  # my_project_win
@@ -676,6 +675,7 @@ D_PRV_PRJ = {
     # dir
     "__PP_USR_CONF__": "",  # config dir
     "__PP_DIST_FMT__": "",  # format name of the dist ([name_small]_[version])
+    "__PP_CMD_RUN__": "",
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
@@ -724,7 +724,7 @@ D_PUB_DIST = {
         S_FILE_README: S_DIR_ASSETS,
         # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LIB: S_DIR_ASSETS,
+        # S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
         # install.json in assets/install folder
@@ -741,7 +741,7 @@ D_PUB_DIST = {
         S_FILE_README: S_DIR_ASSETS,
         # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LIB: S_DIR_ASSETS,
+        # S_DIR_LIB: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
         # install.json in assets/install folder
@@ -849,6 +849,7 @@ D_PUB_I18N = {
 # Other dictionaries
 # ------------------------------------------------------------------------------
 
+# TODO: this could be a list, since dst dir follows prj_dir
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
 # this is so that when you update a file in the PyPlate project, it gets copied
@@ -856,10 +857,8 @@ D_PUB_I18N = {
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
-    f"{S_DIR_MISC}/i18n.txt": f"{S_DIR_MISC}/i18n.txt",
-    f"{S_DIR_MISC}/cnlibs.py": f"{S_DIR_MISC}/cnlibs.py",
-    f"{S_DIR_MISC}/default_class.py": f"{S_DIR_MISC}/default_class.py",
-    f"{S_DIR_MISC}/default_mod.py": f"{S_DIR_MISC}/default_mod.py",
+    f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
+    f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
     f"{S_DIR_MISC}/snippets.txt": f"{S_DIR_MISC}/snippets.txt",
     f"{S_DIR_MISC}/style.txt": f"{S_DIR_MISC}/style.txt",
 }
@@ -868,8 +867,8 @@ D_COPY = {
 # key is prj short type
 # val is list of libs to add to prj type
 D_COPY_LIB = {
-    "c": ["cnlib"],
-    "g": ["cnlib"],  # "cnguilib"],
+    "c": ["cninstalllib", "cnlib"],
+    "g": ["cninstalllib", "cnlib"],  # "cnguilib"],
 }
 
 # dictionary of default stuff to put in install.json
@@ -976,6 +975,7 @@ D_NAME = {
 # Public functions
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
@@ -1042,7 +1042,6 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
         dict_prv_prj["__PP_PDOC_START__"] = (
             f"{S_DIR_SRC}/{dict_prv_prj["__PP_NAME_PRJ_SMALL__"]}"
         )
-
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1196,8 +1195,8 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
         tar.add(in_dir, arcname=Path(in_dir).name)
 
     # chuck the origin dir
-    if not B_DEBUG:
-        shutil.rmtree(in_dir)
+    # if not B_DEBUG:
+    #     shutil.rmtree(in_dir)
 
 
 # ------------------------------------------------------------------------------
@@ -1414,5 +1413,6 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
+
 
 # -)

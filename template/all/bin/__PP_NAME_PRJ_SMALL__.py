@@ -20,7 +20,7 @@ when placed in a folder that is in the default $PATH, ie:
 etc.
 
 All command line options will be passed to the main class, usually located at
-~/.local/share/__PP_NAME_PRJ_SMALL__/src/__PP_NAME_PRJ_SMALL__.py. 
+~/.local/share/__PP_NAME_PRJ_SMALL__/src/__PP_NAME_MAIN__.py. 
 
 Typical usage is show in the main() method.
 """
@@ -64,7 +64,7 @@ class __PP_NAME_PRJ_PASCAL__:
 
     # commands to run
     S_CMD_ACTIVATE = ". ./__PP_NAME_VENV__/bin/activate"
-    S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
+    S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_MAIN__.py"
     S_CMD_RUN_ARGS = "{} {}"
 
     # --------------------------------------------------------------------------

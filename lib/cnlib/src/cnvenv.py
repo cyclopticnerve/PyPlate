@@ -122,7 +122,7 @@ class CNVenv:
     # --------------------------------------------------------------------------
     # Install packages to venv from the reqs_file property
     # --------------------------------------------------------------------------
-    def install(self, file_reqs):
+    def install_reqs(self, file_reqs):
         """
         Install packages to venv from the reqs_file property
 

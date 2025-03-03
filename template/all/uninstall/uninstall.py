@@ -11,8 +11,7 @@
 The uninstall script for this project
 
 THis module uninstalls the project, removing its files and folders to the
-appropriate locations on the user's computer. It also provides for hooks to run
-Python (or other language) scripts before and after the actual install process.
+appropriate locations on the user's computer.
 """
 
 # ------------------------------------------------------------------------------
@@ -24,51 +23,39 @@ import argparse
 from pathlib import Path
 import sys
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
-# my imports
-# add custom import paths
-
-DIR_SELF = Path(__file__).parents[1].resolve()
-FILE_CFG_OLD = Path.home() / "__PP_USR_INST__" / "__PP_UNINST_CONF_FILE__"
-DIR_LIB = DIR_SELF / "__PP_DIR_LIB__"
-
-# add paths to import search
+# constants
+DIR_PRJ = Path(__file__).parents[1].resolve()
+DIR_LIB = DIR_PRJ / "__PP_DIR_LIB__"
 sys.path.append(str(DIR_LIB))
 
-# import my stuff
-# import cnlib.cnfunctions as F  # type: ignore
-import cnlib.cninstall as C # type: ignore
-from cnlib.cnformatter import CNFormatter # type: ignore
+FILE_CFG_UNINST = DIR_PRJ / "__PP_UNINST_CONF_FILE__"
 
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
+# pylint: disable=wrong-import-position
+# import my stuff
+from cninstall import CNInstall
+from cninstall import CNInstallError
+from cnformatter import CNFormatter
 
 # ------------------------------------------------------------------------------
 # Run the main function
 # ------------------------------------------------------------------------------
-def main(debug=False):
+def main(dry=False):
     """
     Run the main function
 
     Args:
-        debug: If True, run in debug mode (default: False)
+        dry: If True, run in dry-run mode (default: False)
 
     The main entry point for the program.
     """
 
     # create an instance of the class
-    inst = C.CNInstall()
+    inst = CNInstall()
 
     # run the instance
     try:
-        inst.uninstall(FILE_CFG_OLD, debug=debug)
-    except C.CNInstallError as e:
+        inst.uninstall(FILE_CFG_UNINST, dry=dry)
+    except CNInstallError as e:
         print(e)
 
 # ------------------------------------------------------------------------------
@@ -86,15 +73,12 @@ if __name__ == "__main__":
     # create the parser
     parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
-    # set help string
-    # parser.description = S_PP_ABOUT
-
-    # add debug option
+    # add dry-run option
     parser.add_argument(
-        C.CNInstall.S_DBG_OPTION,
-        action=C.CNInstall.S_DBG_ACTION,
-        dest=C.CNInstall.S_DBG_DEST,
-        help=C.CNInstall.S_DBG_HELP,
+        CNInstall.S_DRY_OPTION,
+        action=CNInstall.S_DRY_ACTION,
+        dest=CNInstall.S_DRY_DEST,
+        help=CNInstall.S_DRY_HELP,
     )
 
     # get namespace object
@@ -106,10 +90,9 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    # a_dir_cur = os.getcwd()
-    a_debug = dict_args.get(C.CNInstall.S_DBG_DEST, False)
+    a_dry = dict_args.get(CNInstall.S_DRY_DEST, False)
 
     # run main function
-    main(a_debug)
+    main(a_dry)
 
 # -)

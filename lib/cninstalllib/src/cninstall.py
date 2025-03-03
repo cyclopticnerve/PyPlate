@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : CNlLib                                                 /          \
+# Project : CNInstallLib                                           /          \
 # Filename: cninstall.py                                          |     ()     |
 # Date    : 09/23/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -21,15 +21,9 @@ import re
 import shutil
 import sys
 
-# pylint: disable=import-error
-# pylint: disable=no-name-in-module
-
 # local imports
 import cnfunctions as F
 from cnvenv import CNVenv
-
-# pylint: enable=import-error
-# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -93,8 +87,8 @@ class CNInstall:
     # keys
     S_KEY_NAME = "NAME"
     S_KEY_VERSION = "VERSION"
-    S_KEY_DICT_INSTALL = "DICT_INSTALL"
-    S_KEY_LIST_UNINST = "LIST_UNINST"
+    S_KEY_DICT_INSTALL = "INSTALL"
+    S_KEY_LIST_UNINST = "UNINSTALL"
 
     # messages
     # NB: format params are prog_name and prog_version
@@ -116,12 +110,13 @@ class CNInstall:
     S_MSG_VENV_START = "Making venv folder... "
 
     # strings for version compare
-    # NB: format param is prog name
     S_ASK_VER_SAME = (
         "The current version of this program is already installed. Do you "
         "want to overwrite? [y/N] "
     )
     S_MSG_VER_ABORT = "Installation aborted"
+
+    S_ACTION_LIB = "Install libs in venv... "
 
     # errors
     # NB: format param is cfg file path
@@ -130,12 +125,14 @@ class CNInstall:
     S_ERR_NO_SUDO = "Could not get sudo permission"
     S_ERR_REQ = "Could not install {}"
     S_ERR_VERSION = "One or both version numbers are invalid"
+    S_ERR_SRC_PATH = "src can not be {}"
+    S_ERR_DST_PATH = "dst can not be {}"
 
     # debug option strings
-    S_DBG_OPTION = "-d"
-    S_DBG_ACTION = "store_true"
-    S_DBG_DEST = "DBG_DEST"
-    S_DBG_HELP = "enable debugging option"
+    S_DRY_OPTION = "-d"
+    S_DRY_ACTION = "store_true"
+    S_DRY_DEST = "DBG_DEST"
+    S_DRY_HELP = "do a dry run, printing file info instead of modifying it"
 
     # question to ask when installing older version
     S_ASK_VER_OLDER = (
@@ -143,6 +140,9 @@ class CNInstall:
         "to overwrite? [y/N] "
     )
     S_ASK_CONFIRM = "y"
+
+    S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
+    S_CMD_INST_LIB = "python -m pip install {}"
 
     # regex to compare version numbers
     R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
@@ -169,7 +169,7 @@ class CNInstall:
         """
 
         # set properties
-        self._debug = False
+        self._dry = False
         self._dict_cfg = {}
 
     # --------------------------------------------------------------------------
@@ -237,17 +237,22 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Fix .desktop stuff
     # --------------------------------------------------------------------------
-    def fix_desktop_file(self, desk_file, path_icon):
+    def fix_desktop_file(self, desk_file, path_icon, dry=False):
         """
         Fix .desktop stuff
 
         Args:
             desk_file: abs path to desktop file
             path_icon: path to icon, rel to user home
+            dry: If True, do not copy files, ony print the action (default:
+            False)
 
         Fixes entries in the .desktop file (absolute paths, etc.)
         Currently only fixes absolute path to icon.
         """
+
+        if dry:
+            return
 
         # sanity check
         # NB: in a cli or pkg, this file will not exist
@@ -284,12 +289,12 @@ class CNInstall:
     def install(
         self,
         dir_assets,
-        path_cfg_new,
-        path_cfg_old,
+        path_cfg_inst,
+        path_cfg_uninst,
         dir_usr_inst,
         dir_venv,
         path_reqs,
-        debug=False,
+        dry=False,
     ):
         """
         Install the program
@@ -298,18 +303,18 @@ class CNInstall:
             dir_assets: Path to the assets folder where all of the program
             files are put in dist. This is the base source path to use when
             copying files to the user's computer
-            path_cfg_new: Path to the file that contains the current install
+            path_cfg_inst: Path to the file that contains the current install
             dict info
-            path_cfg_old: Path to the currently installed program's install
-            dict info
-            debug: If True, do not copy files, ony print the action (default:
+            path_cfg_uninst: Path to the currently installed program's
+            uninstall dict info
+            dry: If True, do not copy files, ony print the action (default:
             False)
 
         Runs the install operation.
         """
 
         # get dicts from files
-        self._dict_cfg = self._get_dict_from_file(path_cfg_new)
+        self._dict_cfg = self._get_dict_from_file(path_cfg_inst)
 
         # get prg name
         prog_name = self._dict_cfg[self.S_KEY_NAME]
@@ -318,15 +323,12 @@ class CNInstall:
         print(self.S_MSG_INST_START.format(prog_name))
 
         # set properties
-        self._debug = debug
-
-        # make the venv on the user's comp
-        self._make_venv(dir_usr_inst, dir_venv, path_reqs)
+        self._dry = dry
 
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
-        if path_cfg_old and Path(path_cfg_old).exists():
-            dict_cfg_old = self._get_dict_from_file(path_cfg_old)
+        if path_cfg_uninst and Path(path_cfg_uninst).exists():
+            dict_cfg_old = self._get_dict_from_file(path_cfg_uninst)
 
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_VERSION]
@@ -345,7 +347,7 @@ class CNInstall:
                     or str_ask.lower()[0] != self.S_ASK_CONFIRM
                 ):
                     print(self.S_MSG_VER_ABORT)
-                    sys.exit(0)
+                    sys.exit()
 
             # newer version is installed
             elif res == -1:
@@ -359,29 +361,36 @@ class CNInstall:
                     or str_ask.lower()[0] != self.S_ASK_CONFIRM
                 ):
                     print(self.S_MSG_VER_ABORT)
-                    sys.exit(0)
+                    sys.exit()
 
-        # print, install, make venv, print
+        # make the venv on the user's comp
+        self._make_venv(dir_usr_inst, dir_venv, path_reqs)
+
+        # install libs
+        self._install_libs(dir_usr_inst, dir_venv, dir_assets)
+
+        # move content
         self._do_install_content(dir_assets)
+
         print(self.S_MSG_INST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
     # Uninstall the program
     # --------------------------------------------------------------------------
-    def uninstall(self, path_cfg, debug=False):
+    def uninstall(self, path_cfg, dry=False):
         """
         Uninstall the program
 
         Args:
             path_cfg: Path to the file that contains the uninstall dict info
-            debug: If True, do not remove files, ony print the action (default:
+            dry: If True, do not remove files, ony print the action (default:
             False)
 
         Runs the uninstall operation.
         """
 
         # set properties
-        self._debug = debug
+        self._dry = dry
 
         # get dict from file
         self._dict_cfg = self._get_dict_from_file(path_cfg)
@@ -422,13 +431,50 @@ class CNInstall:
         # do the thing with the thing
         cv = CNVenv(dir_usr_inst, dir_venv)
         try:
-            if not self._debug:
+            if not self._dry:
                 cv.create()
-                cv.install(path_reqs)
+                cv.install_reqs(path_reqs)
             print(self.S_MSG_DONE)
         except F.CNShellError as e:
             print(self.S_MSG_FAIL)
             print(e.message)
+
+    # --------------------------------------------------------------------------
+    # Install libs to program's venv
+    # --------------------------------------------------------------------------
+    def _install_libs(self, dir_usr_inst, dir_venv, dir_assets):
+        """
+        Install libs to program's venv
+
+        """
+
+        print(self.S_ACTION_LIB, end="", flush=True)
+
+        # get activate cmd
+        cmd_activate = self.S_CMD_VENV_ACTIVATE.format(dir_usr_inst, dir_venv)
+
+        # start the full command
+        cmd = f"{cmd_activate};"
+
+        # get list of libs for this prj type
+        dir_lib = dir_assets / "lib"
+        val = [dir_lib / f for f in dir_lib.iterdir() if f.is_dir()]
+
+        # copy libs to command
+        for item in val:
+
+            # add lib
+            add_str = self.S_CMD_INST_LIB.format(str(item))
+            cmd += add_str + "; "
+
+        # the command to install libs
+        try:
+            if not self._dry:
+                F.sh(cmd, shell=True)
+            print(self.S_MSG_DONE)
+        except F.CNShellError as e:
+            print(self.S_MSG_FAIL)
+            raise e
 
     # --------------------------------------------------------------------------
     # Open a json file and return the dict inside
@@ -480,6 +526,10 @@ class CNInstall:
 
         print(self.S_MSG_COPY_START, end="", flush=True)
 
+        # add an extra line break
+        if self._dry:
+            print("\n")
+
         # get source dir and user home
         inst_home = Path.home()
 
@@ -493,25 +543,33 @@ class CNInstall:
             src = dir_assets / k
             dst = inst_home / v / src.name
 
+            if k in ("", ".", "..", None):
+                print(self.S_ERR_SRC_PATH.format(k))
+                sys.exit()
+
+            if v in ("", ".", "..") or src.name in ("", ".", ".."):
+                print(self.S_ERR_DST_PATH.format(v))
+                sys.exit()
+
             # debug may omit certain assets
             if not src.exists():
                 continue
 
             # if the source is a dir
             if src.is_dir():
-                if not self._debug:
+                if not self._dry:
                     # copy dir
                     shutil.copytree(src, dst, dirs_exist_ok=True)
                 else:
-                    print(f"copy dir {src} to {dst}")
+                    print(f"copy dir\n{src}\nto\n{dst}\n")
 
             # if the source is a file
             else:
-                if not self._debug:
+                if not self._dry:
                     # copy file
                     shutil.copy(src, dst)
                 else:
-                    print(f"copy file {src} to {dst}")
+                    print(f"copy file\n{src}\nto\n{dst}\n")
 
         print(self.S_MSG_DONE)
 
@@ -528,6 +586,10 @@ class CNInstall:
 
         print(self.S_MSG_DEL_START, end="", flush=True)
 
+        # add an extra line break
+        if self._dry:
+            print("\n")
+
         # get source dir and user home
         inst_home = Path.home()
 
@@ -537,28 +599,30 @@ class CNInstall:
         # for each key, value
         for item in content:
 
-            # get full path of destination
-            dst = inst_home / item
+            if item == "" or item == "." or item == "..":
+                print(self.S_ERR_DST_PATH.format(item))
+                sys.exit()
 
-            # debug may omit certain assets
-            if not dst.exists():
-                continue
-
-            # if the source is a dir
-            if dst.is_dir():
-                if not self._debug:
-                    # copy dir
-                    shutil.rmtree(dst)
-                else:
-                    print(f"rmtree {dst}")
-
-            # if the source is a file
+            if self._dry:
+                print(f"remove\n{item}\n")
             else:
-                if not self._debug:
+
+                # get full path of destination
+                dst = inst_home / item
+
+                # debug may omit certain assets
+                if not dst.exists():
+                    continue
+
+                # if the source is a dir
+                if dst.is_dir():
+                    # remove dir
+                    shutil.rmtree(dst)
+
+                # if the source is a file
+                else:
                     # copy file
                     Path.unlink(dst)
-                else:
-                    print(f"unlink {dst}")
 
         print(self.S_MSG_DONE)
 

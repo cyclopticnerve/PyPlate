@@ -24,8 +24,8 @@ from pathlib import Path
 # pylint: disable=import-error
 
 # my imports
-from cnlib import cnfunctions as F
-from cnlib.cnformatter import CNFormatter
+import cnfunctions as F
+from cnformatter import CNFormatter
 
 # pylint: enable=import-error
 

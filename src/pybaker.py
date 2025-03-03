@@ -30,28 +30,14 @@ import re
 import shutil
 import sys
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
-# find path to prj
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
-
 # local imports
-import pyplate as PP  # type:ignore
-from lib.cnlib import cnfunctions as F  # type: ignore
-from lib.cnlib.cnformatter import CNFormatter  # type: ignore
-from lib.cnlib.cninstall import CNInstall  # type: ignore
-from lib.cnlib.cnpot import CNPotPy  # type: ignore
-from lib.cnlib.cntree import CNTree  # type: ignore
-from lib.cnlib.cnvenv import CNVenv  # type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
+import cnfunctions as F
+from cnformatter import CNFormatter
+from cninstall import CNInstall
+from cnpot import CNPotPy
+from cntree import CNTree
+from cnvenv import CNVenv
+import pyplate as PP
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -81,6 +67,9 @@ class PyBaker:
     # NB: these should be the only strings in this file, as they should NOT be
     # changed by dev
 
+    # find path to prj
+    P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
     # name and desc for cmd line help
     S_PP_NAME_BIG = "PyBaker"
     S_PP_NAME_SMALL = "pybaker"
@@ -92,12 +81,16 @@ class PyBaker:
     # formatted version
     S_PP_VER_FMT = f"Version {S_PP_VERSION}"
 
+    # help str
+    S_PP_HELP = "Use __PP_NAME_MAIN__ -h for more info"
+
     # about string
     S_PP_ABOUT = (
         f"{S_PP_NAME_BIG}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VER_FMT}\n"
-        f"https://www.github.com/cyclopticnerve/PyPlate\n"
+        f"https://www.github.com/cyclopticnerve/PyPlate\n\n"
+        f"{S_PP_HELP}\n"
     )
 
     # instructions string
@@ -110,7 +103,7 @@ class PyBaker:
     S_PP_VENV = ".venv-pyplate"
 
     # look for pp in dir struct
-    S_LOOK_FOR_PP = "pyplate"
+    # S_LOOK_FOR_PP = "pyplate"
 
     # debug option strings
     S_DBG_OPTION = "-d"
@@ -237,26 +230,29 @@ class PyBaker:
         # check if we are running in ide
         # if yes, ask for prj name
         if self._ide:
-            prj_name = ""
-            while prj_name == "":
-                prj_name = input(PP.S_ASK_NAME)
+            while True:
+                prj_name = ""
+                while prj_name == "":
+                    prj_name = input(PP.S_ASK_NAME)
 
-            # if running in ide, cwd is pyplate prj dir, so move up and down
-            self._dir_prj = Path(P_DIR_PRJ / ".." / prj_name)
+                # if running in ide, cwd is pyplate prj dir, so move up and down
+                self._dir_prj = Path(self.P_DIR_PRJ / ".." / prj_name)
+                if self._dir_prj.exists():
+                    break
 
         # get abs path either way
         self._dir_prj = self._dir_prj.resolve()
 
         # do not run pybaker on pyplate (we are not that meta YET...)
-        if self.S_LOOK_FOR_PP in str(self._dir_prj).lower():
+        if self._dir_prj.is_relative_to(self.P_DIR_PRJ):
             print(PP.S_ERR_PRJ_DIR_IS_PP)
-            sys.exit(-1)
+            sys.exit()
 
         # check if dir_prj has pyplate folder for a valid prj
-        path_pyplate = self._dir_prj / self.S_LOOK_FOR_PP
+        path_pyplate = self._dir_prj / PP.S_PRJ_PP_DIR
         if not path_pyplate.exists():
             print(PP.S_ERR_NOT_PRJ)
-            sys.exit(-1)
+            sys.exit()
 
         # debug turns off some _do_after_fix features
         if self._debug:
@@ -304,7 +300,7 @@ class PyBaker:
 
         # if answer is anything but default or blank, we bail
         print(PP.S_ASK_PROPS_ABORT)
-        sys.exit(-1)
+        sys.exit()
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -456,7 +452,7 @@ class PyBaker:
             a_dict[CNInstall.S_KEY_VERSION] = version
             F.save_dict(a_dict, [a_file])
 
-        # get install cfg
+        # get uninstall cfg
         a_file = self._dir_prj / PP.S_PATH_UNINST_CFG
         if a_file.exists():
 
@@ -602,7 +598,7 @@ class PyBaker:
             # activate cmd for pyplate's venv
             # (so we don't need to install pdoc in every project)
             cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
-                str(P_DIR_PRJ), self.S_PP_VENV
+                str(self.P_DIR_PRJ), self.S_PP_VENV
             )
 
             # get template and output dirs
@@ -718,6 +714,26 @@ class PyBaker:
             if src.exists() and src.is_dir():
                 shutil.copytree(src, dst, dirs_exist_ok=True)
             elif src.exists() and src.is_file():
+                shutil.copy2(src, dst)
+
+        # ----------------------------------------------------------------------
+        # do copy lib dict
+
+        # get list of libs for this prj type
+        prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
+        val = PP.D_COPY_LIB.get(prj_type_short, [])
+
+        # copy libs
+        for item in val:
+
+            # get src/dst
+            src = self.P_DIR_PRJ / PP.S_DIR_LIB / item
+            dst = p_dist / PP.S_DIR_ASSETS / PP.S_DIR_LIB / item
+
+            # copy dir/file
+            if src.is_dir():
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
                 shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
@@ -1139,12 +1155,12 @@ if __name__ == "__main__":
     # )
 
     # add ide option
-    # parser.add_argument(
-    #     PyBaker.S_IDE_OPTION,
-    #     action=PyBaker.S_IDE_ACTION,
-    #     dest=PyBaker.S_IDE_DEST,
-    #     help=PyBaker.S_IDE_HELP,
-    # )
+    parser.add_argument(
+        PyBaker.S_IDE_OPTION,
+        action=PyBaker.S_IDE_ACTION,
+        dest=PyBaker.S_IDE_DEST,
+        help=PyBaker.S_IDE_HELP,
+    )
 
     # get namespace object
     args = parser.parse_args()

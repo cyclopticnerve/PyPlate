@@ -84,12 +84,16 @@ class PyMaker:
     # formatted version
     S_PP_VER_FMT = f"Version {S_PP_VERSION}"
 
+    # help str
+    S_PP_HELP = "Use __PP_NAME_MAIN__ -h for more info"
+
     # about string
     S_PP_ABOUT = (
         f"{S_PP_NAME_BIG}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VER_FMT}\n"
-        f"https://www.github.com/cyclopticnerve/PyPlate\n"
+        f"https://www.github.com/cyclopticnerve/PyPlate\n\n"
+        f"{S_PP_HELP}\n"
     )
 
     # instructions string
@@ -208,14 +212,13 @@ class PyMaker:
         if self._debug:
 
             # yup, yell
-            print(PP.S_ERR_DEBUG)
+            print(PP.S_MSG_DEBUG)
 
         # do not run pymaker on pyplate (we are not that meta YET...)
         cwd = Path.cwd()
-        if self.S_LOOK_FOR_PP in str(cwd).lower():
+        if cwd.is_relative_to(self.P_DIR_PRJ):
             print(PP.S_ERR_PRJ_DIR_IS_PP)
-            print(cwd)
-            sys.exit(-1)
+            sys.exit()
 
         # debug turns off some features to speed up project creation
         if self._debug:
@@ -423,8 +426,6 @@ class PyMaker:
             PP.D_PRV_PRJ["__PP_FILE_WIN__"]
         )
 
-        F.pp(PP.D_PRV_PRJ)
-
         # remove home dir from PyPlate path
         h = str(Path.home())
         p = str(self.P_DIR_PRJ)
@@ -487,27 +488,27 @@ class PyMaker:
             # copy dir/file
             if src.is_dir():
                 shutil.copytree(src, dst)
-            else:
+            elif src.is_file():
                 shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
         # do copy lib dict
 
         # get list of libs for this prj type
-        val = PP.D_COPY_LIB.get(prj_type_short, [])
+        # val = PP.D_COPY_LIB.get(prj_type_short, [])
 
-        # copy libs
-        for item in val:
+        # # copy libs
+        # for item in val:
 
-            # get src/dst
-            src = self.P_DIR_PRJ / PP.S_DIR_LIB / item
-            dst = self._dir_prj / PP.S_DIR_LIB / item
+        #     # get src/dst
+        #     src = self.P_DIR_PRJ / PP.S_DIR_LIB / item
+        #     dst = self._dir_prj / PP.S_DIR_LIB / item
 
-            # copy dir/file
-            if src.is_dir():
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            else:
-                shutil.copy2(src, dst)
+        #     # copy dir/file
+        #     if src.is_dir():
+        #         shutil.copytree(src, dst, dirs_exist_ok=True)
+        #     else:
+        #         shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
         # combine any reqs files
@@ -760,11 +761,45 @@ class PyMaker:
             cv = CNVenv(self._dir_prj, dir_venv)
             try:
                 cv.create()
-                cv.install(file_reqs)
+                cv.install_reqs(file_reqs)
                 print(PP.S_ACTION_DONE)
             except F.CNShellError as e:
                 print(PP.S_ACTION_FAIL)
                 print(e.message)
+
+            # ------------------------------------------------------------------
+            # install libs in project venv
+
+            print(PP.S_ACTION_LIB, end="", flush=True)
+
+            # get activate cmd
+            cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
+                str(self._dir_prj), dir_venv
+            )
+
+            # start the full command
+            cmd = f"{cmd_activate};"
+
+            # get list of libs for this prj type
+            prj_type_short = PP.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+            val = PP.D_COPY_LIB.get(prj_type_short, [])
+
+            # copy libs to command
+            for item in val:
+
+                # get lib
+                add_path = self.P_DIR_PRJ / "lib" / item
+                add_str = PP.S_CMD_INST_LIB.format(add_path)
+                cmd += add_str + ";"
+
+            # the command to install libs
+            # cmd = f"{cmd}"
+            try:
+                F.sh(cmd, shell=True)
+                print(PP.S_ACTION_DONE)
+            except F.CNShellError as e:
+                print(PP.S_ACTION_FAIL)
+                raise e
 
         # ----------------------------------------------------------------------
         # i18n
@@ -932,11 +967,6 @@ class PyMaker:
                     # running pybaker
                     PP.D_UNINSTALL[prj_type],
                 )
-
-                # fix dunders in inst cfg file
-                path_inst = self._dir_prj / PP.S_PATH_INST_CFG
-                F.save_dict(dict_inst, [path_inst])
-                self._fix_content(path_inst)
 
                 # fix dunders in inst cfg file
                 path_uninst = self._dir_prj / PP.S_PATH_UNINST_CFG

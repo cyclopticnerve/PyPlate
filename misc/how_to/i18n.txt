@@ -4,4 +4,4 @@ add lang to pyplate/project.json
 run pybaker to create folders/files
 edit strings in i18n/po/<lang>.po
 run pybaker to make mo from po
-test using $ LANGUAGE=xx ./src/__PP_NAME_PRJ_SMALL__.py
+test using $ LANGUAGE=xx ./src/__PP_NAME_MAIN__.py

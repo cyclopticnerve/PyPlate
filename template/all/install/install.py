@@ -23,55 +23,42 @@ import argparse
 from pathlib import Path
 import sys
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=no-name-in-module
-# pylint: disable=import-error
-
-# my imports
-# add custom import paths
-
-DIR_SELF = Path(__file__).parent.resolve()
-DIR_ASSETS = DIR_SELF / "__PP_INST_ASSETS__"
-
-FILE_CFG_NEW = DIR_ASSETS / "__PP_INST_CONF_FILE__"
-FILE_DESK = DIR_ASSETS / "__PP_FILE_DESK__"
-FILE_REQS = DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
-DIR_LIB = DIR_ASSETS / "__PP_DIR_LIB__"
-
+# constants
+DIR_PRJ = Path(__file__).parent.resolve()
+DIR_ASSETS = DIR_PRJ / "__PP_INST_ASSETS__"
 DIR_USR_INST = Path.home() / "__PP_USR_INST__"
 DIR_VENV = DIR_USR_INST / "__PP_NAME_VENV__"
-FILE_CFG_OLD = DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
-FILE_DESK_ICON = Path.home() / "__PP_DESK_ICON__"
-
-# add paths to import search
+DIR_LIB = DIR_ASSETS / "__PP_DIR_LIB__"
 sys.path.append(str(DIR_LIB))
 
+FILE_DESK = DIR_ASSETS / "__PP_FILE_DESK__"
+FILE_DESK_ICON = Path.home() / "__PP_DESK_ICON__"
+
+FILE_CFG_INST = DIR_ASSETS / "__PP_INST_CONF_FILE__"
+FILE_CFG_UNINST = DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
+FILE_REQS = DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
+
+# pylint: disable=wrong-import-position
 # import my stuff
-import cnlib.cninstall as C  # type: ignore
-from cnlib.cnformatter import CNFormatter  # type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=no-name-in-module
-# pylint: enable=import-error
-
+from cninstall import CNInstall
+from cninstall import CNInstallError
+from cnformatter import CNFormatter
 
 # ------------------------------------------------------------------------------
 # Run the main function
 # ------------------------------------------------------------------------------
-def main(debug=False):
+def main(dry=False):
     """
     Run the main function
 
     Args:
-        debug: If True, run in debug mode (default: False)
+        dry: If True, run in dry-run mode (default: False)
 
     The main entry point for the program.
     """
 
     # create an instance of the class
-    inst = C.CNInstall()
+    inst = CNInstall()
 
     # run the instance
     try:
@@ -80,18 +67,19 @@ def main(debug=False):
         # rel to assets
 
         # gui
-        inst.fix_desktop_file(FILE_DESK, FILE_DESK_ICON)
+        inst.fix_desktop_file(FILE_DESK, FILE_DESK_ICON, dry=dry)
+
         # gui, cli
         inst.install(
             DIR_ASSETS,
-            FILE_CFG_NEW,
-            FILE_CFG_OLD,
+            FILE_CFG_INST,
+            FILE_CFG_UNINST,
             DIR_USR_INST,
             DIR_VENV,
             FILE_REQS,
-            debug=debug
+            dry=dry
         )
-    except C.CNInstallError as e:
+    except CNInstallError as e:
         print(e)
 
 
@@ -110,12 +98,12 @@ if __name__ == "__main__":
     # create the parser
     parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
-    # add debug option
+    # add dry-run option
     parser.add_argument(
-        C.CNInstall.S_DBG_OPTION,
-        action=C.CNInstall.S_DBG_ACTION,
-        dest=C.CNInstall.S_DBG_DEST,
-        help=C.CNInstall.S_DBG_HELP,
+        CNInstall.S_DRY_OPTION,
+        action=CNInstall.S_DRY_ACTION,
+        dest=CNInstall.S_DRY_DEST,
+        help=CNInstall.S_DRY_HELP,
     )
 
     # get namespace object
@@ -127,9 +115,9 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------
 
     # get the args
-    a_debug = dict_args.get(C.CNInstall.S_DBG_DEST, False)
+    a_dry = dict_args.get(CNInstall.S_DRY_DEST, False)
 
     # run main function
-    main(a_debug)
+    main(a_dry)
 
 # -)
