@@ -38,8 +38,7 @@ B_CMD_I18N = True
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
 # create docs
-# FIXME: docs broken by rel imports
-B_CMD_DOCS = False
+B_CMD_DOCS = True
 # do install/uninstall
 B_CMD_INST = True
 
@@ -74,7 +73,7 @@ S_ASK_NAME = "Project name: "
 S_ASK_SEC_P = "Module name (default: {}): "
 S_ASK_SEC_P_DEF = "{}"
 S_ASK_SEC_G = "Window class name (default: {}): "
-S_ASK_SEC_G_DEF = "{}_win"
+S_ASK_SEC_G_DEF = "{}"
 
 # error strings
 S_ERR_TYPE = "Type must be one of {}"
@@ -754,12 +753,11 @@ D_PUB_DIST = {
     },
     "p": {
         # basic stuff (put at top level)
-        f"{S_DIR_SRC}/__PP_NAME_PRJ_SMALL__": "",
+        S_DIR_SRC: "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
-        # toml file in subdir with same name as pkg
-        S_FILE_TOML: "__PP_NAME_PRJ_SMALL__",
         S_DIR_DOCS: "",
+        S_FILE_TOML: "",
     },
 }
 
@@ -1020,28 +1018,9 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
         f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_big}.desktop"
     )
 
-    # k/v to fix gui stuff
-    # dict_prv_prj["__PP_APP_FILE_FMT__"] = S_APP_FILE_FMT.format(name_small)
-    # dict_prv_prj["__PP_APP_CLASS_FMT__"] = _pascal_case(
-    #     dict_prv_prj["__PP_APP_FILE_FMT__"]
-    # )
-
-    # name_sec = dict_prv_prj["__PP_NAME_SEC__"]
-    # dict_prv_prj["__PP_WIN_FILE_FMT__"] = S_WIN_FILE_FMT.format(name_sec)
-    # dict_prv_prj["__PP_WIN_CLASS_FMT__"] = _pascal_case(
-    #     dict_prv_prj["__PP_WIN_FILE_FMT__"]
-    # )
-
     author = dict_prv_all["__PP_AUTHOR__"]
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
 
-    # fix pdoc start point
-    # NB: not a fan of pdoc but it's easier to use than sphinx...
-    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
-    if prj_type == "p":
-        dict_prv_prj["__PP_PDOC_START__"] = (
-            f"{S_DIR_SRC}/{dict_prv_prj["__PP_NAME_PRJ_SMALL__"]}"
-        )
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1165,21 +1144,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     ext = ".tar.gz"
 
     # get prj type
-    type_prj = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
     name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
-
-    if type_prj == "p":
-
-        # first tar inner pkg
-        in_dir = p_dist / name_small
-        out_file = p_dist / f"{in_dir}{ext}"
-
-        with tarfile.open(out_file, mode="w:gz") as tar:
-            tar.add(in_dir, arcname=Path(in_dir).name)
-
-        # chuck the origin dir
-        if not B_DEBUG:
-            shutil.rmtree(in_dir)
 
     # remove ext from bin file
     old_bin = p_dist / S_DIR_ASSETS / S_DIR_BIN / f"{name_small}.py"
@@ -1198,11 +1163,9 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     # if not B_DEBUG:
     #     shutil.rmtree(in_dir)
 
-
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file

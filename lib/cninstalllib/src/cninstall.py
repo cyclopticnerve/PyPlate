@@ -19,11 +19,8 @@ import json
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import sys
-
-# local imports
-import cnfunctions as F
-from cnvenv import CNVenv
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -108,6 +105,8 @@ class CNInstall:
     S_MSG_COPY_START = "Copying files... "
     S_MSG_DEL_START = "Deleting files... "
     S_MSG_VENV_START = "Making venv folder... "
+    S_MSG_REQS_START = "Installing requirements... "
+    S_MSG_LIBS_START = "Installing libs... "
 
     # strings for version compare
     S_ASK_VER_SAME = (
@@ -115,8 +114,6 @@ class CNInstall:
         "want to overwrite? [y/N] "
     )
     S_MSG_VER_ABORT = "Installation aborted"
-
-    S_ACTION_LIB = "Install libs in venv... "
 
     # errors
     # NB: format param is cfg file path
@@ -141,6 +138,8 @@ class CNInstall:
     )
     S_ASK_CONFIRM = "y"
 
+    S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
+    S_CMD_INSTALL = "cd {};. ./{}/bin/activate;python -m pip install -r {}"
     S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
     S_CMD_INST_LIB = "python -m pip install {}"
 
@@ -289,6 +288,7 @@ class CNInstall:
     def install(
         self,
         dir_assets,
+        path_lib,
         path_cfg_inst,
         path_cfg_uninst,
         dir_usr_inst,
@@ -303,6 +303,7 @@ class CNInstall:
             dir_assets: Path to the assets folder where all of the program
             files are put in dist. This is the base source path to use when
             copying files to the user's computer
+            path_lib: Path to the dist's lib folder, ie. "assets/lib"
             path_cfg_inst: Path to the file that contains the current install
             dict info
             path_cfg_uninst: Path to the currently installed program's
@@ -364,10 +365,13 @@ class CNInstall:
                     sys.exit()
 
         # make the venv on the user's comp
-        self._make_venv(dir_usr_inst, dir_venv, path_reqs)
+        self._make_venv(dir_usr_inst, dir_venv)
+
+        # install reqs
+        self._install_reqs(dir_usr_inst, dir_venv, path_reqs)
 
         # install libs
-        self._install_libs(dir_usr_inst, dir_venv, dir_assets)
+        self._install_libs(dir_usr_inst, dir_venv, path_lib)
 
         # move content
         self._do_install_content(dir_assets)
@@ -410,54 +414,118 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
     # --------------------------------------------------------------------------
-    def _make_venv(self, dir_usr_inst, dir_venv, path_reqs):
+    def _make_venv(self, dir_usr_inst, dir_venv):
         """
         Make venv for this program on user's computer
 
         Args:
             dir_usr_inst: The program's install folder in which to make a venv
             folder.
-            dir_venv: The path tp the venv folder to create.
-            path_reqs: Path to the requirements.txt file to add requirements to
-            the venv.
+            dir_venv: The path to the venv folder to create.
 
-        Makes a .venv-XXX folder on the user's computer, and installs the
-        required libs.
+        Makes a .venv-XXX folder on the user's computer.
         """
 
         # show progress
         print(self.S_MSG_VENV_START, flush=True, end="")
 
-        # do the thing with the thing
-        cv = CNVenv(dir_usr_inst, dir_venv)
-        try:
-            if not self._dry:
-                cv.create()
-                cv.install_reqs(path_reqs)
+        # sanity check
+        dir_venv = Path(dir_venv)
+        if not dir_venv.is_absolute():
+            dir_venv = Path(dir_usr_inst) / dir_venv
+
+        # if it's a dry run, don't make venv
+        if self._dry:
             print(self.S_MSG_DONE)
-        except F.CNShellError as e:
+            print("venv:", dir_venv)
+            return
+
+        # create a venv
+        cmd = self.S_CMD_CREATE.format(dir_venv)
+        try:
+            subprocess.run(cmd, check=True, shell=True)
+            print(self.S_MSG_DONE)
+        except Exception as e:
             print(self.S_MSG_FAIL)
-            print(e.message)
+            raise e
+
+    # --------------------------------------------------------------------------
+    # Install requirements.txt
+    # --------------------------------------------------------------------------
+    def _install_reqs(self, dir_usr_inst, dir_venv, file_reqs):
+        """
+        Install requirements.txt
+
+        Args:
+            dir_usr_inst: The program's install folder in which the venv
+            resides.
+            dir_venv: The path tp the venv folder to create.
+            path_reqs: Path to the requirements.txt file to add requirements to
+            the venv.
+
+        Installs the contents of a requirements.txt file into the program's
+        venv.
+        """
+
+        # show progress
+        print(self.S_MSG_REQS_START, flush=True, end="")
+
+        # if param is not abs, make abs rel to prj dir
+        file_reqs = Path(file_reqs)
+        if not file_reqs.is_absolute():
+            file_reqs = Path(dir_usr_inst) / file_reqs
+
+        # if it's a dry run, don't install
+        if self._dry:
+            print(self.S_MSG_DONE)
+            print("reqs:", file_reqs)
+            return
+
+        # no reqs, make pretty
+        with open(file_reqs, "r", encoding="UTF-8") as a_file:
+            lines = a_file.readlines()
+            if len(lines) > 0:
+                print()
+
+        # the command to install packages to venv from reqs
+        cmd = self.S_CMD_INSTALL.format(
+            dir_venv.parent, dir_venv.name, file_reqs
+        )
+        try:
+            subprocess.run(cmd, check=True, shell=True)
+            print(self.S_MSG_DONE)
+        except Exception as e:
+            print(self.S_MSG_FAIL)
+            raise e
 
     # --------------------------------------------------------------------------
     # Install libs to program's venv
     # --------------------------------------------------------------------------
-    def _install_libs(self, dir_usr_inst, dir_venv, dir_assets):
+    def _install_libs(self, dir_usr_inst, dir_venv, dir_lib):
         """
         Install libs to program's venv
 
+        Args:
+            dir_usr_inst: The program's install folder in which the venv
+            resides.
+            dir_venv: The path tp the venv folder to create.
+            dir_lib: The path to the folder where the libs reside.
+
+        Installs the contents of a lib folder in the program's venv.
         """
 
-        print(self.S_ACTION_LIB, end="", flush=True)
+        # show some info
+        print(self.S_MSG_LIBS_START, flush=True, end="")
 
-        # get activate cmd
-        cmd_activate = self.S_CMD_VENV_ACTIVATE.format(dir_usr_inst, dir_venv)
+        # sanity check
+        dir_lib = Path(dir_lib)
+        if not dir_lib.is_absolute():
+            dir_lib = Path(dir_usr_inst) / dir_lib
 
         # start the full command
-        cmd = f"{cmd_activate};"
+        cmd = self.S_CMD_VENV_ACTIVATE.format(dir_usr_inst, dir_venv)
 
         # get list of libs for this prj type
-        dir_lib = dir_assets / "lib"
         val = [dir_lib / f for f in dir_lib.iterdir() if f.is_dir()]
 
         # copy libs to command
@@ -465,14 +533,23 @@ class CNInstall:
 
             # add lib
             add_str = self.S_CMD_INST_LIB.format(str(item))
-            cmd += add_str + "; "
+            cmd += ";" + add_str
+
+        # if it's a dry run, don't install
+        if self._dry:
+            print(self.S_MSG_DONE)
+            print("cmd:", cmd)
+            return
+
+        # make pretty
+        if len(val) > 0:
+            print()
 
         # the command to install libs
         try:
-            if not self._dry:
-                F.sh(cmd, shell=True)
+            subprocess.run(cmd, check=True, shell=True)
             print(self.S_MSG_DONE)
-        except F.CNShellError as e:
+        except Exception as e:
             print(self.S_MSG_FAIL)
             raise e
 
@@ -524,14 +601,12 @@ class CNInstall:
         source to their final locations in the user's folder structure.
         """
 
-        print(self.S_MSG_COPY_START, end="", flush=True)
+        # show some info
+        print(self.S_MSG_COPY_START, flush=True, end="")
 
         # add an extra line break
         if self._dry:
-            print("\n")
-
-        # get source dir and user home
-        inst_home = Path.home()
+            print()
 
         # content list from dict
         content = self._dict_cfg.get(self.S_KEY_DICT_INSTALL, {})
@@ -541,7 +616,7 @@ class CNInstall:
 
             # get full paths of source / destination
             src = dir_assets / k
-            dst = inst_home / v / src.name
+            dst = Path.home() / v / src.name
 
             if k in ("", ".", "..", None):
                 print(self.S_ERR_SRC_PATH.format(k))
@@ -555,22 +630,16 @@ class CNInstall:
             if not src.exists():
                 continue
 
-            # if the source is a dir
-            if src.is_dir():
-                if not self._dry:
-                    # copy dir
+            if self._dry:
+                print(f"copy\n{src}\nto\n{dst}\n")
+            else:
+                # if the source is a dir
+                if src.is_dir():
                     shutil.copytree(src, dst, dirs_exist_ok=True)
                 else:
-                    print(f"copy dir\n{src}\nto\n{dst}\n")
-
-            # if the source is a file
-            else:
-                if not self._dry:
-                    # copy file
                     shutil.copy(src, dst)
-                else:
-                    print(f"copy file\n{src}\nto\n{dst}\n")
 
+        # show some info
         print(self.S_MSG_DONE)
 
     # --------------------------------------------------------------------------
@@ -584,14 +653,12 @@ class CNInstall:
         user's computer.
         """
 
-        print(self.S_MSG_DEL_START, end="", flush=True)
+        # show some info
+        print(self.S_MSG_DEL_START, flush=True, end="")
 
-        # add an extra line break
+        # make pretty
         if self._dry:
-            print("\n")
-
-        # get source dir and user home
-        inst_home = Path.home()
+            print()
 
         # content list from dict
         content = self._dict_cfg.get(self.S_KEY_LIST_UNINST, [])
@@ -599,20 +666,22 @@ class CNInstall:
         # for each key, value
         for item in content:
 
-            if item == "" or item == "." or item == "..":
+            # weed out relative paths
+            if item in ("", ".", ".."):
                 print(self.S_ERR_DST_PATH.format(item))
                 sys.exit()
 
+            # get full path of destination
+            dst = Path.home() / item
+
+            # debug may omit certain assets
+            if not dst.exists():
+                continue
+
+            # (maybe) do delete
             if self._dry:
                 print(f"remove\n{item}\n")
             else:
-
-                # get full path of destination
-                dst = inst_home / item
-
-                # debug may omit certain assets
-                if not dst.exists():
-                    continue
 
                 # if the source is a dir
                 if dst.is_dir():
@@ -624,6 +693,7 @@ class CNInstall:
                     # copy file
                     Path.unlink(dst)
 
+        # show some info
         print(self.S_MSG_DONE)
 
     # --------------------------------------------------------------------------

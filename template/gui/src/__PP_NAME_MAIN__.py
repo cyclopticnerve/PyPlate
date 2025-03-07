@@ -13,7 +13,7 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PP_NAME_PRJ_SMALL__.py [cmd line]
+foo@bar:~[path to directory of this file]$ ./__PP_NAME_MAIN__.py [cmd line]
 
 or if installed in a global location:
 
@@ -34,7 +34,7 @@ from pathlib import Path
 # import my stuff
 import cnfunctions as F
 from cncli import CNCli
-from gui.python.__PP_FILE_APP__ import App  # type: ignore
+from .gui.python.__PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
 
 # find path to prj
 # NB: keep this global for i18n stuff
@@ -80,26 +80,24 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
 
     # globals for pb to find
     # NB: you may edit these by hand, but they will be overwritten by PyBaker
-    S_PP_VERSION = "__PP_VERSION__"
 
     # I18N: short description
     S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
-    # help str
-    S_PP_HELP = "Use __PP_NAME_MAIN__ -h for more info"
-
     # version string
+    S_PP_VERSION = "__PP_VERSION__"
+
+    # formatted version string
     # NB: done in two steps to avoid linter errors
     S_VER_FMT = "__PP_VER_FMT__"
     S_VER_OUT = S_VER_FMT.format(S_PP_VERSION)
 
     # about string
     S_ABOUT = (
-        "__PP_NAME_PRJ__\n"
+        f"{"__PP_NAME_PRJ__"}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_VER_OUT}\n"
         "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
-        f"{S_PP_HELP}\n"
     )
 
     # path to default config file
@@ -130,7 +128,7 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         # main stuff
 
         # do the thing with the thing
-        app = App(self._dict_args, self._dict_cfg)
+        app = __PP_CLASS_APP__(self._dict_args, self._dict_cfg)
         app.run()
 
         # ----------------------------------------------------------------------
@@ -154,11 +152,29 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         config files.
         """
 
-        # call to super run arg parser
-        self._run_parser(self.S_ABOUT)
+        # set default about text
+        s_about = self.S_ABOUT
+
+        # ----------------------------------------------------------------------
+
+        # use cmd line
+
+        # add help text to about block
+        s_about = self.S_ABOUT + self.S_ABOUT_HELP
+        self._parser.description = s_about
+
+        # add some options
+        self._add_cfg_arg()
+        self._add_dbg_arg()
+
+        # run the parser
+        # NB: if -h passed, this will print and exit
+        self._run_parser()
+
+        # ----------------------------------------------------------------------
 
         # print about msg on every run (but only after checking for -h)
-        print(self.S_ABOUT)
+        print(s_about)
 
         # super load config file (or not, if no param and not using -c)
         # NB: first param is path to us (for rel path)
@@ -169,24 +185,6 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         # throw in a debug test
         if self._debug:
             F.pp(self._dict_cfg, label="load cfg")
-
-    # --------------------------------------------------------------------------
-    # Add arguments to argparse parser
-    # --------------------------------------------------------------------------
-    def _add_args(self):
-        """
-        Add arguments to argparse parser
-
-        Args:
-            parser: The ArgumentParser to add the args to
-
-        This method is called by the superclass's _run_parser method, and
-        allows subclasses to add their own arguments to the parser.
-        """
-
-        # add the default args
-        self._add_cfg_arg()
-        self._add_dbg_arg()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main

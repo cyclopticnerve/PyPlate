@@ -21,13 +21,9 @@ See PyPlate/template/cli/src/__PP_NAME_PRJ_SMALL__.py for an example.
 import argparse
 from pathlib import Path
 
-# pylint: disable=import-error
-
 # my imports
 import cnfunctions as F
 from cnformatter import CNFormatter
-
-# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -54,6 +50,9 @@ class CNCli:
     # Class constants
     # --------------------------------------------------------------------------
 
+    # if using argparse, add help at end of about
+    S_ABOUT_HELP = "Use -h for help\n"
+
     # config option strings
     S_ARG_CFG_OPTION = "-c"
     S_ARG_CFG_DEST = "CFG_DEST"
@@ -65,9 +64,6 @@ class CNCli:
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
     S_ARG_DBG_HELP = "enable debugging mode"
-
-    # error messages
-    S_ERR_IMPL = "This method must be implemented by a subclass"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -86,12 +82,14 @@ class CNCli:
         """
 
         # set defaults
-        self._parser = None
         self._dict_args = {}
         self._debug = False
         self._dict_cfg = {}
         self._path_cfg = None
         self._path_cfg_arg = None
+
+        # create a parser object in case we need it
+        self._parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -100,26 +98,14 @@ class CNCli:
     # --------------------------------------------------------------------------
     # Set up and run the command line parser
     # --------------------------------------------------------------------------
-    def _run_parser(self, description):
+    def _run_parser(self):
         """
         Set up and run the command line parser
-
-        Args:
-            description: The description of the program to show when the -h
-            option is used
 
         This method sets up and runs the command line parser to minimize code
         in the subclass. It calls the subclass to add it's arguments, then it
         parses the command line and returns a dictionary.
         """
-
-        # create the command line parser
-        self._parser = argparse.ArgumentParser(
-            description=description, formatter_class=CNFormatter
-        )
-
-        # call the subclass method
-        self._add_args()
 
         # get namespace object
         args = self._parser.parse_args()
@@ -138,19 +124,6 @@ class CNCli:
             self._path_cfg_arg = Path(cfg_arg)
 
     # --------------------------------------------------------------------------
-    # This method does nothing, it is for subclassing
-    # --------------------------------------------------------------------------
-    def _add_args(self):
-        """
-        This method does nothing, it is for subclassing
-
-        Do nothing here, only defer to subclass
-        """
-
-        # shoe message that we do nothing, only subclass
-        raise NotImplementedError(CNCli.S_ERR_IMPL)
-
-    # --------------------------------------------------------------------------
     # Add default cfg arg to parser
     # --------------------------------------------------------------------------
     def _add_cfg_arg(self):
@@ -160,13 +133,12 @@ class CNCli:
         Adds the default configuration option to the command line
         """
 
-        if self._parser:
-            self._parser.add_argument(
-                CNCli.S_ARG_CFG_OPTION,
-                dest=CNCli.S_ARG_CFG_DEST,
-                help=CNCli.S_ARG_CFG_HELP,
-                metavar=CNCli.S_ARG_CFG_METAVAR,
-            )
+        self._parser.add_argument(
+            CNCli.S_ARG_CFG_OPTION,
+            dest=CNCli.S_ARG_CFG_DEST,
+            help=CNCli.S_ARG_CFG_HELP,
+            metavar=CNCli.S_ARG_CFG_METAVAR,
+        )
 
     # --------------------------------------------------------------------------
     # Add default dbg arg to parser
@@ -178,13 +150,12 @@ class CNCli:
         Adds the default debug option to the command line
         """
 
-        if self._parser:
-            self._parser.add_argument(
-                CNCli.S_ARG_DBG_OPTION,
-                action=CNCli.S_ARG_DBG_ACTION,
-                dest=CNCli.S_ARG_DBG_DEST,
-                help=CNCli.S_ARG_DBG_HELP,
-            )
+        self._parser.add_argument(
+            CNCli.S_ARG_DBG_OPTION,
+            action=CNCli.S_ARG_DBG_ACTION,
+            dest=CNCli.S_ARG_DBG_DEST,
+            help=CNCli.S_ARG_DBG_HELP,
+        )
 
     # --------------------------------------------------------------------------
     # Load config dict from a json file

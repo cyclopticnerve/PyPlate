@@ -14,8 +14,10 @@ Note that you will need to activate the project's venv to use this script.
 If you are working in VSCode, you should:
 1. Deactivate the current venv in the Terminal tab using the "deactivate"
 command
-2. Switch to the "Run and Debug" tab, and select the "Pkg Test" option
-3. Press the "Run" button to run the script. This will activate the project's
+2. Make sure you have the correct interpreter selected for the project (check
+the status bar)
+3. Switch to the "Run and Debug" tab, and select the "Pkg Test" option
+4. Press the "Run" button to run the script. This will activate the project's
 venv for you
 
 If you are working in an external terminal, you should:
@@ -37,7 +39,7 @@ command
 # pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
-from __PP_NAME_PRJ_SMALL__ import __PP_NAME_SEC_SMALL__  # type: ignore
+import __PP_NAME_SEC_SMALL__  # type: ignore
 
 # pylint: enable=no-name-in-module
 # pylint: enable=import-error

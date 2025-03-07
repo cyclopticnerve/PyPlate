@@ -82,17 +82,19 @@ class PyMaker:
     S_PP_VERSION = "0.0.1"
 
     # formatted version
-    S_PP_VER_FMT = f"Version {S_PP_VERSION}"
+    # NB: done in two steps to avoid linter errors
+    S_VER_FMT = "Version {}"
+    S_VER_OUT = S_VER_FMT.format(S_PP_VERSION)
 
     # help str
-    S_PP_HELP = "Use __PP_NAME_MAIN__ -h for more info"
+    S_PP_HELP = "Use pymaker -h for more info"
 
     # about string
     S_PP_ABOUT = (
         f"{S_PP_NAME_BIG}\n"
         f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VER_FMT}\n"
-        f"https://www.github.com/cyclopticnerve/PyPlate\n\n"
+        f"{S_VER_OUT}\n"
+        f"https://www.github.com/cyclopticnerve/PyPlate\n"
         f"{S_PP_HELP}\n"
     )
 
@@ -104,9 +106,6 @@ class PyMaker:
 
     # our venv name
     S_PP_VENV = ".venv-pyplate"
-
-    # look for pp in dir struct
-    S_LOOK_FOR_PP = "pyplate"
 
     # debug option strings
     S_DBG_OPTION = "-d"
@@ -861,26 +860,22 @@ class PyMaker:
 
             print(PP.S_ACTION_DOCS, end="", flush=True)
 
-            # activate cmd for pyplate's venv
-            # (so we don't need to install pdoc in every project)
-            cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
-                str(self.P_DIR_PRJ), self.S_PP_VENV
-            )
-
             # get template and output dirs
             dir_docs_tmp = self._dir_prj / PP.S_DIR_DOCS_TMP
             dir_docs_out = self._dir_prj / PP.S_DIR_DOCS
 
-            # adjust doc start dir
-            doc_start = PP.D_PRV_PRJ["__PP_PDOC_START__"]
+            # nuke old docs
+            if dir_docs_out.exists():
+                shutil.rmtree(dir_docs_out)
+                Path.mkdir(dir_docs_out, parents=True)
 
             # format cmd using pdoc template dir, output dir, and start dir
             cmd_docs = PP.S_CMD_DOC.format(
-                dir_docs_tmp, dir_docs_out, self._dir_prj / doc_start
+                dir_docs_tmp, dir_docs_out, self._dir_prj / PP.S_DIR_SRC
             )
 
             # the command to run pdoc
-            cmd = f"{cmd_activate};" f"{cmd_docs}"
+            cmd = f"{cmd_docs}"
             try:
                 F.sh(cmd, shell=True)
                 print(PP.S_ACTION_DONE)

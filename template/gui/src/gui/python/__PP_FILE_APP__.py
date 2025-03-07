@@ -24,15 +24,17 @@ from pathlib import Path
 
 # pylint: disable=wrong-import-position
 # pylint: disable=import-error
+# pylint: disable=relative-beyond-top-level
 
 # my imports
 import gi  # type: ignore
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk  # type: ignore
-from python.__PP_FILE_WIN__ import __PP_CLASS_WIN__  # type: ignore
+from .__PP_FILE_WIN__ import __PP_CLASS_WIN__  # type: ignore
 
 # pylint: enable=wrong-import-position
 # pylint: enable=import-error
+# pylint: enable=relative-beyond-top-level
 
 # ------------------------------------------------------------------------------
 # Public classes

@@ -72,6 +72,7 @@ def main(dry=False):
         # gui, cli
         inst.install(
             DIR_ASSETS,
+            DIR_LIB,
             FILE_CFG_INST,
             FILE_CFG_UNINST,
             DIR_USR_INST,
