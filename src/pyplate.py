@@ -865,8 +865,8 @@ D_COPY = {
 # key is prj short type
 # val is list of libs to add to prj type
 D_COPY_LIB = {
-    "c": ["cninstalllib", "cnlib"],
-    "g": ["cninstalllib", "cnlib"],  # "cnguilib"],
+    "c": ["cnlib"],
+    "g": ["cnlib"],  # "cnguilib"],
 }
 
 # dictionary of default stuff to put in install.json

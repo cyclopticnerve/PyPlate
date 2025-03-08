@@ -571,10 +571,16 @@ class PyBaker:
                 charset=self._dict_pub_i18n[PP.S_KEY_CHARSET],
             )
 
-            # this .pot, .po, and .mo files
+            # make .pot, .po, and .mo files
             potpy.main()
 
             # i18n-ify .desktop file
+            # NB: if you change PP_SHORT_DESC, this will break. this is because
+            # you have not i18n'ed the new description. the solution is to:
+            # 1. run pybaker once to generate the new .pot/.po files
+            # 2. translate the "Comment=" entry in all .po files
+            # 3. run pybaker again to apply translations to .desktop file
+
             if path_dsk_tmp.exists():
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
