@@ -32,14 +32,8 @@ from pathlib import Path
 import re
 import shutil
 
-# pylint: disable=import-error
-# pylint: disable=no-name-in-module
-
 # my imports
 import cnfunctions as F
-
-# pylint: enable=import-error
-# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -62,10 +56,12 @@ class CNPotPy:
     for internationalizing a Python or PyGObject project.
     """
 
-    # default locale dir under src
+    # default locale dir under prj
     DEF_DIR_LOCALE = "locale"
-    # default po dir under src
+    # default po dir under prj
     DEF_DIR_PO = "po"
+    # default src dir under prj
+    DEF_DIR_SRC = "src"
     # default domain
     DEF_DOMAIN = "messages"
     # default encoding for .pot and .po files
@@ -98,6 +94,9 @@ class CNPotPy:
     REG_CHAR_SCH = r"(\"Content-Type: text/plain; charset=)(CHARSET)(.*)"
     REG_CHAR_REP = r"\g<1>{}\g<3>"
 
+    REG_VER_SCH = r"^(\"Project-Id-Version: .*? )([^\n]*)(\\n\")$"
+    REG_VER_REP = r"\g<1>{}\g<3>"
+
     # shell commands to make po/mo
     # NB: params are po_file and pot_file
     S_CMD_POS = "msgmerge --update {} {} --backup=none"
@@ -124,6 +123,7 @@ class CNPotPy:
         dir_pot,
         # in
         dir_prj,
+        dir_src,
         # optional out
         dir_locale=None,
         dir_po=None,
@@ -147,7 +147,8 @@ class CNPotPy:
 
             dir_pot: Directory to place master .pot file
 
-            dir_prj: Where to start looking for input files
+            dir_prj: Used for relative paths
+            dir_src: Where to start looking for input files
 
             dir_locale: Where to put output locale files (default:
             dir_src/"locale")
@@ -222,16 +223,23 @@ class CNPotPy:
         # fix up dir_locale
         if dir_locale is None:
             dir_locale = self._dir_prj / self.DEF_DIR_LOCALE
-        elif not dir_locale.is_absolute():
+        if not dir_locale.is_absolute():
             dir_locale = self._dir_prj / dir_locale
         self._dir_locale = dir_locale
 
         # fix up dir_po
         if dir_po is None:
             dir_po = self._dir_prj / self.DEF_DIR_PO
-        elif not dir_po.is_absolute():
+        if not dir_po.is_absolute():
             dir_po = self._dir_prj / dir_po
         self._dir_po = dir_po
+
+        # fix up dir_src
+        if dir_src is None:
+            dir_src = self._dir_prj / self.DEF_DIR_SRC
+        if not dir_src.is_absolute():
+            dir_src = self._dir_prj / dir_src
+        self._dir_src = dir_src
 
         # fix up domain
         if str_domain is None:
@@ -386,20 +394,20 @@ class CNPotPy:
 
             # get initial cmd
             cmd = (
-                f"cd {self._dir_prj}; "
+                f"cd {self._dir_src}; "
                 "xgettext "
                 # add any comments above string (or msgctxt in ui files)
                 # NB: check that all files have appropriate contexts/comments
                 # NB: also, no space after -c? weird right?
                 f"-c{self._str_tag} "
                 # fix some header values (the rest should be fixed in
-                # _fix_header)
+                # _fix_pot_header)
+                # copyright
                 # NB: if blank, file is public domain
-                # if not included, file is under same license as
-                # self._str_appname.
+                # if not included, file is under same license as _str_appname
                 # "--copyright-holder "" "
-                # Project-Id-Version
-                # | name | version | out
+                # version
+                # | name | version | Project-Id-Version
                 # -----------------------------------
                 # |    0 |       0 | PACKAGE VERSION
                 # |    0 |       1 | PACKAGE VERSION
@@ -411,6 +419,8 @@ class CNPotPy:
                 f"--msgid-bugs-address {self._str_email} "
                 # sort entries by file
                 "-F "
+                # don't add location info (hide path to source)
+                "--no-location "
                 # append existing file
                 # NB: this is the key to running xgettext once for each clang
                 # this allows us to set the -L option for different file types
@@ -471,6 +481,17 @@ class CNPotPy:
                 # update existing po file using latest pot
                 cmd = self.S_CMD_POS.format(po_file, pot_file)
                 F.sh(cmd)
+
+            # fix po version
+            with open(po_file, "r", encoding="UTF-8") as a_file:
+                text = a_file.read()
+
+            rep = self.REG_VER_REP.format(self._str_version)
+            text = re.sub(self.REG_VER_SCH, rep, text, flags=re.M)
+
+            # write fixed text back to file
+            with open(po_file, "w", encoding="UTF-8") as a_file:
+                a_file.write(text)
 
     # --------------------------------------------------------------------------
     # Create .mo files for all .po files in the locale folder
@@ -545,7 +566,7 @@ class CNPotPy:
         # generally only one item, while a list contains all results
         # calling list() on a generator causes the generator to give ALL it's
         # generated results to the final list
-        paths = list(self._dir_prj.rglob("*"))
+        paths = list(self._dir_src.rglob("*"))
 
         # for each clang name / list of exts
         for clang, ext_list in dict_clangs.items():
@@ -558,10 +579,8 @@ class CNPotPy:
             ]
 
             # get all paths that match file ext
+            # files = [self._dir_src / f for f in paths if f.suffix in exts]
             files = [f for f in paths if f.suffix in exts]
-
-            # make all paths rel to src (to remove home dir from location)
-            files = [f.relative_to(self._dir_prj) for f in files]
 
             # make sure the key exists
             if not clang in dict_res:
@@ -576,10 +595,8 @@ class CNPotPy:
             # get all paths that match file ext
             # NB: the is_file() check here is to make sure we only add files
             # that have no ext, not dirs (which have no ext, obvs)
+            # files = [self._dir_src / f for f in paths if f.name in name_list if f.is_file()]
             files = [f for f in paths if f.name in name_list if f.is_file()]
-
-            # make all paths rel to src (to remove home dir from location)
-            files = [f.relative_to(self._dir_prj) for f in files]
 
             # make sure the key exists
             if not clang in dict_res:

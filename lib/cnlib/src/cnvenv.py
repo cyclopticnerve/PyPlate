@@ -17,14 +17,8 @@ A class to make handling of venv folders easier
 # system imports
 from pathlib import Path
 
-# pylint: disable=import-error
-# pylint: disable=no-name-in-module
-
 # my imports
 import cnfunctions as F
-
-# pylint: enable=import-error
-# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Public classes

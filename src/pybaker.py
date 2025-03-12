@@ -19,6 +19,8 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# NB: if you change short desc, you need to fix fuzzy in al po files
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -73,10 +75,10 @@ class PyBaker:
     # name and desc for cmd line help
     S_PP_NAME_BIG = "PyBaker"
     S_PP_NAME_SMALL = "pybaker"
+    S_PP_VERSION = "0.0.1"
     S_PP_SHORT_DESC = (
         "A program to set the metadata of a PyPlate project and create a dist"
     )
-    S_PP_VERSION = "0.0.1"
 
     # formatted version
     # NB: done in two steps to avoid linter errors
@@ -292,14 +294,14 @@ class PyBaker:
         """
 
         # ask questions
-        ask_in = input(PP.S_ASK_PROPS)
-        if ask_in.lower().startswith(PP.S_ASK_PROPS_DEF) or ask_in == "":
-            print()
-            return
+        # ask_in = input(PP.S_ASK_PROPS)
+        # if ask_in.lower().startswith(PP.S_ASK_PROPS_DEF) or ask_in == "":
+        #     print()
+        #     return
 
-        # if answer is anything but default or blank, we bail
-        print(PP.S_ASK_PROPS_ABORT)
-        sys.exit()
+        # # if answer is anything but default or blank, we bail
+        # print(PP.S_ASK_PROPS_ABORT)
+        # sys.exit()
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
@@ -558,6 +560,7 @@ class PyBaker:
                 dir_pot=self._dir_prj / PP.S_DIR_I18N,
                 # in
                 dir_prj=self._dir_prj,
+                dir_src=Path(self._dict_prv_all["__PP_DIR_SRC__"]),
                 # optional out
                 dir_locale=self._dir_prj / PP.S_PATH_LOCALE,
                 dir_po=self._dir_prj / PP.S_PATH_PO,
@@ -575,12 +578,6 @@ class PyBaker:
             potpy.main()
 
             # i18n-ify .desktop file
-            # NB: if you change PP_SHORT_DESC, this will break. this is because
-            # you have not i18n'ed the new description. the solution is to:
-            # 1. run pybaker once to generate the new .pot/.po files
-            # 2. translate the "Comment=" entry in all .po files
-            # 3. run pybaker again to apply translations to .desktop file
-
             if path_dsk_tmp.exists():
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
@@ -699,6 +696,7 @@ class PyBaker:
         # for each key, val (type, dict)
         for key, val in self._dict_pub_dist.items():
 
+            print(key, ":", val)
             # get src/dst rel to prj dir/dist dir
             src = self._dir_prj / key
             dst = p_dist / val

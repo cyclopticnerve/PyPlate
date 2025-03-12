@@ -80,11 +80,11 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
     # globals for pb to find
     # NB: you may edit these by hand, but they will be overwritten by PyBaker
 
-    # I18N: short description
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
-
     # version string
     S_PP_VERSION = "__PP_VERSION__"
+
+    # I18N: short description
+    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
     # formatted version string
     # NB: done in two steps to avoid linter errors
@@ -174,8 +174,6 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
         # pyplate: disable=replace
         _fix = "__PP_NAME_PRJ_BIG__"  # pyplate: enable=replace
         # pyplate: enable=replace
-
-        _desc = _("__PP_SHORT_DESC__")
 
         # check for debug flag
         if self._debug:

@@ -1,4 +1,6 @@
 
+# TODO: combine pyplate.py B_ flags into dict and add to project.json
+# how to read in pybaker? and write (debug at least, since we pass it in prj)
 # TODO: dock icon only works after install, and only for global (not src)
 # this might be a wayland thing, see here:
 # https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
@@ -15,6 +17,7 @@
 # TODO: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
 # dunder that is not in comment
 # report that as error
+# TODO: multiple sources for i18n
 
 # TODO: replace all PB_VERSION with new version, across all files in prj dir
 # TODO: fix every metadata using choice menu for new value

@@ -41,6 +41,8 @@ from cntree import CNTree
 from cnvenv import CNVenv
 import pyplate as PP
 
+# FICME: no location, only use i18n tag as context
+
 # ------------------------------------------------------------------------------
 # Public classes
 # ------------------------------------------------------------------------------
@@ -75,11 +77,11 @@ class PyMaker:
     # name and desc for cmd line help
     S_PP_NAME_BIG = "PyMaker"
     S_PP_NAME_SMALL = "pymaker"
+    S_PP_VERSION = "0.0.1"
     S_PP_SHORT_DESC = (
         "A program for creating CLI/Package/GUI projects in Python from a "
         "template"
     )
-    S_PP_VERSION = "0.0.1"
 
     # formatted version
     # NB: done in two steps to avoid linter errors
@@ -493,7 +495,7 @@ class PyMaker:
         # ----------------------------------------------------------------------
         # do copy lib dict
 
-        # get list of libs for this prj type
+        # # get list of libs for this prj type
         # val = PP.D_COPY_LIB.get(prj_type_short, [])
 
         # # copy libs
@@ -824,6 +826,7 @@ class PyMaker:
                 dir_pot=self._dir_prj / PP.S_DIR_I18N,
                 # in
                 dir_prj=self._dir_prj,
+                dir_src=Path(PP.S_DIR_SRC),
                 # optional out
                 dir_locale=self._dir_prj / PP.S_PATH_LOCALE,
                 dir_po=self._dir_prj / PP.S_PATH_PO,

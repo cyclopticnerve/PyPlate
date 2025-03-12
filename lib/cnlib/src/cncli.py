@@ -50,6 +50,8 @@ class CNCli:
     # Class constants
     # --------------------------------------------------------------------------
 
+    # FIXME: localize? (all lib modules)
+
     # if using argparse, add help at end of about
     S_ABOUT_HELP = "Use -h for help\n"
 

@@ -34,7 +34,7 @@ from pathlib import Path
 # import my stuff
 import cnfunctions as F
 from cncli import CNCli
-from .gui.python.__PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
+from gui.python.__PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
 
 # find path to prj
 # NB: keep this global for i18n stuff
@@ -81,11 +81,11 @@ class __PP_NAME_PRJ_PASCAL__(CNCli):
     # globals for pb to find
     # NB: you may edit these by hand, but they will be overwritten by PyBaker
 
-    # I18N: short description
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
-
     # version string
     S_PP_VERSION = "__PP_VERSION__"
+
+    # I18N: short description
+    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
     # formatted version string
     # NB: done in two steps to avoid linter errors

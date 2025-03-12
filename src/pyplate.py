@@ -20,7 +20,6 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # system imports
 from pathlib import Path
 import re
-import shutil
 import tarfile
 
 # ------------------------------------------------------------------------------
@@ -38,7 +37,9 @@ B_CMD_I18N = True
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
 # create docs
-B_CMD_DOCS = True
+# FIXME: can't have pdoc switch away from prj venv or we lose local imports
+# don't need docs in pyplate, do need docs in prj, don't need docs in dist
+B_CMD_DOCS = False
 # do install/uninstall
 B_CMD_INST = True
 
@@ -145,6 +146,7 @@ S_KEY_WLANGS = "WLANGS"
 S_KEY_NO_EXT = "NO_EXT"
 S_KEY_LOCALE = "LOCALE"
 S_KEY_PO = "PO"
+S_KEY_MO = "MO"
 
 # python header/split dict keys
 S_KEY_HDR = "S_KEY_HDR"
@@ -183,6 +185,7 @@ S_DIR_I18N = "i18n"
 S_DIR_IMAGES = "images"
 S_DIR_LOCALE = "locale"
 S_DIR_PO = "po"
+S_DIR_MO = "mo"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
 S_DIR_GUI = "gui"
@@ -222,7 +225,8 @@ S_FILE_DSK_TMP = (
 
 # I18N stuff
 S_PATH_LOCALE = str(Path(S_DIR_I18N) / S_DIR_LOCALE)
-S_PATH_PO = Path(S_DIR_I18N) / S_DIR_PO
+S_PATH_PO = str(Path(S_DIR_I18N) / S_DIR_PO)
+S_PATH_MO = str(Path(S_DIR_I18N) / S_DIR_MO)
 
 # paths relative to end user home only
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
@@ -628,6 +632,7 @@ D_PRV_ALL = {
     # location of src files
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
+    "__PP_PATH_MO__": S_PATH_MO,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_NAME_DSK_TMP__": S_NAME_DSK_TMP,
@@ -723,8 +728,7 @@ D_PUB_DIST = {
         S_FILE_README: S_DIR_ASSETS,
         # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        # S_DIR_LIB: S_DIR_ASSETS,
-        S_DIR_I18N: S_DIR_ASSETS,
+        f"{S_DIR_I18N}/{S_DIR_LOCALE}": f"{S_DIR_ASSETS}/{S_DIR_I18N}",
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
         # install.json in assets/install folder
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
@@ -740,8 +744,7 @@ D_PUB_DIST = {
         S_FILE_README: S_DIR_ASSETS,
         # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        # S_DIR_LIB: S_DIR_ASSETS,
-        S_DIR_I18N: S_DIR_ASSETS,
+        f"{S_DIR_I18N}/{S_DIR_LOCALE}": f"{S_DIR_ASSETS}/{S_DIR_I18N}",
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
         # install.json in assets/install folder
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
@@ -847,7 +850,6 @@ D_PUB_I18N = {
 # Other dictionaries
 # ------------------------------------------------------------------------------
 
-# TODO: this could be a list, since dst dir follows prj_dir
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
 # this is so that when you update a file in the PyPlate project, it gets copied
@@ -1163,9 +1165,11 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     # if not B_DEBUG:
     #     shutil.rmtree(in_dir)
 
+
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file

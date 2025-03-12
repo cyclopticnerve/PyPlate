@@ -87,6 +87,10 @@ class CNInstall:
     S_KEY_DICT_INSTALL = "INSTALL"
     S_KEY_LIST_UNINST = "UNINSTALL"
 
+    # --------------------------------------------------------------------------
+
+    # FIXME: localize? (all lib modules)
+
     # messages
     # NB: format params are prog_name and prog_version
     S_MSG_INST_START = "Installing {}"
@@ -137,6 +141,8 @@ class CNInstall:
         "to overwrite? [y/N] "
     )
     S_ASK_CONFIRM = "y"
+
+    # --------------------------------------------------------------------------
 
     S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
     S_CMD_INSTALL = "cd {};. ./{}/bin/activate;python -m pip install -r {}"
