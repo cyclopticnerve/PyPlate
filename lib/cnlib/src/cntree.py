@@ -19,6 +19,7 @@ specified formats.
 # system imports
 from pathlib import Path
 
+
 # ------------------------------------------------------------------------------
 # Generate a file tree in text format with the names formatted according to some
 # format strings
@@ -29,7 +30,8 @@ class CNTree:
     some format strings
 
     Methods:
-        build_tree(): Creates the new tree and returns its items as a string
+        main: Creates a tree from the given start directory, using filter list,
+        directory and file formats
 
     This class builds the tree as a complete string, ready to be printed to
     stdout or a file.
@@ -40,33 +42,34 @@ class CNTree:
     # --------------------------------------------------------------------------
 
     # console/terminal values for the individual prefix/connector chars
-    CHAR_VERT = "\u2502"  # vertical join (pipe)
-    CHAR_HORZ = "\u2500"  # horizontal join (full-width dash)
-    CHAR_TEE = "\u251C"  # tee join (not last item)
-    CHAR_ELL = "\u2514"  # elbow join (last item)
-    CHAR_SPACE = " "  # single space char
+    S_CHAR_VERT = "\u2502"  # vertical join (pipe)
+    S_CHAR_HORZ = "\u2500"  # horizontal join (full-width dash)
+    S_CHAR_TEE = "\u251c"  # tee join (not last item)
+    S_CHAR_ELL = "\u2514"  # elbow join (last item)
+    S_CHAR_SPACE = " "  # single space char
 
     # char sequences for the prefix/connector char sets
     # NB: these must always be equal length
-    PREFIX_VERT = f"{CHAR_VERT}{CHAR_SPACE}"  # next level ("| ")
-    PREFIX_NONE = f"{CHAR_SPACE}{CHAR_SPACE}"  # skip level ("  ")
-    CONNECTOR_TEE = f"{CHAR_TEE}{CHAR_HORZ}"  # next sub item ("T-")
-    CONNECTOR_ELL = f"{CHAR_ELL}{CHAR_HORZ}"  # last sub item ("L-")
+    S_PREFIX_VERT = f"{S_CHAR_VERT}{S_CHAR_SPACE}"  # next level ("| ")
+    S_PREFIX_NONE = f"{S_CHAR_SPACE}{S_CHAR_SPACE}"  # skip level ("  ")
+    S_CONNECTOR_TEE = f"{S_CHAR_TEE}{S_CHAR_HORZ}"  # next sub item ("T-")
+    S_CONNECTOR_ELL = f"{S_CHAR_ELL}{S_CHAR_HORZ}"  # last sub item ("L-")
 
     # the default directory/file name formats
     # NB: NAME alone is used for the top level directory name
     # DIR is used for subdirectories and should have a leading space to
     # separate it from the prefix and/or connector
     # FILE has the same purpose as DIR, but for files (DUH!)
-    DEF_FORMAT_NAME = "$NAME"
-    DEF_FORMAT_DIR = f" {DEF_FORMAT_NAME}/"
-    DEF_FORMAT_FILE = f" {DEF_FORMAT_NAME}"
+    S_DEF_FORMAT_NAME = "$NAME"
+    S_DEF_FORMAT_DIR = f" {S_DEF_FORMAT_NAME}/"
+    S_DEF_FORMAT_FILE = f" {S_DEF_FORMAT_NAME}"
 
     # custom error strings
-    ERR_NOT_A_DIR = "{} is not a directory"
+    S_ERR_NOT_ABS = "path {} is not absolute"
+    S_ERR_NOT_DIR = "path {} is not a directory"
 
     # custom sorting order
-    SORT_ORDER = "_."  # sort first char of name in this order (above ord)
+    S_SORT_ORDER = "_."  # sort first char of name in this order (above ord)
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -75,53 +78,29 @@ class CNTree:
     # --------------------------------------------------------------------------
     # Initializes the new object
     # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initializes the new object
-
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
-        new object.
-        """
-
-        # NB: something i learned the hard way from c++ coding: you want to do
-        # AS LITTLE coding in the constructor method because the whole class may
-        # not exist at this point! you should definitely not call setter methods
-        # on any attrs, as these methods may not exist at the time you call
-        # them. so to initialize attrs, set them directly rather than using
-        # setter methods.
-
-        # set the initial values of properties
-        # NB: probably not needed, just a sanity check
-        self._start_dir = Path("")
-        self._filter_list = []
-        self._dir_format = self.DEF_FORMAT_DIR
-        self._file_format = self.DEF_FORMAT_FILE
-        self._dirs_only = False
-        self._ignore_case = True
-        self._root_lead = ""
-        self._dir_lead = ""
-        self._sort_order = {}
-        self._tree = []
-
-    # --------------------------------------------------------------------------
-    # Public methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Creates a tree from the given start directory, using filter list,
-    # directory and file formats
-    # --------------------------------------------------------------------------
-    def build_tree(
+    def __init__(
         self,
         start_dir,
         filter_list=None,
+        fmt_name="",
         dir_format="",
         file_format="",
         dirs_only=False,
         ignore_case=True,
     ):
         """
+        Initializes the new object
+
+        Args:
+            start_dir: String or Path to the root directory of the tree
+            filter_list: List of directory/file names to filter out (default:
+            None)
+            dir_format: Format to use for directories (default:"$NAME/")
+            file_format: Format to use for files (default: "$NAME")
+            dirs_only: Only list directories (default: False)
+            ignore_case: Sort entries regardless of case. If False,
+            uppercase alpha characters take precedence.
+
         Creates a tree from the given start directory.
 
         The start_dir can be an absolute path, a relative path, or a Path
@@ -163,16 +142,56 @@ class CNTree:
         name, will be left-trimmed to make the tree start at the first
         column.
 
-        Args:
-            start_dir: String or Path to the root directory of the tree
-            (default: "")
-            filter_list: List of directory/file names to filter out (default:
-            None)
-            dir_format: Format to use for directories (default:"$NAME/")
-            file_format: Format to use for files (default: "$NAME")
-            dirs_only: Only list directories (default: False)
-            ignore_case: Sort entries regardless of case. If False,
-            uppercase alpha characters take precedence.
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
+        """
+
+        # set the initial values of properties
+        self._start_dir = Path(start_dir)
+        if not self._start_dir.is_absolute():
+            raise OSError(self.S_ERR_NOT_ABS.format(self._start_dir))
+        if not self._start_dir.is_dir():
+            raise OSError(self.S_ERR_NOT_DIR.format(self._start_dir))
+
+        # fill in param props
+        self._filter_list = filter_list
+        if self._filter_list is None:
+            self._filter_list = []
+
+        self._fmt_name = self.S_DEF_FORMAT_NAME
+        if fmt_name and self.S_DEF_FORMAT_NAME in fmt_name:
+            self._fmt_name = fmt_name
+
+        self._dir_format = self.S_DEF_FORMAT_DIR
+        if dir_format and self._fmt_name in dir_format:
+            self._dir_format = dir_format
+
+        self._file_format = self.S_DEF_FORMAT_FILE
+        if file_format and self._fmt_name in file_format:
+            self._file_format = file_format
+
+        self._dirs_only = dirs_only
+        self._ignore_case = ignore_case
+
+        # create private props
+        self._root_lead = ""
+        self._dir_lead = ""
+        self._sort_order = {}
+        self._tree = []
+
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Creates a tree from the given start directory, using filter list,
+    # directory and file formats
+    # --------------------------------------------------------------------------
+    def main(self):
+        """
+        Creates a tree from the given start directory, using filter list,
+        directory and file formats
 
         Returns:
             The current tree as a string
@@ -182,39 +201,8 @@ class CNTree:
                 a path to a valid directory
         """
 
-        # if list is None, create it
-        # https://docs.python-guide.org/writing/gotchas/
-        if not filter_list:
-            filter_list = []
-
-        # reset all props every time this method is called
-        # NB: most of this is not needed, since it will be set by the various
-        # _sanitize* functions. just a sanity check
-        self._start_dir = Path("")  # will set in sanitizer
-        self._filter_list = []  # will set in sanitizer
-        self._dir_format = self.DEF_FORMAT_DIR
-        self._file_format = self.DEF_FORMAT_FILE
-        self._dirs_only = dirs_only
-        self._ignore_case = ignore_case
-        self._root_lead = ""
-        self._dir_lead = ""
-        self._sort_order = {}
-        self._tree = []
-
-        # sanitize start_dir param
-        try:
-            self._sanitize_start_dir(start_dir)
-
-        # this exception gets raised if start_dir is None or not a dir
-        except OSError as exception:
-            err_string = self.ERR_NOT_A_DIR.format(start_dir)
-            raise OSError(err_string) from exception
-
-        # sanitize the filter list
-        self._sanitize_filter_list(filter_list)
-
-        # sanitize the format params
-        self._sanitize_formats(dir_format, file_format)
+        # get filters from globs
+        self._get_filter_list()
 
         # get leads (extra spaces before prefix/connector)
         self._get_leads()
@@ -229,62 +217,31 @@ class CNTree:
         self._add_contents(self._start_dir)
 
         # turn the final tree array into a string and return it
-        return self._get_result()
+        str_out = "\n".join(self._tree)
+        return str_out
 
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Sanitizes the start_dir parameter
+    # Gets the filter_list from paths or globs
     # --------------------------------------------------------------------------
-    def _sanitize_start_dir(self, start_dir):
+    def _get_filter_list(self):
         """
-        Sanitizes the start_dir parameter
-
-        Args:
-            start_dir: start_dir parameter from build_tree (Can be a string or
-            Path object)
-
-        Raises:
-            OSError: If the start_dir parameter is None or does not contain a
-            path to a valid directory
-
-        Ensures the start_dir parameter is a valid path to a directory.
-        """
-
-        # check for stupid people (start_dir=None)
-        if start_dir is None:
-            raise OSError()
-
-        # convert string param to Path object
-        # NB: if it is already a Path, this does nothing
-        self._start_dir = Path(start_dir)
-
-        # check for param is not a dir (it happens...)
-        if not self._start_dir.is_dir():
-            raise OSError()
-
-        # in case the param is relative (replace in-situ)
-        self._start_dir = self._start_dir.resolve()
-
-    # --------------------------------------------------------------------------
-    # Sanitizes the filter_list parameter
-    # --------------------------------------------------------------------------
-    def _sanitize_filter_list(self, filter_list):
-        """
-        Sanitizes the filter_list parameter
-
-        Args:
-            filter_list: filter_list parameter from build_tree
+        Gets the filter_list from paths or globs
 
         Converts entries in filter_list to absolute Path objects relative
         to start_dir. Globs are acceptable, see
         https://docs.python.org/3/library/pathlib.html#pathlib.Path.globs
         """
 
+        # sanity check
+        if self._filter_list is None:
+            return
+
         # convert all items in filter_list to Path objects
-        filter_paths = [Path(item) for item in filter_list]
+        filter_paths = [Path(item) for item in self._filter_list]
 
         # move absolute paths to one list
         absolute_paths = [item for item in filter_paths if item.is_absolute()]
@@ -310,32 +267,6 @@ class CNTree:
         self._filter_list = result
 
     # --------------------------------------------------------------------------
-    # Sanitizes the dir_format and file_format arguments
-    # --------------------------------------------------------------------------
-    def _sanitize_formats(self, dir_format, file_format):
-        """
-        Sanitizes the dir_format and file_format arguments
-
-        Args:
-            dir_format: Format to use for directory names
-            file_format: Format to use for file names
-
-        Ensures that the user entered a correctly formatted format string,
-        which is to say it includes the FORMAT_NAME.
-        """
-
-        # set directory/file format
-        # NB: make sure the user didn't use an incorrect format value, such as:
-        # build_tree(... dir_format=None)
-        # or
-        # build_tree(..., dir_format="")
-        # also check that the format string contains FORMAT_NAME
-        if dir_format and self.DEF_FORMAT_NAME in dir_format:
-            self._dir_format = dir_format
-        if file_format and self.DEF_FORMAT_NAME in file_format:
-            self._file_format = file_format
-
-    # --------------------------------------------------------------------------
     # Gets the leads (extra spaces) before each entry in the tree
     # --------------------------------------------------------------------------
     def _get_leads(self):
@@ -356,11 +287,11 @@ class CNTree:
         root_fmt = self._dir_format.lstrip()
 
         # set root lead as string
-        root_lead_count = root_fmt.find(self.DEF_FORMAT_NAME)
+        root_lead_count = root_fmt.find(self.S_DEF_FORMAT_NAME)
         self._root_lead = " " * root_lead_count
 
         # set directory lead as string
-        dir_lead_count = self._dir_format.find(self.DEF_FORMAT_NAME)
+        dir_lead_count = self._dir_format.find(self.S_DEF_FORMAT_NAME)
         self._dir_lead = " " * dir_lead_count
 
     # --------------------------------------------------------------------------
@@ -374,7 +305,7 @@ class CNTree:
         in Python sorts names starting with a dot (.) above a name starting
         with an underscore (_) (as per string.printable), which for me is
         dependant on my locale, en_US, YMMV. This does not match my IDE,
-        Codium, and I want the tree to match my File Explorer in my IDE. So
+        VSCode, and I want the tree to match my File Explorer in my IDE. So
         to fix this, I created a custom sorter that reverses that. It's not
         really necessary, but it does the job.
 
@@ -394,10 +325,10 @@ class CNTree:
         """
 
         # get length of string to count backwards
-        sort_len = len(self.SORT_ORDER)
+        sort_len = len(self.S_SORT_ORDER)
 
         # for each char in string
-        for index, char in enumerate(self.SORT_ORDER):
+        for index, char in enumerate(self.S_SORT_ORDER):
             # make a dict entry for the char and its new ord
             self._sort_order[char] = index - sort_len
 
@@ -414,7 +345,7 @@ class CNTree:
 
         # format the root directory name to a display name and add it
         fmt_root = self._dir_format.lstrip()
-        rep_name = fmt_root.replace(self.DEF_FORMAT_NAME, self._start_dir.name)
+        rep_name = fmt_root.replace(self._fmt_name, self._start_dir.name)
         self._tree.append(rep_name)
 
     # --------------------------------------------------------------------------
@@ -452,10 +383,10 @@ class CNTree:
 
         # sort works by iterating through a list. this function passes every
         # item through the is_file() test to get its result
-        # the item.is_file() might seem backwards, but sort works by placing
-        # a false(0) above a true(1), so an item that is NOT a file (ie. a dir,
-        # and thus a 0), will be placed above an item that IS a file (and thus a
-        # 1)
+        # the item.is_file() might seem backwards, but sort works by placing a
+        # false(0) above a true(1), so an item that is NOT a file (ie. a dir,
+        # and thus a 0), will be placed above an item that IS a file (and thus
+        # a 1)
         items.sort(key=lambda item: item.is_file())
 
         # remove the filtered paths
@@ -472,16 +403,16 @@ class CNTree:
         for index, item in enumerate(items):
             # get the type of connector based on position in enum
             connector = (
-                self.CONNECTOR_TEE
+                self.S_CONNECTOR_TEE
                 if index < (count - 1)
-                else self.CONNECTOR_ELL
+                else self.S_CONNECTOR_ELL
             )
 
             # get format string based on whether it is a dir or file
             fmt = self._dir_format if item.is_dir() else self._file_format
 
             # replace name in format string
-            rep_name = fmt.replace(self.DEF_FORMAT_NAME, item.name)
+            rep_name = fmt.replace(self.S_DEF_FORMAT_NAME, item.name)
 
             # add the item to the tree
             self._tree.append(
@@ -510,36 +441,20 @@ class CNTree:
         needs to be appended with another pipe or more spaces. Also the line
         needs to account for the directory lead. Then, it needs to recurse
         back to _add_contents.
-        NOTE: This code CANNOT be included in _add_contents because changing
-        the prefix will break recursion (IDKWTF)
+        This code CANNOT be included in _add_contents because changing the
+        prefix will break recursion (IDKWTF)
         """
 
         # add a vert or a blank
-        prefix += self.PREFIX_VERT if index < (count - 1) else self.PREFIX_NONE
+        prefix += (
+            self.S_PREFIX_VERT if index < (count - 1) else self.S_PREFIX_NONE
+        )
 
         # add some spacing
         prefix += self._dir_lead
 
         # call _add_contents recursively with current item and new prefix
         self._add_contents(item, prefix)
-
-    # --------------------------------------------------------------------------
-    # Creates the final output string of the tree (trumpets in the distance)
-    # --------------------------------------------------------------------------
-    def _get_result(self):
-        """
-        Creates the final output string of the tree (trumpets in the distance)
-
-        Returns:
-            The final string representation of the tree
-
-        Gets the internal list representation of the tree, and convert it to
-        a string.
-        """
-
-        # join the final tree array into a string and return it
-        str_out = "\n".join(self._tree)
-        return str_out
 
     # --------------------------------------------------------------------------
     # Sorts items in the item list according to the item name

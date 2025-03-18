@@ -32,10 +32,10 @@ class CNVenv:
     """
     A class to make handling of venv folders easier
 
-    Public methods:
-        create: Make a new venv folder for a project
-        freeze: Collects all packages needed for this project
-        install: Installs all packages needed for this project
+    Methods:
+        create: Create sa new venv given the __init__ params
+        install_reqs: Install packages to venv from the reqs_file property
+        freeze: Freeze packages in the venv folder to the file_reqs property
 
     This class provides methods to create, freeze, and install dependencies
     in the project's venv folder.
@@ -46,9 +46,7 @@ class CNVenv:
     # --------------------------------------------------------------------------
 
     S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
-    S_CMD_INSTALL = (
-        "cd {};. ./{}/bin/activate;python -m pip install -r {}"
-    )
+    S_CMD_INSTALL = "cd {};. ./{}/bin/activate;python -m pip install -r {}"
     S_CMD_FREEZE = (
         "cd {}; "
         ". ./{}/bin/activate; "
@@ -60,6 +58,11 @@ class CNVenv:
         "> "
         "{}"
     )
+
+    # custom error strings
+    S_ERR_NOT_ABS = "path {} is not absolute"
+    S_ERR_NOT_DIR = "path {} is not a directory"
+
     # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
@@ -83,35 +86,33 @@ class CNVenv:
 
         # save prj dir
         self._dir_prj = Path(dir_prj)
+        if not self._dir_prj.is_absolute():
+            raise OSError(self.S_ERR_NOT_ABS.format(self._dir_prj))
+        if not self._dir_prj.is_dir():
+            raise OSError(self.S_ERR_NOT_DIR.format(self._dir_prj))
 
         # if param is not abs, make abs rel to prj dir
         self._dir_venv = Path(dir_venv)
         if not self._dir_venv.is_absolute():
-            self._dir_venv = Path(self._dir_prj) / dir_venv
+            self._dir_venv = self._dir_prj / dir_venv
 
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Create a new venv given the __init__ params
+    # Create sa new venv given the __init__ params
     # --------------------------------------------------------------------------
     def create(self):
         """
-        Create a new venv given the __init__ params
-
-        Raises:
-            cnfunctions.CNShellError if an error occurs
+        Creates a new venv given the __init__ params
 
         Creates a new venv folder with the parameters provided at create time.
         """
 
         # the command to create a venv
         cmd = self.S_CMD_CREATE.format(self._dir_venv)
-        try:
-            F.sh(cmd, shell=True)
-        except F.CNShellError as e:
-            raise e
+        F.sh(cmd, shell=True)
 
     # --------------------------------------------------------------------------
     # Install packages to venv from the reqs_file property
@@ -123,9 +124,6 @@ class CNVenv:
         Args:
             file_reqs: File to load requirements
 
-        Raises:
-            cnfunctions.CNShellError if an error occurs
-
         This method takes requirements in the reqs_file property and installs
         them in the dir_venv property.
         """
@@ -133,16 +131,13 @@ class CNVenv:
         # if param is not abs, make abs rel to prj dir
         file_reqs = Path(file_reqs)
         if not file_reqs.is_absolute():
-            file_reqs = Path(self._dir_prj) / file_reqs
+            file_reqs = self._dir_prj / file_reqs
 
         # the command to install packages to venv from reqs
         cmd = self.S_CMD_INSTALL.format(
             self._dir_venv.parent, self._dir_venv.name, file_reqs
         )
-        try:
-            F.sh(cmd, shell=True)
-        except F.CNShellError as e:
-            raise e
+        F.sh(cmd, shell=True)
 
     # --------------------------------------------------------------------------
     # Freeze packages in the venv folder to the file_reqs property
@@ -154,9 +149,6 @@ class CNVenv:
         Args:
             file_reqs: File to save requirements
 
-        Raises:
-            cnfunctions.CNShellError if an error occurs
-
         Freezes current packages in the venv dir into a file for easy
         installation.
         """
@@ -164,16 +156,13 @@ class CNVenv:
         # if param is not abs, make abs rel to prj dir
         file_reqs = Path(file_reqs)
         if not file_reqs.is_absolute():
-            file_reqs = Path(self._dir_prj) / file_reqs
+            file_reqs = self._dir_prj / file_reqs
 
         # the command to freeze a venv
         cmd = self.S_CMD_FREEZE.format(
             self._dir_venv.parent, self._dir_venv.name, file_reqs
         )
-        try:
-            F.sh(cmd, shell=True)
-        except F.CNShellError as e:
-            raise e
+        F.sh(cmd, shell=True)
 
 
 # -)

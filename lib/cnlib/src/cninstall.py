@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : CNInstallLib                                           /          \
+# Project : CNlLib                                                 /          \
 # Filename: cninstall.py                                          |     ()     |
 # Date    : 09/23/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -23,51 +23,8 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# Constants
+# Classes
 # ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Public classes
-# ------------------------------------------------------------------------------
-
-
-# ------------------------------------------------------------------------------
-# A class to wrap errors from the install/uninstall methods
-# ------------------------------------------------------------------------------
-class CNInstallError(Exception):
-    """
-    A class to wrap errors from the install/uninstall methods
-
-    This class is used to wrap exceptions from the install/uninstall methods,
-    so that a file that uses install/uninstall does not need to import or check
-    for all possible failures. The original exception and its properties will
-    be exposed by the 'exception' property, but printing will defer to the
-    object's repr_str property.
-    """
-
-    # --------------------------------------------------------------------------
-    # Class methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Initialize the class
-    # --------------------------------------------------------------------------
-    def __init__(self, message):
-        """
-        Initialize the class
-
-        Args:
-            message: A custom string to print for clarity
-
-        Creates a new instance of the object and initializes its properties.
-        """
-
-        # call super constructor
-        super().__init__(message)
-
-        # set properties
-        self.message = message
-
 
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
@@ -75,6 +32,16 @@ class CNInstallError(Exception):
 class CNInstall:
     """
     The class to use for installing/uninstalling
+
+    Methods:
+        make_install_cfg: Make a valid install config file
+        make_uninstall_cfg: Make a valid uninstall config file
+        fix_desktop_file: Fix .desktop file, for paths and such
+        install: Install the program
+        uninstall: Uninstall the program
+
+    This class provides functions to create install/uninstall config files, and
+    performs the install and uninstall operations.
     """
 
     # --------------------------------------------------------------------------
@@ -89,7 +56,7 @@ class CNInstall:
 
     # --------------------------------------------------------------------------
 
-    # FIXME: localize? (all lib modules)
+    # FIXME: localize?
 
     # messages
     # NB: format params are prog_name and prog_version
@@ -144,6 +111,8 @@ class CNInstall:
 
     # --------------------------------------------------------------------------
 
+    S_DRY_DESK_ICON = "desktop_icon: {}"
+
     S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
     S_CMD_INSTALL = "cd {};. ./{}/bin/activate;python -m pip install -r {}"
     S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
@@ -182,11 +151,11 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Make install file
+    # Make a valid install config file
     # --------------------------------------------------------------------------
     def make_install_cfg(self, name, version, dict_install):
         """
-        Make install file
+        Make a valid install config file
 
         Args:
             name: Program name
@@ -211,11 +180,11 @@ class CNInstall:
         return dict_use
 
     # --------------------------------------------------------------------------
-    # Make uninstall file
+    # Make a valid uninstall config file
     # --------------------------------------------------------------------------
     def make_uninstall_cfg(self, name, version, list_uninst):
         """
-        Make uninstall file
+        Make a valid uninstall config file
 
         Args:
             name: Program name
@@ -240,24 +209,21 @@ class CNInstall:
         return dict_use
 
     # --------------------------------------------------------------------------
-    # Fix .desktop stuff
+    # Fix .desktop file, for paths and such
     # --------------------------------------------------------------------------
     def fix_desktop_file(self, desk_file, path_icon, dry=False):
         """
-        Fix .desktop stuff
+        Fix .desktop file, for paths and such
 
         Args:
-            desk_file: abs path to desktop file
-            path_icon: path to icon, rel to user home
+            desk_file: The path to the desktop file to be modified
+            path_icon: The path to the program's icon, relative to user home
             dry: If True, do not copy files, ony print the action (default:
             False)
 
         Fixes entries in the .desktop file (absolute paths, etc.)
         Currently only fixes absolute path to icon.
         """
-
-        if dry:
-            return
 
         # sanity check
         # NB: in a cli or pkg, this file will not exist
@@ -269,24 +235,27 @@ class CNInstall:
         with open(desk_file, "r", encoding="UTF-8") as a_file:
             text = a_file.read()
 
-        # ----------------------------------------------------------------------
-
-        # get installed user's home
-        path_icon = Path.home() / path_icon
-
-        # fix abs path to icon
-        r_icon_rep = self.R_ICON_REP.format(path_icon)
-
         # find icon line and fix
         res = re.search(self.R_ICON_SCH, text, flags=re.M)
         if res:
+
+            # get user's home and path to icon rel to prj
+            path_icon = Path.home() / path_icon
+
+            # fix abs path to icon
+            r_icon_rep = self.R_ICON_REP.format(path_icon)
             text = re.sub(self.R_ICON_SCH, r_icon_rep, text, flags=re.M)
 
-        # ----------------------------------------------------------------------
+            # ----------------------------------------------------------------------
 
-        # write fixed text back to file
-        with open(desk_file, "w", encoding="UTF-8") as a_file:
-            a_file.write(text)
+            # don't mess with file
+            if dry:
+                print(self.S_DRY_DESK_ICON.format(path_icon))
+                return
+
+            # write fixed text back to file
+            with open(desk_file, "w", encoding="UTF-8") as a_file:
+                a_file.write(text)
 
     # --------------------------------------------------------------------------
     # Install the program
@@ -314,13 +283,20 @@ class CNInstall:
             dict info
             path_cfg_uninst: Path to the currently installed program's
             uninstall dict info
+            dir_usr_inst: The program's install folder in which to make a venv
+            dir_venv: The path to the venv folder to create
+            path_reqs: Path to the requirements.txt file to add requirements to
+            the venv
             dry: If True, do not copy files, ony print the action (default:
             False)
 
         Runs the install operation.
         """
 
-        # get dicts from files
+        # set properties
+        self._dry = dry
+
+        # get install dict
         self._dict_cfg = self._get_dict_from_file(path_cfg_inst)
 
         # get prg name
@@ -329,8 +305,8 @@ class CNInstall:
         # print start msg
         print(self.S_MSG_INST_START.format(prog_name))
 
-        # set properties
-        self._dry = dry
+        # ----------------------------------------------------------------------
+        # check for existing/old version
 
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
@@ -369,6 +345,9 @@ class CNInstall:
                 ):
                     print(self.S_MSG_VER_ABORT)
                     sys.exit()
+
+        # ----------------------------------------------------------------------
+        # draw the rest of the owl
 
         # make the venv on the user's comp
         self._make_venv(dir_usr_inst, dir_venv)
@@ -429,6 +408,9 @@ class CNInstall:
             folder.
             dir_venv: The path to the venv folder to create.
 
+        Raises:
+            subprocess.CalledProcessError if the venv creation fails
+
         Makes a .venv-XXX folder on the user's computer.
         """
 
@@ -440,34 +422,39 @@ class CNInstall:
         if not dir_venv.is_absolute():
             dir_venv = Path(dir_usr_inst) / dir_venv
 
+        # the command to create a venv
+        cmd = self.S_CMD_CREATE.format(dir_venv)
+
         # if it's a dry run, don't make venv
         if self._dry:
             print(self.S_MSG_DONE)
-            print("venv:", dir_venv)
+            print("venv cmd:", cmd)
             return
 
-        # create a venv
-        cmd = self.S_CMD_CREATE.format(dir_venv)
+        # the cmd to create the venv
         try:
             subprocess.run(cmd, check=True, shell=True)
             print(self.S_MSG_DONE)
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             print(self.S_MSG_FAIL)
             raise e
 
     # --------------------------------------------------------------------------
     # Install requirements.txt
     # --------------------------------------------------------------------------
-    def _install_reqs(self, dir_usr_inst, dir_venv, file_reqs):
+    def _install_reqs(self, dir_usr_inst, dir_venv, path_reqs):
         """
         Install requirements.txt
 
         Args:
             dir_usr_inst: The program's install folder in which the venv
-            resides.
-            dir_venv: The path tp the venv folder to create.
+            resides
+            dir_venv: The path tp the venv folder to create
             path_reqs: Path to the requirements.txt file to add requirements to
-            the venv.
+            the venv
+
+        Raises:
+            subprocess.CalledProcessError if the reqs install fails
 
         Installs the contents of a requirements.txt file into the program's
         venv.
@@ -477,30 +464,26 @@ class CNInstall:
         print(self.S_MSG_REQS_START, flush=True, end="")
 
         # if param is not abs, make abs rel to prj dir
-        file_reqs = Path(file_reqs)
-        if not file_reqs.is_absolute():
-            file_reqs = Path(dir_usr_inst) / file_reqs
+        path_reqs = Path(path_reqs)
+        if not path_reqs.is_absolute():
+            path_reqs = Path(dir_usr_inst) / path_reqs
+
+        # the command to install packages to venv from reqs
+        cmd = self.S_CMD_INSTALL.format(
+            dir_venv.parent, dir_venv.name, path_reqs
+        )
 
         # if it's a dry run, don't install
         if self._dry:
             print(self.S_MSG_DONE)
-            print("reqs:", file_reqs)
+            print("reqs cmd:", cmd)
             return
 
-        # no reqs, make pretty
-        with open(file_reqs, "r", encoding="UTF-8") as a_file:
-            lines = a_file.readlines()
-            if len(lines) > 0:
-                print()
-
-        # the command to install packages to venv from reqs
-        cmd = self.S_CMD_INSTALL.format(
-            dir_venv.parent, dir_venv.name, file_reqs
-        )
+        # the cmd to install the reqs
         try:
             subprocess.run(cmd, check=True, shell=True)
             print(self.S_MSG_DONE)
-        except Exception as e:
+        except subprocess.SubprocessError as e:
             print(self.S_MSG_FAIL)
             raise e
 
@@ -513,9 +496,12 @@ class CNInstall:
 
         Args:
             dir_usr_inst: The program's install folder in which the venv
-            resides.
-            dir_venv: The path tp the venv folder to create.
-            dir_lib: The path to the folder where the libs reside.
+            resides
+            dir_venv: The path tp the venv folder to create
+            dir_lib: The path to the folder where the libs reside
+
+        Raises:
+            subprocess.CalledProcessError if the libs install fails
 
         Installs the contents of a lib folder in the program's venv.
         """
@@ -544,18 +530,14 @@ class CNInstall:
         # if it's a dry run, don't install
         if self._dry:
             print(self.S_MSG_DONE)
-            print("cmd:", cmd)
+            print("libs cmd:", cmd)
             return
-
-        # make pretty
-        if len(val) > 0:
-            print()
 
         # the command to install libs
         try:
             subprocess.run(cmd, check=True, shell=True)
             print(self.S_MSG_DONE)
-        except Exception as e:
+        except subprocess.SubprocessError as e:
             print(self.S_MSG_FAIL)
             raise e
 
@@ -572,9 +554,6 @@ class CNInstall:
         Returns:
             The dict contained in the file
 
-        Raises:
-            CNInstallError: If something goes wrong
-
         Opens the specified file and returns the config dict found in it.
         """
 
@@ -585,13 +564,11 @@ class CNInstall:
 
         # file not found
         except FileNotFoundError as e:
-            error = CNInstallError(self.S_ERR_NOT_FOUND.format(path_cfg))
-            raise error from e
+            raise OSError(self.S_ERR_NOT_FOUND.format(path_cfg)) from e
 
         # not valid json in file
         except json.JSONDecodeError as e:
-            error = CNInstallError(self.S_ERR_NOT_JSON.format(path_cfg))
-            raise error from e
+            raise OSError(self.S_ERR_NOT_JSON.format(path_cfg)) from e
 
     # --------------------------------------------------------------------------
     # Copy source files/folders
@@ -678,10 +655,10 @@ class CNInstall:
                 sys.exit()
 
             # get full path of destination
-            dst = Path.home() / item
+            src = Path.home() / item
 
             # debug may omit certain assets
-            if not dst.exists():
+            if not src.exists():
                 continue
 
             # (maybe) do delete
@@ -690,14 +667,14 @@ class CNInstall:
             else:
 
                 # if the source is a dir
-                if dst.is_dir():
+                if src.is_dir():
                     # remove dir
-                    shutil.rmtree(dst)
+                    shutil.rmtree(src)
 
                 # if the source is a file
                 else:
                     # copy file
-                    Path.unlink(dst)
+                    Path.unlink(src)
 
         # show some info
         print(self.S_MSG_DONE)
@@ -717,7 +694,7 @@ class CNInstall:
             An integer representing the relativity of the two version strings.
             0 means the two versions are equal,
             1 means new_ver is newer than old_ver (or there is no old_ver), and
-            -1 means new_ver is newer than old_ver.
+            -1 means new_ver is older than old_ver.
 
         This method compares two version strings and determines which is older,
         which is newer, or if they are equal. Note that this method converts
@@ -757,11 +734,14 @@ class CNInstall:
                     return 1
                 elif old_val > new_val:
                     return -1
+                else:
+                    continue
         else:
-            raise CNInstallError(self.S_ERR_VERSION)
+            raise OSError(self.S_ERR_VERSION)
 
         # return 0 if equal
         return 0
 
 
+# -)
 # -)

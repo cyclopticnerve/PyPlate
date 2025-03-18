@@ -36,7 +36,7 @@ import shutil
 import cnfunctions as F
 
 # ------------------------------------------------------------------------------
-# Public classes
+# Classes
 # ------------------------------------------------------------------------------
 
 
@@ -48,62 +48,64 @@ class CNPotPy:
     A class to handle making the different I18N files needed for a Python
     project
 
-    Public methods:
-        main: Run the program
-        make_desktop: Make a desktop file
+    Methods:
+        main: Run the program and make or update the files
+        make_desktop: Localize the desktop file using all available wlangs
 
     This class provides methods to create .pot, .po, .mo, and .desktop files
     for internationalizing a Python or PyGObject project.
     """
 
-    # default locale dir under prj
-    DEF_DIR_LOCALE = "locale"
-    # default po dir under prj
-    DEF_DIR_PO = "po"
-    # default src dir under prj
-    DEF_DIR_SRC = "src"
-    # default domain
-    DEF_DOMAIN = "messages"
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
     # default encoding for .pot and .po files
-    DEF_CHARSET = "UTF-8"
+    S_DEF_CHARSET = "UTF-8"
 
-    # default file extensions
-    DEF_POT_EXT = ".pot"
-    DEF_PO_EXT = ".po"
-    DEF_MO_EXT = ".mo"
-
+    # NB: DO NOT CHANGE THESE! i only put them here because they are strings
+    # default locale folder under i18n
+    S_DIR_LOCALE = "locale"
+    # default po folder under i18n
+    S_DIR_PO = "po"
     # this is the default subdir for GNU
-    # NB: DO NOT CHANGE THIS! i only put it here because it is a string
-    DIR_MESSAGES = "LC_MESSAGES"
+    S_DIR_MESSAGES = "LC_MESSAGES"
     # the file to store all wlangs for bulk operations
-    # NB: DO NOT CHANGE THIS! i only put it here because it is a string
-    FILE_LINGUAS = "LINGUAS"
-
-    # header regex
-    REG_TITLE_SCH = r"# SOME DESCRIPTIVE TITLE."
-    REG_TITLE_REP = r"# {} translation template"
-
-    REG_COPY_SCH = (
-        r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
-    )
-    REG_COPY_REP = r"\g<1>{}\g<3>{}"
-
-    REG_EMAIL_SCH = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
-    REG_EMAIL_REP = r"\g<1>{}\g<3>{}"
-
-    REG_CHAR_SCH = r"(\"Content-Type: text/plain; charset=)(CHARSET)(.*)"
-    REG_CHAR_REP = r"\g<1>{}\g<3>"
-
-    REG_VER_SCH = r"^(\"Project-Id-Version: .*? )([^\n]*)(\\n\")$"
-    REG_VER_REP = r"\g<1>{}\g<3>"
+    S_FILE_LINGUAS = "LINGUAS"
+    # default file extensions
+    S_POT_EXT = ".pot"
+    S_PO_EXT = ".po"
+    S_MO_EXT = ".mo"
 
     # shell commands to make po/mo
     # NB: params are po_file and pot_file
-    S_CMD_POS = "msgmerge --update {} {} --backup=none"
+    S_CMD_MERGE_POS = "msgmerge --update {} {} --backup=none"
     # NB: params are mo_file and wlang_po
-    S_CMD_MOS = "msgfmt -o {} {}"
+    S_CMD_MAKE_MOS = "msgfmt -o {} {}"
     # params are po dir, template file, final file
     S_CMD_DSK = "msgfmt --desktop -d {} --template={} -o {}"
+
+    # error messages
+    S_ERR_NOT_ABS = "path {} is not absolute"
+    S_ERR_NOT_DIR = "path {} is not a directory"
+
+    # header regexes
+    R_TITLE_SCH = r"# SOME DESCRIPTIVE TITLE."
+    R_TITLE_REP = r"# {} translation template"
+
+    R_COPY_SCH = (
+        r"(# Copyright \(C\) )(YEAR)( )(THE PACKAGE'S COPYRIGHT HOLDER)"
+    )
+    R_COPY_REP = r"\g<1>{}\g<3>{}"
+
+    R_EMAIL_SCH = r"(# FIRST AUTHOR )(<EMAIL@ADDRESS>)(, )(YEAR)"
+    R_EMAIL_REP = r"\g<1>{}\g<3>{}"
+
+    R_CHAR_SCH = r"(\"Content-Type: text/plain; charset=)(CHARSET)(.*)"
+    R_CHAR_REP = r"\g<1>{}\g<3>"
+
+    R_VER_SCH = r"^(\"Project-Id-Version: .*? )([^\n]*)(\\n\")$"
+    R_VER_REP = r"\g<1>{}\g<3>"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -115,25 +117,22 @@ class CNPotPy:
     def __init__(
         self,
         # header
-        str_appname,
-        str_version,
-        str_author,
-        str_email,
-        # out
-        dir_pot,
-        # in
+        str_appname, # prv
+        str_version, # pub
+        str_author, # prv
+        str_email, # prv
+        # base prj dir
         dir_prj,
+        # in
         dir_src,
-        # optional out
-        dir_locale=None,
-        dir_po=None,
-        str_domain=None,
+        # out
+        dir_i18n,
         # optional in
         str_tag=None,
-        dict_clangs=None,
-        dict_no_ext=None,
-        list_wlangs=None,
-        charset=None,
+        dict_clangs=None,  # pub
+        dict_no_ext=None,  # pub
+        list_wlangs=None,  # pub
+        charset=None,  # pub
     ):
         """
         Initialize the new object
@@ -145,10 +144,11 @@ class CNPotPy:
             str_author: Author name to use in .pot/.po header
             str_email: Email to use in .pot/.po header
 
-            dir_pot: Directory to place master .pot file
-
             dir_prj: Used for relative paths
+
             dir_src: Where to start looking for input files
+
+            dir_pot: Directory to place master .pot file
 
             dir_locale: Where to put output locale files (default:
             dir_src/"locale")
@@ -210,41 +210,30 @@ class CNPotPy:
         its properties, and any other code needed to create a new object.
         """
 
-        # header info
+        # set header info
         self._str_appname = str_appname
         self._str_version = str_version
         self._str_author = str_author
         self._str_email = str_email
 
-        # set private props from params
-        self._dir_pot = Path(dir_pot).resolve()
-        self._dir_prj = Path(dir_prj).resolve()
+        # set base props
+        self._dir_prj = Path(dir_prj)
+        if not self._dir_prj.is_absolute():
+            raise OSError(self.S_ERR_NOT_ABS.format(self._dir_prj))
+        if not self._dir_prj.is_dir():
+            raise OSError(self.S_ERR_NOT_DIR.format(self._dir_prj))
 
-        # fix up dir_locale
-        if dir_locale is None:
-            dir_locale = self._dir_prj / self.DEF_DIR_LOCALE
-        if not dir_locale.is_absolute():
-            dir_locale = self._dir_prj / dir_locale
-        self._dir_locale = dir_locale
+        # set in props
+        self._dir_src = Path(dir_src)
+        if not self._dir_src.is_absolute():
+            self._dir_src = self._dir_prj / dir_src
 
-        # fix up dir_po
-        if dir_po is None:
-            dir_po = self._dir_prj / self.DEF_DIR_PO
-        if not dir_po.is_absolute():
-            dir_po = self._dir_prj / dir_po
-        self._dir_po = dir_po
+        # set out props
+        self._dir_i18n = Path(dir_i18n)
+        if not self._dir_i18n.is_absolute():
+            self._dir_i18n = self._dir_prj / dir_i18n
 
-        # fix up dir_src
-        if dir_src is None:
-            dir_src = self._dir_prj / self.DEF_DIR_SRC
-        if not dir_src.is_absolute():
-            dir_src = self._dir_prj / dir_src
-        self._dir_src = dir_src
-
-        # fix up domain
-        if str_domain is None:
-            str_domain = self.DEF_DOMAIN
-        self._str_domain = str_domain
+        # set optional in props
 
         # set comment tag
         if str_tag is None:
@@ -268,19 +257,23 @@ class CNPotPy:
 
         # fix up charset
         if charset is None:
-            charset = self.DEF_CHARSET
+            charset = self.S_DEF_CHARSET
         self._charset = charset
+
+        # set up folder props
+        self._dir_locale = self._dir_i18n / self.S_DIR_LOCALE
+        self._dir_po = self._dir_i18n / self.S_DIR_PO
 
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Main method of the class
+    # Run the program and make or update the files
     # --------------------------------------------------------------------------
     def main(self):
         """
-        Main method of the class
+        Run the program and make or update the files
 
         Main method of the class, performing its steps.
         """
@@ -289,7 +282,7 @@ class CNPotPy:
         # do the steps
 
         self._make_pot()
-        self._make_pos()
+        self._merge_pos()
         self._make_mos()
 
     # --------------------------------------------------------------------------
@@ -302,9 +295,9 @@ class CNPotPy:
         Args:
             dt_template: File containing the default information to include in
             the desktop file
-            This is the file that pymaker/pybaker modify using metadata
+                This is the file that pymaker/pybaker modifies using metadata.
             dt_out: Location of the i18n'ed desktop file
-            This is the file that will be distributed with your app
+                This is the file that will be distributed with your app.
 
         Takes a template desktop file and applies all i18n'ed info from all .po
         files in the po folder and creates a final .desktop file.
@@ -371,7 +364,7 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get path to pot file
-        pot_file = self._dir_pot / f"{self._str_domain}{self.DEF_POT_EXT}"
+        pot_file = self._dir_i18n / f"{self._str_appname}{self.S_POT_EXT}"
 
         # delete the existing .pot file (if it exists)
         Path.unlink(pot_file, missing_ok=True)
@@ -448,7 +441,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Merge any .po files in the pos folder with existing .po files
     # --------------------------------------------------------------------------
-    def _make_pos(self):
+    def _merge_pos(self):
         """
         Merge any .po files in the pos folder with existing .po files
 
@@ -462,16 +455,13 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get the pot file we made in the last step
-        pot_file = self._dir_pot / f"{self._str_domain}{self.DEF_POT_EXT}"
+        pot_file = self._dir_i18n / f"{self._str_appname}{self.S_POT_EXT}"
 
         # for each wlang in the po folder
         for wlang in self._list_wlangs:
 
             # create or update the .po file
-            po_file = (
-                self._dir_po
-                / f"{wlang}{self.DEF_PO_EXT}"
-            )
+            po_file = self._dir_po / f"{wlang}{self.S_PO_EXT}"
             if not po_file.exists():
 
                 # no po file, copy pot
@@ -479,15 +469,15 @@ class CNPotPy:
             else:
 
                 # update existing po file using latest pot
-                cmd = self.S_CMD_POS.format(po_file, pot_file)
+                cmd = self.S_CMD_MERGE_POS.format(po_file, pot_file)
                 F.sh(cmd)
 
             # fix po version
             with open(po_file, "r", encoding="UTF-8") as a_file:
                 text = a_file.read()
 
-            rep = self.REG_VER_REP.format(self._str_version)
-            text = re.sub(self.REG_VER_SCH, rep, text, flags=re.M)
+            rep = self.R_VER_REP.format(self._str_version)
+            text = re.sub(self.R_VER_SCH, rep, text, flags=re.M)
 
             # write fixed text back to file
             with open(po_file, "w", encoding="UTF-8") as a_file:
@@ -508,7 +498,7 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get all wlangs to output
-        wlangs_pos = list(self._dir_po.glob(f"*{self.DEF_PO_EXT}"))
+        wlangs_pos = list(self._dir_po.glob(f"*{self.S_PO_EXT}"))
 
         # for each wlang
         for wlang_po in wlangs_pos:
@@ -517,11 +507,11 @@ class CNPotPy:
             wlang_name = wlang_po.stem  # en, etc
 
             # get .mo file (output)
-            mo_dir = self._dir_locale / wlang_name / self.DIR_MESSAGES
-            mo_file = mo_dir / f"{self._str_domain}{self.DEF_MO_EXT}"
+            mo_dir = self._dir_locale / wlang_name / self.S_DIR_MESSAGES
+            mo_file = mo_dir / f"{self._str_appname}{self.S_MO_EXT}"
 
             # do the command
-            cmd = self.S_CMD_MOS.format(mo_file, wlang_po)
+            cmd = self.S_CMD_MAKE_MOS.format(mo_file, wlang_po)
             F.sh(cmd)
 
     # --------------------------------------------------------------------------
@@ -534,8 +524,6 @@ class CNPotPy:
         Args:
             dict_clangs: The dictionary of clang names / clang extensions to
             scan for
-            dict_no_ext: An optional dictionary mapping files with no extension
-            to their clang value
 
         Returns:
             A dictionary containing file paths to source files
@@ -579,7 +567,6 @@ class CNPotPy:
             ]
 
             # get all paths that match file ext
-            # files = [self._dir_src / f for f in paths if f.suffix in exts]
             files = [f for f in paths if f.suffix in exts]
 
             # make sure the key exists
@@ -595,7 +582,6 @@ class CNPotPy:
             # get all paths that match file ext
             # NB: the is_file() check here is to make sure we only add files
             # that have no ext, not dirs (which have no ext, obvs)
-            # files = [self._dir_src / f for f in paths if f.name in name_list if f.is_file()]
             files = [f for f in paths if f.name in name_list if f.is_file()]
 
             # make sure the key exists
@@ -620,10 +606,12 @@ class CNPotPy:
         The idea is to get all *existing* languages on disk, then
         add all the languages passed in to the constructor.
 
-        The logic here is a little fuzzy, so try to keep the removal of
-        languages in sync between disk and the list passed to the constructor.
-        Adding languages should be as easy as adding a .po file to the correct
-        po/wlang dir.
+        This method is used to get a list of all languages installed, which is
+        in turn used to write the LINGUAS file. That file is in turn used to do
+        i18n on the .desktop file. The logic here is a little fuzzy, so try to
+        keep the removal of languages in sync between disk and the list passed
+        to the constructor. Adding languages should be as easy as adding a
+        wlang identifier to pyplate/project.json.
         """
 
         # make sure there is a locale dir
@@ -643,7 +631,7 @@ class CNPotPy:
 
         # sweep po folder for wlangs and reduce to ISO name
         # po_wlangs_glob = self._dir_po.glob("*")
-        po_wlangs_glob = list(self._dir_po.glob(f"*{self.DEF_PO_EXT}"))
+        po_wlangs_glob = list(self._dir_po.glob(f"*{self.S_PO_EXT}"))
         # convert generator to list
         po_wlangs = list(po_wlangs_glob)
         # only dirs
@@ -652,14 +640,14 @@ class CNPotPy:
         po_wlangs = [item.stem for item in po_wlangs]
 
         # combine locale and po wlangs (whatever we found on disk)
-        list_on_dir = locale_wlangs + po_wlangs
+        list_on_disk = locale_wlangs + po_wlangs
         # remove duplicates
-        set_on_dir = set(list_on_dir)
+        set_on_disk = set(list_on_disk)
         # convert back to list
-        list_on_dir = list(set_on_dir)
+        list_on_disk.extend(set_on_disk)
 
         # add any names passed in via list_wlangs (should be ISO names)
-        list_comb = list_on_dir + self._list_wlangs
+        list_comb = list_on_disk + self._list_wlangs
         # remove duplicates
         set_comb = set(list_comb)
         # convert back to list
@@ -672,6 +660,12 @@ class CNPotPy:
     # Make a list of all supported written language directories
     # --------------------------------------------------------------------------
     def _make_wlang_dirs(self):
+        """
+        Make a list of all supported written language directories
+
+        This writes the LINGUAS file, which is used for i18n'ing a .desktop
+        file. 
+        """
 
         # get names of all wlangs present in po/locale/property
         self._get_wlang_names()
@@ -680,21 +674,20 @@ class CNPotPy:
         linguas = ""
 
         # make the po dir where we will put updated files to be merged
-        d = self._dir_po
-        Path.mkdir(d, parents=True, exist_ok=True)
+        Path.mkdir(self._dir_po, parents=True, exist_ok=True)
 
         # go through the wlang list
         for wlang in self._list_wlangs:
 
             # make the locale/lang/LC_MESSAGES dir
-            d = self._dir_locale / wlang / self.DIR_MESSAGES
+            d = self._dir_locale / wlang / self.S_DIR_MESSAGES
             Path.mkdir(d, parents=True, exist_ok=True)
 
             # add each wlang to LINGUAS file
             linguas += wlang + " "
 
         # write the LINGUAS file
-        linguas_path = self._dir_po / self.FILE_LINGUAS
+        linguas_path = self._dir_po / self.S_FILE_LINGUAS
         with open(linguas_path, "w", encoding="UTF8") as f:
             f.write(linguas)
 
@@ -719,27 +712,27 @@ class CNPotPy:
             text = a_file.read()
 
         # replace short description
-        str_pattern = self.REG_TITLE_SCH
-        str_rep = self.REG_TITLE_REP.format(self._str_appname)
+        str_pattern = self.R_TITLE_SCH
+        str_rep = self.R_TITLE_REP.format(self._str_appname)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace copyright
-        str_pattern = self.REG_COPY_SCH
+        str_pattern = self.R_COPY_SCH
         year = date.today().year
-        str_rep = self.REG_COPY_REP.format(year, self._str_author)
+        str_rep = self.R_COPY_REP.format(year, self._str_author)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace author's email
-        str_pattern = self.REG_EMAIL_SCH
+        str_pattern = self.R_EMAIL_SCH
         email = self._str_email
         year = date.today().year
-        str_rep = self.REG_EMAIL_REP.format(email, year)
+        str_rep = self.R_EMAIL_REP.format(email, year)
         text = re.sub(str_pattern, str_rep, text)
 
         # NB: if the specific phrase "CHARSET" is not found, nothing will be
         # changed
-        str_pattern = self.REG_CHAR_SCH
-        str_rep = self.REG_CHAR_REP.format(self._charset)
+        str_pattern = self.R_CHAR_SCH
+        str_rep = self.R_CHAR_REP.format(self._charset)
         text = re.sub(str_pattern, str_rep, text, flags=re.M)
 
         # save file

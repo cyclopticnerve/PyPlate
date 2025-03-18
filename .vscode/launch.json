@@ -9,17 +9,6 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/..",
         },
-        // {
-        //     "name": "PM Debug",
-        //     "type": "debugpy",
-        //     "request": "launch",
-        //     "program": "PyPlate/src/pymaker.py",
-        //     "console": "integratedTerminal",
-        //     "cwd": "${workspaceFolder}/..",
-        //     "args": [
-        //         "-d",
-        //     ]
-        // },
         {
             "name": "PB",
             "type": "debugpy",
@@ -30,18 +19,6 @@
             "args": [
                 "-i"
             ]
-        },
-        // {
-        //     "name": "PB Debug",
-        //     "type": "debugpy",
-        //     "request": "launch",
-        //     "program": "PyPlate/src/pybaker.py",
-        //     "console": "integratedTerminal",
-        //     "cwd": "${workspaceFolder}/..",
-        //     "args": [
-        //         "-d",
-        //         "-i"
-        //     ]
-        // },
+        }
     ]
 }

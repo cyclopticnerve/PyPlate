@@ -1,5 +1,6 @@
 
 # TODO: combine pyplate.py B_ flags into dict and add to project.json
+# TODO: custom exceptions (instead of except Exception as e/raise e)
 # how to read in pybaker? and write (debug at least, since we pass it in prj)
 # TODO: dock icon only works after install, and only for global (not src)
 # this might be a wayland thing, see here:

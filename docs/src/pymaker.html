@@ -1,56 +1,67 @@
-#! /usr/bin/env python
-# ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
-# Filename: pymaker.py                                            |     ()     |
-# Date    : 12/08/2022                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
-# ------------------------------------------------------------------------------
-
-# pylint: disable=too-many-lines
-
-"""
-A program to create a PyPlate project from a few variables
-
-This module gets the project type, the project's destination dir, copies the
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>src.pymaker API documentation</title>
+<meta name="description" content="A program to create a PyPlate project from a few variables …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.pymaker</code></h1>
+</header>
+<section id="section-intro">
+<p>A program to create a PyPlate project from a few variables</p>
+<p>This module gets the project type, the project's destination dir, copies the
 required dirs/files for the project type from the template to the specified
 destination, and performs some initial fixes/replacements of text and path
-names in the resulting files.
-
-Run pymaker -h for more options.
-"""
-
-# ------------------------------------------------------------------------------
-# Imports
-# ------------------------------------------------------------------------------
-
-# system imports
-import argparse
-from datetime import datetime
-from pathlib import Path
-import re
-import shutil
-import sys
-
-# local imports
-import cnfunctions as F
-from cnformatter import CNFormatter
-from cninstall import CNInstall
-from cnpot import CNPotPy
-from cntree import CNTree
-from cnvenv import CNVenv
-import pyplate as PP
-
-# ------------------------------------------------------------------------------
-# Public classes
-# ------------------------------------------------------------------------------
-
-
-# ------------------------------------------------------------------------------
-# The main class, responsible for the operation of the program
-# ------------------------------------------------------------------------------
-class PyMaker:
-    """
+names in the resulting files.</p>
+<p>Run pymaker -h for more options.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.pymaker.PyMaker"><code class="flex name class">
+<span>class <span class="ident">PyMaker</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PyMaker:
+    &#34;&#34;&#34;
     The main class, responsible for the operation of the program
 
     Public methods:
@@ -58,7 +69,7 @@ class PyMaker:
 
     This class implements all the needed functionality of PyMaker, to create a
     project from a template.
-    """
+    &#34;&#34;&#34;
 
     # --------------------------------------------------------------------------
     # Class constants
@@ -73,45 +84,45 @@ class PyMaker:
     P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
     # name and desc for cmd line help
-    S_PP_NAME_BIG = "PyMaker"
-    S_PP_NAME_SMALL = "pymaker"
-    S_PP_VERSION = "0.0.1"
+    S_PP_NAME_BIG = &#34;PyMaker&#34;
+    S_PP_NAME_SMALL = &#34;pymaker&#34;
+    S_PP_VERSION = &#34;0.0.1&#34;
     S_PP_SHORT_DESC = (
-        "A program for creating CLI/Package/GUI projects in Python from a "
-        "template"
+        &#34;A program for creating CLI/Package/GUI projects in Python from a &#34;
+        &#34;template&#34;
     )
 
     # formatted version
     # NB: done in two steps to avoid linter errors
-    S_VER_FMT = "Version {}"
+    S_VER_FMT = &#34;Version {}&#34;
     S_VER_OUT = S_VER_FMT.format(S_PP_VERSION)
 
     # help str
-    S_PP_HELP = "Use pymaker -h for more info"
+    S_PP_HELP = &#34;Use pymaker -h for more info&#34;
 
     # about string
     S_PP_ABOUT = (
-        f"{S_PP_NAME_BIG}\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_VER_OUT}\n"
-        f"https://www.github.com/cyclopticnerve/PyPlate\n"
-        f"{S_PP_HELP}\n"
+        f&#34;{S_PP_NAME_BIG}\n&#34;
+        f&#34;{S_PP_SHORT_DESC}\n&#34;
+        f&#34;{S_VER_OUT}\n&#34;
+        f&#34;https://www.github.com/cyclopticnerve/PyPlate\n&#34;
+        f&#34;{S_PP_HELP}\n&#34;
     )
 
     # instructions string
     S_PP_EPILOG = (
-        "Run this program from the directory where you want to create a "
-        "project."
+        &#34;Run this program from the directory where you want to create a &#34;
+        &#34;project.&#34;
     )
 
     # our venv name
-    S_PP_VENV = ".venv-pyplate"
+    S_PP_VENV = &#34;.venv-pyplate&#34;
 
     # debug option strings
-    S_DBG_OPTION = "-d"
-    S_DBG_ACTION = "store_true"
-    S_DBG_DEST = "DBG_DEST"
-    S_DBG_HELP = "enable debugging option"
+    S_DBG_OPTION = &#34;-d&#34;
+    S_DBG_ACTION = &#34;store_true&#34;
+    S_DBG_DEST = &#34;DBG_DEST&#34;
+    S_DBG_HELP = &#34;enable debugging option&#34;
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -121,13 +132,13 @@ class PyMaker:
     # Initialize the new object
     # --------------------------------------------------------------------------
     def __init__(self):
-        """
+        &#34;&#34;&#34;
         Initialize the new object
 
         Initializes a new instance of the class, setting the default values
         of its properties, and any other code that needs to run to create a
         new object.
-        """
+        &#34;&#34;&#34;
 
         # set the initial values of properties
 
@@ -149,7 +160,7 @@ class PyMaker:
     # The main method of the program
     # --------------------------------------------------------------------------
     def main(self, debug=False):
-        """
+        &#34;&#34;&#34;
         The main method of the program
 
         Args:
@@ -157,7 +168,7 @@ class PyMaker:
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
-        """
+        &#34;&#34;&#34;
 
         # set properties
         self._debug = debug
@@ -193,11 +204,11 @@ class PyMaker:
     # Boilerplate to use at the start of main
     # --------------------------------------------------------------------------
     def _setup(self):
-        """
+        &#34;&#34;&#34;
         Boilerplate to use at the start of main
 
         Perform some mundane stuff like setting properties.
-        """
+        &#34;&#34;&#34;
 
         # print about info
         print(self.S_PP_ABOUT)
@@ -236,19 +247,19 @@ class PyMaker:
     # Get project info
     # --------------------------------------------------------------------------
     def _get_project_info(self):
-        """
+        &#34;&#34;&#34;
         Get project info
 
         Asks the user for project info, such as type and name, to be saved to
         PP.D_PRV_PRJ.
-        """
+        &#34;&#34;&#34;
 
         # ----------------------------------------------------------------------
         # first question is type
         # this makes the string to display in terminal
 
         # sanity check
-        prj_type = ""
+        prj_type = &#34;&#34;
 
         # build the input question
         types = []
@@ -286,11 +297,11 @@ class PyMaker:
             for item in PP.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
-                    name_prj = f"{item[1]} DEBUG"
+                    name_prj = f&#34;{item[1]} DEBUG&#34;
                     break
 
             # dir name, no spaces
-            name_prj_big = name_prj.replace(" ", "_")
+            name_prj_big = name_prj.replace(&#34; &#34;, &#34;_&#34;)
 
             # set up for existence check
             tmp_dir = cwd / name_prj_big
@@ -298,8 +309,8 @@ class PyMaker:
             # check if project already exists
             if tmp_dir.exists():
 
-                # if it does exist, "nuke it from orbit! it's the only way to
-                # be sure!"
+                # if it does exist, &#34;nuke it from orbit! it&#39;s the only way to
+                # be sure!&#34;
                 # NB: yes i know ive used this joke more than once... FUCK YOU
                 # ITS FUNNY
                 shutil.rmtree(tmp_dir)
@@ -312,13 +323,13 @@ class PyMaker:
 
                 # ask for name of project
                 name_prj = input(PP.S_ASK_NAME)
-                name_prj = name_prj.strip(" ")
+                name_prj = name_prj.strip(&#34; &#34;)
 
                 # check for valid name
                 if self._check_name(name_prj):
 
                     # dir name, no spaces
-                    name_prj_big = name_prj.replace(" ", "_")
+                    name_prj_big = name_prj.replace(&#34; &#34;, &#34;_&#34;)
 
                     # set up for existence check
                     tmp_dir = cwd / name_prj_big
@@ -345,10 +356,10 @@ class PyMaker:
         # for a gui we should ask for the main window class name
         # for a package we should ask for the module name
 
-        name_sec = ""
-        name_sec_big = ""
-        name_sec_small = ""
-        name_sec_pascal = ""
+        name_sec = &#34;&#34;
+        name_sec_big = &#34;&#34;
+        name_sec_small = &#34;&#34;
+        name_sec_pascal = &#34;&#34;
 
         # if not debug, if need second name, ask for it
         if not self._debug and prj_type in PP.D_NAME_SEC:
@@ -364,15 +375,15 @@ class PyMaker:
 
                 # ask for second name
                 name_sec = input(s_sec_ask_fmt)
-                name_sec = name_sec.strip(" ")
+                name_sec = name_sec.strip(&#34; &#34;)
 
                 # empty, keep default
-                if name_sec == "":
+                if name_sec == &#34;&#34;:
                     name_sec = s_sec_def_fmt
 
                 # check for valid name
                 if self._check_name(name_sec):
-                    name_sec_big = name_sec.replace(" ", "_")
+                    name_sec_big = name_sec.replace(&#34; &#34;, &#34;_&#34;)
                     break
 
             # save other names
@@ -394,44 +405,44 @@ class PyMaker:
         # save stuff to prj/meta dicts
 
         # save project stuff
-        PP.D_PRV_PRJ["__PP_TYPE_PRJ__"] = prj_type
+        PP.D_PRV_PRJ[&#34;__PP_TYPE_PRJ__&#34;] = prj_type
 
-        PP.D_PRV_PRJ["__PP_NAME_PRJ__"] = name_prj
-        PP.D_PRV_PRJ["__PP_NAME_PRJ_BIG__"] = name_prj_big
-        PP.D_PRV_PRJ["__PP_NAME_PRJ_SMALL__"] = name_prj_small
-        PP.D_PRV_PRJ["__PP_NAME_PRJ_PASCAL__"] = name_prj_pascal
+        PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ__&#34;] = name_prj
+        PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ_BIG__&#34;] = name_prj_big
+        PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ_SMALL__&#34;] = name_prj_small
+        PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ_PASCAL__&#34;] = name_prj_pascal
 
-        PP.D_PRV_PRJ["__PP_NAME_SEC__"] = name_sec
-        PP.D_PRV_PRJ["__PP_NAME_SEC_BIG__"] = name_sec_big
-        PP.D_PRV_PRJ["__PP_NAME_SEC_SMALL__"] = name_sec_small
-        PP.D_PRV_PRJ["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
+        PP.D_PRV_PRJ[&#34;__PP_NAME_SEC__&#34;] = name_sec
+        PP.D_PRV_PRJ[&#34;__PP_NAME_SEC_BIG__&#34;] = name_sec_big
+        PP.D_PRV_PRJ[&#34;__PP_NAME_SEC_SMALL__&#34;] = name_sec_small
+        PP.D_PRV_PRJ[&#34;__PP_NAME_SEC_PASCAL__&#34;] = name_sec_pascal
 
-        PP.D_PRV_PRJ["__PP_DATE__"] = info_date
-        PP.D_PRV_PRJ["__PP_NAME_VENV__"] = PP.S_VENV_FMT_NAME.format(
+        PP.D_PRV_PRJ[&#34;__PP_DATE__&#34;] = info_date
+        PP.D_PRV_PRJ[&#34;__PP_NAME_VENV__&#34;] = PP.S_VENV_FMT_NAME.format(
             name_prj_small
         )
 
-        PP.D_PRV_PRJ["__PP_FILE_APP__"] = PP.S_APP_FILE_FMT.format(
+        PP.D_PRV_PRJ[&#34;__PP_FILE_APP__&#34;] = PP.S_APP_FILE_FMT.format(
             name_prj_small
         )
-        PP.D_PRV_PRJ["__PP_CLASS_APP__"] = F.pascal_case(
-            PP.D_PRV_PRJ["__PP_FILE_APP__"]
+        PP.D_PRV_PRJ[&#34;__PP_CLASS_APP__&#34;] = F.pascal_case(
+            PP.D_PRV_PRJ[&#34;__PP_FILE_APP__&#34;]
         )
 
-        PP.D_PRV_PRJ["__PP_FILE_WIN__"] = PP.S_WIN_FILE_FMT.format(
+        PP.D_PRV_PRJ[&#34;__PP_FILE_WIN__&#34;] = PP.S_WIN_FILE_FMT.format(
             name_sec_small
         )
-        PP.D_PRV_PRJ["__PP_CLASS_WIN__"] = F.pascal_case(
-            PP.D_PRV_PRJ["__PP_FILE_WIN__"]
+        PP.D_PRV_PRJ[&#34;__PP_CLASS_WIN__&#34;] = F.pascal_case(
+            PP.D_PRV_PRJ[&#34;__PP_FILE_WIN__&#34;]
         )
 
         # remove home dir from PyPlate path
         h = str(Path.home())
         p = str(self.P_DIR_PRJ)
-        p = p.lstrip(h).strip("/")
-        p = p.lstrip(h).strip("\\")
+        p = p.lstrip(h).strip(&#34;/&#34;)
+        p = p.lstrip(h).strip(&#34;\\&#34;)
         # NB: change global val
-        PP.D_PRV_PRJ["__PP_DEV_PP__"] = p
+        PP.D_PRV_PRJ[&#34;__PP_DEV_PP__&#34;] = p
 
         # blank line before printing progress
         print()
@@ -440,13 +451,13 @@ class PyMaker:
     # Copy template files to final location
     # --------------------------------------------------------------------------
     def _do_template(self):
-        """
+        &#34;&#34;&#34;
         Copy template files to final location
 
         Gets dirs/files from template and copies them to the project dir.
-        """
+        &#34;&#34;&#34;
 
-        print(PP.S_ACTION_COPY, end="", flush=True)
+        print(PP.S_ACTION_COPY, end=&#34;&#34;, flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -460,8 +471,8 @@ class PyMaker:
         # copy template/type
 
         # get some paths
-        prj_type_short = PP.D_PRV_PRJ["__PP_TYPE_PRJ__"]
-        prj_type_long = ""
+        prj_type_short = PP.D_PRV_PRJ[&#34;__PP_TYPE_PRJ__&#34;]
+        prj_type_long = &#34;&#34;
 
         # get parent of project
         for item in PP.L_TYPES:
@@ -511,8 +522,8 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # combine any reqs files
-        # NB: this combines initial reqs from the "all" template folder and the
-        # "type" template folder. these will then be installed during
+        # NB: this combines initial reqs from the &#34;all&#34; template folder and the
+        # &#34;type&#34; template folder. these will then be installed during
         # _do_after_fix, after the venv is created
         self._fix_reqs(prj_type_long)
 
@@ -522,14 +533,14 @@ class PyMaker:
     # A function to do stuff before fix
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
-        """
+        &#34;&#34;&#34;
         A function to do stuff before fix
 
         This function does some more changes before the actual fix. Mostly it
         is used to call the do_before_fix method in pyplate.py.
-        """
+        &#34;&#34;&#34;
 
-        print(PP.S_ACTION_BEFORE, end="", flush=True)
+        print(PP.S_ACTION_BEFORE, end=&#34;&#34;, flush=True)
 
         # save fixed settings
         dict_prv = {
@@ -538,7 +549,7 @@ class PyMaker:
         }
 
         # save editable settings (blacklist/i18n etc.)
-        type_prj = PP.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        type_prj = PP.D_PRV_PRJ[&#34;__PP_TYPE_PRJ__&#34;]
         dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
             PP.S_KEY_PUB_I18N: PP.D_PUB_I18N,
@@ -555,15 +566,15 @@ class PyMaker:
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
     def _do_fix(self):
-        """
+        &#34;&#34;&#34;
         Scan dirs/files in the project for replacing text
 
-        Scans for dirs/files under the project's location. For each dir/file it
+        Scans for dirs/files under the project&#39;s location. For each dir/file it
         encounters, it passes the path to a filter to determine if the file
         needs fixing based on its appearance in the blacklist.
-        """
+        &#34;&#34;&#34;
 
-        print(PP.S_ACTION_FIX, end="", flush=True)
+        print(PP.S_ACTION_FIX, end=&#34;&#34;, flush=True)
 
         # combine dicts for string replacement
         F.combine_dicts(
@@ -593,7 +604,7 @@ class PyMaker:
 
             # skip dir if in skip_all
             if root in skip_all:
-                # NB: don't recurse into subfolders
+                # NB: don&#39;t recurse into subfolders
                 root_dirs.clear()
                 continue
 
@@ -607,7 +618,7 @@ class PyMaker:
                 if item in skip_all:
                     continue
 
-                # if we shouldn't skip contents
+                # if we shouldn&#39;t skip contents
                 if root not in skip_contents and item not in skip_contents:
 
                     # for each new file, reset block and line switches to def
@@ -627,8 +638,8 @@ class PyMaker:
                     # do md/html/xml separately (needs special handling)
                     self._dict_type_rep = PP.D_PY_REPL
                     suffix = (
-                        f".{item.suffix}"
-                        if not item.suffix.startswith(".")
+                        f&#34;.{item.suffix}&#34;
+                        if not item.suffix.startswith(&#34;.&#34;)
                         else item.suffix
                     )
                     if suffix in PP.L_EXT_MARKUP:
@@ -639,7 +650,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # fix path
-        # NB: top_down=False is required for the renaming, as we don't want to
+        # NB: top_down=False is required for the renaming, as we don&#39;t want to
         # rename (and thus clobber) a directory name before we rename all its
         # child dirs/files
         for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
@@ -680,7 +691,7 @@ class PyMaker:
         F.save_dict(dict_prv, [path_prv])
 
         # save editable settings (blacklist/i18n etc.)
-        type_prj = PP.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+        type_prj = PP.D_PRV_PRJ[&#34;__PP_TYPE_PRJ__&#34;]
         dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
             PP.S_KEY_PUB_I18N: PP.D_PUB_I18N,
@@ -710,13 +721,13 @@ class PyMaker:
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
     def _do_after_fix(self):
-        """
+        &#34;&#34;&#34;
         Make any necessary changes after all fixes have been done
 
         This method is called after all fixes have been completed. There should
         be no dunders in the file contents or path names. Do any further
         project modification in do_after_fix in pyplate.py.
-        """
+        &#34;&#34;&#34;
 
         # ----------------------------------------------------------------------
         # call conf after fix
@@ -726,7 +737,7 @@ class PyMaker:
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         dict_pub = F.load_dicts([path_pub])
 
-        print(PP.S_ACTION_AFTER, end="", flush=True)
+        print(PP.S_ACTION_AFTER, end=&#34;&#34;, flush=True)
         PP.do_after_fix(self._dir_prj, dict_prv, dict_pub)
         print(PP.S_ACTION_DONE)
 
@@ -736,7 +747,7 @@ class PyMaker:
         # if git flag
         if PP.B_CMD_GIT:
 
-            print(PP.S_ACTION_GIT, end="", flush=True)
+            print(PP.S_ACTION_GIT, end=&#34;&#34;, flush=True)
 
             # add git dir
             cmd = PP.S_CMD_GIT_CREATE.format(self._dir_prj)
@@ -750,10 +761,10 @@ class PyMaker:
         # if venv flag is set
         if PP.B_CMD_VENV:
 
-            print(PP.S_ACTION_VENV, end="", flush=True)
+            print(PP.S_ACTION_VENV, end=&#34;&#34;, flush=True)
 
             # get name ov venv folder and reqs file
-            dir_venv = PP.D_PRV_PRJ["__PP_NAME_VENV__"]
+            dir_venv = PP.D_PRV_PRJ[&#34;__PP_NAME_VENV__&#34;]
             file_reqs = self._dir_prj / PP.S_FILE_REQS
 
             # do the thing with the thing
@@ -762,16 +773,14 @@ class PyMaker:
                 cv.create()
                 cv.install_reqs(file_reqs)
                 print(PP.S_ACTION_DONE)
-            # except F.CNShellError as e:
-            except Exception as e:
+            except F.CNShellError as e:
                 print(PP.S_ACTION_FAIL)
-                # print(e.message)
-                raise e
+                print(e.message)
 
             # ------------------------------------------------------------------
             # install libs in project venv
 
-            print(PP.S_ACTION_LIB, end="", flush=True)
+            print(PP.S_ACTION_LIB, end=&#34;&#34;, flush=True)
 
             # get activate cmd
             cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
@@ -779,27 +788,26 @@ class PyMaker:
             )
 
             # start the full command
-            cmd = f"{cmd_activate};"
+            cmd = f&#34;{cmd_activate};&#34;
 
             # get list of libs for this prj type
-            prj_type_short = PP.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+            prj_type_short = PP.D_PRV_PRJ[&#34;__PP_TYPE_PRJ__&#34;]
             val = PP.D_COPY_LIB.get(prj_type_short, [])
 
             # copy libs to command
             for item in val:
 
                 # get lib
-                add_path = self.P_DIR_PRJ / "lib" / item
+                add_path = self.P_DIR_PRJ / &#34;lib&#34; / item
                 add_str = PP.S_CMD_INST_LIB.format(add_path)
-                cmd += add_str + ";"
+                cmd += add_str + &#34;;&#34;
 
             # the command to install libs
-            # cmd = f"{cmd}"
+            # cmd = f&#34;{cmd}&#34;
             try:
                 F.sh(cmd, shell=True)
                 print(PP.S_ACTION_DONE)
-            # except F.CNShellError as e:
-            except Exception as e:
+            except F.CNShellError as e:
                 print(PP.S_ACTION_FAIL)
                 raise e
 
@@ -809,28 +817,32 @@ class PyMaker:
         # path to desktop template
         path_dsk_tmp = self._dir_prj / PP.S_FILE_DSK_TMP
         # path to desktop output
-        path_dsk_out = self._dir_prj / PP.D_PRV_PRJ["__PP_FILE_DESK__"]
+        path_dsk_out = self._dir_prj / PP.D_PRV_PRJ[&#34;__PP_FILE_DESK__&#34;]
 
         # if i18n flag is set
         if PP.B_CMD_I18N:
 
-            print(PP.S_ACTION_I18N, end="", flush=True)
+            print(PP.S_ACTION_I18N, end=&#34;&#34;, flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
                 # header
-                str_appname=PP.D_PRV_PRJ["__PP_NAME_PRJ_BIG__"],
-                str_version=PP.D_PUB_META["__PP_VERSION__"],
-                str_author=PP.D_PRV_ALL["__PP_AUTHOR__"],
-                str_email=PP.D_PRV_ALL["__PP_EMAIL__"],
-                # base prj dir
-                dir_prj=self._dir_prj,
-                # in
-                dir_src=Path(PP.S_DIR_SRC),
+                str_appname=PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ_BIG__&#34;],
+                str_version=PP.D_PUB_META[&#34;__PP_VERSION__&#34;],
+                str_author=PP.D_PRV_ALL[&#34;__PP_AUTHOR__&#34;],
+                str_email=PP.D_PRV_ALL[&#34;__PP_EMAIL__&#34;],
                 # out
-                dir_i18n=self._dir_prj / PP.S_DIR_I18N,
+                dir_pot=self._dir_prj / PP.S_DIR_I18N,
+                # in
+                dir_prj=self._dir_prj,
+                dir_src=Path(PP.S_DIR_SRC),
+                # optional out
+                dir_locale=self._dir_prj / PP.S_PATH_LOCALE,
+                dir_po=self._dir_prj / PP.S_PATH_PO,
+                str_domain=PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ_SMALL__&#34;],
                 # optional in
                 str_tag=PP.S_I18N_TAG,
+                # NB: use dict_pub here b/c dunders have been fixed
                 dict_clangs=PP.D_PUB_I18N[PP.S_KEY_CLANGS],
                 dict_no_ext=PP.D_PUB_I18N[PP.S_KEY_NO_EXT],
                 list_wlangs=PP.D_PUB_I18N[PP.S_KEY_WLANGS],
@@ -858,7 +870,7 @@ class PyMaker:
         # if docs flag is set
         if PP.B_CMD_DOCS:
 
-            print(PP.S_ACTION_DOCS, end="", flush=True)
+            print(PP.S_ACTION_DOCS, end=&#34;&#34;, flush=True)
 
             # get template and output dirs
             dir_docs_tmp = self._dir_prj / PP.S_DIR_DOCS_TMP
@@ -875,12 +887,11 @@ class PyMaker:
             )
 
             # the command to run pdoc
-            cmd = f"{cmd_docs}"
+            cmd = f&#34;{cmd_docs}&#34;
             try:
                 F.sh(cmd, shell=True)
                 print(PP.S_ACTION_DONE)
-            # except F.CNShellError as e:
-            except Exception as e:
+            except F.CNShellError as e:
                 print(PP.S_ACTION_FAIL)
                 raise e
 
@@ -892,26 +903,26 @@ class PyMaker:
         # if tree flag is set
         if PP.B_CMD_TREE:
 
-            print(PP.S_ACTION_TREE, end="", flush=True)
+            print(PP.S_ACTION_TREE, end=&#34;&#34;, flush=True)
 
             # get path to tree
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
-                a_file.write("")
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
+                a_file.write(&#34;&#34;)
 
             # create tree object and call
-            tree_obj = CNTree(
+            tree_obj = CNTree()
+            tree_str = tree_obj.build_tree(
                 str(self._dir_prj),
                 filter_list=PP.D_PUB_BL[PP.S_KEY_SKIP_TREE],
                 dir_format=PP.S_TREE_DIR_FORMAT,
                 file_format=PP.S_TREE_FILE_FORMAT,
             )
-            tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -924,17 +935,17 @@ class PyMaker:
         if PP.B_CMD_INST:
 
             # get project type
-            prj_type = PP.D_PRV_PRJ["__PP_TYPE_PRJ__"]
+            prj_type = PP.D_PRV_PRJ[&#34;__PP_TYPE_PRJ__&#34;]
 
             # cli/gui
             if prj_type in PP.L_PRG_INSTALL:
 
                 # show info
-                print(PP.S_ACTION_INST, end="", flush=True)
+                print(PP.S_ACTION_INST, end=&#34;&#34;, flush=True)
 
                 # get params
-                name = PP.D_PRV_PRJ["__PP_NAME_PRJ__"]
-                version = PP.D_PUB_META["__PP_VERSION__"]
+                name = PP.D_PRV_PRJ[&#34;__PP_NAME_PRJ__&#34;]
+                version = PP.D_PUB_META[&#34;__PP_VERSION__&#34;]
 
                 # get an install instance
                 inst = CNInstall()
@@ -943,7 +954,7 @@ class PyMaker:
                 dict_inst = inst.make_install_cfg(
                     name,
                     version,
-                    # these are the defaults spec'd in pyplate_conf
+                    # these are the defaults spec&#39;d in pyplate_conf
                     # they can be edited in prj/install/install.json before
                     # running pybaker
                     PP.D_INSTALL[prj_type],
@@ -958,7 +969,7 @@ class PyMaker:
                 dict_uninst = inst.make_uninstall_cfg(
                     name,
                     version,
-                    # these are the defaults spec'd in pyplate_conf
+                    # these are the defaults spec&#39;d in pyplate_conf
                     # they can be edited in prj/uninstall/uninstall.json before
                     # running pybaker
                     PP.D_UNINSTALL[prj_type],
@@ -976,10 +987,10 @@ class PyMaker:
             if prj_type in PP.L_PKG_INSTALL:
 
                 # let user know
-                print(PP.S_ACTION_INST_PKG, end="", flush=True)
+                print(PP.S_ACTION_INST_PKG, end=&#34;&#34;, flush=True)
 
                 # need to activate prj venv
-                dir_venv = PP.D_PRV_PRJ["__PP_NAME_VENV__"]
+                dir_venv = PP.D_PRV_PRJ[&#34;__PP_NAME_VENV__&#34;]
                 cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
                     self._dir_prj, dir_venv
                 )
@@ -988,12 +999,11 @@ class PyMaker:
                 cmd_install = PP.S_CMD_INSTALL_PKG.format(self._dir_prj)
 
                 # the command to install pkg
-                cmd = f"{cmd_activate};" f"{cmd_install}"
+                cmd = f&#34;{cmd_activate};&#34; f&#34;{cmd_install}&#34;
                 try:
                     F.sh(cmd, shell=True)
                     print(PP.S_ACTION_DONE)
-                # except F.CNShellError as e:
-                except Exception as e:
+                except F.CNShellError as e:
                     print(PP.S_ACTION_FAIL)
                     raise e
 
@@ -1005,11 +1015,11 @@ class PyMaker:
     # Convert items in blacklist to absolute Path objects
     # --------------------------------------------------------------------------
     def _fix_blacklist_paths(self):
-        """
+        &#34;&#34;&#34;
         Convert items in blacklist to absolute Path objects
 
         Get absolute paths for all entries in the blacklist.
-        """
+        &#34;&#34;&#34;
 
         # def result
         res = {}
@@ -1019,7 +1029,7 @@ class PyMaker:
         # separators
         l_bl = PP.D_PUB_BL
         for key in l_bl:
-            l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
+            l_bl[key] = [item.rstrip(&#34;/&#34;) for item in l_bl[key]]
         PP.D_PUB_BL = l_bl
 
         # support for absolute/relative/glob
@@ -1060,7 +1070,7 @@ class PyMaker:
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
     def _fix_content(self, path, bl_hdr=False, bl_code=False):
-        """
+        &#34;&#34;&#34;
         Fix header or code for each line in a file
 
         Args:
@@ -1072,13 +1082,13 @@ class PyMaker:
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.
-        """
+        &#34;&#34;&#34;
 
         # default lines
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
+        with open(path, &#34;r&#34;, encoding=PP.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1086,7 +1096,7 @@ class PyMaker:
 
             # ------------------------------------------------------------------
             # skip blank lines
-            if line.strip() == "":
+            if line.strip() == &#34;&#34;:
                 continue
 
             # ------------------------------------------------------------------
@@ -1132,14 +1142,14 @@ class PyMaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(path, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Replace dunders inside a file header
     # --------------------------------------------------------------------------
     def _fix_header(self, line):
-        """
+        &#34;&#34;&#34;
         Replace dunders inside a file header
 
         Args:
@@ -1151,7 +1161,7 @@ class PyMaker:
         Replaces text inside a header line, using a regex to match specific
         lines. Given a line, it replaces the found pattern with the replacement
         as it goes.
-        """
+        &#34;&#34;&#34;
 
         # sanity check
         str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
@@ -1178,7 +1188,7 @@ class PyMaker:
         tmp_pad = str(pad)
         tmp_rat = tmp_pad.lstrip()
         len_pad = len(tmp_pad) - len(tmp_rat) - val_diff
-        pad = " " * len_pad
+        pad = &#34; &#34; * len_pad
 
         # put the header line back together, adjusting for the pad len
         line = lead + tmp_val + pad + tmp_rat + PP.S_NEW_LINE
@@ -1187,11 +1197,11 @@ class PyMaker:
         return line
 
     # --------------------------------------------------------------------------
-    # Replace dunders inside a file's contents
+    # Replace dunders inside a file&#39;s contents
     # --------------------------------------------------------------------------
     def _fix_code(self, line):
-        """
-        Replace dunders inside a file's contents
+        &#34;&#34;&#34;
+        Replace dunders inside a file&#39;s contents
 
         Args:
             line: The line of the file to replace text in
@@ -1204,7 +1214,7 @@ class PyMaker:
         dunders inside the file, excluding flag switches, headers, and
         comment-only lines (all of which are previously handled in
         _fix_content).
-        """
+        &#34;&#34;&#34;
 
         # ----------------------------------------------------------------------
         # split the line into code and comm
@@ -1212,7 +1222,7 @@ class PyMaker:
         # we will split the line into two parts
         # NB: assume code is whole line (i.e. no trailing comment)
         code = line
-        comm = ""
+        comm = &#34;&#34;
 
         # do the split, checking each match to see if we get a trailing comment
         split = self._dict_type_rep[PP.S_KEY_SPLIT]
@@ -1260,13 +1270,13 @@ class PyMaker:
         line = code + comm
 
         # replace version
-        ver = PP.D_PUB_META["__PP_VERSION__"]
+        ver = PP.D_PUB_META[&#34;__PP_VERSION__&#34;]
         str_sch = PP.S_META_VER_SEARCH
         str_rep = PP.S_META_VER_REPL.format(ver)
         line = re.sub(str_sch, str_rep, line)
 
         # replace short desc
-        desc = PP.D_PUB_META["__PP_SHORT_DESC__"]
+        desc = PP.D_PUB_META[&#34;__PP_SHORT_DESC__&#34;]
         str_sch = PP.S_META_SD_SEARCH
         str_rep = PP.S_META_SD_REPL.format(desc)
         line = re.sub(str_sch, str_rep, line)
@@ -1278,7 +1288,7 @@ class PyMaker:
     # Rename dirs/files in the project
     # --------------------------------------------------------------------------
     def _fix_path(self, path):
-        """
+        &#34;&#34;&#34;
         Rename dirs/files in the project
 
         Args:
@@ -1287,7 +1297,7 @@ class PyMaker:
         Rename dirs/files. Given a path, it renames the dir/file by replacing
         dunders in the path with their appropriate replacements from
         self._dict_rep.
-        """
+        &#34;&#34;&#34;
 
         # first get the path name (we only want to change the last component)
         last_part = path.name
@@ -1300,7 +1310,7 @@ class PyMaker:
         # replace the name
         path_new = path.parent / last_part
 
-        # if it hasn't changed, skip to avoid overhead
+        # if it hasn&#39;t changed, skip to avoid overhead
         if path_new == path:
             return
 
@@ -1311,7 +1321,7 @@ class PyMaker:
     # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
     def _fix_reqs(self, prj_type_long):
-        """
+        &#34;&#34;&#34;
         Combine reqs from template/all and template/prj_type
 
         Args:
@@ -1319,9 +1329,9 @@ class PyMaker:
 
         This method combines reqs from the all dir used by all projects, and
         those used by specific project type (gui needs pygobject, etc).
-        """
+        &#34;&#34;&#34;
 
-        # get sources and filter out items that don't exist
+        # get sources and filter out items that don&#39;t exist
         reqs_prj = PP.S_FILE_REQS_TYPE.format(prj_type_long)
         src = [
             self.P_DIR_PRJ / PP.S_FILE_REQS_ALL,
@@ -1337,21 +1347,21 @@ class PyMaker:
 
         # read reqs files and put in result
         for item in src:
-            with open(item, "r", encoding=PP.S_ENCODING) as a_file:
+            with open(item, &#34;r&#34;, encoding=PP.S_ENCODING) as a_file:
                 old_file = a_file.readlines()
                 old_file = [line.rstrip() for line in old_file]
                 new_file = new_file + old_file
 
         # put combined reqs into final file
         joint = PP.S_NEW_LINE.join(new_file)
-        with open(dst, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(dst, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(self, line, block):
-        """
+        &#34;&#34;&#34;
         Check if line or trailing comment is a switch
 
         Args:
@@ -1366,9 +1376,9 @@ class PyMaker:
         valid switch (for either markup or regular files). If a valid switch is
         found, it sets the appropriate flag in either self._dict_sw_block or
         self._dict_sw_line and returns True.
-        """
+        &#34;&#34;&#34;
 
-        # match  switches ('#|<!-- pyplate: enable=replace', etc)
+        # match  switches (&#39;#|&lt;!-- pyplate: enable=replace&#39;, etc)
         match = re.match(self._dict_type_rep[PP.S_KEY_SWITCH], line)
         if not match:
             return False
@@ -1404,7 +1414,7 @@ class PyMaker:
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
     def _check_type(self, prj_type):
-        """
+        &#34;&#34;&#34;
         Check project type for allowed characters
 
         Args:
@@ -1415,7 +1425,7 @@ class PyMaker:
 
         Checks the passed type to see if it is one of the allowed project
         types.
-        """
+        &#34;&#34;&#34;
 
         if len(prj_type) == 0:
             return False
@@ -1430,10 +1440,10 @@ class PyMaker:
 
         # nope, fail
         types = []
-        s = ""
+        s = &#34;&#34;
         for item in PP.L_TYPES:
             types.append(item[0])
-        s = ", ".join(types)
+        s = &#34;, &#34;.join(types)
         print(PP.S_ERR_TYPE.format(s))
         return False
 
@@ -1441,7 +1451,7 @@ class PyMaker:
     # Check project name for allowed characters
     # --------------------------------------------------------------------------
     def _check_name(self, name_prj):
-        """
+        &#34;&#34;&#34;
         Check project name for allowed characters
 
         Args:
@@ -1455,17 +1465,17 @@ class PyMaker:
         2. starts with an alpha char
         3. ends with an alphanumeric char
         4. contains only alphanumeric chars and/or dash(-) or underscore(_)
-        """
+        &#34;&#34;&#34;
 
         # NB: there is an easier way to do this with regex:
         # ^([a-zA-Z]+[a-zA-Z\d\-_]*[a-zA-Z\d]+)$ AND OMG DID IT TAKE A LONG
         # TIME TO FIND IT! in case you were looking for it. It will give you a
-        # quick yes-no answer. I don't use it here because I want to give the
+        # quick yes-no answer. I don&#39;t use it here because I want to give the
         # user as much feedback as possible, so I break down the regex into
         # steps where each step explains which part of the name is wrong.
 
         # check for name length
-        if len(name_prj.strip(" ")) < 2:
+        if len(name_prj.strip(&#34; &#34;)) &lt; 2:
             print(PP.S_ERR_LEN)
             return False
 
@@ -1491,51 +1501,179 @@ class PyMaker:
             return False
 
         # if we made it this far, return true
-        return True
+        return True</code></pre>
+</details>
+<div class="desc"><p>The main class, responsible for the operation of the program</p>
+<p>Public methods:
+main: The main method of the program</p>
+<p>This class implements all the needed functionality of PyMaker, to create a
+project from a template.</p>
+<p>Initialize the new object</p>
+<p>Initializes a new instance of the class, setting the default values
+of its properties, and any other code that needs to run to create a
+new object.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.pymaker.PyMaker.P_DIR_PRJ"><code class="name">var <span class="ident">P_DIR_PRJ</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_DBG_ACTION"><code class="name">var <span class="ident">S_DBG_ACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_DBG_DEST"><code class="name">var <span class="ident">S_DBG_DEST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_DBG_HELP"><code class="name">var <span class="ident">S_DBG_HELP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_DBG_OPTION"><code class="name">var <span class="ident">S_DBG_OPTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_ABOUT"><code class="name">var <span class="ident">S_PP_ABOUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_EPILOG"><code class="name">var <span class="ident">S_PP_EPILOG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_HELP"><code class="name">var <span class="ident">S_PP_HELP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_NAME_BIG"><code class="name">var <span class="ident">S_PP_NAME_BIG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_NAME_SMALL"><code class="name">var <span class="ident">S_PP_NAME_SMALL</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_SHORT_DESC"><code class="name">var <span class="ident">S_PP_SHORT_DESC</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_VENV"><code class="name">var <span class="ident">S_PP_VENV</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_PP_VERSION"><code class="name">var <span class="ident">S_PP_VERSION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_VER_FMT"><code class="name">var <span class="ident">S_VER_FMT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pymaker.PyMaker.S_VER_OUT"><code class="name">var <span class="ident">S_VER_OUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.pymaker.PyMaker.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>self, debug=False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main(self, debug=False):
+    &#34;&#34;&#34;
+    The main method of the program
 
+    Args:
+        debug: Whether to run in debug mode (default: False)
 
-# ------------------------------------------------------------------------------
-# Code to run when called from command line
-# ------------------------------------------------------------------------------
-if __name__ == "__main__":
-    # Code to run when called from command line
+    This method is the main entry point for the program, initializing the
+    program, and performing its steps.
+    &#34;&#34;&#34;
 
-    # This is the top level code of the program, called when the Python file is
-    # invoked from the command line.
+    # set properties
+    self._debug = debug
 
-    # NB: argparse code placed here so we can run the script from the command
-    # line or use it as an object
+    # ----------------------------------------------------------------------
+    #  do the work
 
-    # create the command line parser
-    parser = argparse.ArgumentParser(
-        formatter_class=CNFormatter,
-        description=PyMaker.S_PP_ABOUT,
-        epilog=PyMaker.S_PP_EPILOG,
-    )
+    # call boilerplate code
+    self._setup()
 
-    # add debug option
-    # parser.add_argument(
-    #     PyMaker.S_DBG_OPTION,
-    #     action=PyMaker.S_DBG_ACTION,
-    #     dest=PyMaker.S_DBG_DEST,
-    #     help=PyMaker.S_DBG_HELP,
-    # )
+    # get info
+    self._get_project_info()
 
-    # get namespace object
-    args = parser.parse_args()
+    # copy template
+    self._do_template()
 
-    # convert namespace to dict
-    dict_args = vars(args)
+    # call before fix
+    self._do_before_fix()
 
-    # --------------------------------------------------------------------------
+    # do replacements in final project location
+    self._do_fix()
 
-    # get the args
-    a_debug = dict_args.get(PyMaker.S_DBG_DEST, False)
-
-    # create object
-    pm = PyMaker()
-
-    # run main method with args
-    pm.main(debug=a_debug)
-
-# -)
+    # do extra stuff to final dir after fix
+    self._do_after_fix()</code></pre>
+</details>
+<div class="desc"><p>The main method of the program</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>debug</code></strong></dt>
+<dd>Whether to run in debug mode (default: False)</dd>
+</dl>
+<p>This method is the main entry point for the program, initializing the
+program, and performing its steps.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.pymaker.PyMaker" href="#src.pymaker.PyMaker">PyMaker</a></code></h4>
+<ul class="two-column">
+<li><code><a title="src.pymaker.PyMaker.P_DIR_PRJ" href="#src.pymaker.PyMaker.P_DIR_PRJ">P_DIR_PRJ</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_DBG_ACTION" href="#src.pymaker.PyMaker.S_DBG_ACTION">S_DBG_ACTION</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_DBG_DEST" href="#src.pymaker.PyMaker.S_DBG_DEST">S_DBG_DEST</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_DBG_HELP" href="#src.pymaker.PyMaker.S_DBG_HELP">S_DBG_HELP</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_DBG_OPTION" href="#src.pymaker.PyMaker.S_DBG_OPTION">S_DBG_OPTION</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_ABOUT" href="#src.pymaker.PyMaker.S_PP_ABOUT">S_PP_ABOUT</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_EPILOG" href="#src.pymaker.PyMaker.S_PP_EPILOG">S_PP_EPILOG</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_HELP" href="#src.pymaker.PyMaker.S_PP_HELP">S_PP_HELP</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_NAME_BIG" href="#src.pymaker.PyMaker.S_PP_NAME_BIG">S_PP_NAME_BIG</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_NAME_SMALL" href="#src.pymaker.PyMaker.S_PP_NAME_SMALL">S_PP_NAME_SMALL</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_SHORT_DESC" href="#src.pymaker.PyMaker.S_PP_SHORT_DESC">S_PP_SHORT_DESC</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_VENV" href="#src.pymaker.PyMaker.S_PP_VENV">S_PP_VENV</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_PP_VERSION" href="#src.pymaker.PyMaker.S_PP_VERSION">S_PP_VERSION</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_VER_FMT" href="#src.pymaker.PyMaker.S_VER_FMT">S_VER_FMT</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.S_VER_OUT" href="#src.pymaker.PyMaker.S_VER_OUT">S_VER_OUT</a></code></li>
+<li><code><a title="src.pymaker.PyMaker.main" href="#src.pymaker.PyMaker.main">main</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>

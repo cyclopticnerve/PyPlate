@@ -10,6 +10,7 @@
 A collection of common functions used by CN software
 
 Functions:
+    pascal_case: Convert a class name to it's Pascal equivalent
     do_bool: Convert other values, like integers or strings, to bools
     dpretty: Pretty print a dict
     lpretty: Pretty print a list
@@ -30,48 +31,33 @@ from pathlib import Path
 import shlex
 import subprocess
 
+# ------------------------------------------------------------------------------
+# Constant strings
+# ------------------------------------------------------------------------------
+
+S_ERR_NOT_DICT = "dpretty object is not a dict"
+S_ERR_NOT_LIST = "lpretty object is not a list"
+S_ERR_NOT_DICT_OR_LIST = "pp object is not a dict or list"
+S_ERR_SHELL = "shell process failed"
+S_ERR_NOT_EXIST = "dict file '{}' does not exist"
+S_ERR_NOT_VALID = "dict file '{}' is not a valid JSON file"
+S_ERR_NOT_CREATE = "dict file '{}' could not be created"
+
+# if it is in this list, it is True, else false
+# NB: strings here should be all lowercase
+L_RULES_TRUE = [
+    "true",
+    "1",
+    "yes",
+    "y",
+]
 
 # ------------------------------------------------------------------------------
-# A class to wrap errors from the sh function
+# Public methods
 # ------------------------------------------------------------------------------
-class CNShellError(Exception):
-    """
-    A class to wrap errors from the sh function
-
-    This class is used to wrap exceptions from the sh function, so that a file
-    that uses sh does not need to import or check for all possible failures.
-    The original exception and its properties will be exposed by the
-    'exception' property, but printing will defer to the object's repr_str
-    property.
-    """
-
-    # --------------------------------------------------------------------------
-    # Class methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Initialize the class
-    # --------------------------------------------------------------------------
-    def __init__(self, message):
-        """
-        Initialize the class
-
-        Args:
-            message: A custom string to print for clarity
-            exception: The original exception
-
-        Creates a new instance of the object and initializes its properties.
-        """
-
-        # call super constructor
-        super().__init__(message)
-
-        # set properties
-        self.message = message
-
 
 # ------------------------------------------------------------------------------
-# Pascal case a string
+# Format a string in Pascal case
 # ------------------------------------------------------------------------------
 def pascal_case(a_str):
     """
@@ -82,6 +68,9 @@ def pascal_case(a_str):
 
     Returns;
         The Pascal cased string
+
+    Formats the given string to a Pascal case equivalent, ie. "my_class"
+    becomes "MyClass".  
     """
 
     # do formatting
@@ -96,7 +85,7 @@ def pascal_case(a_str):
 
 
 # ------------------------------------------------------------------------------
-# A function to convert bools from other values, like integers or strings
+# Convert other values, like integers or strings, to bools
 # ------------------------------------------------------------------------------
 def do_bool(val):
     """
@@ -111,17 +100,8 @@ def do_bool(val):
     Converts integers and strings to boolean values based on the rules.
     """
 
-    # if it is in this list, it is True, else false
-    # NB: strings here should be all lowercase
-    rules_true = [
-        "true",
-        "1",
-        "yes",
-        "y",
-    ]
-
     # lower all test vals
-    rules_true = [item.lower() for item in rules_true]
+    rules_true = [item.lower() for item in L_RULES_TRUE]
 
     # return result
     return str(val).lower() in rules_true
@@ -145,12 +125,15 @@ def dpretty(dict_print, indent_size=4, indent_level=0, label=None):
     Returns:
         The formatted string to print
 
+    Raises:
+        OSError if the first param is not a dict
+
     Formats a dictionary nicely so it can be printed to the console.
     """
 
     # sanity check
     if not isinstance(dict_print, dict):
-        raise OSError("dict_print param is not a dict")
+        raise OSError(S_ERR_NOT_DICT)
 
     # default out
     out = ""
@@ -244,13 +227,15 @@ def lpretty(list_print, indent_size=4, indent_level=0, label=None):
     Returns:
         The formatted string to print
 
+    Raises:
+        OSError if the first param is not a list
+
     Formats a list nicely so it can be printed to the console.
     """
 
     # sanity check
     if not isinstance(list_print, list):
-        # the parameter type is not a list
-        raise OSError("list_print param is not a list")
+        raise OSError(S_ERR_NOT_LIST)
 
     # default out
     out = ""
@@ -334,6 +319,11 @@ def pp(obj, indent_size=4, label=None):
         (default: 4)
         label: The string to use as a label (default: None)
 
+    Returns:
+        The object formatted for printing
+
+    Raises:
+        OSError if the first param is not a dict or list
 
     Formats a dictionary or list nicely and prints it to the console. Note that
     this method includes magic commas in the output, and therefore cannot be
@@ -349,6 +339,8 @@ def pp(obj, indent_size=4, label=None):
         result = dpretty(obj, indent_size, 0, label)
     elif isinstance(obj, list):
         result = lpretty(obj, indent_size, 0, label)
+    else:
+        raise OSError(S_ERR_NOT_DICT_OR_LIST)
 
     # print the result
     print(result)
@@ -362,8 +354,8 @@ def combine_dicts(dicts_new, dict_old):
     Update a dictionary with entries from another dict
 
     Args:
-        dicts_new: A list of dictionaries containing new keys/values to be
-        updated in the old dictionary
+        dicts_new: A dictionary or list of dictionaries containing new
+        keys/values to be updated in the old dictionary
         dict_old: The dictionary defined as the one to receive updates
 
     Returns:
@@ -376,6 +368,8 @@ def combine_dicts(dicts_new, dict_old):
     """
 
     # sanity check
+    if isinstance(dicts_new, dict):
+        dicts_new = [dicts_new]
     if len(dicts_new) == 0:
         return dict_old
 
@@ -423,9 +417,6 @@ def sh(cmd, shell=False):
         shell: If False (the default), run the cmd as one long string. If True,
         split the cmd into separate arguments
 
-    Raises:
-        CNShellError if something went wrong
-
     Returns:
         The result of running the command line, as a
         subprocess.CompletedProcess object
@@ -462,16 +453,10 @@ def sh(cmd, shell=False):
             # input (True)
             shell=shell,
         )
-    # this is the return code check
+
+    # check if it failed
     except subprocess.CalledProcessError as e:
-        # bubble up the error to the calling function
-        new_err = CNShellError(e.stderr)
-        raise new_err from e
-    # this is everything else
-    except Exception as e:
-        # bubble up the error to the calling function
-        new_err = CNShellError(e.__repr__)
-        raise new_err from e
+        raise OSError(S_ERR_SHELL) from e
 
     # return the result
     return res
@@ -485,7 +470,7 @@ def load_dicts(paths, start_dict=None):
     Combines dictionaries from all found paths
 
     Args:
-        paths: The list of file paths to load
+        paths: The file path or list of file paths to load
         start_dict: The starting dict and final dict after combining (default:
         None)
 
@@ -496,12 +481,12 @@ def load_dicts(paths, start_dict=None):
         FileNotFoundError: If the file does not exist
         json.JSONDecodeError: If the file is not a valid JSON file
 
-    Load the dictionaries from all files at all found locations, and
-    combine them.
+    Load the dictionaries from all files and use combine_dicts to combine them.
     """
 
-    err_not_exist = "dict file '{}' does not exist"
-    err_not_valid = "dict file '{}' is not a valid JSON file"
+    # sanity check
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
 
     # set the default result
     if start_dict is None:
@@ -515,7 +500,7 @@ def load_dicts(paths, start_dict=None):
 
         # sanity check
         if path is None or not path.exists():
-            print(err_not_exist.format(path))
+            print(S_ERR_NOT_EXIST.format(path))
             continue
 
         # try each option
@@ -529,13 +514,9 @@ def load_dicts(paths, start_dict=None):
                 # combine new dict with previous
                 start_dict = combine_dicts([new_dict], start_dict)
 
-        # file not found
-        except FileNotFoundError:
-            print(err_not_exist.format(path))
-
         # file not JSON
-        except json.JSONDecodeError:
-            print(err_not_valid.format(path))
+        except json.JSONDecodeError as e:
+            raise OSError(S_ERR_NOT_VALID.format(path)) from e
 
     # return the final dict
     return start_dict
@@ -549,8 +530,8 @@ def save_dict(a_dict, paths):
     Save a dictionary to all paths
 
     Args:
-        a_dict: the dictionary to save to the file
-        paths: the list of file paths to save to
+        a_dict: The dictionary to save to the file
+        paths: The path or list of paths to save to
 
     Raises:
         OSError: If the file does not exist and can't be created
@@ -558,7 +539,9 @@ def save_dict(a_dict, paths):
     Save the dictionary to a file at all the specified locations.
     """
 
-    err_not_create = "dict file '{}' could not be created"
+    # sanity check
+    if isinstance(paths, (str, Path)):
+        paths = [paths]
 
     # loop through possible files
     for path in paths:
@@ -571,7 +554,7 @@ def save_dict(a_dict, paths):
 
             # make sure path is absolute
             if not path.is_absolute():
-                print(err_not_create.format(path))
+                print(S_ERR_NOT_CREATE.format(path))
                 continue
 
             # first make dirs
@@ -582,12 +565,9 @@ def save_dict(a_dict, paths):
                 # save dict tp file
                 json.dump(a_dict, a_file, indent=4)
 
-            # it worked, done here
-            return
-
         # raise an OS Error
-        except OSError:
-            print(err_not_create.format(path))
+        except OSError as e:
+            raise OSError(S_ERR_NOT_CREATE.format(path)) from e
 
 
 # -)

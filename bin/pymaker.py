@@ -52,7 +52,7 @@ class PyMaker:
     directories that are defined in the $PATH variable. These are places like
     /usr/bin, ~/.local/bin, etc. and can be called from the command line
     regardless of the current working directory. It is basically a "bootstrap"
-    file.
+    file, activating the venv and calling the main program.
     """
 
     # --------------------------------------------------------------------------
@@ -117,7 +117,10 @@ class PyMaker:
         )
 
         # run cmd
-        subprocess.run(cmd, shell=True, check=True)
+        try:
+            subprocess.run(cmd, shell=True, check=True)
+        except subprocess.CalledProcessError:
+            print("error")
 
 
 # ------------------------------------------------------------------------------

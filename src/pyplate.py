@@ -37,9 +37,7 @@ B_CMD_I18N = True
 # create a tree and save it to S_TREE_FILE
 B_CMD_TREE = True
 # create docs
-# FIXME: can't have pdoc switch away from prj venv or we lose local imports
-# don't need docs in pyplate, do need docs in prj, don't need docs in dist
-B_CMD_DOCS = False
+B_CMD_DOCS = True
 # do install/uninstall
 B_CMD_INST = True
 

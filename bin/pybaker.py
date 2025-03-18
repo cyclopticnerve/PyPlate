@@ -4,7 +4,7 @@
 # Filename: pybaker.py                                            |     ()     |
 # Date    : 02/20/2025                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                               \          /
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -52,7 +52,7 @@ class PyBaker:
     directories that are defined in the $PATH variable. These are places like
     /usr/bin, ~/.local/bin, etc. and can be called from the command line
     regardless of the current working directory. It is basically a "bootstrap"
-    file.
+    file, activating the venv and calling the main program.
     """
 
     # --------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class PyBaker:
         # remove our path
         args = args[1:]
 
-        # quote an args with spaces
+        # quote any args with spaces
         args = [f'"{item}"' if " " in item else item for item in args]
 
         # put args back together with spaces
@@ -117,7 +117,10 @@ class PyBaker:
         )
 
         # run cmd
-        subprocess.run(cmd, shell=True, check=True)
+        try:
+            subprocess.run(cmd, shell=True, check=True)
+        except subprocess.CalledProcessError:
+            print("error")
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

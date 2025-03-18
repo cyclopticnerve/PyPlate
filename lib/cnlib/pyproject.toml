@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 # NB: some of these values would normally come from pymaker, but since this IS
 # pymaker, we need to enter it manually (aka bootstrap)
 name = "cnlib"
-version = "0.0.0"
+version = "0.0.1"
 description = "A package for helping create projects in PyPlate"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 # readme = "README.md"

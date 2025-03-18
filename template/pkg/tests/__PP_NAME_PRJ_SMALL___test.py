@@ -36,14 +36,11 @@ command
 # Imports
 # ------------------------------------------------------------------------------
 
-# pylint: disable=no-name-in-module
 # pylint: disable=import-error
 
 import __PP_NAME_SEC_SMALL__  # type: ignore
 
-# pylint: enable=no-name-in-module
 # pylint: enable=import-error
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
