@@ -50,9 +50,9 @@ import pyplate as PP
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
 
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DOMAIN = "pyplate"
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -90,10 +90,13 @@ class PyBaker:
     # --------------------------------------------------------------------------
 
     # I18N: short description
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    S_PP_SHORT_DESC = _(
+        "A program for creating and building CLI/Package/GUI projects in "
+        "Python from a template"
+    )
 
     # version string
-    S_PP_VERSION = "__PP_VER_DISP__"
+    S_PP_VERSION = "Version 0.0.0"
 
     # config option strings
     S_ARG_HLP_OPTION = "-h"
@@ -118,10 +121,10 @@ class PyBaker:
 
     # about string
     S_ABOUT = (
-        f"{'__PP_NAME_PRJ__'}\n"
+        f"{'PyPlate'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        f"__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        f"https://github.com/cyclopticnerve/PyPlate\n"
     )
 
     # I18N if using argparse, add help at end of about
@@ -377,7 +380,7 @@ class PyBaker:
         is used to call the do_before_fix method in pyplate.py.
         """
 
-        # peint info
+        # print info
         print(PP.S_ACTION_BEFORE, end="", flush=True)
 
         # call public before fix function
@@ -774,6 +777,7 @@ class PyBaker:
         self._dict_prv, self._dict_pub = PP.do_before_dist(
             self._dir_prj, self._dict_prv, self._dict_pub
         )
+
         # update dicts after change
         self._reload_dicts()
 
@@ -828,6 +832,8 @@ class PyBaker:
         # call conf after dist
 
         PP.do_after_dist(self._dir_prj, self._dict_prv, self._dict_pub)
+
+        # update dicts after change
         self._reload_dicts()
 
         # done copying project files
@@ -1221,9 +1227,9 @@ class PyBaker:
         pattern = PP.S_SEMVER_VALID
         return re.match(pattern, version)
 
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Reload dicts after any outside changes
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _reload_dicts(self):
         """
         Reload dicts after any outside changes

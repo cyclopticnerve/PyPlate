@@ -60,7 +60,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
 
     # find path to prj/lib
-    P_DIR_PP = Path.home() / ".local/share/pyplate"
+    P_DIR_PP = f"{Path.home()}/.local/share/pyplate"
 
     # commands to run
     S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"

@@ -12,7 +12,8 @@
             "readme",
             "LICENSE.txt",
             "requirements.txt",
-            "**/__pycache__"
+            "**/__pycache__",
+            "src"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
@@ -48,7 +49,8 @@
         },
         "NO_EXT": {
             "Python": [
-                "cli_test"
+                "pymaker",
+                "pybaker"
             ]
         },
         "WLANGS": [

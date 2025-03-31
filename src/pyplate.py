@@ -1025,6 +1025,9 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
 
+    Returns:
+        The modified dicts to be synced with the caller
+
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
     modified.\n
@@ -1062,10 +1065,19 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
 
     # formatted version string
     # NB: done in two steps to avoid linter errors
+    version = dict_pub_meta["__PP_VERSION__"]
     ver_fmt = dict_prv_all["__PP_VER_FMT__"]
-    ver_disp = ver_fmt.format(dict_pub_meta["__PP_VERSION__"])
+    ver_disp = ver_fmt.format(version)
     dict_prv_prj["__PP_VER_DISP__"] = ver_disp
 
+    # replace all dots with dashes in ver
+    version = version.replace(".", "-")
+
+    # format dist dir name with prj and ver
+    name_fmt = f"{name_small}_{version}"
+    dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
+
+    # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
 
 
@@ -1080,6 +1092,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
+
+    Returns:
+        The modified dicts to be synced with the caller
 
     Do any work after fix. This method is called at the end of the internal
     _do_after_fix, after all files have been modified.
@@ -1119,6 +1134,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_DESKTOP:
                 _fix_desktop(item, dict_prv_prj, dict_pub_meta)
 
+    # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
 
 
@@ -1131,29 +1147,16 @@ def do_before_dist(_dir_prj, dict_prv, dict_pub):
 
     Args:
         dir_prj: The root of the new project (reserved for future use)
-        dict_prv: The dictionary containing private pyplate data (reserved for
-        future use)
-        dict_pub: The dictionary containing public project data (reserved for
-        future use)
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+
+    Returns:
+        The modified dicts to be synced with the caller
 
     Do any work on the dist folder before it is created.
     """
 
-    # get sub-dicts we need
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    dict_pub_meta = dict_pub[S_KEY_PUB_META]
-
-    # get small name and version
-    name_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
-    version = dict_pub_meta["__PP_VERSION__"]
-
-    # replace all dots with dashes in ver
-    version = version.replace(".", "-")
-
-    # format dist dir name with prj and ver
-    name_fmt = f"{name_small}_{version}"
-    dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
-
+    # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
 
 
@@ -1169,6 +1172,9 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data (reserved for
         future use)
+
+    Returns:
+        The modified dicts to be synced with the caller
 
     Do any work on the dist folder after it is created. Currently, this method
     purges any "ABOUT" file used as placeholders for github syncing. It also
@@ -1222,6 +1228,7 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
     # if not B_DEBUG:
     #     shutil.rmtree(in_dir)
 
+    # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
 
 

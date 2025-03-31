@@ -52,9 +52,9 @@ import pyplate as PP
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
 
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DOMAIN = "_pyplate"
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DIR_LOCALE = f"{T_DIR_PRJ}/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -92,10 +92,13 @@ class PyMaker:
     # --------------------------------------------------------------------------
 
     # I18N: short description
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    S_PP_SHORT_DESC = _(
+        "A program for creating and building CLI/Package/GUI projects in "
+        "Python from a template"
+    )
 
     # version string
-    S_PP_VERSION = "__PP_VER_DISP__"
+    S_PP_VERSION = "Version 0.0.0"
 
     # config option strings
     S_ARG_HLP_OPTION = "-h"
@@ -113,10 +116,10 @@ class PyMaker:
 
     # about string
     S_ABOUT = (
-        f"{'__PP_NAME_PRJ__'}\n"
+        f"{'PyPlate'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        f"__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        f"https://github.com/cyclopticnerve/PyPlate\n"
     )
 
     # I18N if using argparse, add help at end of about
@@ -1591,7 +1594,16 @@ class PyMaker:
         # if we made it this far, return true
         return True
 
+    # --------------------------------------------------------------------------
+    # Reload dicts after any outside changes
+    # --------------------------------------------------------------------------
     def _reload_dicts(self):
+        """
+        Reload dicts after any outside changes
+
+        This function is called when a dict is passed to another function, in
+        order to keep it synced with the internal dict.
+        """
 
         # get global and calculated settings dicts in pyplate.py
         self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]

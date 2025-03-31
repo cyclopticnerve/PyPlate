@@ -436,7 +436,6 @@ class CNPotPy:
 
             # do the final command
             out = F.sh(cmd, shell=True)
-            print(out)
 
         # fix CHARSET in pot
         self._fix_pot_header(pot_file)

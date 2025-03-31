@@ -60,7 +60,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
 
     # find path to prj/lib
-    P_DIR_PP = Path.home() / "Documents/Projects/Python/PyPlate"
+    P_DIR_PP = f"{Path.home()}/Documents/Projects/Python/PyPlate"
 
     # commands to run (relative to PP dir)
     S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"
