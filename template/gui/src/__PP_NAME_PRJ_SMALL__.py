@@ -44,6 +44,7 @@ sys.path.append(str(P_DIR_PRJ))
 
 # pylint: disable=wrong-import-position
 from gui.python.__PP_FILE_APP__ import __PP_CLASS_APP__
+
 # pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
