@@ -1,0 +1,104 @@
+# ------------------------------------------------------------------------------
+# Project : PyPlate                                                /          \
+# Filename: checklist.txt                                         |     ()     |
+# Date    : 03/22/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+Initialize
+
+    VSCodium
+        [] Create venv - $ python -m venv .venv
+        [] Activate venv - $ source .venv/bin/activate
+        [] Install reqs - $ python -m pip install -r requirements.txt
+
+        Mod/Pkg
+            [] Install in venv - $ python -m pip install -e .  
+
+        [] Stage all changes
+        [] Commit 'first commit'
+        [] Publish 'main' branch
+        [] Checkout new branch 'dev' from 'main'
+        [] Publish 'dev' branch
+
+    GitHub
+        [] Make 'dev' default branch
+        [] Add description and keywords to repo settings
+
+================================================================================
+
+Release
+
+    [] Update tree (should be done in pybaker.py)
+
+    Glade
+        [] icon in src is 128x128 png
+        [] Toolkit version matches gi.repository number
+        [] All I18N strings must have comments
+        [] About dialog icon path
+        [] File properties in Glade - errors, load images from rel,
+
+    I18N
+        [] Use gettext _ for all user-facing strings
+        [] Format numbers/dates/currency 
+            https://phrase.com/blog/posts/beginners-guide-to-locale-in-python/
+        [] Do I18N for .pot/.mo in src/gui/locale
+                
+    VSCodium
+
+        All
+            [] Do style guide for all files in tree (misc/style.txt)
+            [] Screenshot in misc/README
+            [] TODO tree
+            [] todo.txt file
+            [] Check dependencies in pyproject.toml and install.py
+            [] Update extra files in MANIFEST.in
+            [] README usage/notes
+            [] Change version number in conf/strings.json
+            [] Do reqs - $ python -m pip freeze > requirements.txt
+            [] Changelog - $ git log --pretty='- %s' > CHANGELOG.md
+            [] Generate docs
+            cd <pkg name>
+            python -m pdoc -o ../docs -d google --favicon "https://github.com/cyclopticnerve.png" --footer-text "\"In the kingdom of the blind, the man with one eye is King.\"" --logo "https://github.com/cyclopticnerve.png?size=64" *.py
+            [] Run conf/pybaker.py
+            [] Update VSCodeCounter
+            [] Commit/push 'dev' for 'next release'
+
+        Branch 'dev'
+            ??? [] Unit tests
+
+            Mod/Pkg
+                [] Test build - $ python -m build
+                
+            [] Test in VM using GitHub/README
+
+        Branch 'release'
+            [] Checkout new branch 'release' from 'dev'
+            [] Publish branch
+            [] Change all DEBUG constants to 0
+            ??? [] Modify files as necessary (delete .gitignore, etc.)
+            [] Build - $ python -m build
+            ??? [] Upload to TestPyPI/PyPI
+            [] Commit/push 'release'
+    
+        branch 'main'
+            [] Checkout 'main'
+            [] Merge from 'release' to 'main' (git checkout 'main'; git merge 'release')
+            [] Delete release branch
+            [] Tag with version number 'vX.X.X'
+            [] Push 'main'    
+            [] Checkout 'dev'
+
+    GitHub
+        [] Check/update description and keywords in repo settings
+        [] Draft release
+        [] Make sure target is main
+        [] Add CHANGELOG.md
+
+================================================================================
+
+Reset all checks below 'Release'
+    [] Ctrl-H, replace [X] with []
+
+-)

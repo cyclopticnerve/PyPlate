@@ -1,6 +1,0 @@
-This file is here to make sure git includes this directory in the repo because 
-git does not currently allow empty directories to be synced.
-
-This folder can be used to store additional .md files that are linked from your 
-main README.md, as well as images/screenshots and other stuff.
-It is used to keep your main directory clean.

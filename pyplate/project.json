@@ -1,0 +1,79 @@
+{
+    "PUB_BL": {
+        "SKIP_ALL": [
+            ".git",
+            "**/.venv*",
+            ".VSCodeCounter",
+            "dist",
+            "docs",
+            "i18n",
+            "lib",
+            "misc",
+            "readme",
+            "LICENSE.txt",
+            "requirements.txt",
+            "**/__pycache__"
+        ],
+        "SKIP_CONTENTS": [
+            "**/*.png",
+            "**/*.jpg",
+            "**/*.jpeg"
+        ],
+        "SKIP_HEADER": [],
+        "SKIP_CODE": [
+            "MANIFEST.in",
+            ".gitignore"
+        ],
+        "SKIP_PATH": [],
+        "SKIP_TREE": [
+            ".git",
+            "**/.venv*",
+            ".VSCodeCounter",
+            "**/__pycache__"
+        ]
+    },
+    "PUB_I18N": {
+        "CHARSET": "UTF-8",
+        "CLANGS": {
+            "Python": [
+                "py"
+            ],
+            "Glade": [
+                ".ui",
+                ".glade"
+            ],
+            "Desktop": [
+                ".desktop"
+            ]
+        },
+        "NO_EXT": {
+            "Python": [
+                "cli_test"
+            ]
+        },
+        "WLANGS": [
+            "en",
+            "es"
+        ]
+    },
+    "PUB_DIST": {
+        "bin": "assets",
+        "src": "assets",
+        "LICENSE.txt": "assets",
+        "README.md": "assets",
+        "conf": "assets",
+        "i18n/locale": "assets/i18n",
+        "install/install.py": "",
+        "install/install.json": "assets/install",
+        "uninstall": "assets",
+        "requirements.txt": "assets/install"
+    },
+    "PUB_META": {
+        "__PP_VERSION__": "0.0.1",
+        "__PP_SHORT_DESC__": "A program for creating and building CLI/Package/GUI projects in Python from a template",
+        "__PP_KEYWORDS__": [],
+        "__PP_PY_DEPS__": {"Python 3.10+": "https://python.org"},
+        "__PP_SYS_DEPS__": {},
+        "__PP_GUI_CATS__": []
+    }
+}

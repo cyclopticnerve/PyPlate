@@ -1,0 +1,47 @@
+<!----------------------------------------------------------------------------->
+<!-- Project : __PP_NAME_PRJ_BIG__                             /          \  -->
+<!-- Filename: checklist.html                                 |     ()     | -->
+<!-- Date    : __PP_DATE__                                    |            | -->
+<!-- Author  : __PP_AUTHOR__                                  |   \____/   | -->
+<!-- License : __PP_LICENSE_NAME__                             \          /  -->
+<!----------------------------------------------------------------------------->
+
+<!----------------------------------------------------------------------------->
+<!-- this is the start of a checklist that will automatically update the     -->
+<!-- state of a project when items are ticked in the list                    -->
+<!----------------------------------------------------------------------------->
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script>
+        function doAlert(checkboxElem) {
+            name = checkboxElem.name
+            if (checkboxElem.checked) {
+                alert(name + " checked");
+            } else {
+                alert(name + " unchecked");
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <fieldset>
+        <legend>VSCode:</legend>
+
+        <div>
+            <input type="checkbox" id="create_venv" name="create_venv" onchange="doAlert(this)" />
+            <label for="create_venv">Create venv</label>
+        </div>
+
+        <div>
+            <input type="checkbox" id="activate_venv" name="activate_venv" onchange="doAlert(this)" />
+            <label for="activate_venv">Activate venv</label>
+        </div>
+    </fieldset>
+</body>
+
+<!-- -) -->

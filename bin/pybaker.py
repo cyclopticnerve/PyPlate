@@ -34,7 +34,7 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# Public classes
+# Classes
 # ------------------------------------------------------------------------------
 
 
@@ -60,12 +60,11 @@ class PyBaker:
     # --------------------------------------------------------------------------
 
     # find path to prj/lib
-    # P_DIR_PRJ = Path.home() / ".local/share/pyplate"
-    P_DIR_PRJ = Path.home() / "Documents/Projects/Python/PyPlate"
+    P_DIR_PP = Path.home() / ".local/share/pyplate"
 
     # commands to run
-    S_CMD_ACTIVATE = f". {P_DIR_PRJ}/.venv-pyplate/bin/activate"
-    S_CMD_RUN = f"{P_DIR_PRJ}/src/pybaker.py"
+    S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"
+    S_CMD_RUN = f"{P_DIR_PP}/src/pybaker.py"
     S_CMD_RUN_ARGS = "{} {}"
 
     # --------------------------------------------------------------------------
@@ -86,6 +85,9 @@ class PyBaker:
         """
 
         # ----------------------------------------------------------------------
+
+        # save project path to return after venv activate
+        start_dir = Path.cwd()
 
         # get args
         args = sys.argv
@@ -110,8 +112,12 @@ class PyBaker:
 
         # build cmd
         cmd = (
+            # cd to inst
+            f"cd {self.P_DIR_PP};"
             # activate venv
             f"{self.S_CMD_ACTIVATE};"
+            # get back to start dir (where we were called)
+            f"cd {start_dir};"
             # call src w/ args
             f"{src_run}"
         )

@@ -15,19 +15,7 @@ docstring
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Strings
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# Public classes
+# Classes
 # ------------------------------------------------------------------------------
 
 
@@ -38,12 +26,16 @@ class Main:
     """
     Short description
 
-    Public methods:
+    Methods:
         set_zaz(new_zaz): Sets the new value of _zaz
         get_zaz(): Gets the current value of _zaz
 
     Long description (including HTML).
     """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -61,10 +53,7 @@ class Main:
         new object.
         """
 
-        # call super init to initialize the base class
-        super().__init__()
-
-        # set the initial value of class
+        # create a property and set the initial value
         self._zaz = "zaz"
 
     # --------------------------------------------------------------------------
@@ -78,8 +67,14 @@ class Main:
         """
         Gets the current value of zaz
 
+        Args:
+            var_name: Description
+
         Returns:
-            The current value of zaz
+            Description
+
+        Raises:
+            exception_type(vars): Description
 
         Long description (including HTML).
         """
@@ -99,6 +94,12 @@ class Main:
 
         Args:
             new_zaz: The new value of zaz
+
+        Returns:
+            None: none
+        
+        Raises:
+            None: none
 
         Long description (including HTML).
         """

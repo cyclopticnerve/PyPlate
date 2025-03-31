@@ -9,18 +9,46 @@
 # pylint: disable=too-many-lines
 
 """
-This module separates out the constants from pymaker.py.
+This module separates out the constants from pymaker.py. It also includes hook
+functions to extend the functionality of pymaker.py and pybaker.py.
 This file, and the template folder, are the main ways to customize PyPlate.
 """
+
+# FIXME: I18N tags
+# FIXME: format params
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
 # system imports
+import gettext
+import locale
 from pathlib import Path
 import re
 import tarfile
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# ABSOLUTE CURRENT PATH OF PyPlate
+P_DIR_PP = Path(__file__).parents[1].resolve()
+
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI
+# NB: keep global
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
+
+T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DIR_PRJ = Path(__file__).parents[1].resolve()
+T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+_ = T_TRANSLATION.gettext
+
+# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# use for CLI in the interest of common code)
+locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Bools
@@ -54,69 +82,79 @@ I_SW_FALSE = 0
 # Strings
 # ------------------------------------------------------------------------------
 
-S_NEW_LINE = "\n"
+# default encoding
 S_ENCODING = "UTF-8"
 
-S_ASK_NAME = "Project name: "
+# ask for project name
+S_ASK_NAME = _("Project name: ")
 # date format
-S_DATE_FMT = "%m/%d/%Y"
+S_DATE_FMT = _("%m/%d/%Y")
 
 # NB: format params are keys in L_TYPES[item][0] and L_TYPES[item][1]
 S_TYPE_FMT = "{} ({})"
 # join each project type with this
 S_TYPE_JOIN = " | "
 
+# version output format
+S_VER_FMT = _("Version {}")
+
 # NB: format param is joined list of project types
-S_ASK_TYPE = "Project type [{}]: "
-S_ASK_NAME = "Project name: "
-S_ASK_SEC_P = "Module name (default: {}): "
+S_ASK_TYPE = _("Project type [{}]: ")
+S_ASK_NAME = _("Project name: ")
+S_ASK_SEC_P = _("Module name (default: {}): ")
 S_ASK_SEC_P_DEF = "{}"
-S_ASK_SEC_G = "Window class name (default: {}): "
+S_ASK_SEC_G = _("Window class name (default: {}): ")
 S_ASK_SEC_G_DEF = "{}"
 
 # error strings
-S_ERR_TYPE = "Type must be one of {}"
-S_ERR_LEN = "Project names must be more than 1 character"
-S_ERR_START = "Project names must start with a letter"
-S_ERR_END = "Project names must end with a letter or number"
-S_ERR_MID = (
-    "Project names must contain only letters, numbers,"
-    "dashes (-), or underscores (_)"
+S_ERR_TYPE = _("Type must be one of {}")
+S_ERR_LEN = _("Project names must be more than 1 character")
+S_ERR_START = _("Project names must start with a letter")
+S_ERR_END = _("Project names must end with a letter or number")
+S_ERR_MID = _(
+    "Project names must contain only letters, numbers, dashes (-), or "
+    "underscores (_)"
 )
-# NB: format param arise dir_type/(proj type dir)
-S_ERR_EXIST = 'Project "{}" already exists'
-S_ERR_NOT_PRJ = (
-    "This folder does not have a 'pyplate' folder.\n"
-    "Are you sure this is a PyPlate project?"
+# NB: format param is project name
+S_ERR_EXIST = _('Project "{}" already exists')
+S_ERR_NOT_PRJ = _(
+    "This folder does not have a 'pyplate' folder.\nAre you sure this is a "
+    "PyPlate project?"
 )
-S_ERR_VERS = "Version must be n.n.n(xxx)"
-S_ERR_PRJ_DIR_NO_EXIST = "Project dir {} does not exist"
-S_ERR_PRJ_DIR_NONE = "Project dir not provided"
-S_ERR_PRJ_DIR_IS_PP = "Cannot run pymaker/pybaker in PyPlate dir"
+S_ERR_VERS = _("Version must be n.n.n(xxx)")
+S_ERR_PRJ_DIR_NO_EXIST = _("Project dir {} does not exist")
+S_ERR_PRJ_DIR_NONE = _("Project dir not provided")
+S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker/pybaker in PyPlate dir")
+S_ERR_DESK_CAT = (
+    'In metadata categories, "{}" is not valid, see '
+    "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
+)
 
 # output msg for steps
-S_ACTION_COPY = "Copy template files... "
-S_ACTION_BEFORE = "Do before fix... "
-S_ACTION_FIX = "Do fix... "
-S_ACTION_AFTER = "Do after fix... "
-S_ACTION_GIT = "Make git folder... "
-S_ACTION_VENV = "Make venv folder... "
-S_ACTION_LIB = "Install libs in venv... "
-S_ACTION_I18N = "Make i18n folder... "
-S_ACTION_DESK = "Fixing desktop file... "
-S_ACTION_DOCS = "Make docs folder... "
-S_ACTION_TREE = "Make tree file... "
-S_ACTION_INST_PKG = "Install package in venv... "
-S_ACTION_DIST = "Make dist folder... "
-S_ACTION_INST = "Make install file... "
-S_ACTION_DONE = "Done"
-S_ACTION_FAIL = "Failed"
+S_ACTION_COPY = _("Copy template files... ")
+S_ACTION_BEFORE = _("Do before fix... ")
+S_ACTION_FIX = _("Do fix... ")
+S_ACTION_AFTER = _("Do after fix... ")
+S_ACTION_GIT = _("Make git folder... ")
+S_ACTION_VENV = _("Make venv folder... ")
+S_ACTION_LIB = _("Install libs in venv... ")
+S_ACTION_I18N = _("Make i18n folder... ")
+S_ACTION_DESK = _("Fixing desktop file... ")
+S_ACTION_DOCS = _("Make docs folder... ")
+S_ACTION_TREE = _("Make tree file... ")
+S_ACTION_INST_PKG = _("Install package in venv... ")
+S_ACTION_DIST = _("Make dist folder... ")
+S_ACTION_INST = _("Make install file... ")
+S_ACTION_DONE = _("Done")
+S_ACTION_FAIL = _("Failed")
 
 # debug-specific strings
-S_MSG_DEBUG = (
-    "WARNING! YOU ARE IN DEBUG MODE!\n"
-    "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
+S_MSG_DEBUG = _(
+    "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING "
+    "PROJECTS!\n"
 )
+
+# ------------------------------------------------------------------------------
 
 # keys for pybaker private dict
 S_KEY_PRV_ALL = "PRV_ALL"
@@ -173,7 +211,7 @@ S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_VENV = ".venv"
 S_DIR_DOCS = "docs"
-S_DIR_DOCS_TMP = "pdoc3"
+S_DIR_DOCS_TPLT = "pdoc3"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -202,8 +240,7 @@ S_FILE_INST_CFG = "install.json"
 S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
-
-S_NAME_MAIN = "main"
+S_FILE_LOGO = "logo.mako"
 
 # concatenate some paths
 S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
@@ -254,7 +291,7 @@ S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/private"
 S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # ------------------------------------------------------------------------------
-# commands for _do_extras
+# commands for _do_after_fix
 
 # cmd for git
 # NB: format param is proj dir
@@ -264,32 +301,47 @@ S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
 # NB: format param is prj dir
 S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ."
 # cmd for pdoc3
-# NB: format params are pdoc3 template dir, project's S_DIR_DOCS and project
-# dir
-S_CMD_DOC = "pdoc --html --force --template-dir {} -o {} {}"
+# NB: format params are path to pp, path to pp venv, path to project, path to
+# project's template, path to project's docs dir, and path to project's input
+# (src) dir
+S_CMD_DOC = (
+    "cd {};"
+    ". {}/bin/activate;"
+    "cd {};"
+    "pdoc --html --force --template-dir {} -o {} {}"
+)
+# cmd to install libs as editable
 S_CMD_INST_LIB = "python -m pip install -e {}"
 
+# ------------------------------------------------------------------------------
+# regex stuff
+
 # fix readme
-S_RM_PKG = r"<!-- __RM_PKG_START__ -->(.*?)<!-- __RM_PKG_END__ -->"
-S_RM_APP = r"<!-- __RM_APP_START__ -->(.*?)<!-- __RM_APP_END__ -->"
+S_RM_PKG = r"<!-- __RM_PKG__ -->(.*?)<!-- __RM_PKG__ -->"
+S_RM_APP = r"<!-- __RM_APP__ -->(.*?)<!-- __RM_APP__ -->"
+
 S_RM_DESC_SCH = (
-    r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
+    r"(<!--[\t ]*__RM_SHORT_DESC__[\t ]*-->)"
     r"(.*?)"
-    r"(<!--[\t ]*__PP_SHORT_DESC__[\t ]*-->)"
+    r"(<!--[\t ]*__RM_SHORT_DESC__[\t ]*-->)"
 )
 S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
-S_RM_DEPS_SCH = (
-    r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
+
+S_RM_VER_SCH = (
+    r"(<!--[\t ]*__RM_VERSION__[\t ]*-->)"
     r"(.*?)"
-    r"(<!--[\t ]*__PP_RM_DEPS__[\t ]*-->)"
+    r"(<!--[\t ]*__RM_VERSION__[\t ]*-->)"
+)
+S_RM_VER_REP = r"\g<1>\n{}\n\g<3>"
+
+S_RM_DEPS_SCH = (
+    r"(<!--[\t ]*__RM_DEPS__[\t ]*-->)"
+    r"(.*?)"
+    r"(<!--[\t ]*__RM_DEPS__[\t ]*-->)"
 )
 S_RM_DEPS_REP = r"\g<1>\n{}\g<3>"
 
 # fix desktop
-S_DESK_ERR_CAT = (
-    'In metadata categories, "{}" is not valid, see '
-    "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
-)
 S_DESK_CAT_SCH = (
     r"(^\s*\[Desktop Entry\]\s*$)"
     r"(.*?)"
@@ -297,6 +349,7 @@ S_DESK_CAT_SCH = (
     r"(.*?$)"
 )
 S_DESK_CAT_REP = r"\g<1>\g<2>\g<3>{}"
+
 S_DESK_DESC_SCH = r"(^\s*\[Desktop Entry\]\s*$)(.*?)(^\s*Comment[\t ]*=)(.*?$)"
 S_DESK_DESC_REP = r"\g<1>\g<2>\g<3>{}"
 
@@ -308,6 +361,7 @@ S_GTK_DESC_SCH = (
     r"(</property>)"
 )
 S_GTK_DESC_REP = r"\g<1>\g<2>{}\g<4>"
+
 S_GTK_VER_SCH = (
     r"(<object class=\"GtkAboutDialog\".*?)"
     r"(<property name=\"version\">)"
@@ -329,32 +383,25 @@ S_TOML_SHORT_DESC_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*description[\t ]*=[\t ]*)(.*?$)"
 )
 S_TOML_SHORT_DESC_REPL = r'\g<1>\g<2>\g<3>"{}"'
+
 S_TOML_KW_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 )
 S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
 
-# global vars for cmd line help
-S_META_VER_SEARCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
-S_META_VER_REPL = r'\g<1>"{}"'
-S_META_SD_SEARCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
-S_META_SD_REPL = r"\g<1>\g<2>{}\g<4>"
+# desc/version in all files
+S_META_VER_SCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
+S_META_VER_REP = r'\g<1>"{}"'
+
+S_META_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
+S_META_DESC_REP = r"\g<1>\g<2>{}\g<4>"
 
 # make sure ver num entered in pybaker is valid
 S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
 
-# ask about metadata
-S_ASK_PROPS = (
-    "Have you checked all properties in pyplate/project.json/PUB_META? [Y/n]: "
-)
-S_ASK_PROPS_DEF = "y"
-S_ASK_PROPS_ABORT = "Abort"
-
 # ------------------------------------------------------------------------------
 # gui stuff
 
-S_DEF_WIN_NAME = "default_window"
-S_DEF_UI_NAME = "win_main"
 S_DLG_UI_FILE = "dialogs"
 S_DLG_ABOUT = "dlg_about"
 
@@ -402,7 +449,6 @@ L_EXT_DESKTOP = [".desktop"]
 L_EXT_GTK = [".ui", ".glade"]
 
 # files to remove after the project is done
-# paths are relative to project dir
 L_PURGE = [
     "ABOUT",
 ]
@@ -556,14 +602,14 @@ L_CATS = [
     "Shell",
 ]
 
-# install pkg in venv after making
-L_PKG_INSTALL = ["p"]
-
 # which prj types need an install.json?
-L_PRG_INSTALL = [
+L_APP_INSTALL = [
     "c",
     "g",
 ]
+
+# install pkg in venv after making
+L_PKG_INSTALL = ["p"]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
@@ -604,7 +650,7 @@ D_PRV_ALL = {
     "__PP_DUMMY__": "",
     # version format string for command line
     # NB: format param is __PP_VERSION__ from metadata
-    "__PP_VER_FMT__": "Version {}",
+    "__PP_VER_FMT__": S_VER_FMT,
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -622,12 +668,12 @@ D_PRV_ALL = {
     "__PP_DIR_LIB__": S_DIR_LIB,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    "__PP_LOGO_FILE__": f"{S_DIR_DOCS_TPLT}/{S_FILE_LOGO}",
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
     "__PP_UNINST_CONF_FILE__": f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}",
     # --------------------------------------------------------------------------
-    # these paths are relative to the dev's home/S_BASE_DIR/prj type/prj name
-    # i.e. ~_/Documents/Projects/Python/CLIs/MyProject
-    # location of src files
+    # these paths are relative to the dev's prj name
+    # i.e. /home/dev/Documents/Projects/Python/MyProject
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
     "__PP_PATH_MO__": S_PATH_MO,
@@ -636,17 +682,12 @@ D_PRV_ALL = {
     "__PP_NAME_DSK_TMP__": S_NAME_DSK_TMP,
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
-    "__PP_DIR_IMAGES__": S_DIR_IMAGES,  # where gui images are stored
     # --------------------------------------------------------------------------
     # gui stuff
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
     "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
-    #
-    "__PP_DEF_WIN_NAME__": S_DEF_WIN_NAME,
-    "__PP_DEF_UI_NAME__": S_DEF_UI_NAME,
     "__PP_DLG_FILE__": S_DLG_UI_FILE,
     "__PP_DLG_ABOUT__": S_DLG_ABOUT,
-    "__PP_NAME_MAIN__": S_NAME_MAIN,
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -659,7 +700,6 @@ D_PRV_PRJ = {
     "__PP_NAME_PRJ_BIG__": "",  # My_Project
     "__PP_NAME_PRJ_SMALL__": "",  # my_project
     "__PP_NAME_PRJ_PASCAL__": "",  # MyProject
-    "__PP_NAME_SEC__": "",  # My Win
     "__PP_NAME_SEC_BIG__": "",  # My_Win
     "__PP_NAME_SEC_SMALL__": "",  # my_win
     "__PP_NAME_SEC_PASCAL__": "",  # MyWin
@@ -682,8 +722,9 @@ D_PRV_PRJ = {
     # these strings are calculated in do_before_fix
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
+    "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
     "__PP_KW_STR__": "",  # fix up keywords list for pyproject.toml
-    "__PP_RM_DEPS__": "",  # fix up deps for README.md
+    "__RM_DEPS__": "",  # fix up deps for README.md
     "__PP_FILE_DESK__": "",  # final desk file, not template
     "__PP_PDOC_START__": "",  # start doc search at this folder
 }
@@ -726,7 +767,7 @@ D_PUB_DIST = {
         S_FILE_README: S_DIR_ASSETS,
         # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        f"{S_DIR_I18N}/{S_DIR_LOCALE}": f"{S_DIR_ASSETS}/{S_DIR_I18N}",
+        S_PATH_LOCALE: f"{S_DIR_ASSETS}/{S_DIR_I18N}",
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
         # install.json in assets/install folder
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
@@ -742,7 +783,7 @@ D_PUB_DIST = {
         S_FILE_README: S_DIR_ASSETS,
         # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        f"{S_DIR_I18N}/{S_DIR_LOCALE}": f"{S_DIR_ASSETS}/{S_DIR_I18N}",
+        S_PATH_LOCALE: f"{S_DIR_ASSETS}/{S_DIR_I18N}",
         f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
         # install.json in assets/install folder
         "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
@@ -782,7 +823,7 @@ D_PUB_BL = {
         S_DIR_I18N,
         S_DIR_LIB,
         S_DIR_MISC,
-        S_DIR_README,
+        # S_DIR_README,
         S_FILE_LICENSE,
         S_FILE_REQS,
         "**/__pycache__",
@@ -857,8 +898,6 @@ D_PUB_I18N = {
 D_COPY = {
     f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
     f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
-    f"{S_DIR_MISC}/snippets.txt": f"{S_DIR_MISC}/snippets.txt",
-    f"{S_DIR_MISC}/style.txt": f"{S_DIR_MISC}/style.txt",
 }
 
 # which libs to add to which type of project
@@ -911,12 +950,12 @@ D_UNINSTALL = {
         "__PP_USR_INST__",
         "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
         #
-        f"{S_USR_APPS}/__PP_NAME_PRJ_BIG__.desktop",
+        f"{S_USR_APPS}/__PP_FILE_DESK__",
     ],
 }
 
 # the info for matching/fixing lines in markup files
-D_MU_REPL = {
+D_MARKUP_REP = {
     S_KEY_HDR: r"^(\s*<!--\s*\S*\s*:\s*)(\S+)(.*-->.*)$",
     S_KEY_LEAD: 1,
     S_KEY_VAL: 2,
@@ -931,7 +970,7 @@ D_MU_REPL = {
 }
 
 # the info for matching/fixing lines in non-markup files
-D_PY_REPL = {
+D_PY_REP = {
     S_KEY_HDR: r"^(\s*#\s*\S*\s*:\s*)(\S+)(.*)$",
     S_KEY_LEAD: 1,
     S_KEY_VAL: 2,
@@ -977,15 +1016,14 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, _dict_pub):
+def do_before_fix(_dir_prj, dict_prv, dict_pub):
     """
     Do any work before fix
 
     Args:
         dir_prj: The root of the new project (reserved for future use)
         dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data (reserved for
-        future use)
+        dict_pub: The dictionary containing public project data
 
     Do any work before fix. This method is called at the beginning of _do_fix,
     after all dunders have been configured, but before any files have been
@@ -1001,6 +1039,7 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
     # get sub-dicts we need
     dict_prv_all = dict_prv[S_KEY_PRV_ALL]
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+    dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # get values after pymaker has set them
     name_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
@@ -1020,6 +1059,14 @@ def do_before_fix(_dir_prj, dict_prv, _dict_pub):
 
     author = dict_prv_all["__PP_AUTHOR__"]
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
+
+    # formatted version string
+    # NB: done in two steps to avoid linter errors
+    ver_fmt = dict_prv_all["__PP_VER_FMT__"]
+    ver_disp = ver_fmt.format(dict_pub_meta["__PP_VERSION__"])
+    dict_prv_prj["__PP_VER_DISP__"] = ver_disp
+
+    return (dict_prv, dict_pub)
 
 
 # ------------------------------------------------------------------------------
@@ -1043,6 +1090,10 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # fix top level files
+    a_file = dir_prj / D_PRV_ALL["__PP_LOGO_FILE__"]
+    if a_file.exists():
+        _fix_docs(a_file, dict_prv_prj, dict_pub_meta)
+
     a_file = dir_prj / D_PRV_ALL["__PP_README_FILE__"]
     if a_file.exists():
         _fix_readme(a_file, dict_prv_prj, dict_pub_meta)
@@ -1068,6 +1119,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_DESKTOP:
                 _fix_desktop(item, dict_prv_prj, dict_pub_meta)
 
+    return (dict_prv, dict_pub)
+
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1086,28 +1139,33 @@ def do_before_dist(_dir_prj, dict_prv, dict_pub):
     Do any work on the dist folder before it is created.
     """
 
+    # get sub-dicts we need
+    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+    dict_pub_meta = dict_pub[S_KEY_PUB_META]
+
     # get small name and version
-    name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
-    version = dict_pub[S_KEY_PUB_META]["__PP_VERSION__"]
+    name_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
+    version = dict_pub_meta["__PP_VERSION__"]
 
     # replace all dots with dashes in ver
     version = version.replace(".", "-")
 
     # format dist dir name with prj and ver
     name_fmt = f"{name_small}_{version}"
-    dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_FMT__"] = name_fmt
+    dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
+
+    return (dict_prv, dict_pub)
 
 
 # ------------------------------------------------------------------------------
 # Do any work after making dist
 # ------------------------------------------------------------------------------
-def do_after_dist(dir_prj, dict_prv, _dict_pub):
+def do_after_dist(dir_prj, dict_prv, dict_pub):
     """
     Do any work after making dist
 
     Args:
-        dir_prj: The root of the new project (reserved for
-        future use)
+        dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data (reserved for
         future use)
@@ -1159,14 +1217,52 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub):
     with tarfile.open(out_file, mode="w:gz") as tar:
         tar.add(in_dir, arcname=Path(in_dir).name)
 
-    # chuck the origin dir
+    # FIXME: REMOVE BEFORE FLIGHT
+    # delete the origin dir
     # if not B_DEBUG:
     #     shutil.rmtree(in_dir)
+
+    return (dict_prv, dict_pub)
 
 
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Remove/replace parts of the docs logo.mako file
+# ------------------------------------------------------------------------------
+def _fix_docs(path, dict_prv_prj, _dict_pub_meta):
+    """
+    Remove/replace parts of the docs logo file
+
+    Args:
+        path: Path for the logo.mako file to modify text
+        dict_prv_prj: Private calculated proj dict
+        dict_pub_meta: Dict of metadata to replace in the file (reserved for
+        future use)
+
+    Fixes metadata in the docs logo.mako file to adjust version number and logo
+    image.
+    """
+
+    # the whole text of the file
+    text = ""
+
+    # open and read whole file
+    with open(path, "r", encoding=S_ENCODING) as a_file:
+        text = a_file.read()
+
+    # replace version
+    str_pattern = S_RM_VER_SCH
+    pp_ver_disp = dict_prv_prj["__PP_VER_DISP__"]
+    str_rep = S_RM_VER_REP.format(pp_ver_disp)
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
+    # save file
+    with open(path, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(text)
 
 
 # ------------------------------------------------------------------------------
@@ -1215,10 +1311,17 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     str_rep = S_RM_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
+    # replace version
+    str_pattern = S_RM_VER_SCH
+    pp_ver_disp = dict_prv_prj["__PP_VER_DISP__"]
+    str_rep = S_RM_VER_REP.format(pp_ver_disp)
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
     # get deps as links for readme
     d_py_deps = dict_pub_meta["__PP_PY_DEPS__"]
     l_rm_deps = [
-        f"[{key}]({val})" if val != "" else key for key, val in d_py_deps
+        f"[{key}]({val})" if val != "" else key
+        for key, val in d_py_deps.items()
     ]
 
     # get rm deps as links
@@ -1311,7 +1414,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
             pp_gui_categories.append(cat)
         else:
             # category is not valid, print error and increase error count
-            print(S_DESK_ERR_CAT.format(cat))
+            print(S_ERR_DESK_CAT.format(cat))
 
     # convert list to string
     str_cat = ";".join(pp_gui_categories)

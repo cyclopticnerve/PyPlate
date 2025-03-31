@@ -6,27 +6,34 @@
 <!-- License : __PP_LICENSE_NAME__                             \          /  -->
 <!----------------------------------------------------------------------------->
 
+![__PP_NAME_PRJ_BIG__](readme/__PP_NAME_PRJ_SMALL__.png)
 # __PP_NAME_PRJ__
 
 ## "It mostly works ™©®"
 
 __PP_RM_LICENSE__
 
-<!-- __PP_SHORT_DESC__ -->
+<!-- __RM_SHORT_DESC__ -->
 __PP_SHORT_DESC__
-<!-- __PP_SHORT_DESC__ -->
+<!-- __RM_SHORT_DESC__ -->
+
+<!-- __RM_VERSION__ -->
+__PP_VER_DISP__
+<!-- __RM_VERSION__ -->
 
 <!-- ![alt-text](README/screenshot.png "screenshot") -->
 
 ## Requirements
-<!-- __PP_RM_DEPS__ -->
+<!-- __RM_DEPS__ -->
 __PP_RM_DEPS__
-<!-- __PP_RM_DEPS__ -->
+<!-- __RM_DEPS__ -->
 
 ## Installing
-<!-- __RM_PKG_START__ -->
+<!-- __RM_PKG__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
+[latest
+release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest 
+"https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest")
 from the main branch.<br>
 Download the 'tar.gz' file.
 
@@ -48,10 +55,11 @@ foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m pip install build
 foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m build
 foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m pip install ./dist/__PP_NAME_PRJ_SMALL__-<version>.tar.gz
 ```
-<!-- __RM_PKG_END__ -->
-<!-- __RM_APP_START__ -->
+<!-- __RM_PKG__ -->
+<!-- __RM_APP__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
+[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/
+latest "https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.
 
@@ -61,29 +69,29 @@ foo@bar:~$ cd ~/Downloads/__PP_NAME_PRJ_BIG__-<version>/dist
 foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>/dist$ ./install.py
 ```
 
-Or you can clone the git repo to get the latest (and often broken) code from the
-dev branch:
+Or you can clone the git repo to get the latest (and often broken) code from
+the dev branch:
 ```bash
 foo@bar:~$ cd ~/Downloads
 foo@bar:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
 foo@bar:~/Downloads$ cd __PP_NAME_PRJ_BIG__-<version>/dist
 foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ ./install.py
 ```
-<!-- __RM_APP_END__ -->
+<!-- __RM_APP__ -->
 
 ## Uninstalling
-<!-- __RM_PKG_START__ -->
+<!-- __RM_PKG__ -->
 ```bash
 foo@bar:~$ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
-<!-- __RM_PKG_END__ -->
-<!-- __RM_APP_START__ -->
-Go to the uninstall folder for __PP_NAME_PRJ__ and run the uninstaller:
+<!-- __RM_PKG__ -->
+<!-- __RM_APP__ -->
+Go to the source folder for __PP_NAME_PRJ__ and run the uninstaller:
 ```bash
-foo@bar:~$ cd ~/.local/share/__PP_NAME_PRJ_BIG__/uninstall
-foo@bar:~/.local/share/__PP_NAME_PRJ_BIG__/uninstall$ ./uninstall.py
+foo@bar:~$ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
+foo@bar:~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall$ ./uninstall.py
 ```
-<!-- __RM_APP_END__ -->
+<!-- __RM_APP__ -->
 
 ## Usage
 blah blah blah
@@ -91,4 +99,5 @@ blah blah blah
 ## Notes
 blah blah blah
 
+-)
 <!-- -) -->

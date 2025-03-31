@@ -12,6 +12,8 @@ The uninstall script for this project
 
 THis module uninstalls the project, removing its files and folders to the
 appropriate locations on the user's computer.
+
+This file is real ugly b/c we can't access the venv, so we do it manually.
 """
 
 # ------------------------------------------------------------------------------
@@ -23,18 +25,27 @@ import argparse
 from pathlib import Path
 import sys
 
-# constants
-DIR_PRJ = Path(__file__).parents[1].resolve()
-DIR_LIB = DIR_PRJ / "__PP_DIR_LIB__"
-sys.path.append(str(DIR_LIB))
+# add lib to path
+P_DIR_PRJ = Path(__file__).parent.resolve()
+P_DIR_LIB = P_DIR_PRJ/"__PP_DIR_LIB__"
+sys.path.append(str(P_DIR_LIB))
 
-FILE_CFG_UNINST = DIR_PRJ / "__PP_UNINST_CONF_FILE__"
-
+# pylint: disable=import-error
 # pylint: disable=wrong-import-position
+
 # import my stuff
-from cninstall import CNInstall
-from cninstall import CNInstallError
-from cnformatter import CNFormatter
+from cnlib.src.cninstall import CNInstall  # type: ignore
+from cnlib.src.cnformatter import CNFormatter  # type: ignore
+
+# pylint: enable=import-error
+# pylint: enable=wrong-import-position
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
+# get files
+P_FILE_CFG_UNINST = P_DIR_PRJ / "__PP_UNINST_CONF_FILE__"
 
 # ------------------------------------------------------------------------------
 # Run the main function
@@ -54,9 +65,9 @@ def main(dry=False):
 
     # run the instance
     try:
-        inst.uninstall(FILE_CFG_UNINST, dry=dry)
-    except CNInstallError as e:
-        print(e)
+        inst.uninstall(P_FILE_CFG_UNINST, dry=dry)
+    except Exception as e:
+        raise e
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -66,9 +77,6 @@ if __name__ == "__main__":
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
-
-    # NB: argparse code placed here so we can run the script from the command
-    # line or use it as an object
 
     # create the parser
     parser = argparse.ArgumentParser(formatter_class=CNFormatter)

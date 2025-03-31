@@ -17,17 +17,15 @@ description = "__PP_SHORT_DESC__"
 authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
 readme = "__PP_README_FILE__"
 license = { file = "__PP_LICENSE_FILE__" }
-keywords = [__PP_KW_STR__]
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-requires-python = ">=3.10"
-# NB: dependencies in pyproject.toml are WAY too complicated for an automaton,
-# and are best handled manually (ie. you're on your own here, bud...)
+keywords = ["__PP_KW_STR__"]
 dependencies = []
+requires-python = ">=3.10"
 
 [project.urls]
 homepage = "__PP_URL__/__PP_NAME_PRJ_BIG__"

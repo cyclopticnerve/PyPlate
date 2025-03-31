@@ -1,0 +1,18 @@
+To add a language to a CLI/GUI app:
+
+add lang to pyplate/project.json
+run pybaker to create folders/files
+edit strings in i18n/po/<lang>.po
+run pybaker again to create new .mo files
+
+test using $ LANGUAGE=xx ./src/__PP_NAME_PRJ_SMALL__.py
+
+--------------------------------------------------------------------------------
+
+To change the version/short description:
+
+change values in pyplate/project.json
+run pybaker to create a new .pot file
+check that version number has updated in all .po files
+translate fuzzy short description in all .po files
+run pybaker again to create new .mo files

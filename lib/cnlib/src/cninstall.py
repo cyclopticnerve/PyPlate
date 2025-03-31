@@ -56,7 +56,8 @@ class CNInstall:
 
     # --------------------------------------------------------------------------
 
-    # FIXME: localize?
+    # FIXME: localize
+    # FIXME: rewrite to use less params
 
     # messages
     # NB: format params are prog_name and prog_version

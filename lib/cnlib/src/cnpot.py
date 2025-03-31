@@ -22,6 +22,8 @@ file (ie. "English", "Spanish"). I have tried to disambiguate this by using
 "clang(s)" to refer to the former, and "wlang(s)" to refer to the latter.
 """
 
+# FIXME: rewrite to use pub/prv dicts
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -433,7 +435,8 @@ class CNPotPy:
                 cmd += f"{item} "
 
             # do the final command
-            F.sh(cmd, shell=True)
+            out = F.sh(cmd, shell=True)
+            print(out)
 
         # fix CHARSET in pot
         self._fix_pot_header(pot_file)
@@ -627,11 +630,10 @@ class CNPotPy:
         # only dirs
         locale_wlangs = [item for item in locale_wlangs if item.is_dir()]
         # only names (last path component)
-        locale_wlangs = [item.name for item in locale_wlangs]
+        locale_wlangs = [item.stem for item in locale_wlangs]
 
         # sweep po folder for wlangs and reduce to ISO name
-        # po_wlangs_glob = self._dir_po.glob("*")
-        po_wlangs_glob = list(self._dir_po.glob(f"*{self.S_PO_EXT}"))
+        po_wlangs_glob = self._dir_po.glob(f"*{self.S_PO_EXT}")
         # convert generator to list
         po_wlangs = list(po_wlangs_glob)
         # only dirs

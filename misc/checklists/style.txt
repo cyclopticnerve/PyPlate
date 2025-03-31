@@ -1,0 +1,47 @@
+# ------------------------------------------------------------------------------
+# Project : PyPlate                                                /          \
+# Filename: style.txt                                             |     ()     |
+# Date    : 03/22/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
+# ------------------------------------------------------------------------------
+
+[] 2+ part vars: \b[a-zA-Z]+_[a-zA-Z]+\b
+
+    check for _path, _file, _dir, _str, _lst and swap
+    check for path_, file_, dir_, str_, lst_
+
+    check for _proj and make _prj
+    check for proj_ and make prj_
+
+    check for _prj and swap
+    check for prj_
+
+    path - whole thing
+    file - name/ext only
+    dir - up to name or if a folder
+
+[] check for single quotes: (?<!")"(?!") (skips triple-doubles in docstrings)
+[] also check for empty double quotes: (?<!")""(?!")
+
+[] no += for strings
+
+[] Headers/footers
+
+[] spellcheck
+
+[] over 80 cols
+
+[] use list/dict comprehensions (look for (for) loops)
+
+[] reduce re flags/groups
+
+[] cli/gui: function/method not called from main: start with underscore
+[] mod/pkg: Private functions/methods start with underscore
+
+[] 'method' in a class, 'function' in a module
+
+[] Docstrings
+    class docstring methods/functions match short desc
+    short desc matches comment block
+    last line of long desc ends w/ a period
