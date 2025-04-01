@@ -890,6 +890,7 @@ class PyMaker:
             for item in val:
 
                 # get lib
+                # test
                 add_path = self.P_DIR_PP / "lib" / item
                 add_str = PP.S_CMD_INST_LIB.format(add_path)
                 cmd += add_str + ";"
