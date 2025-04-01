@@ -32,13 +32,17 @@ import re
 import shutil
 import sys
 
-# local imports
-from cnformatter import CNFormatter
-import cnfunctions as F
-from cninstall import CNInstall
-from cnpot import CNPotPy
-from cntree import CNTree
-from cnvenv import CNVenv
+# pylint: disable=import-error
+
+# cnlib imports
+from cnformatter import CNFormatter  # type: ignore
+import cnfunctions as F  # type: ignore
+from cninstall import CNInstall  # type: ignore
+from cnpot import CNPotPy  # type: ignore
+from cntree import CNTree  # type: ignore
+from cnvenv import CNVenv  # type: ignore
+
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # fudge the path to import conf stuff
@@ -821,21 +825,21 @@ class PyBaker:
         # do copy lib dict
 
         # get list of libs for this prj type
-        prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
-        val = PP.D_COPY_LIB.get(prj_type_short, [])
+        # prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
+        # val = PP.D_COPY_LIB.get(prj_type_short, [])
 
-        # copy libs
-        for item in val:
+        # # copy libs
+        # for item in val:
 
-            # get src/dst
-            src = self.P_DIR_PP / "lib" / item
-            dst = p_dist / PP.S_DIR_ASSETS / PP.S_DIR_LIB / item
+        #     # get src/dst
+        #     src = self.P_DIR_PP / "lib" / item
+        #     dst = p_dist / PP.S_DIR_ASSETS / PP.S_DIR_LIB / item
 
-            # copy dir/file
-            if src.is_dir():
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            else:
-                shutil.copy2(src, dst)
+        #     # copy dir/file
+        #     if src.is_dir():
+        #         shutil.copytree(src, dst, dirs_exist_ok=True)
+        #     else:
+        #         shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
         # call conf after dist

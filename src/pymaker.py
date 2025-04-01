@@ -34,13 +34,17 @@ import re
 import shutil
 import sys
 
-# local imports
-from cnformatter import CNFormatter
-import cnfunctions as F
-from cninstall import CNInstall
-from cnpot import CNPotPy
-from cntree import CNTree
-from cnvenv import CNVenv
+# pylint: disable=import-error
+
+# cnlib imports
+from cnformatter import CNFormatter  # type: ignore
+import cnfunctions as F  # type: ignore
+from cninstall import CNInstall  # type: ignore
+from cnpot import CNPotPy  # type: ignore
+from cntree import CNTree  # type: ignore
+from cnvenv import CNVenv  # type: ignore
+
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # fudge the path to import conf stuff
@@ -890,7 +894,6 @@ class PyMaker:
             for item in val:
 
                 # get lib
-                # test
                 add_path = self.P_DIR_PP / "lib" / item
                 add_str = PP.S_CMD_INST_LIB.format(add_path)
                 cmd += add_str + ";"
