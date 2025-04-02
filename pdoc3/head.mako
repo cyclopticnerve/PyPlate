@@ -18,6 +18,7 @@
         max-height: 5em;
         margin: auto;
         margin-bottom: .3em;
+        margin-right:.5em;
     }
 </%def>
 

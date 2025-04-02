@@ -132,5 +132,11 @@ incorporate your changes to make them user, system, and/or IDE agnostic. This
 way the template can hopefully become more customizable to suit everyone's
 needs.
 
+PyPlate currently uses pdoc3 for documentation, mostly because it is easy and
+sphinx is HARD! I don't really want to learn RST, and the Markdown/MyST stuff
+is confusing. So for now, if you create docs for your project, and you are
+using an icon in said docs, you may need to adjust the path to that icon in all
+your HTML files. YMMV.
+
 -)
 <!-- -) -->
