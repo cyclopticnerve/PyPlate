@@ -48,6 +48,7 @@ P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
 # pylint: disable=wrong-import-position
+
 import conf.pyplate as PP
 
 # pylint: enable=wrong-import-position
@@ -125,7 +126,7 @@ class PyMaker:
 
     # about string
     S_ABOUT = (
-        f"{'PyPlate'}\n"
+        f"{'PyPlate/PyMaker'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate\n"

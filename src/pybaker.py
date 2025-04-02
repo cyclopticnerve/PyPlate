@@ -130,7 +130,7 @@ class PyBaker:
 
     # about string
     S_ABOUT = (
-        f"{'PyPlate'}\n"
+        f"{'PyPlate/PyBaker'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate\n"
@@ -315,22 +315,28 @@ class PyBaker:
 
         # if yes, ask for prj name
         if self._ide:
+            rel = PP.S_ASK_IDE.format(self._dir_prj)
+            in_str = f"{PP.S_ASK_NAME}{rel}"
             while True:
-                prj_name = input(PP.S_ASK_NAME)
+                prj_name = input(in_str)
                 if prj_name == "":
                     continue
 
                 # if running in ide, cwd is pyplate prj dir, so move up and down
                 tmp_dir = Path(self._dir_prj / prj_name)
-                if tmp_dir.exists():
-                    self._dir_prj = tmp_dir
-                    break
+                if not tmp_dir.exists():
+                    e_str = PP.S_ERR_NOT_EXIST.format(tmp_dir)
+                    print(e_str)
+                    continue
+
+                self._dir_prj = tmp_dir
+                break
 
         # FIXME: REMOVE BEFORE FLIGHT
         # do not run pyplate in pyplate dir
-        if self._dir_prj.is_relative_to(self.P_DIR_PP):
-            print(PP.S_ERR_PRJ_DIR_IS_PP)
-            sys.exit()
+        # if self._dir_prj.is_relative_to(self.P_DIR_PP):
+        #     print(PP.S_ERR_PRJ_DIR_IS_PP)
+        #     sys.exit()
 
         # ----------------------------------------------------------------------
 

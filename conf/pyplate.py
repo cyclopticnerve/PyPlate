@@ -105,6 +105,7 @@ S_ASK_SEC_P = _("Module name (default: {}): ")
 S_ASK_SEC_P_DEF = "{}"
 S_ASK_SEC_G = _("Window class name (default: {}): ")
 S_ASK_SEC_G_DEF = "{}"
+S_ASK_IDE = _("(Relative to {}): ")
 
 # error strings
 S_ERR_TYPE = _("Type must be one of {}")
@@ -129,6 +130,8 @@ S_ERR_DESK_CAT = (
     'In metadata categories, "{}" is not valid, see '
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
 )
+# I18N: message from pybaker/ide mode
+S_ERR_NOT_EXIST = _("The file '{}' does not exist")
 
 # output msg for steps
 S_ACTION_COPY = _("Copy template files... ")
@@ -904,8 +907,8 @@ D_COPY = {
 # key is prj short type
 # val is list of libs to add to prj type
 D_COPY_LIB = {
-    "c": ["cnlib"],
-    "g": ["cnlib"],  # "cnguilib"],
+    "c": ["CNLib"],
+    "g": ["CNLib"],  # "cnguilib"],
 }
 
 # dictionary of default stuff to put in install.json
