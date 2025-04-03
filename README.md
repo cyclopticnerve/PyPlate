@@ -6,8 +6,19 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-![PyPlate](readme/pyplate.png)
-# PyPlate
+<!-- make a pretty header -->
+<table>
+    <tr>
+        <td>
+            <img src="readme/pyplate.png" alt="PyPlate"/>
+        </td>
+        <td>
+            <span style="font-size:48px;font-weight:bold;">
+                CNLib
+            </span>
+        </td>
+    </tr>
+</table>
 
 ## "It mostly works ™©®"
 

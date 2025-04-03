@@ -6,8 +6,19 @@
 <!-- License : __PP_LICENSE_NAME__                             \          /  -->
 <!----------------------------------------------------------------------------->
 
-![__PP_NAME_PRJ_BIG__](readme/__PP_NAME_PRJ_SMALL__.png)
-# __PP_NAME_PRJ__
+<!-- make a pretty header -->
+<table>
+    <tr>
+        <td>
+            <img src="readme/__PP_NAME_PRJ_SMALL__.png" alt="__PP_NAME_PRJ_BIG__"/>
+        </td>
+        <td>
+            <span style="font-size:48px;font-weight:bold;">
+                __PP_NAME_PRJ_BIG__
+            </span>
+        </td>
+    </tr>
+</table>
 
 ## "It mostly works ™©®"
 
