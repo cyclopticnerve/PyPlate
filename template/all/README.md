@@ -36,7 +36,7 @@ __PP_VER_DISP__
 
 ## Requirements
 <!-- __RM_DEPS__ -->
-__PP_RM_DEPS__
+__PP_PY_DEPS__
 <!-- __RM_DEPS__ -->
 
 ## Installing

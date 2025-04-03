@@ -27,8 +27,8 @@ import sys
 
 # add assets lib to path
 P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
-P_DIR_LIB = P_DIR_ASSETS / "__PP_DIR_LIB__"
+P_DIR_ASSETS = P_DIR_PRJ / "assets"
+P_DIR_LIB = P_DIR_ASSETS / "_lib"
 sys.path.append(str(P_DIR_LIB))
 
 # pylint: disable=import-error
