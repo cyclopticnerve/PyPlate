@@ -7,12 +7,12 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<table style="border-collapse: collapse">
-    <tr>
-        <td>
+<table style="border: none">
+    <tr style="border: none">
+        <td style="border: none">
             <img src="readme/pyplate.png" alt="PyPlate"/>
         </td>
-        <td>
+        <td style="border: none">
             <span style="font-size:48px;font-weight:bold;">
                 CNLib
             </span>
