@@ -6,6 +6,20 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
+<!-- make a pretty header -->
+<table style="border-collapse: collapse">
+    <tr>
+        <td>
+            <img src="readme/pyplate.png" alt="PyPlate"/>
+        </td>
+        <td>
+            <span style="font-size:48px;font-weight:bold;">
+                CNLib
+            </span>
+        </td>
+    </tr>
+</table>
+
 ## "It mostly works ™©®"
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg
