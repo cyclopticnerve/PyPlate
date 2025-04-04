@@ -9,10 +9,10 @@
 <!-- make a pretty header -->
 <table style="border: none">
     <tr style="border: 1px solid red">
-        <td style="border: none">
+        <td style="border: 1px solid green">
             <img src="readme/pyplate.png" alt="PyPlate"/>
         </td>
-        <td style="border: none">
+        <td style="border: 1px solid blue">
             <span style="font-size:48px;font-weight:bold;">
                 FOOBAR
             </span>
