@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<table style="border: none">
+<table style="border: 3px solid white">
     <tr style="border: 3px solid red">
         <td style="border: 3px solid green">
             <img src="readme/pyplate.png" alt="PyPlate"/>
