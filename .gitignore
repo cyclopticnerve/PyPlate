@@ -10,7 +10,7 @@
 # https://github.com/github/gitignore/blob/main/Python.gitignore
 # (and reformatted)
 
-.VSCodeCounter
+.VSCodeCounter/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
