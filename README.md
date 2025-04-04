@@ -8,7 +8,7 @@
 
 <!-- make a pretty header -->
 <table>
-    <tr>
+    <tr border="0">
         <td>
             <img src="readme/pyplate.png" alt="PyPlate"/>
         </td>
@@ -46,7 +46,7 @@ __PP_VER_DISP__
 
 ## Requirements
 <!-- __RM_DEPS__ -->
-__PP_PY_DEPS__
+None
 <!-- __RM_DEPS__ -->
 
 ## Installing
