@@ -8,13 +8,13 @@
 
 <!-- make a pretty header -->
 <table style="border: none">
-    <tr style="border: 1px solid red">
-        <td style="border: 1px solid green">
+    <tr style="border: 3px solid red">
+        <td style="border: 3px solid green">
             <img src="readme/pyplate.png" alt="PyPlate"/>
         </td>
-        <td style="border: 1px solid blue">
+        <td style="border: 3px solid blue">
             <span style="font-size:48px;font-weight:bold;">
-                FOOBAR
+                FOOBAR2
             </span>
         </td>
     </tr>
