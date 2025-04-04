@@ -8,7 +8,7 @@
 
 <!-- make a pretty header -->
 <table style="border: none">
-    <tr style="border: 1-x solid red">
+    <tr style="border: 1px solid red">
         <td style="border: none">
             <img src="readme/pyplate.png" alt="PyPlate"/>
         </td>
