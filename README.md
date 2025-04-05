@@ -7,23 +7,9 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<!-- <table style="border: 3px solid white">
-    <tr style="border: 3px solid red">
-        <td style="border: 3px solid green">
-            <img src="readme/pyplate.png" alt="PyPlate"/>
-        </td>
-        <td style="border: 3px solid blue">
-            <span style="font-size:48px;font-weight:bold;">
-                FOOBAR2
-            </span>
-        </td>
-    </tr>
-</table> -->
 <img align="left" src="readme/pyplate.png" alt="PyPlate"/>
 
 ## Test
-
-<br clear="right">
 
 ## "It mostly works ™©®"
 

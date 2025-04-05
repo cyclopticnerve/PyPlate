@@ -20,6 +20,8 @@
     </tr>
 </table>
 
+<img align="left" src="readme/__PP_NAME_PRJ_SMALL__.png" alt="__PP_NAME_PRJ_BIG__"/>
+
 ## "It mostly works ™©®"
 
 __PP_RM_LICENSE__
