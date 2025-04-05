@@ -24,7 +24,7 @@ from pathlib import Path
 
 # pylint: disable=wrong-import-position
 
-# my imports
+# cnlib imports
 import gi  # type: ignore
 
 gi.require_version("Gtk", "3.0")

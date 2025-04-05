@@ -24,7 +24,7 @@
 # from pathlib import Path
 # import sys
 
-# # my imports
+# # cnlib imports
 # from .cnapp import CNApp as A
 # from cnlib import cnfunctions as CF  # type: ignore
 # import gi  # type: ignore

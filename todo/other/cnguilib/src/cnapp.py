@@ -23,11 +23,13 @@ sizes/controls.
 import copy
 from pathlib import Path
 
-# my imports
+# cnlib imports
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk  # pylint:disable=wrong-import-position # type: ignore
+from gi.repository import (
+    Gtk,
+)  # pylint:disable=wrong-import-position # type: ignore
 
 # ------------------------------------------------------------------------------
 # Public classes

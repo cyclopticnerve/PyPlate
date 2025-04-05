@@ -18,7 +18,7 @@ A class to make handling of docs folders easier
 from pathlib import Path
 import re
 
-# my imports
+# cnlib imports
 from cnlib import cnfunctions as F  # type: ignore
 
 # ------------------------------------------------------------------------------

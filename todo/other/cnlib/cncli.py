@@ -21,7 +21,7 @@ See PyPlate/template/cli/src/__PP_NAME_PRJ_SMALL__.py for an example.
 # import argparse
 # from pathlib import Path
 
-# # my imports
+# # cnlib imports
 # import cnfunctions as F
 # from cnformatter import CNFormatter
 
@@ -78,119 +78,119 @@ See PyPlate/template/cli/src/__PP_NAME_PRJ_SMALL__.py for an example.
 #         # create a parser object in case we need it
 #         self._parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
-    # --------------------------------------------------------------------------
-    # Private methods
-    # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# Private methods
+# --------------------------------------------------------------------------
 
-    # --------------------------------------------------------------------------
-    # Set up and run the command line parser
-    # # --------------------------------------------------------------------------
-    # def _run_parser(self):
-    #     """
-    #     Set up and run the command line parser
+# --------------------------------------------------------------------------
+# Set up and run the command line parser
+# # --------------------------------------------------------------------------
+# def _run_parser(self):
+#     """
+#     Set up and run the command line parser
 
-    #     This method sets up and runs the command line parser to minimize code
-    #     in the subclass. It calls the subclass to add it's arguments, then it
-    #     parses the command line and returns a dictionary.
-    #     """
+#     This method sets up and runs the command line parser to minimize code
+#     in the subclass. It calls the subclass to add it's arguments, then it
+#     parses the command line and returns a dictionary.
+#     """
 
-        # get namespace object
-        # args = self._parser.parse_args()
+# get namespace object
+# args = self._parser.parse_args()
 
-        # # convert namespace to dict
-        # self._dict_args = vars(args)
+# # convert namespace to dict
+# self._dict_args = vars(args)
 
-        # set debug if flag is present, else leave init default
-        # self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
+# set debug if flag is present, else leave init default
+# self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
 
-        # # set cfg path if flag is present, else leave init default
-        # cfg_arg = self._dict_args.get(self.S_ARG_CFG_DEST, self._path_cfg_arg)
+# # set cfg path if flag is present, else leave init default
+# cfg_arg = self._dict_args.get(self.S_ARG_CFG_DEST, self._path_cfg_arg)
 
-        # # try to make cfg_arg a Path (always a string/None coming from dict)
-        # if cfg_arg:
-        #     self._path_cfg_arg = Path(cfg_arg)
+# # try to make cfg_arg a Path (always a string/None coming from dict)
+# if cfg_arg:
+#     self._path_cfg_arg = Path(cfg_arg)
 
-    # --------------------------------------------------------------------------
-    # Load config dict from a json file
-    # --------------------------------------------------------------------------
-    # def _load_config(self, path_cli, path_arg=None, path_def=None):
-    #     """
-    #     Load config dict from a json file
+# --------------------------------------------------------------------------
+# Load config dict from a json file
+# --------------------------------------------------------------------------
+# def _load_config(self, path_cli, path_arg=None, path_def=None):
+#     """
+#     Load config dict from a json file
 
-    #     Args:
-    #         path_cli: The path to the subclass cli, for relative paths
-    #         path_arg: The path to the configuration file supplied via the -c
-    #         option (default: None)
-    #         path_def: The path to the default config file (default: None)
+#     Args:
+#         path_cli: The path to the subclass cli, for relative paths
+#         path_arg: The path to the configuration file supplied via the -c
+#         option (default: None)
+#         path_def: The path to the default config file (default: None)
 
-    #     This method loads the config dict from either:
-    #     1. the command line -c option (if present)
-    #     or
-    #     2. the path_def argument (if present)
+#     This method loads the config dict from either:
+#     1. the command line -c option (if present)
+#     or
+#     2. the path_def argument (if present)
 
-    #     If you use the -c option, and the file exists, it will be combined with
-    #     the existing _dict_cfg property, and processing stops.
-    #     If you do not use the -c option, or it is not present on the command
-    #     line, the path_def value will be used.
-    #     If you use neither, nothing happens to the _dict_cfg property.
-    #     """
+#     If you use the -c option, and the file exists, it will be combined with
+#     the existing _dict_cfg property, and processing stops.
+#     If you do not use the -c option, or it is not present on the command
+#     line, the path_def value will be used.
+#     If you use neither, nothing happens to the _dict_cfg property.
+#     """
 
-    #     # accept path or str
-    #     path_cli = Path(path_cli)
+#     # accept path or str
+#     path_cli = Path(path_cli)
 
-    #     # accept path or str
-    #     if path_def:
-    #         path_def = Path(path_def)
-    #         if not path_def.is_absolute():
-    #             # make abs rel to subclass
-    #             path_def = path_cli / path_def
+#     # accept path or str
+#     if path_def:
+#         path_def = Path(path_def)
+#         if not path_def.is_absolute():
+#             # make abs rel to subclass
+#             path_def = path_cli / path_def
 
-    #     # accept path or str
-    #     if self._path_cfg_arg:
-    #         self._path_cfg_arg = Path(self._path_cfg_arg)
-    #         if not self._path_cfg_arg.is_absolute():
-    #             # make abs rel to subclass
-    #             self._path_cfg_arg = path_cli / self._path_cfg_arg
+#     # accept path or str
+#     if self._path_cfg_arg:
+#         self._path_cfg_arg = Path(self._path_cfg_arg)
+#         if not self._path_cfg_arg.is_absolute():
+#             # make abs rel to subclass
+#             self._path_cfg_arg = path_cli / self._path_cfg_arg
 
-    #     # ----------------------------------------------------------------------
+#     # ----------------------------------------------------------------------
 
-    #     # if cmd line
-    #     if self._path_cfg_arg and self._path_cfg_arg.exists():
-    #         self._path_cfg = self._path_cfg_arg
+#     # if cmd line
+#     if self._path_cfg_arg and self._path_cfg_arg.exists():
+#         self._path_cfg = self._path_cfg_arg
 
-    #     # else if def
-    #     elif path_def and path_def.exists():
-    #         self._path_cfg = path_def
+#     # else if def
+#     elif path_def and path_def.exists():
+#         self._path_cfg = path_def
 
-    #     # ----------------------------------------------------------------------
+#     # ----------------------------------------------------------------------
 
-    #     # if one or the other, load it
-    #     if self._path_cfg and self._path_cfg.exists():
-    #         self._dict_cfg = F.load_dicts([self._path_cfg], self._dict_cfg)
+#     # if one or the other, load it
+#     if self._path_cfg and self._path_cfg.exists():
+#         self._dict_cfg = F.load_dicts([self._path_cfg], self._dict_cfg)
 
-    #     # add a debug message
-    #     if self._debug:
-    #         print("load cfg from:", self._path_cfg)
-    #         F.pp(self._dict_cfg, label="cfg")
+#     # add a debug message
+#     if self._debug:
+#         print("load cfg from:", self._path_cfg)
+#         F.pp(self._dict_cfg, label="cfg")
 
-    # # --------------------------------------------------------------------------
-    # # Save config file to one of several sources
-    # # --------------------------------------------------------------------------
-    # def _save_config(self):
-    #     """
-    #     Save config file to a file
+# # --------------------------------------------------------------------------
+# # Save config file to one of several sources
+# # --------------------------------------------------------------------------
+# def _save_config(self):
+#     """
+#     Save config file to a file
 
-    #     This method saves the config dict to the same file it was loaded from.
-    #     """
+#     This method saves the config dict to the same file it was loaded from.
+#     """
 
-    #     # save dict to path
-    #     if self._path_cfg:
-    #         F.save_dict(self._dict_cfg, [self._path_cfg])
+#     # save dict to path
+#     if self._path_cfg:
+#         F.save_dict(self._dict_cfg, [self._path_cfg])
 
-    #     # add a debug message
-    #     if self._debug:
-    #         print("save cfg to:", self._path_cfg)
-    #         F.pp(self._dict_cfg, label="cfg")
+#     # add a debug message
+#     if self._debug:
+#         print("save cfg to:", self._path_cfg)
+#         F.pp(self._dict_cfg, label="cfg")
 
 
 # -)

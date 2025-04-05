@@ -11,7 +11,6 @@
 # (and reformatted)
 
 .VSCodeCounter
-lib/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

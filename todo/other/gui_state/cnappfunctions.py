@@ -20,7 +20,7 @@
 # # Imports
 # # ------------------------------------------------------------------------------
 
-# # my imports
+# # cnlib imports
 # from cnlib import cnfunctions as CF
 # from . import cnapp as AC
 

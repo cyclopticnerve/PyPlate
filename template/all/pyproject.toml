@@ -11,7 +11,7 @@ requires = ["setuptools>=59.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__PP_NAME_PRJ_SMALL__"
+name = "__PP_NAME_PRJ_BIG__"
 version = "__PP_VERSION__"
 description = "__PP_SHORT_DESC__"
 authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]

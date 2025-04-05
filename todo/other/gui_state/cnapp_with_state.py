@@ -31,7 +31,7 @@
 # from pathlib import Path
 # import sys
 
-# # my imports
+# # cnlib imports
 # from cnlib import cnfunctions as CF  # type: ignore
 # import gi  # type: ignore
 
