@@ -17,16 +17,14 @@
 "http://www.wtfpl.net")](http://www.wtfpl.net)
 
 <!-- __RM_SHORT_DESC__ -->
-A program for creating and building CLI/Package/GUI projects in Python from a
-template
+A program for creating and building CLI/Package/GUI projects in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-__PP_VER_DISP__
+Version 0.0.1
 <!-- __RM_VERSION__ -->
 
 <!-- ![alt-text](README/screenshot.png "screenshot") -->
-
 
 ## Table of Contents
 - [Requirements](#requirements)
