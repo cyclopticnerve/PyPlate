@@ -20,7 +20,7 @@ when placed in a folder that is in the default $PATH, ie:
 etc.
 
 All command line options will be passed to the main class, usually located at
-~/.local/share/pyplate/src/pybaker.py. 
+~/.local/share/pyplate/src/pybaker.py.
 
 Typical usage is show in the main() method.
 """
@@ -127,6 +127,7 @@ class PyBaker:
             subprocess.run(cmd, shell=True, check=True)
         except subprocess.CalledProcessError:
             print("error")
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
