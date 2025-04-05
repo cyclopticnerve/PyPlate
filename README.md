@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<table style="border: 3px solid white">
+<!-- <table style="border: 3px solid white">
     <tr style="border: 3px solid red">
         <td style="border: 3px solid green">
             <img src="readme/pyplate.png" alt="PyPlate"/>
@@ -18,7 +18,12 @@
             </span>
         </td>
     </tr>
-</table>
+</table> -->
+<img align="left" src="readme/pyplate.png" alt="PyPlate"/>
+
+## Test
+
+<br clear="right">
 
 ## "It mostly works ™©®"
 
