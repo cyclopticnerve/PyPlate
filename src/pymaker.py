@@ -64,7 +64,7 @@ import conf.pyplate as PP
 
 T_DOMAIN = "_pyplate"
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = f"{T_DIR_PRJ}/locale"
+T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
