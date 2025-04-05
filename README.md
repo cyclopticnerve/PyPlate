@@ -9,7 +9,7 @@
 <!-- make a pretty header -->
 <img align="left" src="readme/pyplate.png" alt="PyPlate"/>
 
-## Test
+# PyPlate
 
 ## "It mostly works ™©®"
 
