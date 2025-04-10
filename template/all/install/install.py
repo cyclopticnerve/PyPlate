@@ -25,16 +25,19 @@ import argparse
 from pathlib import Path
 import sys
 
+# ------------------------------------------------------------------------------
+# local imports
+
+# pylint: disable=import-error
+# pylint: disable=wrong-import-position
+
 # add assets lib to path
 P_DIR_PRJ = Path(__file__).parent.resolve()
 P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
 P_DIR_LIB = P_DIR_ASSETS / "__PP_DIR_LIB__"
 sys.path.append(str(P_DIR_LIB))
 
-# pylint: disable=import-error
-# pylint: disable=wrong-import-position
-
-# import my stuff
+# local imports
 from cnlib.src.cninstall import CNInstall  # type: ignore
 from cnlib.src.cnformatter import CNFormatter  # type: ignore
 

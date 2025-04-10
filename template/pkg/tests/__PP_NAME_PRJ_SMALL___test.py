@@ -36,11 +36,8 @@ command
 # Imports
 # ------------------------------------------------------------------------------
 
-# pylint: disable=import-error
-
-import __PP_NAME_SEC_SMALL__  # type: ignore
-
-# pylint: enable=import-error
+# lib imports
+import __PP_NAME_SEC_SMALL__
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

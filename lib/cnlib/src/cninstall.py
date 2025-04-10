@@ -126,8 +126,9 @@ class CNInstall:
 
     # question to ask when installing older version
     S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently installed. Do you want to overwrite? [y/N] "
-    )
+        "A newer version of this program is currently installed. Do you want "
+        "to overwrite? [y/N]"
+    ) + " "
     S_ASK_CONFIRM = _("y")
 
     # --------------------------------------------------------------------------

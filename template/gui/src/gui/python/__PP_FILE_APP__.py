@@ -21,21 +21,33 @@ sizes/controls.
 
 # system imports
 from pathlib import Path
+import sys
 
-# pylint: disable=wrong-import-position
-# pylint: disable=import-error
-# pylint: disable=relative-beyond-top-level
+# ------------------------------------------------------------------------------
+# 3rd party imports
 
-# cnlib imports
-import gi  # type: ignore
+import gi
 
 gi.require_version("Gtk", "3.0")
+
+# pylint: disable=wrong-import-position
+
 from gi.repository import Gtk  # type: ignore
-from .__PP_FILE_WIN__ import __PP_CLASS_WIN__  # type: ignore
 
 # pylint: enable=wrong-import-position
-# pylint: enable=import-error
-# pylint: enable=relative-beyond-top-level
+
+# ------------------------------------------------------------------------------
+# local imports
+
+# pylint: disable=wrong-import-position
+
+# add to path
+P_DIR_PY = Path(__file__).parent.resolve()
+sys.path.append(str(P_DIR_PY))
+
+from __PP_FILE_WIN__ import __PP_CLASS_WIN__
+
+# pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Public classes

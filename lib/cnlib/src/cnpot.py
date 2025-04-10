@@ -117,7 +117,7 @@ class CNPotPy:
     def __init__(
         self,
         # header
-        str_appname, # prv
+        str_domain, # prv
         str_version, # pub
         str_author, # prv
         str_email, # prv
@@ -139,7 +139,7 @@ class CNPotPy:
 
         Args:
 
-            str_appname: Name to use in .pot/.po header
+            str_domain: Name to use in .pot/.po header
             str_version: Version info to use in .pot/.po header
             str_author: Author name to use in .pot/.po header
             str_email: Email to use in .pot/.po header
@@ -211,7 +211,7 @@ class CNPotPy:
         """
 
         # set header info
-        self._str_appname = str_appname
+        self._str_domain = str_domain
         self._str_version = str_version
         self._str_author = str_author
         self._str_email = str_email
@@ -364,7 +364,7 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get path to pot file
-        pot_file = self._dir_i18n / f"{self._str_appname}{self.S_POT_EXT}"
+        pot_file = self._dir_i18n / f"{self._str_domain}{self.S_POT_EXT}"
 
         # delete the existing .pot file (if it exists)
         Path.unlink(pot_file, missing_ok=True)
@@ -404,9 +404,9 @@ class CNPotPy:
                 # -----------------------------------
                 # |    0 |       0 | PACKAGE VERSION
                 # |    0 |       1 | PACKAGE VERSION
-                # |    1 |       0 | self._str_appname
-                # |    1 |       1 | self._str_appname self._str_version
-                f"--package-name {self._str_appname} "
+                # |    1 |       0 | self._str_domain
+                # |    1 |       1 | self._str_domain self._str_version
+                f"--package-name {self._str_domain} "
                 f"--package-version {self._str_version} "
                 # author email
                 f"--msgid-bugs-address {self._str_email} "
@@ -455,7 +455,7 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get the pot file we made in the last step
-        pot_file = self._dir_i18n / f"{self._str_appname}{self.S_POT_EXT}"
+        pot_file = self._dir_i18n / f"{self._str_domain}{self.S_POT_EXT}"
 
         # for each wlang in the po folder
         for wlang in self._list_wlangs:
@@ -508,7 +508,7 @@ class CNPotPy:
 
             # get .mo file (output)
             mo_dir = self._dir_locale / wlang_name / self.S_DIR_MESSAGES
-            mo_file = mo_dir / f"{self._str_appname}{self.S_MO_EXT}"
+            mo_file = mo_dir / f"{self._str_domain}{self.S_MO_EXT}"
 
             # do the command
             cmd = self.S_CMD_MAKE_MOS.format(mo_file, wlang_po)
@@ -712,7 +712,7 @@ class CNPotPy:
 
         # replace short description
         str_pattern = self.R_TITLE_SCH
-        str_rep = self.R_TITLE_REP.format(self._str_appname)
+        str_rep = self.R_TITLE_REP.format(self._str_domain)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace copyright

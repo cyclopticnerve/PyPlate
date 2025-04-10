@@ -19,6 +19,21 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# FIXME: multiple i18n domains
+# {
+#   "DOMAINS": {
+#       "__PP_NAME_PRJ_SMALL__": ["src"],
+#       "cnlib": ["lib"],
+#   }
+# }
+# make new cnpot for each input dir (or list in pyplate/public as dict ie domain:in_dir)
+# use same out dir
+# xgettext the in dir to locale/domain.po
+# adjust T_xxx constants in input dir
+# 3. profit!
+
+# FIXME: read bool debug switches from project.json?
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -32,7 +47,7 @@ import re
 import shutil
 import sys
 
-# local imports
+# cnlib imports
 from cnformatter import CNFormatter
 import cnfunctions as F
 from cninstall import CNInstall
@@ -41,11 +56,14 @@ from cntree import CNTree
 from cnvenv import CNVenv
 
 # ------------------------------------------------------------------------------
+# local imports
+
+# pylint: disable=wrong-import-position
+
 # fudge the path to import conf stuff
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
-# pylint: disable=wrong-import-position
 import conf.pyplate as PP
 
 # pylint: enable=wrong-import-position
@@ -182,6 +200,7 @@ class PyBaker:
         # project.json dicts
         self._dict_pub = {}
         self._dict_pub_bl = {}
+        self._dict_pub_dbg = {}
         self._dict_pub_dist = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
@@ -315,8 +334,8 @@ class PyBaker:
 
         # if yes, ask for prj name
         if self._ide:
-            rel = PP.S_ASK_IDE.format(self._dir_prj)
-            in_str = f"{PP.S_ASK_NAME}{rel}"
+            # ask for prj name rel to cwd
+            in_str = PP.S_ASK_IDE.format(self._dir_prj)
             while True:
                 prj_name = input(in_str)
                 if prj_name == "":
@@ -333,10 +352,10 @@ class PyBaker:
                 break
 
         # FIXME: REMOVE BEFORE FLIGHT
-        # do not run pyplate in pyplate dir
-        # if self._dir_prj.is_relative_to(self.P_DIR_PP):
-        #     print(PP.S_ERR_PRJ_DIR_IS_PP)
-        #     sys.exit()
+        # do not run pybaker in pyplate dir
+        if self._dir_prj.is_relative_to(self.P_DIR_PP):
+            print(PP.S_ERR_PRJ_DIR_IS_PP)
+            sys.exit()
 
         # ----------------------------------------------------------------------
 
@@ -369,8 +388,9 @@ class PyBaker:
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         self._dict_pub = F.load_dicts([path_pub], {})
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
-        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
         self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
+        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
     # --------------------------------------------------------------------------
@@ -565,8 +585,9 @@ class PyBaker:
         # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
+            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
         }
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
@@ -625,7 +646,7 @@ class PyBaker:
         # venv freeze
 
         # if venv flag is set
-        if PP.B_CMD_VENV:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_VENV]:
 
             print(PP.S_ACTION_VENV, end="", flush=True)
 
@@ -651,7 +672,7 @@ class PyBaker:
         path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
 
         # if i18n flag is set
-        if PP.B_CMD_I18N:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_I18N]:
 
             # print info
             print(PP.S_ACTION_I18N, end="", flush=True)
@@ -659,7 +680,7 @@ class PyBaker:
             # create CNPotPy object
             potpy = CNPotPy(
                 # header
-                str_appname=self._dict_prv_prj["__PP_NAME_PRJ_BIG__"],
+                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_BIG__"],
                 str_version=self._dict_pub_meta["__PP_VERSION__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
@@ -696,7 +717,7 @@ class PyBaker:
         # update docs
 
         # if docs flag is set
-        if PP.B_CMD_DOCS:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_DOCS]:
 
             # print info
             print(PP.S_ACTION_DOCS, end="", flush=True)
@@ -735,7 +756,7 @@ class PyBaker:
         # NB: this will wipe out all previous checks (maybe good?)
 
         # if tree flag is set
-        if PP.B_CMD_TREE:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_TREE]:
 
             # print info
             print(PP.S_ACTION_TREE, end="", flush=True)
@@ -767,7 +788,7 @@ class PyBaker:
         # fix install/uninstall cfg files
 
         # if install flag is set
-        if PP.B_CMD_INST:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_INST]:
             a_path = self._dir_prj / PP.S_FILE_INST_CFG
             if a_path.exists():
                 self._fix_content(a_path)

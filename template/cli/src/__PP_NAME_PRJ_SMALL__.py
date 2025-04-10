@@ -33,7 +33,7 @@ import locale
 from pathlib import Path
 import sys
 
-# local imports
+# cnlib imports
 from cnformatter import CNFormatter
 import cnfunctions as F
 
@@ -116,6 +116,7 @@ class __PP_NAME_PRJ_PASCAL__:
 
     # about string
     S_ABOUT = (
+        "\n"
         f"{'__PP_NAME_PRJ__'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
@@ -293,6 +294,7 @@ class __PP_NAME_PRJ_PASCAL__:
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             parser.print_help()
+            print()
             sys.exit()
 
         # set props from args

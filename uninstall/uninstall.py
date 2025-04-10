@@ -25,13 +25,16 @@ import argparse
 from pathlib import Path
 import sys
 
-# add lib to path
-P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_LIB = P_DIR_PRJ/"__PP_DIR_LIB__"
-sys.path.append(str(P_DIR_LIB))
+# ------------------------------------------------------------------------------
+# local imports
 
 # pylint: disable=import-error
 # pylint: disable=wrong-import-position
+
+# add lib to path
+P_DIR_PRJ = Path(__file__).parent.resolve()
+P_DIR_LIB = P_DIR_PRJ/"_lib"
+sys.path.append(str(P_DIR_LIB))
 
 # import my stuff
 from cnlib.src.cninstall import CNInstall  # type: ignore
@@ -45,7 +48,7 @@ from cnlib.src.cnformatter import CNFormatter  # type: ignore
 # ------------------------------------------------------------------------------
 
 # get files
-P_FILE_CFG_UNINST = P_DIR_PRJ / "__PP_UNINST_CONF_FILE__"
+P_FILE_CFG_UNINST = Path.home() / ".local/share/pyplate/uninstall"
 
 # ------------------------------------------------------------------------------
 # Run the main function

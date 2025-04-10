@@ -19,6 +19,7 @@ when placed in a folder that is in the default $PATH, ie:
 ~/.local/bin
 etc.
 
+(The extension will be removed by the installer)\n
 All command line options will be passed to the main class, usually located at
 ~/.local/share/__PP_NAME_PRJ_SMALL__/src/__PP_NAME_PRJ_SMALL__.py.
 

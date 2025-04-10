@@ -43,11 +43,12 @@ from cntree import CNTree
 from cnvenv import CNVenv
 
 # ------------------------------------------------------------------------------
-# fudge the path to import conf stuff
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
+# local imports
 
 # pylint: disable=wrong-import-position
+
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+sys.path.append(str(P_DIR_PRJ))
 
 import conf.pyplate as PP
 
@@ -177,6 +178,7 @@ class PyMaker:
         # project.json dicts
         self._dict_pub = {}
         self._dict_pub_bl = {}
+        self._dict_pub_dbg = {}
         self._dict_pub_dist = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
@@ -306,14 +308,14 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
 
-        # debug turns off some features to speed up process
+        # debug turns off all post processing to speed up process
         if self._debug:
-            PP.B_CMD_DOCS = False
-            PP.B_CMD_GIT = False
-            PP.B_CMD_INST = False
-            PP.B_CMD_I18N = False
-            PP.B_CMD_TREE = False
-            PP.B_CMD_VENV = False
+            PP.D_PUB_DBG[PP.S_KEY_DBG_GIT] = False
+            PP.D_PUB_DBG[PP.S_KEY_DBG_VENV] = False
+            PP.D_PUB_DBG[PP.S_KEY_DBG_I18N] = False
+            PP.D_PUB_DBG[PP.S_KEY_DBG_TREE] = False
+            PP.D_PUB_DBG[PP.S_KEY_DBG_DOCS] = False
+            PP.D_PUB_DBG[PP.S_KEY_DBG_INST] = False
 
         # set switch dicts to defaults
         self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
@@ -330,10 +332,14 @@ class PyMaker:
         # get individual dicts in pyplate.py
         self._dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
+            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
+            PP.S_KEY_PUB_DIST: PP.D_PUB_DIST,
             PP.S_KEY_PUB_I18N: PP.D_PUB_I18N,
             PP.S_KEY_PUB_META: PP.D_PUB_META,
         }
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
@@ -459,10 +465,8 @@ class PyMaker:
         if not self._debug and prj_type in PP.D_NAME_SEC:
 
             # format question for second name
-            s_sec_ask = PP.D_NAME_SEC[prj_type][0]
-            s_sec_def = PP.D_NAME_SEC[prj_type][1]
-            s_sec_def_fmt = s_sec_def.format(name_prj_small)
-            s_sec_ask_fmt = s_sec_ask.format(s_sec_def_fmt)
+            s_sec_ask = PP.D_NAME_SEC[prj_type]
+            s_sec_ask_fmt = s_sec_ask.format(name_prj_small)
 
             # loop forever until we get a valid name or empty string
             while True:
@@ -473,7 +477,7 @@ class PyMaker:
 
                 # empty, keep default
                 if name_sec == "":
-                    name_sec = s_sec_def_fmt
+                    name_sec = name_prj_small
 
                 # check for valid name
                 if self._check_name(name_sec):
@@ -500,32 +504,30 @@ class PyMaker:
 
         # save project stuff
         self._dict_prv_prj["__PP_TYPE_PRJ__"] = prj_type
-        self._dict_pub_dist = PP.D_PUB_DIST[prj_type]
-
         self._dict_prv_prj["__PP_NAME_PRJ__"] = name_prj
         self._dict_prv_prj["__PP_NAME_PRJ_BIG__"] = name_prj_big
         self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"] = name_prj_small
         self._dict_prv_prj["__PP_NAME_PRJ_PASCAL__"] = name_prj_pascal
-
-        # self._dict_prv_prj["__PP_NAME_SEC__"] = name_sec
         self._dict_prv_prj["__PP_NAME_SEC_BIG__"] = name_sec_big
         self._dict_prv_prj["__PP_NAME_SEC_SMALL__"] = name_sec_small
         self._dict_prv_prj["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
-
         self._dict_prv_prj["__PP_DATE__"] = info_date
         self._dict_prv_prj["__PP_NAME_VENV__"] = PP.S_VENV_FMT_NAME.format(
             name_prj_small
         )
-
         self._dict_prv_prj["__PP_FILE_APP__"] = PP.S_APP_FILE_FMT.format(
             name_prj_small
         )
-        self._dict_prv_prj["__PP_CLASS_APP__"] = name_prj_small
-
+        self._dict_prv_prj["__PP_CLASS_APP__"] = name_prj_pascal
         self._dict_prv_prj["__PP_FILE_WIN__"] = PP.S_WIN_FILE_FMT.format(
             name_sec_small
         )
-        self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_small
+        self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
+
+        # add dist stuff
+        self._dict_pub_dist = PP.D_PUB_DIST[prj_type]
+
+        # ----------------------------------------------------------------------
 
         # remove home dir from PyPlate path
         h = str(Path.home())
@@ -778,8 +780,9 @@ class PyMaker:
         # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
+            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
         }
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
@@ -838,7 +841,7 @@ class PyMaker:
         # git
 
         # if git flag
-        if PP.B_CMD_GIT:
+        if PP.D_PUB_DBG[PP.S_KEY_DBG_GIT]:
 
             print(PP.S_ACTION_GIT, end="", flush=True)
 
@@ -852,7 +855,7 @@ class PyMaker:
         # venv create
 
         # if venv flag is set
-        if PP.B_CMD_VENV:
+        if PP.D_PUB_DBG[PP.S_KEY_DBG_VENV]:
 
             print(PP.S_ACTION_VENV, end="", flush=True)
 
@@ -912,7 +915,7 @@ class PyMaker:
         path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
 
         # if i18n flag is set
-        if PP.B_CMD_I18N:
+        if PP.D_PUB_DBG[PP.S_KEY_DBG_I18N]:
 
             # print info
             print(PP.S_ACTION_I18N, end="", flush=True)
@@ -920,7 +923,7 @@ class PyMaker:
             # create CNPotPy object
             potpy = CNPotPy(
                 # header
-                str_appname=self._dict_prv_prj["__PP_NAME_PRJ_BIG__"],
+                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_BIG__"],
                 str_version=self._dict_pub_meta["__PP_VERSION__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
@@ -957,7 +960,7 @@ class PyMaker:
         # update docs
 
         # if docs flag is set
-        if PP.B_CMD_DOCS:
+        if PP.D_PUB_DBG[PP.S_KEY_DBG_DOCS]:
 
             # print info
             print(PP.S_ACTION_DOCS, end="", flush=True)
@@ -991,44 +994,10 @@ class PyMaker:
                 raise e
 
         # ----------------------------------------------------------------------
-        # tree
-        # NB: run last so it includes .git and .venv folders
-        # NB: this will wipe out all previous checks (maybe good?)
-
-        # if tree flag is set
-        if PP.B_CMD_TREE:
-
-            # print info
-            print(PP.S_ACTION_TREE, end="", flush=True)
-
-            # get path to tree
-            file_tree = self._dir_prj / PP.S_TREE_FILE
-
-            # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
-                a_file.write("")
-
-            # create tree object and call
-            tree_obj = CNTree(
-                str(self._dir_prj),
-                filter_list=self._dict_pub_bl[PP.S_KEY_SKIP_TREE],
-                dir_format=PP.S_TREE_DIR_FORMAT,
-                file_format=PP.S_TREE_FILE_FORMAT,
-            )
-            tree_str = tree_obj.main()
-
-            # write to file
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
-                a_file.write(tree_str)
-
-            # we are done
-            print(PP.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
         # make install/uninstall cfg files
 
         # if install flag is set
-        if PP.B_CMD_INST:
+        if PP.D_PUB_DBG[PP.S_KEY_DBG_INST]:
 
             # get project type
             prj_type = self._dict_prv_prj["__PP_TYPE_PRJ__"]
@@ -1102,6 +1071,40 @@ class PyMaker:
                 except Exception as e:
                     print(PP.S_ACTION_FAIL)
                     raise e
+
+        # ----------------------------------------------------------------------
+        # tree
+        # NB: run last so it includes .git and .venv folders
+        # NB: this will wipe out all previous checks (maybe good?)
+
+        # if tree flag is set
+        if PP.D_PUB_DBG[PP.S_KEY_DBG_TREE]:
+
+            # print info
+            print(PP.S_ACTION_TREE, end="", flush=True)
+
+            # get path to tree
+            file_tree = self._dir_prj / PP.S_TREE_FILE
+
+            # create the file so it includes itself
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+                a_file.write("")
+
+            # create tree object and call
+            tree_obj = CNTree(
+                str(self._dir_prj),
+                filter_list=self._dict_pub_bl[PP.S_KEY_SKIP_TREE],
+                dir_format=PP.S_TREE_DIR_FORMAT,
+                file_format=PP.S_TREE_FILE_FORMAT,
+            )
+            tree_str = tree_obj.main()
+
+            # write to file
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+                a_file.write(tree_str)
+
+            # we are done
+            print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -1622,6 +1625,7 @@ class PyMaker:
         # get individual dicts in pyplate.py
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
 

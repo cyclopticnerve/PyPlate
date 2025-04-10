@@ -57,17 +57,17 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # global debug flag
 B_DEBUG = False
 # create a git using S_CMD_GIT
-B_CMD_GIT = True
-# create a venv using S_VENV_CREATE
-B_CMD_VENV = True
-# do i18n
-B_CMD_I18N = True
-# create a tree and save it to S_TREE_FILE
-B_CMD_TREE = True
-# create docs
-B_CMD_DOCS = True
-# do install/uninstall
-B_CMD_INST = True
+# B_CMD_GIT = True
+# # create a venv using S_VENV_CREATE
+# B_CMD_VENV = True
+# # do i18n
+# B_CMD_I18N = True
+# # create a tree and save it to S_TREE_FILE
+# B_CMD_TREE = True
+# # create docs
+# B_CMD_DOCS = True
+# # do install/uninstall
+# B_CMD_INST = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -84,54 +84,71 @@ I_SW_FALSE = 0
 
 # default encoding
 S_ENCODING = "UTF-8"
-
-# ask for project name
-S_ASK_NAME = _("Project name: ")
-# date format
+# I18N: date format
 S_DATE_FMT = _("%m/%d/%Y")
-
-# NB: format params are keys in L_TYPES[item][0] and L_TYPES[item][1]
-S_TYPE_FMT = "{} ({})"
-# join each project type with this
-S_TYPE_JOIN = " | "
-
-# version output format
+# I18N: make version pretty
+# NB: format param is D_PUB_META["__PP_VERSION__"]
 S_VER_FMT = _("Version {}")
 
-# NB: format param is joined list of project types
-S_ASK_TYPE = _("Project type [{}]: ")
+# I18N: ask user for project name
 S_ASK_NAME = _("Project name: ")
+# NB: format params are L_TYPES[item][0] and L_TYPES[item][1]
+S_TYPE_FMT = "{} ({})"
+# join each project type in L_TYPES with this
+S_TYPE_JOIN = " | "
+# I18N: ask for project type
+# NB: format param is joined list of project types from L_TYPES
+S_ASK_TYPE = _("Project type [{}]: ")
+# I18N: ask for module name in pkg project
+# NB: format param is __PP_NAME_PRJ_SMALL__
 S_ASK_SEC_P = _("Module name (default: {}): ")
-S_ASK_SEC_P_DEF = "{}"
+# I18N: ask for window class name in gui project
+# NB: format param is __PP_NAME_PRJ_SMALL__
 S_ASK_SEC_G = _("Window class name (default: {}): ")
-S_ASK_SEC_G_DEF = "{}"
-S_ASK_IDE = _("(Relative to {}): ")
+
+# I18N: sk for project name when running from vscode run/debug
+# NB: format param is current working dir
+S_ASK_IDE = _("Project name: (Relative to {}): ")
 
 # error strings
+
+# I18N: user entered wrong project type
+# NB: format param is joined list of project types from L_TYPES
 S_ERR_TYPE = _("Type must be one of {}")
+# I18N: project name is too short
 S_ERR_LEN = _("Project names must be more than 1 character")
+# I18N: project name must start with letter
 S_ERR_START = _("Project names must start with a letter")
+# I18N: project names must end with a letter or number
 S_ERR_END = _("Project names must end with a letter or number")
+# I18N: project name contains invalid characters
 S_ERR_MID = _(
     "Project names must contain only letters, numbers, dashes (-), or "
     "underscores (_)"
 )
-# NB: format param is project name
+# I18N: project already exists
+# NB: format param is __PP_NAME_PRJ_BIG__
 S_ERR_EXIST = _('Project "{}" already exists')
+# I18N:project does not exist (when pb run from ide)
+# NB: format param is full path to user entry (when pb run from ide)
+S_ERR_NOT_EXIST = _('Project "{}" does not exist')
+# I18N: running pybaker on an invalid project
 S_ERR_NOT_PRJ = _(
     "This folder does not have a 'pyplate' folder.\nAre you sure this is a "
     "PyPlate project?"
 )
+# I18N: invalid semantic version format
 S_ERR_VERS = _("Version must be n.n.n(xxx)")
-S_ERR_PRJ_DIR_NO_EXIST = _("Project dir {} does not exist")
-S_ERR_PRJ_DIR_NONE = _("Project dir not provided")
-S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker/pybaker in PyPlate dir")
+# I18N:don't run pm in pyplate prj dir
+S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
+# I18N: invalid category in .desktop file
+# NB: format param is item in L_CATS
 S_ERR_DESK_CAT = (
-    'In metadata categories, "{}" is not valid, see '
+    '"{}" is not a valid desktop category, see '
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
 )
-# I18N: message from pybaker/ide mode
-S_ERR_NOT_EXIST = _("The file '{}' does not exist")
+
+# ------------------------------------------------------------------------------
 
 # output msg for steps
 S_ACTION_COPY = _("Copy template files... ")
@@ -152,6 +169,7 @@ S_ACTION_DONE = _("Done")
 S_ACTION_FAIL = _("Failed")
 
 # debug-specific strings
+# I18N: warn user that they are running in debug mode
 S_MSG_DEBUG = _(
     "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING "
     "PROJECTS!\n"
@@ -169,6 +187,7 @@ S_KEY_PUB_BL = "PUB_BL"
 S_KEY_PUB_I18N = "PUB_I18N"
 S_KEY_PUB_INSTALL = "PUB_INSTALL"
 S_KEY_PUB_DIST = "PUB_DIST"
+S_KEY_PUB_DBG = "PUB_DBG"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -187,6 +206,14 @@ S_KEY_LOCALE = "LOCALE"
 S_KEY_PO = "PO"
 S_KEY_MO = "MO"
 
+# keys for D_PUB_DBG
+S_KEY_DBG_GIT = "DBG_GIT"
+S_KEY_DBG_VENV = "DBG_VENV"
+S_KEY_DBG_I18N = "DBG_I18N"
+S_KEY_DBG_DOCS = "DBG_DOCS"
+S_KEY_DBG_INST = "DBG_INST"
+S_KEY_DBG_TREE = "DBG_TREE"
+
 # python header/split dict keys
 S_KEY_HDR = "S_KEY_HDR"
 S_KEY_LEAD = "S_KEY_GRP_LEAD"
@@ -197,6 +224,7 @@ S_KEY_COMM = "S_KEY_COMM"
 S_KEY_SPLIT = "S_KEY_SPLIT"
 S_KEY_SPLIT_INDEX = "S_KEY_SPLIT_INDEX"
 
+# constants for _check_name()
 S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
 S_KEY_NAME_MID = "S_KEY_NAME_MID"
@@ -244,6 +272,9 @@ S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_LOGO = "logo.mako"
+
+# i18n stuff
+S_I18N_TAG = "I18N"
 
 # concatenate some paths
 S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
@@ -314,6 +345,7 @@ S_CMD_DOC = (
     "pdoc --html --force --template-dir {} -o {} {}"
 )
 # cmd to install libs as editable
+# NB: format param is relative path to cnlib dir
 S_CMD_INST_LIB = "python -m pip install -e {}"
 
 # ------------------------------------------------------------------------------
@@ -373,9 +405,6 @@ S_GTK_VER_SCH = (
 )
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
-# i18n stuff
-S_I18N_TAG = "I18N"
-
 # pyproject.toml
 S_TOML_VERSION_SEARCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
@@ -405,11 +434,21 @@ S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
 # ------------------------------------------------------------------------------
 # gui stuff
 
+# ui files/names
 S_DLG_UI_FILE = "dialogs"
 S_DLG_ABOUT = "dlg_about"
 
+# NB: format param is __PP_NAME_PRJ_SMALL__
 S_APP_FILE_FMT = "{}_app"
+# NB: format param is __PP_NAME_SEC_SMALL__
 S_WIN_FILE_FMT = "{}_win"
+
+# NB: format param is _PP_NAME_PRJ_PASCAL__
+S_APP_CLASS_FMT = "{}App"
+# NB: format param is _PP_NAME_SEC_PASCAL__
+S_WIN_CLASS_FMT = "{}Win"
+
+# NB: format params are _dict_prv_all["__PP_AUTHOR__"] and __PP_NAME_PRJ_SMALL__
 S_APP_ID_FMT = "org.{}.{}"
 
 # ------------------------------------------------------------------------------
@@ -417,9 +456,9 @@ S_APP_ID_FMT = "org.{}.{}"
 # ------------------------------------------------------------------------------
 
 # the types of projects this script can create
-# val[0] is the char to enter in the cli (short, display only)
-# val[1] is the display name in the cli (long, display only)
-# val[2] is the template folder to use (template/subdir)
+# val[0] is the char to enter for project type
+# val[1] is the display name for project type
+# val[2] is the template subdir to use for project type
 L_TYPES = [
     [
         "c",
@@ -452,9 +491,19 @@ L_EXT_DESKTOP = [".desktop"]
 L_EXT_GTK = [".ui", ".glade"]
 
 # files to remove after the project is done
-L_PURGE = [
+L_PURGE_FILES = [
     "ABOUT",
 ]
+
+# dirs to remove after the project is done
+L_PURGE_DIRS = {
+    "p": [
+        S_DIR_BIN,
+        S_DIR_CONF,
+        S_DIR_INSTALL,
+        S_DIR_UNINSTALL,
+    ]
+}
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -708,10 +757,12 @@ D_PRV_PRJ = {
     "__PP_NAME_SEC_PASCAL__": "",  # MyWin
     "__PP_DATE__": "",  # the date each file was created, updated every time
     "__PP_NAME_VENV__": "",  # venv folder name
+
     "__PP_FILE_APP__": "",  # my_project_app
     "__PP_CLASS_APP__": "",  # MyProjectApp
     "__PP_FILE_WIN__": "",  # my_project_win
     "__PP_CLASS_WIN__": "",  # MyProjectWin
+
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
     "__PP_DEV_PP__": "",  # location of PyPlate src dir, rel to dev home
@@ -726,8 +777,6 @@ D_PRV_PRJ = {
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
-    "__PP_KW_STR__": "",  # fix up keywords list for pyproject.toml
-    "__RM_DEPS__": "",  # fix up deps for README.md
     "__PP_FILE_DESK__": "",  # final desk file, not template
     "__PP_PDOC_START__": "",  # start doc search at this folder
 }
@@ -744,7 +793,7 @@ D_PUB_META = {
     # the short description to use in __PP_README_FILE__ and pyproject.toml
     "__PP_SHORT_DESC__": "Short description",
     # the keywords to use in pyproject.toml and github
-    "__PP_KEYWORDS__": [],
+    "__PP_KW_STR__": [],
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     # key is dep name, val is link to dep (optional)
@@ -888,6 +937,16 @@ D_PUB_I18N = {
     S_KEY_WLANGS: ["en"],
 }
 
+# dict in project to control post processing
+D_PUB_DBG = {
+    S_KEY_DBG_GIT: True,
+    S_KEY_DBG_VENV: True,
+    S_KEY_DBG_I18N: True,
+    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_INST: True,
+    S_KEY_DBG_TREE: True,
+}
+
 # ------------------------------------------------------------------------------
 # Other dictionaries
 # ------------------------------------------------------------------------------
@@ -989,8 +1048,10 @@ D_PY_REP = {
 
 # the type of projects that will ask for a second name
 D_NAME_SEC = {
-    "p": [S_ASK_SEC_P, S_ASK_SEC_P_DEF],
-    "g": [S_ASK_SEC_G, S_ASK_SEC_G_DEF],
+    # "p": [S_ASK_SEC_P, S_ASK_SEC_P_DEF],
+    # "g": [S_ASK_SEC_G, S_ASK_SEC_G_DEF],
+    "p": S_ASK_SEC_P,
+    "g": S_ASK_SEC_G,
 }
 
 # default dict of block-level switches (should be I_SW_TRUE or I_SW_FALSE)
@@ -1048,15 +1109,15 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # get values after pymaker has set them
-    name_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
+    name_prj_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
-    usr_inst = f"{S_USR_SHARE}/{name_small}"
+    usr_inst = f"{S_USR_SHARE}/{name_prj_small}"
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
     # k/v to fix desktop
     dict_prv_prj["__PP_DESK_ICON__"] = (
-        f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_small}.png"
+        f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_prj_small}.png"
     )
     name_big = dict_prv_prj["__PP_NAME_PRJ_BIG__"]
     dict_prv_prj["__PP_FILE_DESK__"] = (
@@ -1064,7 +1125,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     )
 
     author = dict_prv_all["__PP_AUTHOR__"]
-    dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_small)
+    dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_prj_small)
 
     # formatted version string
     # NB: done in two steps to avoid linter errors
@@ -1077,8 +1138,17 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     version = version.replace(".", "-")
 
     # format dist dir name with prj and ver
-    name_fmt = f"{name_small}_{version}"
+    name_fmt = f"{name_prj_small}_{version}"
     dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
+
+    # gui app/win replacements
+    name_prj_pascal = dict_prv_prj["__PP_NAME_PRJ_PASCAL__"]
+    name_sec_small = dict_prv_prj["__PP_NAME_SEC_SMALL__"]
+    name_sec_pascal = dict_prv_prj["__PP_NAME_SEC_PASCAL__"]
+    dict_prv_prj["__PP_FILE_APP__"] = S_APP_FILE_FMT.format(name_prj_small)
+    dict_prv_prj["__PP_CLASS_APP__"] = S_APP_CLASS_FMT.format(name_prj_pascal)
+    dict_prv_prj["__PP_FILE_WIN__"] = S_WIN_FILE_FMT.format(name_sec_small)
+    dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
 
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
@@ -1137,6 +1207,24 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_DESKTOP:
                 _fix_desktop(item, dict_prv_prj, dict_pub_meta)
 
+
+    # --------------------------------------------------------------------------
+    # remove some extra stuff
+
+    # first purge all dummy files
+    for root, root_dirs, _root_files in dir_prj.walk():
+
+        # convert files into Paths
+        dirs = [root / f for f in root_dirs]
+
+        # for each file item
+        for item in dirs:
+
+            # if it is in purge list, delete it
+            if item.name in L_PURGE_DIRS:
+                Path.unlink(item)
+
+
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
 
@@ -1191,6 +1279,7 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
     p_dist = dist / name_fmt
 
     # --------------------------------------------------------------------------
+    # remove all "ABOUT" files
 
     # first purge all dummy files
     for root, _root_dirs, root_files in p_dist.walk():
@@ -1202,7 +1291,7 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
         for item in files:
 
             # if it is in purge list, delete it
-            if item.name in L_PURGE:
+            if item.name in L_PURGE_FILES:
                 Path.unlink(item)
 
     # --------------------------------------------------------------------------
@@ -1384,14 +1473,14 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # fix keywords for pyproject.toml
-    l_keywords = dict_pub_meta["__PP_KEYWORDS__"]
+    l_keywords = dict_pub_meta["__PP_KW_STR__"]
     q_keywords = [f'"{item}"' for item in l_keywords]
     s_keywords = ", ".join(q_keywords)
 
     # replace keywords array
     str_pattern = S_TOML_KW_SEARCH
     str_rep = S_TOML_KW_REPL.format(s_keywords)
-    text = re.sub(str_pattern, str_rep, text)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:

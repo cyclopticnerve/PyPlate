@@ -22,18 +22,21 @@ private functions declared here.
 # system imports
 from pathlib import Path
 
-# pylint: disable=wrong-import-position
+# ------------------------------------------------------------------------------
+# 3rd party imports
 
-# cnlib imports
-import gi  # type: ignore
+import gi
 
 gi.require_version("Gtk", "3.0")
+
+# pylint: disable=wrong-import-position
+
 from gi.repository import Gtk  # type: ignore
 
 # pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
-# Public classes
+# Classes
 # ------------------------------------------------------------------------------
 
 
@@ -55,8 +58,13 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     # find path to self
     P_DIR_PRJ = Path(__file__).parents[3].resolve()
 
+    # get paths to ui files
+    P_FILE_WIN = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
+    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_DLG_FILE__.ui"
+
     # the name of the window in the ui file
-    # S_UI_WIN_NAME = "__PP_NAME_SEC__"
+    S_UI_WIN_NAME = "__PP_CLASS_WIN__"
+    S_UI_ABT_NAME = "__PP_DLG_ABOUT__"
 
     # window actions
     S_ACTION_DELETE_EVENT = "delete-event"
