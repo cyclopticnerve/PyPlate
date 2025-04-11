@@ -145,21 +145,37 @@ S_MSG_DEBUG = _(
 
 # output msg for steps
 # NB: these are not tagged i18n as they should be self explanatory
+# I18N: Copy template files...
 S_ACTION_COPY = _("Copy template files... ")
+# I18N: Do before fix...
 S_ACTION_BEFORE = _("Do before fix... ")
+# I18N: Do fix...
 S_ACTION_FIX = _("Do fix... ")
+# I18N: Do after fix...
 S_ACTION_AFTER = _("Do after fix... ")
+# I18N: Make git folder...
 S_ACTION_GIT = _("Make git folder... ")
+# I18N: Make venv folder...
 S_ACTION_VENV = _("Make venv folder... ")
+# I18N: Install libs in venv...
 S_ACTION_LIB = _("Install libs in venv... ")
+# I18N: Make i18n folder...
 S_ACTION_I18N = _("Make i18n folder... ")
+# I18N: Fixing desktop file...
 S_ACTION_DESK = _("Fixing desktop file... ")
+# I18N: Make docs folder...
 S_ACTION_DOCS = _("Make docs folder... ")
+# I18N: Make tree file...
 S_ACTION_TREE = _("Make tree file... ")
+# I18N: Install package in venv...
 S_ACTION_INST_PKG = _("Install package in venv... ")
+# I18N: Make dist folder...
 S_ACTION_DIST = _("Make dist folder... ")
+# I18N: Make install file...
 S_ACTION_INST = _("Make install file... ")
+# I18N: Done
 S_ACTION_DONE = _("Done")
+# I18N: Failed
 S_ACTION_FAIL = _("Failed")
 
 # ------------------------------------------------------------------------------
@@ -744,12 +760,10 @@ D_PRV_PRJ = {
     "__PP_NAME_SEC_PASCAL__": "",  # MyWin
     "__PP_DATE__": "",  # the date each file was created, updated every time
     "__PP_NAME_VENV__": "",  # venv folder name
-
     "__PP_FILE_APP__": "",  # my_project_app
     "__PP_CLASS_APP__": "",  # MyProjectApp
     "__PP_FILE_WIN__": "",  # my_project_win
     "__PP_CLASS_WIN__": "",  # MyProjectWin
-
     # --------------------------------------------------------------------------
     # these paths are calculated at runtime relative to the dev's home dir
     "__PP_DEV_PP__": "",  # location of PyPlate src dir, rel to dev home
@@ -1196,7 +1210,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_DESKTOP:
                 _fix_desktop(item, dict_prv_prj, dict_pub_meta)
 
-
     # --------------------------------------------------------------------------
     # remove some extra stuff
 
@@ -1212,7 +1225,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             # if it is in purge list, delete it
             if item.name in L_PURGE_DIRS:
                 Path.unlink(item)
-
 
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)

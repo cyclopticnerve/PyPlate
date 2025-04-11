@@ -190,6 +190,9 @@ class PyBaker:
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
+        # backup for debug changes
+        self._dict_dbg_old = {}
+
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
@@ -364,12 +367,13 @@ class PyBaker:
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         self._dict_pub = F.load_dicts([path_pub], {})
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG].copy()
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
         self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
         # debug turns off all post processing to speed up process
+        self._dict_dbg_old = self._dict_pub_dbg.copy()
         if self._debug:
             self._dict_pub_dbg[PP.S_KEY_DBG_GIT] = False
             self._dict_pub_dbg[PP.S_KEY_DBG_VENV] = False
@@ -571,7 +575,7 @@ class PyBaker:
         # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: self._dict_pub[PP.S_KEY_PUB_DBG],
+            PP.S_KEY_PUB_DBG: self._dict_dbg_old,
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
             PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
         }

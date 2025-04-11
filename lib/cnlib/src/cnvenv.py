@@ -15,10 +15,31 @@ A class to make handling of venv folders easier
 # ------------------------------------------------------------------------------
 
 # system imports
+import gettext
+import locale
 from pathlib import Path
 
 # cnlib imports
 import cnfunctions as F
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI
+# NB: keep global
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
+
+T_DOMAIN = "cnlib"
+T_DIR_PRJ = Path(__file__).parents[1].resolve()
+T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
+T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+_ = T_TRANSLATION.gettext
+
+# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# use for CLI in the interest of common code)
+locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -45,8 +66,11 @@ class CNVenv:
     # Class constants
     # --------------------------------------------------------------------------
 
+    # NB format param is self._dir_venv
     S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
+    # NB: format params are venv.parent, venv.name, path to reqs file
     S_CMD_INSTALL = "cd {};. ./{}/bin/activate;python -m pip install -r {}"
+    # NB: format params are venv.parent, venv.name, path to reqs file
     S_CMD_FREEZE = (
         "cd {}; "
         ". ./{}/bin/activate; "
@@ -59,9 +83,13 @@ class CNVenv:
         "{}"
     )
 
-    # custom error strings
-    S_ERR_NOT_ABS = "path {} is not absolute"
-    S_ERR_NOT_DIR = "path {} is not a directory"
+    # error messages
+    # I18N: path {} is not absolute
+    # NB: format param is dir_prj
+    S_ERR_NOT_ABS = _("path {} is not absolute")
+    # I18N: path {} is not a directory
+    # NB: format param is dir_prj
+    S_ERR_NOT_DIR = _("path {} is not a directory")
 
     # --------------------------------------------------------------------------
     # Class methods

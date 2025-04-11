@@ -183,6 +183,9 @@ class PyMaker:
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
+        # backup for debug changes
+        self._dict_dbg_old = {}
+
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
@@ -323,7 +326,7 @@ class PyMaker:
         # get individual dicts in pyplate.py
         self._dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
-            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG.copy(),
+            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
             PP.S_KEY_PUB_DIST: PP.D_PUB_DIST,
             PP.S_KEY_PUB_I18N: PP.D_PUB_I18N,
             PP.S_KEY_PUB_META: PP.D_PUB_META,
@@ -335,6 +338,7 @@ class PyMaker:
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
         # debug turns off all post processing to speed up process
+        self._dict_dbg_old = PP.D_PUB_DBG.copy()
         if self._debug:
             self._dict_pub_dbg[PP.S_KEY_DBG_GIT] = False
             self._dict_pub_dbg[PP.S_KEY_DBG_VENV] = False
@@ -781,7 +785,7 @@ class PyMaker:
         # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
+            PP.S_KEY_PUB_DBG: self._dict_dbg_old,
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
             PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
         }

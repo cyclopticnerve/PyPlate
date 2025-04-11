@@ -79,7 +79,6 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # FIXME: I18N tags in all lib
-    # FIXME: format params in all lib
 
     # FIXME: multiple i18n domains
     # {
@@ -95,62 +94,92 @@ class CNInstall:
     # 3. profit!
 
     # messages
+    # I18N: message to start installing
     # NB: format params are prog_name and prog_version
-    S_MSG_INST_START = _("Installing {}")
+    S_MSG_INST_START = _("Installing {} Version {}")
+    # I18N: message to end installing
     # NB: format param is prog_name
     S_MSG_INST_END = _("{} installed")
+    # I18N: message to start uninstalling
     # NB: format param is prog_name
     S_MSG_UNINST_START = _("Uninstalling {}")
+    # I18N: message to end uninstalling
     # NB: format param is prog_name
     S_MSG_UNINST_END = _("{} uninstalled")
-    # general "done" message
+    # I18N: general "done" message
     S_MSG_DONE = _("Done")
-    # general "fail" message
+    # I18N: general "fail" message
     S_MSG_FAIL = _("Fail")
 
     # strings for system requirements
+    # I18N: message to start copying
     S_MSG_COPY_START = _("Copying files... ")
+    # I18N: message to start deleting
     S_MSG_DEL_START = _("Deleting files... ")
+    # I18N: message to start venv
     S_MSG_VENV_START = _("Making venv folder... ")
+    # I18N: message to install reqs
     S_MSG_REQS_START = _("Installing requirements... ")
+    # I18N: message to install cnlib
     S_MSG_LIBS_START = _("Installing libs... ")
 
-    # strings for version compare
+    # I18N: ask to overwrite if same version
     S_ASK_VER_SAME = _(
-        "The current version of this program is already installed. Do you want to overwrite? [y/N] "
+        "The current version of this program is already installed. Do you"
+        " want to overwrite? [y/N] "
     )
+    # I18N: do not install same/older version
     S_MSG_VER_ABORT = _("Installation aborted")
 
     # errors
-    # NB: format param is cfg file path
+    # I18N: File {} not found
+    # NB: format param is file path
     S_ERR_NOT_FOUND = _("File {} not found")
+    # I18N: File {} is not a JSON file
+    # NB: format param is file path
     S_ERR_NOT_JSON = _("File {} is not a JSON file")
+    # I18N: Could not get sudo permission
     S_ERR_NO_SUDO = _("Could not get sudo permission")
-    S_ERR_REQ = _("Could not install {}")
+    # I18N: One or both version numbers are invalid
     S_ERR_VERSION = _("One or both version numbers are invalid")
+    # I18N: src can not be {}
+    # NB: format param is source path
     S_ERR_SRC_PATH = _("src can not be {}")
+    # I18N: dst can not be {}
+    # NB: format param is dest path
     S_ERR_DST_PATH = _("dst can not be {}")
 
     # debug option strings
     S_DRY_OPTION = "-d"
     S_DRY_ACTION = "store_true"
     S_DRY_DEST = "DBG_DEST"
+    # I18N: do a dry run
     S_DRY_HELP = _("do a dry run, printing file info instead of modifying it")
 
-    # question to ask when installing older version
-    S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently installed. Do you want "
-        "to overwrite? [y/N]"
-    ) + " "
+    # I18N: question to ask when installing older version
+    S_ASK_VER_OLDER = (
+        _(
+            "A newer version of this program is currently installed. Do you want "
+            "to overwrite? [y/N]"
+        )
+        + " "
+    )
+    # I18N: the response required to continue
     S_ASK_CONFIRM = _("y")
 
     # --------------------------------------------------------------------------
 
+    # NB: format param is path to icon
     S_DRY_DESK_ICON = "desktop_icon: {}"
 
+    # commands
+    # NB: format param is dir_venv
     S_CMD_CREATE = "python -Xfrozen_modules=off -m venv {}"
+    # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_INSTALL = "cd {};. ./{}/bin/activate;python -m pip install -r {}"
+    # NB: format params are path to prj, path to venv
     S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
+    # NB: format param is name of lib
     S_CMD_INST_LIB = "python -m pip install {}"
 
     # regex to compare version numbers
@@ -334,11 +363,12 @@ class CNInstall:
         # get install dict
         self._dict_cfg = self._get_dict_from_file(path_cfg_inst)
 
-        # get prg name
+        # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_NAME]
+        prog_version = self._dict_cfg[self.S_KEY_VERSION]
 
         # print start msg
-        print(self.S_MSG_INST_START.format(prog_name))
+        print(self.S_MSG_INST_START.format(prog_name, prog_version))
 
         # ----------------------------------------------------------------------
         # check for existing/old version

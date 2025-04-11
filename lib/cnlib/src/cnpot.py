@@ -28,12 +28,29 @@ file (ie. "English", "Spanish"). I have tried to disambiguate this by using
 
 # system imports
 from datetime import date
+import gettext
+import locale
 from pathlib import Path
 import re
 import shutil
 
 # my imports
 import cnfunctions as F
+
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI
+# NB: keep global
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
+
+T_DOMAIN = "cnlib"
+T_DIR_PRJ = Path(__file__).parents[1].resolve()
+T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
+T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+_ = T_TRANSLATION.gettext
+
+# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# use for CLI in the interest of common code)
+locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -78,16 +95,20 @@ class CNPotPy:
     S_MO_EXT = ".mo"
 
     # shell commands to make po/mo
-    # NB: params are po_file and pot_file
+    # NB: format params are po_file and pot_file
     S_CMD_MERGE_POS = "msgmerge --update {} {} --backup=none"
-    # NB: params are mo_file and wlang_po
+    # NB: format params are mo_file and wlang_po
     S_CMD_MAKE_MOS = "msgfmt -o {} {}"
-    # params are po dir, template file, final file
+    # NB: format params are po dir, template dir, and output file
     S_CMD_DSK = "msgfmt --desktop -d {} --template={} -o {}"
 
     # error messages
-    S_ERR_NOT_ABS = "path {} is not absolute"
-    S_ERR_NOT_DIR = "path {} is not a directory"
+    # I18N: path {} is not absolute
+    # NB: format param is dir_prj
+    S_ERR_NOT_ABS = _("path {} is not absolute")
+    # I18N: path {} is not a directory
+    # NB: format param is dir_prj
+    S_ERR_NOT_DIR = _("path {} is not a directory")
 
     # header regexes
     R_TITLE_SCH = r"# SOME DESCRIPTIVE TITLE."
@@ -117,10 +138,10 @@ class CNPotPy:
     def __init__(
         self,
         # header
-        str_domain, # prv
-        str_version, # pub
-        str_author, # prv
-        str_email, # prv
+        str_domain,  # prv
+        str_version,  # pub
+        str_author,  # prv
+        str_email,  # prv
         # base prj dir
         dir_prj,
         # in
@@ -663,7 +684,7 @@ class CNPotPy:
         Make a list of all supported written language directories
 
         This writes the LINGUAS file, which is used for i18n'ing a .desktop
-        file. 
+        file.
         """
 
         # get names of all wlangs present in po/locale/property
