@@ -78,7 +78,7 @@ class CNInstall:
 
     # --------------------------------------------------------------------------
 
-    # FIXME: I18N tags in all ib
+    # FIXME: I18N tags in all lib
     # FIXME: format params in all lib
 
     # FIXME: multiple i18n domains

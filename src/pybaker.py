@@ -336,7 +336,7 @@ class PyBaker:
                 self._dir_prj = tmp_dir
                 break
 
-        # FIXME: do not run pybaker in pyplate dir
+        # FIXME: REMOVE BEFORE FLIGHT
         # do not run pybaker in pyplate dir
         if self._dir_prj.is_relative_to(self.P_DIR_PP):
             print(PP.S_ERR_PRJ_DIR_IS_PP)

@@ -932,7 +932,8 @@ D_PUB_DBG = {
     S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
-    S_KEY_DBG_DIST: True,
+    # FIXME: REMOVE BEFORE FLIGHT
+    S_KEY_DBG_DIST: False,
 }
 
 # ------------------------------------------------------------------------------
