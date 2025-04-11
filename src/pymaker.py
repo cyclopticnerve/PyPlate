@@ -308,15 +308,6 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
 
-        # debug turns off all post processing to speed up process
-        if self._debug:
-            PP.D_PUB_DBG[PP.S_KEY_DBG_GIT] = False
-            PP.D_PUB_DBG[PP.S_KEY_DBG_VENV] = False
-            PP.D_PUB_DBG[PP.S_KEY_DBG_I18N] = False
-            PP.D_PUB_DBG[PP.S_KEY_DBG_TREE] = False
-            PP.D_PUB_DBG[PP.S_KEY_DBG_DOCS] = False
-            PP.D_PUB_DBG[PP.S_KEY_DBG_INST] = False
-
         # set switch dicts to defaults
         self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
@@ -332,7 +323,7 @@ class PyMaker:
         # get individual dicts in pyplate.py
         self._dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
-            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
+            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG.copy(),
             PP.S_KEY_PUB_DIST: PP.D_PUB_DIST,
             PP.S_KEY_PUB_I18N: PP.D_PUB_I18N,
             PP.S_KEY_PUB_META: PP.D_PUB_META,
@@ -342,6 +333,16 @@ class PyMaker:
         self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
+
+        # debug turns off all post processing to speed up process
+        if self._debug:
+            self._dict_pub_dbg[PP.S_KEY_DBG_GIT] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_VENV] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_I18N] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_DOCS] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_INST] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_TREE] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_DIST] = False
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -780,7 +781,7 @@ class PyMaker:
         # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
             PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
         }
@@ -841,7 +842,7 @@ class PyMaker:
         # git
 
         # if git flag
-        if PP.D_PUB_DBG[PP.S_KEY_DBG_GIT]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_GIT]:
 
             print(PP.S_ACTION_GIT, end="", flush=True)
 
@@ -855,7 +856,7 @@ class PyMaker:
         # venv create
 
         # if venv flag is set
-        if PP.D_PUB_DBG[PP.S_KEY_DBG_VENV]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_VENV]:
 
             print(PP.S_ACTION_VENV, end="", flush=True)
 
@@ -915,7 +916,7 @@ class PyMaker:
         path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
 
         # if i18n flag is set
-        if PP.D_PUB_DBG[PP.S_KEY_DBG_I18N]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_I18N]:
 
             # print info
             print(PP.S_ACTION_I18N, end="", flush=True)
@@ -960,7 +961,7 @@ class PyMaker:
         # update docs
 
         # if docs flag is set
-        if PP.D_PUB_DBG[PP.S_KEY_DBG_DOCS]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_DOCS]:
 
             # print info
             print(PP.S_ACTION_DOCS, end="", flush=True)
@@ -997,7 +998,7 @@ class PyMaker:
         # make install/uninstall cfg files
 
         # if install flag is set
-        if PP.D_PUB_DBG[PP.S_KEY_DBG_INST]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_INST]:
 
             # get project type
             prj_type = self._dict_prv_prj["__PP_TYPE_PRJ__"]
@@ -1078,7 +1079,7 @@ class PyMaker:
         # NB: this will wipe out all previous checks (maybe good?)
 
         # if tree flag is set
-        if PP.D_PUB_DBG[PP.S_KEY_DBG_TREE]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_TREE]:
 
             # print info
             print(PP.S_ACTION_TREE, end="", flush=True)

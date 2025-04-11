@@ -14,9 +14,6 @@ functions to extend the functionality of pymaker.py and pybaker.py.
 This file, and the template folder, are the main ways to customize PyPlate.
 """
 
-# FIXME: I18N tags
-# FIXME: format params
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -26,6 +23,7 @@ import gettext
 import locale
 from pathlib import Path
 import re
+import shutil
 import tarfile
 
 # ------------------------------------------------------------------------------
@@ -56,18 +54,6 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # global debug flag
 B_DEBUG = False
-# create a git using S_CMD_GIT
-# B_CMD_GIT = True
-# # create a venv using S_VENV_CREATE
-# B_CMD_VENV = True
-# # do i18n
-# B_CMD_I18N = True
-# # create a tree and save it to S_TREE_FILE
-# B_CMD_TREE = True
-# # create docs
-# B_CMD_DOCS = True
-# # do install/uninstall
-# B_CMD_INST = True
 
 # ------------------------------------------------------------------------------
 # Integers
@@ -138,7 +124,7 @@ S_ERR_NOT_PRJ = _(
     "PyPlate project?"
 )
 # I18N: invalid semantic version format
-S_ERR_VERS = _("Version must be n.n.n(xxx)")
+S_ERR_VERS = _('Version number must be the format "n.n.n..."')
 # I18N:don't run pm in pyplate prj dir
 S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
 # I18N: invalid category in .desktop file
@@ -148,9 +134,17 @@ S_ERR_DESK_CAT = (
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
 )
 
+# debug-specific strings
+# I18N: warn user that they are running in debug mode
+S_MSG_DEBUG = _(
+    "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING "
+    "PROJECTS!\n"
+)
+
 # ------------------------------------------------------------------------------
 
 # output msg for steps
+# NB: these are not tagged i18n as they should be self explanatory
 S_ACTION_COPY = _("Copy template files... ")
 S_ACTION_BEFORE = _("Do before fix... ")
 S_ACTION_FIX = _("Do fix... ")
@@ -168,13 +162,6 @@ S_ACTION_INST = _("Make install file... ")
 S_ACTION_DONE = _("Done")
 S_ACTION_FAIL = _("Failed")
 
-# debug-specific strings
-# I18N: warn user that they are running in debug mode
-S_MSG_DEBUG = _(
-    "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING "
-    "PROJECTS!\n"
-)
-
 # ------------------------------------------------------------------------------
 
 # keys for pybaker private dict
@@ -182,12 +169,11 @@ S_KEY_PRV_ALL = "PRV_ALL"
 S_KEY_PRV_PRJ = "PRV_PRJ"
 
 # keys for metadata, blacklist, i18n in pybaker dev dict
-S_KEY_PUB_META = "PUB_META"
 S_KEY_PUB_BL = "PUB_BL"
-S_KEY_PUB_I18N = "PUB_I18N"
-S_KEY_PUB_INSTALL = "PUB_INSTALL"
-S_KEY_PUB_DIST = "PUB_DIST"
 S_KEY_PUB_DBG = "PUB_DBG"
+S_KEY_PUB_DIST = "PUB_DIST"
+S_KEY_PUB_I18N = "PUB_I18N"
+S_KEY_PUB_META = "PUB_META"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -213,6 +199,7 @@ S_KEY_DBG_I18N = "DBG_I18N"
 S_KEY_DBG_DOCS = "DBG_DOCS"
 S_KEY_DBG_INST = "DBG_INST"
 S_KEY_DBG_TREE = "DBG_TREE"
+S_KEY_DBG_DIST = "DBG_DIST"
 
 # python header/split dict keys
 S_KEY_HDR = "S_KEY_HDR"
@@ -945,6 +932,7 @@ D_PUB_DBG = {
     S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
+    S_KEY_DBG_DIST: True,
 }
 
 # ------------------------------------------------------------------------------
@@ -1311,14 +1299,12 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
     # now do normal dist tar
     in_dir = p_dist
     out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
-
     with tarfile.open(out_file, mode="w:gz") as tar:
         tar.add(in_dir, arcname=Path(in_dir).name)
 
-    # FIXME: REMOVE BEFORE FLIGHT
-    # delete the origin dir
-    # if not B_DEBUG:
-    #     shutil.rmtree(in_dir)
+    # delete the origin dir, if key set
+    if dict_pub[S_KEY_PUB_DBG][S_KEY_DBG_DIST]:
+        shutil.rmtree(in_dir)
 
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)

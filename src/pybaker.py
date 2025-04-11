@@ -19,21 +19,6 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
-# FIXME: multiple i18n domains
-# {
-#   "DOMAINS": {
-#       "__PP_NAME_PRJ_SMALL__": ["src"],
-#       "cnlib": ["lib"],
-#   }
-# }
-# make new cnpot for each input dir (or list in pyplate/public as dict ie domain:in_dir)
-# use same out dir
-# xgettext the in dir to locale/domain.po
-# adjust T_xxx constants in input dir
-# 3. profit!
-
-# FIXME: read bool debug switches from project.json?
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -351,13 +336,11 @@ class PyBaker:
                 self._dir_prj = tmp_dir
                 break
 
-        # FIXME: REMOVE BEFORE FLIGHT
+        # FIXME: do not run pybaker in pyplate dir
         # do not run pybaker in pyplate dir
         if self._dir_prj.is_relative_to(self.P_DIR_PP):
             print(PP.S_ERR_PRJ_DIR_IS_PP)
             sys.exit()
-
-        # ----------------------------------------------------------------------
 
         # check if dir_prj has pyplate folder for a valid prj
         path_pyplate = self._dir_prj / PP.S_PRJ_PP_DIR
@@ -365,14 +348,7 @@ class PyBaker:
             print(PP.S_ERR_NOT_PRJ)
             sys.exit()
 
-        # debug turns off some features to speed up process
-        if self._debug:
-            PP.B_CMD_DOCS = False
-            PP.B_CMD_GIT = False
-            PP.B_CMD_INST = False
-            PP.B_CMD_I18N = False
-            PP.B_CMD_TREE = False
-            PP.B_CMD_VENV = False
+        # ----------------------------------------------------------------------
 
         # set switch dicts to defaults
         self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
@@ -388,10 +364,20 @@ class PyBaker:
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         self._dict_pub = F.load_dicts([path_pub], {})
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG].copy()
         self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
+
+        # debug turns off all post processing to speed up process
+        if self._debug:
+            self._dict_pub_dbg[PP.S_KEY_DBG_GIT] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_VENV] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_I18N] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_DOCS] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_INST] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_TREE] = False
+            self._dict_pub_dbg[PP.S_KEY_DBG_DIST] = False
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -585,7 +571,7 @@ class PyBaker:
         # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            PP.S_KEY_PUB_DBG: self._dict_pub[PP.S_KEY_PUB_DBG],
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
             PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
         }
