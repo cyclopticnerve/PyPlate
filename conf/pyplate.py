@@ -202,6 +202,9 @@ S_KEY_SKIP_TREE = "SKIP_TREE"
 # keys for i18n
 S_KEY_CHARSET = "CHARSET"
 S_KEY_CLANGS = "CLANGS"
+S_KEY_DOMAINS = "DOMAINS"
+S_KEY_SOURCES = "SOURCES"
+S_KEY_LOCALE = "LOCALE"
 S_KEY_WLANGS = "WLANGS"
 S_KEY_NO_EXT = "NO_EXT"
 S_KEY_LOCALE = "LOCALE"
@@ -933,6 +936,13 @@ D_PUB_I18N = {
         "Python": [
             "__PP_NAME_PRJ_SMALL__",
         ],
+    },
+    # list of sources per domain
+    S_KEY_DOMAINS: {
+        "__PP_NAME_PRJ_SMALL__": {
+            S_KEY_SOURCES: ["src"],
+            S_KEY_LOCALE: S_DIR_I18N,
+        },
     },
     # list of written languages that are available
     S_KEY_WLANGS: ["en"],

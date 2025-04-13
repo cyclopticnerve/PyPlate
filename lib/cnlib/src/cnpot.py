@@ -85,6 +85,8 @@ class CNPotPy:
     S_DIR_LOCALE = "locale"
     # default po folder under i18n
     S_DIR_PO = "po"
+    # default pot folder under i18n
+    S_DIR_POT = "pot"
     # this is the default subdir for GNU
     S_DIR_MESSAGES = "LC_MESSAGES"
     # the file to store all wlangs for bulk operations
@@ -138,14 +140,13 @@ class CNPotPy:
     def __init__(
         self,
         # header
-        str_domain,  # prv
         str_version,  # pub
         str_author,  # prv
         str_email,  # prv
         # base prj dir
         dir_prj,
         # in
-        dir_src,
+        dict_domains,
         # out
         dir_i18n,
         # optional in
@@ -185,7 +186,9 @@ class CNPotPy:
                 If this string is empty, all comments above an entry are
                 included as context
             dict_clangs: The dictionary of file extensions to scan for each
-            clang
+            clang\n
+            Note that if ths dict is empty or None, all files will be scanned
+            (this is generally considered * A Very Bad Thing *)
             dict_no_ext: An optional dict mapping files with no extension
             to their clang value
             list_wlangs: A list of supported languages to ensure a complete
@@ -232,7 +235,6 @@ class CNPotPy:
         """
 
         # set header info
-        self._str_domain = str_domain
         self._str_version = str_version
         self._str_author = str_author
         self._str_email = str_email
@@ -244,10 +246,10 @@ class CNPotPy:
         if not self._dir_prj.is_dir():
             raise OSError(self.S_ERR_NOT_DIR.format(self._dir_prj))
 
-        # set in props
-        self._dir_src = Path(dir_src)
-        if not self._dir_src.is_absolute():
-            self._dir_src = self._dir_prj / dir_src
+        # fix up dict_domains
+        if dict_domains is None:
+            dict_domains = {}
+        self._dict_domains = dict_domains
 
         # set out props
         self._dir_i18n = Path(dir_i18n)
@@ -284,6 +286,7 @@ class CNPotPy:
         # set up folder props
         self._dir_locale = self._dir_i18n / self.S_DIR_LOCALE
         self._dir_po = self._dir_i18n / self.S_DIR_PO
+        self._dir_pot = self._dir_i18n / self.S_DIR_POT
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -384,80 +387,82 @@ class CNPotPy:
         # make sure all necessary dirs exist
         self._make_wlang_dirs()
 
-        # get path to pot file
-        pot_file = self._dir_i18n / f"{self._str_domain}{self.S_POT_EXT}"
+        # for each src folder in each domain
+        for domain, srcs in self._dict_domains.items():
 
-        # delete the existing .pot file (if it exists)
-        Path.unlink(pot_file, missing_ok=True)
+            # get path to pot file
+            pot_file = self._dir_pot / f"{domain}{self.S_POT_EXT}"
 
-        # create a new, empty .pot file if it does not exist
-        # NB: this allow us to use the -j flag without error (which would
-        # happen if the current file to join does not exist)
-        Path.touch(pot_file, exist_ok=True)
+            # delete the existing .pot file (if it exists)
+            pot_file.unlink(missing_ok=True)
 
-        # get all files for all clangs
-        files_dict = self._get_paths_for_exts(self._dict_clangs)
+            # create a new, empty .pot file if it does not exist
+            # NB: this allow us to use the -j flag without error (which would
+            # happen if the current file to join does not exist)
+            pot_file.parent.mkdir(parents=True, exist_ok=True)
+            pot_file.touch(exist_ok=True)
 
-        # for each clang name / list of clang files
-        for clang_name, clang_files in files_dict.items():
+            # get all paths for this domain
+            files_dict = self._get_paths_for_domain(srcs, self._dict_clangs)
 
-            # check if there are any files (avoids any unnecessary errors for
-            # empty lists)
-            if len(clang_files) == 0:
-                continue
+            # for each clang name / list of clang files
+            for clang_name, clang_files in files_dict.items():
 
-            # get initial cmd
-            cmd = (
-                f"cd {self._dir_src}; "
-                "xgettext "
-                # add any comments above string (or msgctxt in ui files)
-                # NB: check that all files have appropriate contexts/comments
-                # NB: also, no space after -c? weird right?
-                f"-c{self._str_tag} "
-                # fix some header values (the rest should be fixed in
-                # _fix_pot_header)
-                # copyright
-                # NB: if blank, file is public domain
-                # if not included, file is under same license as _str_appname
-                # "--copyright-holder "" "
-                # version
-                # | name | version | Project-Id-Version
-                # -----------------------------------
-                # |    0 |       0 | PACKAGE VERSION
-                # |    0 |       1 | PACKAGE VERSION
-                # |    1 |       0 | self._str_domain
-                # |    1 |       1 | self._str_domain self._str_version
-                f"--package-name {self._str_domain} "
-                f"--package-version {self._str_version} "
-                # author email
-                f"--msgid-bugs-address {self._str_email} "
-                # sort entries by file
-                "-F "
-                # don't add location info (hide path to source)
-                "--no-location "
-                # append existing file
-                # NB: this is the key to running xgettext once for each clang
-                # this allows us to set the -L option for different file types
-                # and still end up with one unified .pot file
-                "-j "
-                # final name of output file
-                # NB: note that you can fiddle with the -o, -d, and -p options
-                # here, but i find it's just better to use an abs path to the
-                # output file
-                f"-o {pot_file} "
-                # input clang
-                f"-L {clang_name} "
-            )
+                # get initial cmd
+                cmd = (
+                    f"cd {self._dir_prj}; "
+                    "xgettext "
+                    # add any comments above string (or msgctxt in ui files)
+                    # NB: check that all files have appropriate contexts/comments
+                    # NB: also, no space after -c? weird right?
+                    f"-c{self._str_tag} "
+                    # fix some header values (the rest should be fixed in
+                    # _fix_pot_header)
+                    # copyright
+                    # NB: if blank, file is public domain
+                    # if not included, file is under same license as _str_appname
+                    # "--copyright-holder "" "
+                    # version
+                    # | name | version | Project-Id-Version
+                    # -----------------------------------
+                    # |    0 |       0 | PACKAGE VERSION
+                    # |    0 |       1 | PACKAGE VERSION
+                    # |    1 |       0 | self._str_domain
+                    # |    1 |       1 | self._str_domain self._str_version
+                    f"--package-name {domain} "
+                    f"--package-version {self._str_version} "
+                    # author email
+                    f"--msgid-bugs-address {self._str_email} "
+                    # sort entries by file
+                    "-F "
+                    # don't add location info (hide path to source)
+                    "--no-location "
+                    # append existing file
+                    # NB: this is the key to running xgettext once for each clang
+                    # this allows us to set the -L option for different file types
+                    # and still end up with one unified .pot file
+                    "-j "
+                    # final name of output file
+                    # NB: note that you can fiddle with the -o, -d, and -p options
+                    # here, but i find it's just better to use an abs path to the
+                    # output file
+                    f"-o {pot_file} "
+                )
 
-            # add all input files
-            for item in clang_files:
-                cmd += f"{item} "
+                # add -L for specific exts
+                if clang_name != "*":
+                    cmd += f"-L {clang_name} "
 
-            # do the final command
-            F.sh(cmd, shell=True)
+                # add all input files
+                paths = [f"\"{item}\" " for item in clang_files]
+                j_paths = "".join(paths)
+                cmd += j_paths
 
-        # fix CHARSET in pot
-        self._fix_pot_header(pot_file)
+                # do the final command
+                F.sh(cmd, shell=True)
+
+            # fix CHARSET in pot
+            self._fix_pot_header(domain, pot_file)
 
     # --------------------------------------------------------------------------
     # Merge any .po files in the pos folder with existing .po files
@@ -472,37 +477,42 @@ class CNPotPy:
         folder. Then run pybaker to merge the new .po file with any existing
         .po file, and then pybaker will create a new .mo file.
         """
+
         # make sure all necessary dirs exist
         self._make_wlang_dirs()
 
-        # get the pot file we made in the last step
-        pot_file = self._dir_i18n / f"{self._str_domain}{self.S_POT_EXT}"
+        # for each domain
+        for domain in self._dict_domains:
 
-        # for each wlang in the po folder
-        for wlang in self._list_wlangs:
+            # for each wlang in the po folder
+            for wlang in self._list_wlangs:
 
-            # create or update the .po file
-            po_file = self._dir_po / f"{wlang}{self.S_PO_EXT}"
-            if not po_file.exists():
+                # get the pot file we made in the last step
+                pot_file = self._dir_pot / f"{domain}{self.S_POT_EXT}"
 
-                # no po file, copy pot
-                shutil.copy(pot_file, po_file)
-            else:
+                # create or update the .po file
+                po_file = self._dir_po / f"{wlang}/{domain}{self.S_PO_EXT}"
+                po_file.parent.mkdir(parents=True, exist_ok=True)
+                if not po_file.exists():
+
+                    # no po file, copy pot
+                    shutil.copy(pot_file, po_file)
+                    continue
 
                 # update existing po file using latest pot
                 cmd = self.S_CMD_MERGE_POS.format(po_file, pot_file)
                 F.sh(cmd)
 
-            # fix po version
-            with open(po_file, "r", encoding="UTF-8") as a_file:
-                text = a_file.read()
+                # fix po version
+                with open(po_file, "r", encoding="UTF-8") as a_file:
+                    text = a_file.read()
 
-            rep = self.R_VER_REP.format(self._str_version)
-            text = re.sub(self.R_VER_SCH, rep, text, flags=re.M)
+                rep = self.R_VER_REP.format(self._str_version)
+                text = re.sub(self.R_VER_SCH, rep, text, flags=re.M)
 
-            # write fixed text back to file
-            with open(po_file, "w", encoding="UTF-8") as a_file:
-                a_file.write(text)
+                # write fixed text back to file
+                with open(po_file, "w", encoding="UTF-8") as a_file:
+                    a_file.write(text)
 
     # --------------------------------------------------------------------------
     # Create .mo files for all .po files in the locale folder
@@ -519,17 +529,19 @@ class CNPotPy:
         self._make_wlang_dirs()
 
         # get all wlangs to output
-        wlangs_pos = list(self._dir_po.glob(f"*{self.S_PO_EXT}"))
+        wlangs_pos = list(self._dir_po.glob(f"*/*{self.S_PO_EXT}"))
 
         # for each wlang
         for wlang_po in wlangs_pos:
 
             # get wlang name
-            wlang_name = wlang_po.stem  # en, etc
+            wlang_name = wlang_po.parent.name  # en, etc
+            domain = wlang_po.stem
 
             # get .mo file (output)
             mo_dir = self._dir_locale / wlang_name / self.S_DIR_MESSAGES
-            mo_file = mo_dir / f"{self._str_domain}{self.S_MO_EXT}"
+            mo_dir.mkdir(parents=True, exist_ok=True)
+            mo_file = mo_dir / f"{domain}{self.S_MO_EXT}"
 
             # do the command
             cmd = self.S_CMD_MAKE_MOS.format(mo_file, wlang_po)
@@ -538,11 +550,12 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Scan the source dir for files with certain extensions
     # --------------------------------------------------------------------------
-    def _get_paths_for_exts(self, dict_clangs):
+    def _get_paths_for_domain(self, srcs, dict_clangs):
         """
         Scan the source dir for files with certain extensions
 
         Args:
+            srcs: An array of dirs to search, relative to _dir_pj
             dict_clangs: The dictionary of clang names / clang extensions to
             scan for
 
@@ -564,56 +577,75 @@ class CNPotPy:
         so they can be passed to xgettext.
         """
 
-        # get default result
-        dict_res = {}
+        # return value
+        scan_all = {}
 
-        # get all paths to all files in source dir, recursively
-        # NB: very important to convert generator to list here
-        # this is because generators use yield to return every result
-        # individually, while lists are monolithic (and rglob is a generator)
-        # you cannot iterate over a generator's yield result, because it is
-        # generally only one item, while a list contains all results
-        # calling list() on a generator causes the generator to give ALL it's
-        # generated results to the final list
-        paths = list(self._dir_src.rglob("*"))
+        # make src paths abs to prj dir
+        abs_srcs = [self._dir_prj / src for src in srcs]
 
-        # for each clang name / list of exts
-        for clang, ext_list in dict_clangs.items():
+        # for each full src
+        for abs_src in abs_srcs:
 
-            # sanity check to add dots for exts that don't start with dot
-            # (dots needed for path.suffix matching)
-            exts = [
-                f".{item}" if not item.startswith(".") else item
-                for item in ext_list
-            ]
+            # get default result
+            dict_res = {}
 
-            # get all paths that match file ext
-            files = [f for f in paths if f.suffix in exts]
+            # get all files for all clangs (or all files if no clangs)
 
-            # make sure the key exists
-            if not clang in dict_res:
-                dict_res[clang] = []
+            # get all paths to all files in source dir, recursively
+            # NB: very important to convert generator to list here
+            # this is because generators use yield to return every result
+            # individually, while lists are monolithic (and rglob is a generator)
+            # you cannot iterate over a generator's yield result, because it is
+            # generally only one item, while a list contains all results
+            # calling list() on a generator causes the generator to give ALL it's
+            # generated results to the final list
+            paths = list(abs_src.rglob("*"))
 
-            # add results to langs that have extensions
-            dict_res[clang].extend(files)
+            # sanity check
+            if not dict_clangs or len(dict_clangs) == 0:
+                scan_all["*"] = paths.copy()
+                return scan_all
 
-        # now time to handle files with no ext
-        for clang, name_list in self._dict_no_ext.items():
+            # for each clang name / list of exts
+            for clang, ext_list in dict_clangs.items():
 
-            # get all paths that match file ext
-            # NB: the is_file() check here is to make sure we only add files
-            # that have no ext, not dirs (which have no ext, obvs)
-            files = [f for f in paths if f.name in name_list if f.is_file()]
+                # sanity check to add dots for exts that don't start with dot
+                # (dots needed for path.suffix matching)
+                exts = [
+                    f".{item}" if not item.startswith(".") else item
+                    for item in ext_list
+                ]
 
-            # make sure the key exists
-            if not clang in dict_res:
-                dict_res[clang] = []
+                # get all paths that match file ext
+                files = [f for f in paths if f.suffix in exts]
 
-            # add results to langs that have extensions
-            dict_res[clang].extend(files)
+                # make sure the key exists
+                if not clang in dict_res:
+                    dict_res[clang] = []
+
+                # add results to langs that have extensions
+                dict_res[clang].extend(files)
+
+            # now time to handle files with no ext
+            for clang, name_list in self._dict_no_ext.items():
+
+                # get all paths that match file ext
+                # NB: the is_file() check here is to make sure we only add files
+                # that have no ext, not dirs (which have no ext, obvs)
+                files = [f for f in paths if f.name in name_list if f.is_file()]
+
+                # make sure the key exists
+                if not clang in dict_res:
+                    dict_res[clang] = []
+
+                # add results to langs that have extensions
+                dict_res[clang].extend(files)
+
+            # add them all up
+            scan_all = F.combine_dicts(dict_res, scan_all)
 
         # return result
-        return dict_res
+        return scan_all
 
     # --------------------------------------------------------------------------
     # Make a list of all supported written language directories
@@ -695,6 +727,7 @@ class CNPotPy:
 
         # make the po dir where we will put updated files to be merged
         Path.mkdir(self._dir_po, parents=True, exist_ok=True)
+        Path.mkdir(self._dir_pot, parents=True, exist_ok=True)
 
         # go through the wlang list
         for wlang in self._list_wlangs:
@@ -714,7 +747,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
     # Set the charset for the pot which will carry over to each po
     # --------------------------------------------------------------------------
-    def _fix_pot_header(self, file_pot):
+    def _fix_pot_header(self, domain, file_pot):
         """
         Set the charset for the pot which will carry over to each po
 
@@ -733,7 +766,7 @@ class CNPotPy:
 
         # replace short description
         str_pattern = self.R_TITLE_SCH
-        str_rep = self.R_TITLE_REP.format(self._str_domain)
+        str_rep = self.R_TITLE_REP.format(domain)
         text = re.sub(str_pattern, str_rep, text)
 
         # replace copyright

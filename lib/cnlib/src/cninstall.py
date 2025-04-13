@@ -78,21 +78,6 @@ class CNInstall:
 
     # --------------------------------------------------------------------------
 
-    # FIXME: I18N tags in all lib
-
-    # FIXME: multiple i18n domains
-    # {
-    #   "DOMAINS": {
-    #       "__PP_NAME_PRJ_SMALL__": ["src"],
-    #       "cnlib": ["lib"],
-    #   }
-    # }
-    # make new cnpot for each input dir (or list in pyplate/public as dict ie domain:in_dir)
-    # use same out dir
-    # xgettext the in dir to locale/domain.po
-    # adjust T_xxx constants in input dir
-    # 3. profit!
-
     # messages
     # I18N: message to start installing
     # NB: format params are prog_name and prog_version

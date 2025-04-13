@@ -53,6 +53,24 @@
                 "pybaker"
             ]
         },
+        "DOMAINS": {
+            "pyplate": {
+                "SOURCES": [
+                    "src"
+                ],
+                "LOCALE": [
+                    "i18n/locale"
+                ]
+            },
+            "cnlib": {
+                "SOURCES": [
+                    "cnlib/src"
+                ],
+                "LOCALE": [
+                    "cnlib/i18n/locale"
+                ]
+            }
+        },
         "WLANGS": [
             "en",
             "es"
@@ -74,7 +92,9 @@
         "__PP_VERSION__": "0.0.1",
         "__PP_SHORT_DESC__": "A program for creating and building CLI/Package/GUI projects in Python from a template",
         "__PP_KEYWORDS__": [],
-        "__PP_PY_DEPS__": {"Python 3.10+": "https://python.org"},
+        "__PP_PY_DEPS__": {
+            "Python 3.10+": "https://python.org"
+        },
         "__PP_SYS_DEPS__": {},
         "__PP_GUI_CATS__": []
     }

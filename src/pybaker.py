@@ -667,33 +667,38 @@ class PyBaker:
             # print info
             print(PP.S_ACTION_I18N, end="", flush=True)
 
-            # create CNPotPy object
-            potpy = CNPotPy(
-                # header
-                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_BIG__"],
-                str_version=self._dict_pub_meta["__PP_VERSION__"],
-                str_author=self._dict_prv_all["__PP_AUTHOR__"],
-                str_email=self._dict_prv_all["__PP_EMAIL__"],
-                # base prj dir
-                dir_prj=self._dir_prj,
-                # in
-                dir_src=Path(PP.S_DIR_SRC),
-                # out
-                dir_i18n=self._dir_prj / PP.S_DIR_I18N,
-                # optional in
-                str_tag=PP.S_I18N_TAG,
-                dict_clangs=self._dict_pub_i18n[PP.S_KEY_CLANGS],
-                dict_no_ext=self._dict_pub_i18n[PP.S_KEY_NO_EXT],
-                list_wlangs=self._dict_pub_i18n[PP.S_KEY_WLANGS],
-                charset=self._dict_pub_i18n[PP.S_KEY_CHARSET],
-            )
+            # loop through domains
+            for domain, data in self._dict_pub_i18n[PP.S_KEY_DOMAINS]:
 
-            # make .pot, .po, and .mo files
-            potpy.main()
+                dict_domains={domain: data[PP.S_KEY_SOURCES]}
+                dir_i18n = self._dir_prj / data[PP.S_KEY_LOCALE]
 
-            # i18n-ify .desktop file
-            if path_dsk_tmp.exists():
-                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+                # create CNPotPy object
+                potpy = CNPotPy(
+                    # header
+                    str_version=self._dict_pub_meta["__PP_VERSION__"],
+                    str_author=self._dict_prv_all["__PP_AUTHOR__"],
+                    str_email=self._dict_prv_all["__PP_EMAIL__"],
+                    # base prj dir
+                    dir_prj=self._dir_prj,
+                    # in
+                    dict_domains=dict_domains,
+                    # out
+                    dir_i18n=dir_i18n,
+                    # optional in
+                    str_tag=PP.S_I18N_TAG,
+                    dict_clangs=self._dict_pub_i18n[PP.S_KEY_CLANGS],
+                    dict_no_ext=self._dict_pub_i18n[PP.S_KEY_NO_EXT],
+                    list_wlangs=self._dict_pub_i18n[PP.S_KEY_WLANGS],
+                    charset=self._dict_pub_i18n[PP.S_KEY_CHARSET],
+                )
+
+                # make .pot, .po, and .mo files
+                potpy.main()
+
+                # i18n-ify .desktop file
+                if path_dsk_tmp.exists():
+                    potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
             print(PP.S_ACTION_DONE)
