@@ -103,7 +103,7 @@ class CNSphinx:
 
         # make docs dir
         if not self._dir_docs.exists():
-            Path.mkdir(self._dir_docs, parents=True)
+            self._dir_docs.mkdir(parents=True)
 
         # sanity check
         if not dirs_import:

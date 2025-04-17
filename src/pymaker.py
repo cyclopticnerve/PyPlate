@@ -63,9 +63,12 @@ import conf.pyplate as PP
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
 
-T_DOMAIN = "_pyplate"
+# path to project dir
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
+
+# init gettext
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -369,9 +372,9 @@ class PyMaker:
         # build the input question
         types = []
         for item in PP.L_TYPES:
-            s = PP.S_TYPE_FMT.format(item[0], item[1])
+            s = PP.S_ASK_TYPE_FMT.format(item[0], item[1])
             types.append(s)
-        str_types = PP.S_TYPE_JOIN.join(types)
+        str_types = PP.S_ASK_TYPE_JOIN.join(types)
 
         # format the question
         in_type = PP.S_ASK_TYPE.format(str_types)
@@ -501,7 +504,7 @@ class PyMaker:
 
         # get current date and format it according to dev fmt
         now = datetime.now()
-        fmt_date = PP.S_DATE_FMT
+        fmt_date = PP.S_DEF_DATE_FMT
         info_date = now.strftime(fmt_date)
 
         # ----------------------------------------------------------------------
@@ -925,38 +928,35 @@ class PyMaker:
             # print info
             print(PP.S_ACTION_I18N, end="", flush=True)
 
-            # loop through domains
-            for domain, data in self._dict_pub_i18n[PP.S_KEY_DOMAINS]:
+            # create CNPotPy object
+            potpy = CNPotPy(
+                # header
+                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
+                str_version=self._dict_pub_meta["__PP_VERSION__"],
+                str_author=self._dict_prv_all["__PP_AUTHOR__"],
+                str_email=self._dict_prv_all["__PP_EMAIL__"],
+                # base prj dir
+                dir_prj=self._dir_prj,
+                # in
+                list_src=self._dict_pub_i18n[PP.S_KEY_I18N_SRC],
+                # out
+                dir_pot=PP.S_PATH_POT,
+                dir_po=PP.S_PATH_PO,
+                dir_locale=PP.S_PATH_LOCALE,
+                # optional in
+                str_tag=PP.S_I18N_TAG,
+                dict_clangs=self._dict_pub_i18n[PP.S_KEY_I18N_CLANGS],
+                dict_no_ext=self._dict_pub_i18n[PP.S_KEY_I18N_NO_EXT],
+                list_wlangs=self._dict_pub_i18n[PP.S_KEY_I18N_WLANGS],
+                charset=self._dict_pub_i18n[PP.S_KEY_I18N_CHAR],
+            )
 
-                dict_domains = {domain: data[PP.S_KEY_SOURCES]}
-                dir_i18n = self._dir_prj / data[PP.S_KEY_LOCALE]
+            # make .pot, .po, and .mo files
+            potpy.main()
 
-                # create CNPotPy object
-                potpy = CNPotPy(
-                    # header
-                    str_version=self._dict_pub_meta["__PP_VERSION__"],
-                    str_author=self._dict_prv_all["__PP_AUTHOR__"],
-                    str_email=self._dict_prv_all["__PP_EMAIL__"],
-                    # base prj dir
-                    dir_prj=self._dir_prj,
-                    # in
-                    dict_domains=dict_domains,
-                    # out
-                    dir_i18n=dir_i18n,
-                    # optional in
-                    str_tag=PP.S_I18N_TAG,
-                    dict_clangs=self._dict_pub_i18n[PP.S_KEY_CLANGS],
-                    dict_no_ext=self._dict_pub_i18n[PP.S_KEY_NO_EXT],
-                    list_wlangs=self._dict_pub_i18n[PP.S_KEY_WLANGS],
-                    charset=self._dict_pub_i18n[PP.S_KEY_CHARSET],
-                )
-
-                # make .pot, .po, and .mo files
-                potpy.main()
-
-                # i18n-ify .desktop file
-                if path_dsk_tmp.exists():
-                    potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+            # do the thing
+            # potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
             print(PP.S_ACTION_DONE)
@@ -982,7 +982,7 @@ class PyMaker:
             # nuke old docs
             if dir_docs_out.exists():
                 shutil.rmtree(dir_docs_out)
-                Path.mkdir(dir_docs_out, parents=True)
+                dir_docs_out.mkdir(parents=True)
 
             # format cmd using pdoc template dir, output dir, and start dir
             cmd_docs = PP.S_CMD_DOC.format(
@@ -1097,7 +1097,7 @@ class PyMaker:
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
@@ -1110,7 +1110,7 @@ class PyMaker:
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -1197,7 +1197,7 @@ class PyMaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "r", encoding=PP.S_DEF_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1251,7 +1251,7 @@ class PyMaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "w", encoding=PP.S_DEF_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -1460,14 +1460,14 @@ class PyMaker:
 
         # read reqs files and put in result
         for item in src:
-            with open(item, "r", encoding=PP.S_ENCODING) as a_file:
+            with open(item, "r", encoding=PP.S_DEF_ENCODING) as a_file:
                 old_file = a_file.readlines()
                 old_file = [line.rstrip() for line in old_file]
                 new_file = new_file + old_file
 
         # put combined reqs into final file
         joint = "\n".join(new_file)
-        with open(dst, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(dst, "w", encoding=PP.S_DEF_ENCODING) as a_file:
             a_file.writelines(joint)
 
     # --------------------------------------------------------------------------

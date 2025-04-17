@@ -15,33 +15,12 @@ The class to use for installing/uninstalling
 # ------------------------------------------------------------------------------
 
 # system imports
-import gettext
 import json
-import locale
 from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
-
-T_DOMAIN = "cnlib"
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -79,78 +58,50 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # messages
-    # I18N: message to start installing
     # NB: format params are prog_name and prog_version
-    S_MSG_INST_START = _("Installing {} Version {}")
-    # I18N: message to end installing
+    S_MSG_INST_START = "Installing {} Version {}"
     # NB: format param is prog_name
-    S_MSG_INST_END = _("{} installed")
-    # I18N: message to start uninstalling
+    S_MSG_INST_END = "{} installed"
     # NB: format param is prog_name
-    S_MSG_UNINST_START = _("Uninstalling {}")
-    # I18N: message to end uninstalling
+    S_MSG_UNINST_START = "Uninstalling {}"
     # NB: format param is prog_name
-    S_MSG_UNINST_END = _("{} uninstalled")
-    # I18N: general "done" message
-    S_MSG_DONE = _("Done")
-    # I18N: general "fail" message
-    S_MSG_FAIL = _("Fail")
+    S_MSG_UNINST_END = "{} uninstalled"
+    S_MSG_DONE = "Done"
+    S_MSG_FAIL = "Fail"
 
     # strings for system requirements
-    # I18N: message to start copying
-    S_MSG_COPY_START = _("Copying files... ")
-    # I18N: message to start deleting
-    S_MSG_DEL_START = _("Deleting files... ")
-    # I18N: message to start venv
-    S_MSG_VENV_START = _("Making venv folder... ")
-    # I18N: message to install reqs
-    S_MSG_REQS_START = _("Installing requirements... ")
-    # I18N: message to install cnlib
-    S_MSG_LIBS_START = _("Installing libs... ")
 
-    # I18N: ask to overwrite if same version
-    S_ASK_VER_SAME = _(
+    S_MSG_COPY_START = "Copying files... "
+    S_MSG_DEL_START = "Deleting files... "
+    S_MSG_VENV_START = "Making venv folder... "
+    S_MSG_REQS_START = "Installing requirements... "
+    S_MSG_LIBS_START = "Installing libs... "
+    S_ASK_VER_SAME = (
         "The current version of this program is already installed. Do you"
         " want to overwrite? [y/N] "
     )
-    # I18N: do not install same/older version
-    S_MSG_VER_ABORT = _("Installation aborted")
+    S_MSG_VER_ABORT = "Installation aborted"
 
     # errors
-    # I18N: File {} not found
     # NB: format param is file path
-    S_ERR_NOT_FOUND = _("File {} not found")
-    # I18N: File {} is not a JSON file
+    S_ERR_NOT_FOUND = "File {} not found"
     # NB: format param is file path
-    S_ERR_NOT_JSON = _("File {} is not a JSON file")
-    # I18N: Could not get sudo permission
-    S_ERR_NO_SUDO = _("Could not get sudo permission")
-    # I18N: One or both version numbers are invalid
-    S_ERR_VERSION = _("One or both version numbers are invalid")
-    # I18N: src can not be {}
+    S_ERR_NOT_JSON = "File {} is not a JSON file"
+    S_ERR_NO_SUDO = "Could not get sudo permission"
+    S_ERR_VERSION = "One or both version numbers are invalid"
     # NB: format param is source path
-    S_ERR_SRC_PATH = _("src can not be {}")
-    # I18N: dst can not be {}
+    S_ERR_SRC_PATH = "src can not be {}"
     # NB: format param is dest path
-    S_ERR_DST_PATH = _("dst can not be {}")
+    S_ERR_DST_PATH = "dst can not be {}"
 
     # debug option strings
     S_DRY_OPTION = "-d"
     S_DRY_ACTION = "store_true"
     S_DRY_DEST = "DBG_DEST"
-    # I18N: do a dry run
-    S_DRY_HELP = _("do a dry run, printing file info instead of modifying it")
-
-    # I18N: question to ask when installing older version
-    S_ASK_VER_OLDER = (
-        _(
-            "A newer version of this program is currently installed. Do you want "
-            "to overwrite? [y/N]"
-        )
-        + " "
-    )
-    # I18N: the response required to continue
-    S_ASK_CONFIRM = _("y")
+    S_DRY_HELP = "do a dry run, printing file info instead of modifying it"
+    S_ASK_VER_OLDER = "A newer version of this program is currently installed. \
+        Do you want to overwrite? [y/N] "
+    S_ASK_CONFIRM = "y"
 
     # --------------------------------------------------------------------------
 
@@ -724,7 +675,7 @@ class CNInstall:
                 # if the source is a file
                 else:
                     # copy file
-                    Path.unlink(src)
+                    src.unlink()
 
         # show some info
         print(self.S_MSG_DONE)

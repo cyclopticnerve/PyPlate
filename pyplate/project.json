@@ -34,7 +34,8 @@
         ]
     },
     "PUB_I18N": {
-        "CHARSET": "UTF-8",
+        "DOMAIN": "pyplate",
+        "SOURCES": ["src", "conf"],
         "CLANGS": {
             "Python": [
                 "py"
@@ -53,28 +54,11 @@
                 "pybaker"
             ]
         },
-        "DOMAINS": {
-            "pyplate": {
-                "SOURCES": [
-                    "src"
-                ],
-                "LOCALE": [
-                    "i18n/locale"
-                ]
-            },
-            "cnlib": {
-                "SOURCES": [
-                    "cnlib/src"
-                ],
-                "LOCALE": [
-                    "cnlib/i18n/locale"
-                ]
-            }
-        },
         "WLANGS": [
             "en",
             "es"
-        ]
+        ],
+        "CHARSET": "UTF-8"
     },
     "PUB_DIST": {
         "bin": "assets",

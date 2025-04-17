@@ -62,9 +62,12 @@ import conf.pyplate as PP
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
 
-T_DOMAIN = "pyplate"
+# path to project dir
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
+
+# init gettext
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -330,7 +333,7 @@ class PyBaker:
                     continue
 
                 # if running in ide, cwd is pyplate prj dir, so move up and down
-                tmp_dir = Path(self._dir_prj / prj_name)
+                tmp_dir = Path(self._dir_prj / prj_name).resolve()
                 if not tmp_dir.exists():
                     e_str = PP.S_ERR_NOT_EXIST.format(tmp_dir)
                     print(e_str)
@@ -667,38 +670,34 @@ class PyBaker:
             # print info
             print(PP.S_ACTION_I18N, end="", flush=True)
 
-            # loop through domains
-            for domain, data in self._dict_pub_i18n[PP.S_KEY_DOMAINS]:
+            # create CNPotPy object
+            potpy = CNPotPy(
+                # header
+                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
+                str_version=self._dict_pub_meta["__PP_VERSION__"],
+                str_author=self._dict_prv_all["__PP_AUTHOR__"],
+                str_email=self._dict_prv_all["__PP_EMAIL__"],
+                # base prj dir
+                dir_prj=self._dir_prj,
+                # in
+                list_src=self._dict_pub_i18n[PP.S_KEY_I18N_SRC],
+                # out
+                dir_pot=PP.S_PATH_POT,
+                dir_po=PP.S_PATH_PO,
+                dir_locale=PP.S_PATH_LOCALE,
+                # optional in
+                str_tag=PP.S_I18N_TAG,
+                dict_clangs=self._dict_pub_i18n[PP.S_KEY_I18N_CLANGS],
+                dict_no_ext=self._dict_pub_i18n[PP.S_KEY_I18N_NO_EXT],
+                list_wlangs=self._dict_pub_i18n[PP.S_KEY_I18N_WLANGS],
+                charset=self._dict_pub_i18n[PP.S_KEY_I18N_CHAR],
+            )
 
-                dict_domains={domain: data[PP.S_KEY_SOURCES]}
-                dir_i18n = self._dir_prj / data[PP.S_KEY_LOCALE]
+            # make .pot, .po, and .mo files
+            potpy.main()
 
-                # create CNPotPy object
-                potpy = CNPotPy(
-                    # header
-                    str_version=self._dict_pub_meta["__PP_VERSION__"],
-                    str_author=self._dict_prv_all["__PP_AUTHOR__"],
-                    str_email=self._dict_prv_all["__PP_EMAIL__"],
-                    # base prj dir
-                    dir_prj=self._dir_prj,
-                    # in
-                    dict_domains=dict_domains,
-                    # out
-                    dir_i18n=dir_i18n,
-                    # optional in
-                    str_tag=PP.S_I18N_TAG,
-                    dict_clangs=self._dict_pub_i18n[PP.S_KEY_CLANGS],
-                    dict_no_ext=self._dict_pub_i18n[PP.S_KEY_NO_EXT],
-                    list_wlangs=self._dict_pub_i18n[PP.S_KEY_WLANGS],
-                    charset=self._dict_pub_i18n[PP.S_KEY_CHARSET],
-                )
-
-                # make .pot, .po, and .mo files
-                potpy.main()
-
-                # i18n-ify .desktop file
-                if path_dsk_tmp.exists():
-                    potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+            # do the thing
+            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
             print(PP.S_ACTION_DONE)
@@ -724,7 +723,7 @@ class PyBaker:
             # nuke old docs
             if dir_docs_out.exists():
                 shutil.rmtree(dir_docs_out)
-                Path.mkdir(dir_docs_out, parents=True)
+                dir_docs_out.mkdir(parents=True)
 
             # format cmd using pdoc template dir, output dir, and start dir
             cmd_docs = PP.S_CMD_DOC.format(
@@ -760,7 +759,7 @@ class PyBaker:
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
@@ -773,7 +772,7 @@ class PyBaker:
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -821,7 +820,7 @@ class PyBaker:
         # make child dir in case we nuked
         name_fmt = self._dict_prv_prj["__PP_DIST_FMT__"]
         p_dist = a_dist / name_fmt
-        Path.mkdir(p_dist, parents=True)
+        p_dist.mkdir(parents=True)
 
         # for each key, val (type, dict)
         for key, val in self._dict_pub_dist.items():
@@ -830,7 +829,7 @@ class PyBaker:
             src = self._dir_prj / key
             dst = p_dist / val
             if not dst.exists():
-                Path.mkdir(dst, parents=True)
+                dst.mkdir(parents=True)
             dst = dst / src.name
 
             # do the copy
@@ -951,7 +950,7 @@ class PyBaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "r", encoding=PP.S_DEF_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1005,7 +1004,7 @@ class PyBaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "w", encoding=PP.S_DEF_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------

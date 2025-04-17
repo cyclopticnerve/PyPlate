@@ -38,9 +38,12 @@ P_DIR_PP = Path(__file__).parents[1].resolve()
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
 
-T_DOMAIN = "pyplate"
+# path to project dir
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
+
+# init gettext
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -69,73 +72,72 @@ I_SW_FALSE = 0
 # ------------------------------------------------------------------------------
 
 # default encoding
-S_ENCODING = "UTF-8"
-# I18N: date format
-S_DATE_FMT = _("%m/%d/%Y")
-# I18N: make version pretty
-# NB: format param is D_PUB_META["__PP_VERSION__"]
-S_VER_FMT = _("Version {}")
+S_DEF_ENCODING = "UTF-8"
+# I18N: default date format
+S_DEF_DATE_FMT = _("%m/%d/%Y")
+# NB: format param is __PP_VERSION__
+# I18N: printable version number
+S_DEF_VER_FMT = _("Version {}")
 
-# I18N: ask user for project name
+# ask questions
+# I18N: ask prj name
 S_ASK_NAME = _("Project name: ")
 # NB: format params are L_TYPES[item][0] and L_TYPES[item][1]
-S_TYPE_FMT = "{} ({})"
+S_ASK_TYPE_FMT = "{} ({})"
 # join each project type in L_TYPES with this
-S_TYPE_JOIN = " | "
-# I18N: ask for project type
+S_ASK_TYPE_JOIN = " | "
 # NB: format param is joined list of project types from L_TYPES
+# I18N: ask prj type
 S_ASK_TYPE = _("Project type [{}]: ")
-# I18N: ask for module name in pkg project
 # NB: format param is __PP_NAME_PRJ_SMALL__
+# I18N: ask module name
 S_ASK_SEC_P = _("Module name (default: {}): ")
-# I18N: ask for window class name in gui project
 # NB: format param is __PP_NAME_PRJ_SMALL__
+# I18N: ask window class name
 S_ASK_SEC_G = _("Window class name (default: {}): ")
-
-# I18N: sk for project name when running from vscode run/debug
 # NB: format param is current working dir
+# I18N: ask prj name if running pybaker in IDE
 S_ASK_IDE = _("Project name: (Relative to {}): ")
 
 # error strings
-
-# I18N: user entered wrong project type
 # NB: format param is joined list of project types from L_TYPES
+# I18N: Type must be one of {}
 S_ERR_TYPE = _("Type must be one of {}")
-# I18N: project name is too short
+# I18N: Project names must be more than 1 character
 S_ERR_LEN = _("Project names must be more than 1 character")
-# I18N: project name must start with letter
+# I18N: Project names must start with a letter
 S_ERR_START = _("Project names must start with a letter")
-# I18N: project names must end with a letter or number
+# I18N: Project names must end with a letter or number
 S_ERR_END = _("Project names must end with a letter or number")
-# I18N: project name contains invalid characters
+# I18N: name contains invalid char
 S_ERR_MID = _(
     "Project names must contain only letters, numbers, dashes (-), or "
     "underscores (_)"
 )
-# I18N: project already exists
 # NB: format param is __PP_NAME_PRJ_BIG__
+# I18N: project already exists
 S_ERR_EXIST = _('Project "{}" already exists')
-# I18N:project does not exist (when pb run from ide)
 # NB: format param is full path to user entry (when pb run from ide)
+# I18N: run pybaker on project that does not exist
 S_ERR_NOT_EXIST = _('Project "{}" does not exist')
-# I18N: running pybaker on an invalid project
+# I18N: run pybaker on non-pyplate project dir
 S_ERR_NOT_PRJ = _(
     "This folder does not have a 'pyplate' folder.\nAre you sure this is a "
     "PyPlate project?"
 )
-# I18N: invalid semantic version format
+# I18N: invalid version string format
 S_ERR_VERS = _('Version number must be the format "n.n.n..."')
-# I18N:don't run pm in pyplate prj dir
+# I18N: Cannot run pymaker in PyPlate dir
 S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
-# I18N: invalid category in .desktop file
 # NB: format param is item in L_CATS
-S_ERR_DESK_CAT = (
+# I18N: invalid ,desktop category
+S_ERR_DESK_CAT = _(
     '"{}" is not a valid desktop category, see '
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
 )
 
 # debug-specific strings
-# I18N: warn user that they are running in debug mode
+# I18N: warn if running in debug mode
 S_MSG_DEBUG = _(
     "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING "
     "PROJECTS!\n"
@@ -144,34 +146,33 @@ S_MSG_DEBUG = _(
 # ------------------------------------------------------------------------------
 
 # output msg for steps
-# NB: these are not tagged i18n as they should be self explanatory
-# I18N: Copy template files...
+# I18N: Copy template files
 S_ACTION_COPY = _("Copy template files... ")
-# I18N: Do before fix...
+# I18N: Do before fix
 S_ACTION_BEFORE = _("Do before fix... ")
-# I18N: Do fix...
+# I18N: Do fix
 S_ACTION_FIX = _("Do fix... ")
-# I18N: Do after fix...
+# I18N: Do after fix
 S_ACTION_AFTER = _("Do after fix... ")
-# I18N: Make git folder...
+# I18N: Make git folder
 S_ACTION_GIT = _("Make git folder... ")
-# I18N: Make venv folder...
+# I18N: Make venv folder
 S_ACTION_VENV = _("Make venv folder... ")
-# I18N: Install libs in venv...
+# I18N: Install libs in venv
 S_ACTION_LIB = _("Install libs in venv... ")
-# I18N: Make i18n folder...
+# I18N: Make i18n folder
 S_ACTION_I18N = _("Make i18n folder... ")
-# I18N: Fixing desktop file...
+# I18N: Fixing desktop file
 S_ACTION_DESK = _("Fixing desktop file... ")
-# I18N: Make docs folder...
+# I18N: Make docs folder
 S_ACTION_DOCS = _("Make docs folder... ")
-# I18N: Make tree file...
+# I18N: Make tree file
 S_ACTION_TREE = _("Make tree file... ")
-# I18N: Install package in venv...
+# I18N: Install package in venv
 S_ACTION_INST_PKG = _("Install package in venv... ")
-# I18N: Make dist folder...
+# I18N: Make dist folder
 S_ACTION_DIST = _("Make dist folder... ")
-# I18N: Make install file...
+# I18N: Make install file
 S_ACTION_INST = _("Make install file... ")
 # I18N: Done
 S_ACTION_DONE = _("Done")
@@ -200,16 +201,12 @@ S_KEY_SKIP_PATH = "SKIP_PATH"
 S_KEY_SKIP_TREE = "SKIP_TREE"
 
 # keys for i18n
-S_KEY_CHARSET = "CHARSET"
-S_KEY_CLANGS = "CLANGS"
-S_KEY_DOMAINS = "DOMAINS"
-S_KEY_SOURCES = "SOURCES"
-S_KEY_LOCALE = "LOCALE"
-S_KEY_WLANGS = "WLANGS"
-S_KEY_NO_EXT = "NO_EXT"
-S_KEY_LOCALE = "LOCALE"
-S_KEY_PO = "PO"
-S_KEY_MO = "MO"
+S_KEY_I18N_DOM = "DOMAIN"
+S_KEY_I18N_SRC = "SOURCES"
+S_KEY_I18N_CLANGS = "CLANGS"
+S_KEY_I18N_NO_EXT = "NO_EXT"
+S_KEY_I18N_WLANGS = "WLANGS"
+S_KEY_I18N_CHAR = "CHARSET"
 
 # keys for D_PUB_DBG
 S_KEY_DBG_GIT = "DBG_GIT"
@@ -257,8 +254,8 @@ S_DIR_UI = "ui"
 S_DIR_I18N = "i18n"
 S_DIR_IMAGES = "images"
 S_DIR_LOCALE = "locale"
+S_DIR_POT = "pot"
 S_DIR_PO = "po"
-S_DIR_MO = "mo"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
 S_DIR_GUI = "gui"
@@ -279,9 +276,6 @@ S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_LOGO = "logo.mako"
 
-# i18n stuff
-S_I18N_TAG = "I18N"
-
 # concatenate some paths
 S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
 S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
@@ -299,9 +293,11 @@ S_FILE_DSK_TMP = (
 )
 
 # I18N stuff
-S_PATH_LOCALE = str(Path(S_DIR_I18N) / S_DIR_LOCALE)
-S_PATH_PO = str(Path(S_DIR_I18N) / S_DIR_PO)
-S_PATH_MO = str(Path(S_DIR_I18N) / S_DIR_MO)
+P_DIR_I18N = Path(S_DIR_I18N)
+S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
+S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
+S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
+S_I18N_TAG = "I18N"
 
 # paths relative to end user home only
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
@@ -454,7 +450,7 @@ S_APP_CLASS_FMT = "{}App"
 # NB: format param is _PP_NAME_SEC_PASCAL__
 S_WIN_CLASS_FMT = "{}Win"
 
-# NB: format params are _dict_prv_all["__PP_AUTHOR__"] and __PP_NAME_PRJ_SMALL__
+# NB: format params are __PP_AUTHOR__ and __PP_NAME_PRJ_SMALL__
 S_APP_ID_FMT = "org.{}.{}"
 
 # ------------------------------------------------------------------------------
@@ -708,7 +704,7 @@ D_PRV_ALL = {
     "__PP_DUMMY__": "",
     # version format string for command line
     # NB: format param is __PP_VERSION__ from metadata
-    "__PP_VER_FMT__": S_VER_FMT,
+    "__PP_VER_FMT__": S_DEF_VER_FMT,
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -717,7 +713,7 @@ D_PRV_ALL = {
     # sure how to proceed but i think for now i will leave this as a
     # user-editable string and place it in the realm of 'edit it before you
     # run' along with author/email/license/etc
-    "__PP_DATE_FMT__": S_DATE_FMT,
+    "__PP_DATE_FMT__": S_DEF_DATE_FMT,
     # file names replaced in various places, rel to prj dir
     "__PP_LICENSE_FILE__": S_FILE_LICENSE,
     "__PP_README_FILE__": S_FILE_README,
@@ -734,7 +730,6 @@ D_PRV_ALL = {
     # i.e. /home/dev/Documents/Projects/Python/MyProject
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
-    "__PP_PATH_MO__": S_PATH_MO,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_NAME_DSK_TMP__": S_NAME_DSK_TMP,
@@ -916,12 +911,14 @@ D_PUB_BL = {
     ],
 }
 
-# I18N stuff to be used in pybaker
+# stuff to be used in pybaker
 D_PUB_I18N = {
-    # default charset for .pot/.po files
-    S_KEY_CHARSET: S_ENCODING,
+    # name of the project as domain
+    S_KEY_I18N_DOM: "__PP_NAME_PRJ_SMALL__",
+    # list of sources per domain
+    S_KEY_I18N_SRC: [S_DIR_SRC],
     # computer languages
-    S_KEY_CLANGS: {
+    S_KEY_I18N_CLANGS: {
         "Python": [
             "py",
         ],
@@ -932,20 +929,15 @@ D_PUB_I18N = {
         "Desktop": [".desktop"],
     },
     # dict of clangs and no exts (ie file names)
-    S_KEY_NO_EXT: {
+    S_KEY_I18N_NO_EXT: {
         "Python": [
             "__PP_NAME_PRJ_SMALL__",
         ],
     },
-    # list of sources per domain
-    S_KEY_DOMAINS: {
-        "__PP_NAME_PRJ_SMALL__": {
-            S_KEY_SOURCES: ["src"],
-            S_KEY_LOCALE: S_DIR_I18N,
-        },
-    },
     # list of written languages that are available
-    S_KEY_WLANGS: ["en"],
+    S_KEY_I18N_WLANGS: ["en"],
+    # default charset for .pot/.po files
+    S_KEY_I18N_CHAR: S_DEF_ENCODING,
 }
 
 # dict in project to control post processing
@@ -1234,7 +1226,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
 
             # if it is in purge list, delete it
             if item.name in L_PURGE_DIRS:
-                Path.unlink(item)
+                item.unlink()
 
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
@@ -1303,7 +1295,7 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
 
             # if it is in purge list, delete it
             if item.name in L_PURGE_FILES:
-                Path.unlink(item)
+                item.unlink()
 
     # --------------------------------------------------------------------------
     # check for compression in dist
@@ -1359,7 +1351,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
@@ -1369,7 +1361,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1393,7 +1385,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
         text = a_file.read()
 
     # --------------------------------------------------------------------------
@@ -1443,7 +1435,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1466,7 +1458,7 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
@@ -1492,7 +1484,7 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1533,7 +1525,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
         text = a_file.read()
 
     # replace categories
@@ -1548,7 +1540,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1571,7 +1563,7 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
         text = a_file.read()
 
     # replace short description
@@ -1587,7 +1579,7 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
         a_file.write(text)
 
 

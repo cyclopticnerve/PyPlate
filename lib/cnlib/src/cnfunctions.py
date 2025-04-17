@@ -26,53 +26,25 @@ Functions:
 # ------------------------------------------------------------------------------
 
 # system imports
-import gettext
 import json
-import locale
 from pathlib import Path
 import shlex
 import subprocess
 
 # ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
-
-T_DOMAIN = "cnlib"
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-T_DIR_LOCALE = f"{T_DIR_PRJ}/i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
-# ------------------------------------------------------------------------------
 # Constant strings
 # ------------------------------------------------------------------------------
 
-# I18N: dpretty object is not a dict
-S_ERR_NOT_DICT = _("dpretty object is not a dict")
-# I18N: lpretty object is not a list
-S_ERR_NOT_LIST = _("lpretty object is not a list")
-# I18N: pp object is not a dict or list
-S_ERR_NOT_DICT_OR_LIST = _("pp object is not a dict or list")
-# I18N: shell process failed
-S_ERR_SHELL = _("shell process failed")
-# I18N: dict file '{}' does not exist
+S_ERR_NOT_DICT = "dpretty object is not a dict"
+S_ERR_NOT_LIST = "lpretty object is not a list"
+S_ERR_NOT_DICT_OR_LIST = "pp object is not a dict or list"
+S_ERR_SHELL = "shell process failed"
 # NB: format param is dict file path
-S_ERR_NOT_EXIST = _("dict file '{}' does not exist")
-# I18N: dict file '{}' is not a valid JSON file
+S_ERR_NOT_EXIST = "dict file '{}' does not exist"
 # NB: format param is dict file path
-S_ERR_NOT_VALID = _("dict file '{}' is not a valid JSON file")
-# I18N: dict file '{}' could not be created
+S_ERR_NOT_VALID = "dict file '{}' is not a valid JSON file"
 # NB: format param is dict file path
-S_ERR_NOT_CREATE = _("dict file '{}' could not be created")
+S_ERR_NOT_CREATE = "dict file '{}' could not be created"
 
 # if it is in this list, it is True, else false
 # NB: strings here should be all lowercase
