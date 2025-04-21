@@ -1,4 +1,5 @@
 
+# TODO: all refs to .local, etc. should be relative to prj in ide until unstall
 # TODO: combine pyplate.py B_ flags into dict and add to project.json
 # TODO: custom exceptions (instead of except Exception as e/raise e)
 # how to read in pybaker? and write (debug at least, since we pass it in prj)

@@ -55,7 +55,7 @@ from gui.python.__PP_FILE_APP__ import __PP_CLASS_APP__
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# gettext stuff for CLI
+# gettext stuff for CLI and GUI
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
 
@@ -143,7 +143,7 @@ class __PP_NAME_PRJ_PASCAL__:
     S_ABOUT_HELP = _("Use -h for help") + "\n"
 
     # path to default config file
-    P_CFG_DEF = None
+    P_CFG_DEF = Path("__PP_DIR_CONF__/__PP_NAME_PRJ_SMALL__.json")
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -320,13 +320,6 @@ class __PP_NAME_PRJ_PASCAL__:
         """
 
         # accept path or str
-        if self._path_cfg_arg:
-            self._path_cfg_arg = Path(self._path_cfg_arg)
-            if not self._path_cfg_arg.is_absolute():
-                # make abs rel to self
-                self._path_cfg_arg = self.P_DIR_PRJ / self._path_cfg_arg
-
-        # accept path or str
         path_def = self.P_CFG_DEF
         if path_def:
             path_def = Path(path_def)
@@ -334,15 +327,22 @@ class __PP_NAME_PRJ_PASCAL__:
                 # make abs rel to self
                 path_def = self.P_DIR_PRJ / path_def
 
+        # accept path or str
+        if self._path_cfg_arg:
+            self._path_cfg_arg = Path(self._path_cfg_arg)
+            if not self._path_cfg_arg.is_absolute():
+                # make abs rel to self
+                self._path_cfg_arg = self.P_DIR_PRJ / self._path_cfg_arg
+
         # ----------------------------------------------------------------------
 
-        # if cmd line
+        # assume def
+        if path_def and path_def.exists():
+            self._path_cfg = path_def
+
+        # arg supersedes def
         if self._path_cfg_arg and self._path_cfg_arg.exists():
             self._path_cfg = self._path_cfg_arg
-
-        # else if def
-        elif path_def and path_def.exists():
-            self._path_cfg = path_def
 
     # --------------------------------------------------------------------------
     # Load config data from a file
@@ -363,7 +363,7 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # throw in a debug test
         if self._debug:
-            print("load cfg from:", self._dict_cfg)
+            print("load cfg from:", self._path_cfg)
             F.pp(self._dict_cfg, label="load cfg")
 
     # --------------------------------------------------------------------------
@@ -381,11 +381,12 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # save dict to path
         if self._path_cfg:
+            self._path_cfg.parent.mkdir(parents=True, exist_ok=True)
             F.save_dict(self._dict_cfg, [self._path_cfg])
 
         # throw in a debug test
         if self._debug:
-            print("save cfg to:", self._dict_cfg)
+            print("save cfg to:", self._path_cfg)
             F.pp(self._dict_cfg, label="save cfg")
 
 

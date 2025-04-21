@@ -6,7 +6,8 @@
         {
             "label": "PyBaker",
             "type": "shell",
-            "command": "pybaker",
+            //FIXME: REMOVE BEFORE FLIGHT
+            "command": "pybaker-dev",
             "problemMatcher": [],
             "options": {
                 "cwd": "${workspaceFolder}"

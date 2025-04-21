@@ -136,6 +136,7 @@ class PyBaker:
 
     # about string
     S_ABOUT = (
+        "\n"
         f"{'PyPlate/PyBaker'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
@@ -825,18 +826,24 @@ class PyBaker:
         # for each key, val (type, dict)
         for key, val in self._dict_pub_dist.items():
 
-            # get src/dst rel to prj dir/dist dir
-            src = self._dir_prj / key
-            dst = p_dist / val
-            if not dst.exists():
-                dst.mkdir(parents=True)
-            dst = dst / src.name
+            # if it is our project type
+            if key == self._dict_prv_prj["__PP_TYPE_PRJ__"]:
 
-            # do the copy
-            if src.exists() and src.is_dir():
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            elif src.exists() and src.is_file():
-                shutil.copy2(src, dst)
+                # get the contents of the dict
+                for k2, v2 in val.items():
+
+                    # get src/dst rel to prj dir/dist dir
+                    src = self._dir_prj / k2
+                    dst = p_dist / v2
+                    if not dst.exists():
+                        dst.mkdir(parents=True)
+                    dst = dst / src.name
+
+                    # do the copy
+                    if src.exists() and src.is_dir():
+                        shutil.copytree(src, dst, dirs_exist_ok=True)
+                    elif src.exists() and src.is_file():
+                        shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
         # do copy lib dict

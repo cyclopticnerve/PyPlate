@@ -33,7 +33,7 @@ class CNVenv:
     A class to make handling of venv folders easier
 
     Methods:
-        create: Create sa new venv given the __init__ params
+        create: Creates a new venv given the __init__ params
         install_reqs: Install packages to venv from the reqs_file property
         freeze: Freeze packages in the venv folder to the file_reqs property
 
@@ -106,7 +106,7 @@ class CNVenv:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Create sa new venv given the __init__ params
+    # Creates a new venv given the __init__ params
     # --------------------------------------------------------------------------
     def create(self):
         """

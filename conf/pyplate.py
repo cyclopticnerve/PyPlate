@@ -97,21 +97,21 @@ S_ASK_SEC_P = _("Module name (default: {}): ")
 S_ASK_SEC_G = _("Window class name (default: {}): ")
 # NB: format param is current working dir
 # I18N: ask prj name if running pybaker in IDE
-S_ASK_IDE = _("Project name: (Relative to {}): ")
+S_ASK_IDE = _("Project name: (relative to {}): ")
 
 # error strings
 # NB: format param is joined list of project types from L_TYPES
 # I18N: Type must be one of {}
 S_ERR_TYPE = _("Type must be one of {}")
 # I18N: Project names must be more than 1 character
-S_ERR_LEN = _("Project names must be more than 1 character")
+S_ERR_LEN = _("Name must be more than 1 character")
 # I18N: Project names must start with a letter
-S_ERR_START = _("Project names must start with a letter")
+S_ERR_START = _("Name must start with a letter")
 # I18N: Project names must end with a letter or number
-S_ERR_END = _("Project names must end with a letter or number")
+S_ERR_END = _("Name must end with a letter or number")
 # I18N: name contains invalid char
 S_ERR_MID = _(
-    "Project names must contain only letters, numbers, dashes (-), or "
+    "Name must contain only letters, numbers, spaces, dashes (-), or "
     "underscores (_)"
 )
 # NB: format param is __PP_NAME_PRJ_BIG__
@@ -728,6 +728,7 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's prj name
     # i.e. /home/dev/Documents/Projects/Python/MyProject
+    "__PP_DIR_CONF__": S_DIR_CONF,
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
     # --------------------------------------------------------------------------

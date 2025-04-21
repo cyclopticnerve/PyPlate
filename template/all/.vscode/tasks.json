@@ -6,7 +6,7 @@
         {
             "label": "PyBaker",
             "type": "shell",
-            "command": "pybaker",
+            "command": "pybaker-dev",
             "problemMatcher": [],
             "options": {
                 "cwd": "${workspaceFolder}"

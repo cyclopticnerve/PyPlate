@@ -8,7 +8,17 @@
             "program": "PyPlate/src/pymaker.py",
             "console": "integratedTerminal",
             // run from above PyPlate project
+            "cwd": "${workspaceFolder}/.."
+        },
+        {
+            "name": "PM Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "PyPlate/src/pymaker.py",
+            "console": "integratedTerminal",
+            // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
+            "args": "${command:pickArgs}"
         },
         {
             "name": "PB",
@@ -19,6 +29,19 @@
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
             "args": [
+                "-i"
+            ]
+        },
+        {
+            "name": "PB Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "PyPlate/src/pybaker.py",
+            "console": "integratedTerminal",
+            // run from above PyPlate project
+            "cwd": "${workspaceFolder}/..",
+            "args": [
+                "${command:pickArgs}",
                 "-i"
             ]
         }

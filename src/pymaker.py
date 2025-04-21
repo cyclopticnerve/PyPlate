@@ -130,6 +130,7 @@ class PyMaker:
 
     # about string
     S_ABOUT = (
+        "\n"
         f"{'PyPlate/PyMaker'}\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
@@ -307,7 +308,7 @@ class PyMaker:
         # this is used in a lot of places, so just shorthand it
         self._dir_prj = Path.cwd()
 
-        # do not run pyplate in pyplate dir
+        # do not run pymaker in pyplate dir
         if self._dir_prj.is_relative_to(self.P_DIR_PP):
             print(PP.S_ERR_PRJ_DIR_IS_PP)
             sys.exit()
@@ -469,32 +470,42 @@ class PyMaker:
         name_sec_small = ""
         name_sec_pascal = ""
 
-        # if not debug, if need second name, ask for it
-        if not self._debug and prj_type in PP.D_NAME_SEC:
+        # do we need a second name?
+        if prj_type in PP.D_NAME_SEC:
 
-            # format question for second name
-            s_sec_ask = PP.D_NAME_SEC[prj_type]
-            s_sec_ask_fmt = s_sec_ask.format(name_prj_small)
+            # dup prj names if debug
+            if self._debug:
+                name_sec = name_prj
+                name_sec_big = name_prj_big
+                name_sec_small = name_prj_small
+                name_sec_pascal = name_prj_pascal
 
-            # loop forever until we get a valid name or empty string
-            while True:
+            # if not debug, if need second name, ask for it
+            else:
 
-                # ask for second name
-                name_sec = input(s_sec_ask_fmt)
-                name_sec = name_sec.strip(" ")
+                # format question for second name
+                s_sec_ask = PP.D_NAME_SEC[prj_type]
+                s_sec_ask_fmt = s_sec_ask.format(name_prj_small)
 
-                # empty, keep default
-                if name_sec == "":
-                    name_sec = name_prj_small
+                # loop forever until we get a valid name or empty string
+                while True:
 
-                # check for valid name
-                if self._check_name(name_sec):
-                    name_sec_big = name_sec.replace(" ", "_")
-                    break
+                    # ask for second name
+                    name_sec = input(s_sec_ask_fmt)
+                    name_sec = name_sec.strip(" ")
 
-            # save other names
-            name_sec_small = name_sec_big.lower()
-            name_sec_pascal = F.pascal_case(name_sec_small)
+                    # empty, keep default
+                    if name_sec == "":
+                        name_sec = name_prj_small
+
+                    # check for valid name
+                    if self._check_name(name_sec):
+                        name_sec_big = name_sec.replace(" ", "_")
+                        break
+
+                # save other names
+                name_sec_small = name_sec_big.lower()
+                name_sec_pascal = F.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
         # calculate initial project date
@@ -1582,7 +1593,7 @@ class PyMaker:
         """
 
         # NB: there is an easier way to do this with regex:
-        # ^([a-zA-Z]+[a-zA-Z\d\-_]*[a-zA-Z\d]+)$ AND OMG DID IT TAKE A LONG
+        # ^([a-zA-Z]+[a-zA-Z\d\-_ ]*[a-zA-Z\d]+)$ AND OMG DID IT TAKE A LONG
         # TIME TO FIND IT! in case you were looking for it. It will give you a
         # quick yes-no answer. I don't use it here because I want to give the
         # user as much feedback as possible, so I break down the regex into
@@ -1634,8 +1645,9 @@ class PyMaker:
 
         # get individual dicts in pyplate.py
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
-        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
+        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
 
