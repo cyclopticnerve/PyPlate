@@ -1281,6 +1281,8 @@ class PyBaker:
 
         # get individual dicts in pyplate.py
         self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 

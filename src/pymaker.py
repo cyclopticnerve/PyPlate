@@ -331,7 +331,8 @@ class PyMaker:
         self._dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
             PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
-            PP.S_KEY_PUB_DIST: PP.D_PUB_DIST,
+            # NB: placeholder until we get prj type
+            PP.S_KEY_PUB_DIST: [],
             PP.S_KEY_PUB_I18N: PP.D_PUB_I18N,
             PP.S_KEY_PUB_META: PP.D_PUB_META,
         }
@@ -544,7 +545,8 @@ class PyMaker:
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
 
         # add dist stuff
-        self._dict_pub_dist = PP.D_PUB_DIST[prj_type]
+        self._dict_pub[PP.S_KEY_PUB_DIST] = PP.D_PUB_DIST[prj_type]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
 
         # ----------------------------------------------------------------------
 
@@ -1552,15 +1554,14 @@ class PyMaker:
         """
 
         # sanity check
-        if len(prj_type) == 0:
-            return False
+        if len(prj_type) == 1:
 
-        # get first char and lower case it
-        first_char = prj_type[0].lower()
+            # get first char and lower case it
+            first_char = prj_type[0].lower()
 
-        # we got a valid type
-        for item in PP.L_TYPES:
-            if first_char == item[0]:
+            # check if it's one of ours
+            first_char_test = [item[0] for item in PP.L_TYPES]
+            if first_char in first_char_test:
                 return True
 
         # nope, fail
