@@ -78,6 +78,8 @@ S_DEF_DATE_FMT = _("%m/%d/%Y")
 # NB: format param is __PP_VERSION__
 # I18N: printable version number
 S_DEF_VER_FMT = _("Version {}")
+# I18N: def deps
+S_DEF_DEPS_NONE = "None"
 
 # ask questions
 # I18N: ask prj name
@@ -376,7 +378,7 @@ S_RM_DEPS_SCH = (
     r"(.*?)"
     r"(<!--[\t ]*__RM_DEPS__[\t ]*-->)"
 )
-S_RM_DEPS_REP = r"\g<1>\n{}\g<3>"
+S_RM_DEPS_REP = r"\g<1>\n{}\n\g<3>"
 
 # fix desktop
 S_DESK_CAT_SCH = (
@@ -797,11 +799,7 @@ D_PUB_META = {
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     # key is dep name, val is link to dep (optional)
-    "__PP_PY_DEPS__": {},
-    # the system dependencies to use in __PP_README_FILE__, github.com, and
-    # install.py
-    # key is dep name, val is link to dep (optional)
-    "__PP_SYS_DEPS__": {},
+    "__PP_PY_DEPS__": {"Python 3.10+": "https://python.org"},
     # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
     "__PP_GUI_CATS__": [],
 }
@@ -1428,7 +1426,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     # get rm deps as links
     s_rm_deps = "<br>\n".join(l_rm_deps)
     if len(s_rm_deps) == 0:
-        s_rm_deps = "None\n"
+        s_rm_deps = S_DEF_DEPS_NONE
 
     # replace dependencies array
     str_pattern = S_RM_DEPS_SCH

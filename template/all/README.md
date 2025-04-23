@@ -9,7 +9,7 @@
 <!-- make a pretty header -->
 <img align="left" src="readme/__PP_NAME_PRJ_SMALL__.png" alt="__PP_NAME_PRJ_BIG__"/>
 
-# __PP_NAME_PRJ_BIG__
+# __PP_NAME_PRJ__
 
 ## "It mostly works ™©®"
 
@@ -33,9 +33,7 @@ __PP_PY_DEPS__
 ## Installing
 <!-- __RM_PKG__ -->
 You can download the (hopefully stable)
-[latest
-release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest 
-"https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest")
+[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest "https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest")
 from the main branch.<br>
 Download the 'tar.gz' file.
 
@@ -60,8 +58,7 @@ foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m pip install ./dist/
 <!-- __RM_PKG__ -->
 <!-- __RM_APP__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/
-latest "https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
+[latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest "https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest")
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.
 

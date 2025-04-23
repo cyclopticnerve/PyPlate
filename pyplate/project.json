@@ -79,7 +79,6 @@
         "__PP_PY_DEPS__": {
             "Python 3.10+": "https://python.org"
         },
-        "__PP_SYS_DEPS__": {},
         "__PP_GUI_CATS__": []
     }
 }
