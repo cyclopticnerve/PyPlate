@@ -1194,6 +1194,15 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     if a_file.exists():
         _fix_pyproject(a_file, dict_prv_prj, dict_pub_meta)
 
+    # check cats now
+    cats = dict_pub_meta["__PP_GUI_CATS__"]
+    for cat in cats:
+        # category is not valid
+        if not cat in L_CATS:
+            # category is not valid, print error
+            print()
+            print(S_ERR_DESK_CAT.format(cat))
+
     # fix deep files
     for root, _root_dirs, root_files in dir_prj.walk():
 
@@ -1203,13 +1212,13 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
         # test each file
         for item in items:
 
-            # fix ui files
-            if item.suffix in L_EXT_GTK:
-                _fix_ui(item, dict_prv_prj, dict_pub_meta)
-
             # fix ,desktop files
             if item.suffix in L_EXT_DESKTOP:
                 _fix_desktop(item, dict_prv_prj, dict_pub_meta)
+
+            # fix ui files
+            if item.suffix in L_EXT_GTK:
+                _fix_ui(item, dict_prv_prj, dict_pub_meta)
 
     # --------------------------------------------------------------------------
     # remove some extra stuff
@@ -1504,22 +1513,14 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     """
 
     # validate wanted categories into approved categories
-    pp_gui_categories = []
-    wanted_cats = dict_pub_meta["__PP_GUI_CATS__"]
-    for cat in wanted_cats:
-        # category is valid
-        if cat in L_CATS:
-            # add to final list
-            pp_gui_categories.append(cat)
-        else:
-            # category is not valid, print error and increase error count
-            print(S_ERR_DESK_CAT.format(cat))
+    cats = dict_pub_meta["__PP_GUI_CATS__"]
+    cats = [f"{cat};" for cat in cats if cat in L_CATS]
 
-    # convert list to string
-    str_cat = ";".join(pp_gui_categories)
-    # NB: must have trailing semicolon
-    str_cat += ";"
+    # # convert list to string
+    str_cat = "".join(cats)
 
+    # --------------------------------------------------------------------------
+    
     # default text if we can't open file
     text = ""
 
@@ -1532,7 +1533,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     str_rep = S_DESK_CAT_REP.format(str_cat)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # replace short description
+    # replace short description0
     str_pattern = S_DESK_DESC_SCH
     pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
     str_rep = S_DESK_DESC_REP.format(pp_short_desc)
