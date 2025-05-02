@@ -7,9 +7,16 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<img align="left" src="readme/__PP_NAME_PRJ_SMALL__.png" alt="__PP_NAME_PRJ_BIG__"/>
-
-# __PP_NAME_PRJ__
+<table>
+    <tr>
+        <td>
+            <img style="display:flex;" src="__PP_IMG_README__" />
+        </td>
+        <td>
+            <span style="font-size:300%;font-weight:bold;">__PP_NAME_PRJ_BIG__</span>
+        </td>
+    </tr>
+</table>
 
 ## "It mostly works ™©®"
 

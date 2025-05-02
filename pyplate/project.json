@@ -9,11 +9,10 @@
             "i18n",
             "lib",
             "misc",
-            "readme",
             "LICENSE.txt",
             "requirements.txt",
             "**/__pycache__",
-            "src"
+            "template"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
@@ -33,9 +32,33 @@
             "**/__pycache__"
         ]
     },
+    "PUB_DBG": {
+        "DBG_GIT": true,
+        "DBG_VENV": true,
+        "DBG_I18N": true,
+        "DBG_DOCS": true,
+        "DBG_INST": true,
+        "DBG_TREE": true,
+        "DBG_DIST": true
+    },
+    "PUB_DIST": {
+        "bin": "assets",
+        "src": "assets",
+        "LICENSE.txt": "assets",
+        "README.md": "assets",
+        "conf": "assets",
+        "i18n/locale": "assets/i18n",
+        "install/install.py": "",
+        "install/install.json": "assets/install",
+        "uninstall": "assets",
+        "requirements.txt": "assets/install"
+    },
     "PUB_I18N": {
         "DOMAIN": "pyplate",
-        "SOURCES": ["src", "conf"],
+        "SOURCES": [
+            "src",
+            "conf"
+        ],
         "CLANGS": {
             "Python": [
                 "py"
@@ -60,25 +83,13 @@
         ],
         "CHARSET": "UTF-8"
     },
-    "PUB_DIST": {
-        "bin": "assets",
-        "src": "assets",
-        "LICENSE.txt": "assets",
-        "README.md": "assets",
-        "conf": "assets",
-        "i18n/locale": "assets/i18n",
-        "install/install.py": "",
-        "install/install.json": "assets/install",
-        "uninstall": "assets",
-        "requirements.txt": "assets/install"
-    },
     "PUB_META": {
-        "__PP_VERSION__": "0.0.1",
-        "__PP_SHORT_DESC__": "A program for creating and building CLI/Package/GUI projects in Python from a template",
-        "__PP_KEYWORDS__": [],
-        "__PP_PY_DEPS__": {
+        "META_VERSION": "0.0.2",
+        "META_SHORT_DESC": "A program for creating and building CLI/Package/GUI projects in Python from a template",
+        "META_KEYWORDS": [],
+        "META_DEPS": {
             "Python 3.10+": "https://python.org"
         },
-        "__PP_GUI_CATS__": []
+        "META_CATS": []
     }
 }

@@ -4,3 +4,4 @@ MarkupSafe==3.0.2
 pdoc3==0.11.5
 pycairo==1.27.0
 PyGObject==3.50.0
+setuptools==78.1.0

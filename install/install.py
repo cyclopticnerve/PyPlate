@@ -54,7 +54,7 @@ P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
 # get files
 P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
 P_FILE_DESK_ICON = (
-    Path.home() / ".local/share/pyplate/src/gui/desktop/pyplate.png"
+    Path.home() / ".local/share/pyplate/images/pyplate.png"
 )
 
 P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"

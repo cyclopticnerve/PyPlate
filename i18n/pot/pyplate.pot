@@ -1,0 +1,162 @@
+# pyplate translation template
+# Copyright (C) 2025 cyclopticnerve
+# This file is distributed under the same license as the pyplate package.
+# FIRST AUTHOR cyclopticnerve@gmail.com, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyplate 0.0.2\n"
+"Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
+"POT-Creation-Date: 2025-04-27 11:21-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. I18N: default date format
+msgid "%m/%d/%Y"
+msgstr ""
+
+#. I18N: printable version number
+msgid "Version {}"
+msgstr ""
+
+#. I18N: ask prj name
+msgid "Project name: "
+msgstr ""
+
+#. I18N: ask prj type
+msgid "Project type [{}]: "
+msgstr ""
+
+#. I18N: ask module name
+msgid "Module name (default: {}): "
+msgstr ""
+
+#. I18N: ask window class name
+msgid "Window class name (default: {}): "
+msgstr ""
+
+#. I18N: ask prj name if running pybaker in IDE
+msgid "Project name: (relative to {}): "
+msgstr ""
+
+#. I18N: Type must be one of {}
+msgid "Type must be one of {}"
+msgstr ""
+
+#. I18N: Project names must be more than 1 character
+msgid "Name must be more than 1 character"
+msgstr ""
+
+#. I18N: Project names must start with a letter
+msgid "Name must start with a letter"
+msgstr ""
+
+#. I18N: Project names must end with a letter or number
+msgid "Name must end with a letter or number"
+msgstr ""
+
+msgid ""
+"Name must contain only letters, numbers, spaces, dashes (-), or underscores "
+"(_)"
+msgstr ""
+
+#. I18N: project already exists
+msgid "Project \"{}\" already exists"
+msgstr ""
+
+#. I18N: run pybaker on project that does not exist
+msgid "Project \"{}\" does not exist"
+msgstr ""
+
+msgid ""
+"This folder does not have a 'pyplate' folder.\n"
+"Are you sure this is a PyPlate project?"
+msgstr ""
+
+#. I18N: invalid version string format
+msgid "Version number must be the format \"n.n.n...\""
+msgstr ""
+
+#. I18N: Cannot run pymaker in PyPlate dir
+msgid "Cannot run pymaker in PyPlate dir"
+msgstr ""
+
+msgid ""
+"\"{}\" is not a valid desktop category, see https://specifications."
+"freedesktop.org/menu-spec/latest/apa.html"
+msgstr ""
+
+msgid ""
+"WARNING! YOU ARE IN DEBUG MODE!\n"
+"IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
+msgstr ""
+
+#. I18N: Copy template files
+msgid "Copy template files... "
+msgstr ""
+
+#. I18N: Do before fix
+msgid "Do before fix... "
+msgstr ""
+
+#. I18N: Do fix
+msgid "Do fix... "
+msgstr ""
+
+#. I18N: Do after fix
+msgid "Do after fix... "
+msgstr ""
+
+#. I18N: Make git folder
+msgid "Make git folder... "
+msgstr ""
+
+#. I18N: Make venv folder
+msgid "Make venv folder... "
+msgstr ""
+
+#. I18N: Install libs in venv
+msgid "Install libs in venv... "
+msgstr ""
+
+#. I18N: Make i18n folder
+msgid "Make i18n folder... "
+msgstr ""
+
+#. I18N: Fixing desktop file
+msgid "Fixing desktop file... "
+msgstr ""
+
+#. I18N: Make docs folder
+msgid "Make docs folder... "
+msgstr ""
+
+#. I18N: Make tree file
+msgid "Make tree file... "
+msgstr ""
+
+#. I18N: Install package in venv
+msgid "Install package in venv... "
+msgstr ""
+
+#. I18N: Make dist folder
+msgid "Make dist folder... "
+msgstr ""
+
+#. I18N: Make install file
+msgid "Make install file... "
+msgstr ""
+
+#. I18N: Done
+msgid "Done"
+msgstr ""
+
+#. I18N: Failed
+msgid "Failed"
+msgstr ""

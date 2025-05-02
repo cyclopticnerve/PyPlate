@@ -353,7 +353,7 @@ def pp(obj, indent_size=4, label=None):
 # ------------------------------------------------------------------------------
 # Update a dictionary with entries from another dict
 # ------------------------------------------------------------------------------
-def combine_dicts(dicts_new, dict_old):
+def combine_dicts(dicts_new, dict_old=None):
     """
     Update a dictionary with entries from another dict
 
@@ -371,11 +371,16 @@ def combine_dicts(dicts_new, dict_old):
     as a value will be handled correctly.
     """
 
+    # default return val
+    dict_old = {}
+
     # sanity check
     if isinstance(dicts_new, dict):
         dicts_new = [dicts_new]
     if len(dicts_new) == 0:
         return dict_old
+    if not dict_old:
+        dict_old = {}
 
     # go through the new dicts in order
     for dict_new in dicts_new:

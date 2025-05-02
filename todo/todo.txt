@@ -45,7 +45,7 @@
 # TODO: installer for pkg should move pkg to __PP_USR_LIB__
 
 TODO: change __RM_XXX and _xxx_readme to 'mx/MX' (for markup/markdown)
-TODO: fix README instuctions for installing (like where it gets
+TODO: fix README instructions for installing (like where it gets
 installed/uninstalled from)
 TODO: output each step to terminal from pymaker
 TODO: combine all __PP dicts
@@ -143,8 +143,8 @@ TODO: lint (CTRL+S) all files
 
 TODO: in gui, what to set to make name change in top bar/dock 
 step 1: remove .py from main file
-step 2: where is it getting __PP_NAME_PRJ_SMALL__? from main file?
-if so, need to rename main file to __PP_NAME_PRJ_BIG__?
+step 2: where is it getting pyplate? from main file?
+if so, need to rename main file to PyPlate?
 how does that affect other stuff
 also why does it try to load png from current dir? (about dlg!)
 
@@ -305,7 +305,7 @@ DONE: dir - up to name or if a folder
 DONE: run pip freeze into template during copy
 DONE: docs folder is empty in template, so doesn't get into GitHub
 DONE: why does PP_SHORT_DESC/PP_VERSION change in misc/empty_main.py?
-DONE: __PP_NAME_PRJ_BIG__ in empty_main.py? can we live with one error?
+DONE: PyPlate in empty_main.py? can we live with one error?
 DONE: in strings.json, make py deps into dict and add links for README
 DONE: check _split_quote in toml/install
 DONE: gui categories have commas in file, split on comma and join with semicolon
@@ -384,13 +384,13 @@ $ twine upload -r testpypi dist/*
 $ twine upload dist/*
 
 install from testpypi/pypi
-$ python3 -m pip install -i https://test.pypi.org/simple/__PP_NAME_PRJ_BIG__
-$ python3 -m pip install __PP_NAME_PRJ_BIG__
+$ python3 -m pip install -i https://test.pypi.org/simple/PyPlate
+$ python3 -m pip install PyPlate
 
 install from github
 https://packaging.python.org/en/latest/tutorials/installing-packages/#id23
-python3 -m pip install git+https://github.com/cyclopticnerve/__PP_NAME_PRJ_BIG__
+python3 -m pip install git+https://github.com/cyclopticnerve/PyPlate
 requirements? pip install -r requirements.txt
 
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_PRJ_BIG__.git#egg=__PP_NAME_PRJ_BIG__         # from default branch
-python3 -m pip install -e git+https://github.com/cyclopticnerve/__PP_NAME_PRJ_BIG__.git@maine#egg=__PP_NAME_PRJ_BIG__   # from specific branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/PyPlate.git#egg=__PP_NAME_PRJ_BIG__         # from default branch
+python3 -m pip install -e git+https://github.com/cyclopticnerve/PyPlate.git@maine#egg=__PP_NAME_PRJ_BIG__   # from specific branch

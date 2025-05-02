@@ -7,9 +7,16 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<img align="left" src="readme/pyplate.png" alt="PyPlate"/>
-
-# PyPlate
+<table>
+    <tr>
+        <td>
+            <img style="display:flex;" src="images/pyplate.png" />
+        </td>
+        <td>
+            <span style="font-size:300%;font-weight:bold;">PyPlate</span>
+        </td>
+    </tr>
+</table>
 
 ## "It mostly works ™©®"
 
@@ -21,7 +28,7 @@ A program for creating and building CLI/Package/GUI projects in Python from a te
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 0.0.1
+Version 0.0.2
 <!-- __RM_VERSION__ -->
 
 <!-- ![alt-text](README/screenshot.png "screenshot") -->
@@ -35,7 +42,7 @@ Version 0.0.1
 
 ## Requirements
 <!-- __RM_DEPS__ -->
-None
+[Python 3.10+](https://python.org)
 <!-- __RM_DEPS__ -->
 
 ## Installing

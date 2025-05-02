@@ -8,6 +8,8 @@
 
 # pylint: disable=too-many-lines
 
+# pyplate: disable=replace
+
 """
 This module separates out the constants from pymaker.py. It also includes hook
 functions to extend the functionality of pymaker.py and pybaker.py.
@@ -19,6 +21,7 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # ------------------------------------------------------------------------------
 
 # system imports
+from datetime import datetime
 import gettext
 import locale
 from pathlib import Path
@@ -75,7 +78,7 @@ I_SW_FALSE = 0
 S_DEF_ENCODING = "UTF-8"
 # I18N: default date format
 S_DEF_DATE_FMT = _("%m/%d/%Y")
-# NB: format param is __PP_VERSION__
+# NB: format param is __PP_VER_LONG__
 # I18N: printable version number
 S_DEF_VER_FMT = _("Version {}")
 # I18N: def deps
@@ -128,9 +131,15 @@ S_ERR_NOT_PRJ = _(
     "PyPlate project?"
 )
 # I18N: invalid version string format
-S_ERR_VERS = _('Version number must be the format "n.n.n..."')
+S_ERR_SEMVER = _(
+    "Warning: version number does not match S_SEMVER_VALID \n"
+    "See https://semver.org/"
+)
 # I18N: Cannot run pymaker in PyPlate dir
 S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
+# NB: format params are S_FILE_DSK_TMP and __PP_FILE_DESK__
+# I18N: we want i18n but the template desktop doesn't exist
+S_ERR_DESK_NO_TEMP = _("Warning: file {} does not exist, using {}")
 # NB: format param is item in L_CATS
 # I18N: invalid ,desktop category
 S_ERR_DESK_CAT = _(
@@ -164,8 +173,6 @@ S_ACTION_VENV = _("Make venv folder... ")
 S_ACTION_LIB = _("Install libs in venv... ")
 # I18N: Make i18n folder
 S_ACTION_I18N = _("Make i18n folder... ")
-# I18N: Fixing desktop file
-S_ACTION_DESK = _("Fixing desktop file... ")
 # I18N: Make docs folder
 S_ACTION_DOCS = _("Make docs folder... ")
 # I18N: Make tree file
@@ -173,7 +180,7 @@ S_ACTION_TREE = _("Make tree file... ")
 # I18N: Install package in venv
 S_ACTION_INST_PKG = _("Install package in venv... ")
 # I18N: Make dist folder
-S_ACTION_DIST = _("Make dist folder... ")
+S_ACTION_DIST = _("Copy dist files... ")
 # I18N: Make install file
 S_ACTION_INST = _("Make install file... ")
 # I18N: Done
@@ -218,6 +225,13 @@ S_KEY_DBG_DOCS = "DBG_DOCS"
 S_KEY_DBG_INST = "DBG_INST"
 S_KEY_DBG_TREE = "DBG_TREE"
 S_KEY_DBG_DIST = "DBG_DIST"
+
+# keys for meta dict
+S_KEY_META_VERSION = "META_VERSION"
+S_KEY_META_SHORT_DESC = "META_SHORT_DESC"
+S_KEY_META_KEYWORDS = "META_KEYWORDS"
+S_KEY_META_DEPS = "META_DEPS"
+S_KEY_META_CATS = "META_CATS"
 
 # python header/split dict keys
 S_KEY_HDR = "S_KEY_HDR"
@@ -300,6 +314,13 @@ S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
 S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
 S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
 S_I18N_TAG = "I18N"
+
+# spice up version number
+S_BUILD_DATE_FMT = "%Y%m%d"
+# NB: format params are S_BUILD_DATE_FMT and __PP_BUILD_INFO__
+S_BUILD_FMT = "+{}.{}"
+# NB: format params are name_prj_small and __PP_VER_LONG__
+S_DIST_FMT = "{}_{}"
 
 # paths relative to end user home only
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
@@ -426,14 +447,27 @@ S_TOML_KW_SEARCH = (
 S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
 
 # desc/version in all files
-S_META_VER_SCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
-S_META_VER_REP = r'\g<1>"{}"'
+S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
+S_SRC_VER_REP = r'\g<1>"{}"'
 
-S_META_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
-S_META_DESC_REP = r"\g<1>\g<2>{}\g<4>"
+S_SRC_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
+S_SRC_DESC_REP = r"\g<1>\g<2>{}\g<4>"
 
 # make sure ver num entered in pybaker is valid
-S_SEMVER_VALID = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
+S_SEMVER_VALID = (
+    # r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
+
+    r"^"
+    r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+    r"(?:-("
+      r"(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+      r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*"
+    r"))?"
+    r"(?:\+("
+      r"[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*"
+    r"))?"
+    r"$"
+)
 
 # ------------------------------------------------------------------------------
 # gui stuff
@@ -490,9 +524,10 @@ L_EXT_MARKUP = [
     ".glade",
 ]
 
-# file exts for pybaker
+# file exts for _do_after_fix
 L_EXT_DESKTOP = [".desktop"]
 L_EXT_GTK = [".ui", ".glade"]
+L_EXT_SRC = [".py"]
 
 # files to remove after the project is done
 L_PURGE_FILES = [
@@ -657,15 +692,17 @@ L_CATS = [
     "Applet",
     "Shell",
 ]
-
-# which prj types need an install.json?
+# prj type(s) for making an install.json
 L_APP_INSTALL = [
     "c",
     "g",
 ]
 
-# install pkg in venv after making
+# prj types(s) for making install pkg in venv
 L_PKG_INSTALL = ["p"]
+
+# prj type(s) for making .desktop file
+L_MAKE_DESK = ["g"]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
@@ -705,7 +742,6 @@ D_PRV_ALL = {
     # dummy value to use in headers
     "__PP_DUMMY__": "",
     # version format string for command line
-    # NB: format param is __PP_VERSION__ from metadata
     "__PP_VER_FMT__": S_DEF_VER_FMT,
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
@@ -716,11 +752,14 @@ D_PRV_ALL = {
     # user-editable string and place it in the realm of 'edit it before you
     # run' along with author/email/license/etc
     "__PP_DATE_FMT__": S_DEF_DATE_FMT,
-    # file names replaced in various places, rel to prj dir
+    "__PP_BUILD_DATE_FMT__": S_BUILD_DATE_FMT,
+    "__PP_BUILD_FMT__": S_BUILD_FMT,
+    # filenames replaced in various places, rel to prj dir
     "__PP_LICENSE_FILE__": S_FILE_LICENSE,
     "__PP_README_FILE__": S_FILE_README,
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
+    "__PP_DIR_IMAGES__": S_DIR_IMAGES,
     "__PP_DIR_LIB__": S_DIR_LIB,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
@@ -779,8 +818,15 @@ D_PRV_PRJ = {
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
+    "__PP_VER_LONG__": "",  # version with build info
+    "__PP_BUILD_INFO__": "",  # build info to add to version
     "__PP_FILE_DESK__": "",  # final desk file, not template
     "__PP_PDOC_START__": "",  # start doc search at this folder
+    "__PP_IMG_README__": "",  # image for readme file logo
+    "__PP_IMG_DOCS__": "",  # image for docs header logo
+    "__PP_IMG_DESK__": "",  # image for .desktop logo
+    "__PP_IMG_DASH__": "",  # image for dash/win logo
+    "__PP_IMG_ABOUT__": "",  # image for about logo
 }
 
 # ------------------------------------------------------------------------------
@@ -791,17 +837,17 @@ D_PRV_PRJ = {
 # consider them the "each build" settings
 D_PUB_META = {
     # the version number to use in __PP_README_FILE__ and pyproject.toml
-    "__PP_VERSION__": "0.0.0",
+    S_KEY_META_VERSION: "0.0.0",
     # the short description to use in __PP_README_FILE__ and pyproject.toml
-    "__PP_SHORT_DESC__": "Short description",
+    S_KEY_META_SHORT_DESC: "Short description",
     # the keywords to use in pyproject.toml and github
-    "__PP_KW_STR__": [],
+    S_KEY_META_KEYWORDS: [],
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     # key is dep name, val is link to dep (optional)
-    "__PP_PY_DEPS__": {"Python 3.10+": "https://python.org"},
+    S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
     # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
-    "__PP_GUI_CATS__": [],
+    S_KEY_META_CATS: [],
 }
 
 # dict of files to put in dist folder (defaults, written by pymaker, edited by
@@ -812,6 +858,8 @@ D_PUB_DIST = {
     "c": {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
+        S_DIR_IMAGES: S_DIR_ASSETS,
+        S_DIR_README: S_DIR_ASSETS,
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
@@ -828,6 +876,8 @@ D_PUB_DIST = {
     "g": {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
+        S_DIR_IMAGES: S_DIR_ASSETS,
+        S_DIR_README: S_DIR_ASSETS,
         S_DIR_SRC: S_DIR_ASSETS,
         S_FILE_LICENSE: S_DIR_ASSETS,
         S_FILE_README: S_DIR_ASSETS,
@@ -840,11 +890,11 @@ D_PUB_DIST = {
         S_DIR_UNINSTALL: S_DIR_ASSETS,
         # requirements.txt in assets/install folder
         S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-        # extended readme folder (screenshots, etc.)
-        S_DIR_README: S_DIR_ASSETS,
     },
     "p": {
         # basic stuff (put at top level)
+        S_DIR_IMAGES: "",
+        S_DIR_README: "",
         S_DIR_SRC: "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
@@ -954,6 +1004,28 @@ D_PUB_DBG = {
 # Other dictionaries
 # ------------------------------------------------------------------------------
 
+# dict in pymaker to control post processing in debug mode
+D_DBG_PM = {
+    S_KEY_DBG_GIT: False,
+    S_KEY_DBG_VENV: False,
+    S_KEY_DBG_I18N: False,
+    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_INST: False,
+    S_KEY_DBG_TREE: False,
+    S_KEY_DBG_DIST: False,
+}
+
+# dict in pybaker to control post processing in debug mode
+D_DBG_PB = {
+    S_KEY_DBG_GIT: False,
+    S_KEY_DBG_VENV: False,
+    S_KEY_DBG_I18N: False,
+    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_INST: False,
+    S_KEY_DBG_TREE: False,
+    S_KEY_DBG_DIST: False,
+}
+
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
 # this is so that when you update a file in the PyPlate project, it gets copied
@@ -980,6 +1052,7 @@ D_COPY_LIB = {
 D_INSTALL = {
     "c": {
         S_DIR_CONF: "__PP_USR_INST__",
+        S_DIR_IMAGES: "__PP_USR_INST__",
         S_DIR_LIB: "__PP_USR_INST__",
         S_DIR_README: "__PP_USR_INST__",
         S_DIR_SRC: "__PP_USR_INST__",
@@ -991,6 +1064,7 @@ D_INSTALL = {
     },
     "g": {
         S_DIR_CONF: "__PP_USR_INST__",
+        S_DIR_IMAGES: "__PP_USR_INST__",
         S_DIR_LIB: "__PP_USR_INST__",
         S_DIR_README: "__PP_USR_INST__",
         S_DIR_SRC: "__PP_USR_INST__",
@@ -1119,29 +1193,53 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
     # k/v to fix desktop
-    dict_prv_prj["__PP_DESK_ICON__"] = (
-        f"{usr_inst}/{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_prj_small}.png"
-    )
     name_big = dict_prv_prj["__PP_NAME_PRJ_BIG__"]
     dict_prv_prj["__PP_FILE_DESK__"] = (
         f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_big}.desktop"
     )
 
+    # app id for gui
     author = dict_prv_all["__PP_AUTHOR__"]
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_prj_small)
 
+    # get base version
+    ver_base = dict_pub_meta[S_KEY_META_VERSION]
+
+    # --------------------------------------------------------------------------
+    # add date to version number
+
+    # get current date and format it according to dev fmt
+    now = datetime.now()
+    build_date = now.strftime(S_BUILD_DATE_FMT)
+
+    # get current build number, add 1
+    build_num_str = dict_prv_prj["__PP_BUILD_INFO__"]
+    try:
+        build_num_int = int(build_num_str)
+    except ValueError:
+        build_num_int = 0
+    build_num_int += 1
+    build_num_str = str(build_num_int)
+    dict_prv_prj["__PP_BUILD_INFO__"] = build_num_str
+
+    # do the final formatting
+    build_info = S_BUILD_FMT.format(build_date, build_num_str)
+    ver_long = ver_base + build_info
+    dict_prv_prj["__PP_VER_LONG__"] = ver_long
+
     # formatted version string
-    # NB: done in two steps to avoid linter errors
-    version = dict_pub_meta["__PP_VERSION__"]
     ver_fmt = dict_prv_all["__PP_VER_FMT__"]
-    ver_disp = ver_fmt.format(version)
+    ver_disp = ver_fmt.format(ver_long)
     dict_prv_prj["__PP_VER_DISP__"] = ver_disp
 
-    # replace all dots with dashes in ver
-    version = version.replace(".", "-")
+    # --------------------------------------------------------------------------
+
+    # fix ver for dist filename
+    ver_dist = ver_long.replace("-", "_")
+    ver_dist = ver_dist.replace(".", "-")
 
     # format dist dir name with prj and ver
-    name_fmt = f"{name_prj_small}_{version}"
+    name_fmt = S_DIST_FMT.format(name_prj_small, ver_dist)
     dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
 
     # gui app/win replacements
@@ -1152,6 +1250,21 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     dict_prv_prj["__PP_CLASS_APP__"] = S_APP_CLASS_FMT.format(name_prj_pascal)
     dict_prv_prj["__PP_FILE_WIN__"] = S_WIN_FILE_FMT.format(name_sec_small)
     dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
+
+    # various image files
+    dict_prv_prj["__PP_IMG_README__"] = f"{S_DIR_IMAGES}/{name_prj_small}.png"
+    dict_prv_prj["__PP_IMG_DOCS__"] = f"{S_DIR_IMAGES}/{name_prj_small}.png"
+    # NB: .desktop needs abs path to img
+    dict_prv_prj["__PP_IMG_DESK__"] = (
+        f"{usr_inst}/{S_DIR_IMAGES}/{name_prj_small}.png"
+    )
+    # NB: .ui files need rel path to img
+    dict_prv_prj["__PP_IMG_DASH__"] = (
+        f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}.png"
+    )
+    dict_prv_prj["__PP_IMG_ABOUT__"] = (
+        f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}.png"
+    )
 
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
@@ -1193,15 +1306,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
     if a_file.exists():
         _fix_pyproject(a_file, dict_prv_prj, dict_pub_meta)
 
-    # check cats now
-    cats = dict_pub_meta["__PP_GUI_CATS__"]
-    for cat in cats:
-        # category is not valid
-        if not cat in L_CATS:
-            # category is not valid, print error
-            print()
-            print(S_ERR_DESK_CAT.format(cat))
-
     # fix deep files
     for root, _root_dirs, root_files in dir_prj.walk():
 
@@ -1219,17 +1323,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_GTK:
                 _fix_ui(item, dict_prv_prj, dict_pub_meta)
 
-    # --------------------------------------------------------------------------
-    # remove some extra stuff
-
-    # first purge all dummy files
-    for root, root_dirs, _root_files in dir_prj.walk():
-
-        # convert files into Paths
-        dirs = [root / f for f in root_dirs]
-
-        # for each file item
-        for item in dirs:
+            # fix ui files
+            if item.suffix in L_EXT_SRC:
+                _fix_src(item, dict_prv_prj, dict_pub_meta)
 
             # if it is in purge list, delete it
             if item.name in L_PURGE_DIRS:
@@ -1414,7 +1510,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
 
     # replace short description
     str_pattern = S_RM_DESC_SCH
-    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
     str_rep = S_RM_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
@@ -1425,7 +1521,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # get deps as links for readme
-    d_py_deps = dict_pub_meta["__PP_PY_DEPS__"]
+    d_py_deps = dict_pub_meta[S_KEY_META_DEPS]
     l_rm_deps = [
         f"[{key}]({val})" if val != "" else key
         for key, val in d_py_deps.items()
@@ -1446,10 +1542,10 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
         a_file.write(text)
 
 
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Replace text in the pyproject file
-# --------------------------------------------------------------------------
-def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
+# ------------------------------------------------------------------------------
+def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     """
     Replace text in the pyproject file
 
@@ -1470,18 +1566,18 @@ def _fix_pyproject(path, _dict_prv_prj, dict_pub_meta):
 
     # replace version
     str_pattern = S_TOML_VERSION_SEARCH
-    pp_version = dict_pub_meta["__PP_VERSION__"]
+    pp_version = dict_prv_prj["__PP_VER_LONG__"]
     str_rep = S_TOML_VERSION_REPL.format(pp_version)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
     str_pattern = S_TOML_SHORT_DESC_SEARCH
-    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
     str_rep = S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # fix keywords for pyproject.toml
-    l_keywords = dict_pub_meta["__PP_KW_STR__"]
+    l_keywords = dict_pub_meta[S_KEY_META_KEYWORDS]
     q_keywords = [f'"{item}"' for item in l_keywords]
     s_keywords = ", ".join(q_keywords)
 
@@ -1511,15 +1607,25 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     programs that use this.
     """
 
-    # validate wanted categories into approved categories
-    cats = dict_pub_meta["__PP_GUI_CATS__"]
-    cats = [f"{cat};" for cat in cats if cat in L_CATS]
+    # the result cat list
+    new_cats = []
 
-    # # convert list to string
-    str_cat = "".join(cats)
+    # check cats now
+    cats = dict_pub_meta[S_KEY_META_CATS]
+    for cat in cats:
+        # category is not valid
+        if not cat in L_CATS:
+            # category is not valid, print error
+            print()
+            print(S_ERR_DESK_CAT.format(cat))
+        else:
+            new_cats.append(cat)
+
+    # convert list to string
+    str_cat = "".join(new_cats)
 
     # --------------------------------------------------------------------------
-    
+
     # default text if we can't open file
     text = ""
 
@@ -1534,7 +1640,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
 
     # replace short description0
     str_pattern = S_DESK_DESC_SCH
-    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
     str_rep = S_DESK_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1546,7 +1652,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
 # ------------------------------------------------------------------------------
 # Replace text in the UI files
 # ------------------------------------------------------------------------------
-def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
+def _fix_ui(path, dict_prv_prj, dict_pub_meta):
     """
     Replace text in the UI files
 
@@ -1567,19 +1673,61 @@ def _fix_ui(path, _dict_prv_prj, dict_pub_meta):
 
     # replace short description
     str_pattern = S_GTK_DESC_SCH
-    pp_short_desc = dict_pub_meta["__PP_SHORT_DESC__"]
+    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
     str_rep = S_GTK_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace version
     str_pattern = S_GTK_VER_SCH
-    pp_version = dict_pub_meta["__PP_VERSION__"]
+    pp_version = dict_prv_prj["__PP_VER_DISP__"]
     str_rep = S_GTK_VER_REP.format(pp_version)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
     with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
         a_file.write(text)
+
+
+# --------------------------------------------------------------------------
+# Fix the version number and short description in source files
+# --------------------------------------------------------------------------
+def _fix_src(path, dict_prv_prj, dict_pub_meta):
+    """
+    Fix the version number and short description in source files
+
+    Args:
+        path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict (reserved for future use)
+        dict_pub_meta: Dict of metadata to replace in the file
+
+    Returns:
+        The new line of code
+
+    Fixes the version number and short description in any file whose extension
+    is in L_EXT_SRC.
+    """
+
+    # the whole text of the file
+    text = ""
+
+    # open and read whole file
+    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+        text = a_file.read()
+
+    # replace version
+    ver = dict_prv_prj["__PP_VER_DISP__"]
+    str_sch = S_SRC_VER_SCH
+    str_rep = S_SRC_VER_REP.format(ver)
+    text = re.sub(str_sch, str_rep, text, flags=re.M)
+
+    # replace short desc
+    desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
+    str_sch = S_SRC_DESC_SCH
+    str_rep = S_SRC_DESC_REP.format(desc)
+    text = re.sub(str_sch, str_rep, text, flags=re.M)
+
+    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+        a_file.writelines(text)
 
 
 # -)

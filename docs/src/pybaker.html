@@ -1,92 +1,67 @@
-#! /usr/bin/env python
-# ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
-# Filename: pybaker.py                                            |     ()     |
-# Date    : 12/08/2022                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
-# ------------------------------------------------------------------------------
-
-# pylint: disable=too-many-lines
-
-# pyplate: disable=replace
-
-"""
-A program to change the metadata of a PyPlate project and create a dist
-
-This module sets the project metadata in each of the files, according to the
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.5">
+<title>src.pybaker API documentation</title>
+<meta name="description" content="A program to change the metadata of a PyPlate project and create a dist …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+<style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em;margin-right:.5em}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>src.pybaker</code></h1>
+</header>
+<section id="section-intro">
+<p>A program to change the metadata of a PyPlate project and create a dist</p>
+<p>This module sets the project metadata in each of the files, according to the
 data present in the conf files. It then sets up the dist folder with all
-necessary files to create a complete distribution of the project.
-
-Run pybaker -h for more options.
-"""
-
-# ------------------------------------------------------------------------------
-# Imports
-# ------------------------------------------------------------------------------
-
-# system imports
-import argparse
-import gettext
-import locale
-from pathlib import Path
-import re
-import shutil
-import sys
-
-# local imports
-from cnformatter import CNFormatter
-import cnfunctions as F
-from cninstall import CNInstall
-from cnpot import CNPotPy
-from cntree import CNTree
-from cnvenv import CNVenv
-
-# ------------------------------------------------------------------------------
-# local imports
-
-# pylint: disable=wrong-import-position
-
-# fudge the path to import conf stuff
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
-
-import conf.pyplate as PP
-
-# pylint: enable=wrong-import-position
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
-
-# path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
-# ------------------------------------------------------------------------------
-# Classes
-# ------------------------------------------------------------------------------
-
-
-# ------------------------------------------------------------------------------
-# The main class, responsible for the operation of the program
-# ------------------------------------------------------------------------------
-class PyBaker:
-    """
+necessary files to create a complete distribution of the project.</p>
+<p>Run pybaker -h for more options.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="src.pybaker.PyBaker"><code class="flex name class">
+<span>class <span class="ident">PyBaker</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PyBaker:
+    &#34;&#34;&#34;
     The main class, responsible for the operation of the program
 
     Public methods:
@@ -94,7 +69,7 @@ class PyBaker:
 
     This class implements all the needed functionality of PyBaker, to create a
     distribution from a PyPlate project.
-    """
+    &#34;&#34;&#34;
 
     # --------------------------------------------------------------------------
     # Class constants
@@ -110,52 +85,52 @@ class PyBaker:
 
     # I18N: short description
     S_PP_SHORT_DESC = _(
-        "A program for creating and building CLI/Package/GUI projects in "
-        "Python from a template"
+        &#34;A program for creating and building CLI/Package/GUI projects in &#34;
+        &#34;Python from a template&#34;
     )
 
     # version string
-    S_PP_VERSION = "0.0.1"
+    S_PP_VERSION = &#34;0.0.2&#34;
 
     # pyplate: disable=replace
 
     # config option strings
-    S_ARG_HLP_OPTION = "-h"
-    S_ARG_HLP_ACTION = "store_true"
-    S_ARG_HLP_DEST = "HLP_DEST"
+    S_ARG_HLP_OPTION = &#34;-h&#34;
+    S_ARG_HLP_ACTION = &#34;store_true&#34;
+    S_ARG_HLP_DEST = &#34;HLP_DEST&#34;
     # I18N: help option help
-    S_ARG_HLP_HELP = _("show this help message and exit")
+    S_ARG_HLP_HELP = _(&#34;show this help message and exit&#34;)
 
     # debug option strings
-    S_ARG_DBG_OPTION = "-d"
-    S_ARG_DBG_ACTION = "store_true"
-    S_ARG_DBG_DEST = "DBG_DEST"
+    S_ARG_DBG_OPTION = &#34;-d&#34;
+    S_ARG_DBG_ACTION = &#34;store_true&#34;
+    S_ARG_DBG_DEST = &#34;DBG_DEST&#34;
     # I18N help string for debug cmd line option
-    S_ARG_DBG_HELP = _("enable debugging mode")
+    S_ARG_DBG_HELP = _(&#34;enable debugging mode&#34;)
 
     # ide option strings
-    S_ARG_IDE_OPTION = "-i"
-    S_ARG_IDE_ACTION = "store_true"
-    S_ARG_IDE_DEST = "IDE_DEST"
+    S_ARG_IDE_OPTION = &#34;-i&#34;
+    S_ARG_IDE_ACTION = &#34;store_true&#34;
+    S_ARG_IDE_DEST = &#34;IDE_DEST&#34;
     # I18N help string for ide cmd line option
-    S_ARG_IDE_HELP = _("ask for project folder when running in IDE")
+    S_ARG_IDE_HELP = _(&#34;ask for project folder when running in IDE&#34;)
 
     # about string
     S_ABOUT = (
-        "\n"
-        f"{'PyPlate/PyBaker'}\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VERSION}\n"
-        f"https://github.com/cyclopticnerve/PyPlate\n"
+        &#34;\n&#34;
+        f&#34;{&#39;PyPlate/PyBaker&#39;}\n&#34;
+        f&#34;{S_PP_SHORT_DESC}\n&#34;
+        f&#34;{S_PP_VERSION}\n&#34;
+        f&#34;https://github.com/cyclopticnerve/PyPlate\n&#34;
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help") + "\n"
+    S_ABOUT_HELP = _(&#34;Use -h for help&#34;) + &#34;\n&#34;
 
     # I18N cmd line instructions string
     S_EPILOG = _(
-        "Run this program from the parent directory of the project you want "
-        "to build."
+        &#34;Run this program from the parent directory of the project you want &#34;
+        &#34;to build.&#34;
     )
 
     # --------------------------------------------------------------------------
@@ -166,13 +141,13 @@ class PyBaker:
     # Initialize the new object
     # --------------------------------------------------------------------------
     def __init__(self):
-        """
+        &#34;&#34;&#34;
         Initialize the new object
 
         Initializes a new instance of the class, setting the default values
         of its properties, and any other code that needs to run to create a
         new object.
-        """
+        &#34;&#34;&#34;
 
         # set the initial values of properties
 
@@ -200,8 +175,8 @@ class PyBaker:
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
-        # dictionary to hold current debug settings
-        self._dict_debug = {}
+        # backup for debug changes
+        self._dict_dbg_old = {}
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -211,12 +186,12 @@ class PyBaker:
     # The main method of the program
     # --------------------------------------------------------------------------
     def main(self):
-        """
+        &#34;&#34;&#34;
         The main method of the program
 
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
-        """
+        &#34;&#34;&#34;
 
         # ----------------------------------------------------------------------
         #  do the work
@@ -249,11 +224,11 @@ class PyBaker:
     # Boilerplate to use at the start of main
     # --------------------------------------------------------------------------
     def _setup(self):
-        """
+        &#34;&#34;&#34;
         Boilerplate to use at the start of main
 
         Perform some mundane stuff like setting properties.
-        """
+        &#34;&#34;&#34;
 
         # print default about text
         print(self.S_ABOUT)
@@ -336,7 +311,7 @@ class PyBaker:
             in_str = PP.S_ASK_IDE.format(self._dir_prj)
             while True:
                 prj_name = input(in_str)
-                if prj_name == "":
+                if prj_name == &#34;&#34;:
                     continue
 
                 # if running in ide, cwd is pyplate prj dir, so move up and down
@@ -364,47 +339,47 @@ class PyBaker:
         # get global and calculated settings dicts in private.json
         path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
         self._dict_prv = F.load_dicts([path_prv], {})
+        self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[PP.S_KEY_PRV_PRJ]
 
         # get individual dicts in project.json
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         self._dict_pub = F.load_dicts([path_pub], {})
+        self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
+        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
 
-        # reload dict pointers after dict change
-        self._reload_dicts()
-
-        # debug turns off some post processing to speed up processing
-        # NB: changing values in self._dict_pub_dbg (through the functions in
-        # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
-        # pyplate.py
-        self._dict_debug = self._dict_pub_dbg
+        # debug turns off all post processing to speed up process
+        self._dict_dbg_old = self._dict_pub_dbg.copy()
         if self._debug:
-            self._dict_debug = PP.D_DBG_PB
+            self._dict_pub_dbg = {k: False for k in self._dict_pub_dbg}
 
     # --------------------------------------------------------------------------
     # Get project info
     # --------------------------------------------------------------------------
     def _get_project_info(self):
-        """
+        &#34;&#34;&#34;
         Get project info
 
         Here we just make sure the user has edited the appropriate config
         files.
-        """
+        &#34;&#34;&#34;
 
     # --------------------------------------------------------------------------
     # A function to do stuff before fix
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
-        """
+        &#34;&#34;&#34;
         A function to do stuff before fix
 
         This function does some more changes before the actual fix. Mostly it
         is used to call the do_before_fix method in pyplate.py.
-        """
+        &#34;&#34;&#34;
 
         # print info
-        print(PP.S_ACTION_BEFORE, end="", flush=True)
+        print(PP.S_ACTION_BEFORE, end=&#34;&#34;, flush=True)
 
         # call public before fix function
         self._dict_prv, self._dict_pub = PP.do_before_fix(
@@ -421,21 +396,16 @@ class PyBaker:
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
     def _do_fix(self):
-        """
+        &#34;&#34;&#34;
         Scan dirs/files in the project for replacing text
 
-        Scans for dirs/files under the project's location. For each dir/file it
+        Scans for dirs/files under the project&#39;s location. For each dir/file it
         encounters, it passes the path to a filter to determine if the file
         needs fixing based on its appearance in the blacklist.
-        """
+        &#34;&#34;&#34;
 
         # print info
-        print(PP.S_ACTION_FIX, end="", flush=True)
-
-        # check version before we start
-        version = self._dict_prv_prj["__PP_VER_LONG__"]
-        if not self._check_version(version):
-            print(PP.S_ERR_SEMVER)
+        print(PP.S_ACTION_FIX, end=&#34;&#34;, flush=True)
 
         # combine dicts for string replacement
         self._dict_rep = F.combine_dicts(
@@ -460,7 +430,7 @@ class PyBaker:
 
             # handle dirs in skip_all
             if root in skip_all:
-                # NB: don't recurse into subfolders
+                # NB: don&#39;t recurse into subfolders
                 root_dirs.clear()
                 continue
 
@@ -491,8 +461,8 @@ class PyBaker:
                 # do md/html/xml separately (needs special handling)
                 self._dict_type_rep = PP.D_PY_REP
                 suffix = (
-                    f".{item.suffix}"
-                    if not item.suffix.startswith(".")
+                    f&#34;.{item.suffix}&#34;
+                    if not item.suffix.startswith(&#34;.&#34;)
                     else item.suffix
                 )
                 if suffix in PP.L_EXT_MARKUP:
@@ -503,7 +473,7 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # fix path
-        # NB: top_down=False is required for the renaming, as we don't want to
+        # NB: top_down=False is required for the renaming, as we don&#39;t want to
         # rename (and thus clobber) a directory name before we rename all its
         # child dirs/files
         for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
@@ -537,36 +507,31 @@ class PyBaker:
         # ----------------------------------------------------------------------
         # save project settings
 
-        # create private settings
+        # save fixed settings
         dict_prv = {
             PP.S_KEY_PRV_ALL: self._dict_prv_all,
             PP.S_KEY_PRV_PRJ: self._dict_prv_prj,
         }
-
-        # save private settings
         path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
         F.save_dict(dict_prv, [path_prv])
 
-        # create public settings
+        # save editable settings (blacklist/i18n/dist, no meta)
         dict_pub = {
             PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            PP.S_KEY_PUB_DBG: self._dict_dbg_old,
             PP.S_KEY_PUB_DIST: self._dict_pub_dist,
             PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
             PP.S_KEY_PUB_META: self._dict_pub_meta,
         }
-
-        # save public settings
         path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # fix dunders in dict_pub (project.json)
+        # fix dunders in bl/i18n/dist
         self._fix_contents(path_pub)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
-        self._reload_dicts()
 
         # done
         print(PP.S_ACTION_DONE)
@@ -575,13 +540,13 @@ class PyBaker:
     # Make any necessary changes after all fixes have been done
     # --------------------------------------------------------------------------
     def _do_after_fix(self):
-        """
+        &#34;&#34;&#34;
         Make any necessary changes after all fixes have been done
 
         This method is called after all fixes have been completed. There should
         be no dunders in the file contents or path names. Do any further
         project modification in do_after_fix in pyplate.py.
-        """
+        &#34;&#34;&#34;
 
         # ----------------------------------------------------------------------
         # dicts
@@ -593,7 +558,7 @@ class PyBaker:
         self._dict_pub = F.load_dicts([path_pub])
 
         # call conf after fix
-        print(PP.S_ACTION_AFTER, end="", flush=True)
+        print(PP.S_ACTION_AFTER, end=&#34;&#34;, flush=True)
         self._dict_prv, self._dict_pub = PP.do_after_fix(
             self._dir_prj, self._dict_prv, self._dict_pub
         )
@@ -605,15 +570,15 @@ class PyBaker:
         print(PP.S_ACTION_DONE)
 
         # ----------------------------------------------------------------------
-        # venv
+        # venv freeze
 
         # if venv flag is set
-        if self._dict_debug[PP.S_KEY_DBG_VENV]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_VENV]:
 
-            print(PP.S_ACTION_VENV, end="", flush=True)
+            print(PP.S_ACTION_VENV, end=&#34;&#34;, flush=True)
 
             # get name ov venv folder and reqs file
-            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
+            dir_venv = self._dict_prv_prj[&#34;__PP_NAME_VENV__&#34;]
             file_reqs = self._dir_prj / PP.S_FILE_REQS
 
             # do the thing with the thing
@@ -631,24 +596,21 @@ class PyBaker:
         # path to desktop template
         path_dsk_tmp = self._dir_prj / PP.S_FILE_DSK_TMP
         # path to desktop output
-        path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
+        path_dsk_out = self._dir_prj / self._dict_prv_prj[&#34;__PP_FILE_DESK__&#34;]
 
         # if i18n flag is set
-        if self._dict_debug[PP.S_KEY_DBG_I18N]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_I18N]:
 
             # print info
-            print(PP.S_ACTION_I18N, end="", flush=True)
-
-            # ------------------------------------------------------------------
-            # do bulk of i18n
+            print(PP.S_ACTION_I18N, end=&#34;&#34;, flush=True)
 
             # create CNPotPy object
             potpy = CNPotPy(
                 # header
-                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
-                str_version=self._dict_prv_prj["__PP_VER_LONG__"],
-                str_author=self._dict_prv_all["__PP_AUTHOR__"],
-                str_email=self._dict_prv_all["__PP_EMAIL__"],
+                str_domain=self._dict_prv_prj[&#34;__PP_NAME_PRJ_SMALL__&#34;],
+                str_version=self._dict_pub_meta[PP.S_KEY_META_VERSION],
+                str_author=self._dict_prv_all[&#34;__PP_AUTHOR__&#34;],
+                str_email=self._dict_prv_all[&#34;__PP_EMAIL__&#34;],
                 # base prj dir
                 dir_prj=self._dir_prj,
                 # in
@@ -668,25 +630,25 @@ class PyBaker:
             # make .pot, .po, and .mo files
             potpy.main()
 
-            # ------------------------------------------------------------------
-            # do .desktop
-            if not path_dsk_tmp.exists():
-                print("\n" + PP.S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out))
-            else:
-                # do the thing
-                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+            # do the thing
+            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
             # we are done
             print(PP.S_ACTION_DONE)
 
+        # if no i18n, copy .desktop
+        else:
+            if path_dsk_tmp.exists():
+                shutil.copy(path_dsk_tmp, path_dsk_out)
+
         # ----------------------------------------------------------------------
-        # docs
+        # update docs
 
         # if docs flag is set
-        if self._dict_debug[PP.S_KEY_DBG_DOCS]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_DOCS]:
 
             # print info
-            print(PP.S_ACTION_DOCS, end="", flush=True)
+            print(PP.S_ACTION_DOCS, end=&#34;&#34;, flush=True)
 
             # get template and output dirs
             dir_docs_tplt = self._dir_prj / PP.S_DIR_DOCS_TPLT
@@ -700,7 +662,7 @@ class PyBaker:
             # format cmd using pdoc template dir, output dir, and start dir
             cmd_docs = PP.S_CMD_DOC.format(
                 PP.P_DIR_PP,
-                f"{Path(PP.P_DIR_PP) / '.venv-pyplate'}",
+                f&#34;{Path(PP.P_DIR_PP) / &#39;.venv-pyplate&#39;}&#34;,
                 self._dir_prj,
                 dir_docs_tplt,
                 dir_docs_out,
@@ -708,7 +670,7 @@ class PyBaker:
             )
 
             # the command to run pdoc
-            cmd = f"{cmd_docs}"
+            cmd = f&#34;{cmd_docs}&#34;
             try:
                 F.sh(cmd, shell=True)
                 print(PP.S_ACTION_DONE)
@@ -722,17 +684,17 @@ class PyBaker:
         # NB: this will wipe out all previous checks (maybe good?)
 
         # if tree flag is set
-        if self._dict_debug[PP.S_KEY_DBG_TREE]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_TREE]:
 
             # print info
-            print(PP.S_ACTION_TREE, end="", flush=True)
+            print(PP.S_ACTION_TREE, end=&#34;&#34;, flush=True)
 
             # get path to tree
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
-                a_file.write("")
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+                a_file.write(&#34;&#34;)
 
             # create tree object and call
             tree_obj = CNTree(
@@ -744,7 +706,7 @@ class PyBaker:
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -754,45 +716,120 @@ class PyBaker:
         # install/uninstall
 
         # if install flag is set
-        if self._dict_debug[PP.S_KEY_DBG_INST]:
+        if self._dict_pub_dbg[PP.S_KEY_DBG_INST]:
+            a_path = self._dir_prj / PP.S_FILE_INST_CFG
+            if a_path.exists():
+                self._fix_contents(a_path)
+            a_path = self._dir_prj / PP.S_FILE_UNINST_CFG
+            if a_path.exists():
+                self._fix_contents(a_path)
 
-            # show info
-            print(PP.S_ACTION_INST, end="", flush=True)
+            # get project type
+            prj_type = self._dict_prv_prj[&#34;__PP_TYPE_PRJ__&#34;]
 
-            # get version from project.json
-            version = self._dict_prv_prj["__PP_VER_LONG__"]
+            # cli/gui
+            if prj_type in PP.L_APP_INSTALL:
 
-            # get install cfg
-            a_file = self._dir_prj / PP.S_PATH_INST_CFG
-            if a_file.exists():
+                # show info
+                print(PP.S_ACTION_INST, end=&#34;&#34;, flush=True)
 
-                # load/change/save
-                a_dict = F.load_dicts([a_file])
-                a_dict[CNInstall.S_KEY_VERSION] = version
-                F.save_dict(a_dict, [a_file])
+                # get params
+                name = self._dict_prv_prj[&#34;__PP_NAME_PRJ__&#34;]
+                version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
 
-            # get uninstall cfg
-            a_file = self._dir_prj / PP.S_PATH_UNINST_CFG
-            if a_file.exists():
+                # get an install instance
+                inst = CNInstall()
 
-                # load/change/save
-                a_dict = F.load_dicts([a_file])
-                a_dict[CNInstall.S_KEY_VERSION] = version
-                F.save_dict(a_dict, [a_file])
-            print(PP.S_ACTION_DONE)
+                # create a template install cfg file
+                dict_inst = inst.make_install_cfg(
+                    name,
+                    version,
+                    # these are the defaults spec&#39;d in pyplate_conf
+                    # they can be edited in prj/install/install.json before
+                    # running pybaker
+                    PP.D_INSTALL[prj_type],
+                )
+
+                # fix dunders in inst cfg file
+                path_inst = self._dir_prj / PP.S_PATH_INST_CFG
+                F.save_dict(dict_inst, [path_inst])
+                self._fix_contents(path_inst)
+
+                # create a template uninstall cfg file
+                dict_uninst = inst.make_uninstall_cfg(
+                    name,
+                    version,
+                    # these are the defaults spec&#39;d in pyplate_conf
+                    # they can be edited in prj/uninstall/uninstall.json before
+                    # running pybaker
+                    PP.D_UNINSTALL[prj_type],
+                )
+
+                # fix dunders in inst cfg file
+                path_uninst = self._dir_prj / PP.S_PATH_UNINST_CFG
+                F.save_dict(dict_uninst, [path_uninst])
+                self._fix_contents(path_uninst)
+
+                # show info
+                print(PP.S_ACTION_DONE)
+
+            # pkg
+            if prj_type in PP.L_PKG_INSTALL:
+
+                # let user know
+                print(PP.S_ACTION_INST_PKG, end=&#34;&#34;, flush=True)
+
+                # need to activate prj venv
+                dir_venv = self._dict_prv_prj[&#34;__PP_NAME_VENV__&#34;]
+                cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
+                    self._dir_prj, dir_venv
+                )
+
+                # cmd to install
+                cmd_install = PP.S_CMD_INSTALL_PKG.format(self._dir_prj)
+
+                # the command to install pkg
+                cmd = f&#34;{cmd_activate};&#34; f&#34;{cmd_install}&#34;
+                try:
+                    F.sh(cmd, shell=True)
+                    print(PP.S_ACTION_DONE)
+                except Exception as e:
+                    print(PP.S_ACTION_FAIL)
+                    raise e
+
+        # # get version from project.json
+        # version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
+
+        # # get install cfg
+        # a_file = self._dir_prj / PP.S_PATH_INST_CFG
+        # if a_file.exists():
+
+        #     # load/change/save
+        #     a_dict = F.load_dicts([a_file])
+        #     a_dict[CNInstall.S_KEY_VERSION] = version
+        #     F.save_dict(a_dict, [a_file])
+
+        # # get uninstall cfg
+        # a_file = self._dir_prj / PP.S_PATH_UNINST_CFG
+        # if a_file.exists():
+
+        #     # load/change/save
+        #     a_dict = F.load_dicts([a_file])
+        #     a_dict[CNInstall.S_KEY_VERSION] = version
+        #     F.save_dict(a_dict, [a_file])
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
     def _do_dist(self):
-        """
+        &#34;&#34;&#34;
         Copy fixed files to final location
 
         Gets dirs/files from project and copies them to the dist/assets dir.
-        """
+        &#34;&#34;&#34;
 
         # print info
-        print(PP.S_ACTION_DIST, end="", flush=True)
+        print(PP.S_ACTION_DIST, end=&#34;&#34;, flush=True)
 
         # call conf before dist
         self._dict_prv, self._dict_pub = PP.do_before_dist(
@@ -803,13 +840,13 @@ class PyBaker:
         self._reload_dicts()
 
         # get small name and format w/ version
-        # find old dist? nuke it from orbit! it's the only way to be sure!
+        # find old dist? nuke it from orbit! it&#39;s the only way to be sure!
         a_dist = self._dir_prj / PP.S_DIR_DIST
         if a_dist.is_dir():
             shutil.rmtree(a_dist)
 
         # make child dir in case we nuked
-        name_fmt = self._dict_prv_prj["__PP_DIST_FMT__"]
+        name_fmt = self._dict_prv_prj[&#34;__PP_DIST_FMT__&#34;]
         p_dist = a_dist / name_fmt
         p_dist.mkdir(parents=True)
 
@@ -833,14 +870,14 @@ class PyBaker:
         # do copy lib dict
 
         # get list of libs for this prj type
-        prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
+        prj_type_short = self._dict_prv_prj[&#34;__PP_TYPE_PRJ__&#34;]
         val = PP.D_COPY_LIB.get(prj_type_short, [])
 
         # copy libs
         for item in val:
 
             # get src/dst
-            src = self.P_DIR_PP / "lib" / item
+            src = self.P_DIR_PP / &#34;lib&#34; / item
             dst = p_dist / PP.S_DIR_ASSETS / PP.S_DIR_LIB / item
 
             # copy dir/file
@@ -868,11 +905,11 @@ class PyBaker:
     # Convert items in blacklist to absolute Path objects
     # --------------------------------------------------------------------------
     def _fix_blacklist_paths(self):
-        """
+        &#34;&#34;&#34;
         Convert items in blacklist to absolute Path objects
 
         Get absolute paths for all entries in the blacklist.
-        """
+        &#34;&#34;&#34;
 
         # def result
         res = {}
@@ -882,7 +919,7 @@ class PyBaker:
         # separators
         l_bl = self._dict_pub_bl
         for key in l_bl:
-            l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
+            l_bl[key] = [item.rstrip(&#34;/&#34;) for item in l_bl[key]]
         self._dict_pub_bl = l_bl
 
         # support for absolute/relative/glob
@@ -923,7 +960,7 @@ class PyBaker:
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
     def _fix_contents(self, path, bl_hdr=False, bl_code=False):
-        """
+        &#34;&#34;&#34;
         Fix header or code for each line in a file
 
         Args:
@@ -935,13 +972,13 @@ class PyBaker:
 
         For the given file, loop through each line, checking to see if it is a
         header line or a code line. Ignore blank lines and comment-only lines.
-        """
+        &#34;&#34;&#34;
 
         # default lines
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, &#34;r&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -949,7 +986,7 @@ class PyBaker:
 
             # ------------------------------------------------------------------
             # skip blank lines
-            if line.strip() == "":
+            if line.strip() == &#34;&#34;:
                 continue
 
             # ------------------------------------------------------------------
@@ -995,14 +1032,14 @@ class PyBaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Replace dunders inside a file header
     # --------------------------------------------------------------------------
     def _fix_header(self, line):
-        """
+        &#34;&#34;&#34;
         Replace dunders inside a file header
 
         Args:
@@ -1014,10 +1051,10 @@ class PyBaker:
         Replaces text inside a header line, using a regex to match specific
         lines. Given a line, it replaces the found pattern with the replacement
         as it goes.
-        """
+        &#34;&#34;&#34;
 
         # break apart header line
-        # NB: gotta do this again, can't pass res param
+        # NB: gotta do this again, can&#39;t pass res param
         str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
@@ -1042,20 +1079,20 @@ class PyBaker:
         tmp_pad = str(pad)
         tmp_rat = tmp_pad.lstrip()
         len_pad = len(tmp_pad) - len(tmp_rat) - val_diff
-        pad = " " * len_pad
+        pad = &#34; &#34; * len_pad
 
         # put the header line back together, adjusting for the pad len
-        line = lead + tmp_val + pad + tmp_rat + "\n"
+        line = lead + tmp_val + pad + tmp_rat + &#34;\n&#34;
 
         # return
         return line
 
     # --------------------------------------------------------------------------
-    # Replace dunders inside a file's contents
+    # Replace dunders inside a file&#39;s contents
     # --------------------------------------------------------------------------
     def _fix_code(self, line):
-        """
-        Replace dunders inside a file's contents
+        &#34;&#34;&#34;
+        Replace dunders inside a file&#39;s contents
 
         Args:
             line: The line of the file to replace text in
@@ -1068,7 +1105,7 @@ class PyBaker:
         dunders inside the file, excluding flag switches, headers, and
         comment-only lines (all of which are previously handled in
         _fix_contents).
-        """
+        &#34;&#34;&#34;
 
         # ----------------------------------------------------------------------
         # split the line into code and comm
@@ -1076,7 +1113,7 @@ class PyBaker:
         # we will split the line into two parts
         # NB: assume code is whole line (i.e. no trailing comment)
         code = line
-        comm = ""
+        comm = &#34;&#34;
 
         # do the split, checking each match to see if we get a trailing comment
         split = self._dict_type_rep[PP.S_KEY_SPLIT]
@@ -1130,7 +1167,7 @@ class PyBaker:
     # Rename dirs/files in the project
     # --------------------------------------------------------------------------
     def _fix_path(self, path):
-        """
+        &#34;&#34;&#34;
         Rename dirs/files in the project
 
         Args:
@@ -1139,7 +1176,7 @@ class PyBaker:
         Rename dirs/files. Given a path, it renames the dir/file by replacing
         dunders in the path with their appropriate replacements from
         self._dict_rep.
-        """
+        &#34;&#34;&#34;
 
         # sanity check
         path = Path(path)
@@ -1155,7 +1192,7 @@ class PyBaker:
         # replace the name
         path_new = path.parent / last_part
 
-        # if it hasn't changed, skip to avoid overhead
+        # if it hasn&#39;t changed, skip to avoid overhead
         if path_new == path:
             return
 
@@ -1166,7 +1203,7 @@ class PyBaker:
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(self, line, block):
-        """
+        &#34;&#34;&#34;
         Check if line or trailing comment is a switch
 
         Args:
@@ -1181,9 +1218,9 @@ class PyBaker:
         valid switch (for either markup or regular files). If a valid switch is
         found, it sets the appropriate flag in either self._dict_sw_block or
         self._dict_sw_line and returns True.
-        """
+        &#34;&#34;&#34;
 
-        # match  switches ('#|<!-- pyplate: enable=replace', etc)
+        # match  switches (&#39;#|&lt;!-- pyplate: enable=replace&#39;, etc)
         match = re.match(self._dict_type_rep[PP.S_KEY_SWITCH], line)
         if not match:
             return False
@@ -1219,7 +1256,7 @@ class PyBaker:
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
     def _check_version(self, version):
-        """
+        &#34;&#34;&#34;
         Check if new version number is semantic
 
         Args:
@@ -1230,7 +1267,7 @@ class PyBaker:
 
         This method checks to see if the version string passed is valid for
         semantic versioning.
-        """
+        &#34;&#34;&#34;
 
         # match semantic version from start of string
         pattern = PP.S_SEMVER_VALID
@@ -1240,12 +1277,12 @@ class PyBaker:
     # Reload dicts after any outside changes
     # --------------------------------------------------------------------------
     def _reload_dicts(self):
-        """
+        &#34;&#34;&#34;
         Reload dicts after any outside changes
 
         This function is called when a dict is passed to another function, in
         order to keep it synced with the internal dict.
-        """
+        &#34;&#34;&#34;
 
         # get global and calculated settings dicts in pyplate.py
         self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]
@@ -1256,24 +1293,192 @@ class PyBaker:
         self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
         self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
+        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]</code></pre>
+</details>
+<div class="desc"><p>The main class, responsible for the operation of the program</p>
+<p>Public methods:
+main: The main method of the program</p>
+<p>This class implements all the needed functionality of PyBaker, to create a
+distribution from a PyPlate project.</p>
+<p>Initialize the new object</p>
+<p>Initializes a new instance of the class, setting the default values
+of its properties, and any other code that needs to run to create a
+new object.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="src.pybaker.PyBaker.P_DIR_PP"><code class="name">var <span class="ident">P_DIR_PP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ABOUT"><code class="name">var <span class="ident">S_ABOUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ABOUT_HELP"><code class="name">var <span class="ident">S_ABOUT_HELP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_DBG_ACTION"><code class="name">var <span class="ident">S_ARG_DBG_ACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_DBG_DEST"><code class="name">var <span class="ident">S_ARG_DBG_DEST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_DBG_HELP"><code class="name">var <span class="ident">S_ARG_DBG_HELP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_DBG_OPTION"><code class="name">var <span class="ident">S_ARG_DBG_OPTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_HLP_ACTION"><code class="name">var <span class="ident">S_ARG_HLP_ACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_HLP_DEST"><code class="name">var <span class="ident">S_ARG_HLP_DEST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_HLP_HELP"><code class="name">var <span class="ident">S_ARG_HLP_HELP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_HLP_OPTION"><code class="name">var <span class="ident">S_ARG_HLP_OPTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_IDE_ACTION"><code class="name">var <span class="ident">S_ARG_IDE_ACTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_IDE_DEST"><code class="name">var <span class="ident">S_ARG_IDE_DEST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_IDE_HELP"><code class="name">var <span class="ident">S_ARG_IDE_HELP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_ARG_IDE_OPTION"><code class="name">var <span class="ident">S_ARG_IDE_OPTION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_EPILOG"><code class="name">var <span class="ident">S_EPILOG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_PP_SHORT_DESC"><code class="name">var <span class="ident">S_PP_SHORT_DESC</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="src.pybaker.PyBaker.S_PP_VERSION"><code class="name">var <span class="ident">S_PP_VERSION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="src.pybaker.PyBaker.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main(self):
+    &#34;&#34;&#34;
+    The main method of the program
 
-        if not self._debug:
-            self._dict_debug = self._dict_pub_dbg
+    This method is the main entry point for the program, initializing the
+    program, and performing its steps.
+    &#34;&#34;&#34;
 
-# ------------------------------------------------------------------------------
-# Code to run when called from command line
-# ------------------------------------------------------------------------------
-if __name__ == "__main__":
-    # Code to run when called from command line
+    # ----------------------------------------------------------------------
+    #  do the work
 
-    # This is the top level code of the program, called when the Python file is
-    # invoked from the command line.
+    # call boilerplate code
+    self._setup()
 
-    # create object
-    pb = PyBaker()
+    # load current metadata from conf
+    self._get_project_info()
 
-    # run main method with args
-    pb.main()
+    # do any fixing up of dicts (like meta keywords, etc)
+    self._do_before_fix()
 
-# -)
+    # do replacements in final project location
+    self._do_fix()
+
+    # do extra stuff to final dir after fix
+    self._do_after_fix()
+
+    # copy project files into dist folder
+    self._do_dist()</code></pre>
+</details>
+<div class="desc"><p>The main method of the program</p>
+<p>This method is the main entry point for the program, initializing the
+program, and performing its steps.</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<header>
+<a class="homelink" rel="home" title="PyPlate on GitHub" href="https://github.com/cyclopticnerve/PyPlate">
+<img src="pyplate.png">PyPlate
+</a>
+<br/>
+<!-- __RM_VERSION__ -->
+Version 0.0.2
+<!-- __RM_VERSION__ -->
+</header>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="src" href="index.html">src</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="src.pybaker.PyBaker" href="#src.pybaker.PyBaker">PyBaker</a></code></h4>
+<ul class="two-column">
+<li><code><a title="src.pybaker.PyBaker.P_DIR_PP" href="#src.pybaker.PyBaker.P_DIR_PP">P_DIR_PP</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ABOUT" href="#src.pybaker.PyBaker.S_ABOUT">S_ABOUT</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ABOUT_HELP" href="#src.pybaker.PyBaker.S_ABOUT_HELP">S_ABOUT_HELP</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_DBG_ACTION" href="#src.pybaker.PyBaker.S_ARG_DBG_ACTION">S_ARG_DBG_ACTION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_DBG_DEST" href="#src.pybaker.PyBaker.S_ARG_DBG_DEST">S_ARG_DBG_DEST</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_DBG_HELP" href="#src.pybaker.PyBaker.S_ARG_DBG_HELP">S_ARG_DBG_HELP</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_DBG_OPTION" href="#src.pybaker.PyBaker.S_ARG_DBG_OPTION">S_ARG_DBG_OPTION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_HLP_ACTION" href="#src.pybaker.PyBaker.S_ARG_HLP_ACTION">S_ARG_HLP_ACTION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_HLP_DEST" href="#src.pybaker.PyBaker.S_ARG_HLP_DEST">S_ARG_HLP_DEST</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_HLP_HELP" href="#src.pybaker.PyBaker.S_ARG_HLP_HELP">S_ARG_HLP_HELP</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_HLP_OPTION" href="#src.pybaker.PyBaker.S_ARG_HLP_OPTION">S_ARG_HLP_OPTION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_IDE_ACTION" href="#src.pybaker.PyBaker.S_ARG_IDE_ACTION">S_ARG_IDE_ACTION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_IDE_DEST" href="#src.pybaker.PyBaker.S_ARG_IDE_DEST">S_ARG_IDE_DEST</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_IDE_HELP" href="#src.pybaker.PyBaker.S_ARG_IDE_HELP">S_ARG_IDE_HELP</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_ARG_IDE_OPTION" href="#src.pybaker.PyBaker.S_ARG_IDE_OPTION">S_ARG_IDE_OPTION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_EPILOG" href="#src.pybaker.PyBaker.S_EPILOG">S_EPILOG</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_PP_SHORT_DESC" href="#src.pybaker.PyBaker.S_PP_SHORT_DESC">S_PP_SHORT_DESC</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.S_PP_VERSION" href="#src.pybaker.PyBaker.S_PP_VERSION">S_PP_VERSION</a></code></li>
+<li><code><a title="src.pybaker.PyBaker.main" href="#src.pybaker.PyBaker.main">main</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+</footer>
+</body>
+</html>

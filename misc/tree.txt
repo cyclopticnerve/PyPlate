@@ -1,0 +1,201 @@
+[] PyPlate/
+   ├─ [] .vscode/
+   │     ├─ [] launch.json
+   │     └─ [] tasks.json
+   ├─ [] bin/
+   │     ├─ [] pybaker.py
+   │     └─ [] pymaker.py
+   ├─ [] bin-dev/
+   │     ├─ [] pybaker-dev.py
+   │     └─ [] pymaker-dev.py
+   ├─ [] conf/
+   │     └─ [] pyplate.py
+   ├─ [] dist/
+   │     └─ [] pyplate_0-0-2.tar.gz
+   ├─ [] docs/
+   │     └─ [] src/
+   │           ├─ [] index.html
+   │           ├─ [] pybaker.html
+   │           └─ [] pymaker.html
+   ├─ [] i18n/
+   │     ├─ [] locale/
+   │     │     ├─ [] en/
+   │     │     │     └─ [] LC_MESSAGES/
+   │     │     │           ├─ [] ABOUT
+   │     │     │           └─ [] pyplate.mo
+   │     │     └─ [] es/
+   │     │           └─ [] LC_MESSAGES/
+   │     │                 └─ [] pyplate.mo
+   │     ├─ [] po/
+   │     │     ├─ [] en/
+   │     │     │     └─ [] pyplate.po
+   │     │     ├─ [] es/
+   │     │     │     └─ [] pyplate.po
+   │     │     └─ [] LINGUAS
+   │     └─ [] pot/
+   │           └─ [] pyplate.pot
+   ├─ [] install/
+   │     ├─ [] install.json
+   │     └─ [] install.py
+   ├─ [] lib/
+   │     └─ [] cnlib/
+   │           ├─ [] src/
+   │           │     ├─ [] CNLib.egg-info/
+   │           │     │     ├─ [] dependency_links.txt
+   │           │     │     ├─ [] PKG-INFO
+   │           │     │     ├─ [] SOURCES.txt
+   │           │     │     └─ [] top_level.txt
+   │           │     ├─ [] cnformatter.py
+   │           │     ├─ [] cnfunctions.py
+   │           │     ├─ [] cninstall.py
+   │           │     ├─ [] cnpot.py
+   │           │     ├─ [] cntree.py
+   │           │     └─ [] cnvenv.py
+   │           └─ [] pyproject.toml
+   ├─ [] misc/
+   │     ├─ [] checklists/
+   │     │     ├─ [] checklist.html
+   │     │     ├─ [] checklist.txt
+   │     │     └─ [] style.txt
+   │     ├─ [] default_files/
+   │     │     ├─ [] class.py
+   │     │     ├─ [] default.html
+   │     │     ├─ [] default.md
+   │     │     ├─ [] module.py
+   │     │     └─ [] window.py
+   │     ├─ [] how_to/
+   │     │     └─ [] i18n_tips.txt
+   │     └─ [] tree.txt
+   ├─ [] pdoc3/
+   │     ├─ [] head.mako
+   │     ├─ [] logo.mako
+   │     └─ [] pyplate.png
+   ├─ [] pyplate/
+   │     ├─ [] private/
+   │     │     └─ [] private.json
+   │     └─ [] project.json
+   ├─ [] readme/
+   │     └─ [] pyplate.png
+   ├─ [] src/
+   │     ├─ [] pybaker.py
+   │     └─ [] pymaker.py
+   ├─ [] template/
+   │     ├─ [] all/
+   │     │     ├─ [] .vscode/
+   │     │     │     └─ [] tasks.json
+   │     │     ├─ [] bin/
+   │     │     │     └─ [] pyplate.py
+   │     │     ├─ [] conf/
+   │     │     │     ├─ [] ABOUT
+   │     │     │     └─ [] pyplate.json
+   │     │     ├─ [] dist/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] docs/
+   │     │     │     └─ [] pyplate.png
+   │     │     ├─ [] i18n/
+   │     │     │     ├─ [] locale/
+   │     │     │     │     └─ [] en/
+   │     │     │     │           └─ [] LC_MESSAGES/
+   │     │     │     │                 └─ [] ABOUT
+   │     │     │     └─ [] po/
+   │     │     │           └─ [] LINGUAS
+   │     │     ├─ [] install/
+   │     │     │     └─ [] install.py
+   │     │     ├─ [] misc/
+   │     │     │     └─ [] checklists/
+   │     │     │           ├─ [] checklist.html
+   │     │     │           ├─ [] checklist.txt
+   │     │     │           └─ [] style.txt
+   │     │     ├─ [] pdoc3/
+   │     │     │     ├─ [] head.mako
+   │     │     │     ├─ [] logo.mako
+   │     │     │     └─ [] pyplate.png
+   │     │     ├─ [] pyplate/
+   │     │     │     └─ [] private/
+   │     │     ├─ [] readme/
+   │     │     │     └─ [] pyplate.png
+   │     │     ├─ [] src/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] tests/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] todo/
+   │     │     │     └─ [] ABOUT
+   │     │     ├─ [] uninstall/
+   │     │     │     └─ [] uninstall.py
+   │     │     ├─ [] .gitignore
+   │     │     ├─ [] LICENSE.txt
+   │     │     ├─ [] pyproject.toml
+   │     │     ├─ [] README.md
+   │     │     └─ [] requirements.txt
+   │     ├─ [] cli/
+   │     │     ├─ [] .vscode/
+   │     │     │     └─ [] launch.json
+   │     │     └─ [] src/
+   │     │           └─ [] pyplate.py
+   │     ├─ [] gui/
+   │     │     ├─ [] .vscode/
+   │     │     │     └─ [] launch.json
+   │     │     ├─ [] readme/
+   │     │     │     └─ [] screenshot.png
+   │     │     ├─ [] src/
+   │     │     │     ├─ [] gui/
+   │     │     │     │     ├─ [] desktop/
+   │     │     │     │     │     ├─ [] PyPlate.desktop
+   │     │     │     │     │     ├─ [] pyplate.png
+   │     │     │     │     │     └─ [] template.desktop
+   │     │     │     │     ├─ [] python/
+   │     │     │     │     │     ├─ [] _win.py
+   │     │     │     │     │     └─ [] pyplate_app.py
+   │     │     │     │     └─ [] ui/
+   │     │     │     │           ├─ [] _win.ui
+   │     │     │     │           └─ [] dialogs.ui
+   │     │     │     └─ [] pyplate.py
+   │     │     └─ [] requirements.txt
+   │     └─ [] pkg/
+   │           ├─ [] .vscode/
+   │           │     └─ [] launch.json
+   │           ├─ [] src/
+   │           │     └─ [] .py
+   │           └─ [] tests/
+   │                 └─ [] pyplate_test.py
+   ├─ [] tests/
+   │     └─ [] ABOUT
+   ├─ [] todo/
+   │     ├─ [] other/
+   │     │     ├─ [] clean/
+   │     │     │     ├─ [] collect_strings.py
+   │     │     │     └─ [] unused.py
+   │     │     ├─ [] cnguilib/
+   │     │     │     └─ [] src/
+   │     │     │           ├─ [] cnguilib.egg-info/
+   │     │     │           │     ├─ [] dependency_links.txt
+   │     │     │           │     ├─ [] PKG-INFO
+   │     │     │           │     ├─ [] SOURCES.txt
+   │     │     │           │     └─ [] top_level.txt
+   │     │     │           ├─ [] cnapp.py
+   │     │     │           └─ [] cnwindow.py
+   │     │     ├─ [] cnlib/
+   │     │     │     └─ [] cncli.py
+   │     │     ├─ [] gui_state/
+   │     │     │     ├─ [] cnapp_with_state.py
+   │     │     │     ├─ [] cnappfunctions.py
+   │     │     │     ├─ [] cnwindow_junk.py
+   │     │     │     ├─ [] cnwindow_w_state.py
+   │     │     │     └─ [] state.py
+   │     │     ├─ [] pdoc/
+   │     │     │     ├─ [] __init__.py
+   │     │     │     ├─ [] cnpdoc.py
+   │     │     │     ├─ [] cyclopticnerve.png
+   │     │     │     ├─ [] head.mako
+   │     │     │     └─ [] logo.mako
+   │     │     └─ [] sphinx/
+   │     │           └─ [] cnsphinx.py
+   │     └─ [] todo.txt
+   ├─ [] uninstall/
+   │     ├─ [] uninstall.json
+   │     └─ [] uninstall.py
+   ├─ [] .gitignore
+   ├─ [] LICENSE.txt
+   ├─ [] pyproject.toml
+   ├─ [] README.md
+   └─ [] requirements.txt

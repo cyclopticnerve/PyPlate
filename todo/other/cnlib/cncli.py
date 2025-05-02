@@ -10,7 +10,7 @@
 This is the base class for a CLI program. The template CLI and GUI programs
 subclass it.
 
-See PyPlate/template/cli/src/__PP_NAME_PRJ_SMALL__.py for an example.
+See PyPlate/template/cli/src/pyplate.py for an example.
 """
 
 # ------------------------------------------------------------------------------

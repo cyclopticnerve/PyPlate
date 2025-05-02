@@ -1,0 +1,8 @@
+{
+    "NAME": "PyPlate",
+    "VERSION": "0.0.2",
+    "UNINSTALL": [
+        ".local/share/pyplate",
+        ".local/bin/pyplate"
+    ]
+}

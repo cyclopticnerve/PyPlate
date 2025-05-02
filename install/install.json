@@ -1,0 +1,15 @@
+{
+    "NAME": "PyPlate",
+    "VERSION": "0.0.2",
+    "INSTALL": {
+        "conf": ".local/share/pyplate",
+        "lib": ".local/share/pyplate",
+        "readme": ".local/share/pyplate",
+        "src": ".local/share/pyplate",
+        "i18n": ".local/share/pyplate",
+        "LICENSE.txt": ".local/share/pyplate",
+        "README.md": ".local/share/pyplate",
+        "uninstall": ".local/share/pyplate",
+        "bin/pyplate": ".local/bin"
+    }
+}

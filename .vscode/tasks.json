@@ -6,7 +6,7 @@
         {
             "label": "PyBaker",
             "type": "shell",
-            //FIXME: REMOVE BEFORE FLIGHT
+            // FIXME: REMOVE BEFORE FLIGHT
             "command": "pybaker-dev",
             "problemMatcher": [],
             "options": {
