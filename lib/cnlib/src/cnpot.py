@@ -61,7 +61,7 @@ class CNPotPy:
     # --------------------------------------------------------------------------
 
     # default encoding for .pot and .po files
-    S_DEF_CHARSET = "UTF-8"
+    S_CHARSET = "UTF-8"
     # this is the default subdir for GNU
     S_DIR_LC = "LC_MESSAGES"
     # the file to store all wlang/domain names for .desktop files
@@ -130,7 +130,7 @@ class CNPotPy:
         dict_clangs=None,
         dict_no_ext=None,
         list_wlangs=None,
-        charset=S_DEF_CHARSET,
+        charset=S_CHARSET,
     ):
         """
         Initialize the new object
@@ -257,7 +257,7 @@ class CNPotPy:
 
         # fix up charset
         if charset is None:
-            charset = self.S_DEF_CHARSET
+            charset = self.S_CHARSET
         self._charset = charset
 
         # make sure all necessary dirs exist
@@ -450,7 +450,7 @@ class CNPotPy:
 
         Whenever a new .pot file is generated using make_pot, this method will
         produce a new .po file for each wlang that contains the difference
-        between the new .pot file and the existing .po file. 
+        between the new .pot file and the existing .po file.
 
         This new .po file should be sent to the translator for each wlang. Then
         when the translator sends back the translated .po file, place it in the
@@ -690,5 +690,6 @@ class CNPotPy:
         # save file
         with open(file_pot, "w", encoding="UTF-8") as a_file:
             a_file.write(text)
+
 
 # -)

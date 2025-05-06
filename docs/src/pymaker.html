@@ -1,67 +1,568 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-<meta name="generator" content="pdoc3 0.11.5">
-<title>src.pymaker API documentation</title>
-<meta name="description" content="A program to create a PyPlate project from a few variables …">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
-<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => {
-hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
-hljs.highlightAll();
-/* Collapse source docstrings */
-setTimeout(() => {
-[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
-.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
-.forEach(el => {
-let d = document.createElement('details');
-d.classList.add('hljs-string');
-d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
-el.replaceWith(d);
-});
-}, 100);
-})</script>
-<style>.homelink{display:block;font-size:2em;font-weight:bold;color:#555;padding-bottom:.5em;border-bottom:1px solid silver}.homelink:hover{color:inherit}.homelink img{max-width:20%;max-height:5em;margin:auto;margin-bottom:.3em;margin-right:.5em}</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <meta name="generator" content="pdoc3 0.11.5">
+    <title>src.pymaker API documentation</title>
+    <meta name="description" content="A program to create a PyPlate project from a few variables …">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css"
+        integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA=="
+        crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css"
+        integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA=="
+        crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"
+        crossorigin>
+    <style>
+        :root {
+            --highlight-color: #fe9
+        }
+
+        .flex {
+            display: flex !important
+        }
+
+        body {
+            line-height: 1.5em
+        }
+
+        #content {
+            padding: 20px
+        }
+
+        #sidebar {
+            padding: 1.5em;
+            overflow: hidden
+        }
+
+        #sidebar>*:last-child {
+            margin-bottom: 2cm
+        }
+
+        .http-server-breadcrumbs {
+            font-size: 130%;
+            margin: 0 0 15px 0
+        }
+
+        #footer {
+            font-size: .75em;
+            padding: 5px 30px;
+            border-top: 1px solid #ddd;
+            text-align: right
+        }
+
+        #footer p {
+            margin: 0 0 0 1em;
+            display: inline-block
+        }
+
+        #footer p:last-child {
+            margin-right: 30px
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-weight: 300
+        }
+
+        h1 {
+            font-size: 2.5em;
+            line-height: 1.1em
+        }
+
+        h2 {
+            font-size: 1.75em;
+            margin: 2em 0 .50em 0
+        }
+
+        h3 {
+            font-size: 1.4em;
+            margin: 1.6em 0 .7em 0
+        }
+
+        h4 {
+            margin: 0;
+            font-size: 105%
+        }
+
+        h1:target,
+        h2:target,
+        h3:target,
+        h4:target,
+        h5:target,
+        h6:target {
+            background: var(--highlight-color);
+            padding: .2em 0
+        }
+
+        a {
+            color: #058;
+            text-decoration: none;
+            transition: color .2s ease-in-out
+        }
+
+        a:visited {
+            color: #503
+        }
+
+        a:hover {
+            color: #b62
+        }
+
+        .title code {
+            font-weight: bold
+        }
+
+        h2[id^="header-"] {
+            margin-top: 2em
+        }
+
+        .ident {
+            color: #900;
+            font-weight: bold
+        }
+
+        pre code {
+            font-size: .8em;
+            line-height: 1.4em;
+            padding: 1em;
+            display: block
+        }
+
+        code {
+            background: #f3f3f3;
+            font-family: "DejaVu Sans Mono", monospace;
+            padding: 1px 4px;
+            overflow-wrap: break-word
+        }
+
+        h1 code {
+            background: transparent
+        }
+
+        pre {
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            margin: 1em 0
+        }
+
+        #http-server-module-list {
+            display: flex;
+            flex-flow: column
+        }
+
+        #http-server-module-list div {
+            display: flex
+        }
+
+        #http-server-module-list dt {
+            min-width: 10%
+        }
+
+        #http-server-module-list p {
+            margin-top: 0
+        }
+
+        .toc ul,
+        #index {
+            list-style-type: none;
+            margin: 0;
+            padding: 0
+        }
+
+        #index code {
+            background: transparent
+        }
+
+        #index h3 {
+            border-bottom: 1px solid #ddd
+        }
+
+        #index ul {
+            padding: 0
+        }
+
+        #index h4 {
+            margin-top: .6em;
+            font-weight: bold
+        }
+
+        @media (min-width:200ex) {
+            #index .two-column {
+                column-count: 2
+            }
+        }
+
+        @media (min-width:300ex) {
+            #index .two-column {
+                column-count: 3
+            }
+        }
+
+        dl {
+            margin-bottom: 2em
+        }
+
+        dl dl:last-child {
+            margin-bottom: 4em
+        }
+
+        dd {
+            margin: 0 0 1em 3em
+        }
+
+        #header-classes+dl>dd {
+            margin-bottom: 3em
+        }
+
+        dd dd {
+            margin-left: 2em
+        }
+
+        dd p {
+            margin: 10px 0
+        }
+
+        .name {
+            background: #eee;
+            font-size: .85em;
+            padding: 5px 10px;
+            display: inline-block;
+            min-width: 40%
+        }
+
+        .name:hover {
+            background: #e0e0e0
+        }
+
+        dt:target .name {
+            background: var(--highlight-color)
+        }
+
+        .name>span:first-child {
+            white-space: nowrap
+        }
+
+        .name.class>span:nth-child(2) {
+            margin-left: .4em
+        }
+
+        .inherited {
+            color: #999;
+            border-left: 5px solid #eee;
+            padding-left: 1em
+        }
+
+        .inheritance em {
+            font-style: normal;
+            font-weight: bold
+        }
+
+        .desc h2 {
+            font-weight: 400;
+            font-size: 1.25em
+        }
+
+        .desc h3 {
+            font-size: 1em
+        }
+
+        .desc dt code {
+            background: inherit
+        }
+
+        .source>summary,
+        .git-link-div {
+            color: #666;
+            text-align: right;
+            font-weight: 400;
+            font-size: .8em;
+            text-transform: uppercase
+        }
+
+        .source summary>* {
+            white-space: nowrap;
+            cursor: pointer
+        }
+
+        .git-link {
+            color: inherit;
+            margin-left: 1em
+        }
+
+        .source pre {
+            max-height: 500px;
+            overflow: auto;
+            margin: 0
+        }
+
+        .source pre code {
+            font-size: 12px;
+            overflow: visible;
+            min-width: max-content
+        }
+
+        .hlist {
+            list-style: none
+        }
+
+        .hlist li {
+            display: inline
+        }
+
+        .hlist li:after {
+            content: ',\2002'
+        }
+
+        .hlist li:last-child:after {
+            content: none
+        }
+
+        .hlist .hlist {
+            display: inline;
+            padding-left: 1em
+        }
+
+        img {
+            max-width: 100%
+        }
+
+        td {
+            padding: 0 .5em
+        }
+
+        .admonition {
+            padding: .1em 1em;
+            margin: 1em 0
+        }
+
+        .admonition-title {
+            font-weight: bold
+        }
+
+        .admonition.note,
+        .admonition.info,
+        .admonition.important {
+            background: #aef
+        }
+
+        .admonition.todo,
+        .admonition.versionadded,
+        .admonition.tip,
+        .admonition.hint {
+            background: #dfd
+        }
+
+        .admonition.warning,
+        .admonition.versionchanged,
+        .admonition.deprecated {
+            background: #fd4
+        }
+
+        .admonition.error,
+        .admonition.danger,
+        .admonition.caution {
+            background: lightpink
+        }
+    </style>
+    <style media="screen and (min-width: 700px)">
+        @media screen and (min-width:700px) {
+            #sidebar {
+                width: 30%;
+                height: 100vh;
+                overflow: auto;
+                position: sticky;
+                top: 0
+            }
+
+            #content {
+                width: 70%;
+                max-width: 100ch;
+                padding: 3em 4em;
+                border-left: 1px solid #ddd
+            }
+
+            pre code {
+                font-size: 1em
+            }
+
+            .name {
+                font-size: 1em
+            }
+
+            main {
+                display: flex;
+                flex-direction: row-reverse;
+                justify-content: flex-end
+            }
+
+            .toc ul ul,
+            #index ul ul {
+                padding-left: 1em
+            }
+
+            .toc>ul>li {
+                margin-top: .5em
+            }
+        }
+    </style>
+    <style media="print">
+        @media print {
+            #sidebar h1 {
+                page-break-before: always
+            }
+
+            .source {
+                display: none
+            }
+        }
+
+        @media print {
+            * {
+                background: transparent !important;
+                color: #000 !important;
+                box-shadow: none !important;
+                text-shadow: none !important
+            }
+
+            a[href]:after {
+                content: " (" attr(href) ")";
+                font-size: 90%
+            }
+
+            a[href][title]:after {
+                content: none
+            }
+
+            abbr[title]:after {
+                content: " (" attr(title) ")"
+            }
+
+            .ir a:after,
+            a[href^="javascript:"]:after,
+            a[href^="#"]:after {
+                content: ""
+            }
+
+            pre,
+            blockquote {
+                border: 1px solid #999;
+                page-break-inside: avoid
+            }
+
+            thead {
+                display: table-header-group
+            }
+
+            tr,
+            img {
+                page-break-inside: avoid
+            }
+
+            img {
+                max-width: 100% !important
+            }
+
+            @page {
+                margin: 0.5cm
+            }
+
+            p,
+            h2,
+            h3 {
+                orphans: 3;
+                widows: 3
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                page-break-after: avoid
+            }
+        }
+    </style>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+        integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ=="
+        crossorigin></script>
+    <script>window.addEventListener('DOMContentLoaded', () => {
+            hljs.configure({ languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml'] });
+            hljs.highlightAll();
+            /* Collapse source docstrings */
+            setTimeout(() => {
+                [...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+                    .filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+                    .forEach(el => {
+                        let d = document.createElement('details');
+                        d.classList.add('hljs-string');
+                        d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+                        el.replaceWith(d);
+                    });
+            }, 100);
+        })</script>
+    <style>
+        .homelink {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            color: #555;
+            padding-bottom: .5em;
+            border-bottom: 1px solid silver
+        }
+
+        .homelink:hover {
+            color: inherit
+        }
+
+        .homelink img {
+            max-width: 20%;
+            max-height: 5em;
+            margin: auto;
+            margin-bottom: .3em;
+            margin-right: .5em
+        }
+    </style>
 </head>
+
 <body>
-<main>
-<article id="content">
-<header>
-<h1 class="title">Module <code>src.pymaker</code></h1>
-</header>
-<section id="section-intro">
-<p>A program to create a PyPlate project from a few variables</p>
-<p>This module gets the project type, the project's destination dir, copies the
-required dirs/files for the project type from the template to the specified
-destination, and performs some initial fixes/replacements of text and path
-names in the resulting files.</p>
-<p>Run pymaker -h for more options.</p>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="src.pymaker.PyMaker"><code class="flex name class">
+    <main>
+        <article id="content">
+            <header>
+                <h1 class="title">Module <code>src.pymaker</code></h1>
+            </header>
+            <section id="section-intro">
+                <p>A program to create a PyPlate project from a few variables</p>
+                <p>This module gets the project type, the project's destination dir, copies the
+                    required dirs/files for the project type from the template to the specified
+                    destination, and performs some initial fixes/replacements of text and path
+                    names in the resulting files.</p>
+                <p>Run pymaker -h for more options.</p>
+            </section>
+            <section>
+            </section>
+            <section>
+            </section>
+            <section>
+            </section>
+            <section>
+                <h2 class="section-title" id="header-classes">Classes</h2>
+                <dl>
+                    <dt id="src.pymaker.PyMaker"><code class="flex name class">
 <span>class <span class="ident">PyMaker</span></span>
 </code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class PyMaker:
+                    <dd>
+                        <details class="source">
+                            <summary>
+                                <span>Expand source code</span>
+                            </summary>
+                            <pre><code class="python">class PyMaker:
     &#34;&#34;&#34;
     The main class, responsible for the operation of the program
 
@@ -491,7 +992,7 @@ names in the resulting files.</p>
 
         # get current date and format it according to dev fmt
         now = datetime.now()
-        fmt_date = PP.S_DEF_DATE_FMT
+        fmt_date = PP.S_DATE_FMT
         info_date = now.strftime(fmt_date)
 
         # ----------------------------------------------------------------------
@@ -969,7 +1470,7 @@ names in the resulting files.</p>
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
                 a_file.write(&#34;&#34;)
 
             # create tree object and call
@@ -982,7 +1483,7 @@ names in the resulting files.</p>
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -1175,7 +1676,7 @@ names in the resulting files.</p>
         lines = []
 
         # open and read file
-        with open(path, &#34;r&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, &#34;r&#34;, encoding=PP.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1229,7 +1730,7 @@ names in the resulting files.</p>
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -1426,14 +1927,14 @@ names in the resulting files.</p>
 
         # read reqs files and put in result
         for item in src:
-            with open(item, &#34;r&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(item, &#34;r&#34;, encoding=PP.S_ENCODING) as a_file:
                 old_file = a_file.readlines()
                 old_file = [line.rstrip() for line in old_file]
                 new_file = new_file + old_file
 
         # put combined reqs into final file
         joint = &#34;\n&#34;.join(new_file)
-        with open(dst, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(dst, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
@@ -1603,86 +2104,102 @@ names in the resulting files.</p>
         self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
         self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]</code></pre>
-</details>
-<div class="desc"><p>The main class, responsible for the operation of the program</p>
-<p>Public methods:
-main: The main method of the program</p>
-<p>This class implements all the needed functionality of PyMaker, to create a
-project from a template.</p>
-<p>Initialize the new object</p>
-<p>Initializes a new instance of the class, setting the default values
-of its properties, and any other code that needs to run to create a
-new object.</p></div>
-<h3>Class variables</h3>
-<dl>
-<dt id="src.pymaker.PyMaker.P_DIR_PP"><code class="name">var <span class="ident">P_DIR_PP</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ABOUT"><code class="name">var <span class="ident">S_ABOUT</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ABOUT_HELP"><code class="name">var <span class="ident">S_ABOUT_HELP</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_DBG_ACTION"><code class="name">var <span class="ident">S_ARG_DBG_ACTION</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_DBG_DEST"><code class="name">var <span class="ident">S_ARG_DBG_DEST</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_DBG_HELP"><code class="name">var <span class="ident">S_ARG_DBG_HELP</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_DBG_OPTION"><code class="name">var <span class="ident">S_ARG_DBG_OPTION</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_HLP_ACTION"><code class="name">var <span class="ident">S_ARG_HLP_ACTION</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_HLP_DEST"><code class="name">var <span class="ident">S_ARG_HLP_DEST</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_HLP_HELP"><code class="name">var <span class="ident">S_ARG_HLP_HELP</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_ARG_HLP_OPTION"><code class="name">var <span class="ident">S_ARG_HLP_OPTION</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_EPILOG"><code class="name">var <span class="ident">S_EPILOG</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_PP_SHORT_DESC"><code class="name">var <span class="ident">S_PP_SHORT_DESC</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="src.pymaker.PyMaker.S_PP_VERSION"><code class="name">var <span class="ident">S_PP_VERSION</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="src.pymaker.PyMaker.main"><code class="name flex">
+                        </details>
+                        <div class="desc">
+                            <p>The main class, responsible for the operation of the program</p>
+                            <p>Public methods:
+                                main: The main method of the program</p>
+                            <p>This class implements all the needed functionality of PyMaker, to create a
+                                project from a template.</p>
+                            <p>Initialize the new object</p>
+                            <p>Initializes a new instance of the class, setting the default values
+                                of its properties, and any other code that needs to run to create a
+                                new object.</p>
+                        </div>
+                        <h3>Class variables</h3>
+                        <dl>
+                            <dt id="src.pymaker.PyMaker.P_DIR_PP"><code
+                                    class="name">var <span class="ident">P_DIR_PP</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ABOUT"><code
+                                    class="name">var <span class="ident">S_ABOUT</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ABOUT_HELP"><code
+                                    class="name">var <span class="ident">S_ABOUT_HELP</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_DBG_ACTION"><code
+                                    class="name">var <span class="ident">S_ARG_DBG_ACTION</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_DBG_DEST"><code
+                                    class="name">var <span class="ident">S_ARG_DBG_DEST</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_DBG_HELP"><code
+                                    class="name">var <span class="ident">S_ARG_DBG_HELP</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_DBG_OPTION"><code
+                                    class="name">var <span class="ident">S_ARG_DBG_OPTION</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_HLP_ACTION"><code
+                                    class="name">var <span class="ident">S_ARG_HLP_ACTION</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_HLP_DEST"><code
+                                    class="name">var <span class="ident">S_ARG_HLP_DEST</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_HLP_HELP"><code
+                                    class="name">var <span class="ident">S_ARG_HLP_HELP</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_ARG_HLP_OPTION"><code
+                                    class="name">var <span class="ident">S_ARG_HLP_OPTION</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_EPILOG"><code
+                                    class="name">var <span class="ident">S_EPILOG</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_PP_SHORT_DESC"><code
+                                    class="name">var <span class="ident">S_PP_SHORT_DESC</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                            <dt id="src.pymaker.PyMaker.S_PP_VERSION"><code
+                                    class="name">var <span class="ident">S_PP_VERSION</span></code></dt>
+                            <dd>
+                                <div class="desc"></div>
+                            </dd>
+                        </dl>
+                        <h3>Methods</h3>
+                        <dl>
+                            <dt id="src.pymaker.PyMaker.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>self)</span>
 </code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def main(self):
+                            <dd>
+                                <details class="source">
+                                    <summary>
+                                        <span>Expand source code</span>
+                                    </summary>
+                                    <pre><code class="python">def main(self):
     &#34;&#34;&#34;
     The main method of the program
 
@@ -1710,64 +2227,86 @@ new object.</p></div>
 
     # do extra stuff to final dir after fix
     self._do_after_fix()</code></pre>
-</details>
-<div class="desc"><p>The main method of the program</p>
-<p>This method is the main entry point for the program, initializing the
-program, and performing its steps.</p></div>
-</dd>
-</dl>
-</dd>
-</dl>
-</section>
-</article>
-<nav id="sidebar">
-<header>
-<a class="homelink" rel="home" title="PyPlate on GitHub" href="https://github.com/cyclopticnerve/PyPlate">
-<img src="pyplate.png">PyPlate
-</a>
-<br/>
-<!-- __RM_VERSION__ -->
-Version 0.0.2
-<!-- __RM_VERSION__ -->
-</header>
-<div class="toc">
-<ul></ul>
-</div>
-<ul id="index">
-<li><h3>Super-module</h3>
-<ul>
-<li><code><a title="src" href="index.html">src</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="src.pymaker.PyMaker" href="#src.pymaker.PyMaker">PyMaker</a></code></h4>
-<ul class="two-column">
-<li><code><a title="src.pymaker.PyMaker.P_DIR_PP" href="#src.pymaker.PyMaker.P_DIR_PP">P_DIR_PP</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ABOUT" href="#src.pymaker.PyMaker.S_ABOUT">S_ABOUT</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ABOUT_HELP" href="#src.pymaker.PyMaker.S_ABOUT_HELP">S_ABOUT_HELP</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_ACTION" href="#src.pymaker.PyMaker.S_ARG_DBG_ACTION">S_ARG_DBG_ACTION</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_DEST" href="#src.pymaker.PyMaker.S_ARG_DBG_DEST">S_ARG_DBG_DEST</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_HELP" href="#src.pymaker.PyMaker.S_ARG_DBG_HELP">S_ARG_DBG_HELP</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_OPTION" href="#src.pymaker.PyMaker.S_ARG_DBG_OPTION">S_ARG_DBG_OPTION</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_ACTION" href="#src.pymaker.PyMaker.S_ARG_HLP_ACTION">S_ARG_HLP_ACTION</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_DEST" href="#src.pymaker.PyMaker.S_ARG_HLP_DEST">S_ARG_HLP_DEST</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_HELP" href="#src.pymaker.PyMaker.S_ARG_HLP_HELP">S_ARG_HLP_HELP</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_OPTION" href="#src.pymaker.PyMaker.S_ARG_HLP_OPTION">S_ARG_HLP_OPTION</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_EPILOG" href="#src.pymaker.PyMaker.S_EPILOG">S_EPILOG</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_PP_SHORT_DESC" href="#src.pymaker.PyMaker.S_PP_SHORT_DESC">S_PP_SHORT_DESC</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.S_PP_VERSION" href="#src.pymaker.PyMaker.S_PP_VERSION">S_PP_VERSION</a></code></li>
-<li><code><a title="src.pymaker.PyMaker.main" href="#src.pymaker.PyMaker.main">main</a></code></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</nav>
-</main>
-<footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
-</footer>
+                                </details>
+                                <div class="desc">
+                                    <p>The main method of the program</p>
+                                    <p>This method is the main entry point for the program, initializing the
+                                        program, and performing its steps.</p>
+                                </div>
+                            </dd>
+                        </dl>
+                    </dd>
+                </dl>
+            </section>
+        </article>
+        <nav id="sidebar">
+            <header>
+                <a class="homelink" rel="home" title="PyPlate on GitHub"
+                    href="https://github.com/cyclopticnerve/PyPlate">
+                    <img src="pyplate.png">PyPlate
+                </a>
+                <br />
+                <!-- __RM_VERSION__ -->
+                Version 0.0.2
+                <!-- __RM_VERSION__ -->
+            </header>
+            <div class="toc">
+                <ul></ul>
+            </div>
+            <ul id="index">
+                <li>
+                    <h3>Super-module</h3>
+                    <ul>
+                        <li><code><a title="src" href="index.html">src</a></code></li>
+                    </ul>
+                </li>
+                <li>
+                    <h3><a href="#header-classes">Classes</a></h3>
+                    <ul>
+                        <li>
+                            <h4><code><a title="src.pymaker.PyMaker" href="#src.pymaker.PyMaker">PyMaker</a></code></h4>
+                            <ul class="two-column">
+                                <li><code><a title="src.pymaker.PyMaker.P_DIR_PP" href="#src.pymaker.PyMaker.P_DIR_PP">P_DIR_PP</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ABOUT" href="#src.pymaker.PyMaker.S_ABOUT">S_ABOUT</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ABOUT_HELP" href="#src.pymaker.PyMaker.S_ABOUT_HELP">S_ABOUT_HELP</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_ACTION" href="#src.pymaker.PyMaker.S_ARG_DBG_ACTION">S_ARG_DBG_ACTION</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_DEST" href="#src.pymaker.PyMaker.S_ARG_DBG_DEST">S_ARG_DBG_DEST</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_HELP" href="#src.pymaker.PyMaker.S_ARG_DBG_HELP">S_ARG_DBG_HELP</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_DBG_OPTION" href="#src.pymaker.PyMaker.S_ARG_DBG_OPTION">S_ARG_DBG_OPTION</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_ACTION" href="#src.pymaker.PyMaker.S_ARG_HLP_ACTION">S_ARG_HLP_ACTION</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_DEST" href="#src.pymaker.PyMaker.S_ARG_HLP_DEST">S_ARG_HLP_DEST</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_HELP" href="#src.pymaker.PyMaker.S_ARG_HLP_HELP">S_ARG_HLP_HELP</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_ARG_HLP_OPTION" href="#src.pymaker.PyMaker.S_ARG_HLP_OPTION">S_ARG_HLP_OPTION</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_EPILOG" href="#src.pymaker.PyMaker.S_EPILOG">S_EPILOG</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_PP_SHORT_DESC" href="#src.pymaker.PyMaker.S_PP_SHORT_DESC">S_PP_SHORT_DESC</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.S_PP_VERSION" href="#src.pymaker.PyMaker.S_PP_VERSION">S_PP_VERSION</a></code>
+                                </li>
+                                <li><code><a title="src.pymaker.PyMaker.main" href="#src.pymaker.PyMaker.main">main</a></code>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </main>
+    <footer id="footer">
+        <p>Generated by <a href="https://pdoc3.github.io/pdoc"
+                title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.5</a>.</p>
+    </footer>
 </body>
+
 </html>

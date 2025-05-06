@@ -693,7 +693,7 @@ necessary files to create a complete distribution of the project.</p>
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
                 a_file.write(&#34;&#34;)
 
             # create tree object and call
@@ -706,7 +706,7 @@ necessary files to create a complete distribution of the project.</p>
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -978,7 +978,7 @@ necessary files to create a complete distribution of the project.</p>
         lines = []
 
         # open and read file
-        with open(path, &#34;r&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, &#34;r&#34;, encoding=PP.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1032,7 +1032,7 @@ necessary files to create a complete distribution of the project.</p>
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, &#34;w&#34;, encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, &#34;w&#34;, encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------

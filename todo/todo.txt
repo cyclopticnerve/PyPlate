@@ -13,8 +13,6 @@
 # TODO: CNInstall help str
 # TODO: for pkg, after fix, activate prj venv and install pkg as editable
 # then change test to use installed pkg, not local dir
-# TODO: prg image in docs
-# TODO: prg version in docs
 # TODO: multiple switches on one line: # pyplate: disable=foo disable=bar
 # TODO: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
 # dunder that is not in comment
@@ -238,6 +236,8 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
 
+DONE: prg image in docs
+DONE: prg version in docs
 DONE ask for meta
 DONE update meta in conf file
 DONE: markdown needs to ignore hash

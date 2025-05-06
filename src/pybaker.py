@@ -433,7 +433,7 @@ class PyBaker:
         print(PP.S_ACTION_FIX, end="", flush=True)
 
         # check version before we start
-        version = self._dict_prv_prj["__PP_VER_LONG__"]
+        version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
         if not self._check_version(version):
             print(PP.S_ERR_SEMVER)
 
@@ -646,7 +646,7 @@ class PyBaker:
             potpy = CNPotPy(
                 # header
                 str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
-                str_version=self._dict_prv_prj["__PP_VER_LONG__"],
+                str_version=self._dict_prv_prj["__PP_VER_POT__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
                 # base prj dir
@@ -670,12 +670,21 @@ class PyBaker:
 
             # ------------------------------------------------------------------
             # do .desktop
-            if not path_dsk_tmp.exists():
-                print("\n" + PP.S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out))
+
+            # check if we want template
+            prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
+            if prj_type_short in PP.L_MAKE_DESK and not path_dsk_tmp.exists():
+
+                # we want template, but does not exist
+                print(
+                    "\n"
+                    + PP.S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out)
+                )
             else:
                 # do the thing
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
 
+            # ------------------------------------------------------------------
             # we are done
             print(PP.S_ACTION_DONE)
 
@@ -716,6 +725,47 @@ class PyBaker:
                 print(PP.S_ACTION_FAIL)
                 raise e
 
+            # ------------------------------------------------------------------
+            # use local image in docs
+
+            # initial "../" level
+            level = 0
+
+            # walk the docs tree
+            for root, _dirs, files in dir_docs_out.walk():
+
+                # next level
+                level += 1
+
+                # get full paths
+                files = [root / f for f in files]
+                files = [f for f in files if f.suffix == ".html"]
+
+                # for each html file
+                for f in files:
+
+                    # build the dots, one set for each level
+                    dots = ""
+                    for _i in range(level):
+                        dots += "../"
+
+                    # add the image path rel to prj dir
+                    dots += self._dict_prv_prj["__PP_IMG_DOCS__"]
+
+                    # format the rep str
+                    img_rep = PP.S_DOC_IMG_REP.format(dots)
+
+                    # open html file for read
+                    with open(f, "r", encoding=PP.S_ENCODING) as a_file:
+                        text = a_file.read()
+
+                    # replace img src with dots
+                    text = re.sub(PP.S_DOC_IMG_SCH, img_rep, text, flags=re.S)
+
+                    # write text back to file
+                    with open(f, "w", encoding=PP.S_ENCODING) as a_file:
+                        a_file.write(text)
+
         # ----------------------------------------------------------------------
         # tree
         # NB: run last so it includes .git and .venv folders
@@ -731,7 +781,7 @@ class PyBaker:
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
@@ -744,7 +794,7 @@ class PyBaker:
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -760,7 +810,7 @@ class PyBaker:
             print(PP.S_ACTION_INST, end="", flush=True)
 
             # get version from project.json
-            version = self._dict_prv_prj["__PP_VER_LONG__"]
+            version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
 
             # get install cfg
             a_file = self._dir_prj / PP.S_PATH_INST_CFG
@@ -779,6 +829,8 @@ class PyBaker:
                 a_dict = F.load_dicts([a_file])
                 a_dict[CNInstall.S_KEY_VERSION] = version
                 F.save_dict(a_dict, [a_file])
+
+            # done
             print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
@@ -941,7 +993,7 @@ class PyBaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -995,7 +1047,7 @@ class PyBaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -1260,6 +1312,7 @@ class PyBaker:
 
         if not self._debug:
             self._dict_debug = self._dict_pub_dbg
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

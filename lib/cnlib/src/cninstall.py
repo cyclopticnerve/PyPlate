@@ -126,7 +126,7 @@ class CNInstall:
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_DESK_ICON__>
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -464,6 +464,11 @@ class CNInstall:
         # show progress
         print(self.S_MSG_REQS_START, flush=True, end="")
 
+        # sanity check
+        dir_venv = Path(dir_venv)
+        if not dir_venv.is_absolute():
+            dir_venv = Path(dir_usr_inst) / dir_venv
+
         # if param is not abs, make abs rel to prj dir
         path_reqs = Path(path_reqs)
         if not path_reqs.is_absolute():
@@ -509,6 +514,11 @@ class CNInstall:
 
         # show some info
         print(self.S_MSG_LIBS_START, flush=True, end="")
+
+        # sanity check
+        dir_venv = Path(dir_venv)
+        if not dir_venv.is_absolute():
+            dir_venv = Path(dir_usr_inst) / dir_venv
 
         # sanity check
         dir_lib = Path(dir_lib)

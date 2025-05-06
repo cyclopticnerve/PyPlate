@@ -33,8 +33,8 @@ import sys
 
 # add assets lib to path
 P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
-P_DIR_LIB = P_DIR_ASSETS / "__PP_DIR_LIB__"
+P_DIR_ASSETS = P_DIR_PRJ / "assets"
+P_DIR_LIB = P_DIR_ASSETS / "lib"
 sys.path.append(str(P_DIR_LIB))
 
 # local imports
@@ -54,11 +54,12 @@ P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
 
 # get files
 P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
-P_FILE_DESK_ICON = Path.home() / "__PP_DESK_ICON__"
+P_FILE_DESK_ICON = Path.home() / "__PP_IMG_DESK__"
 
 P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
 P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
 P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
+
 
 # ------------------------------------------------------------------------------
 # Run the main function
@@ -94,7 +95,7 @@ def main(dry=False):
             P_DIR_USR_INST,
             P_DIR_VENV,
             P_FILE_REQS,
-            dry=dry
+            dry=dry,
         )
     except Exception as e:
         raise e

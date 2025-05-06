@@ -34,7 +34,7 @@ import sys
 # add assets lib to path
 P_DIR_PRJ = Path(__file__).parent.resolve()
 P_DIR_ASSETS = P_DIR_PRJ / "assets"
-P_DIR_LIB = P_DIR_ASSETS / "_lib"
+P_DIR_LIB = P_DIR_ASSETS / "lib"
 sys.path.append(str(P_DIR_LIB))
 
 from cnlib.src.cninstall import CNInstall  # type: ignore

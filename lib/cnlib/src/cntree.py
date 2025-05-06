@@ -64,9 +64,9 @@ class CNTree:
     # DIR is used for subdirectories and should have a leading space to
     # separate it from the prefix and/or connector
     # FILE has the same purpose as DIR, but for files (DUH!)
-    S_DEF_FORMAT_NAME = "$NAME"
-    S_DEF_FORMAT_DIR = f" {S_DEF_FORMAT_NAME}/"
-    S_DEF_FORMAT_FILE = f" {S_DEF_FORMAT_NAME}"
+    S_FORMAT_NAME = "$NAME"
+    S_FORMAT_DIR = f" {S_FORMAT_NAME}/"
+    S_FORMAT_FILE = f" {S_FORMAT_NAME}"
 
     # error messages
     # NB: format param is dir_prj
@@ -165,15 +165,15 @@ class CNTree:
         if self._filter_list is None:
             self._filter_list = []
 
-        self._fmt_name = self.S_DEF_FORMAT_NAME
-        if fmt_name and self.S_DEF_FORMAT_NAME in fmt_name:
+        self._fmt_name = self.S_FORMAT_NAME
+        if fmt_name and self.S_FORMAT_NAME in fmt_name:
             self._fmt_name = fmt_name
 
-        self._dir_format = self.S_DEF_FORMAT_DIR
+        self._dir_format = self.S_FORMAT_DIR
         if dir_format and self._fmt_name in dir_format:
             self._dir_format = dir_format
 
-        self._file_format = self.S_DEF_FORMAT_FILE
+        self._file_format = self.S_FORMAT_FILE
         if file_format and self._fmt_name in file_format:
             self._file_format = file_format
 
@@ -293,11 +293,11 @@ class CNTree:
         root_fmt = self._dir_format.lstrip()
 
         # set root lead as string
-        root_lead_count = root_fmt.find(self.S_DEF_FORMAT_NAME)
+        root_lead_count = root_fmt.find(self.S_FORMAT_NAME)
         self._root_lead = " " * root_lead_count
 
         # set directory lead as string
-        dir_lead_count = self._dir_format.find(self.S_DEF_FORMAT_NAME)
+        dir_lead_count = self._dir_format.find(self.S_FORMAT_NAME)
         self._dir_lead = " " * dir_lead_count
 
     # --------------------------------------------------------------------------
@@ -418,7 +418,7 @@ class CNTree:
             fmt = self._dir_format if item.is_dir() else self._file_format
 
             # replace name in format string
-            rep_name = fmt.replace(self.S_DEF_FORMAT_NAME, item.name)
+            rep_name = fmt.replace(self.S_FORMAT_NAME, item.name)
 
             # add the item to the tree
             self._tree.append(

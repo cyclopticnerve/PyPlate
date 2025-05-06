@@ -7,7 +7,7 @@
         "__PP_LICENSE_URL__": "http://www.wtfpl.net",
         "__PP_RM_LICENSE__": "[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)",
         "__PP_DUMMY__": "",
-        "__PP_VER_FMT__": "Version {}",
+        "__PP_VER_DISP_FMT__": "Version {}",
         "__PP_DATE_FMT__": "%m/%d/%Y",
         "__PP_LICENSE_FILE__": "LICENSE.txt",
         "__PP_README_FILE__": "README.md",
@@ -53,7 +53,7 @@
         "__PP_FILE_DESK__": "src/gui/desktop/PyPlate.desktop",
         "__PP_PDOC_START__": "",
         "__PP_USR_INST__": ".local/share/pyplate",
-        "__PP_DESK_ICON__": ".local/share/pyplate/images/pyplate.png",
+        "__PP_IMG_DESK__": ".local/share/pyplate/images/pyplate.png",
         "__PP_APP_ID__": "org.cyclopticnerve.pyplate"
     }
 }

@@ -75,14 +75,28 @@ I_SW_FALSE = 0
 # ------------------------------------------------------------------------------
 
 # default encoding
-S_DEF_ENCODING = "UTF-8"
+S_ENCODING = "UTF-8"
 # I18N: default date format
-S_DEF_DATE_FMT = _("%m/%d/%Y")
-# NB: format param is __PP_VER_LONG__
-# I18N: printable version number
-S_DEF_VER_FMT = _("Version {}")
+S_DATE_FMT = _("%m/%d/%Y")
 # I18N: def deps
-S_DEF_DEPS_NONE = "None"
+S_DEPS_NONE = _("None")
+
+# spice up version number
+S_VER_DATE_FMT = "%Y%m%d"
+# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+# I18N: printable version number
+S_VER_DISP_FMT = _("Version {}-{}.{}")
+# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+S_VER_TOML_FMT = "{}+{}.{}"
+# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+S_VER_DIST_FMT = "{}-{}-{}"
+# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+S_VER_POT_FMT = "{}+{}.{}"
+# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+S_VER_SEM_FMT = "{}+{}.{}"
+# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+S_VER_INST_FMT = "{}-{}.{}"
+
 
 # ask questions
 # I18N: ask prj name
@@ -139,7 +153,7 @@ S_ERR_SEMVER = _(
 S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
 # NB: format params are S_FILE_DSK_TMP and __PP_FILE_DESK__
 # I18N: we want i18n but the template desktop doesn't exist
-S_ERR_DESK_NO_TEMP = _("Warning: file {} does not exist, using {}")
+S_ERR_DESK_NO_TEMP = _("Warning: file '{}' does not exist, using '{}'")
 # NB: format param is item in L_CATS
 # I18N: invalid ,desktop category
 S_ERR_DESK_CAT = _(
@@ -315,13 +329,6 @@ S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
 S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
 S_I18N_TAG = "I18N"
 
-# spice up version number
-S_BUILD_DATE_FMT = "%Y%m%d"
-# NB: format params are S_BUILD_DATE_FMT and __PP_BUILD_INFO__
-S_BUILD_FMT = "+{}.{}"
-# NB: format params are name_prj_small and __PP_VER_LONG__
-S_DIST_FMT = "{}_{}"
-
 # paths relative to end user home only
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
 S_USR_APPS = ".local/share/applications"  # for .desktop out file
@@ -431,20 +438,20 @@ S_GTK_VER_SCH = (
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
 # pyproject.toml
-S_TOML_VERSION_SEARCH = (
+S_TOML_VER_SCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
 )
-S_TOML_VERSION_REPL = r'\g<1>\g<2>\g<3>"{}"'
+S_TOML_VER_REP = r'\g<1>\g<2>\g<3>"{}"'
 
-S_TOML_SHORT_DESC_SEARCH = (
+S_TOML_DESC_SCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*description[\t ]*=[\t ]*)(.*?$)"
 )
-S_TOML_SHORT_DESC_REPL = r'\g<1>\g<2>\g<3>"{}"'
+S_TOML_DESC_REP = r'\g<1>\g<2>\g<3>"{}"'
 
-S_TOML_KW_SEARCH = (
+S_TOML_KW_SCH = (
     r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 )
-S_TOML_KW_REPL = r"\g<1>\g<2>\g<3>[{}]"
+S_TOML_KW_REP = r"\g<1>\g<2>\g<3>[{}]"
 
 # desc/version in all files
 S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
@@ -456,18 +463,21 @@ S_SRC_DESC_REP = r"\g<1>\g<2>{}\g<4>"
 # make sure ver num entered in pybaker is valid
 S_SEMVER_VALID = (
     # r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
-
     r"^"
     r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
     r"(?:-("
-      r"(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
-      r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*"
+    r"(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+    r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*"
     r"))?"
     r"(?:\+("
-      r"[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*"
+    r"[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*"
     r"))?"
     r"$"
 )
+
+# use local image in docs
+S_DOC_IMG_SCH = r"(<header>.*<img src=\")(.*?)(\")"
+S_DOC_IMG_REP = r"\g<1>{}\g<3>"
 
 # ------------------------------------------------------------------------------
 # gui stuff
@@ -741,8 +751,6 @@ D_PRV_ALL = {
     ),
     # dummy value to use in headers
     "__PP_DUMMY__": "",
-    # version format string for command line
-    "__PP_VER_FMT__": S_DEF_VER_FMT,
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -751,9 +759,8 @@ D_PRV_ALL = {
     # sure how to proceed but i think for now i will leave this as a
     # user-editable string and place it in the realm of 'edit it before you
     # run' along with author/email/license/etc
-    "__PP_DATE_FMT__": S_DEF_DATE_FMT,
-    "__PP_BUILD_DATE_FMT__": S_BUILD_DATE_FMT,
-    "__PP_BUILD_FMT__": S_BUILD_FMT,
+    # version format string for command line
+    "__PP_DATE_FMT__": S_DATE_FMT,
     # filenames replaced in various places, rel to prj dir
     "__PP_LICENSE_FILE__": S_FILE_LICENSE,
     "__PP_README_FILE__": S_FILE_README,
@@ -815,11 +822,6 @@ D_PRV_PRJ = {
     "__PP_CMD_RUN__": "",
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
-    # NB: technically this should be metadata but we don't want dev editing,
-    # only use metadata to recalculate these on every build
-    "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
-    "__PP_VER_LONG__": "",  # version with build info
-    "__PP_BUILD_INFO__": "",  # build info to add to version
     "__PP_FILE_DESK__": "",  # final desk file, not template
     "__PP_PDOC_START__": "",  # start doc search at this folder
     "__PP_IMG_README__": "",  # image for readme file logo
@@ -827,6 +829,17 @@ D_PRV_PRJ = {
     "__PP_IMG_DESK__": "",  # image for .desktop logo
     "__PP_IMG_DASH__": "",  # image for dash/win logo
     "__PP_IMG_ABOUT__": "",  # image for about logo
+    # NB: technically this should be metadata but we don't want dev editing,
+    # only use metadata to recalculate these on every build
+    "__PP_VER_META__": "",
+    "__PP_VER_DATE__": "",
+    "__PP_VER_BUILD__": "",
+    "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1+20250505.17653"
+    "__PP_VER_TOML__": "",
+    "__PP_VER_DIST__": "",
+    "__PP_VER_POT__": "",
+    "__PP_VER_SEM__": "",
+    "__PP_VER_INST__": "",
 }
 
 # ------------------------------------------------------------------------------
@@ -986,7 +999,7 @@ D_PUB_I18N = {
     # list of written languages that are available
     S_KEY_I18N_WLANGS: ["en"],
     # default charset for .pot/.po files
-    S_KEY_I18N_CHAR: S_DEF_ENCODING,
+    S_KEY_I18N_CHAR: S_ENCODING,
 }
 
 # dict in project to control post processing
@@ -1009,7 +1022,7 @@ D_DBG_PM = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1203,44 +1216,64 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_prj_small)
 
     # get base version
-    ver_base = dict_pub_meta[S_KEY_META_VERSION]
+    ver_meta = dict_pub_meta[S_KEY_META_VERSION]
 
     # --------------------------------------------------------------------------
-    # add date to version number
+    # get date for version number
 
     # get current date and format it according to dev fmt
     now = datetime.now()
-    build_date = now.strftime(S_BUILD_DATE_FMT)
+    ver_date = now.strftime(S_VER_DATE_FMT)
+    dict_prv_prj["__PP_VER_DATE__"] = ver_date
 
+    # --------------------------------------------------------------------------
     # get current build number, add 1
-    build_num_str = dict_prv_prj["__PP_BUILD_INFO__"]
+    str_build = dict_prv_prj["__PP_VER_BUILD__"]
+    int_build = 0
     try:
-        build_num_int = int(build_num_str)
+        int_build = int(str_build)
     except ValueError:
-        build_num_int = 0
-    build_num_int += 1
-    build_num_str = str(build_num_int)
-    dict_prv_prj["__PP_BUILD_INFO__"] = build_num_str
+        int_build = 0
+    int_build += 1
+    dict_prv_prj["__PP_VER_BUILD__"] = str(int_build)
 
-    # do the final formatting
-    build_info = S_BUILD_FMT.format(build_date, build_num_str)
-    ver_long = ver_base + build_info
-    dict_prv_prj["__PP_VER_LONG__"] = ver_long
+    # --------------------------------------------------------------------------
+    # calculate all the different version strings
 
-    # formatted version string
-    ver_fmt = dict_prv_all["__PP_VER_FMT__"]
-    ver_disp = ver_fmt.format(ver_long)
-    dict_prv_prj["__PP_VER_DISP__"] = ver_disp
+    # display
+    str_disp = S_VER_DISP_FMT.format(ver_meta, ver_date, str(int_build))
+    dict_prv_prj["__PP_VER_DISP__"] = str_disp
+
+    # toml
+    str_toml = S_VER_TOML_FMT.format(ver_meta, ver_date, str(int_build))
+    dict_prv_prj["__PP_VER_TOML__"] = str_toml
+
+    # dist folder
+    str_dist = S_VER_DIST_FMT.format(ver_meta, ver_date, str(int_build))
+    dict_prv_prj["__PP_VER_DIST__"] = str_dist
+
+    # pot header
+    str_pot = S_VER_POT_FMT.format(ver_meta, ver_date, str(int_build))
+    dict_prv_prj["__PP_VER_POT__"] = str_pot
+
+    # semver
+    str_sem = S_VER_SEM_FMT.format(ver_meta, ver_date, str(int_build))
+    dict_prv_prj["__PP_VER_SEM__"] = str_sem
+
+    # inst/uninst
+    str_inst = S_VER_INST_FMT.format(ver_meta, ver_date, str(int_build))
+    dict_prv_prj["__PP_VER_INST__"] = str_inst
 
     # --------------------------------------------------------------------------
 
     # fix ver for dist filename
-    ver_dist = ver_long.replace("-", "_")
-    ver_dist = ver_dist.replace(".", "-")
+    # ver_dist = ver_long.replace("-", "_")
+    # ver_dist = ver_dist.replace(".", "-")
 
     # format dist dir name with prj and ver
-    name_fmt = S_DIST_FMT.format(name_prj_small, ver_dist)
-    dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
+    # dist_fmt = S_VER_DIST_FMT.format(name_prj_small, str_dist)
+    # name_fmt = name_prj_small + dist_fmt
+    # dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
 
     # gui app/win replacements
     name_prj_pascal = dict_prv_prj["__PP_NAME_PRJ_PASCAL__"]
@@ -1454,7 +1487,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
@@ -1464,7 +1497,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
-    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1488,7 +1521,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # --------------------------------------------------------------------------
@@ -1530,7 +1563,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     # get rm deps as links
     s_rm_deps = "<br>\n".join(l_rm_deps)
     if len(s_rm_deps) == 0:
-        s_rm_deps = S_DEF_DEPS_NONE
+        s_rm_deps = S_DEPS_NONE
 
     # replace dependencies array
     str_pattern = S_RM_DEPS_SCH
@@ -1538,7 +1571,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # save file
-    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1561,19 +1594,18 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
-    str_pattern = S_TOML_VERSION_SEARCH
-    pp_version = dict_prv_prj["__PP_VER_LONG__"]
-    str_rep = S_TOML_VERSION_REPL.format(pp_version)
+    str_pattern = S_TOML_VER_SCH
+    str_rep = dict_prv_prj["__PP_VER_TOML__"]
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
-    str_pattern = S_TOML_SHORT_DESC_SEARCH
+    str_pattern = S_TOML_DESC_SCH
     pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-    str_rep = S_TOML_SHORT_DESC_REPL.format(pp_short_desc)
+    str_rep = S_TOML_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # fix keywords for pyproject.toml
@@ -1582,12 +1614,12 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     s_keywords = ", ".join(q_keywords)
 
     # replace keywords array
-    str_pattern = S_TOML_KW_SEARCH
-    str_rep = S_TOML_KW_REPL.format(s_keywords)
+    str_pattern = S_TOML_KW_SCH
+    str_rep = S_TOML_KW_REP.format(s_keywords)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1630,7 +1662,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace categories
@@ -1645,7 +1677,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1668,7 +1700,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace short description
@@ -1684,7 +1716,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -1711,7 +1743,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
@@ -1726,7 +1758,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
     str_rep = S_SRC_DESC_REP.format(desc)
     text = re.sub(str_sch, str_rep, text, flags=re.M)
 
-    with open(path, "w", encoding=S_DEF_ENCODING) as a_file:
+    with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(text)
 
 

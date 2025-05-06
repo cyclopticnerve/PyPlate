@@ -326,7 +326,7 @@ class PyMaker:
         self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
-        # get global and calculated settings dicts in pyplate.py
+        # get global and calculated settings dicts in private.json
         self._dict_prv = {
             PP.S_KEY_PRV_ALL: PP.D_PRV_ALL,
             PP.S_KEY_PRV_PRJ: PP.D_PRV_PRJ,
@@ -517,7 +517,7 @@ class PyMaker:
 
         # get current date and format it according to dev fmt
         now = datetime.now()
-        fmt_date = PP.S_DEF_DATE_FMT
+        fmt_date = PP.S_DATE_FMT
         info_date = now.strftime(fmt_date)
 
         # ----------------------------------------------------------------------
@@ -662,7 +662,7 @@ class PyMaker:
         print(PP.S_ACTION_FIX, end="", flush=True)
 
         # check version before we start
-        version = self._dict_prv_prj["__PP_VER_LONG__"]
+        version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
         if not self._check_version(version):
             print(PP.S_ERR_SEMVER)
 
@@ -923,7 +923,7 @@ class PyMaker:
             potpy = CNPotPy(
                 # header
                 str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
-                str_version=self._dict_prv_prj["__PP_VER_LONG__"],
+                str_version=self._dict_prv_prj["__PP_VER_POT__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
                 # base prj dir
@@ -953,7 +953,10 @@ class PyMaker:
             if prj_type_short in PP.L_MAKE_DESK and not path_dsk_tmp.exists():
 
                 # we want template, but does not exist
-                print("\n" + PP.S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out))
+                print(
+                    "\n"
+                    + PP.S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out)
+                )
             else:
                 # do the thing
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
@@ -964,7 +967,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # docs
-        # FIXME: image
+
         # if docs flag is set
         if self._dict_debug[PP.S_KEY_DBG_DOCS]:
 
@@ -999,6 +1002,47 @@ class PyMaker:
                 print(PP.S_ACTION_FAIL)
                 raise e
 
+            # ------------------------------------------------------------------
+            # use local image in docs
+
+            # initial "../" level
+            level = 0
+
+            # walk the docs tree
+            for root, _dirs, files in dir_docs_out.walk():
+
+                # next level
+                level += 1
+
+                # get full paths
+                files = [root / f for f in files]
+                files = [f for f in files if f.suffix == ".html"]
+
+                # for each html file
+                for f in files:
+
+                    # build the dots, one set for each level
+                    dots = ""
+                    for _i in range(level):
+                        dots += "../"
+
+                    # add the image path rel to prj dir
+                    dots += self._dict_prv_prj["__PP_IMG_DOCS__"]
+
+                    # format the rep str
+                    img_rep = PP.S_DOC_IMG_REP.format(dots)
+
+                    # open html file for read
+                    with open(f, "r", encoding=PP.S_ENCODING) as a_file:
+                        text = a_file.read()
+
+                    # replace img src with dots
+                    text = re.sub(PP.S_DOC_IMG_SCH, img_rep, text, flags=re.S)
+
+                    # write text back to file
+                    with open(f, "w", encoding=PP.S_ENCODING) as a_file:
+                        a_file.write(text)
+
         # ----------------------------------------------------------------------
         # tree
         # NB: run last so it includes .git and .venv folders
@@ -1014,7 +1058,7 @@ class PyMaker:
             file_tree = self._dir_prj / PP.S_TREE_FILE
 
             # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
                 a_file.write("")
 
             # create tree object and call
@@ -1027,7 +1071,7 @@ class PyMaker:
             tree_str = tree_obj.main()
 
             # write to file
-            with open(file_tree, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
                 a_file.write(tree_str)
 
             # we are done
@@ -1056,7 +1100,9 @@ class PyMaker:
 
                 # get params
                 name = self._dict_prv_prj["__PP_NAME_PRJ__"]
-                version = self._dict_prv_prj["__PP_VER_LONG__"]
+
+                # get version number
+                version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
 
                 # get an install instance
                 inst = CNInstall()
@@ -1199,7 +1245,7 @@ class PyMaker:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -1253,7 +1299,7 @@ class PyMaker:
                 lines[index] = self._fix_code(line)
 
         # open and write file
-        with open(path, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -1450,14 +1496,14 @@ class PyMaker:
 
         # read reqs files and put in result
         for item in src:
-            with open(item, "r", encoding=PP.S_DEF_ENCODING) as a_file:
+            with open(item, "r", encoding=PP.S_ENCODING) as a_file:
                 old_file = a_file.readlines()
                 old_file = [line.rstrip() for line in old_file]
                 new_file = new_file + old_file
 
         # put combined reqs into final file
         joint = "\n".join(new_file)
-        with open(dst, "w", encoding=PP.S_DEF_ENCODING) as a_file:
+        with open(dst, "w", encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
     # --------------------------------------------------------------------------
@@ -1533,6 +1579,7 @@ class PyMaker:
         # match semantic version from start of string
         pattern = PP.S_SEMVER_VALID
         return re.match(pattern, version)
+
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
@@ -1650,6 +1697,7 @@ class PyMaker:
 
         if not self._debug:
             self._dict_debug = self._dict_pub_dbg
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

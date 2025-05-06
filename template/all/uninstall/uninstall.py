@@ -32,11 +32,11 @@ import sys
 # pylint: disable=wrong-import-position
 
 # add lib to path
-P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_LIB = P_DIR_PRJ/"__PP_DIR_LIB__"
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_LIB = P_DIR_PRJ / "lib"
 sys.path.append(str(P_DIR_LIB))
 
-# local imp0rts
+# local imports
 from cnlib.src.cninstall import CNInstall  # type: ignore
 from cnlib.src.cnformatter import CNFormatter  # type: ignore
 
