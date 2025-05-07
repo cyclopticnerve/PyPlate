@@ -26,7 +26,6 @@ import gettext
 import locale
 from pathlib import Path
 import re
-import shutil
 import tarfile
 
 # ------------------------------------------------------------------------------
@@ -83,20 +82,13 @@ S_DEPS_NONE = _("None")
 
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
-# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
-# I18N: printable version number
-S_VER_DISP_FMT = _("Version {}-{}.{}")
-# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
-S_VER_TOML_FMT = "{}+{}.{}"
-# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
-S_VER_DIST_FMT = "{}-{}-{}"
-# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
-S_VER_POT_FMT = "{}+{}.{}"
-# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
+# NB: format params are meta version, date, and __PP_VER_BUILD__
 S_VER_SEM_FMT = "{}+{}.{}"
-# NB: format params are __PP_VER_META__, __PP_VER_DATE__, and __PP_VER_BUILD__
-S_VER_INST_FMT = "{}-{}.{}"
-
+# NB: format param is __PP_VER_SEM__
+# I18N: printable version number
+S_VER_DISP_FMT = _("Version {}")
+# # NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_SEM__
+S_VER_DIST_FMT = "{}_{}"
 
 # ask questions
 # I18N: ask prj name
@@ -438,9 +430,7 @@ S_GTK_VER_SCH = (
 S_GTK_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
 # pyproject.toml
-S_TOML_VER_SCH = (
-    r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
-)
+S_TOML_VER_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
 S_TOML_VER_REP = r'\g<1>\g<2>\g<3>"{}"'
 
 S_TOML_DESC_SCH = (
@@ -448,9 +438,7 @@ S_TOML_DESC_SCH = (
 )
 S_TOML_DESC_REP = r'\g<1>\g<2>\g<3>"{}"'
 
-S_TOML_KW_SCH = (
-    r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
-)
+S_TOML_KW_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 S_TOML_KW_REP = r"\g<1>\g<2>\g<3>[{}]"
 
 # desc/version in all files
@@ -818,7 +806,7 @@ D_PRV_PRJ = {
     # these paths are calculated in do_before_fix, relative to the user's home
     # dir
     "__PP_USR_CONF__": "",  # config dir
-    "__PP_DIST_FMT__": "",  # format name of the dist ([name_small]_[version])
+    "__PP_DIST_DIR__": "",  # formatted name of the dist ([name_small]_[version])
     "__PP_CMD_RUN__": "",
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
@@ -831,15 +819,9 @@ D_PRV_PRJ = {
     "__PP_IMG_ABOUT__": "",  # image for about logo
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
-    "__PP_VER_META__": "",
-    "__PP_VER_DATE__": "",
-    "__PP_VER_BUILD__": "",
+    "__PP_VER_SEM__": "",  # semantic version string, ie. "0.0.1+20250505.17653"
+    "__PP_VER_BUILD__": "",  # build number, inc every run of pm/pb, def 0
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1+20250505.17653"
-    "__PP_VER_TOML__": "",
-    "__PP_VER_DIST__": "",
-    "__PP_VER_POT__": "",
-    "__PP_VER_SEM__": "",
-    "__PP_VER_INST__": "",
 }
 
 # ------------------------------------------------------------------------------
@@ -1022,7 +1004,7 @@ D_DBG_PM = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1138,8 +1120,6 @@ D_PY_REP = {
 
 # the type of projects that will ask for a second name
 D_NAME_SEC = {
-    # "p": [S_ASK_SEC_P, S_ASK_SEC_P_DEF],
-    # "g": [S_ASK_SEC_G, S_ASK_SEC_G_DEF],
     "p": S_ASK_SEC_P,
     "g": S_ASK_SEC_G,
 }
@@ -1224,7 +1204,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     # get current date and format it according to dev fmt
     now = datetime.now()
     ver_date = now.strftime(S_VER_DATE_FMT)
-    dict_prv_prj["__PP_VER_DATE__"] = ver_date
 
     # --------------------------------------------------------------------------
     # get current build number, add 1
@@ -1240,40 +1219,24 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub):
     # --------------------------------------------------------------------------
     # calculate all the different version strings
 
-    # display
-    str_disp = S_VER_DISP_FMT.format(ver_meta, ver_date, str(int_build))
-    dict_prv_prj["__PP_VER_DISP__"] = str_disp
-
-    # toml
-    str_toml = S_VER_TOML_FMT.format(ver_meta, ver_date, str(int_build))
-    dict_prv_prj["__PP_VER_TOML__"] = str_toml
-
-    # dist folder
-    str_dist = S_VER_DIST_FMT.format(ver_meta, ver_date, str(int_build))
-    dict_prv_prj["__PP_VER_DIST__"] = str_dist
-
-    # pot header
-    str_pot = S_VER_POT_FMT.format(ver_meta, ver_date, str(int_build))
-    dict_prv_prj["__PP_VER_POT__"] = str_pot
-
     # semver
     str_sem = S_VER_SEM_FMT.format(ver_meta, ver_date, str(int_build))
     dict_prv_prj["__PP_VER_SEM__"] = str_sem
 
-    # inst/uninst
-    str_inst = S_VER_INST_FMT.format(ver_meta, ver_date, str(int_build))
-    dict_prv_prj["__PP_VER_INST__"] = str_inst
+    # display
+    str_disp = S_VER_DISP_FMT.format(str_sem)
+    dict_prv_prj["__PP_VER_DISP__"] = str_disp
 
     # --------------------------------------------------------------------------
 
     # fix ver for dist filename
-    # ver_dist = ver_long.replace("-", "_")
-    # ver_dist = ver_dist.replace(".", "-")
+    ver_dist = str_sem
+    ver_dist = ver_dist.replace(".", "-")
+    ver_dist = ver_dist.replace("+", "_")
 
     # format dist dir name with prj and ver
-    # dist_fmt = S_VER_DIST_FMT.format(name_prj_small, str_dist)
-    # name_fmt = name_prj_small + dist_fmt
-    # dict_prv_prj["__PP_DIST_FMT__"] = name_fmt
+    name_fmt = S_VER_DIST_FMT.format(name_prj_small, ver_dist)
+    dict_prv_prj["__PP_DIST_DIR__"] = name_fmt
 
     # gui app/win replacements
     name_prj_pascal = dict_prv_prj["__PP_NAME_PRJ_PASCAL__"]
@@ -1414,7 +1377,7 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
 
     # get dist dir for all operations
     dist = Path(dir_prj) / S_DIR_DIST
-    name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_FMT__"]
+    name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_DIR__"]
     p_dist = dist / name_fmt
 
     # --------------------------------------------------------------------------
@@ -1452,10 +1415,6 @@ def do_after_dist(dir_prj, dict_prv, dict_pub):
     out_file = Path(S_DIR_DIST) / f"{in_dir}{ext}"
     with tarfile.open(out_file, mode="w:gz") as tar:
         tar.add(in_dir, arcname=Path(in_dir).name)
-
-    # delete the origin dir, if key set
-    if dict_pub[S_KEY_PUB_DBG][S_KEY_DBG_DIST]:
-        shutil.rmtree(in_dir)
 
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
@@ -1539,7 +1498,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = re.sub(str_pattern, "", text, flags=re.S)
 
     # --------------------------------------------------------------------------
-    # this part is used by pybaker to replace metadata
+    # this part is used by pymaker/pybaker to replace metadata
 
     # replace short description
     str_pattern = S_RM_DESC_SCH
@@ -1599,13 +1558,14 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
 
     # replace version
     str_pattern = S_TOML_VER_SCH
-    str_rep = dict_prv_prj["__PP_VER_TOML__"]
+    str_rep = dict_prv_prj["__PP_VER_SEM__"]
+    str_rep = S_TOML_VER_REP.format(str_rep)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
     str_pattern = S_TOML_DESC_SCH
-    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-    str_rep = S_TOML_DESC_REP.format(pp_short_desc)
+    str_rep = dict_pub_meta[S_KEY_META_SHORT_DESC]
+    str_rep = S_TOML_DESC_REP.format(str_rep)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # fix keywords for pyproject.toml
@@ -1711,7 +1671,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta):
 
     # replace version
     str_pattern = S_GTK_VER_SCH
-    pp_version = dict_prv_prj["__PP_VER_DISP__"]
+    pp_version = dict_prv_prj["__PP_VER_SEM__"]
     str_rep = S_GTK_VER_REP.format(pp_version)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 

@@ -646,7 +646,7 @@ class PyBaker:
             potpy = CNPotPy(
                 # header
                 str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
-                str_version=self._dict_prv_prj["__PP_VER_POT__"],
+                str_version=self._dict_prv_prj["__PP_VER_SEM__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
                 # base prj dir
@@ -810,7 +810,7 @@ class PyBaker:
             print(PP.S_ACTION_INST, end="", flush=True)
 
             # get version from project.json
-            version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
+            version = self._dict_prv_prj["__PP_VER_SEM__"]
 
             # get install cfg
             a_file = self._dir_prj / PP.S_PATH_INST_CFG
@@ -861,7 +861,7 @@ class PyBaker:
             shutil.rmtree(a_dist)
 
         # make child dir in case we nuked
-        name_fmt = self._dict_prv_prj["__PP_DIST_FMT__"]
+        name_fmt = self._dict_prv_prj["__PP_DIST_DIR__"]
         p_dist = a_dist / name_fmt
         p_dist.mkdir(parents=True)
 
@@ -908,6 +908,17 @@ class PyBaker:
 
         # update dicts after change
         self._reload_dicts()
+
+        # delete the origin dir, if key set
+        if self._dict_debug[PP.S_KEY_DBG_DIST]:
+
+            # get dist dir for all operations
+            dist = Path(self._dir_prj) / PP.S_DIR_DIST
+            name_fmt = self._dict_prv_prj["__PP_DIST_DIR__"]
+            p_dist = dist / name_fmt
+
+            # delete folder
+            shutil.rmtree(p_dist)
 
         # done copying project files
         print(PP.S_ACTION_DONE)

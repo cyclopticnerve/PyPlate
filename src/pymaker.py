@@ -923,7 +923,7 @@ class PyMaker:
             potpy = CNPotPy(
                 # header
                 str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
-                str_version=self._dict_prv_prj["__PP_VER_POT__"],
+                str_version=self._dict_prv_prj["__PP_VER_SEM__"],
                 str_author=self._dict_prv_all["__PP_AUTHOR__"],
                 str_email=self._dict_prv_all["__PP_EMAIL__"],
                 # base prj dir
@@ -1082,6 +1082,8 @@ class PyMaker:
 
         # if install flag is set
         if self._dict_debug[PP.S_KEY_DBG_INST]:
+
+            # fix contents
             a_path = self._dir_prj / PP.S_FILE_INST_CFG
             if a_path.exists():
                 self._fix_contents(a_path)
@@ -1102,7 +1104,7 @@ class PyMaker:
                 name = self._dict_prv_prj["__PP_NAME_PRJ__"]
 
                 # get version number
-                version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
+                version = self._dict_prv_prj["__PP_VER_SEM__"]
 
                 # get an install instance
                 inst = CNInstall()
@@ -1149,7 +1151,7 @@ class PyMaker:
                 # need to activate prj venv
                 dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
                 cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
-                    self._dir_prj, dir_venv
+                    self._dir_prj, self._dir_prj / dir_venv
                 )
 
                 # cmd to install
