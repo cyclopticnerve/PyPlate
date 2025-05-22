@@ -1,5 +1,6 @@
 
 # TODO: all refs to .local, etc. should be relative to prj in ide until unstall
+# TODO: remove tooltips from docs
 # TODO: combine pyplate.py B_ flags into dict and add to project.json
 # TODO: custom exceptions (instead of except Exception as e/raise e)
 # how to read in pybaker? and write (debug at least, since we pass it in prj)
@@ -13,7 +14,7 @@
 # TODO: CNInstall help str
 # TODO: for pkg, after fix, activate prj venv and install pkg as editable
 # then change test to use installed pkg, not local dir
-# TODO: multiple switches on one line: # pyplate: disable=foo disable=bar
+# TODO: multiple switches on one line: # pyplate: foo=7 bar=False
 # TODO: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
 # dunder that is not in comment
 # report that as error

@@ -8,8 +8,7 @@
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
-
-# pyplate: disable=replace
+# pyplate: replace=False
 
 """
 A program to create a PyPlate project from a few variables
@@ -39,10 +38,6 @@ import sys
 # local imports
 from cnformatter import CNFormatter
 import cnfunctions as F
-from cninstall import CNInstall
-from cnpot import CNPotPy
-from cntree import CNTree
-from cnvenv import CNVenv
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -108,7 +103,7 @@ class PyMaker:
 
     # --------------------------------------------------------------------------
 
-    # pyplate: enable=replace
+    # pyplate: replace=True
 
     # I18N: short description
     S_PP_SHORT_DESC = _(
@@ -117,9 +112,9 @@ class PyMaker:
     )
 
     # version string
-    S_PP_VERSION = "0.0.1"
+    S_PP_VERSION = "Version 0.0.1+20250507.9"
 
-    # pyplate: disable=replace
+    # pyplate: replace=False
 
     # config option strings
     S_ARG_HLP_OPTION = "-h"
@@ -221,8 +216,14 @@ class PyMaker:
         # ask user for project info
         self._get_project_info()
 
+        # do before template
+        self._do_before_template()
+
         # copy template
         self._do_template()
+
+        # do before template
+        self._do_after_template()
 
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_before_fix()
@@ -326,13 +327,13 @@ class PyMaker:
         self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
         self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
-        # get global and calculated settings dicts in private.json
+        # create global and calculated settings dicts in private.json
         self._dict_prv = {
             PP.S_KEY_PRV_ALL: PP.D_PRV_ALL,
             PP.S_KEY_PRV_PRJ: PP.D_PRV_PRJ,
         }
 
-        # get individual dicts in pyplate.py
+        # create individual dicts in pyplate.py
         self._dict_pub = {
             PP.S_KEY_PUB_BL: PP.D_PUB_BL,
             PP.S_KEY_PUB_DBG: PP.D_PUB_DBG,
@@ -563,6 +564,27 @@ class PyMaker:
         print()
 
     # --------------------------------------------------------------------------
+    # Do any work before template copy
+    # --------------------------------------------------------------------------
+    def _do_before_template(self):
+        """
+        Do any work before template copy
+
+        Do any work before copying the template. This method is called just
+        before _do_template, before any files have been copied.\n
+        It is mostly used to make final adjustments to the 'dict_prv' and
+        'dict_pub' dicts before any copying occurs.
+        """
+
+        # call public before template function
+        self._dict_prv, self._dict_pub = PP.do_before_template(
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+        )
+
+        # update dict pointers
+        self._reload_dicts()
+
+    # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
     def _do_template(self):
@@ -572,6 +594,7 @@ class PyMaker:
         Gets dirs/files from template and copies them to the project dir.
         """
 
+        # show info
         print(PP.S_ACTION_COPY, end="", flush=True)
 
         # ----------------------------------------------------------------------
@@ -589,7 +612,7 @@ class PyMaker:
         prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
         prj_type_long = ""
 
-        # get parent of project
+        # get long type of project
         for item in PP.L_TYPES:
             if item[0] == prj_type_short:
                 prj_type_long = item[2]
@@ -601,7 +624,7 @@ class PyMaker:
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
         # ----------------------------------------------------------------------
-        # do copy misc
+        # do stuff outside template all/type
 
         # copy linked files
         for key, val in PP.D_COPY.items():
@@ -616,35 +639,57 @@ class PyMaker:
             elif src.is_file():
                 shutil.copy2(src, dst)
 
-        # _do_after_fix, after the venv is created
-        self._fix_reqs(prj_type_long)
+        # ----------------------------------------------------------------------
+        # merge reqs
+
+        # merge reqs files from all and prj
+        self._merge_reqs(prj_type_long)
+
+        # ----------------------------------------------------------------------
+        # done
 
         print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
-    # A function to do stuff before fix
+    # Do any work after template copy
+    # --------------------------------------------------------------------------
+    def _do_after_template(self):
+        """
+        Do any work after template copy
+
+        Do any work after copying the template. This method is called after
+        _do_template, and before _do_before_fix.
+        """
+
+        # call public after template function
+        self._dict_prv, self._dict_pub = PP.do_after_template(
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+        )
+
+        # update dict pointers
+        self._reload_dicts()
+
+    # --------------------------------------------------------------------------
+    # Do any work before fix
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
         """
-        A function to do stuff before fix
+        Do any work before fix
 
-        This function does some more changes before the actual fix. Mostly it
-        is used to call the do_before_fix method in pyplate.py.
+        Do any work before fix. This method is called just before _do_fix,
+        after all dunders have been configured, but before any files have been
+        modified.\n
+        It is mostly used to make final adjustments to the 'dict_prv' and
+        'dict_pub' dicts before any replacement occurs.
         """
-
-        # print info
-        print(PP.S_ACTION_BEFORE, end="", flush=True)
 
         # call public before fix function
         self._dict_prv, self._dict_pub = PP.do_before_fix(
-            self._dir_prj, self._dict_prv, self._dict_pub
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
 
-        # reload dicts after change
+        # update dict pointers
         self._reload_dicts()
-
-        # print info
-        print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -663,8 +708,8 @@ class PyMaker:
 
         # check version before we start
         version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
-        if not self._check_version(version):
-            print(PP.S_ERR_SEMVER)
+        if not self._check_sem_ver(version):
+            print(PP.S_ERR_SEM_VER)
 
         # combine dicts for string replacement
         self._dict_rep = F.combine_dicts(
@@ -673,14 +718,14 @@ class PyMaker:
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        dict_paths = self._fix_blacklist_paths()
+        dict_bl = self._fix_blacklist_paths()
 
         # just shorten the names
-        skip_all = dict_paths[PP.S_KEY_SKIP_ALL]
-        skip_contents = dict_paths[PP.S_KEY_SKIP_CONTENTS]
-        skip_header = dict_paths[PP.S_KEY_SKIP_HEADER]
-        skip_code = dict_paths[PP.S_KEY_SKIP_CODE]
-        skip_path = dict_paths[PP.S_KEY_SKIP_PATH]
+        skip_all = dict_bl[PP.S_KEY_SKIP_ALL]
+        skip_contents = dict_bl[PP.S_KEY_SKIP_CONTENTS]
+        skip_header = dict_bl[PP.S_KEY_SKIP_HEADER]
+        skip_code = dict_bl[PP.S_KEY_SKIP_CODE]
+        skip_path = dict_bl[PP.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -699,472 +744,65 @@ class PyMaker:
             # for each file item
             for item in files:
 
-                # handle files in skip_all, dirs/files in skip_contents
-                if (
-                    item in skip_all
-                    or item in skip_contents
-                    or root in skip_contents
-                ):
-                    continue
-
                 # for each new file, reset block and line switches to def
                 self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
                 self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
-                # handle dirs/files in skip_header
-                bl_hdr = root in skip_header or item in skip_header
+                # handle files in skip_all
+                if item in skip_all:
+                    continue
 
-                # handle dirs/files in skip_code
-                bl_code = root in skip_code or item in skip_code
+                # handle dirs/files in skip_contents
+                if not root in skip_contents and not item in skip_contents:
 
-                # do md/html/xml separately (needs special handling)
-                self._dict_type_rep = PP.D_PY_REP
-                suffix = (
-                    f".{item.suffix}"
-                    if not item.suffix.startswith(".")
-                    else item.suffix
-                )
-                if suffix in PP.L_EXT_MARKUP:
-                    self._dict_type_rep = PP.D_MARKUP_REP
+                    # get regex for header/switches
+                    self._dict_type_rep = self._get_regex(item)
 
-                # fix content with appropriate dict
-                self._fix_contents(item, bl_hdr, bl_code)
+                    # handle dirs/files in skip_header
+                    bl_hdr = root in skip_header or item in skip_header
 
-        # ----------------------------------------------------------------------
-        # fix path
-        # NB: top_down=False is required for the renaming, as we don't want to
-        # rename (and thus clobber) a directory name before we rename all its
-        # child dirs/files
-        for root, root_dirs, root_files in self._dir_prj.walk(top_down=False):
+                    # handle dirs/files in skip_code
+                    bl_code = root in skip_code or item in skip_code
 
-            # handle dirs in skip_all/skip_path
-            if root in skip_all or root in skip_path:
-                # NB: do not recurse
-                root_dirs.clear()
-                continue
+                    # fix content with appropriate dict
+                    self._fix_contents(item, bl_hdr, bl_code)
 
-            # convert files into Paths
-            files = [root / f for f in root_files]
+                # handle files in skip_path
+                if not item in skip_path:
+                    self._fix_path(item)
 
-            # handle files in skip_all/skip_path
-            items = [
-                item
-                for item in files
-                if item not in skip_all and item not in skip_path
-            ]
-
-            # for each file item
-            for item in items:
-
-                # fix path
-                self._fix_path(item)
-
-            # fix current dir path
-            if root not in skip_path:
+            # handle dirs in skip_path
+            if not root in skip_path:
                 self._fix_path(root)
 
-        # ----------------------------------------------------------------------
-        # save project settings
-
-        # create private settings
-        dict_prv = {
-            PP.S_KEY_PRV_ALL: self._dict_prv_all,
-            PP.S_KEY_PRV_PRJ: self._dict_prv_prj,
-        }
-
-        # save private settings
-        path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
-        F.save_dict(dict_prv, [path_prv])
-
-        # create public settings
-        dict_pub = {
-            PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
-            PP.S_KEY_PUB_DIST: self._dict_pub_dist,
-            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            PP.S_KEY_PUB_META: self._dict_pub_meta,
-        }
-
-        # save public settings
-        path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
-        F.save_dict(dict_pub, [path_pub])
-
-        # ----------------------------------------------------------------------
-        # fix dunders in dict_pub (project.json)
-        self._fix_contents(path_pub)
-
-        # reload dict from fixed file
-        dict_pub = F.load_dicts([path_pub])
-        self._reload_dicts()
+        # save private.json and project.json
+        # NB: doing this at the end means we don't need pyplate folder in
+        # blacklist
+        self._save_project_info()
 
         # done
         print(PP.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
-    # Make any necessary changes after all fixes have been done
+    # Do any work after fix
     # --------------------------------------------------------------------------
     def _do_after_fix(self):
         """
-        Make any necessary changes after all fixes have been done
+        Do any work after fix
 
-        This method is called after all fixes have been completed. There should
-        be no dunders in the file contents or path names. Do any further
-        project modification in do_after_fix in pyplate.py.
+        Do any work after fix. This method is called just after _do_after_fix,
+        after all files have been modified.\n
+        It is mostly used to tweak files once all the normal fixes have been
+        applied.
         """
 
-        # ----------------------------------------------------------------------
-        # dicts
-
-        # reload dicts after fix
-        path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
-        self._dict_prv = F.load_dicts([path_prv])
-        path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
-        self._dict_pub = F.load_dicts([path_pub])
-
         # call conf after fix
-        print(PP.S_ACTION_AFTER, end="", flush=True)
         self._dict_prv, self._dict_pub = PP.do_after_fix(
-            self._dir_prj, self._dict_prv, self._dict_pub
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
 
         # update dicts after change
         self._reload_dicts()
-
-        # print info
-        print(PP.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
-        # git
-
-        # if git flag
-        if self._dict_debug[PP.S_KEY_DBG_GIT]:
-
-            print(PP.S_ACTION_GIT, end="", flush=True)
-
-            # add git dir
-            cmd = PP.S_CMD_GIT_CREATE.format(self._dir_prj)
-            F.sh(cmd, shell=True)
-
-            print(PP.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
-        # venv
-
-        # if venv flag is set
-        if self._dict_debug[PP.S_KEY_DBG_VENV]:
-
-            print(PP.S_ACTION_VENV, end="", flush=True)
-
-            # get name ov venv folder and reqs file
-            dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-            file_reqs = self._dir_prj / PP.S_FILE_REQS
-
-            # do the thing with the thing
-            cv = CNVenv(self._dir_prj, dir_venv)
-            try:
-                cv.create()
-                cv.install_reqs(file_reqs)
-                print(PP.S_ACTION_DONE)
-            except Exception as e:
-                print(PP.S_ACTION_FAIL)
-                raise e
-
-            # ------------------------------------------------------------------
-            # install libs in project venv
-
-            print(PP.S_ACTION_LIB, end="", flush=True)
-
-            # get activate cmd
-            cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
-                str(self._dir_prj), dir_venv
-            )
-
-            # start the full command
-            cmd = f"{cmd_activate};"
-
-            # get list of libs for this prj type
-            prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
-            val = PP.D_COPY_LIB.get(prj_type_short, [])
-
-            # copy libs to command
-            for item in val:
-
-                # get lib
-                add_path = self.P_DIR_PP / "lib" / item
-                add_str = PP.S_CMD_INST_LIB.format(add_path)
-                cmd += add_str + ";"
-
-            # the command to install libs
-            try:
-                F.sh(cmd, shell=True)
-                print(PP.S_ACTION_DONE)
-            except Exception as e:
-                print(PP.S_ACTION_FAIL)
-                raise e
-
-        # ----------------------------------------------------------------------
-        # i18n
-
-        # path to desktop template
-        path_dsk_tmp = self._dir_prj / PP.S_FILE_DSK_TMP
-        # path to desktop output
-        path_dsk_out = self._dir_prj / self._dict_prv_prj["__PP_FILE_DESK__"]
-
-        # if i18n flag is set
-        if self._dict_debug[PP.S_KEY_DBG_I18N]:
-
-            # print info
-            print(PP.S_ACTION_I18N, end="", flush=True)
-
-            # ------------------------------------------------------------------
-            # do bulk of i18n
-
-            # create CNPotPy object
-            potpy = CNPotPy(
-                # header
-                str_domain=self._dict_prv_prj["__PP_NAME_PRJ_SMALL__"],
-                str_version=self._dict_prv_prj["__PP_VER_SEM__"],
-                str_author=self._dict_prv_all["__PP_AUTHOR__"],
-                str_email=self._dict_prv_all["__PP_EMAIL__"],
-                # base prj dir
-                dir_prj=self._dir_prj,
-                # in
-                list_src=self._dict_pub_i18n[PP.S_KEY_I18N_SRC],
-                # out
-                dir_pot=PP.S_PATH_POT,
-                dir_po=PP.S_PATH_PO,
-                dir_locale=PP.S_PATH_LOCALE,
-                # optional in
-                str_tag=PP.S_I18N_TAG,
-                dict_clangs=self._dict_pub_i18n[PP.S_KEY_I18N_CLANGS],
-                dict_no_ext=self._dict_pub_i18n[PP.S_KEY_I18N_NO_EXT],
-                list_wlangs=self._dict_pub_i18n[PP.S_KEY_I18N_WLANGS],
-                charset=self._dict_pub_i18n[PP.S_KEY_I18N_CHAR],
-            )
-
-            # make .pot, .po, and .mo files
-            potpy.main()
-
-            # ------------------------------------------------------------------
-            # do .desktop
-
-            # check if we want template
-            prj_type_short = self._dict_prv_prj["__PP_TYPE_PRJ__"]
-            if prj_type_short in PP.L_MAKE_DESK and not path_dsk_tmp.exists():
-
-                # we want template, but does not exist
-                print(
-                    "\n"
-                    + PP.S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out)
-                )
-            else:
-                # do the thing
-                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
-
-            # ------------------------------------------------------------------
-            # we are done
-            print(PP.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
-        # docs
-
-        # if docs flag is set
-        if self._dict_debug[PP.S_KEY_DBG_DOCS]:
-
-            # print info
-            print(PP.S_ACTION_DOCS, end="", flush=True)
-
-            # get template and output dirs
-            dir_docs_tplt = self._dir_prj / PP.S_DIR_DOCS_TPLT
-            dir_docs_out = self._dir_prj / PP.S_DIR_DOCS
-
-            # nuke old docs
-            if dir_docs_out.exists():
-                shutil.rmtree(dir_docs_out)
-                dir_docs_out.mkdir(parents=True)
-
-            # format cmd using pdoc template dir, output dir, and start dir
-            cmd_docs = PP.S_CMD_DOC.format(
-                PP.P_DIR_PP,
-                f"{Path(PP.P_DIR_PP) / '.venv-pyplate'}",
-                self._dir_prj,
-                dir_docs_tplt,
-                dir_docs_out,
-                self._dir_prj / PP.S_DIR_SRC,
-            )
-
-            # the command to run pdoc
-            cmd = f"{cmd_docs}"
-            try:
-                F.sh(cmd, shell=True)
-                print(PP.S_ACTION_DONE)
-            except Exception as e:
-                print(PP.S_ACTION_FAIL)
-                raise e
-
-            # ------------------------------------------------------------------
-            # use local image in docs
-
-            # initial "../" level
-            level = 0
-
-            # walk the docs tree
-            for root, _dirs, files in dir_docs_out.walk():
-
-                # next level
-                level += 1
-
-                # get full paths
-                files = [root / f for f in files]
-                files = [f for f in files if f.suffix == ".html"]
-
-                # for each html file
-                for f in files:
-
-                    # build the dots, one set for each level
-                    dots = ""
-                    for _i in range(level):
-                        dots += "../"
-
-                    # add the image path rel to prj dir
-                    dots += self._dict_prv_prj["__PP_IMG_DOCS__"]
-
-                    # format the rep str
-                    img_rep = PP.S_DOC_IMG_REP.format(dots)
-
-                    # open html file for read
-                    with open(f, "r", encoding=PP.S_ENCODING) as a_file:
-                        text = a_file.read()
-
-                    # replace img src with dots
-                    text = re.sub(PP.S_DOC_IMG_SCH, img_rep, text, flags=re.S)
-
-                    # write text back to file
-                    with open(f, "w", encoding=PP.S_ENCODING) as a_file:
-                        a_file.write(text)
-
-        # ----------------------------------------------------------------------
-        # tree
-        # NB: run last so it includes .git and .venv folders
-        # NB: this will wipe out all previous checks (maybe good?)
-
-        # if tree flag is set
-        if self._dict_debug[PP.S_KEY_DBG_TREE]:
-
-            # print info
-            print(PP.S_ACTION_TREE, end="", flush=True)
-
-            # get path to tree
-            file_tree = self._dir_prj / PP.S_TREE_FILE
-
-            # create the file so it includes itself
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
-                a_file.write("")
-
-            # create tree object and call
-            tree_obj = CNTree(
-                str(self._dir_prj),
-                filter_list=self._dict_pub_bl[PP.S_KEY_SKIP_TREE],
-                dir_format=PP.S_TREE_DIR_FORMAT,
-                file_format=PP.S_TREE_FILE_FORMAT,
-            )
-            tree_str = tree_obj.main()
-
-            # write to file
-            with open(file_tree, "w", encoding=PP.S_ENCODING) as a_file:
-                a_file.write(tree_str)
-
-            # we are done
-            print(PP.S_ACTION_DONE)
-
-        # ----------------------------------------------------------------------
-        # install/uninstall
-
-        # if install flag is set
-        if self._dict_debug[PP.S_KEY_DBG_INST]:
-
-            # fix contents
-            a_path = self._dir_prj / PP.S_FILE_INST_CFG
-            if a_path.exists():
-                self._fix_contents(a_path)
-            a_path = self._dir_prj / PP.S_FILE_UNINST_CFG
-            if a_path.exists():
-                self._fix_contents(a_path)
-
-            # get project type
-            prj_type = self._dict_prv_prj["__PP_TYPE_PRJ__"]
-
-            # cli/gui
-            if prj_type in PP.L_APP_INSTALL:
-
-                # show info
-                print(PP.S_ACTION_INST, end="", flush=True)
-
-                # get params
-                name = self._dict_prv_prj["__PP_NAME_PRJ__"]
-
-                # get version number
-                version = self._dict_prv_prj["__PP_VER_SEM__"]
-
-                # get an install instance
-                inst = CNInstall()
-
-                # create a template install cfg file
-                dict_inst = inst.make_install_cfg(
-                    name,
-                    version,
-                    # these are the defaults spec'd in pyplate_conf
-                    # they can be edited in prj/install/install.json before
-                    # running pybaker
-                    PP.D_INSTALL[prj_type],
-                )
-
-                # fix dunders in inst cfg file
-                path_inst = self._dir_prj / PP.S_PATH_INST_CFG
-                F.save_dict(dict_inst, [path_inst])
-                self._fix_contents(path_inst)
-
-                # create a template uninstall cfg file
-                dict_uninst = inst.make_uninstall_cfg(
-                    name,
-                    version,
-                    # these are the defaults spec'd in pyplate_conf
-                    # they can be edited in prj/uninstall/uninstall.json before
-                    # running pybaker
-                    PP.D_UNINSTALL[prj_type],
-                )
-
-                # fix dunders in inst cfg file
-                path_uninst = self._dir_prj / PP.S_PATH_UNINST_CFG
-                F.save_dict(dict_uninst, [path_uninst])
-                self._fix_contents(path_uninst)
-
-                # show info
-                print(PP.S_ACTION_DONE)
-
-            # pkg
-            elif prj_type in PP.L_PKG_INSTALL:
-
-                # let user know
-                print(PP.S_ACTION_INST_PKG, end="", flush=True)
-
-                # need to activate prj venv
-                dir_venv = self._dict_prv_prj["__PP_NAME_VENV__"]
-                cmd_activate = PP.S_CMD_VENV_ACTIVATE.format(
-                    self._dir_prj, self._dir_prj / dir_venv
-                )
-
-                # cmd to install
-                cmd_install = PP.S_CMD_INSTALL_PKG.format(self._dir_prj)
-
-                # the command to install pkg
-                cmd = f"{cmd_activate};" f"{cmd_install}"
-                try:
-                    F.sh(cmd, shell=True)
-                    print(PP.S_ACTION_DONE)
-                except Exception as e:
-                    print(PP.S_ACTION_FAIL)
-                    raise e
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -1259,12 +897,13 @@ class PyMaker:
                 continue
 
             # ------------------------------------------------------------------
-            # check for block switches
-
-            # second param is True if we are looking for block switch vs line
-            # switch
-            if self._check_switches(line, True):
-                continue
+            # check for switches
+            self._dict_sw_block, self._dict_sw_line = self._check_switches(
+                line,
+                self._dict_type_rep,
+                self._dict_sw_block,
+                self._dict_sw_line,
+            )
 
             # ------------------------------------------------------------------
             # check for header
@@ -1286,9 +925,9 @@ class PyMaker:
             # ------------------------------------------------------------------
             # skip any other comment lines
 
-            str_pattern = self._dict_type_rep[PP.S_KEY_COMM]
-            if re.search(str_pattern, line):
-                continue
+            # str_pattern = self._dict_type_rep[PP.S_KEY_COMM]
+            # if re.search(str_pattern, line):
+            #     continue
 
             # ------------------------------------------------------------------
             # not a blank, block, header, or comment, must be code ( + comment)
@@ -1393,7 +1032,7 @@ class PyMaker:
             # trailing comment)
             if match.group(split_index):
                 # split the line (comm includes hash mark as first char, code
-                # get space between)
+                # get text from start of line to comment start pos)
                 split = match.start(split_index)
                 code = line[:split]
                 comm = line[split:]
@@ -1405,16 +1044,21 @@ class PyMaker:
         self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
 
         # do the check
-        self._check_switches(comm, False)
+        self._dict_sw_block, self._dict_sw_line = self._check_switches(
+            line,
+            self._dict_type_rep,
+            self._dict_sw_block,
+            self._dict_sw_line,
+        )
 
         # ----------------------------------------------------------------------
 
         # check for block or line replace switch
         repl = False
         if (
-            self._dict_sw_block[PP.S_SW_REPLACE]
-            and self._dict_sw_line[PP.S_SW_REPLACE] != PP.I_SW_FALSE
-            or self._dict_sw_line[PP.S_SW_REPLACE] == PP.I_SW_TRUE
+            self._dict_sw_block[PP.S_SW_REPLACE] is True
+            and self._dict_sw_line[PP.S_SW_REPLACE] is True
+            or self._dict_sw_line[PP.S_SW_REPLACE] is True
         ):
             repl = True
 
@@ -1469,9 +1113,194 @@ class PyMaker:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
+    # Check if line or trailing comment is a switch
+    # --------------------------------------------------------------------------
+    def _check_switches(
+        self, line, dict_type_rep, dict_sw_block, dict_sw_line
+    ):
+        """
+        Check if line or trailing comment is a switch
+
+        Args:
+            line: The line to check for switches
+            dict_type_rep: Dictionary containing the regex to look for
+            dict_sw_block: Dictionary of switch values for block switches
+            dict_sw_line: Dictionary of switch values for line switches
+
+        Returns:
+            A tuple of dictionaries (dict_sw_block, dict_sw_line) containing the
+            current switch values
+
+        This method checks to see if a line or trailing comment contains a
+        valid switch (for either markup or regular files). If a valid switch is
+        found, it sets the appropriate flag in either dict_sw_block or
+        dict_sw_line and returns those dicts.
+        """
+
+        # switch does not appear anywhere in line
+        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], line)
+        if not res:
+            return dict_sw_block, dict_sw_line
+
+        # determine if it is a block or line switch
+        pre_str = res.group(dict_type_rep[PP.S_KEY_SW_PRE])
+        pre_sch = pre_str.strip() != ""
+        line = pre_sch
+        block = not pre_sch
+
+        # which dict to modify
+        dict_to_check = dict_sw_block
+        if line and not block:
+            dict_to_check = dict_sw_line
+
+        # get key/val of switch
+        key = res.group(dict_type_rep[PP.S_KEY_SW_KEY])
+        val = res.group(dict_type_rep[PP.S_KEY_SW_VAL])
+
+        # try a bool conversion
+        # NB: in honor of John Valby (ddg him!)
+        val_b = val.lower()
+        if val_b == "true":
+            val = True
+        elif val_b == "false":
+            val = False
+
+        # update key/val
+        dict_to_check[key] = val
+
+        # --------------------------------------------------------------------------
+        # done
+
+        # NB: ALWAYS RETURN DICTS!
+        return (dict_sw_block, dict_sw_line)
+
+    # --------------------------------------------------------------------------
+    # Check project type for allowed characters
+    # --------------------------------------------------------------------------
+    def _check_sem_ver(self, version):
+        """
+        Check if new version number is semantic
+
+        Args:
+            version: New version number to check
+
+        Returns:
+            True if a valid version is found, False otherwise
+
+        This method checks to see if the version string passed is valid for
+        semantic versioning.
+        """
+
+        # match semantic version from start of string
+        pattern = PP.S_SEM_VER_VALID
+        return re.search(pattern, version)
+
+    # --------------------------------------------------------------------------
+    # Reload dicts after any outside changes
+    # --------------------------------------------------------------------------
+    def _reload_dicts(self):
+        """
+        Reload dicts after any outside changes
+
+        This function is called when a dict is passed to another function, in
+        order to keep it synced with the internal dict.
+        """
+
+        # update individual dicts in dict_prv
+        self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[PP.S_KEY_PRV_PRJ]
+
+        # update individual dicts in dict_pub
+        self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
+        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
+
+        # update debug dict
+        if not self._debug:
+            self._dict_debug = self._dict_pub_dbg
+
+    # --------------------------------------------------------------------------
+    # Save project info before fix
+    # --------------------------------------------------------------------------
+    def _save_project_info(self):
+        """
+        Save project info before fix
+
+        Saves the private.json and project.json files after all modifications,
+        and reloads them to use in _do_fix.
+        """
+
+        # ----------------------------------------------------------------------
+        # save project settings
+
+        # create private settings
+        dict_prv = {
+            PP.S_KEY_PRV_ALL: self._dict_prv_all,
+            PP.S_KEY_PRV_PRJ: self._dict_prv_prj,
+        }
+
+        # save private settings
+        path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
+        F.save_dict(dict_prv, [path_prv])
+
+        # create public settings
+        dict_pub = {
+            PP.S_KEY_PUB_BL: self._dict_pub_bl,
+            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            PP.S_KEY_PUB_DIST: self._dict_pub_dist,
+            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            PP.S_KEY_PUB_META: self._dict_pub_meta,
+        }
+
+        # save public settings
+        path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
+        F.save_dict(dict_pub, [path_pub])
+
+        # ----------------------------------------------------------------------
+        # fix dunders in dict_pub (project.json)
+        self._fix_contents(path_pub)
+
+        # reload dict from fixed file
+        dict_pub = F.load_dicts([path_pub])
+        self._reload_dicts()
+
+    # --------------------------------------------------------------------------
+    # Get the filetype-specific regexes
+    # --------------------------------------------------------------------------
+    def _get_regex(self, name):
+        """
+        Get the filetype-specific regexes
+
+        Args:
+            name: Name of the file go get the dict of regexes for
+
+        Returns:
+            The dict of regexes for this file type
+        """
+
+        # iterate over reps
+        for _key, val in PP.D_TYPE_REP.items():
+
+            # fix ets if necessary
+            exts = val[PP.S_KEY_REP_EXT]
+            exts = [
+                f".{item}" if not item.startswith(".") else item
+                for item in exts
+            ]
+
+            # if we match ext, return only rep stuff
+            if name.suffix in exts:
+                return val[PP.S_KEY_REP_REP]
+
+        # default result is empty or py
+        return dict(PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP])
+
+    # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type
     # --------------------------------------------------------------------------
-    def _fix_reqs(self, prj_type_long):
+    def _merge_reqs(self, prj_type_long):
         """
         Combine reqs from template/all and template/prj_type
 
@@ -1507,80 +1336,6 @@ class PyMaker:
         joint = "\n".join(new_file)
         with open(dst, "w", encoding=PP.S_ENCODING) as a_file:
             a_file.writelines(joint)
-
-    # --------------------------------------------------------------------------
-    # Check if line or trailing comment is a switch
-    # --------------------------------------------------------------------------
-    def _check_switches(self, line, block):
-        """
-        Check if line or trailing comment is a switch
-
-        Args:
-            line: The line to check for block switches
-            block: True if we want to check a block switch, False if we want
-            to check a line switch
-
-        Returns:
-            True if a valid switch is found, False otherwise
-
-        This method checks to see if a line or trailing comment contains a
-        valid switch (for either markup or regular files). If a valid switch is
-        found, it sets the appropriate flag in either self._dict_sw_block or
-        self._dict_sw_line and returns True.
-        """
-
-        # match  switches ('#|<!-- pyplate: enable=replace', etc)
-        match = re.match(self._dict_type_rep[PP.S_KEY_SWITCH], line)
-        if not match:
-            return False
-
-        # this line is a switch
-        key = None
-        val = None
-        if match.group(1) and match.group(2):
-            key = match.group(2)
-            val = match.group(1)
-
-        # which dict to modify
-        dict_to_check = self._dict_sw_block
-        if not block:
-            dict_to_check = self._dict_sw_line
-
-        # ditch any matches that are not valid keys/vals
-        if not key or not val or not key in dict_to_check:
-            return False
-
-        # test for specific values, in case it is malformed
-        if val == PP.S_SW_ENABLE:
-            dict_to_check[key] = PP.I_SW_TRUE
-            return True
-        if val == PP.S_SW_DISABLE:
-            dict_to_check[key] = PP.I_SW_FALSE
-            return True
-
-        # no valid switch found
-        return False
-
-    # --------------------------------------------------------------------------
-    # Check project type for allowed characters
-    # --------------------------------------------------------------------------
-    def _check_version(self, version):
-        """
-        Check if new version number is semantic
-
-        Args:
-            version: New version number to check
-
-        Returns:
-            True if a valid version is found, False otherwise
-
-        This method checks to see if the version string passed is valid for
-        semantic versioning.
-        """
-
-        # match semantic version from start of string
-        pattern = PP.S_SEMVER_VALID
-        return re.match(pattern, version)
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -1674,31 +1429,6 @@ class PyMaker:
 
         # if we made it this far, return true
         return True
-
-    # --------------------------------------------------------------------------
-    # Reload dicts after any outside changes
-    # --------------------------------------------------------------------------
-    def _reload_dicts(self):
-        """
-        Reload dicts after any outside changes
-
-        This function is called when a dict is passed to another function, in
-        order to keep it synced with the internal dict.
-        """
-
-        # get global and calculated settings dicts in pyplate.py
-        self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[PP.S_KEY_PRV_PRJ]
-
-        # get individual dicts in pyplate.py
-        self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
-        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
-        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
-
-        if not self._debug:
-            self._dict_debug = self._dict_pub_dbg
 
 
 # ------------------------------------------------------------------------------

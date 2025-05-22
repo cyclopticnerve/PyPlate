@@ -18,17 +18,16 @@
     </tr>
 </table>
 
-## "It mostly works ™©®"
+## "It mostly works" ™©®
 
-[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg
-"http://www.wtfpl.net")](http://www.wtfpl.net)
+[![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
 <!-- __RM_SHORT_DESC__ -->
 A program for creating and building CLI/Package/GUI projects in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 0.0.2
+Version 0.0.1+20250510.11
 <!-- __RM_VERSION__ -->
 
 <!-- ![alt-text](README/screenshot.png "screenshot") -->
@@ -49,7 +48,6 @@ Version 0.0.2
 <!-- __RM_APP__ -->
 You can download the (hopefully stable)
 [latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest
-"https://github.com/cyclopticnerve/PyPlate/releases/latest")
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.
 

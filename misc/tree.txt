@@ -11,7 +11,7 @@
    ├─ [] conf/
    │     └─ [] pyplate.py
    ├─ [] dist/
-   │     └─ [] pyplate_0-0-2.tar.gz
+   │     └─ [] pyplate_0-0-1_20250508-10.tar.gz
    ├─ [] docs/
    │     └─ [] src/
    │           ├─ [] index.html
@@ -21,7 +21,6 @@
    │     ├─ [] locale/
    │     │     ├─ [] en/
    │     │     │     └─ [] LC_MESSAGES/
-   │     │     │           ├─ [] ABOUT
    │     │     │           └─ [] pyplate.mo
    │     │     └─ [] es/
    │     │           └─ [] LC_MESSAGES/
@@ -34,6 +33,8 @@
    │     │     └─ [] LINGUAS
    │     └─ [] pot/
    │           └─ [] pyplate.pot
+   ├─ [] images/
+   │     └─ [] pyplate.png
    ├─ [] install/
    │     ├─ [] install.json
    │     └─ [] install.py
@@ -68,14 +69,13 @@
    │     └─ [] tree.txt
    ├─ [] pdoc3/
    │     ├─ [] head.mako
-   │     ├─ [] logo.mako
-   │     └─ [] pyplate.png
+   │     └─ [] logo.mako
    ├─ [] pyplate/
    │     ├─ [] private/
    │     │     └─ [] private.json
    │     └─ [] project.json
    ├─ [] readme/
-   │     └─ [] pyplate.png
+   │     └─ [] ABOUT
    ├─ [] src/
    │     ├─ [] pybaker.py
    │     └─ [] pymaker.py
@@ -84,14 +84,13 @@
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] tasks.json
    │     │     ├─ [] bin/
-   │     │     │     └─ [] pyplate.py
+   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
    │     │     ├─ [] conf/
-   │     │     │     ├─ [] ABOUT
-   │     │     │     └─ [] pyplate.json
+   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.json
    │     │     ├─ [] dist/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] docs/
-   │     │     │     └─ [] pyplate.png
+   │     │     │     └─ [] ABOUT
    │     │     ├─ [] i18n/
    │     │     │     ├─ [] locale/
    │     │     │     │     └─ [] en/
@@ -99,6 +98,8 @@
    │     │     │     │                 └─ [] ABOUT
    │     │     │     └─ [] po/
    │     │     │           └─ [] LINGUAS
+   │     │     ├─ [] images/
+   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
    │     │     ├─ [] install/
    │     │     │     └─ [] install.py
    │     │     ├─ [] misc/
@@ -108,12 +109,12 @@
    │     │     │           └─ [] style.txt
    │     │     ├─ [] pdoc3/
    │     │     │     ├─ [] head.mako
-   │     │     │     ├─ [] logo.mako
-   │     │     │     └─ [] pyplate.png
+   │     │     │     └─ [] logo.mako
    │     │     ├─ [] pyplate/
    │     │     │     └─ [] private/
+   │     │     │           └─ [] ABOUT
    │     │     ├─ [] readme/
-   │     │     │     └─ [] pyplate.png
+   │     │     │     └─ [] ABOUT
    │     │     ├─ [] src/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] tests/
@@ -131,7 +132,7 @@
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
    │     │     └─ [] src/
-   │     │           └─ [] pyplate.py
+   │     │           └─ [] __PP_NAME_PRJ_SMALL__.py
    │     ├─ [] gui/
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
@@ -140,24 +141,23 @@
    │     │     ├─ [] src/
    │     │     │     ├─ [] gui/
    │     │     │     │     ├─ [] desktop/
-   │     │     │     │     │     ├─ [] PyPlate.desktop
-   │     │     │     │     │     ├─ [] pyplate.png
+   │     │     │     │     │     ├─ [] __PP_NAME_PRJ_BIG__.desktop
    │     │     │     │     │     └─ [] template.desktop
    │     │     │     │     ├─ [] python/
-   │     │     │     │     │     ├─ [] _win.py
-   │     │     │     │     │     └─ [] pyplate_app.py
+   │     │     │     │     │     ├─ [] __PP_FILE_APP__.py
+   │     │     │     │     │     └─ [] __PP_FILE_WIN__.py
    │     │     │     │     └─ [] ui/
-   │     │     │     │           ├─ [] _win.ui
-   │     │     │     │           └─ [] dialogs.ui
-   │     │     │     └─ [] pyplate.py
+   │     │     │     │           ├─ [] __PP_DLG_FILE__.ui
+   │     │     │     │           └─ [] __PP_FILE_WIN__.ui
+   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
    │     │     └─ [] requirements.txt
    │     └─ [] pkg/
    │           ├─ [] .vscode/
    │           │     └─ [] launch.json
    │           ├─ [] src/
-   │           │     └─ [] .py
+   │           │     └─ [] __PP_NAME_SEC_SMALL__.py
    │           └─ [] tests/
-   │                 └─ [] pyplate_test.py
+   │                 └─ [] __PP_NAME_PRJ_SMALL___test.py
    ├─ [] tests/
    │     └─ [] ABOUT
    ├─ [] todo/

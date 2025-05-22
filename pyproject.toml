@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyPlate"
-version = "0.0.2"
+version = "0.0.1+20250510.11"
 description = "A program for creating and building CLI/Package/GUI projects in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 readme = "README.md"

@@ -198,8 +198,7 @@ class __PP_CLASS_APP__(Gtk.Application):
         Args:
             _obj: Not used
 
-        The Application is about to start. Any windows in self._dict_instances
-        will be added to the parent Application object and presented.
+        The Application is about to start. Add your window instances here.
         """
 
         # create a python window class
@@ -231,7 +230,6 @@ class __PP_CLASS_APP__(Gtk.Application):
         """
 
         # don't do anything special at quit, windows should handle that
-        # pass
 
 
 # -)

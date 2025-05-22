@@ -8,13 +8,13 @@
     <property name="icon">__PP_IMG_DASH__</property>
     <property name="type-hint">dialog</property>
     <property name="program-name">__PP_NAME_PRJ__</property>
-    <property name="version">__PP_VER_DISP__</property>
-    <property name="comments" translatable="yes" comments="comment for program description translation">__PP_SHORT_DESC__</property>
+    <property name="version">version</property>
+    <property name="comments" translatable="yes" context="comment for program description translation">Short description</property>
     <property name="website">https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__</property>
-    <property name="website-label" translatable="yes" comments="Github repository translation">GitHub repository</property>
-    <property name="license">__PP_LICENSE_NAME__
+    <property name="website-label" translatable="yes" context="Github repository translation">GitHub repository</property>
+    <property name="license" context="license for program">__PP_LICENSE_NAME__
     __PP_LICENSE_URL__</property>
-    <property name="authors">__PP_AUTHOR__&lt;__PP_EMAIL__&gt;</property>
+    <property name="authors">__PP_AUTHOR__ &lt;__PP_EMAIL__&gt;</property>
     <property name="logo">__PP_IMG_ABOUT__</property>
     <property name="license-type">custom</property>
     <child internal-child="vbox">
@@ -51,8 +51,8 @@
     <property name="type-hint">dialog</property>
     <property name="gravity">center</property>
     <property name="message-type">question</property>
-    <property name="text" translatable="yes" comments="save changes">Save changes before closing?</property>
-    <property name="secondary-text" translatable="yes">If you don't save, changes will be permanently lost.</property>
+    <property name="text" translatable="yes" context="save changes">Save changes before closing?</property>
+    <property name="secondary-text" translatable="yes" context="secondary text">If you don't save, changes will be permanently lost.</property>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="name">dlg_close</property>
@@ -67,7 +67,7 @@
             <property name="layout-style">expand</property>
             <child>
               <object class="GtkButton" id="button1">
-                <property name="label" translatable="yes">Close without saving</property>
+                <property name="label" translatable="yes" context="Close without saving">Close without saving</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -83,7 +83,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button2">
-                <property name="label" translatable="yes">Cancel</property>
+                <property name="label" translatable="yes" context="Cancel">Cancel</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -96,7 +96,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button3">
-                <property name="label" translatable="yes">Save</property>
+                <property name="label" translatable="yes" context="Save">Save</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>

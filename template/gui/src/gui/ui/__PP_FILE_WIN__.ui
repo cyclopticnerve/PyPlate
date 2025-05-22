@@ -2,14 +2,6 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkPopoverMenu" id="popover_hamburger">
-    <property name="can-focus">False</property>
-    <property name="relative-to">btn_hamburger</property>
-    <property name="position">bottom</property>
-    <child>
-      <placeholder/>
-    </child>
-  </object>
   <object class="GtkApplicationWindow" id="__PP_CLASS_WIN__">
     <property name="can-focus">False</property>
     <property name="default-width">800</property>
@@ -34,7 +26,7 @@
             <property name="layout-style">start</property>
             <child>
               <object class="GtkButton" id="btn_new">
-                <property name="label" translatable="yes">New</property>
+                <property name="label" translatable="yes" context="New">New</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -50,11 +42,11 @@
             </child>
             <child>
               <object class="GtkButton" id="btn_about">
-                <property name="label" translatable="yes" comments="Show the about dialog translation">About...</property>
+                <property name="label" translatable="yes" context="Show the about dialog translation">About...</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes" comments="Show the About dialog">Show the About dialog</property>
+                <property name="tooltip-text" translatable="yes" context="Show the About dialog">Show the About dialog</property>
                 <signal name="clicked" handler="_btn_about_clicked" swapped="no"/>
               </object>
               <packing>
@@ -65,7 +57,7 @@
             </child>
             <child>
               <object class="GtkButton" id="btn_title">
-                <property name="label" translatable="yes">Title</property>
+                <property name="label" translatable="yes" context="Title">Title</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -81,11 +73,11 @@
             </child>
             <child>
               <object class="GtkButton" id="btn_save">
-                <property name="label" translatable="yes" comments="Save the current contents translation">Save</property>
+                <property name="label" translatable="yes" context="Save the current contents translation">Save</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes" context="save changes" comments="Save any changes and leave window open">Save any changes and leave window open</property>
+                <property name="tooltip-text" translatable="yes" context="save changes">Save any changes and leave window open</property>
                 <signal name="clicked" handler="_btn_save_clicked" swapped="no"/>
               </object>
               <packing>
@@ -97,11 +89,11 @@
             </child>
             <child>
               <object class="GtkButton" id="btn_cancel">
-                <property name="label" translatable="yes" comments="Close the window without saving translation">Cancel</property>
+                <property name="label" translatable="yes" context="Close the window without saving translation">Cancel</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes" context="save without changes" comments="Abandon any changes and close window">Abandon any changes and close window</property>
+                <property name="tooltip-text" translatable="yes" context="save without changes">Abandon any changes and close window</property>
                 <signal name="clicked" handler="_btn_cancel_clicked" swapped="no"/>
               </object>
               <packing>
@@ -113,11 +105,11 @@
             </child>
             <child>
               <object class="GtkButton" id="btn_ok">
-                <property name="label" translatable="yes" comments="Save everything and close window translation">OK</property>
+                <property name="label" translatable="yes" context="Save everything and close window translation">OK</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <property name="tooltip-text" translatable="yes" context="save changes" comments="Save any changes and close window">Save any changes and close window</property>
+                <property name="tooltip-text" translatable="yes" context="save changes">Save any changes and close window</property>
                 <signal name="clicked" handler="_btn_ok_clicked" swapped="no"/>
               </object>
               <packing>
@@ -129,7 +121,7 @@
             </child>
             <child>
               <object class="GtkButton" id="btn_close">
-                <property name="label" translatable="yes" comments="Ask for save and close window ">Close</property>
+                <property name="label" translatable="yes" context="Ask for save and close window ">Close</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -153,7 +145,7 @@
           <object class="GtkEntry" id="entry_test">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes" comments="Entry box tooltip translation">Entry box tooltip</property>
+            <property name="tooltip-text" translatable="yes" context="Entry box tooltip translation">Entry box tooltip</property>
             <property name="valign">center</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
@@ -166,12 +158,12 @@
         </child>
         <child>
           <object class="GtkCheckButton" id="check_test">
-            <property name="label" translatable="yes" comments="Checkbox translation">checkbox</property>
+            <property name="label" translatable="yes" context="Checkbox translation">checkbox</property>
             <property name="name">win_main_check_test</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">False</property>
-            <property name="tooltip-text" translatable="yes" comments="Checkbox tooltip translation">A checkbox tooltip</property>
+            <property name="tooltip-text" translatable="yes" context="Checkbox tooltip translation">A checkbox tooltip</property>
             <property name="draw-indicator">True</property>
           </object>
           <packing>
@@ -185,7 +177,7 @@
       <object class="GtkHeaderBar" id="header_bar">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="title" translatable="yes">__PP_NAME_PRJ__</property>
+        <property name="title">__PP_NAME_PRJ__</property>
         <property name="show-close-button">True</property>
         <child>
           <object class="GtkMenuButton" id="btn_hamburger">
@@ -208,6 +200,14 @@
           </packing>
         </child>
       </object>
+    </child>
+  </object>
+  <object class="GtkPopoverMenu" id="popover_hamburger">
+    <property name="can-focus">False</property>
+    <property name="relative-to">btn_hamburger</property>
+    <property name="position">bottom</property>
+    <child>
+      <placeholder/>
     </child>
   </object>
 </interface>

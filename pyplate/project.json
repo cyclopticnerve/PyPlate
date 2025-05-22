@@ -78,13 +78,12 @@
             ]
         },
         "WLANGS": [
-            "en",
-            "es"
+            "en"
         ],
         "CHARSET": "UTF-8"
     },
     "PUB_META": {
-        "META_VERSION": "0.0.2",
+        "META_VERSION": "0.0.1",
         "META_SHORT_DESC": "A program for creating and building CLI/Package/GUI projects in Python from a template",
         "META_KEYWORDS": [],
         "META_DEPS": {

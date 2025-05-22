@@ -1,6 +1,6 @@
 {
     "NAME": "PyPlate",
-    "VERSION": "0.0.2",
+    "VERSION": "0.0.1+20250510.11",
     "INSTALL": {
         "conf": ".local/share/pyplate",
         "lib": ".local/share/pyplate",

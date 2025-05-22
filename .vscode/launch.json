@@ -41,8 +41,8 @@
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
             "args": [
-                "${command:pickArgs}",
-                "-i"
+                "-i",
+                "${command:pickArgs}"
             ]
         }
     ]

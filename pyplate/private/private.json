@@ -46,14 +46,17 @@
         "__PP_FILE_WIN__": "_win",
         "__PP_CLASS_WIN__": "Win",
         "__PP_DEV_PP__": "Documents/Projects/Python/PyPlate",
-        "__PP_USR_CONF__": "",
-        "__PP_DIST_DIR__": "pyplate_0-0-2_20250429-123",
-        "__PP_CMD_RUN__": "",
-        "__PP_VER_DISP__": "Version 0.0.2",
+        "__PP_DIST_DIR__": "pyplate_0-0-1_20250510-11",
+        "__PP_VER_BUILD__": "11",
+        "__PP_VER_SEM__": "0.0.1+20250510.11",
+        "__PP_VER_DISP__": "Version 0.0.1+20250510.11",
         "__PP_FILE_DESK__": "src/gui/desktop/PyPlate.desktop",
-        "__PP_PDOC_START__": "",
         "__PP_USR_INST__": ".local/share/pyplate",
         "__PP_IMG_DESK__": ".local/share/pyplate/images/pyplate.png",
-        "__PP_APP_ID__": "org.cyclopticnerve.pyplate"
+        "__PP_APP_ID__": "org.cyclopticnerve.pyplate",
+        "__PP_IMG_README__": "images/pyplate.png",
+        "__PP_IMG_DOCS__": "images/pyplate.png",
+        "__PP_IMG_DASH__": "../../../images/pyplate.png",
+        "__PP_IMG_ABOUT__": "../../../images/pyplate.png"
     }
 }

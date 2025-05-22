@@ -19,8 +19,23 @@ import json
 from pathlib import Path
 import re
 import shutil
-import subprocess
 import sys
+
+# ------------------------------------------------------------------------------
+# local imports
+
+# pylint: disable=import-error
+# pylint: disable=wrong-import-position
+
+# add assets lib to path
+P_DIR_LIB = Path(__file__).parent.resolve()
+sys.path.append(str(P_DIR_LIB))
+
+# local imports
+import cnfunctions as F  # type: ignore
+
+# pylint: enable=import-error
+# pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -434,9 +449,9 @@ class CNInstall:
 
         # the cmd to create the venv
         try:
-            subprocess.run(cmd, check=True, shell=True)
+            F.sh(cmd, shell=True)
             print(self.S_MSG_DONE)
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             print(self.S_MSG_FAIL)
             raise e
 
@@ -462,7 +477,7 @@ class CNInstall:
         """
 
         # show progress
-        print(self.S_MSG_REQS_START, flush=True, end="")
+        print(self.S_MSG_REQS_START, end="", flush=True)
 
         # sanity check
         dir_venv = Path(dir_venv)
@@ -487,9 +502,9 @@ class CNInstall:
 
         # the cmd to install the reqs
         try:
-            subprocess.run(cmd, check=True, shell=True)
+            F.sh(cmd, shell=True)
             print(self.S_MSG_DONE)
-        except subprocess.SubprocessError as e:
+        except Exception as e:
             print(self.S_MSG_FAIL)
             raise e
 
@@ -513,7 +528,7 @@ class CNInstall:
         """
 
         # show some info
-        print(self.S_MSG_LIBS_START, flush=True, end="")
+        print(self.S_MSG_LIBS_START, end="", flush=True)
 
         # sanity check
         dir_venv = Path(dir_venv)
@@ -546,9 +561,9 @@ class CNInstall:
 
         # the command to install libs
         try:
-            subprocess.run(cmd, check=True, shell=True)
+            F.sh(cmd, shell=True)
             print(self.S_MSG_DONE)
-        except subprocess.SubprocessError as e:
+        except Exception as e:
             print(self.S_MSG_FAIL)
             raise e
 
@@ -754,5 +769,4 @@ class CNInstall:
         return 0
 
 
-# -)
 # -)
