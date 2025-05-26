@@ -269,10 +269,8 @@ S_KEY_SW_SCH = "S_KEY_SW_SCH"
 S_KEY_SW_PRE = "S_KEY_SW_PRE"
 S_KEY_SW_KEY = "S_KEY_SW_KEY"
 S_KEY_SW_VAL = "S_KEY_SW_VAL"
-# FIXME: ditch this after fixing switches in pm/pb
-S_KEY_COMM = "S_KEY_COMM"
 S_KEY_SPLIT = "S_KEY_SPLIT"
-S_KEY_SPLIT_INDEX = "S_KEY_SPLIT_INDEX"
+S_KEY_SPLIT_COMM = "S_KEY_SPLIT_COMM"
 
 # constants for _check_name()
 S_KEY_NAME_START = "S_KEY_NAME_START"
@@ -1125,15 +1123,14 @@ D_TYPE_REP = {
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_PAD: 3,
-            # switch stuff
-            S_KEY_SW_SCH: r"(.*)#\s*.*\s*pyplate\s*:\s*(\S*)\s*=\s*(\S*)",
-            S_KEY_SW_PRE: 1,
-            S_KEY_SW_KEY: 2,
-            S_KEY_SW_VAL: 3,
             # code stuff
-            S_KEY_COMM: r"^\s*#",
-            S_KEY_SPLIT: r"(\'|\")([^\'\"\n]+)(\'|\")|(#.*)$",
-            S_KEY_SPLIT_INDEX: 4,
+            # NB: match first occurrence of unquoted marker to end of line
+            S_KEY_SPLIT: r"[\'\"].*[\'\"]|(#.*)",
+            S_KEY_SPLIT_COMM: 1,
+            # switch stuff
+            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*([^-\ ]*)",
+            S_KEY_SW_KEY: 1,
+            S_KEY_SW_VAL: 2,
         },
     },
     S_KEY_REP_MUD: {
@@ -1144,15 +1141,14 @@ D_TYPE_REP = {
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_PAD: 3,
-            # switch stuff
-            S_KEY_SW_SCH: r"(.*)<!--\s*.*\s*pyplate\s*:\s*(\S*)\s*=\s*(\S*).*?-->",
-            S_KEY_SW_PRE: 1,
-            S_KEY_SW_KEY: 2,
-            S_KEY_SW_VAL: 3,
             # code stuff
-            S_KEY_COMM: r"^\s*<!--(.*)-->\s*$",
-            S_KEY_SPLIT: r"(\'|\")([^\'\"\n]+)(\'|\")|(<!--.*-->)$",
-            S_KEY_SPLIT_INDEX: 4,
+            # NB: match first occurrence of unquoted marker to end of line
+            S_KEY_SPLIT: r"[\'\"].*[\'\"]|(<!--.*)",
+            S_KEY_SPLIT_COMM: 1,
+            # switch stuff
+            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*([^-\ ]*)",
+            S_KEY_SW_KEY: 1,
+            S_KEY_SW_VAL: 2,
         },
     },
 }
@@ -1167,14 +1163,14 @@ D_NAME_SEC = {
 # NB: value should be True if present and enabled, False if present and
 # disabled, or default if not present
 D_SW_BLOCK_DEF = {
-    S_SW_REPLACE: True, # assume we want to replace
+    S_SW_REPLACE: True,  # assume we want to replace
 }
 
 # default dict of line-level switches
 # NB: value should be True if present and enabled, False if present and
 # disabled, or default if not present
 D_SW_LINE_DEF = {
-    S_SW_REPLACE: True, # assume we want to replace
+    S_SW_REPLACE: True,  # assume we want to replace
 }
 
 # regex's to match project name
@@ -1212,6 +1208,7 @@ def do_before_template(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     'dict_pub' dicts before any copying occurs.
     """
 
+    # FIXME: we should not have to return dicts, passed by reference
     # NB: ALWAYS RETURN DICTS!
     return (dict_prv, dict_pub)
 
@@ -2052,7 +2049,7 @@ def _fix_meta(path, dict_prv, dict_pub):
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # do md/html/xml separately (needs special handling)
-    dict_type_rep = _get_regex(path)
+    dict_type_rep = _get_type_rep(path)
 
     # fix docs
     if path.name == S_FILE_LOGO:
@@ -2391,8 +2388,51 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
         if line.strip() == "":
             continue
 
-        # first check line for switches
-        _check_switches(line, dict_type_rep, dict_sw_block, dict_sw_line)
+        # ------------------------------------------------------------------
+        # split the line into code and comm
+
+        # we will split the line into two parts
+        # NB: assume code is whole line (i.e. no trailing comment)
+        code = line
+        comm = ""
+
+            # # do the split, checking each match to see if we get a group
+            # split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
+            # split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+            # matches = re.finditer(split_sch, line)
+            # for match in matches:
+            #     # if there is a match group for hash mark (meaning we found a
+            #     # trailing comment)
+            #     if match.group(split_grp):
+            #         # split the line
+            #         # NB: comm includes all from start marker to end of line
+            #         # get text from start of line to comment start pos)
+            #         split_pos = match.start(split_grp)
+            #         code = line[:split_pos]
+            #         comm = line[split_pos:]
+
+        split_sch = dict_type_rep[S_KEY_SPLIT]
+        split_grp = dict_type_rep[S_KEY_SPLIT_COMM]
+        match = re.search(split_sch, line)
+        if match and match.group(split_grp):
+            # split the line
+            split_pos = match.start(split_grp)
+            code = line[:split_pos]
+            comm = line[split_pos:]
+
+        # ------------------------------------------------------------------
+        # check for switches
+
+        # reset line switches
+        dict_sw_line = dict(D_SW_LINE_DEF)
+
+        # def block, but if code, line
+        dict_sw = dict_sw_block
+        if code.strip() != "":
+            dict_sw = dict_sw_line
+
+        # check switches
+        _check_switches(comm, dict_type_rep, dict_sw)
 
         # check for replace switch status from block and line statuses
         repl = False
@@ -2422,10 +2462,13 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
+
 # --------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
 # --------------------------------------------------------------------------
-def _check_switches(line, dict_type_rep, dict_sw_block, dict_sw_line):
+# def _check_switches(line, dict_type_rep, dict_sw_block, dict_sw_line):
+def _check_switches(comm, dict_type_rep, dict_sw):
+
     """
     Check if line or trailing comment is a switch
 
@@ -2445,52 +2488,86 @@ def _check_switches(line, dict_type_rep, dict_sw_block, dict_sw_line):
     dict_sw_line and returns those dicts.
     """
 
+    # # switch does not appear anywhere in line
+    # res = re.search(dict_type_rep[S_KEY_SW_SCH], line)
+    # if not res:
+    #     return dict_sw_block, dict_sw_line
+
+    # # determine if it is a block or line switch
+    # pre_str = res.group(dict_type_rep[S_KEY_SW_PRE])
+    # pre_sch = pre_str.strip() != ""
+    # line = pre_sch
+    # block = not pre_sch
+
+    # # which dict to modify
+    # dict_to_check = dict_sw_block
+    # if line and not block:
+    #     dict_to_check = dict_sw_line
+
+    # # get key/val of switch
+    # key = res.group(dict_type_rep[S_KEY_SW_KEY])
+    # val = res.group(dict_type_rep[S_KEY_SW_VAL])
+
+    # # try a bool conversion
+    # # NB: in honor of John Valby (ddg him!)
+    # val_b = val.lower()
+    # if val_b == "true":
+    #     val = True
+    # elif val_b == "false":
+    #     val = False
+
+    # # update key/val
+    # dict_to_check[key] = val
+
+    # # --------------------------------------------------------------------------
+    # # done
+
+    # # NB: ALWAYS RETURN DICTS!
+    # return (dict_sw_block, dict_sw_line)
+
+
     # switch does not appear anywhere in line
-    res = re.search(dict_type_rep[S_KEY_SW_SCH], line)
+    res = re.search(dict_type_rep[S_KEY_SW_SCH], comm)
     if not res:
-        return dict_sw_block, dict_sw_line
+        return
 
-    # determine if it is a block or line switch
-    pre_str = res.group(dict_type_rep[S_KEY_SW_PRE])
-    pre_sch = pre_str.strip() != ""
-    line = pre_sch
-    block = not pre_sch
+    # # determine if it is a block or line switch
+    # pre_str = res.group(dict_type_rep[PP.S_KEY_SW_PRE])
+    # pre_sch = pre_str.strip() != ""
+    # line = pre_sch
+    # block = not pre_sch
 
-    # which dict to modify
-    dict_to_check = dict_sw_block
-    if line and not block:
-        dict_to_check = dict_sw_line
+    # # which dict to modify
+    # dict_to_check = dict_sw_block
+    # if line and not block:
+    #     dict_to_check = dict_sw_line
 
-    # get key/val of switch
-    key = res.group(dict_type_rep[S_KEY_SW_KEY])
-    val = res.group(dict_type_rep[S_KEY_SW_VAL])
+    matches = re.finditer(dict_type_rep[S_KEY_SW_SCH], comm)
+    for match in matches:
+        # get key/val of switch
+        key = match.group(dict_type_rep[S_KEY_SW_KEY])
+        val = match.group(dict_type_rep[S_KEY_SW_VAL])
 
-    # try a bool conversion
-    # NB: in honor of John Valby (ddg him!)
-    val_b = val.lower()
-    if val_b == "true":
-        val = True
-    elif val_b == "false":
-        val = False
+        # try a bool conversion
+        # NB: in honor of John Valby (ddg him!)
+        val_b = val.lower()
+        if val_b == "true":
+            val = True
+        elif val_b == "false":
+            val = False
 
-    # update key/val
-    dict_to_check[key] = val
-
-    # --------------------------------------------------------------------------
-    # done
-
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_sw_block, dict_sw_line)
+        # update key/val
+        dict_sw[key] = val
 
 # --------------------------------------------------------------------------
 # Get the filetype-specific regexes
 # --------------------------------------------------------------------------
-def _get_regex(name):
+def _get_type_rep(name):
     """
     Get the filetype-specific regexes
 
     Args:
-        name: Name of the file go get the dict of regexes for
+        name: Name of the file to get the dict of regexes for
 
     Returns:
         The dict of regexes for this file type
@@ -2502,8 +2579,7 @@ def _get_regex(name):
         # fix ets if necessary
         exts = val[S_KEY_REP_EXT]
         exts = [
-            f".{item}" if not item.startswith(".") else item
-            for item in exts
+            f".{item}" if not item.startswith(".") else item for item in exts
         ]
 
         # if we match ext, return only rep stuff

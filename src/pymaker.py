@@ -744,19 +744,16 @@ class PyMaker:
             # for each file item
             for item in files:
 
-                # for each new file, reset block and line switches to def
-                self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
-                self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
-
                 # handle files in skip_all
                 if item in skip_all:
                     continue
 
+                # for each new file, reset block and line switches to def
+                self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
+                self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
+
                 # handle dirs/files in skip_contents
                 if not root in skip_contents and not item in skip_contents:
-
-                    # get regex for header/switches
-                    self._dict_type_rep = self._get_regex(item)
 
                     # handle dirs/files in skip_header
                     bl_hdr = root in skip_header or item in skip_header
@@ -881,6 +878,9 @@ class PyMaker:
         header line or a code line. Ignore blank lines and comment-only lines.
         """
 
+        # get type rep for this file type
+        self._dict_type_rep = self._get_type_rep(path)
+
         # default lines
         lines = []
 
@@ -897,13 +897,63 @@ class PyMaker:
                 continue
 
             # ------------------------------------------------------------------
+            # split the line into code and comm
+
+            # we will split the line into two parts
+            # NB: assume code is whole line (i.e. no trailing comment)
+            code = line
+            comm = ""
+
+            # # do the split, checking each match to see if we get a group
+            # split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
+            # split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+            # matches = re.finditer(split_sch, line)
+            # for match in matches:
+            #     # if there is a match group for hash mark (meaning we found a
+            #     # trailing comment)
+            #     if match.group(split_grp):
+            #         # split the line
+            #         # NB: comm includes all from start marker to end of line
+            #         # get text from start of line to comment start pos)
+            #         split_pos = match.start(split_grp)
+            #         code = line[:split_pos]
+            #         comm = line[split_pos:]
+
+            split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
+            split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+            match = re.search(split_sch, line)
+            if match and match.group(split_grp):
+                # split the line
+                split_pos = match.start(split_grp)
+                code = line[:split_pos]
+                comm = line[split_pos:]
+
+            # ------------------------------------------------------------------
             # check for switches
-            self._dict_sw_block, self._dict_sw_line = self._check_switches(
-                line,
-                self._dict_type_rep,
-                self._dict_sw_block,
-                self._dict_sw_line,
-            )
+
+            # reset line switches
+            self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
+
+            # def block, but if code, line
+            dict_sw = self._dict_sw_block
+            if code.strip() != "":
+                dict_sw = self._dict_sw_line
+
+            # check switches
+            self._check_switches(comm, self._dict_type_rep, dict_sw)
+
+            # ----------------------------------------------------------------------
+
+            # check for block or line replace switch
+            repl = False
+            if (
+                self._dict_sw_block[PP.S_SW_REPLACE] is True
+                and self._dict_sw_line[PP.S_SW_REPLACE] is True
+            ) or self._dict_sw_line[PP.S_SW_REPLACE] is True:
+                repl = True
+
+            if not repl:
+                continue
 
             # ------------------------------------------------------------------
             # check for header
@@ -923,21 +973,18 @@ class PyMaker:
                     continue
 
             # ------------------------------------------------------------------
-            # skip any other comment lines
-
-            # str_pattern = self._dict_type_rep[PP.S_KEY_COMM]
-            # if re.search(str_pattern, line):
-            #     continue
-
-            # ------------------------------------------------------------------
-            # not a blank, block, header, or comment, must be code ( + comment)
+            # not a blank or header, must be code/comment/switch
 
             # check if blacklisted for code
             if not bl_code:
 
                 # fix dunders in real code lines (may still have trailing
                 # comments)
-                lines[index] = self._fix_code(line)
+                code = self._fix_code(code)
+
+            # ------------------------------------------------------------------
+            # put the line back together
+            lines[index] = code + comm
 
         # open and write file
         with open(path, "w", encoding=PP.S_ENCODING) as a_file:
@@ -998,7 +1045,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a file's contents
     # --------------------------------------------------------------------------
-    def _fix_code(self, line):
+    def _fix_code(self, code):
         """
         Replace dunders inside a file's contents
 
@@ -1016,65 +1063,58 @@ class PyMaker:
         """
 
         # ----------------------------------------------------------------------
+        # check for line switches
+        # self._check_switches(
+        #     line,
+        #     self._dict_type_rep,
+        #     self._dict_sw_block,
+        #     self._dict_sw_line,
+        # )
+
+        # ----------------------------------------------------------------------
         # split the line into code and comm
 
         # we will split the line into two parts
         # NB: assume code is whole line (i.e. no trailing comment)
-        code = line
-        comm = ""
+        # code = line
+        # comm = ""
 
-        # do the split, checking each match to see if we get a trailing comment
-        split = self._dict_type_rep[PP.S_KEY_SPLIT]
-        split_index = self._dict_type_rep[PP.S_KEY_SPLIT_INDEX]
-        matches = re.finditer(split, line)
-        for match in matches:
-            # if there is a match group for hash mark (meaning we found a
-            # trailing comment)
-            if match.group(split_index):
-                # split the line (comm includes hash mark as first char, code
-                # get text from start of line to comment start pos)
-                split = match.start(split_index)
-                code = line[:split]
-                comm = line[split:]
-
-        # ----------------------------------------------------------------------
-        # check for line switches
-
-        # for each line, reset line dict
-        self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
-
-        # do the check
-        self._dict_sw_block, self._dict_sw_line = self._check_switches(
-            line,
-            self._dict_type_rep,
-            self._dict_sw_block,
-            self._dict_sw_line,
-        )
+        # # do the split, checking each match to see if we get a trailing comment
+        # split = self._dict_type_rep[PP.S_KEY_SPLIT]
+        # split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+        # matches = re.finditer(split, line)
+        # for match in matches:
+        #     # if there is a match group for hash mark (meaning we found a
+        #     # trailing comment)
+        #     if match.group(split_grp):
+        #         # split the line (comm includes hash mark as first char, code
+        #         # get text from start of line to comment start pos)
+        #         split = match.start(split_grp)
+        #         code = line[:split]
+        #         comm = line[split:]
 
         # ----------------------------------------------------------------------
 
-        # check for block or line replace switch
-        repl = False
-        if (
-            self._dict_sw_block[PP.S_SW_REPLACE] is True
-            and self._dict_sw_line[PP.S_SW_REPLACE] is True
-            or self._dict_sw_line[PP.S_SW_REPLACE] is True
-        ):
-            repl = True
+        # # check for block or line replace switch
+        # repl = False
+        # if (
+        #     self._dict_sw_block[PP.S_SW_REPLACE] is True
+        #     and self._dict_sw_line[PP.S_SW_REPLACE] is True
+        # ) or self._dict_sw_line[PP.S_SW_REPLACE] is True:
+        #     repl = True
 
-        # ----------------------------------------------------------------------
+        # # ----------------------------------------------------------------------
+
+        # if not repl:
+        #     return code
 
         # replace content using current flag setting
-        if repl:
-            for key, val in self._dict_rep.items():
-                if isinstance(val, str):
-                    code = code.replace(key, val)
-
-        # put the line back together
-        line = code + comm
+        for key, val in self._dict_rep.items():
+            if isinstance(val, str):
+                code = code.replace(key, val)
 
         # return the (maybe replaced) line
-        return line
+        return code
 
     # --------------------------------------------------------------------------
     # Rename dirs/files in the project
@@ -1115,9 +1155,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
-    def _check_switches(
-        self, line, dict_type_rep, dict_sw_block, dict_sw_line
-    ):
+    def _check_switches(self, comm, dict_type_rep, dict_sw):
         """
         Check if line or trailing comment is a switch
 
@@ -1138,41 +1176,43 @@ class PyMaker:
         """
 
         # switch does not appear anywhere in line
-        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], line)
+        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], comm)
         if not res:
-            return dict_sw_block, dict_sw_line
+            return
 
-        # determine if it is a block or line switch
-        pre_str = res.group(dict_type_rep[PP.S_KEY_SW_PRE])
-        pre_sch = pre_str.strip() != ""
-        line = pre_sch
-        block = not pre_sch
+        # # determine if it is a block or line switch
+        # pre_str = res.group(dict_type_rep[PP.S_KEY_SW_PRE])
+        # pre_sch = pre_str.strip() != ""
+        # line = pre_sch
+        # block = not pre_sch
 
-        # which dict to modify
-        dict_to_check = dict_sw_block
-        if line and not block:
-            dict_to_check = dict_sw_line
+        # # which dict to modify
+        # dict_to_check = dict_sw_block
+        # if line and not block:
+        #     dict_to_check = dict_sw_line
 
-        # get key/val of switch
-        key = res.group(dict_type_rep[PP.S_KEY_SW_KEY])
-        val = res.group(dict_type_rep[PP.S_KEY_SW_VAL])
+        matches = re.finditer(dict_type_rep[PP.S_KEY_SW_SCH], comm)
+        for match in matches:
+            # get key/val of switch
+            key = match.group(dict_type_rep[PP.S_KEY_SW_KEY])
+            val = match.group(dict_type_rep[PP.S_KEY_SW_VAL])
 
-        # try a bool conversion
-        # NB: in honor of John Valby (ddg him!)
-        val_b = val.lower()
-        if val_b == "true":
-            val = True
-        elif val_b == "false":
-            val = False
+            # try a bool conversion
+            # NB: in honor of John Valby (ddg him!)
+            val_b = val.lower()
+            if val_b == "true":
+                val = True
+            elif val_b == "false":
+                val = False
 
-        # update key/val
-        dict_to_check[key] = val
+            # update key/val
+            dict_sw[key] = val
 
         # --------------------------------------------------------------------------
         # done
 
         # NB: ALWAYS RETURN DICTS!
-        return (dict_sw_block, dict_sw_line)
+        # return (dict_sw_block, dict_sw_line)
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -1193,7 +1233,8 @@ class PyMaker:
 
         # match semantic version from start of string
         pattern = PP.S_SEM_VER_VALID
-        return re.search(pattern, version)
+        res = re.search(pattern, version)
+        return res
 
     # --------------------------------------------------------------------------
     # Reload dicts after any outside changes
@@ -1269,7 +1310,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Get the filetype-specific regexes
     # --------------------------------------------------------------------------
-    def _get_regex(self, name):
+    def _get_type_rep(self, name):
         """
         Get the filetype-specific regexes
 
@@ -1294,7 +1335,7 @@ class PyMaker:
             if name.suffix in exts:
                 return val[PP.S_KEY_REP_REP]
 
-        # default result is empty or py
+        # default result is py type rep
         return dict(PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP])
 
     # --------------------------------------------------------------------------
@@ -1429,7 +1470,6 @@ class PyMaker:
 
         # if we made it this far, return true
         return True
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

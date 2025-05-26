@@ -490,7 +490,7 @@ class PyBaker:
                 if not root in skip_contents and not item in skip_contents:
 
                     # get regex for header/switches
-                    self._dict_type_rep = self._get_regex(item)
+                    self._dict_type_rep = self._get_type_rep(item)
 
                     # handle dirs/files in skip_header
                     bl_hdr = root in skip_header or item in skip_header
@@ -763,14 +763,7 @@ class PyBaker:
                     continue
 
             # ------------------------------------------------------------------
-            # skip any other comment lines
-
-            # str_pattern = self._dict_type_rep[PP.S_KEY_COMM]
-            # if re.search(str_pattern, line):
-            #     continue
-
-            # ------------------------------------------------------------------
-            # not a blank, block, header, or comment, must be code ( + comment)
+            # not a blank, switch, or header, must be code ( + comment)
 
             # check if blacklisted for code
             if not bl_code:
@@ -865,7 +858,7 @@ class PyBaker:
 
         # do the split, checking each match to see if we get a trailing comment
         split = self._dict_type_rep[PP.S_KEY_SPLIT]
-        split_index = self._dict_type_rep[PP.S_KEY_SPLIT_INDEX]
+        split_index = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
         matches = re.finditer(split, line)
         for match in matches:
             # if there is a match group for hash mark (meaning we found a
@@ -1109,7 +1102,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Get the filetype-specific regexes
     # --------------------------------------------------------------------------
-    def _get_regex(self, name):
+    def _get_type_rep(self, name):
         """
         Get the filetype-specific regexes
 
