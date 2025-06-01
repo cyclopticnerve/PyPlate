@@ -215,23 +215,6 @@ class __PP_NAME_PRJ_PASCAL__:
         Long description (including HTML).
         """
 
-        # sample of using repl switch
-        _fix = "__PP_NAME_PRJ_BIG__"
-
-        # pyplate: replace=False
-        _dont_fix = "__PP_NAME_PRJ_BIG__"
-        # pyplate: replace=True
-
-        _fix = "__PP_NAME_PRJ_BIG__"
-
-        _dont_fix = "__PP_NAME_PRJ_BIG__"  # pyplate: replace=False
-
-        _fix = "__PP_NAME_PRJ_BIG__"
-
-        # pyplate: replace=False
-        _fix = "__PP_NAME_PRJ_BIG__"  # pyplate: replace=True
-        # pyplate: replace=True
-
         # check for debug flag
         if self._debug:
             # I18N: context for this string

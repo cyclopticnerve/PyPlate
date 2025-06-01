@@ -316,6 +316,14 @@ class PyBaker:
         # set global prop in conf
         PP.B_DEBUG = self._debug
 
+        # debug turns off some post processing to speed up processing
+        # NB: changing values in self._dict_pub_dbg (through the functions in
+        # pyplate.py) will not affect the current session when running pymaker
+        # in debug mode. to do that, change the values of D_DBG_PM in
+        # pyplate.py
+        self._dict_debug = self._dict_pub_dbg
+        if self._debug:
+            self._dict_debug = PP.D_DBG_PB
         # ----------------------------------------------------------------------
 
         # maybe yell
@@ -353,17 +361,8 @@ class PyBaker:
         # ----------------------------------------------------------------------
 
         # set switch dicts to defaults
-        self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
-        self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
-
-        # debug turns off some post processing to speed up processing
-        # NB: changing values in self._dict_pub_dbg (through the functions in
-        # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
-        # pyplate.py
-        self._dict_debug = self._dict_pub_dbg
-        if self._debug:
-            self._dict_debug = PP.D_DBG_PB
+        self._dict_sw_block = dict(PP.D_SWITCH_DEF)
+        self._dict_sw_line = dict(self._dict_sw_block)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -396,12 +395,12 @@ class PyBaker:
 
             # get individual dicts in project.json
             self._dict_pub = F.load_dicts([path_pub], {})
+
+            # reload dict pointers after dict change
+            self._reload_dicts()
         except OSError:
             print(PP.S_ERR_PP_INVALID)
             sys.exit()
-
-        # reload dict pointers after dict change
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -417,13 +416,9 @@ class PyBaker:
         'dict_pub' dicts before any replacement occurs.
         """
 
-        # call public before fix function
-        self._dict_prv, self._dict_pub = PP.do_before_fix(
+        PP.do_before_fix(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
-
-        # update dict pointers
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -450,16 +445,24 @@ class PyBaker:
             [self._dict_prv_all, self._dict_prv_prj]
         )
 
+        # save private.json and project.json after all fixes have been done
+        self._save_project_info()
+
+        # make sure pyplate in in skip_all
+        skip_all = self._dict_pub_bl[PP.S_KEY_SKIP_ALL]
+        if not PP.S_PRJ_PP_DIR in skip_all:
+            skip_all.append(PP.S_PRJ_PP_DIR)
+
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        dict_bl = self._fix_blacklist_paths()
+        self._fix_blacklist_paths(self._dict_pub_bl)
 
         # just shorten the names
-        skip_all = dict_bl[PP.S_KEY_SKIP_ALL]
-        skip_contents = dict_bl[PP.S_KEY_SKIP_CONTENTS]
-        skip_header = dict_bl[PP.S_KEY_SKIP_HEADER]
-        skip_code = dict_bl[PP.S_KEY_SKIP_CODE]
-        skip_path = dict_bl[PP.S_KEY_SKIP_PATH]
+        skip_all = self._dict_pub_bl[PP.S_KEY_SKIP_ALL]
+        skip_contents = self._dict_pub_bl[PP.S_KEY_SKIP_CONTENTS]
+        skip_header = self._dict_pub_bl[PP.S_KEY_SKIP_HEADER]
+        skip_code = self._dict_pub_bl[PP.S_KEY_SKIP_CODE]
+        skip_path = self._dict_pub_bl[PP.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -479,8 +482,9 @@ class PyBaker:
             for item in files:
 
                 # for each new file, reset block and line switches to def
-                self._dict_sw_block = dict(PP.D_SW_BLOCK_DEF)
-                self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
+                # NB: line switches always default to current block switches
+                self._dict_sw_block = dict(PP.D_SWITCH_DEF)
+                self._dict_sw_line = dict(self._dict_sw_block)
 
                 # handle files in skip_all
                 if item in skip_all:
@@ -488,9 +492,6 @@ class PyBaker:
 
                 # handle dirs/files in skip_contents
                 if not root in skip_contents and not item in skip_contents:
-
-                    # get regex for header/switches
-                    self._dict_type_rep = self._get_type_rep(item)
 
                     # handle dirs/files in skip_header
                     bl_hdr = root in skip_header or item in skip_header
@@ -509,11 +510,6 @@ class PyBaker:
             if not root in skip_path:
                 self._fix_path(root)
 
-        # save private.json and project.json
-        # NB: doing this at the end means we don't need pyplate folder in
-        # blacklist
-        self._save_project_info()
-
         # done
         print(PP.S_ACTION_DONE)
 
@@ -530,13 +526,9 @@ class PyBaker:
         applied.
         """
 
-        # call conf after fix
-        self._dict_prv, self._dict_pub = PP.do_after_fix(
+        PP.do_after_fix(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
-
-        # update dicts after change
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist
@@ -549,13 +541,9 @@ class PyBaker:
         called after _do_after_fix, and before _do_dist.
         """
 
-        # call public before dist function
-        self._dict_prv, self._dict_pub = PP.do_before_dist(
+        PP.do_before_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
-
-        # update dict pointers
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -636,13 +624,9 @@ class PyBaker:
         install process.
         """
 
-        # call public after dist function
-        self._dict_prv, self._dict_pub = PP.do_after_dist(
+        PP.do_after_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
-
-        # update dicts after change
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -651,29 +635,24 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Convert items in blacklist to absolute Path objects
     # --------------------------------------------------------------------------
-    def _fix_blacklist_paths(self):
+    def _fix_blacklist_paths(self, dict_bl):
         """
         Convert items in blacklist to absolute Path objects
 
         Get absolute paths for all entries in the blacklist.
         """
 
-        # def result
-        res = {}
-
-        # remove path separators
+        # make a copy and remove path separators in one shot
         # NB: this is mostly for glob support, as globs cannot end in path
         # separators
-        l_bl = self._dict_pub_bl
-        for key in l_bl:
-            l_bl[key] = [item.rstrip("/") for item in l_bl[key]]
-        self._dict_pub_bl = l_bl
+        for key in dict_bl:
+            dict_bl[key] = [item.rstrip("/") for item in dict_bl[key]]
 
         # support for absolute/relative/glob
         # NB: taken from cntree.py
 
         # for each section of blacklist
-        for key, val in self._dict_pub_bl.items():
+        for key, val in dict_bl.items():
             # convert all items in list to Path objects
             paths = [Path(item) for item in val]
 
@@ -698,10 +677,10 @@ class PyBaker:
                 result += list(item)
 
             # set the list as the result list
-            res[key] = result
+            dict_bl[key] = result
 
         # return dict with path objects
-        return res
+        # return dict_res
 
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
@@ -721,6 +700,9 @@ class PyBaker:
         header line or a code line. Ignore blank lines and comment-only lines.
         """
 
+        # skip unknown file types
+        self._get_type_rep(path)
+
         # default lines
         lines = []
 
@@ -737,13 +719,56 @@ class PyBaker:
                 continue
 
             # ------------------------------------------------------------------
+            # split the line into code and comm
+
+            # we will split the line into two parts
+            # NB: assume code is whole line (i.e. no trailing comment)
+            split_pos = 0
+            code = line
+            comm = ""
+
+            # find split sequence
+            split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
+            split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+
+            # there may be multiple matches per line (ignore quoted markers)
+            matches = re.finditer(split_sch, line)
+
+            # only use matches that have the right group
+            matches = [match for match in matches if match.group(split_grp)]
+            for match in matches:
+
+                # split the line into code and comment (including delimiter)
+                split_pos = match.start(split_grp)
+                code = line[:split_pos]
+                comm = line[split_pos:]
+
+            # ------------------------------------------------------------------
             # check for switches
-            self._dict_sw_block, self._dict_sw_line = self._check_switches(
-                line,
+
+            # reset line switch values to block switch values
+            self._dict_sw_line = dict(self._dict_sw_block)
+
+            # check switches
+            self._check_switches(
+                code,
+                comm,
                 self._dict_type_rep,
                 self._dict_sw_block,
                 self._dict_sw_line,
             )
+
+            # check for block or line replace switch
+            repl = False
+            if (
+                self._dict_sw_block[PP.S_SW_REPLACE] is True
+                and self._dict_sw_line[PP.S_SW_REPLACE] is True
+            ) or self._dict_sw_line[PP.S_SW_REPLACE] is True:
+                repl = True
+
+            # switch says no, gtfo
+            if not repl:
+                continue
 
             # ------------------------------------------------------------------
             # check for header
@@ -759,18 +784,21 @@ class PyBaker:
                     # fix it
                     lines[index] = self._fix_header(line)
 
-                    # stop on first match
+                    # no more processing for header line
                     continue
 
             # ------------------------------------------------------------------
-            # not a blank, switch, or header, must be code ( + comment)
+            # not a blank, header or switch, must be code
 
             # check if blacklisted for code
             if not bl_code:
 
-                # fix dunders in real code lines (may still have trailing
-                # comments)
-                lines[index] = self._fix_code(line)
+                # fix dunders in real code lines
+                code = self._fix_code(code)
+
+                # --------------------------------------------------------------
+                # put the line back together
+                lines[index] = code + comm
 
         # open and write file
         with open(path, "w", encoding=PP.S_ENCODING) as a_file:
@@ -831,83 +859,74 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Replace dunders inside a file's contents
     # --------------------------------------------------------------------------
-    def _fix_code(self, line):
+    def _fix_code(self, code):
         """
         Replace dunders inside a file's contents
 
         Args:
-            line: The line of the file to replace text in
+            code: The code portion of the line to replace text in
 
         Returns:
             The new line of code
 
-        Replaces text inside a line. Given a line, replaces dunders as it goes.
-        When it is done, it returns the new line. This replaces the __PP
-        dunders inside the file, excluding flag switches, headers, and
-        comment-only lines (all of which are previously handled in
+        Replaces text inside the code portion of a  line. Given a line,
+        replaces dunders as it goes. When it is done, it returns the new line.
+        This replaces the __PP dunders inside the file, excluding blank lines,
+        headers, and flag switches (all of which are previously handled in
         _fix_contents).
         """
 
-        # ----------------------------------------------------------------------
-        # split the line into code and comm
-
-        # we will split the line into two parts
-        # NB: assume code is whole line (i.e. no trailing comment)
-        code = line
-        comm = ""
-
-        # do the split, checking each match to see if we get a trailing comment
-        split = self._dict_type_rep[PP.S_KEY_SPLIT]
-        split_index = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
-        matches = re.finditer(split, line)
-        for match in matches:
-            # if there is a match group for hash mark (meaning we found a
-            # trailing comment)
-            if match.group(split_index):
-                # split the line (comm includes hash mark as first char, code
-                # get space between)
-                split = match.start(split_index)
-                code = line[:split]
-                comm = line[split:]
-
-        # ----------------------------------------------------------------------
-        # check for line switches
-
-        # for each line, reset line dict
-        self._dict_sw_line = dict(PP.D_SW_LINE_DEF)
-
-        # do the check
-        self._dict_sw_block, self._dict_sw_line = self._check_switches(
-            line,
-            self._dict_type_rep,
-            self._dict_sw_block,
-            self._dict_sw_line,
-        )
-
-        # ----------------------------------------------------------------------
-
-        # check for block or line replace switch
-        repl = False
-        if (
-            self._dict_sw_block[PP.S_SW_REPLACE] is True
-            and self._dict_sw_line[PP.S_SW_REPLACE] is True
-            or self._dict_sw_line[PP.S_SW_REPLACE] is True
-        ):
-            repl = True
-
-        # ----------------------------------------------------------------------
-
         # replace content using current flag setting
-        if repl:
-            for key, val in self._dict_rep.items():
-                if isinstance(val, str):
-                    code = code.replace(key, val)
-
-        # put the line back together
-        line = code + comm
+        for key, val in self._dict_rep.items():
+            if isinstance(val, str):
+                code = code.replace(key, val)
 
         # return the (maybe replaced) line
-        return line
+        return code
+
+    # --------------------------------------------------------------------------
+    # Replace dunders inside a file's contents
+    # --------------------------------------------------------------------------
+    def _fix_text(self, path):
+        """
+        Replace dunders inside a file's contents
+
+        Args:
+            code: The code portion of the line to replace text in
+
+        Returns:
+            The new line of code
+
+        Replaces text inside the code portion of a  line. This is a qnd
+        function to replace any dunder in any file, regardless of D_TYPE_REP.
+        """
+
+        # default lines
+        lines = []
+
+        # open and read file
+        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
+            lines = a_file.readlines()
+
+        # for each line in array
+        for index, line in enumerate(lines):
+
+            # ------------------------------------------------------------------
+            # skip blank lines
+            if line.strip() == "":
+                continue
+
+            # replace content using current flag setting
+            for key, val in self._dict_rep.items():
+                if isinstance(val, str):
+                    line = line.replace(key, val)
+
+            # put new line back in file
+            lines[index] = line
+
+        # open and write file
+        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
+            a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
     # Rename dirs/files in the project
@@ -949,63 +968,51 @@ class PyBaker:
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(
-        self, line, dict_type_rep, dict_sw_block, dict_sw_line
+        self, code, comm, dict_type_rep, dict_sw_block, dict_sw_line
     ):
         """
         Check if line or trailing comment is a switch
 
         Args:
-            line: The line to check for switches
+            comm: The comment part of a line to check for switches
             dict_type_rep: Dictionary containing the regex to look for
-            dict_sw_block: Dictionary of switch values for block switches
-            dict_sw_line: Dictionary of switch values for line switches
-
-        Returns:
-            A tuple of dictionaries (dict_sw_block, dict_sw_line) containing the
-            current switch values
+            dict_sw: Dictionary of switch values for either block or line
+            switches
 
         This method checks to see if a line or trailing comment contains a
-        valid switch (for either markup or regular files). If a valid switch is
+        valid switch for the values in dict_type_rep. If a valid switch is
         found, it sets the appropriate flag in either dict_sw_block or
-        dict_sw_line and returns those dicts.
+        dict_sw_line.
         """
 
         # switch does not appear anywhere in line
-        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], line)
+        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], comm)
         if not res:
-            return dict_sw_block, dict_sw_line
+            return
 
-        # determine if it is a block or line switch
-        pre_str = res.group(dict_type_rep[PP.S_KEY_SW_PRE])
-        pre_sch = pre_str.strip() != ""
-        line = pre_sch
-        block = not pre_sch
+        # find all matches (case insensitive)
+        matches = re.finditer(dict_type_rep[PP.S_KEY_SW_SCH], comm, flags=re.I)
 
-        # which dict to modify
-        dict_to_check = dict_sw_block
-        if line and not block:
-            dict_to_check = dict_sw_line
+        # for each match
+        for match in matches:
 
-        # get key/val of switch
-        key = res.group(dict_type_rep[PP.S_KEY_SW_KEY])
-        val = res.group(dict_type_rep[PP.S_KEY_SW_VAL])
+            # get key/val of switch
+            key = match.group(dict_type_rep[PP.S_KEY_SW_KEY])
+            val = match.group(dict_type_rep[PP.S_KEY_SW_VAL])
 
-        # try a bool conversion
-        # NB: in honor of John Valby (ddg him!)
-        val_b = val.lower()
-        if val_b == "true":
-            val = True
-        elif val_b == "false":
-            val = False
+            # try a bool conversion
+            # NB: in honor of John Valby (ddg him!)
+            val_b = val.lower()
+            if val_b == "true":
+                val = True
+            elif val_b == "false":
+                val = False
 
-        # update key/val
-        dict_to_check[key] = val
-
-        # ----------------------------------------------------------------------
-        # done
-
-        # NB: ALWAYS RETURN DICTS!
-        return (dict_sw_block, dict_sw_line)
+            # pick a dict based on if there is preceding code
+            if code.strip() == "":
+                dict_sw_block[key] = val
+            else:
+                dict_sw_line[key] = val
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -1092,25 +1099,27 @@ class PyBaker:
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # fix dunders in dict_pub (project.json)
-        self._fix_contents(path_pub)
+        # fix dunders in dict_pub w/o _dict_rep (project.json)
+        self._fix_text(path_pub)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
         self._reload_dicts()
 
     # --------------------------------------------------------------------------
-    # Get the filetype-specific regexes
+    # Get the filetype-specific regexes (headers, comments. switches)
     # --------------------------------------------------------------------------
     def _get_type_rep(self, name):
         """
-        Get the filetype-specific regexes
+        Get the filetype-specific regexes (headers, comments. switches)
 
         Args:
             name: Name of the file go get the dict of regexes for
 
         Returns:
-            The dict of regexes for this file type
+            The dict of regexes for this file type. This dict contains
+            language-specific regexes for matching header lines, comments, and
+            switches.
         """
 
         # iterate over reps
@@ -1125,10 +1134,11 @@ class PyBaker:
 
             # if we match ext, return only rep stuff
             if name.suffix in exts:
-                return val[PP.S_KEY_REP_REP]
+                self._dict_type_rep = val[PP.S_KEY_REP_REP]
+                return
 
-        # default result is empty or py
-        return dict(PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP])
+        # default result is py type rep
+        self._dict_type_rep = PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP]
 
 
 # ------------------------------------------------------------------------------

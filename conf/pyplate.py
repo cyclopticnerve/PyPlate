@@ -173,7 +173,7 @@ S_ACTION_README = _("Fixing README... ")
 # I18N: fix other files
 S_ACTION_META = _("Fixing metadata... ")
 # I18N: fix other files
-S_ACTION_OTHER = _("Fixing other... ")
+S_ACTION_PO = _("Fixing po files... ")
 # I18N: Do before fix
 S_ACTION_BEFORE = _("Do before fix... ")
 # I18N: Do fix
@@ -368,7 +368,7 @@ S_SW_REPLACE = "replace"
 # NB: leave as string, no start dir yet
 S_PRJ_PP_DIR = "pyplate"
 S_PRJ_PUB_CFG = f"{S_PRJ_PP_DIR}/project.json"
-S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/private"
+S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/.private"
 S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # ------------------------------------------------------------------------------
@@ -1128,7 +1128,7 @@ D_TYPE_REP = {
             S_KEY_SPLIT: r"[\'\"].*[\'\"]|(#.*)",
             S_KEY_SPLIT_COMM: 1,
             # switch stuff
-            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*([^-\ ]*)",
+            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*(\S*)",
             S_KEY_SW_KEY: 1,
             S_KEY_SW_VAL: 2,
         },
@@ -1146,7 +1146,7 @@ D_TYPE_REP = {
             S_KEY_SPLIT: r"[\'\"].*[\'\"]|(<!--.*)",
             S_KEY_SPLIT_COMM: 1,
             # switch stuff
-            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*([^-\ ]*)",
+            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*(\S*)",
             S_KEY_SW_KEY: 1,
             S_KEY_SW_VAL: 2,
         },
@@ -1159,10 +1159,8 @@ D_NAME_SEC = {
     "g": S_ASK_SEC_G,
 }
 
-# default dict of block-level switches
-# NB: value should be True if present and enabled, False if present and
-# disabled, or default if not present
-D_SW_BLOCK_DEF = {
+# default dict of switches
+D_SWITCH_DEF = {
     S_SW_REPLACE: True,  # assume we want to replace
 }
 
@@ -1188,7 +1186,7 @@ D_NAME = {
 # ------------------------------------------------------------------------------
 # Do any work before template copy
 # ------------------------------------------------------------------------------
-def do_before_template(_dir_prj, dict_prv, dict_pub, _dict_dbg):
+def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
     """
     Do any work before template copy
 
@@ -1199,24 +1197,16 @@ def do_before_template(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_dbg: The dictionary containing the current session's debug
         settings
 
-    Returns:
-        The modified dicts to be synced with the caller
-
     Do any work before copying the template. This method is called just before
     _do_template, before any files have been copied.\n
     It is mostly used to make final adjustments to the 'dict_prv' and
     'dict_pub' dicts before any copying occurs.
     """
 
-    # FIXME: we should not have to return dicts, passed by reference
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_prv, dict_pub)
-
-
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
-def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work after template copy
 
@@ -1226,9 +1216,6 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
-
-    Returns:
-        The modified dicts to be synced with the caller
 
     Do any work after copying the template. This function is called after
     _do_template, and before _do_before_fix.\n
@@ -1355,13 +1342,6 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             # show info
             print(S_ACTION_DONE)
 
-    # --------------------------------------------------------------------------
-    # done
-
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_prv, dict_pub)
-
-
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
@@ -1375,9 +1355,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
-
-    Returns:
-        The modified dicts to be synced with the caller
 
     Do any work before fix.\n
     This function is called by both PyMaker and PyBaker.\n
@@ -1476,13 +1453,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}.png"
     )
 
-    # --------------------------------------------------------------------------
-    # done
-
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_prv, dict_pub)
-
-
 # ------------------------------------------------------------------------------
 # Do any work after fix
 # ------------------------------------------------------------------------------
@@ -1496,9 +1466,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
-
-    Returns:
-        The modified dicts to be synced with the caller
 
     Do any work after fix.\n
     This function is called by both PyMaker and PyBaker.\n
@@ -1779,7 +1746,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # fix po files outside blacklist
 
     # print info
-    print(S_ACTION_OTHER, end="", flush=True)
+    print(S_ACTION_PO, end="", flush=True)
 
     # get i18n path
     path = dir_prj / S_DIR_I18N
@@ -1820,6 +1787,12 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # metadata
 
+    # NB: this is an example of how to use the blacklist filter in your own
+    # customized fix routine
+
+    # print info
+    print(S_ACTION_META, end="", flush=True)
+
     # NB: this function uses the blacklist to filter files at the very end of
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
@@ -1832,9 +1805,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # --------------------------------------------------------------------------
     # do the fixes
-
-    # print info
-    print(S_ACTION_META, end="", flush=True)
 
     # NB: root is a full path, dirs and files are relative to root
     for root, root_dirs, root_files in dir_prj.walk():
@@ -1861,20 +1831,13 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 # fix content with appropriate dict
                 _fix_meta(item, dict_prv, dict_pub)
 
-    # print info
+    # print done
     print(S_ACTION_DONE)
-
-    # --------------------------------------------------------------------------
-    # done
-
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_prv, dict_pub)
-
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
-def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work before making dist
 
@@ -1884,9 +1847,6 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
-
-    Returns:
-        The modified dicts to be synced with the caller
 
     Do any work on the dist folder before it is created. This method is called
     after _do_after_fix, and before _do_dist.
@@ -1914,17 +1874,10 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
             print(S_ACTION_FAIL)
             raise e
 
-    # --------------------------------------------------------------------------
-    # done
-
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_prv, dict_pub)
-
-
 # ------------------------------------------------------------------------------
 # Do any work after making dist
 # ------------------------------------------------------------------------------
-def do_after_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work after making dist
 
@@ -1934,9 +1887,6 @@ def do_after_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
-
-    Returns:
-        The modified dicts to be synced with the caller
 
     Do any work on the dist folder after it is created. This method is called
     after _do_dist. Currently, this method purges any "ABOUT" file used as
@@ -2016,13 +1966,6 @@ def do_after_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # show info
         print(S_ACTION_DONE)
-
-    # --------------------------------------------------------------------------
-    # done
-
-    # NB: ALWAYS RETURN DICTS!
-    return (dict_prv, dict_pub)
-
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -2369,21 +2312,27 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
     is in L_EXT_SRC.
     """
 
-    # the whole text of the file
-    lines = []
+    # NB: this is an example of using switches to control line replacement
+
+    # skip unknown file types
+    if not dict_type_rep:
+        return
 
     # the switch statuses
-    dict_sw_block = dict(D_SW_BLOCK_DEF)
+    dict_sw_block = dict(D_SWITCH_DEF)
+    dict_sw_line = dict(dict_sw_block)
+
+    # the whole text of the file
+    lines = []
 
     # open and read whole file
     with open(path, "r", encoding=S_ENCODING) as a_file:
         lines = a_file.readlines()
 
+    # for each line in array
     for index, line in enumerate(lines):
 
-        # reset line dict for every line
-        dict_sw_line = dict(D_SW_LINE_DEF)
-
+        # ------------------------------------------------------------------
         # skip blank lines
         if line.strip() == "":
             continue
@@ -2393,29 +2342,22 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
 
         # we will split the line into two parts
         # NB: assume code is whole line (i.e. no trailing comment)
+        split_pos = 0
         code = line
         comm = ""
 
-            # # do the split, checking each match to see if we get a group
-            # split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
-            # split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
-            # matches = re.finditer(split_sch, line)
-            # for match in matches:
-            #     # if there is a match group for hash mark (meaning we found a
-            #     # trailing comment)
-            #     if match.group(split_grp):
-            #         # split the line
-            #         # NB: comm includes all from start marker to end of line
-            #         # get text from start of line to comment start pos)
-            #         split_pos = match.start(split_grp)
-            #         code = line[:split_pos]
-            #         comm = line[split_pos:]
-
+        # find split sequence
         split_sch = dict_type_rep[S_KEY_SPLIT]
         split_grp = dict_type_rep[S_KEY_SPLIT_COMM]
-        match = re.search(split_sch, line)
-        if match and match.group(split_grp):
-            # split the line
+
+        # there may be multiple matches per line (ignore quoted markers)
+        matches = re.finditer(split_sch, line)
+
+        # only use matches that have the right group
+        matches = [match for match in matches if match.group(split_grp)]
+        for match in matches:
+
+            # split the line into code and comment (including delimiter)
             split_pos = match.start(split_grp)
             code = line[:split_pos]
             comm = line[split_pos:]
@@ -2423,52 +2365,53 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
         # ------------------------------------------------------------------
         # check for switches
 
-        # reset line switches
-        dict_sw_line = dict(D_SW_LINE_DEF)
-
-        # def block, but if code, line
-        dict_sw = dict_sw_block
-        if code.strip() != "":
-            dict_sw = dict_sw_line
+        # reset line switch values to block switch values
+        dict_sw_line = dict(dict_sw_block)
 
         # check switches
-        _check_switches(comm, dict_type_rep, dict_sw)
+        _check_switches(
+            code,
+            comm,
+            dict_type_rep,
+            dict_sw_block,
+            dict_sw_line,
+        )
 
-        # check for replace switch status from block and line statuses
+        # check for block or line replace switch
         repl = False
         if (
             dict_sw_block[S_SW_REPLACE] is True
             and dict_sw_line[S_SW_REPLACE] is True
-            or dict_sw_line[S_SW_REPLACE] is True
-        ):
+        ) or dict_sw_line[S_SW_REPLACE] is True:
             repl = True
 
-        # if replace is currently allowed
-        if repl:
+        # switch says no, gtfo
+        if not repl:
+            continue
 
-            # replace version
-            ver = dict_prv_prj["__PP_VER_DISP__"]
-            str_sch = S_SRC_VER_SCH
-            str_rep = S_SRC_VER_REP.format(ver)
-            lines[index] = re.sub(str_sch, str_rep, line, flags=re.M)
+        # ------------------------------------------------------------------
 
-            # replace short desc
-            desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-            str_sch = S_SRC_DESC_SCH
-            str_rep = S_SRC_DESC_REP.format(desc)
-            lines[index] = re.sub(str_sch, str_rep, line, flags=re.M)
+        # replace version
+        ver = dict_prv_prj["__PP_VER_DISP__"]
+        str_sch = S_SRC_VER_SCH
+        str_rep = S_SRC_VER_REP.format(ver)
+        lines[index] = re.sub(str_sch, str_rep, line, flags=re.M)
+
+        # replace short desc
+        desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
+        str_sch = S_SRC_DESC_SCH
+        str_rep = S_SRC_DESC_REP.format(desc)
+        lines[index] = re.sub(str_sch, str_rep, line, flags=re.M)
 
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
-
 # --------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
 # --------------------------------------------------------------------------
 # def _check_switches(line, dict_type_rep, dict_sw_block, dict_sw_line):
-def _check_switches(comm, dict_type_rep, dict_sw):
-
+def _check_switches(code, comm, dict_type_rep, dict_sw_block, dict_sw_line):
     """
     Check if line or trailing comment is a switch
 
@@ -2478,72 +2421,23 @@ def _check_switches(comm, dict_type_rep, dict_sw):
         dict_sw_block: Dictionary of switch values for block switches
         dict_sw_line: Dictionary of switch values for line switches
 
-    Returns:
-        A tuple of dictionaries (dict_sw_block, dict_sw_line) containing the
-        current switch values
-
     This method checks to see if a line or trailing comment contains a
     valid switch (for either markup or regular files). If a valid switch is
     found, it sets the appropriate flag in either dict_sw_block or
-    dict_sw_line and returns those dicts.
+    dict_sw_line.
     """
-
-    # # switch does not appear anywhere in line
-    # res = re.search(dict_type_rep[S_KEY_SW_SCH], line)
-    # if not res:
-    #     return dict_sw_block, dict_sw_line
-
-    # # determine if it is a block or line switch
-    # pre_str = res.group(dict_type_rep[S_KEY_SW_PRE])
-    # pre_sch = pre_str.strip() != ""
-    # line = pre_sch
-    # block = not pre_sch
-
-    # # which dict to modify
-    # dict_to_check = dict_sw_block
-    # if line and not block:
-    #     dict_to_check = dict_sw_line
-
-    # # get key/val of switch
-    # key = res.group(dict_type_rep[S_KEY_SW_KEY])
-    # val = res.group(dict_type_rep[S_KEY_SW_VAL])
-
-    # # try a bool conversion
-    # # NB: in honor of John Valby (ddg him!)
-    # val_b = val.lower()
-    # if val_b == "true":
-    #     val = True
-    # elif val_b == "false":
-    #     val = False
-
-    # # update key/val
-    # dict_to_check[key] = val
-
-    # # --------------------------------------------------------------------------
-    # # done
-
-    # # NB: ALWAYS RETURN DICTS!
-    # return (dict_sw_block, dict_sw_line)
-
 
     # switch does not appear anywhere in line
     res = re.search(dict_type_rep[S_KEY_SW_SCH], comm)
     if not res:
         return
 
-    # # determine if it is a block or line switch
-    # pre_str = res.group(dict_type_rep[PP.S_KEY_SW_PRE])
-    # pre_sch = pre_str.strip() != ""
-    # line = pre_sch
-    # block = not pre_sch
-
-    # # which dict to modify
-    # dict_to_check = dict_sw_block
-    # if line and not block:
-    #     dict_to_check = dict_sw_line
-
+    # find all matches (case insensitive)
     matches = re.finditer(dict_type_rep[S_KEY_SW_SCH], comm)
+
+    # for each match
     for match in matches:
+
         # get key/val of switch
         key = match.group(dict_type_rep[S_KEY_SW_KEY])
         val = match.group(dict_type_rep[S_KEY_SW_VAL])
@@ -2556,8 +2450,12 @@ def _check_switches(comm, dict_type_rep, dict_sw):
         elif val_b == "false":
             val = False
 
-        # update key/val
-        dict_sw[key] = val
+        # pick a dict based on if there is preceding code
+        if code.strip() == "":
+            dict_sw_block[key] = val
+        else:
+            dict_sw_line[key] = val
+
 
 # --------------------------------------------------------------------------
 # Get the filetype-specific regexes

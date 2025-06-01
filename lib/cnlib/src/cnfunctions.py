@@ -372,7 +372,8 @@ def combine_dicts(dicts_new, dict_old=None):
     """
 
     # default return val
-    dict_old = {}
+    if dict_old is None:
+        dict_old = {}
 
     # sanity check
     if isinstance(dicts_new, dict):
