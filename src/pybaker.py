@@ -178,7 +178,7 @@ class PyBaker:
         # internal props
         self._dir_prj = Path()
         self._dict_rep = {}
-        self._dict_type_rep = {}
+        self._dict_rep_rules = {}
         self._dict_sw_block = {}
         self._dict_sw_line = {}
 
@@ -728,8 +728,8 @@ class PyBaker:
             comm = ""
 
             # find split sequence
-            split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
-            split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+            split_sch = self._dict_rep_rules[PP.S_KEY_SPLIT]
+            split_grp = self._dict_rep_rules[PP.S_KEY_SPLIT_COMM]
 
             # there may be multiple matches per line (ignore quoted markers)
             matches = re.finditer(split_sch, line)
@@ -753,7 +753,7 @@ class PyBaker:
             self._check_switches(
                 code,
                 comm,
-                self._dict_type_rep,
+                self._dict_rep_rules,
                 self._dict_sw_block,
                 self._dict_sw_line,
             )
@@ -777,7 +777,7 @@ class PyBaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
+                str_pattern = self._dict_rep_rules[PP.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
@@ -824,15 +824,15 @@ class PyBaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
+        str_pattern = self._dict_rep_rules[PP.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
         # pull out lead, val, and pad using group match values from M
-        lead = res.group(self._dict_type_rep[PP.S_KEY_LEAD])
-        val = res.group(self._dict_type_rep[PP.S_KEY_VAL])
-        pad = res.group(self._dict_type_rep[PP.S_KEY_PAD])
+        lead = res.group(self._dict_rep_rules[PP.S_KEY_LEAD])
+        val = res.group(self._dict_rep_rules[PP.S_KEY_VAL])
+        pad = res.group(self._dict_rep_rules[PP.S_KEY_PAD])
 
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
@@ -968,37 +968,39 @@ class PyBaker:
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(
-        self, code, comm, dict_type_rep, dict_sw_block, dict_sw_line
+        self, code, comm, dict_rep_rules, dict_sw_block, dict_sw_line
     ):
         """
         Check if line or trailing comment is a switch
 
         Args:
             comm: The comment part of a line to check for switches
-            dict_type_rep: Dictionary containing the regex to look for
+            dict_rep_rules: Dictionary containing the regex to look for
             dict_sw: Dictionary of switch values for either block or line
             switches
 
         This method checks to see if a line or trailing comment contains a
-        valid switch for the values in dict_type_rep. If a valid switch is
+        valid switch for the values in dict_rep_rules. If a valid switch is
         found, it sets the appropriate flag in either dict_sw_block or
         dict_sw_line.
         """
 
         # switch does not appear anywhere in line
-        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], comm)
+        res = re.search(dict_rep_rules[PP.S_KEY_SW_SCH], comm)
         if not res:
             return
 
         # find all matches (case insensitive)
-        matches = re.finditer(dict_type_rep[PP.S_KEY_SW_SCH], comm, flags=re.I)
+        matches = re.finditer(
+            dict_rep_rules[PP.S_KEY_SW_SCH], comm, flags=re.I
+        )
 
         # for each match
         for match in matches:
 
             # get key/val of switch
-            key = match.group(dict_type_rep[PP.S_KEY_SW_KEY])
-            val = match.group(dict_type_rep[PP.S_KEY_SW_VAL])
+            key = match.group(dict_rep_rules[PP.S_KEY_SW_KEY])
+            val = match.group(dict_rep_rules[PP.S_KEY_SW_VAL])
 
             # try a bool conversion
             # NB: in honor of John Valby (ddg him!)
@@ -1134,11 +1136,11 @@ class PyBaker:
 
             # if we match ext, return only rep stuff
             if name.suffix in exts:
-                self._dict_type_rep = val[PP.S_KEY_REP_REP]
+                self._dict_rep_rules = val[PP.S_KEY_REP_REP]
                 return
 
         # default result is py type rep
-        self._dict_type_rep = PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP]
+        self._dict_rep_rules = PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP]
 
 
 # ------------------------------------------------------------------------------

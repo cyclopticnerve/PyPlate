@@ -172,7 +172,7 @@ class PyMaker:
         # internal props
         self._dir_prj = Path()
         self._dict_rep = {}
-        self._dict_type_rep = {}
+        self._dict_rep_rules = {}
         self._dict_sw_block = {}
         self._dict_sw_line = {}
 
@@ -839,9 +839,6 @@ class PyMaker:
             # set the list as the result list
             dict_bl[key] = result
 
-        # return dict with path objects
-        # return dict_res
-
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
@@ -860,8 +857,13 @@ class PyMaker:
         header line or a code line. Ignore blank lines and comment-only lines.
         """
 
-        # skip unknown file types
-        self._get_type_rep(path)
+        # check for unknown file types
+        self._get_rep_rules(path)
+        if not self._dict_rep_rules or len(self._dict_rep_rules) == 0:
+
+            # do the basic replace
+            self._fix_text(path)
+            return
 
         # default lines
         lines = []
@@ -888,8 +890,8 @@ class PyMaker:
             comm = ""
 
             # find split sequence
-            split_sch = self._dict_type_rep[PP.S_KEY_SPLIT]
-            split_grp = self._dict_type_rep[PP.S_KEY_SPLIT_COMM]
+            split_sch = self._dict_rep_rules[PP.S_KEY_SPLIT]
+            split_grp = self._dict_rep_rules[PP.S_KEY_SPLIT_COMM]
 
             # there may be multiple matches per line (ignore quoted markers)
             matches = re.finditer(split_sch, line)
@@ -913,7 +915,7 @@ class PyMaker:
             self._check_switches(
                 code,
                 comm,
-                self._dict_type_rep,
+                self._dict_rep_rules,
                 self._dict_sw_block,
                 self._dict_sw_line,
             )
@@ -937,7 +939,7 @@ class PyMaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
+                str_pattern = self._dict_rep_rules[PP.S_KEY_HDR]
                 res = re.search(str_pattern, line)
                 if res:
 
@@ -984,15 +986,15 @@ class PyMaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = self._dict_type_rep[PP.S_KEY_HDR]
+        str_pattern = self._dict_rep_rules[PP.S_KEY_HDR]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
         # pull out lead, val, and pad using group match values from M
-        lead = res.group(self._dict_type_rep[PP.S_KEY_LEAD])
-        val = res.group(self._dict_type_rep[PP.S_KEY_VAL])
-        pad = res.group(self._dict_type_rep[PP.S_KEY_PAD])
+        lead = res.group(self._dict_rep_rules[PP.S_KEY_LEAD])
+        val = res.group(self._dict_rep_rules[PP.S_KEY_VAL])
+        pad = res.group(self._dict_rep_rules[PP.S_KEY_PAD])
 
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
@@ -1057,8 +1059,9 @@ class PyMaker:
         Returns:
             The new line of code
 
-        Replaces text inside the code portion of a  line. This is a qnd
+        Replaces text inside the a file. This is a qnd
         function to replace any dunder in any file, regardless of D_TYPE_REP.
+        Think of it as an oubliette for fi;es you just want to 'undunderize'.
         """
 
         # default lines
@@ -1128,37 +1131,39 @@ class PyMaker:
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(
-        self, code, comm, dict_type_rep, dict_sw_block, dict_sw_line
+        self, code, comm, dict_rep_rules, dict_sw_block, dict_sw_line
     ):
         """
         Check if line or trailing comment is a switch
 
         Args:
             comm: The comment part of a line to check for switches
-            dict_type_rep: Dictionary containing the regex to look for
+            dict_rep_rules: Dictionary containing the regex to look for
             dict_sw: Dictionary of switch values for either block or line
             switches
 
         This method checks to see if a line or trailing comment contains a
-        valid switch for the values in dict_type_rep. If a valid switch is
+        valid switch for the values in dict_rep_rules. If a valid switch is
         found, it sets the appropriate flag in either dict_sw_block or
         dict_sw_line.
         """
 
         # switch does not appear anywhere in line
-        res = re.search(dict_type_rep[PP.S_KEY_SW_SCH], comm)
+        res = re.search(dict_rep_rules[PP.S_KEY_SW_SCH], comm)
         if not res:
             return
 
         # find all matches (case insensitive)
-        matches = re.finditer(dict_type_rep[PP.S_KEY_SW_SCH], comm, flags=re.I)
+        matches = re.finditer(
+            dict_rep_rules[PP.S_KEY_SW_SCH], comm, flags=re.I
+        )
 
         # for each match
         for match in matches:
 
             # get key/val of switch
-            key = match.group(dict_type_rep[PP.S_KEY_SW_KEY])
-            val = match.group(dict_type_rep[PP.S_KEY_SW_VAL])
+            key = match.group(dict_rep_rules[PP.S_KEY_SW_KEY])
+            val = match.group(dict_rep_rules[PP.S_KEY_SW_VAL])
 
             # try a bool conversion
             # NB: in honor of John Valby (ddg him!)
@@ -1260,7 +1265,7 @@ class PyMaker:
 
         # ----------------------------------------------------------------------
         # fix dunders in dict_pub w/o _dict_rep (project.json)
-        self._fix_text(path_pub)
+        self._fix_contents(path_pub)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
@@ -1269,7 +1274,7 @@ class PyMaker:
     # --------------------------------------------------------------------------
     # Get the filetype-specific regexes (headers, comments. switches)
     # --------------------------------------------------------------------------
-    def _get_type_rep(self, name):
+    def _get_rep_rules(self, name):
         """
         Get the filetype-specific regexes (headers, comments. switches)
 
@@ -1281,6 +1286,10 @@ class PyMaker:
             language-specific regexes for matching header lines, comments, and
             switches.
         """
+
+        # default result is empty dict (to match declaration in __init__)
+        # NB: empty dict means unknown type rep
+        self._dict_rep_rules = {}
 
         # iterate over reps
         for _key, val in PP.D_TYPE_REP.items():
@@ -1294,11 +1303,7 @@ class PyMaker:
 
             # if we match ext, return only rep stuff
             if name.suffix in exts:
-                self._dict_type_rep = val[PP.S_KEY_REP_REP]
-                return
-
-        # default result is py type rep
-        self._dict_type_rep = PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP]
+                self._dict_rep_rules = val[PP.S_KEY_REP_REP]
 
     # --------------------------------------------------------------------------
     # Combine reqs from template/all and template/prj_type
@@ -1314,7 +1319,7 @@ class PyMaker:
         those used by specific project type (gui needs pygobject, etc).
         """
 
-        # get sources and filter out items that don't exist
+        # get sources and filter out sources that don't exist
         reqs_prj = PP.S_FILE_REQS_TYPE.format(prj_type_long)
         src = [
             self.P_DIR_PP / PP.S_FILE_REQS_ALL,
@@ -1333,7 +1338,8 @@ class PyMaker:
             with open(item, "r", encoding=PP.S_ENCODING) as a_file:
                 old_file = a_file.readlines()
                 old_file = [line.rstrip() for line in old_file]
-                new_file = new_file + old_file
+                uniq = set(new_file + old_file)
+                new_file = list(uniq)
 
         # put combined reqs into final file
         joint = "\n".join(new_file)

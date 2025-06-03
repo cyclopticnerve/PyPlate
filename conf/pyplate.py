@@ -1203,6 +1203,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
     'dict_pub' dicts before any copying occurs.
     """
 
+
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
@@ -1342,6 +1343,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
             # show info
             print(S_ACTION_DONE)
 
+
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
@@ -1452,6 +1454,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_IMG_ABOUT__"] = (
         f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}.png"
     )
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1834,6 +1837,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # print done
     print(S_ACTION_DONE)
 
+
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
@@ -1873,6 +1877,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         except Exception as e:
             print(S_ACTION_FAIL)
             raise e
+
 
 # ------------------------------------------------------------------------------
 # Do any work after making dist
@@ -1967,6 +1972,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         # show info
         print(S_ACTION_DONE)
 
+
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
@@ -1992,45 +1998,45 @@ def _fix_meta(path, dict_prv, dict_pub):
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # do md/html/xml separately (needs special handling)
-    dict_type_rep = _get_type_rep(path)
+    dict_rep_rules = _get_type_rep(path)
 
     # fix docs
     if path.name == S_FILE_LOGO:
-        _fix_docs(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_docs(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix readme
     if path.name == S_FILE_README:
-        _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix pyproject
     if path.name == S_FILE_TOML:
-        _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix inst
     if path.name == S_FILE_INST_CFG:
-        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix uninst
     if path.name == S_FILE_UNINST_CFG:
-        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix ,desktop files
     if path.suffix in L_EXT_DESKTOP:
-        _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix ui files
     if path.suffix in L_EXT_GTK:
-        _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
     # fix src files
     if path.suffix in L_EXT_SRC:
-        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep)
+        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
 
 
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the docs logo.mako file
 # ------------------------------------------------------------------------------
-def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_type_rep):
+def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
     """
     Remove/replace parts of the docs logo file
 
@@ -2063,7 +2069,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_type_rep):
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
-def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rep):
+def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
     """
     Remove/replace parts of the main README file
 
@@ -2120,7 +2126,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rep):
 # ------------------------------------------------------------------------------
 # Replace text in the pyproject file
 # ------------------------------------------------------------------------------
-def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rep):
+def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
     """
     Replace text in the pyproject file
 
@@ -2169,7 +2175,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rep):
 # --------------------------------------------------------------------------
 # Fix the version number in install/uninstall files
 # --------------------------------------------------------------------------
-def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rep):
+def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
     """
     Fix the version number in install/uninstall files
 
@@ -2199,7 +2205,7 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rep):
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file
 # ------------------------------------------------------------------------------
-def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_type_rep):
+def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_rep_rules):
     """
     Replace text in the desktop file
 
@@ -2257,7 +2263,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_type_rep):
 # ------------------------------------------------------------------------------
 # Replace text in the UI files
 # ------------------------------------------------------------------------------
-def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rep):
+def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
     """
     Replace text in the UI files
 
@@ -2296,7 +2302,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rep):
 # --------------------------------------------------------------------------
 # Fix the version number and short description in source files
 # --------------------------------------------------------------------------
-def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
+def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules):
     """
     Fix the version number and short description in source files
 
@@ -2315,7 +2321,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
     # NB: this is an example of using switches to control line replacement
 
     # skip unknown file types
-    if not dict_type_rep:
+    if not dict_rep_rules:
         return
 
     # the switch statuses
@@ -2347,8 +2353,8 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
         comm = ""
 
         # find split sequence
-        split_sch = dict_type_rep[S_KEY_SPLIT]
-        split_grp = dict_type_rep[S_KEY_SPLIT_COMM]
+        split_sch = dict_rep_rules[S_KEY_SPLIT]
+        split_grp = dict_rep_rules[S_KEY_SPLIT_COMM]
 
         # there may be multiple matches per line (ignore quoted markers)
         matches = re.finditer(split_sch, line)
@@ -2372,7 +2378,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
         _check_switches(
             code,
             comm,
-            dict_type_rep,
+            dict_rep_rules,
             dict_sw_block,
             dict_sw_line,
         )
@@ -2407,17 +2413,18 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rep):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
+
 # --------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
 # --------------------------------------------------------------------------
-# def _check_switches(line, dict_type_rep, dict_sw_block, dict_sw_line):
-def _check_switches(code, comm, dict_type_rep, dict_sw_block, dict_sw_line):
+# def _check_switches(line, dict_rep_rules, dict_sw_block, dict_sw_line):
+def _check_switches(code, comm, dict_rep_rules, dict_sw_block, dict_sw_line):
     """
     Check if line or trailing comment is a switch
 
     Args:
         line: The line to check for switches
-        dict_type_rep: Dictionary containing the regex to look for
+        dict_rep_rules: Dictionary containing the regex to look for
         dict_sw_block: Dictionary of switch values for block switches
         dict_sw_line: Dictionary of switch values for line switches
 
@@ -2428,19 +2435,19 @@ def _check_switches(code, comm, dict_type_rep, dict_sw_block, dict_sw_line):
     """
 
     # switch does not appear anywhere in line
-    res = re.search(dict_type_rep[S_KEY_SW_SCH], comm)
+    res = re.search(dict_rep_rules[S_KEY_SW_SCH], comm)
     if not res:
         return
 
     # find all matches (case insensitive)
-    matches = re.finditer(dict_type_rep[S_KEY_SW_SCH], comm)
+    matches = re.finditer(dict_rep_rules[S_KEY_SW_SCH], comm)
 
     # for each match
     for match in matches:
 
         # get key/val of switch
-        key = match.group(dict_type_rep[S_KEY_SW_KEY])
-        val = match.group(dict_type_rep[S_KEY_SW_VAL])
+        key = match.group(dict_rep_rules[S_KEY_SW_KEY])
+        val = match.group(dict_rep_rules[S_KEY_SW_VAL])
 
         # try a bool conversion
         # NB: in honor of John Valby (ddg him!)
