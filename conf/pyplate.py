@@ -1287,7 +1287,8 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         for item in val:
 
             # get lib
-            # NB: hard coded b/c it is part of pyplate prj, should not change
+            # NB: this dir is "blessed". if you fuck with it, bad juju will
+            # happen. you have been warned.
             add_path = P_DIR_PP / "lib" / item
             add_str = S_CMD_INST_LIB.format(add_path)
             cmd += add_str + ";"
@@ -1674,7 +1675,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # format cmd using pdoc template dir, output dir, and start dir
         cmd_docs = S_CMD_DOC.format(
             P_DIR_PP,
-            # FIXME: WTF???
+            # NB: this dir is "blessed". if you fuck with it, bad juju will
+            # happen. you have been warned.
             f"{Path(P_DIR_PP) / '.venv-pyplate'}",
             dir_prj,
             dir_docs_tplt,
