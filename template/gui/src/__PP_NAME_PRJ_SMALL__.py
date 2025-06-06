@@ -337,11 +337,11 @@ class __PP_NAME_PRJ_PASCAL__:
         # ----------------------------------------------------------------------
 
         # assume def
-        if path_def and path_def.exists():
+        if path_def:
             self._path_cfg = path_def
 
         # arg supersedes def
-        if self._path_cfg_arg and self._path_cfg_arg.exists():
+        if self._path_cfg_arg:
             self._path_cfg = self._path_cfg_arg
 
     # --------------------------------------------------------------------------

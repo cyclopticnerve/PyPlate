@@ -609,9 +609,10 @@ class CNPotPy:
                     f".{item}" if not item.startswith(".") else item
                     for item in ext_list
                 ]
+                exts = [item.lower() for item in exts]
 
                 # get all paths that match file ext
-                files = [f for f in paths if f.suffix in exts]
+                files = [f for f in paths if f.suffix.lower() in exts]
 
                 # make sure the key exists
                 if not clang in dict_res_src:

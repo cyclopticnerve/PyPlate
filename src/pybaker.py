@@ -178,7 +178,7 @@ class PyBaker:
         # internal props
         self._dir_prj = Path()
         self._dict_rep = {}
-        self._dict_rep_rules = {}
+        self._dict_type_rules = {}
         self._dict_sw_block = {}
         self._dict_sw_line = {}
 
@@ -438,7 +438,9 @@ class PyBaker:
         # check version before we start
         version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
         if not self._check_sem_ver(version):
-            print(PP.S_ERR_SEM_VER)
+            res = input(PP.S_ERR_SEM_VER).strip()
+            if res in ["", PP.S_ERR_SEM_VER_N]:
+                sys.exit()
 
         # combine dicts for string replacement
         self._dict_rep = F.combine_dicts(
@@ -679,9 +681,6 @@ class PyBaker:
             # set the list as the result list
             dict_bl[key] = result
 
-        # return dict with path objects
-        # return dict_res
-
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
@@ -700,8 +699,14 @@ class PyBaker:
         header line or a code line. Ignore blank lines and comment-only lines.
         """
 
-        # skip unknown file types
-        self._get_type_rep(path)
+        # check for unknown file types
+        self._get_type_rules(path)
+        if not self._dict_type_rules or len(self._dict_type_rules) == 0:
+
+            # do the basic replace (file got here after skip_all/skip_contents
+            # BUT NOT skip_bl/skip/code)
+            self._fix_text(path)
+            return
 
         # default lines
         lines = []
@@ -728,47 +733,50 @@ class PyBaker:
             comm = ""
 
             # find split sequence
-            split_sch = self._dict_rep_rules[PP.S_KEY_SPLIT]
-            split_grp = self._dict_rep_rules[PP.S_KEY_SPLIT_COMM]
+            split_sch = self._dict_type_rules.get(PP.S_KEY_SPLIT, None)
+            split_grp = self._dict_type_rules.get(PP.S_KEY_SPLIT_COMM, None)
 
-            # there may be multiple matches per line (ignore quoted markers)
-            matches = re.finditer(split_sch, line)
+            # only process files with split
+            if split_sch and split_grp:
 
-            # only use matches that have the right group
-            matches = [match for match in matches if match.group(split_grp)]
-            for match in matches:
+                # there may be multiple matches per line (ignore quoted markers)
+                matches = re.finditer(split_sch, line)
 
-                # split the line into code and comment (including delimiter)
-                split_pos = match.start(split_grp)
-                code = line[:split_pos]
-                comm = line[split_pos:]
+                # only use matches that have the right group
+                matches = [match for match in matches if match.group(split_grp)]
+                for match in matches:
 
-            # ------------------------------------------------------------------
-            # check for switches
+                    # split the line into code and comment (include delimiter)
+                    split_pos = match.start(split_grp)
+                    code = line[:split_pos]
+                    comm = line[split_pos:]
 
-            # reset line switch values to block switch values
-            self._dict_sw_line = dict(self._dict_sw_block)
+                # ------------------------------------------------------------------
+                # check for switches
 
-            # check switches
-            self._check_switches(
-                code,
-                comm,
-                self._dict_rep_rules,
-                self._dict_sw_block,
-                self._dict_sw_line,
-            )
+                # reset line switch values to block switch values
+                self._dict_sw_line = dict(self._dict_sw_block)
 
-            # check for block or line replace switch
-            repl = False
-            if (
-                self._dict_sw_block[PP.S_SW_REPLACE] is True
-                and self._dict_sw_line[PP.S_SW_REPLACE] is True
-            ) or self._dict_sw_line[PP.S_SW_REPLACE] is True:
-                repl = True
+                # check switches
+                self._check_switches(
+                    code,
+                    comm,
+                    self._dict_type_rules,
+                    self._dict_sw_block,
+                    self._dict_sw_line,
+                )
 
-            # switch says no, gtfo
-            if not repl:
-                continue
+                # check for block or line replace switch
+                repl = False
+                if (
+                    self._dict_sw_block[PP.S_SW_REPLACE] is True
+                    and self._dict_sw_line[PP.S_SW_REPLACE] is True
+                ) or self._dict_sw_line[PP.S_SW_REPLACE] is True:
+                    repl = True
+
+                # switch says no, gtfo
+                if not repl:
+                    continue
 
             # ------------------------------------------------------------------
             # check for header
@@ -777,7 +785,7 @@ class PyBaker:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = self._dict_rep_rules[PP.S_KEY_HDR]
+                str_pattern = self._dict_type_rules[PP.S_KEY_HDR_SCH]
                 res = re.search(str_pattern, line)
                 if res:
 
@@ -824,15 +832,15 @@ class PyBaker:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = self._dict_rep_rules[PP.S_KEY_HDR]
+        str_pattern = self._dict_type_rules[PP.S_KEY_HDR_SCH]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
         # pull out lead, val, and pad using group match values from M
-        lead = res.group(self._dict_rep_rules[PP.S_KEY_LEAD])
-        val = res.group(self._dict_rep_rules[PP.S_KEY_VAL])
-        pad = res.group(self._dict_rep_rules[PP.S_KEY_PAD])
+        lead = res.group(self._dict_type_rules[PP.S_KEY_LEAD])
+        val = res.group(self._dict_type_rules[PP.S_KEY_VAL])
+        pad = res.group(self._dict_type_rules[PP.S_KEY_PAD])
 
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
@@ -892,13 +900,14 @@ class PyBaker:
         Replace dunders inside a file's contents
 
         Args:
-            code: The code portion of the line to replace text in
+            path: The path to the file to fix text
 
         Returns:
             The new line of code
 
-        Replaces text inside the code portion of a  line. This is a qnd
-        function to replace any dunder in any file, regardless of D_TYPE_REP.
+        Replaces text inside the a file. This is a qnd function to replace any
+        dunder in any file, regardless of D_TYPE_RULES. Think of it as an
+        oubliette for fi;es you just want to 'undunderize'.
         """
 
         # default lines
@@ -968,39 +977,39 @@ class PyBaker:
     # Check if line or trailing comment is a switch
     # --------------------------------------------------------------------------
     def _check_switches(
-        self, code, comm, dict_rep_rules, dict_sw_block, dict_sw_line
+        self, code, comm, dict_type_rules, dict_sw_block, dict_sw_line
     ):
         """
         Check if line or trailing comment is a switch
 
         Args:
             comm: The comment part of a line to check for switches
-            dict_rep_rules: Dictionary containing the regex to look for
+            dict_type_rules: Dictionary containing the regex to look for
             dict_sw: Dictionary of switch values for either block or line
             switches
 
         This method checks to see if a line or trailing comment contains a
-        valid switch for the values in dict_rep_rules. If a valid switch is
+        valid switch for the values in dict_type_rules. If a valid switch is
         found, it sets the appropriate flag in either dict_sw_block or
         dict_sw_line.
         """
 
         # switch does not appear anywhere in line
-        res = re.search(dict_rep_rules[PP.S_KEY_SW_SCH], comm)
+        res = re.search(dict_type_rules[PP.S_KEY_SW_SCH], comm)
         if not res:
             return
 
         # find all matches (case insensitive)
         matches = re.finditer(
-            dict_rep_rules[PP.S_KEY_SW_SCH], comm, flags=re.I
+            dict_type_rules[PP.S_KEY_SW_SCH], comm, flags=re.I
         )
 
         # for each match
         for match in matches:
 
             # get key/val of switch
-            key = match.group(dict_rep_rules[PP.S_KEY_SW_KEY])
-            val = match.group(dict_rep_rules[PP.S_KEY_SW_VAL])
+            key = match.group(dict_type_rules[PP.S_KEY_SW_KEY])
+            val = match.group(dict_type_rules[PP.S_KEY_SW_VAL])
 
             # try a bool conversion
             # NB: in honor of John Valby (ddg him!)
@@ -1102,7 +1111,7 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
         # fix dunders in dict_pub w/o _dict_rep (project.json)
-        self._fix_text(path_pub)
+        self._fix_contents(path_pub)
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
@@ -1111,12 +1120,12 @@ class PyBaker:
     # --------------------------------------------------------------------------
     # Get the filetype-specific regexes (headers, comments. switches)
     # --------------------------------------------------------------------------
-    def _get_type_rep(self, name):
+    def _get_type_rules(self, path):
         """
         Get the filetype-specific regexes (headers, comments. switches)
 
         Args:
-            name: Name of the file go get the dict of regexes for
+            path: Path of the file go get the dict of regexes for
 
         Returns:
             The dict of regexes for this file type. This dict contains
@@ -1124,23 +1133,26 @@ class PyBaker:
             switches.
         """
 
+        # default result is empty dict (to match declaration in __init__)
+        # NB: empty dict means unknown type rep
+        self._dict_type_rules = {}
+
         # iterate over reps
-        for _key, val in PP.D_TYPE_REP.items():
+        for _key, val in PP.D_TYPE_RULES.items():
 
             # fix ets if necessary
-            exts = val[PP.S_KEY_REP_EXT]
+            exts = val[PP.S_KEY_RULES_EXT]
             exts = [
                 f".{item}" if not item.startswith(".") else item
                 for item in exts
             ]
+            exts = [item.lower() for item in exts]
 
             # if we match ext, return only rep stuff
-            if name.suffix in exts:
-                self._dict_rep_rules = val[PP.S_KEY_REP_REP]
+            # NB: also handles dot files (FUUUUUUCK)
+            if path.suffix.lower() in exts or path.name.lower() in exts:
+                self._dict_type_rules = val[PP.S_KEY_RULES_REP]
                 return
-
-        # default result is py type rep
-        self._dict_rep_rules = PP.D_TYPE_REP[PP.S_KEY_REP_PY][PP.S_KEY_REP_REP]
 
 
 # ------------------------------------------------------------------------------

@@ -142,8 +142,13 @@ S_ERR_PP_INVALID = _("One or more PyPlate data files are corrupted")
 # I18N: invalid version string format
 S_ERR_SEM_VER = _(
     "Warning: version number does not match S_SEM_VER_VALID \n"
-    "See https://semver.org/"
+    "See https://semver.org/\n"
+    "Do you wish to continue? y/N"
 )
+# I18N: continue with bad sem ver
+S_ERR_SEM_VER_Y = _("y")
+# I18N: quit if bad sem ver (the default, should be capitalized)
+S_ERR_SEM_VER_N = _("N")
 # I18N: Cannot run pymaker in PyPlate dir
 S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
 # NB: format params are S_FILE_DSK_TMP and __PP_FILE_DESK__
@@ -257,11 +262,11 @@ S_KEY_META_DEPS = "META_DEPS"
 S_KEY_META_CATS = "META_CATS"
 
 # python header/split dict keys
-S_KEY_REP_PY = "S_KEY_REP_PY"
-S_KEY_REP_MUD = "S_KEY_REP_MUD"
-S_KEY_REP_EXT = "S_KEY_REP_EXT"
-S_KEY_REP_REP = "S_KEY_REP_REP"
-S_KEY_HDR = "S_KEY_HDR"
+S_KEY_RULES_HASH = "S_KEY_RULES_HASH"
+S_KEY_RULES_MUD = "S_KEY_RULES_MUD"
+S_KEY_RULES_EXT = "S_KEY_RULES_EXT"
+S_KEY_RULES_REP = "S_KEY_RULES_REP"
+S_KEY_HDR_SCH = "S_KEY_HDR_SCH"
 S_KEY_LEAD = "S_KEY_GRP_LEAD"
 S_KEY_VAL = "S_KEY_GRP_VAL"
 S_KEY_PAD = "S_KEY_GRP_PAD"
@@ -536,7 +541,10 @@ L_TYPES = [
     ],
 ]
 
-# list of file types to use md/html/xml fixer
+# list of filetypes that use hash for comments
+L_EXT_HASH = [".py", ".toml", ".gitignore",]
+
+# list of file types to use md/html/xml comments
 L_EXT_MARKUP = [
     ".md",
     ".html",
@@ -1114,18 +1122,18 @@ D_UNINSTALL = {
 }
 
 # map file ext to rep type
-D_TYPE_REP = {
-    S_KEY_REP_PY: {
-        S_KEY_REP_EXT: L_EXT_SRC,
-        S_KEY_REP_REP: {
+D_TYPE_RULES = {
+    S_KEY_RULES_HASH: {
+        S_KEY_RULES_EXT: L_EXT_HASH,
+        S_KEY_RULES_REP: {
             # header stuff
-            S_KEY_HDR: r"^(\s*#\s*\S*\s*:\s*)(\S+)(.*)$",
+            S_KEY_HDR_SCH: r"^(\s*#\s*\S*\s*:\s*)(\S+)(.*)$",
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_PAD: 3,
             # code stuff
             # NB: match first occurrence of unquoted marker to end of line
-            S_KEY_SPLIT: r"[\'\"].*[\'\"]|(#.*)",
+            S_KEY_SPLIT: r"[\'\"].*?[\'\"]|(#.*)",
             S_KEY_SPLIT_COMM: 1,
             # switch stuff
             S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*(\S*)",
@@ -1133,22 +1141,24 @@ D_TYPE_REP = {
             S_KEY_SW_VAL: 2,
         },
     },
-    S_KEY_REP_MUD: {
-        S_KEY_REP_EXT: L_EXT_MARKUP,
-        S_KEY_REP_REP: {
+    S_KEY_RULES_MUD: {
+        S_KEY_RULES_EXT: L_EXT_MARKUP,
+        S_KEY_RULES_REP: {
             # header stuff
-            S_KEY_HDR: r"^(\s*<!--\s*\S*\s*:\s*)(\S+)(.*-->.*)$",
+            S_KEY_HDR_SCH: r"^(\s*<!--\s*\S*\s*:\s*)(\S+)(.*-->.*)$",
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_PAD: 3,
             # code stuff
             # NB: match first occurrence of unquoted marker to end of line
-            S_KEY_SPLIT: r"[\'\"].*[\'\"]|(<!--.*)",
-            S_KEY_SPLIT_COMM: 1,
-            # switch stuff
-            S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*)\s*=\s*(\S*)",
-            S_KEY_SW_KEY: 1,
-            S_KEY_SW_VAL: 2,
+            # S_KEY_SPLIT: r"[\'\"].*[\'\"]|(<!--.*)",
+            # match whole line (block sw only)
+            # S_KEY_SPLIT: r"[\'\"].*?[\'\"]|(<!--.*?-->)",
+            # S_KEY_SPLIT_COMM: 1,
+            # # switch stuff
+            # S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*?)\s*=\s*(\S*?)(\s|-->)",
+            # S_KEY_SW_KEY: 1,
+            # S_KEY_SW_VAL: 2,
         },
     },
 }
@@ -1599,7 +1609,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         path_po = dir_prj / S_DIR_I18N / S_DIR_PO
         for root, root_dirs, root_files in path_po.walk():
             files = [root / file for file in root_files]
-            files = [file for file in files if file.suffix == ".po"]
+            files = [file for file in files if file.suffix.lower() == ".po"]
             for item in files:
 
                 # get sub-dicts we need
@@ -1680,7 +1690,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # get full paths
             files = [root / f for f in files]
-            files = [f for f in files if f.suffix == ".html"]
+            files = [f for f in files if f.suffix.lower() == ".html"]
 
             # for each html file
             for f in files:
@@ -1764,7 +1774,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         for root_file in root_files:
 
             # only fix po files
-            if not root_file.suffix == ".po":
+            if not root_file.suffix.lower() == ".po":
                 continue
 
             # default text if we can't open file
@@ -1799,7 +1809,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # NB: this function uses the blacklist to filter files at the very end of
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
-    # dict_prv have been sanitized
+    # dict_prv have been undunderized
     dict_bl = dict_pub[S_KEY_PUB_BL]
 
     # just shorten the names
@@ -1998,45 +2008,45 @@ def _fix_meta(path, dict_prv, dict_pub):
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # do md/html/xml separately (needs special handling)
-    dict_rep_rules = _get_type_rep(path)
+    dict_type_rules = _get_type_rules(path)
 
     # fix docs
     if path.name == S_FILE_LOGO:
-        _fix_docs(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+        _fix_docs(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix readme
     if path.name == S_FILE_README:
-        _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+        _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix pyproject
     if path.name == S_FILE_TOML:
-        _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+        _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix inst
     if path.name == S_FILE_INST_CFG:
-        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix uninst
     if path.name == S_FILE_UNINST_CFG:
-        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
-    # fix ,desktop files
-    if path.suffix in L_EXT_DESKTOP:
-        _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+    # fix desktop
+    if _get_path_in_list(path, L_EXT_DESKTOP):
+        _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix ui files
-    if path.suffix in L_EXT_GTK:
-        _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+    if _get_path_in_list(path, L_EXT_GTK):
+        _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix src files
-    if path.suffix in L_EXT_SRC:
-        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules)
+    if _get_path_in_list(path, L_EXT_SRC):
+        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
 
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the docs logo.mako file
 # ------------------------------------------------------------------------------
-def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
+def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
     """
     Remove/replace parts of the docs logo file
 
@@ -2069,7 +2079,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
-def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
+def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     """
     Remove/replace parts of the main README file
 
@@ -2126,7 +2136,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
 # ------------------------------------------------------------------------------
 # Replace text in the pyproject file
 # ------------------------------------------------------------------------------
-def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
+def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     """
     Replace text in the pyproject file
 
@@ -2175,7 +2185,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
 # --------------------------------------------------------------------------
 # Fix the version number in install/uninstall files
 # --------------------------------------------------------------------------
-def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
+def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
     """
     Fix the version number in install/uninstall files
 
@@ -2184,8 +2194,8 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
 
-    Fixes the version number and short description in any file whose extension
-    is in L_EXT_SRC.
+    Fixes the version number and short description in any file whose name
+    matches S_FILE_INST_CFG or S_FILE_UNINST_CFG.
     """
 
     # get version from project.json
@@ -2205,7 +2215,7 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_rep_rules):
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file
 # ------------------------------------------------------------------------------
-def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_rep_rules):
+def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_type_rules):
     """
     Replace text in the desktop file
 
@@ -2263,7 +2273,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_rep_rules):
 # ------------------------------------------------------------------------------
 # Replace text in the UI files
 # ------------------------------------------------------------------------------
-def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
+def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     """
     Replace text in the UI files
 
@@ -2302,7 +2312,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_rep_rules):
 # --------------------------------------------------------------------------
 # Fix the version number and short description in source files
 # --------------------------------------------------------------------------
-def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules):
+def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     """
     Fix the version number and short description in source files
 
@@ -2319,10 +2329,6 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules):
     """
 
     # NB: this is an example of using switches to control line replacement
-
-    # skip unknown file types
-    if not dict_rep_rules:
-        return
 
     # the switch statuses
     dict_sw_block = dict(D_SWITCH_DEF)
@@ -2353,8 +2359,8 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules):
         comm = ""
 
         # find split sequence
-        split_sch = dict_rep_rules[S_KEY_SPLIT]
-        split_grp = dict_rep_rules[S_KEY_SPLIT_COMM]
+        split_sch = dict_type_rules[S_KEY_SPLIT]
+        split_grp = dict_type_rules[S_KEY_SPLIT_COMM]
 
         # there may be multiple matches per line (ignore quoted markers)
         matches = re.finditer(split_sch, line)
@@ -2378,7 +2384,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules):
         _check_switches(
             code,
             comm,
-            dict_rep_rules,
+            dict_type_rules,
             dict_sw_block,
             dict_sw_line,
         )
@@ -2417,14 +2423,14 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_rep_rules):
 # --------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
 # --------------------------------------------------------------------------
-# def _check_switches(line, dict_rep_rules, dict_sw_block, dict_sw_line):
-def _check_switches(code, comm, dict_rep_rules, dict_sw_block, dict_sw_line):
+# def _check_switches(line, dict_type_rules, dict_sw_block, dict_sw_line):
+def _check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
     """
     Check if line or trailing comment is a switch
 
     Args:
         line: The line to check for switches
-        dict_rep_rules: Dictionary containing the regex to look for
+        dict_type_rules: Dictionary containing the regex to look for
         dict_sw_block: Dictionary of switch values for block switches
         dict_sw_line: Dictionary of switch values for line switches
 
@@ -2435,26 +2441,24 @@ def _check_switches(code, comm, dict_rep_rules, dict_sw_block, dict_sw_line):
     """
 
     # switch does not appear anywhere in line
-    res = re.search(dict_rep_rules[S_KEY_SW_SCH], comm)
+    res = re.search(dict_type_rules[S_KEY_SW_SCH], comm)
     if not res:
         return
 
     # find all matches (case insensitive)
-    matches = re.finditer(dict_rep_rules[S_KEY_SW_SCH], comm)
+    matches = re.finditer(dict_type_rules[S_KEY_SW_SCH], comm, flags=re.I)
 
     # for each match
     for match in matches:
 
         # get key/val of switch
-        key = match.group(dict_rep_rules[S_KEY_SW_KEY])
-        val = match.group(dict_rep_rules[S_KEY_SW_VAL])
+        key = match.group(dict_type_rules[S_KEY_SW_KEY])
+        val = match.group(dict_type_rules[S_KEY_SW_VAL])
 
         # try a bool conversion
-        # NB: in honor of John Valby (ddg him!)
-        val_b = val.lower()
-        if val_b == "true":
+        if val.lower() == "true":
             val = True
-        elif val_b == "false":
+        elif val.lower() == "false":
             val = False
 
         # pick a dict based on if there is preceding code
@@ -2464,35 +2468,59 @@ def _check_switches(code, comm, dict_rep_rules, dict_sw_block, dict_sw_line):
             dict_sw_line[key] = val
 
 
-# --------------------------------------------------------------------------
-# Get the filetype-specific regexes
-# --------------------------------------------------------------------------
-def _get_type_rep(name):
+# ------------------------------------------------------------------------------
+# Get the filetype-specific regexes (headers, comments. switches)
+# ------------------------------------------------------------------------------
+def _get_type_rules(path):
     """
-    Get the filetype-specific regexes
+    Get the filetype-specific regexes (headers, comments. switches)
 
     Args:
-        name: Name of the file to get the dict of regexes for
+        path: Path of the file to get the dict of regexes for
 
     Returns:
         The dict of regexes for this file type
     """
 
     # iterate over reps
-    for _key, val in D_TYPE_REP.items():
+    for _key, val in D_TYPE_RULES.items():
 
         # fix ets if necessary
-        exts = val[S_KEY_REP_EXT]
-        exts = [
-            f".{item}" if not item.startswith(".") else item for item in exts
-        ]
+        exts = val[S_KEY_RULES_EXT]
 
-        # if we match ext, return only rep stuff
-        if name.suffix in exts:
-            return val[S_KEY_REP_REP]
+        # # if we match ext, return only rep stuff
+        if _get_path_in_list(path, exts):
+            return val[S_KEY_RULES_REP]
 
     # default result is py rep
-    return dict(D_TYPE_REP[S_KEY_REP_PY][S_KEY_REP_REP])
+    return {}
 
+
+# ------------------------------------------------------------------------------
+# Check if a file is in a list of file extensions
+# ------------------------------------------------------------------------------
+def _get_path_in_list(path, lst):
+    """
+    Check if a file is in a list of file extensions
+
+    Args:
+        path: The file to find
+        lst: The list to look in
+
+    Returns:
+        Whether the file exists in the list
+    """
+
+    # lowercase the list
+    l_ext = [item.lower() for item in lst]
+
+    # add dots
+    l_ext = [
+        f".{item}" if not item.startswith(".") else item for item in l_ext
+    ]
+
+    # check if the suffix or the filename (for dot files) matches
+    # NB: also checks for dot files
+    return (path.suffix.lower() in l_ext or path.name.lower() in l_ext)
 
 # -)
