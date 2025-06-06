@@ -72,12 +72,18 @@ B_DEBUG = False
 # Strings
 # ------------------------------------------------------------------------------
 
+S_WLANG = "en"
 # default encoding
 S_ENCODING = "UTF-8"
 # I18N: default date format
 S_DATE_FMT = _("%m/%d/%Y")
 # I18N: def deps
 S_DEPS_NONE = _("None")
+# default image ext
+# NB: MAKE SURE TO INCLUDE DOT (NOT SANITIZED)
+S_IMG_EXT = ".png"
+# terminal command to go up one level
+S_LVL_UP = "../"
 
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
@@ -252,7 +258,7 @@ S_KEY_DBG_I18N = "DBG_I18N"
 S_KEY_DBG_DOCS = "DBG_DOCS"
 S_KEY_DBG_INST = "DBG_INST"
 S_KEY_DBG_TREE = "DBG_TREE"
-S_KEY_REM_DIST = "DBG_DIST"
+S_KEY_DBG_DIST = "DBG_DIST"
 
 # keys for meta dict
 S_KEY_META_VERSION = "META_VERSION"
@@ -536,13 +542,17 @@ L_TYPES = [
     ],
     [
         "p",
-        "PKG",
+        "Package",
         "pkg",
     ],
 ]
 
 # list of filetypes that use hash for comments
-L_EXT_HASH = [".py", ".toml", ".gitignore",]
+L_EXT_HASH = [
+    ".py",
+    ".toml",
+    ".gitignore",
+]
 
 # list of file types to use md/html/xml comments
 L_EXT_MARKUP = [
@@ -557,6 +567,8 @@ L_EXT_MARKUP = [
 L_EXT_DESKTOP = [".desktop"]
 L_EXT_GTK = [".ui", ".glade"]
 L_EXT_SRC = [".py"]
+L_EXT_PO = [".po"]
+L_EXT_HTML = [".html"]
 
 # files to remove after the project is done
 L_PURGE_FILES = [
@@ -947,7 +959,6 @@ D_PUB_BL = {
         ".git",
         "**/.venv*",
         ".VSCodeCounter",
-        # NB: dist will have install.py in it, needs dunders
         S_DIR_DIST,
         S_DIR_DOCS,
         S_DIR_I18N,
@@ -1013,7 +1024,7 @@ D_PUB_I18N = {
         ],
     },
     # list of written languages that are available
-    S_KEY_PUB_I18N_WLANGS: ["en"],
+    S_KEY_PUB_I18N_WLANGS: [S_WLANG],
     # default charset for .pot/.po files
     S_KEY_PUB_I18N_CHAR: S_ENCODING,
 }
@@ -1026,7 +1037,7 @@ D_PUB_DBG = {
     S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
-    S_KEY_REM_DIST: True,
+    S_KEY_DBG_DIST: True,
 }
 
 # ------------------------------------------------------------------------------
@@ -1041,7 +1052,7 @@ D_DBG_PM = {
     S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
-    S_KEY_REM_DIST: False,
+    S_KEY_DBG_DIST: False,
 }
 
 # dict in pybaker to control post processing in debug mode
@@ -1052,7 +1063,7 @@ D_DBG_PB = {
     S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
-    S_KEY_REM_DIST: False,
+    S_KEY_DBG_DIST: False,
 }
 
 # dict of files that should be copied from the PyPlate project to the resulting
@@ -1276,6 +1287,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         for item in val:
 
             # get lib
+            # NB: hard coded b/c it is part of pyplate prj, should not change
             add_path = P_DIR_PP / "lib" / item
             add_str = S_CMD_INST_LIB.format(add_path)
             cmd += add_str + ";"
@@ -1451,18 +1463,23 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
 
     # various image files
-    dict_prv_prj["__PP_IMG_README__"] = f"{S_DIR_IMAGES}/{name_prj_small}.png"
-    dict_prv_prj["__PP_IMG_DOCS__"] = f"{S_DIR_IMAGES}/{name_prj_small}.png"
+    img_ext = f".{S_IMG_EXT}" if not S_IMG_EXT.startswith(".") else S_IMG_EXT
+    dict_prv_prj["__PP_IMG_README__"] = (
+        f"{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
+    )
+    dict_prv_prj["__PP_IMG_DOCS__"] = (
+        f"{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
+    )
     # NB: .desktop needs abs path to img
     dict_prv_prj["__PP_IMG_DESK__"] = (
-        f"{usr_inst}/{S_DIR_IMAGES}/{name_prj_small}.png"
+        f"{usr_inst}/{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
     # NB: .ui files need rel path to img
     dict_prv_prj["__PP_IMG_DASH__"] = (
-        f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}.png"
+        f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
     dict_prv_prj["__PP_IMG_ABOUT__"] = (
-        f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}.png"
+        f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
 
 
@@ -1531,9 +1548,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         with open(path_readme, "r", encoding=S_ENCODING) as a_file:
             text = a_file.read()
 
-        # find the remove blocks
+        # find the remove blocks (opposite of prj type)
         prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-        if prj_type == "c" or prj_type == "g":
+        if prj_type in L_APP_INSTALL:
             str_pattern = S_RM_PKG
         else:
             str_pattern = S_RM_APP
@@ -1609,7 +1626,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         path_po = dir_prj / S_DIR_I18N / S_DIR_PO
         for root, root_dirs, root_files in path_po.walk():
             files = [root / file for file in root_files]
-            files = [file for file in files if file.suffix.lower() == ".po"]
+            files = [file for file in files if _get_path_in_list(file, L_EXT_PO)]
             for item in files:
 
                 # get sub-dicts we need
@@ -1657,6 +1674,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # format cmd using pdoc template dir, output dir, and start dir
         cmd_docs = S_CMD_DOC.format(
             P_DIR_PP,
+            # FIXME: WTF???
             f"{Path(P_DIR_PP) / '.venv-pyplate'}",
             dir_prj,
             dir_docs_tplt,
@@ -1690,7 +1708,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # get full paths
             files = [root / f for f in files]
-            files = [f for f in files if f.suffix.lower() == ".html"]
+            # files = [f for f in files if f.suffix.lower() == ".html"]
+            files = [f for f in files if _get_path_in_list(f, L_EXT_HTML)]
 
             # for each html file
             for f in files:
@@ -1698,7 +1717,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 # build the dots, one set for each level
                 dots = ""
                 for _i in range(level):
-                    dots += "../"
+                    dots += S_LVL_UP
 
                 # add the image path rel to prj dir
                 dots += dict_prv[S_KEY_PRV_PRJ]["__PP_IMG_DOCS__"]
@@ -1774,7 +1793,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         for root_file in root_files:
 
             # only fix po files
-            if not root_file.suffix.lower() == ".po":
+            # if not root_file.suffix.lower() == ".po":
+            if not _get_path_in_list(root_file, L_EXT_PO):
                 continue
 
             # default text if we can't open file
@@ -1966,7 +1986,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # delete the origin dir, if key set
 
     # if debug key set
-    if dict_dbg[S_KEY_REM_DIST]:
+    if dict_dbg[S_KEY_DBG_DIST]:
 
         # print info
         print(S_ACTION_REM_DIST, end="", flush=True)
@@ -2091,6 +2111,8 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     Removes parts of the file not applicable to the current project type. Also
     fixes metadata in the file when dict_meta is present.
     """
+
+    # TODO: still has literals, but very tight and specific
 
     # the whole text of the file
     text = ""
@@ -2521,6 +2543,7 @@ def _get_path_in_list(path, lst):
 
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
-    return (path.suffix.lower() in l_ext or path.name.lower() in l_ext)
+    return path.suffix.lower() in l_ext or path.name.lower() in l_ext
+
 
 # -)

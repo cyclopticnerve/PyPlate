@@ -319,11 +319,12 @@ class PyBaker:
         # debug turns off some post processing to speed up processing
         # NB: changing values in self._dict_pub_dbg (through the functions in
         # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
+        # in debug mode. to do that, change the values of D_DBG_PB in
         # pyplate.py
         self._dict_debug = self._dict_pub_dbg
         if self._debug:
             self._dict_debug = PP.D_DBG_PB
+
         # ----------------------------------------------------------------------
 
         # maybe yell
