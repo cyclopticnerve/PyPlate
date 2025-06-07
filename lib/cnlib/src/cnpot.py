@@ -131,6 +131,7 @@ class CNPotPy:
         dict_no_ext=None,
         list_wlangs=None,
         charset=S_CHARSET,
+        location=True,
     ):
         """
         Initialize the new object
@@ -259,6 +260,9 @@ class CNPotPy:
         if charset is None:
             charset = self.S_CHARSET
         self._charset = charset
+
+        # set location prop
+        self._location = location
 
         # make sure all necessary dirs exist
         self._make_wlang_dirs()
@@ -413,7 +417,7 @@ class CNPotPy:
                 # sort entries by file
                 "-F "
                 # don't add location info (hide path to source)
-                "--no-location "
+                # "--no-location "
                 # append existing file
                 # NB: this is the key to running xgettext multiple times for
                 # one domain
@@ -428,6 +432,9 @@ class CNPotPy:
                 # add -L for specific exts
                 f"-L {clang_name} "
             )
+
+            if not self._location:
+                cmd += "--no-location "
 
             # add all input files
             paths = [f'"{item}" ' for item in clang_files]

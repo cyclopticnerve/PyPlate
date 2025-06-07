@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    res = __PP_NAME_SEC_SMALL__.func()
-    print(res)
+    RES = __PP_NAME_SEC_SMALL__.func()
+    print(RES)
 
 # -)

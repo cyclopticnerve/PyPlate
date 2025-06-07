@@ -13,8 +13,10 @@ Type=Application
 Terminal=false
 Exec=__PP_NAME_PRJ_SMALL__
 StartupWMClass = __PP_NAME_PRJ_SMALL__.py
+# I18N: program name
 Name=__PP_NAME_PRJ__
 Icon=__PP_IMG_DESK__
+# I18N: short description
 Comment=__PP_SHORT_DESC__
 Categories=
 X-Desktop-File-Install-Version=0.26

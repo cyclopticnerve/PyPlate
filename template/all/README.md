@@ -30,7 +30,7 @@ __PP_SHORT_DESC__
 __PP_VER_DISP__
 <!-- __RM_VERSION__ -->
 
-<!-- ![alt-text](README/screenshot.png) -->
+<!-- ![alt-text](readme/screenshot.png) -->
 
 ## Table of Contents
 - [Requirements](#requirements)
@@ -86,6 +86,9 @@ foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ ./install.py
 ```
 <!-- __RM_APP__ -->
 
+## Usage
+blah blah blah
+
 ## Uninstalling
 <!-- __RM_PKG__ -->
 ```bash
@@ -99,9 +102,6 @@ foo@bar:~$ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
 foo@bar:~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall$ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
-
-## Usage
-blah blah blah
 
 ## Notes
 blah blah blah

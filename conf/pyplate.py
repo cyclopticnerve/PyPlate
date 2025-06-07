@@ -42,6 +42,10 @@ from cnvenv import CNVenv
 
 # ABSOLUTE CURRENT PATH OF PyPlate
 P_DIR_PP = Path(__file__).parents[1].resolve()
+# NB: these dirs are "blessed". if you fuck with them, bad juju will happen.
+# you have been warned.
+P_DIR_PP_LIB = P_DIR_PP / "lib"
+P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -552,6 +556,7 @@ L_EXT_HASH = [
     ".py",
     ".toml",
     ".gitignore",
+    ".desktop",
 ]
 
 # list of file types to use md/html/xml comments
@@ -984,6 +989,7 @@ D_PUB_BL = {
     S_KEY_SKIP_CODE: [
         "MANIFEST.in",
         ".gitignore",
+        ".desktop",
     ],
     # fix header, fix text, skip path (1 1 0)
     # NB: not really useful, since we always want to fix paths with dunders,
@@ -1287,9 +1293,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         for item in val:
 
             # get lib
-            # NB: this dir is "blessed". if you fuck with it, bad juju will
-            # happen. you have been warned.
-            add_path = P_DIR_PP / "lib" / item
+            add_path = P_DIR_PP_LIB / item
             add_str = S_CMD_INST_LIB.format(add_path)
             cmd += add_str + ";"
 
@@ -1675,9 +1679,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # format cmd using pdoc template dir, output dir, and start dir
         cmd_docs = S_CMD_DOC.format(
             P_DIR_PP,
-            # NB: this dir is "blessed". if you fuck with it, bad juju will
-            # happen. you have been warned.
-            f"{Path(P_DIR_PP) / '.venv-pyplate'}",
+            P_DIR_PP_VENV,
             dir_prj,
             dir_docs_tplt,
             dir_docs_out,
