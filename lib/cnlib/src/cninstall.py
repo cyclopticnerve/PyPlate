@@ -91,6 +91,7 @@ class CNInstall:
     S_MSG_VENV_START = "Making venv folder... "
     S_MSG_REQS_START = "Installing requirements... "
     S_MSG_LIBS_START = "Installing libs... "
+    S_MSG_DSK_START = "Fixing .desktop file... "
     S_ASK_VER_SAME = (
         "The current version of this program is already installed. Do you"
         " want to overwrite? [y/N] "
@@ -245,6 +246,9 @@ class CNInstall:
         if not desk_file.exists():
             return
 
+        # print info
+        print(self.S_MSG_DSK_START, end="", flush=True)
+
         # open file
         text = ""
         with open(desk_file, "r", encoding="UTF-8") as a_file:
@@ -319,6 +323,7 @@ class CNInstall:
         prog_version = self._dict_cfg[self.S_KEY_VERSION]
 
         # print start msg
+        print()
         print(self.S_MSG_INST_START.format(prog_name, prog_version))
 
         # ----------------------------------------------------------------------
@@ -403,8 +408,11 @@ class CNInstall:
         # get prg name
         prog_name = self._dict_cfg[self.S_KEY_NAME]
 
-        # print, uninstall, print
+        # print
+        print()
         print(self.S_MSG_UNINST_START.format(prog_name))
+
+        # uninstall
         self._do_uninstall_content()
         print(self.S_MSG_UNINST_END.format(prog_name))
 
@@ -443,8 +451,8 @@ class CNInstall:
 
         # if it's a dry run, don't make venv
         if self._dry:
-            print(self.S_MSG_DONE)
-            print("venv cmd:", cmd)
+            print("\nvenv cmd:", cmd)
+            print(self.S_MSG_DONE, "\n")
             return
 
         # the cmd to create the venv
@@ -496,8 +504,8 @@ class CNInstall:
 
         # if it's a dry run, don't install
         if self._dry:
-            print(self.S_MSG_DONE)
-            print("reqs cmd:", cmd)
+            print("\nreqs cmd:", cmd)
+            print(self.S_MSG_DONE, "\n")
             return
 
         # the cmd to install the reqs
@@ -555,8 +563,8 @@ class CNInstall:
 
         # if it's a dry run, don't install
         if self._dry:
-            print(self.S_MSG_DONE)
-            print("libs cmd:", cmd)
+            print("\nlibs cmd:", cmd)
+            print(self.S_MSG_DONE, "\n")
             return
 
         # the command to install libs
