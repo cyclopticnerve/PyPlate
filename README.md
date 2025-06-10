@@ -8,6 +8,7 @@
 <div style="display:flex;align-items:center;">
   <div>
     <img src="images/pyplate.png">
+    PyPlate
   </div>
 </div>
 
