@@ -17,6 +17,7 @@
         </td>
     </tr>
 </table>
+![]("images/pyplate.png")
 
 ## "It mostly works" ™©®
 
