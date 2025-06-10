@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 
-<table style=boder-collapse: true>
+<table style=border-collapse: true>
     <tr>
         <td>
             <img style="display:flex;" src="images/pyplate.png" />
