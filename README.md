@@ -7,8 +7,8 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<div style="width: 100%;">
-  <img src="animated.svg" style="width: 100%;" alt="Click to see the source">
+<table style="border-collapse:true;">
+  <img src="readme/pyplate.png">
 </div>
 
 ## "It mostly works" ™©®
