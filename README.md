@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<table>
+<table cellspacing="0" cellpadding="0">
     <tr>
         <td>
             <img style="display:flex;" src="images/pyplate.png" />
