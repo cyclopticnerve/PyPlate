@@ -306,7 +306,6 @@ class PyMaker:
         # pyplate.py) will not affect the current session when running pymaker
         # in debug mode. to do that, change the values of D_DBG_PM in
         # pyplate.py
-        # NB: HOLY FUCK HOW OVER ENGINEERED IS THIS?!?!
         self._dict_debug = self._dict_pub_dbg
         if self._debug:
             self._dict_debug = PP.D_DBG_PM

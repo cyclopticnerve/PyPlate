@@ -357,6 +357,7 @@ class PyBaker:
                     continue
 
                 self._dir_prj = tmp_dir
+                print()
                 break
 
         # ----------------------------------------------------------------------

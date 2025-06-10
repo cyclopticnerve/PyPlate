@@ -477,8 +477,8 @@ S_TOML_KW_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 S_TOML_KW_REP = r"\g<1>\g<2>\g<3>[{}]"
 
 # desc/version in all files
-S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=\s*)(.*)"
-S_SRC_VER_REP = r'\g<1>"{}"'
+S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=)(.*?\")([^\"]*)(.*)"
+S_SRC_VER_REP = r"\g<1>\g<2>{}\g<4>"
 S_SRC_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
 S_SRC_DESC_REP = r"\g<1>\g<2>{}\g<4>"
 
@@ -1511,6 +1511,56 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
 
     # --------------------------------------------------------------------------
+    # metadata
+
+    # NB: this is an example of how to use the blacklist filter in your own
+    # customized fix routine
+
+    # print info
+    print(S_ACTION_META, end="", flush=True)
+
+    # NB: this function uses the blacklist to filter files at the very end of
+    # the fix process. at this point you can assume ALL dunders in ALL eligible
+    # files have been fixed, as well as paths/filenames. also dict_pub and
+    # dict_prv have been undunderized
+    dict_bl = dict_pub[S_KEY_PUB_BL]
+
+    # just shorten the names
+    skip_all = dict_bl[S_KEY_SKIP_ALL]
+    skip_contents = dict_bl[S_KEY_SKIP_CONTENTS]
+
+    # --------------------------------------------------------------------------
+    # do the fixes
+
+    # NB: root is a full path, dirs and files are relative to root
+    for root, root_dirs, root_files in dir_prj.walk():
+
+        # handle dirs in skip_all
+        if root in skip_all:
+            # NB: don't recurse into subfolders
+            root_dirs.clear()
+            continue
+
+        # convert files into Paths
+        files = [root / f for f in root_files]
+
+        # for each file item
+        for item in files:
+
+            # handle files in skip_all
+            if item in skip_all:
+                continue
+
+            # handle dirs/files in skip_contents
+            if not root in skip_contents and not item in skip_contents:
+
+                # fix content with appropriate dict
+                _fix_meta(item, dict_prv, dict_pub)
+
+    # print done
+    print(S_ACTION_DONE)
+
+    # --------------------------------------------------------------------------
     # if we are a package, here is where we will install ourselves in the venv
 
     # get project type
@@ -1817,56 +1867,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             # save file
             with open(root_file, "w", encoding=S_ENCODING) as a_file:
                 a_file.write(text)
-
-    # print done
-    print(S_ACTION_DONE)
-
-    # --------------------------------------------------------------------------
-    # metadata
-
-    # NB: this is an example of how to use the blacklist filter in your own
-    # customized fix routine
-
-    # print info
-    print(S_ACTION_META, end="", flush=True)
-
-    # NB: this function uses the blacklist to filter files at the very end of
-    # the fix process. at this point you can assume ALL dunders in ALL eligible
-    # files have been fixed, as well as paths/filenames. also dict_pub and
-    # dict_prv have been undunderized
-    dict_bl = dict_pub[S_KEY_PUB_BL]
-
-    # just shorten the names
-    skip_all = dict_bl[S_KEY_SKIP_ALL]
-    skip_contents = dict_bl[S_KEY_SKIP_CONTENTS]
-
-    # --------------------------------------------------------------------------
-    # do the fixes
-
-    # NB: root is a full path, dirs and files are relative to root
-    for root, root_dirs, root_files in dir_prj.walk():
-
-        # handle dirs in skip_all
-        if root in skip_all:
-            # NB: don't recurse into subfolders
-            root_dirs.clear()
-            continue
-
-        # convert files into Paths
-        files = [root / f for f in root_files]
-
-        # for each file item
-        for item in files:
-
-            # handle files in skip_all
-            if item in skip_all:
-                continue
-
-            # handle dirs/files in skip_contents
-            if not root in skip_contents and not item in skip_contents:
-
-                # fix content with appropriate dict
-                _fix_meta(item, dict_prv, dict_pub)
 
     # print done
     print(S_ACTION_DONE)
@@ -2263,7 +2263,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_type_rules):
         # category is not valid
         if not cat in L_CATS:
             # category is not valid, print error
-            print()
+            print("\n", path, ":")
             print(S_ERR_DESK_CAT.format(cat))
         else:
             new_cats.append(cat)
@@ -2427,28 +2427,31 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
         if not repl:
             continue
 
-        # ------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
-        # replace version
+        # replace version in line
         ver = dict_prv_prj["__PP_VER_DISP__"]
         str_sch = S_SRC_VER_SCH
         str_rep = S_SRC_VER_REP.format(ver)
-        lines[index] = re.sub(str_sch, str_rep, line, flags=re.M)
+        line = re.sub(str_sch, str_rep, line, flags=re.M)
 
-        # replace short desc
+        # replace short desc in line
         desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
         str_sch = S_SRC_DESC_SCH
         str_rep = S_SRC_DESC_REP.format(desc)
-        lines[index] = re.sub(str_sch, str_rep, line, flags=re.M)
+        line = re.sub(str_sch, str_rep, line, flags=re.M)
+
+        # replace line in lines
+        lines[index] = line
 
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
 
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # def _check_switches(line, dict_type_rules, dict_sw_block, dict_sw_line):
 def _check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
     """
