@@ -7,12 +7,12 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<style
-  type="text/css">
-h1 {color:red;}
 
-p {color:blue;}
+<style type="text/css">
+    h1 {color:red;}
+    p {color:blue;}
 </style>
+
 <table cellspacing="0" cellpadding="0">
     <tr>
         <td>
