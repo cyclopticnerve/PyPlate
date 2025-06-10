@@ -8,7 +8,7 @@
 
 <!-- make a pretty header -->
 
-<style type="text/css">
+<style>
     h1 {color:red;}
     p {color:blue;}
     table {border-collapse:true;}
