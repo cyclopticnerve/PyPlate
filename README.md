@@ -5,10 +5,9 @@
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
-<div style="display:flex;align-items:center;">
-  <div>
-    <img src="images/pyplate.png">
-    <span style="font-size:300%">PyPlate</span>
+<div style="padding-top:0px;height:500px;width:500px;">
+  <div style="width:500px;height:500px;">
+    PyPlate
   </div>
 </div>
 
