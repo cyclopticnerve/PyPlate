@@ -5,6 +5,9 @@
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
+
+!(images/pyplate.png)
+
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
