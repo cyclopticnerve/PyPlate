@@ -17,7 +17,8 @@
         </td>
     </tr>
 </table>
-![]("images/pyplate.png")
+
+[![alt-text](images/pyplate.png)](tooltip)*PyPlate*
 
 ## "It mostly works" ™©®
 
@@ -31,7 +32,7 @@ A program for creating and building CLI/Package/GUI projects in Python from a te
 Version 0.0.1+20250510.11
 <!-- __RM_VERSION__ -->
 
-<!-- ![alt-text](README/screenshot.png "screenshot") -->
+<!-- [![alt-text](readme/screenshot.png)]("tooltip") -->
 
 ## Table of Contents
 - [Requirements](#requirements)
