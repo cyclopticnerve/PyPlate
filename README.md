@@ -6,6 +6,18 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
+
+<table>
+    <tr>
+        <td>
+            <img style="display:flex;" src="images/pyplate.png" />
+        </td>
+        <td>
+            <span style="font-size:300%;font-weight:bold;">PyPlate</span>
+        </td>
+    </tr>
+</table>
+
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
