@@ -5,21 +5,15 @@
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
-
-<style>
-  table td {
-    border: none !important;
-  }
-</style>
 <table>
   <tbody>
     <tr>
-      <td>Column One</td>
-      <td>Column One</td>
+      <td style="border: none">Column One</td>
+      <td style="border: none">Column One</td>
     </tr>
     <tr>
-      <td>Content of column one</td>
-      <td>Content of column two</td>
+      <td style="border: none">Content of column one</td>
+      <td style="border: none">Content of column two</td>
     </tr>
   </tbody>
 </table>
