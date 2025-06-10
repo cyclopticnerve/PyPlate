@@ -6,13 +6,12 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-
 <style>
-  table#example-table td {
-    border: none;
+  table td {
+    border: none !important;
   }
 </style>
-<table id="example-table">
+<table>
   <tbody>
     <tr>
       <td>Column One</td>
