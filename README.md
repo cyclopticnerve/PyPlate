@@ -47,7 +47,7 @@ Version 0.0.1+20250510.11
 ## Installing
 <!-- __RM_APP__ -->
 You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest
+[latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest)
 from the main branch.<br>
 Download either the 'tar.gz' or '.zip' file and extract it.
 
