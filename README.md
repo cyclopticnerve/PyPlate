@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <div>
-  <img src="images/pyplate.png
+  <img src="images/pyplate.png">
 </div>
 
 ## "It mostly works" ™©®
