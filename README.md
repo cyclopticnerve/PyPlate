@@ -6,17 +6,8 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-<!-- make a pretty header -->
-<table>
-    <tr>
-        <td>
-            <img style="display:flex;" src="images/pyplate.png" />
-        </td>
-        <td>
-            <span style="font-size:300%;font-weight:bold;">PyPlate</span>
-        </td>
-    </tr>
-</table>
+!(images/pyplate.png)
+# PyPlate
 
 ## "It mostly works" ™©®
 

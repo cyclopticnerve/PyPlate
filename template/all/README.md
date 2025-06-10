@@ -6,17 +6,8 @@
 <!-- License : __PP_LICENSE_NAME__                             \          /  -->
 <!----------------------------------------------------------------------------->
 
-<!-- make a pretty header -->
-<table>
-    <tr>
-        <td>
-            <img style="display:flex;" src="__PP_IMG_README__" />
-        </td>
-        <td>
-            <span style="font-size:300%;font-weight:bold;">__PP_NAME_PRJ__</span>
-        </td>
-    </tr>
-</table>
+!(images/__PP_NAME_PRJ_SMALL__.png)
+# __PP_NAME_PRJ_BIG__
 
 ## "It mostly works" ™©®
 
