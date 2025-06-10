@@ -11,6 +11,7 @@
 <style type="text/css">
     h1 {color:red;}
     p {color:blue;}
+    table {border-collapse:true;}
 </style>
 
 <table cellspacing="0" cellpadding="0">
