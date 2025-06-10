@@ -6,13 +6,9 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-<!-- make a pretty header -->
-<table style="border-collapse=true;">
-  <tr>
-    <td><img src="images/pyplate.png"></td>
-    <td>PyPlate</td>
-  </tr>
-</table>
+<div>
+  <img src="images/pyplate.png
+</div>
 
 ## "It mostly works" ™©®
 
