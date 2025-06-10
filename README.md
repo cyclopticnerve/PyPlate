@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-<table style="border-collapse:true;">
+<table style="border-collapse=true;">
   <tr>
     <td><img src="images/pyplate.png"></td>
     <td>PyPlate</td>
