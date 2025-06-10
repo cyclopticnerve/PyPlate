@@ -7,7 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-# PyPlate
+<img align="left" width="200" src="https://thehappypuppysite.com/wp-content/uploads/2017/10/Cute-Dog-Names-HP-long.jpg"># PyPlate
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
