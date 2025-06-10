@@ -9,7 +9,7 @@
 <!-- make a pretty header -->
 <table style="border-collapse:true;">
   <tr>
-    <td><img src="readme/pyplate.png"></td>
+    <td><img src="images/pyplate.png"></td>
     <td>PyPlate</td>
   </tr>
 </table>
