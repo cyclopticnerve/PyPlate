@@ -6,7 +6,9 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 <div style="display:flex;align-items:center;">
-  <div></div>
+  <div>
+    <img src="images/pyplate.png">
+  </div>
 </div>
 
 ## "It mostly works" ™©®
