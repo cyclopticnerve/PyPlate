@@ -8,7 +8,7 @@
 <div style="display:flex;align-items:center;">
   <div>
     <img src="images/pyplate.png">
-    PyPlate
+    <span style="font-size:300%">PyPlate</span>
   </div>
 </div>
 
