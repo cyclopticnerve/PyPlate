@@ -6,10 +6,6 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-<div>
-  <img src="images/pyplate.png"><h1>PyPlate</h1>
-</div>
-
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
