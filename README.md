@@ -8,8 +8,11 @@
 
 <!-- make a pretty header -->
 <table style="border-collapse:true;">
-  <img src="readme/pyplate.png">
-</div>
+  <tr>
+    <td><img src="readme/pyplate.png"></td>
+    <td>PyPlate</td>
+  </tr>
+</table>
 
 ## "It mostly works" ™©®
 
