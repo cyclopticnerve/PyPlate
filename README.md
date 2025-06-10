@@ -7,14 +7,7 @@
 <!----------------------------------------------------------------------------->
 
 <!-- make a pretty header -->
-
-<style>
-    h1 {color:red;}
-    p {color:blue;}
-    table {border-collapse:true;}
-</style>
-
-
+# ** PyPlate **
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
