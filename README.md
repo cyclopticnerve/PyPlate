@@ -5,12 +5,6 @@
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
-<div style="padding-top:0px;height:500px;width:500px;">
-  <div style="width:500px;height:500px;">
-    PyPlate
-  </div>
-</div>
-
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
