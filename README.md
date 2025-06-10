@@ -14,16 +14,6 @@
     table {border-collapse:true;}
 </style>
 
-<table cellspacing="0" cellpadding="0">
-    <tr>
-        <td>
-            <img style="display:flex;" src="images/pyplate.png" />
-        </td>
-        <td>
-            <span style="font-size:300%;font-weight:bold;">PyPlate</span>
-        </td>
-    </tr>
-</table>
 
 ## "It mostly works" ™©®
 
