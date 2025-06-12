@@ -199,6 +199,8 @@ S_ACTION_AFTER = _("Do after fix... ")
 S_ACTION_GIT = _("Make git folder... ")
 # I18N: Make venv folder
 S_ACTION_VENV = _("Make venv folder... ")
+# I18N: freeze venv folder
+S_ACTION_FREEZE = _("Freezing venv... ")
 # I18N: Install libs in venv
 S_ACTION_LIB = _("Install libs in venv... ")
 # I18N: Make i18n folder
@@ -1040,7 +1042,8 @@ D_PUB_DBG = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: True,
+    # FIXME: docs no work on gui
+    S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
@@ -1086,10 +1089,10 @@ D_COPY = {
 # which libs to add to which type of project
 # key is prj short type
 # val is list of libs to add to prj type
-D_COPY_LIB = {
-    "c": ["cnlib"],
-    "g": ["cnlib"],  # "cnguilib"],
-}
+# D_COPY_LIB = {
+#     "c": ["cnlib"],
+#     "g": ["cnlib"],  # "cnguilib"],
+# }
 
 # dictionary of default stuff to put in install.json
 # NB: key is rel to prj, val is rel to home
@@ -1286,17 +1289,18 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         cmd = f"{cmd_activate};"
 
         # get list of libs for this prj type
-        prj_type_short = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-        val = D_COPY_LIB.get(prj_type_short, [])
+        # prj_type_short = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+        # val = D_COPY_LIB.get(prj_type_short, [])
 
-        # copy libs to command
-        for item in val:
+        # # copy libs to command
+        # for item in val:
 
-            # get lib
-            add_path = P_DIR_PP_LIB / item
-            add_str = S_CMD_INST_LIB.format(add_path)
-            cmd += add_str + ";"
+        #     # get lib
+        #     add_path = P_DIR_PP_LIB / item
+        #     add_str = S_CMD_INST_LIB.format(add_path)
+        #     cmd += add_str + ";"
 
+        cmd += " python -m pip install -e '/home/dana/Documents/Projects/Python/CNLib'"
         # the command to install libs
         try:
             F.sh(cmd, shell=True)
@@ -1897,7 +1901,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     if dict_dbg[S_KEY_DBG_VENV]:
 
         # print info
-        print(S_ACTION_VENV, end="", flush=True)
+        print(S_ACTION_FREEZE, end="", flush=True)
 
         # get name ov venv folder and reqs file
         dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
