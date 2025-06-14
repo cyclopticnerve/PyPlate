@@ -63,7 +63,7 @@ class PyMaker:
     P_DIR_PP = f"{Path.home()}/Documents/Projects/Python/PyPlate"
 
     # commands to run
-    S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"
+    S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv/bin/activate"
     S_CMD_RUN = f"{P_DIR_PP}/src/pymaker.py"
     S_CMD_RUN_ARGS = "{} {}"
 

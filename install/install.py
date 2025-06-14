@@ -49,7 +49,7 @@ from cnlib.src.cnformatter import CNFormatter  # type: ignore
 
 # get dirs
 P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
-P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
+P_DIR_VENV = P_DIR_USR_INST / ".venv"
 
 # get files
 P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
