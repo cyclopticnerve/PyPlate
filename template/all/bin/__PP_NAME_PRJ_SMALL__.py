@@ -64,7 +64,7 @@ class __PP_NAME_PRJ_PASCAL__:
     P_DIR_PRJ = Path.home() / "__PP_USR_INST__"
 
     # commands to run
-    S_CMD_ACTIVATE = ". ./__PP_NAME_VENV__/bin/activate"
+    S_CMD_ACTIVATE = ". __PP_NAME_VENV__/bin/activate"
     S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
     S_CMD_RUN_ARGS = "{} {}"
 

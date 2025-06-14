@@ -140,7 +140,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv-pyplate
+.venv*
 env/
 venv/
 ENV/

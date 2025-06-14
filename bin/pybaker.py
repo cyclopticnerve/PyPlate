@@ -63,7 +63,7 @@ class PyBaker:
     P_DIR_PP = f"{Path.home()}/.local/share/pyplate"
 
     # commands to run
-    S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"
+    S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv/bin/activate"
     S_CMD_RUN = f"{P_DIR_PP}/src/pybaker.py"
     S_CMD_RUN_ARGS = "{} {}"
 
