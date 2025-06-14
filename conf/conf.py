@@ -27,6 +27,7 @@ import locale
 from pathlib import Path
 import re
 import shutil
+import sys
 import tarfile
 
 # local imports
@@ -37,6 +38,19 @@ from cntree import CNTree
 from cnvenv import CNVenv
 
 # ------------------------------------------------------------------------------
+# local imports
+
+# pylint: disable=wrong-import-position
+
+# fudge the path to import conf stuff
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+sys.path.append(str(P_DIR_PRJ))
+
+import src.pyplate as PP
+
+# pylint: enable=wrong-import-position
+
+# ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
@@ -44,7 +58,6 @@ from cnvenv import CNVenv
 P_DIR_PP = Path(__file__).parents[1].resolve()
 # NB: these dirs are "blessed". if you fuck with them, bad juju will happen.
 # you have been warned.
-P_DIR_PP_LIB = P_DIR_PP / "lib"
 P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
@@ -84,7 +97,7 @@ S_DATE_FMT = _("%m/%d/%Y")
 # I18N: def deps
 S_DEPS_NONE = _("None")
 # default image ext
-# NB: MAKE SURE TO INCLUDE DOT (NOT SANITIZED)
+# NB: MAKE SURE TO INCLUDE DOT AND CASE (NOT SANITIZED)
 S_IMG_EXT = ".png"
 # terminal command to go up one level
 S_LVL_UP = "../"
@@ -1042,8 +1055,7 @@ D_PUB_DBG = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
-    # FIXME: docs no work on gui
-    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
@@ -1460,7 +1472,17 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     name_fmt = S_VER_DIST_FMT.format(name_prj_small, ver_dist)
     dict_prv_prj["__PP_DIST_DIR__"] = name_fmt
 
-    # --------------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # calculate current date
+    # NB: this is the initial create date for all files in the template
+    # new files added to the project will have their dates set to the date
+    # when pybaker was last run
+
+    # get current date and format it according to dev fmt
+    now = datetime.now()
+    fmt_date = S_DATE_FMT
+    info_date = now.strftime(fmt_date)
+    dict_prv_prj["__PP_DATE__"] = info_date
 
     # gui app/win replacements
     name_prj_pascal = dict_prv_prj["__PP_NAME_PRJ_PASCAL__"]
@@ -1472,7 +1494,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
 
     # various image files
-    img_ext = f".{S_IMG_EXT}" if not S_IMG_EXT.startswith(".") else S_IMG_EXT
+    img_ext = f".{S_IMG_EXT.lower()}" if not S_IMG_EXT.startswith(".") else S_IMG_EXT.lower()
     dict_prv_prj["__PP_IMG_README__"] = (
         f"{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
@@ -1685,7 +1707,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         path_po = dir_prj / S_DIR_I18N / S_DIR_PO
         for root, root_dirs, root_files in path_po.walk():
             files = [root / file for file in root_files]
-            files = [file for file in files if _get_path_in_list(file, L_EXT_PO)]
+            files = [
+                file for file in files if PP.is_path_in_list(file, L_EXT_PO)
+            ]
             for item in files:
 
                 # get sub-dicts we need
@@ -1716,7 +1740,11 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # docs
 
     # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
+    # FIXME: docs no work on gui
+    if (
+        dict_dbg[S_KEY_DBG_DOCS]
+        and dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"] != "g"
+    ):
 
         # print info
         print(S_ACTION_DOCS, end="", flush=True)
@@ -1767,7 +1795,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             # get full paths
             files = [root / f for f in files]
             # files = [f for f in files if f.suffix.lower() == ".html"]
-            files = [f for f in files if _get_path_in_list(f, L_EXT_HTML)]
+            files = [f for f in files if PP.is_path_in_list(f, L_EXT_HTML)]
 
             # for each html file
             for f in files:
@@ -1852,7 +1880,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # only fix po files
             # if not root_file.suffix.lower() == ".po":
-            if not _get_path_in_list(root_file, L_EXT_PO):
+            if not PP.is_path_in_list(root_file, L_EXT_PO):
                 continue
 
             # default text if we can't open file
@@ -2036,7 +2064,7 @@ def _fix_meta(path, dict_prv, dict_pub):
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # do md/html/xml separately (needs special handling)
-    dict_type_rules = _get_type_rules(path)
+    dict_type_rules = PP.get_type_rules(path)
 
     # fix docs
     if path.name == S_FILE_LOGO:
@@ -2059,15 +2087,15 @@ def _fix_meta(path, dict_prv, dict_pub):
         _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix desktop
-    if _get_path_in_list(path, L_EXT_DESKTOP):
+    if PP.is_path_in_list(path, L_EXT_DESKTOP):
         _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix ui files
-    if _get_path_in_list(path, L_EXT_GTK):
+    if PP.is_path_in_list(path, L_EXT_GTK):
         _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix src files
-    if _get_path_in_list(path, L_EXT_SRC):
+    if PP.is_path_in_list(path, L_EXT_SRC):
         _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
 
@@ -2411,7 +2439,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
         dict_sw_line = dict(dict_sw_block)
 
         # check switches
-        _check_switches(
+        PP.check_switches(
             code,
             comm,
             dict_type_rules,
@@ -2451,110 +2479,6 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
-
-
-# ------------------------------------------------------------------------------
-# Check if line or trailing comment is a switch
-# ------------------------------------------------------------------------------
-# def _check_switches(line, dict_type_rules, dict_sw_block, dict_sw_line):
-def _check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
-    """
-    Check if line or trailing comment is a switch
-
-    Args:
-        line: The line to check for switches
-        dict_type_rules: Dictionary containing the regex to look for
-        dict_sw_block: Dictionary of switch values for block switches
-        dict_sw_line: Dictionary of switch values for line switches
-
-    This method checks to see if a line or trailing comment contains a
-    valid switch (for either markup or regular files). If a valid switch is
-    found, it sets the appropriate flag in either dict_sw_block or
-    dict_sw_line.
-    """
-
-    # switch does not appear anywhere in line
-    res = re.search(dict_type_rules[S_KEY_SW_SCH], comm)
-    if not res:
-        return
-
-    # find all matches (case insensitive)
-    matches = re.finditer(dict_type_rules[S_KEY_SW_SCH], comm, flags=re.I)
-
-    # for each match
-    for match in matches:
-
-        # get key/val of switch
-        key = match.group(dict_type_rules[S_KEY_SW_KEY])
-        val = match.group(dict_type_rules[S_KEY_SW_VAL])
-
-        # try a bool conversion
-        if val.lower() == "true":
-            val = True
-        elif val.lower() == "false":
-            val = False
-
-        # pick a dict based on if there is preceding code
-        if code.strip() == "":
-            dict_sw_block[key] = val
-        else:
-            dict_sw_line[key] = val
-
-
-# ------------------------------------------------------------------------------
-# Get the filetype-specific regexes (headers, comments. switches)
-# ------------------------------------------------------------------------------
-def _get_type_rules(path):
-    """
-    Get the filetype-specific regexes (headers, comments. switches)
-
-    Args:
-        path: Path of the file to get the dict of regexes for
-
-    Returns:
-        The dict of regexes for this file type
-    """
-
-    # iterate over reps
-    for _key, val in D_TYPE_RULES.items():
-
-        # fix ets if necessary
-        exts = val[S_KEY_RULES_EXT]
-
-        # # if we match ext, return only rep stuff
-        if _get_path_in_list(path, exts):
-            return val[S_KEY_RULES_REP]
-
-    # default result is py rep
-    return {}
-
-
-# ------------------------------------------------------------------------------
-# Check if a file is in a list of file extensions
-# ------------------------------------------------------------------------------
-def _get_path_in_list(path, lst):
-    """
-    Check if a file is in a list of file extensions
-
-    Args:
-        path: The file to find
-        lst: The list to look in
-
-    Returns:
-        Whether the file exists in the list
-    """
-
-    # lowercase the list
-    l_ext = [item.lower() for item in lst]
-
-    # add dots
-    l_ext = [
-        f".{item}" if not item.startswith(".") else item for item in l_ext
-    ]
-
-    # check if the suffix or the filename (for dot files) matches
-    # NB: also checks for dot files
-    return path.suffix.lower() in l_ext or path.name.lower() in l_ext
 
 
 # -)

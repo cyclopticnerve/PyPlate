@@ -70,7 +70,7 @@
 #     """
 
 #     # --------------------------------------------------------------------------
-#     # Class methods
+#     # Instance methods
 #     # --------------------------------------------------------------------------
 
 #     # --------------------------------------------------------------------------
@@ -168,7 +168,7 @@
 #         self.window.connect("delete-event", self._evt_win_delete)
 #         self.window.connect("destroy", self._evt_win_destroy)
 
-#         # connect all subclass methods
+#         # connect all subInstance methods
 #         self._builder.connect_signals(self)
 
 #     # --------------------------------------------------------------------------

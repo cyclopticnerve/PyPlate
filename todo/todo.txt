@@ -1,5 +1,5 @@
 
-# TODO: all refs to .local, etc. should be relative to prj in ide until unstall
+# TODO: all refs to .local, etc. should be relative to prj in ide until uninstall
 # TODO: remove tooltips from docs
 # TODO: combine pyplate.py B_ flags into dict and add to project.json
 # TODO: custom exceptions (instead of except Exception as e/raise e)
@@ -64,7 +64,7 @@ TODO: D_PB_NEED : dict of what pybaker needs : key is D_PRJ_..., val is list
 of keys from that dict
 TODO: never store proj dir
 TODO: determine what lines in a file
-TODO: _fix_... that use lines[] dont need re.M
+TODO: _fix_... that use lines[] don't need re.M
 TODO: _fix_header/_fix_code use multiline
 non-rat: break on colon, do str rep on value, put back together
 with regex, replace line in array
