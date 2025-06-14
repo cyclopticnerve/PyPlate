@@ -58,7 +58,7 @@ import src.pyplate as PP
 P_DIR_PP = Path(__file__).parents[1].resolve()
 # NB: these dirs are "blessed". if you fuck with them, bad juju will happen.
 # you have been warned.
-P_DIR_PP_VENV = P_DIR_PP / ".venv"
+P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -318,7 +318,6 @@ S_DIR_BIN = "bin"
 S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
-# S_DIR_VENV = ".venv"
 S_DIR_DOCS = "docs"
 S_DIR_DOCS_TPLT = "pdoc3"
 S_DIR_MISC = "misc"
