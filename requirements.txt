@@ -1,4 +1,4 @@
-CNLib @ git+https://github.com/cyclopticnerve/CNLib@27389a87d07f4c9ee222e14deb78daeca5f5fb94
+CNLib @ git+https://github.com/cyclopticnerve/CNLib/latest
 Mako==1.3.8
 Markdown==3.7
 MarkupSafe==3.0.2
