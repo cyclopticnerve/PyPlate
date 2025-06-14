@@ -58,7 +58,7 @@ class CNWindow:
     S_ACTION_DESTROY = "destroy"
 
     # --------------------------------------------------------------------------
-    # Class methods
+    # Instance methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -114,7 +114,7 @@ class CNWindow:
         self.window.connect(self.S_ACTION_DELETE_EVENT, self._evt_win_delete)
         self.window.connect(self.S_ACTION_DESTROY, self._evt_win_destroy)
 
-        # connect all subclass methods
+        # connect all subInstance methods
         self._builder.connect_signals(self)  # pylint: disable=no-member
 
     # --------------------------------------------------------------------------

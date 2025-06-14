@@ -10,7 +10,7 @@
 # pyplate: replace=False
 
 """
-A program to create a PyPlate project from a few variables
+A class to be the base for pymaker/pybaker
 
 This module gets the project type, the project's destination dir, copies the
 required dirs/files for the project type from the template to the specified
@@ -26,12 +26,10 @@ Run pymaker -h for more options.
 
 # system imports
 import argparse
-# from datetime import datetime
 import gettext
 import locale
 from pathlib import Path
 import re
-# import shutil
 import sys
 
 # local imports
@@ -47,7 +45,7 @@ import cnfunctions as F
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
-import conf.conf as PP
+import conf.conf as C
 
 # pylint: enable=wrong-import-position
 
@@ -96,19 +94,15 @@ class PyPlate:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # --------------------------------------------------------------------------
-    # find path to pyplate
+    # find path to pyplate project
     P_DIR_PP = Path(__file__).parents[1].resolve()
-
-    # --------------------------------------------------------------------------
 
     # pyplate: replace=True
 
-    # I18N: short description
+    # short description (to be set by subclass)
     S_PP_SHORT_DESC = ""
 
-    # version string
-    # S_PP_VERSION = "Version 0.0.1+20250507.9"
+    # version string (to be set by subclass)
     S_PP_VERSION = ""
 
     # pyplate: replace=False
@@ -127,28 +121,17 @@ class PyPlate:
     # I18N help string for debug cmd line option
     S_ARG_DBG_HELP = _("enable debugging mode")
 
-    # about string
-    # S_ABOUT = (
-    #     "\n"
-    #     f"{'PyPlate/PyMaker'}\n"
-    #     f"{S_PP_SHORT_DESC}\n"
-    #     f"{S_PP_VERSION}\n"
-    #     f"https://github.com/cyclopticnerve/PyPlate\n"
-    # )
+    # about string (to be set by subclass)
     S_ABOUT = ""
 
     # I18N if using argparse, add help at end of about
     S_ABOUT_HELP = _("Use -h for help") + "\n"
 
-    # I18N cmd line instructions string
-    # S_EPILOG = _(
-    #     "Run this program from the directory where you want to create a "
-    #     "project."
-    # )
+    # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
 
     # --------------------------------------------------------------------------
-    # Class methods
+    # Instance methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -163,6 +146,7 @@ class PyPlate:
         new object.
         """
 
+        print("super init")
         # set the initial values of properties
 
         # command line options
@@ -191,7 +175,8 @@ class PyPlate:
         # dictionary to hold current debug settings
         self._dict_debug = {}
 
-        # NB: placeholder to avoid comparing to None
+        # cmd line stuff
+        # NB: placeholder to avoid comparing to None (to be set by subclass)
         self._parser = argparse.ArgumentParser()
         self._dict_args = {}
 
@@ -210,9 +195,7 @@ class PyPlate:
         program, and performing its steps.
         """
 
-        # ----------------------------------------------------------------------
-        #  do the work
-
+        print("super main")
         # call boilerplate code
         self._setup()
 
@@ -223,19 +206,19 @@ class PyPlate:
     # Private methods
     # --------------------------------------------------------------------------
 
-    # NB: these are the main steps, called in order from main
+    # NB: these are the main steps, called in order from main()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
     # --------------------------------------------------------------------------
     def _setup(self):
-
         """
         Boilerplate to use at the start of main
 
         Perform some mundane stuff like setting properties.
         """
 
+        print("super setup")
         # print default about text
         print(self.S_ABOUT)
 
@@ -268,9 +251,32 @@ class PyPlate:
             action=self.S_ARG_DBG_ACTION,
         )
 
-    def _do_parser(self):
-        # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # Get project info
+    # --------------------------------------------------------------------------
+    def _get_project_info(self):
+        """
+        Get project info
 
+        The implementation of this function in the superclass is just a dummy
+        placeholder. The real work should be done in the subclass.
+        """
+
+        print("super get prj info")
+    # ------------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Parse the arguments from the command line
+    # --------------------------------------------------------------------------
+    def _do_cmd_line(self):
+        """
+        Parse the arguments from the command line
+
+        Parse the arguments from the command line, after the parser has been
+        set up.
+        """
+
+        print("super get cmd line")
         # get namespace object
         args = self._parser.parse_args()
 
@@ -282,24 +288,24 @@ class PyPlate:
             self._parser.print_help()
             sys.exit()
 
+        # no -h, print epilog
         print(self.S_EPILOG)
         print()
+
         # ----------------------------------------------------------------------
 
         # get the args
         self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, False)
 
         # set global prop in conf
-        PP.B_DEBUG = self._debug
+        C.B_DEBUG = self._debug
 
         # debug turns off some post processing to speed up processing
         # NB: changing values in self._dict_pub_dbg (through the functions in
         # pyplate.py) will not affect the current session when running pymaker
         # in debug mode. to do that, change the values of D_DBG_PM in
         # pyplate.py
-        self._dict_debug = self._dict_pub
-        if self._debug:
-            self._dict_debug = PP.D_DBG_PM
+        self._dict_debug = self._dict_pub_dbg
 
         # ----------------------------------------------------------------------
 
@@ -307,7 +313,7 @@ class PyPlate:
         if self._debug:
 
             # yup, yell
-            print(PP.S_MSG_DEBUG)
+            print(C.S_MSG_DEBUG)
 
         # ----------------------------------------------------------------------
         # set self._dir_prj
@@ -319,19 +325,8 @@ class PyPlate:
         # ----------------------------------------------------------------------
 
         # set switch dicts to defaults
-        self._dict_sw_block = dict(PP.D_SWITCH_DEF)
+        self._dict_sw_block = dict(C.D_SWITCH_DEF)
         self._dict_sw_line = dict(self._dict_sw_block)
-
-    # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        Asks the user for project info, such as type and name, to be saved to
-        self._dict_prv_prj.
-        """
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -347,7 +342,7 @@ class PyPlate:
         'dict_pub' dicts before any replacement occurs.
         """
 
-        PP.do_before_fix(
+        C.do_before_fix(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
 
@@ -364,13 +359,13 @@ class PyPlate:
         """
 
         # print info
-        print(PP.S_ACTION_FIX, end="", flush=True)
+        print(C.S_ACTION_FIX, end="", flush=True)
 
         # check version before we start
-        version = self._dict_pub_meta[PP.S_KEY_META_VERSION]
+        version = self._dict_pub_meta[C.S_KEY_META_VERSION]
         if not self._check_sem_ver(version):
-            res = input(PP.S_ERR_SEM_VER).strip()
-            if res in ["", PP.S_ERR_SEM_VER_N]:
+            res = input(C.S_ERR_SEM_VER).strip()
+            if res in ["", C.S_ERR_SEM_VER_N]:
                 sys.exit()
 
         # combine dicts for string replacement
@@ -382,20 +377,20 @@ class PyPlate:
         self._save_project_info()
 
         # make sure pyplate in in skip_all
-        skip_all = self._dict_pub_bl[PP.S_KEY_SKIP_ALL]
-        if not PP.S_PRJ_PP_DIR in skip_all:
-            skip_all.append(PP.S_PRJ_PP_DIR)
+        skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
+        if not C.S_PRJ_PP_DIR in skip_all:
+            skip_all.append(C.S_PRJ_PP_DIR)
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
         self._fix_blacklist_paths(self._dict_pub_bl)
 
         # just shorten the names
-        skip_all = self._dict_pub_bl[PP.S_KEY_SKIP_ALL]
-        skip_contents = self._dict_pub_bl[PP.S_KEY_SKIP_CONTENTS]
-        skip_header = self._dict_pub_bl[PP.S_KEY_SKIP_HEADER]
-        skip_code = self._dict_pub_bl[PP.S_KEY_SKIP_CODE]
-        skip_path = self._dict_pub_bl[PP.S_KEY_SKIP_PATH]
+        skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
+        skip_contents = self._dict_pub_bl[C.S_KEY_SKIP_CONTENTS]
+        skip_header = self._dict_pub_bl[C.S_KEY_SKIP_HEADER]
+        skip_code = self._dict_pub_bl[C.S_KEY_SKIP_CODE]
+        skip_path = self._dict_pub_bl[C.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -416,7 +411,7 @@ class PyPlate:
 
                 # for each new file, reset block and line switches to def
                 # NB: line switches always default to current block switches
-                self._dict_sw_block = dict(PP.D_SWITCH_DEF)
+                self._dict_sw_block = dict(C.D_SWITCH_DEF)
                 self._dict_sw_line = dict(self._dict_sw_block)
 
                 # handle files in skip_all
@@ -444,7 +439,7 @@ class PyPlate:
                 self._fix_path(root)
 
         # done
-        print(PP.S_ACTION_DONE)
+        print(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -459,9 +454,10 @@ class PyPlate:
         applied.
         """
 
-        PP.do_after_fix(
+        C.do_after_fix(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
+
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
@@ -532,7 +528,7 @@ class PyPlate:
         """
 
         # check for unknown file types
-        self._get_type_rules(path)
+        self._dict_type_rules = get_type_rules(path)
         if not self._dict_type_rules or len(self._dict_type_rules) == 0:
 
             # do the basic replace (file got here after skip_all/skip_contents
@@ -544,7 +540,7 @@ class PyPlate:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "r", encoding=C.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -565,8 +561,8 @@ class PyPlate:
             comm = ""
 
             # find split sequence
-            split_sch = self._dict_type_rules.get(PP.S_KEY_SPLIT, None)
-            split_grp = self._dict_type_rules.get(PP.S_KEY_SPLIT_COMM, None)
+            split_sch = self._dict_type_rules.get(C.S_KEY_SPLIT, None)
+            split_grp = self._dict_type_rules.get(C.S_KEY_SPLIT_COMM, None)
 
             # only process files with split
             if split_sch and split_grp:
@@ -592,7 +588,7 @@ class PyPlate:
                 self._dict_sw_line = dict(self._dict_sw_block)
 
                 # check switches
-                self._check_switches(
+                check_switches(
                     code,
                     comm,
                     self._dict_type_rules,
@@ -603,9 +599,9 @@ class PyPlate:
                 # check for block or line replace switch
                 repl = False
                 if (
-                    self._dict_sw_block[PP.S_SW_REPLACE] is True
-                    and self._dict_sw_line[PP.S_SW_REPLACE] is True
-                ) or self._dict_sw_line[PP.S_SW_REPLACE] is True:
+                    self._dict_sw_block[C.S_SW_REPLACE] is True
+                    and self._dict_sw_line[C.S_SW_REPLACE] is True
+                ) or self._dict_sw_line[C.S_SW_REPLACE] is True:
                     repl = True
 
                 # switch says no, gtfo
@@ -619,7 +615,7 @@ class PyPlate:
             if not bl_hdr:
 
                 # check if it matches header pattern
-                str_pattern = self._dict_type_rules[PP.S_KEY_HDR_SCH]
+                str_pattern = self._dict_type_rules[C.S_KEY_HDR_SCH]
                 res = re.search(str_pattern, line)
                 if res:
 
@@ -643,7 +639,7 @@ class PyPlate:
                 lines[index] = code + comm
 
         # open and write file
-        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -666,15 +662,15 @@ class PyPlate:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        str_pattern = self._dict_type_rules[PP.S_KEY_HDR_SCH]
+        str_pattern = self._dict_type_rules[C.S_KEY_HDR_SCH]
         res = re.search(str_pattern, line)
         if not res:
             return line
 
         # pull out lead, val, and pad using group match values from M
-        lead = res.group(self._dict_type_rules[PP.S_KEY_LEAD])
-        val = res.group(self._dict_type_rules[PP.S_KEY_VAL])
-        pad = res.group(self._dict_type_rules[PP.S_KEY_PAD])
+        lead = res.group(self._dict_type_rules[C.S_KEY_LEAD])
+        val = res.group(self._dict_type_rules[C.S_KEY_VAL])
+        pad = res.group(self._dict_type_rules[C.S_KEY_PAD])
 
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
@@ -748,7 +744,7 @@ class PyPlate:
         lines = []
 
         # open and read file
-        with open(path, "r", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "r", encoding=C.S_ENCODING) as a_file:
             lines = a_file.readlines()
 
         # for each line in array
@@ -768,7 +764,7 @@ class PyPlate:
             lines[index] = line
 
         # open and write file
-        with open(path, "w", encoding=PP.S_ENCODING) as a_file:
+        with open(path, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(lines)
 
     # --------------------------------------------------------------------------
@@ -808,58 +804,6 @@ class PyPlate:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
-    # Check if line or trailing comment is a switch
-    # --------------------------------------------------------------------------
-    def _check_switches(
-        self, code, comm, dict_type_rules, dict_sw_block, dict_sw_line
-    ):
-        """
-        Check if line or trailing comment is a switch
-
-        Args:
-            comm: The comment part of a line to check for switches
-            dict_type_rules: Dictionary containing the regex to look for
-            dict_sw: Dictionary of switch values for either block or line
-            switches
-
-        This method checks to see if a line or trailing comment contains a
-        valid switch for the values in dict_type_rules. If a valid switch is
-        found, it sets the appropriate flag in either dict_sw_block or
-        dict_sw_line.
-        """
-
-        # switch does not appear anywhere in line
-        res = re.search(dict_type_rules[PP.S_KEY_SW_SCH], comm)
-        if not res:
-            return
-
-        # find all matches (case insensitive)
-        matches = re.finditer(
-            dict_type_rules[PP.S_KEY_SW_SCH], comm, flags=re.I
-        )
-
-        # for each match
-        for match in matches:
-
-            # get key/val of switch
-            key = match.group(dict_type_rules[PP.S_KEY_SW_KEY])
-            val = match.group(dict_type_rules[PP.S_KEY_SW_VAL])
-
-            # try a bool conversion
-            # NB: in honor of John Valby (ddg him!)
-            val_b = val.lower()
-            if val_b == "true":
-                val = True
-            elif val_b == "false":
-                val = False
-
-            # pick a dict based on if there is preceding code
-            if code.strip() == "":
-                dict_sw_block[key] = val
-            else:
-                dict_sw_line[key] = val
-
-    # --------------------------------------------------------------------------
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
     def _check_sem_ver(self, version):
@@ -877,7 +821,7 @@ class PyPlate:
         """
 
         # match semantic version from start of string
-        pattern = PP.S_SEM_VER_VALID
+        pattern = C.S_SEM_VER_VALID
         return re.search(pattern, version)
 
     # --------------------------------------------------------------------------
@@ -892,15 +836,15 @@ class PyPlate:
         """
 
         # update individual dicts in dict_prv
-        self._dict_prv_all = self._dict_prv[PP.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[PP.S_KEY_PRV_PRJ]
+        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
 
         # update individual dicts in dict_pub
-        self._dict_pub_bl = self._dict_pub[PP.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[PP.S_KEY_PUB_DBG]
-        self._dict_pub_dist = self._dict_pub[PP.S_KEY_PUB_DIST]
-        self._dict_pub_i18n = self._dict_pub[PP.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[PP.S_KEY_PUB_META]
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
 
         # update debug dict
         if not self._debug:
@@ -922,25 +866,25 @@ class PyPlate:
 
         # create private settings
         dict_prv = {
-            PP.S_KEY_PRV_ALL: self._dict_prv_all,
-            PP.S_KEY_PRV_PRJ: self._dict_prv_prj,
+            C.S_KEY_PRV_ALL: self._dict_prv_all,
+            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
         }
 
         # save private settings
-        path_prv = self._dir_prj / PP.S_PRJ_PRV_CFG
+        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
         F.save_dict(dict_prv, [path_prv])
 
         # create public settings
         dict_pub = {
-            PP.S_KEY_PUB_BL: self._dict_pub_bl,
-            PP.S_KEY_PUB_DBG: self._dict_pub_dbg,
-            PP.S_KEY_PUB_DIST: self._dict_pub_dist,
-            PP.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            PP.S_KEY_PUB_META: self._dict_pub_meta,
+            C.S_KEY_PUB_BL: self._dict_pub_bl,
+            C.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            C.S_KEY_PUB_DIST: self._dict_pub_dist,
+            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            C.S_KEY_PUB_META: self._dict_pub_meta,
         }
 
         # save public settings
-        path_pub = self._dir_prj / PP.S_PRJ_PUB_CFG
+        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
@@ -952,40 +896,247 @@ class PyPlate:
         self._reload_dicts()
 
     # --------------------------------------------------------------------------
-    # Get the filetype-specific regexes (headers, comments. switches)
+    # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-    def _get_type_rules(self, path):
+
+    # --------------------------------------------------------------------------
+    # Check project type for allowed characters
+    # --------------------------------------------------------------------------
+    def _check_type(self, prj_type):
         """
-        Get the filetype-specific regexes (headers, comments. switches)
+        Check project type for allowed characters
 
         Args:
-            path: Path of the file go get the dict of regexes for
+            prj_type: Type to check for allowed characters
 
         Returns:
-            The dict of regexes for this file type. This dict contains
-            language-specific regexes for matching header lines, comments, and
-            switches.
+            Whether the type is valid to use
+
+        Checks the passed type to see if it is one of the allowed project
+        types.
         """
 
-        # default result is empty dict (to match declaration in __init__)
-        # NB: empty dict means unknown type rep
-        self._dict_type_rules = {}
+        # sanity check
+        if len(prj_type) == 1:
 
-        # iterate over reps
-        for _key, val in PP.D_TYPE_RULES.items():
+            # get first char and lower case it
+            first_char = prj_type[0].lower()
 
-            # fix ets if necessary
-            exts = val[PP.S_KEY_RULES_EXT]
-            exts = [
-                f".{item}" if not item.startswith(".") else item
-                for item in exts
-            ]
-            exts = [item.lower() for item in exts]
+            # check if it's one of ours
+            first_char_test = [item[0] for item in C.L_TYPES]
+            if first_char in first_char_test:
+                return True
 
-            # if we match ext, return only rep stuff
-            # NB: also handles dot files (FUUUUUUCK)
-            if path.suffix.lower() in exts or path.name.lower() in exts:
-                self._dict_type_rules = val[PP.S_KEY_RULES_REP]
-                return
+        # nope, fail
+        types = []
+        s = ""
+        for item in C.L_TYPES:
+            types.append(item[0])
+        s = ", ".join(types)
+        print(C.S_ERR_TYPE.format(s))
+        return False
+
+    # --------------------------------------------------------------------------
+    # Check project name for allowed characters
+    # --------------------------------------------------------------------------
+    def _check_name(self, name_prj):
+        """
+        Check project name for allowed characters
+
+        Args:
+            name_prj: Name to check for allowed characters
+
+        Returns:
+            Whether the name is valid to use
+
+        Checks the passed name for these criteria:
+        1. longer than 1 char
+        2. starts with an alpha char
+        3. ends with an alphanumeric char
+        4. contains only alphanumeric chars and/or dash(-) or underscore(_)
+        """
+
+        # NB: there is an easier way to do this with regex:
+        # ^([a-zA-Z]+[a-zA-Z\d\-_ ]*[a-zA-Z\d]+)$ AND OMG DID IT TAKE A LONG
+        # TIME TO FIND IT! in case you were looking for it. It will give you a
+        # quick yes-no answer. I don't use it here because I want to give the
+        # user as much feedback as possible, so I break down the regex into
+        # steps where each step explains which part of the name is wrong.
+
+        # check for name length
+        if len(name_prj.strip(" ")) < 2:
+            print(C.S_ERR_LEN)
+            return False
+
+        # match start or return false
+        pattern = C.D_NAME[C.S_KEY_NAME_START]
+        res = re.search(pattern, name_prj)
+        if not res:
+            print(C.S_ERR_START)
+            return False
+
+        # match end or return false
+        pattern = C.D_NAME[C.S_KEY_NAME_END]
+        res = re.search(pattern, name_prj)
+        if not res:
+            print(C.S_ERR_END)
+            return False
+
+        # match middle or return false
+        pattern = C.D_NAME[C.S_KEY_NAME_MID]
+        res = re.search(pattern, name_prj)
+        if not res:
+            print(C.S_ERR_MID)
+            return False
+
+        # if we made it this far, return true
+        return True
+
+    # --------------------------------------------------------------------------
+    # Combine reqs from template/all and template/prj_type
+    # --------------------------------------------------------------------------
+    def _merge_reqs(self, prj_type_long):
+        """
+        Combine reqs from template/all and template/prj_type
+
+        Args:
+            prj_type_long: the folder in template for the current project type
+
+        This method combines reqs from the all dir used by all projects, and
+        those used by specific project type (gui needs pygobject, etc).
+        """
+
+        # get sources and filter out sources that don't exist
+        reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
+        src = [
+            self.P_DIR_PP / C.S_FILE_REQS_ALL,
+            self.P_DIR_PP / reqs_prj,
+        ]
+        src = [str(item) for item in src if item.exists()]
+
+        # get dst to put file lines
+        dst = self._dir_prj / C.S_FILE_REQS
+
+        # # the new set of lines for requirements.txt
+        new_file = []
+
+        # read reqs files and put in result
+        for item in src:
+            with open(item, "r", encoding=C.S_ENCODING) as a_file:
+                old_file = a_file.readlines()
+                old_file = [line.rstrip() for line in old_file]
+                uniq = set(new_file + old_file)
+                new_file = list(uniq)
+
+        # put combined reqs into final file
+        joint = "\n".join(new_file)
+        with open(dst, "w", encoding=C.S_ENCODING) as a_file:
+            a_file.writelines(joint)
+
+
+# --------------------------------------------------------------------------
+# Check if line or trailing comment is a switch
+# --------------------------------------------------------------------------
+def check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
+    """
+    Check if line or trailing comment is a switch
+
+    Args:
+        comm: The comment part of a line to check for switches
+        dict_type_rules: Dictionary containing the regex to look for
+        dict_sw: Dictionary of switch values for either block or line
+        switches
+
+    This method checks to see if a line or trailing comment contains a
+    valid switch for the values in dict_type_rules. If a valid switch is
+    found, it sets the appropriate flag in either dict_sw_block or
+    dict_sw_line.
+    """
+
+    # switch does not appear anywhere in line
+    res = re.search(dict_type_rules[C.S_KEY_SW_SCH], comm)
+    if not res:
+        return
+
+    # find all matches (case insensitive)
+    matches = re.finditer(dict_type_rules[C.S_KEY_SW_SCH], comm, flags=re.I)
+
+    # for each match
+    for match in matches:
+
+        # get key/val of switch
+        key = match.group(dict_type_rules[C.S_KEY_SW_KEY])
+        val = match.group(dict_type_rules[C.S_KEY_SW_VAL])
+
+        # try a bool conversion
+        # NB: in honor of John Valby (ddg him!)
+        val_b = val.lower()
+        if val_b == "true":
+            val = True
+        elif val_b == "false":
+            val = False
+
+        # pick a dict based on if there is preceding code
+        if code.strip() == "":
+            dict_sw_block[key] = val
+        else:
+            dict_sw_line[key] = val
+
+
+# ------------------------------------------------------------------------------
+# Get the filetype-specific regexes (headers, comments. switches)
+# ------------------------------------------------------------------------------
+def get_type_rules(path):
+    """
+    Get the filetype-specific regexes (headers, comments. switches)
+
+    Args:
+        path: Path of the file to get the dict of regexes for
+
+    Returns:
+        The dict of regexes for this file type
+    """
+
+    # iterate over reps
+    for _key, val in C.D_TYPE_RULES.items():
+
+        # fix ets if necessary
+        exts = val[C.S_KEY_RULES_EXT]
+
+        # # if we match ext, return only rep stuff
+        if is_path_in_list(path, exts):
+            return val[C.S_KEY_RULES_REP]
+
+    # default result is py rep
+    return {}
+
+
+# ------------------------------------------------------------------------------
+# Check if a file is in a list of file extensions
+# ------------------------------------------------------------------------------
+def is_path_in_list(path, lst):
+    """
+    Check if a file is in a list of file extensions
+
+    Args:
+        path: The file to find
+        lst: The list to look in
+
+    Returns:
+        Whether the file exists in the list
+    """
+
+    # lowercase the list
+    l_ext = [item.lower() for item in lst]
+
+    # add dots
+    l_ext = [
+        f".{item}" if not item.startswith(".") else item for item in l_ext
+    ]
+
+    # check if the suffix or the filename (for dot files) matches
+    # NB: also checks for dot files
+    return path.suffix.lower() in l_ext or path.name.lower() in l_ext
+
 
 # -)

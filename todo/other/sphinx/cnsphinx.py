@@ -19,7 +19,7 @@ from pathlib import Path
 import re
 
 # cnlib imports
-from cnlib import cnfunctions as F  # type: ignore
+import cnfunctions as F  # type: ignore
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -42,7 +42,7 @@ class CNSphinx:
     """
 
     # --------------------------------------------------------------------------
-    # Class methods
+    # Instance methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
@@ -138,7 +138,7 @@ class CNSphinx:
         try:
             F.sh(cmd, shell=True)
             self._modify(dirs_import, theme)
-        except F.CNShellError as e:
+        except Exception as e:
             raise e
 
     # --------------------------------------------------------------------------
@@ -176,7 +176,7 @@ class CNSphinx:
             res = F.sh(cmd, shell=True)
             print(res.stdout)
             print(res.stderr)
-        except F.CNShellError as e:
+        except Exception as e:
             raise e
 
     # --------------------------------------------------------------------------

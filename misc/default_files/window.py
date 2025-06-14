@@ -30,10 +30,12 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 # pylint: disable=wrong-import-position
+# pylint: disable=no-name-in-module
 
 from gi.repository import Gtk  # type: ignore
 
 # pylint: enable=wrong-import-position
+# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -71,7 +73,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     S_ACTION_DESTROY = "destroy"
 
     # --------------------------------------------------------------------------
-    # Class methods
+    # Instance methods
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
