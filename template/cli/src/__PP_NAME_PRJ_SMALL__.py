@@ -34,8 +34,8 @@ from pathlib import Path
 import sys
 
 # cnlib imports
-from cnformatter import CNFormatter
-import cnfunctions as F
+from cnlib.cnformatter import CNFormatter
+import cnlib.cnfunctions as F
 
 # ------------------------------------------------------------------------------
 # Globals

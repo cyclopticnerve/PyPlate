@@ -30,4 +30,7 @@ requires-python = ">=3.10"
 [project.urls]
 homepage = "__PP_URL__/__PP_NAME_PRJ_BIG__"
 
+[tool.setuptools]
+packages = ["__PP_NAME_PRJ_SMALL__"]
+
 # -)

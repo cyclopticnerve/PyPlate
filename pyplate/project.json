@@ -4,15 +4,14 @@
             ".git",
             "**/.venv*",
             ".VSCodeCounter",
+            "**/__pycache__",
             "dist",
             "docs",
             "i18n",
-            "lib",
             "misc",
-            "LICENSE.txt",
-            "requirements.txt",
-            "**/__pycache__",
-            "template"
+            "template",
+            "todo",
+            "LICENSE.txt"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
@@ -21,7 +20,6 @@
         ],
         "SKIP_HEADER": [],
         "SKIP_CODE": [
-            "MANIFEST.in",
             ".gitignore"
         ],
         "SKIP_PATH": [],
@@ -84,8 +82,15 @@
     },
     "PUB_META": {
         "META_VERSION": "0.0.1",
-        "META_SHORT_DESC": "A program for creating and building CLI/Package/GUI projects in Python from a template",
-        "META_KEYWORDS": [],
+        "META_SHORT_DESC": "A program for creating and building CLI/GUI/Package projects in Python from a template",
+        "META_KEYWORDS": ["python",
+            "cli",
+            "template",
+            "app",
+            "package",
+            "gui",
+            "module",
+            "gtk3"],
         "META_DEPS": {
             "Python 3.10+": "https://python.org"
         },

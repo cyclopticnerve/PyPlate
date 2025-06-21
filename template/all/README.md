@@ -25,9 +25,10 @@ __PP_VER_DISP__
 
 ## Table of Contents
 - [Requirements](#requirements)
+- [Downloading](#downloading)
 - [Installing](#installing)
-- [Uninstalling](#uninstalling)
 - [Usage](#usage)
+- [Uninstalling](#uninstalling)
 - [Notes](#notes)
 
 ## Requirements
@@ -35,45 +36,71 @@ __PP_VER_DISP__
 __PP_PY_DEPS__
 <!-- __RM_DEPS__ -->
 
+## Downloading
+
+There are two ways to get the code:
+
+1. Download the [latest
+release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
+(the **'Source code (zip)'** file should work an all platforms).
+
+2. Or you can clone the git repo to get the latest (and often broken) code from
+   the main branch:
+```bash
+$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
+```
+
 ## Installing
 <!-- __RM_PKG__ -->
-First, download the [latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest).
-Download the 'tar.gz' file.
+There are also two ways to get __PP_NAME_PRJ_BIG__ into your project.
+Run these commands from your project directory.
 
-Then install it:
+First make sure you have a venv and it is active:
 ```bash
-foo@bar:~$ cd ~/Downloads/__PP_NAME_PRJ_BIG__-<version>/dist
-foo@bar:~/Downloads$ python -m pip install __PP_NAME_PRJ_BIG__-<version>.tar.gz
+$  python -m venv .venv
+$ . .venv/bin/activate
 ```
-Or you can clone the git repo to get the latest (and often broken) code:
+
+### Manually
+
+If you downloaded the zip file:
 ```bash
-foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
-foo@bar:~/Downloads$ cd __PP_NAME_PRJ_BIG__-<version>
+$ python -m pip install /path/to/__PP_NAME_PRJ_BIG__-<version>.zip
 ```
-Then build and install it:
+where \<version\> is the version number included in the file name.
+
+Or if you cloned the repo:
 ```bash
-foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m pip install build
-foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m build
-foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ python -m pip install ./dist/__PP_NAME_PRJ_SMALL__-<version>.tar.gz
+$ python -m pip install /path/to/__PP_NAME_PRJ_BIG__
+```
+
+### Automagically
+Add this line to your project's 'requirements.txt' file:
+```bash
+__PP_NAME_PRJ_BIG__ @ git+https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__@<tag>
+```
+where \<tag\> is the tag you want, such as 'v0.0.1', etc.
+
+Then run:
+```
+$ python -m pip install -r requirements.txt
 ```
 <!-- __RM_PKG__ -->
 <!-- __RM_APP__ -->
-First, download the [latest release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest).
-Download either the 'tar.gz' or '.zip' file and extract it.
-
-Then install it:
+If you downloaded the zip file, extract it and go to the 'install' directory:
 ```bash
-foo@bar:~$ cd ~/Downloads/__PP_NAME_PRJ_BIG__-<version>/dist
-foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>/dist$ ./install.py
+$ cd ~/Downloads/__PP_NAME_PRJ_BIG__-<version>/install
+```
+where \<version\> is the version number of the file you downloaded.
+
+If you cloned the repo, just go to the 'install' directory:
+```bash
+$ cd ~/Downloads/__PP_NAME_PRJ_BIG__/install
 ```
 
-Or you can clone the git repo to get the latest (and often broken) code:
+Either way, run the install script:
 ```bash
-foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
-foo@bar:~/Downloads$ cd __PP_NAME_PRJ_BIG__-<version>/dist
-foo@bar:~/Downloads/__PP_NAME_PRJ_BIG__-<version>$ ./install.py
+$ ./install.py
 ```
 <!-- __RM_APP__ -->
 
@@ -82,15 +109,17 @@ blah blah blah
 
 ## Uninstalling
 <!-- __RM_PKG__ -->
+In your project folder:
 ```bash
-foo@bar:~$ python -m pip uninstall __PP_NAME_PRJ_SMALL__
+$ . .venv/bin/activate
+$ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
 <!-- __RM_PKG__ -->
 <!-- __RM_APP__ -->
-Go to the source folder for __PP_NAME_PRJ__ and run the uninstaller:
+Go to the source folder for __PPNAME_PRJ_BIG__ and run the uninstaller:
 ```bash
-foo@bar:~$ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
-foo@bar:~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall$ ./uninstall.py
+$ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
+$ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
 

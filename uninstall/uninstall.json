@@ -1,6 +1,6 @@
 {
     "NAME": "PyPlate",
-    "VERSION": "0.0.1+20250510.11",
+    "VERSION": "0.0.1",
     "UNINSTALL": [
         ".local/share/pyplate",
         ".local/bin/pyplate"

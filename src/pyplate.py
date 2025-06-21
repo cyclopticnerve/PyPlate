@@ -33,8 +33,8 @@ import re
 import sys
 
 # local imports
-from cnformatter import CNFormatter
-import cnfunctions as F
+from cnlib.cnformatter import CNFormatter
+import cnlib.cnfunctions as F
 
 # ------------------------------------------------------------------------------
 # local imports

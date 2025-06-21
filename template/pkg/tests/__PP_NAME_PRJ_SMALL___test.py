@@ -8,36 +8,30 @@
 # ------------------------------------------------------------------------------
 
 """
-A simple script to test a package
-
-Note that you will need to activate the project's venv to use this script.
-If you are working in VSCode, you should:
-1. Deactivate the current venv in the Terminal tab using the "deactivate"
-command
-2. Make sure you have the correct interpreter selected for the project (check
-the status bar)
-3. Switch to the "Run and Debug" tab, and select the "Pkg Test" option
-4. Press the "Run" button to run the script. This will activate the project's
-venv for you
-
-If you are working in an external terminal, you should:
-1. Deactivate the current venv in the Terminal tab using the "deactivate"
-command
-2. cd to the project directory
-3*. Activate the project's venv using:
-"(source | .) .venv-__PP_NAME_PRJ_SMALL__/bin/activate"
-4. Run the script using:
-"./tests/__PP_NAME_PRJ_SMALL___test.py"
-
-* some shells accept the "source" command, while others accept the "." command.
+A simple script to test a package from within the project itself
 """
 
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
 
-# lib imports
-import __PP_NAME_SEC_SMALL__  # pylint: disable=import-error
+# system imports
+from pathlib import Path
+import sys
+
+# local imports
+PATH_PRJ = Path(__file__).parents[1].resolve()
+PATH_SRC = PATH_PRJ / "__PP_NAME_PRJ_SMALL__"
+sys.path.append(str(PATH_SRC))
+
+# NB: i know this looks bad, but it WILL work
+# pylint: disable=import-error
+# pylint: disable=wrong-import-position
+
+import __PP_NAME_SEC_SMALL__  # type: ignore
+
+# pylint: enable=import-error
+# pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

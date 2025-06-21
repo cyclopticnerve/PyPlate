@@ -33,7 +33,7 @@ import shutil
 import sys
 
 # local imports
-import cnfunctions as F
+from cnlib import cnfunctions as F
 from pyplate import PyPlate
 
 # ------------------------------------------------------------------------------

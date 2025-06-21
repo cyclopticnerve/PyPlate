@@ -31,11 +31,11 @@ import sys
 import tarfile
 
 # local imports
-import cnfunctions as F
-from cninstall import CNInstall
-from cnpot import CNPotPy
-from cntree import CNTree
-from cnvenv import CNVenv
+import cnlib.cnfunctions as F
+from cnlib.cninstall import CNInstall
+from cnlib.cnpot import CNPotPy
+from cnlib.cntree import CNTree
+from cnlib.cnvenv import CNVenv
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -105,12 +105,12 @@ S_LVL_UP = "../"
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
 # NB: format params are meta version, date, and __PP_VER_BUILD__
-S_VER_SEM_FMT = "{}+{}.{}"
+# S_VER_SEM_FMT = "{}+{}.{}"
 # NB: format param is __PP_VER_SEM__
 # I18N: printable version number
 S_VER_DISP_FMT = _("Version {}")
 # # NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_SEM__
-S_VER_DIST_FMT = "{}_{}"
+S_VER_DIST_FMT = "{}-{}"
 
 # ask questions
 # I18N: ask prj name
@@ -408,8 +408,8 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 S_CMD_GIT_CREATE = "git init {} -q"
 # NB: format params are prj dir and venv name
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
-# NB: format param is prj dir
-S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ."
+# NB: format params are prj dir and src dir
+# S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ./{}"
 # cmd for pdoc3
 # NB: format params are path to pp, path to pp venv, path to project, path to
 # project's template, path to project's docs dir, and path to project's input
@@ -422,7 +422,7 @@ S_CMD_DOC = (
 )
 # cmd to install libs as editable
 # NB: format param is relative path to cnlib dir
-S_CMD_INST_LIB = "python -m pip install -e {}"
+# S_CMD_INST_LIB = "python -m pip install -e {}"
 
 # ------------------------------------------------------------------------------
 # regex stuff
@@ -594,15 +594,10 @@ L_PURGE_FILES = [
     "ABOUT",
 ]
 
-# dirs to remove after the project is done
-L_PURGE_DIRS = {
-    "p": [
-        S_DIR_BIN,
-        S_DIR_CONF,
-        S_DIR_INSTALL,
-        S_DIR_UNINSTALL,
-    ]
-}
+L_MAKE_VENV = [
+    "c",
+    "g",
+]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -886,7 +881,7 @@ D_PRV_PRJ = {
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
     "__PP_VER_SEM__": "",  # semantic version string, ie. "0.0.1+20250505.17653"
-    "__PP_VER_BUILD__": "",  # build number, inc every run of pm/pb, def 0
+    # "__PP_VER_BUILD__": "",  # build number, inc every run of pm/pb, def 0
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1+20250505.17653"
 }
 
@@ -1054,7 +1049,7 @@ D_PUB_DBG = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
@@ -1219,6 +1214,19 @@ D_NAME = {
     S_KEY_NAME_MID: r"(^[a-zA-Z\d\-_ ]*$)",
 }
 
+# dirs to remove after the project is done
+D_PURGE_DIRS = {
+    "p": [
+        S_DIR_BIN,
+        S_DIR_CONF,
+        S_DIR_DIST,
+        S_DIR_I18N,
+        S_DIR_INSTALL,
+        S_DIR_SRC,
+        S_DIR_UNINSTALL,
+    ]
+}
+
 # ------------------------------------------------------------------------------
 # Public functions
 # ------------------------------------------------------------------------------
@@ -1266,42 +1274,51 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
     fixing, like chopping the readme file sections.
     """
 
+    # get project type
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
     # --------------------------------------------------------------------------
     # venv
 
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
 
-        print(S_ACTION_VENV, end="", flush=True)
+        # venv only for certain project types
+        if prj_type in L_MAKE_VENV:
 
-        # get name ov venv folder and reqs file
-        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-        file_reqs = dir_prj / S_FILE_REQS
+            print(S_ACTION_VENV, end="", flush=True)
 
-        # do the thing with the thing
-        cv = CNVenv(dir_prj, dir_venv)
-        try:
-            cv.create()
-            cv.install_reqs(file_reqs)
-            print(S_ACTION_DONE)
-        except Exception as e:
-            print(S_ACTION_FAIL)
-            raise e
+            # get name ov venv folder and reqs file
+            dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+            file_reqs = dir_prj / S_FILE_REQS
+
+            # do the thing with the thing
+            cv = CNVenv(dir_prj, dir_venv)
+            try:
+                cv.create()
+                if file_reqs.exists():
+                    cv.install_reqs(file_reqs)
+                print(S_ACTION_DONE)
+            except Exception as e:
+                print(S_ACTION_FAIL)
+                raise e
+        else:
+            # no venv, no reqs
+            (Path(dir_prj) / S_FILE_REQS).unlink()
 
         # ----------------------------------------------------------------------
         # install libs in project venv
 
-        print(S_ACTION_LIB, end="", flush=True)
+        # print(S_ACTION_LIB, end="", flush=True)
 
-        # get activate cmd
-        cmd_activate = S_CMD_VENV_ACTIVATE.format(str(dir_prj), dir_venv)
+        # # get activate cmd
+        # cmd_activate = S_CMD_VENV_ACTIVATE.format(str(dir_prj), dir_venv)
 
-        # start the full command
-        cmd = f"{cmd_activate};"
+        # # start the full command
+        # cmd = f"{cmd_activate};"
 
         # get list of libs for this prj type
-        # prj_type_short = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-        # val = D_COPY_LIB.get(prj_type_short, [])
+        # val = D_COPY_LIB.get(prj_type, [])
 
         # # copy libs to command
         # for item in val:
@@ -1311,14 +1328,14 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         #     add_str = S_CMD_INST_LIB.format(add_path)
         #     cmd += add_str + ";"
 
-        cmd += " python -m pip install -e '/home/dana/Documents/Projects/Python/CNLib'"
+        # cmd += " python -m pip install -e '/home/dana/Documents/Projects/Python/CNLib'"
         # the command to install libs
-        try:
-            F.sh(cmd, shell=True)
-            print(S_ACTION_DONE)
-        except Exception as e:
-            print(S_ACTION_FAIL)
-            raise e
+        # try:
+        #     F.sh(cmd, shell=True)
+        #     print(S_ACTION_DONE)
+        # except Exception as e:
+        #     print(S_ACTION_FAIL)
+        #     raise e
 
     # --------------------------------------------------------------------------
     # git
@@ -1341,9 +1358,6 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
     # if install flag is set
     if dict_dbg[S_KEY_DBG_INST]:
-
-        # get project type
-        prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
         # cli/gui
         if prj_type in L_APP_INSTALL:
@@ -1438,24 +1452,25 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # version stuff
 
     # get base version
-    ver_meta = dict_pub_meta[S_KEY_META_VERSION]
+    ver_base = dict_pub_meta[S_KEY_META_VERSION]
 
     # get current date and format it according to dev fmt
-    now = datetime.now()
-    ver_date = now.strftime(S_VER_DATE_FMT)
+    # now = datetime.now()
+    # ver_date = now.strftime(S_VER_DATE_FMT)
 
-    # get current build number, add 1
-    str_build = dict_prv_prj["__PP_VER_BUILD__"]
-    int_build = 0
-    try:
-        int_build = int(str_build)
-    except ValueError:
-        int_build = 0
-    int_build += 1
-    dict_prv_prj["__PP_VER_BUILD__"] = str(int_build)
+    # # get current build number, add 1
+    # str_build = dict_prv_prj["__PP_VER_BUILD__"]
+    # int_build = 0
+    # try:
+    #     int_build = int(str_build)
+    # except ValueError:
+    #     int_build = 0
+    # int_build += 1
+    # dict_prv_prj["__PP_VER_BUILD__"] = str(int_build)
 
-    # semver
-    str_sem = S_VER_SEM_FMT.format(ver_meta, ver_date, str(int_build))
+    # semantic version with meta info
+    # str_sem = S_VER_SEM_FMT.format(ver_base, ver_date, str(int_build))
+    str_sem = ver_base
     dict_prv_prj["__PP_VER_SEM__"] = str_sem
 
     # display
@@ -1464,8 +1479,8 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
 
     # fix ver for dist filename
     ver_dist = str_sem
-    ver_dist = ver_dist.replace(".", "-")
-    ver_dist = ver_dist.replace("+", "_")
+    # ver_dist = ver_dist.replace(".", "-")
+    # ver_dist = ver_dist.replace("+", "_")
 
     # format dist dir name with prj and ver
     name_fmt = S_VER_DIST_FMT.format(name_prj_small, ver_dist)
@@ -1493,7 +1508,11 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
 
     # various image files
-    img_ext = f".{S_IMG_EXT.lower()}" if not S_IMG_EXT.startswith(".") else S_IMG_EXT.lower()
+    img_ext = (
+        f".{S_IMG_EXT.lower()}"
+        if not S_IMG_EXT.startswith(".")
+        else S_IMG_EXT.lower()
+    )
     dict_prv_prj["__PP_IMG_README__"] = (
         f"{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
@@ -1511,7 +1530,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_IMG_ABOUT__"] = (
         f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
-
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1534,6 +1552,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     It is mostly used to update metadata once all the normal fixes have been
     applied.
     """
+
+    # get project type
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # --------------------------------------------------------------------------
     # metadata
@@ -1588,30 +1609,28 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # if we are a package, here is where we will install ourselves in the venv
 
-    # get project type
-    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    # # pkg
+    # if prj_type in L_PKG_INSTALL:
 
-    # pkg
-    if prj_type in L_PKG_INSTALL:
+    #     # let user know
+    #     print(S_ACTION_INST_PKG, end="", flush=True)
 
-        # let user know
-        print(S_ACTION_INST_PKG, end="", flush=True)
+    #     # need to activate prj venv
+    #     dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+    #     cmd_activate = S_CMD_VENV_ACTIVATE.format(dir_prj, dir_prj / dir_venv)
 
-        # need to activate prj venv
-        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-        cmd_activate = S_CMD_VENV_ACTIVATE.format(dir_prj, dir_prj / dir_venv)
+    #     # cmd to install
+    #     # NB: installed as editable b/c we need to use it in tests/foo.py
+    #     cmd_install = S_CMD_INSTALL_PKG.format(dir_prj, S_DIR_SRC)
 
-        # cmd to install
-        cmd_install = S_CMD_INSTALL_PKG.format(dir_prj)
-
-        # the command to install pkg
-        cmd = f"{cmd_activate};" f"{cmd_install}"
-        try:
-            F.sh(cmd, shell=True)
-            print(S_ACTION_DONE)
-        except Exception as e:
-            print(S_ACTION_FAIL)
-            raise e
+    #     # the command to install pkg
+    #     cmd = f"{cmd_activate};" f"{cmd_install}"
+    #     try:
+    #         F.sh(cmd, shell=True)
+    #         print(S_ACTION_DONE)
+    #     except Exception as e:
+    #         print(S_ACTION_FAIL)
+    #         raise e
 
     # --------------------------------------------------------------------------
     # readme chop section
@@ -1629,7 +1648,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             text = a_file.read()
 
         # find the remove blocks (opposite of prj type)
-        prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
         if prj_type in L_APP_INSTALL:
             str_pattern = S_RM_PKG
         else:
@@ -1693,8 +1711,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # do .desktop
 
         # check if we want template
-        prj_type_short = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-        if prj_type_short in L_MAKE_DESK and not path_dsk_tmp.exists():
+        if prj_type in L_MAKE_DESK and not path_dsk_tmp.exists():
 
             # we want template, but does not exist
             print("\n" + S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out))
@@ -1759,7 +1776,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             dir_prj,
             dir_docs_tplt,
             dir_docs_out,
-            dir_prj / S_DIR_SRC,
+            # dir_prj / S_DIR_SRC,
+            dir_prj,
         )
 
         # the command to run pdoc
@@ -1894,6 +1912,23 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             with open(root_file, "w", encoding=S_ENCODING) as a_file:
                 a_file.write(text)
 
+    # --------------------------------------------------------------------------
+    # purge package dirs
+
+    if prj_type in D_PURGE_DIRS:
+        l_purge = D_PURGE_DIRS[prj_type]
+        l_purge = [
+            (
+                Path(dir_prj) / item
+                if not Path(item).is_absolute()
+                else Path(item)
+            )
+            for item in l_purge
+        ]
+        for item in l_purge:
+            if item.exists():
+                shutil.rmtree(item)
+
     # print done
     print(S_ACTION_DONE)
 
@@ -1916,28 +1951,50 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     after _do_after_fix, and before _do_dist.
     """
 
+    # get project type
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
     # ----------------------------------------------------------------------
     # venv
 
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
 
-        # print info
-        print(S_ACTION_FREEZE, end="", flush=True)
+        # venv only for certain project types
+        if prj_type in L_MAKE_VENV:
 
-        # get name ov venv folder and reqs file
-        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-        file_reqs = dir_prj / S_FILE_REQS
+            # print info
+            print(S_ACTION_FREEZE, end="", flush=True)
 
-        # do the thing with the thing
-        cv = CNVenv(dir_prj, dir_venv)
-        try:
-            cv.freeze(file_reqs)
-            print(S_ACTION_DONE)
-        except Exception as e:
-            print(S_ACTION_FAIL)
-            raise e
+            # get name ov venv folder and reqs file
+            dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+            file_reqs = dir_prj / S_FILE_REQS
 
+            # do the thing with the thing
+            cv = CNVenv(dir_prj, dir_venv)
+            try:
+                cv.freeze(file_reqs)
+                print(S_ACTION_DONE)
+            except Exception as e:
+                print(S_ACTION_FAIL)
+                raise e
+
+    # --------------------------------------------------------------------------
+    # purge package dirs
+
+    if prj_type in D_PURGE_DIRS:
+        l_purge = D_PURGE_DIRS[prj_type]
+        l_purge = [
+            (
+                Path(dir_prj) / item
+                if not Path(item).is_absolute()
+                else Path(item)
+            )
+            for item in l_purge
+        ]
+        for item in l_purge:
+            if item.exists():
+                shutil.rmtree(item)
 
 # ------------------------------------------------------------------------------
 # Do any work after making dist

@@ -18,20 +18,21 @@
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
 <!-- __RM_SHORT_DESC__ -->
-A program for creating and building CLI/Package/GUI projects in Python from a template
+A program for creating and building CLI/GUI/Package projects in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 0.0.1+20250510.11
+Version 0.0.1
 <!-- __RM_VERSION__ -->
 
 <!-- [![alt-text](readme/screenshot.png)]("tooltip") -->
 
 ## Table of Contents
 - [Requirements](#requirements)
+- [Downloading](#downloading)
 - [Installing](#installing)
-- [Uninstalling](#uninstalling)
 - [Usage](#usage)
+- [Uninstalling](#uninstalling)
 - [Notes](#notes)
 
 ## Requirements
@@ -39,35 +40,36 @@ Version 0.0.1+20250510.11
 [Python 3.10+](https://python.org)
 <!-- __RM_DEPS__ -->
 
+## Downloading
+
+There are two ways to get the code:
+
+1. Download the [latest
+release](https://github.com/cyclopticnerve/PyPlate/releases/latest) (the
+**'Source code (zip)'** file should work an all platforms).
+
+2. Or you can clone the git repo to get the latest (and often broken) code from
+   the main branch:
+```bash
+$ git clone https://github.com/cyclopticnerve/PyPlate
+```
+
 ## Installing
 <!-- __RM_APP__ -->
-You can download the (hopefully stable)
-[latest release](https://github.com/cyclopticnerve/PyPlate/releases/latest)
-from the main branch.<br>
-Download either the 'tar.gz' or '.zip' file and extract it.
-
-Then install it:
+If you downloaded the zip file, extract it and go to the 'install' directory:
 ```bash
-foo@bar:~$ cd ~/Downloads/PyPlate-<version>/dist
-foo@bar:~/Downloads/PyPlate-<version>/dist$ ./install.py
+$ cd ~/Downloads/PyPlate-<version>/install
+```
+where \<version\> is the version number of the file you downloaded.
+
+If you cloned the repo, just go to the 'install' directory:
+```bash
+$ cd ~/Downloads/PyPlate/install
 ```
 
-Or you can clone the git repo to get the latest (and often broken) code from
-the dev branch:
+Either way, run the install script:
 ```bash
-foo@bar:~$ cd ~/Downloads
-foo@bar:~/Downloads$ git clone https://github.com/cyclopticnerve/PyPlate
-foo@bar:~/Downloads$ cd PyPlate-<version>/dist
-foo@bar:~/Documents/Downloads/PyPlate-<version>$ ./install.py
-```
-<!-- __RM_APP__ -->
-
-## Uninstalling
-<!-- __RM_APP__ -->
-Go to the source folder for PyPlate and run the uninstaller:
-```bash
-foo@bar:~$ cd ~/.local/share/pyplate/uninstall
-foo@bar:~/.local/share/pyplate/uninstall$ ./uninstall.py
+$ ./install.py
 ```
 <!-- __RM_APP__ -->
 
@@ -78,12 +80,13 @@ project as its development continues.
 
 Let us start with 'pymaker'.
 
-## PyMaker - create the project
-Before you do anything, you should take a look at the 'pyplate.py' file in
-'~/.local/share/pyplate/conf'. This file contains A LOT of information that is
-used when creating/building a project. Most of these are string values and
+## PyMaker - Create the project
+Before you do anything, you should take a look at the 'conf.py' file in
+'~/.local/share/pyplate/conf'. This file contains A **LOT** of information that
+is used when creating/building a project. Most of these are string values and
 file/folder names used in the program, which you are free to change. PyPlate
-does not yet support i18n/l10n, but that may be included at a later date.  
+does not yet support i18n/l10n for itself (meaning any strings in this file
+will not be i18n'ed), but that may be included at a later date.  
 
 This file also contains some functions that are run at various times during
 creating/building the project, such as before/after creating a project,
@@ -95,8 +98,8 @@ too.
 Now run the script from the command line, in the directory where you want to
 create the project:
 ```bash
-foo@bar:~$: cd Documents/Projects/Python
-foo@bar:~/Documents/Projects/Python$ pymaker
+$ cd ~/Documents/Projects/Python
+$ pymaker
 ```
 
 Enter the required information, and 'pymaker' will create the required files
@@ -125,6 +128,15 @@ the project (since it may not know the current directory). Give it the name of
 the project's directory as it was created by pymaker, relative to the current
 dir in VSCode's terminal.
 
+## Uninstalling
+<!-- __RM_APP__ -->
+Go to the source folder for PyPlate and run the uninstaller:
+```bash
+$ cd ~/.local/share/pyplate/uninstall
+$ ./uninstall.py
+```
+<!-- __RM_APP__ -->
+
 ## Notes
 If you make any changes to this template to better suit your own style/setup,
 please let me know or send a pull request. I will take a look and see if I can
@@ -134,9 +146,8 @@ needs.
 
 PyPlate currently uses pdoc3 for documentation, mostly because it is easy and
 sphinx is HARD! I don't really want to learn RST, and the Markdown/MyST stuff
-is confusing. So for now, if you create docs for your project, and you are
-using an icon in said docs, you may need to adjust the path to that icon in all
-your HTML files. YMMV.
+is confusing.
+I am currently looking at mkdocs, will let you know.
 
 -)
 <!-- -) -->
