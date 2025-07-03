@@ -6,15 +6,7 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-<<<<<<< HEAD
 ![](images/pyplate.png)
-<<<<<<< HEAD
-
-=======
->>>>>>> c722d5f (fix readme)
-=======
-![](images/icon.png)
->>>>>>> b0e4bab (finished comman)
 # PyPlate
 
 ## "It mostly works" ™©®
@@ -25,15 +17,13 @@
 Version 0.0.1
 <!-- __RM_VERSION__ -->
 
-<<<<<<< HEAD
-<!-- [![alt-text](readme/screenshot.png)]("tooltip") -->
-=======
 <!-- __RM_SHORT_DESC__ -->
 A program for creating and building CLI/GUI/Package projects in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
+<!-- __RM_SCREENSHOT__ -->
 <!-- ![alt-text](images/screenshot.png "screenshot") -->
->>>>>>> b0e4bab (finished comman)
+<!-- __RM_SCREENSHOT__ -->
 
 ## Table of Contents
 - [Requirements](#requirements)
@@ -145,7 +135,7 @@ $ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
 
-## Notes
+## Note
 If you make any changes to this template to better suit your own style/setup,
 please let me know or send a pull request. I will take a look and see if I can
 incorporate your changes to make them user, system, and/or IDE agnostic. This
