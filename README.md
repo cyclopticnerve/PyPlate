@@ -6,26 +6,34 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
+<<<<<<< HEAD
 ![](images/pyplate.png)
 <<<<<<< HEAD
 
 =======
 >>>>>>> c722d5f (fix readme)
+=======
+![](images/icon.png)
+>>>>>>> b0e4bab (finished comman)
 # PyPlate
 
 ## "It mostly works" ™©®
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
-<!-- __RM_SHORT_DESC__ -->
-A program for creating and building CLI/GUI/Package projects in Python from a template
-<!-- __RM_SHORT_DESC__ -->
-
 <!-- __RM_VERSION__ -->
 Version 0.0.1
 <!-- __RM_VERSION__ -->
 
+<<<<<<< HEAD
 <!-- [![alt-text](readme/screenshot.png)]("tooltip") -->
+=======
+<!-- __RM_SHORT_DESC__ -->
+A program for creating and building CLI/GUI/Package projects in Python from a template
+<!-- __RM_SHORT_DESC__ -->
+
+<!-- ![alt-text](images/screenshot.png "screenshot") -->
+>>>>>>> b0e4bab (finished comman)
 
 ## Table of Contents
 - [Requirements](#requirements)

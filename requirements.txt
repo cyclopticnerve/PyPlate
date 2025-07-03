@@ -1,0 +1,7 @@
+CNLib @ git+https://github.com/cyclopticnerve/CNLib@ed042c33b4da1eaf32269744e144b65d5d810d61
+Mako==1.3.10
+Markdown==3.8.1
+MarkupSafe==3.0.2
+pdoc3==0.11.6
+pycairo==1.27.0
+PyGObject==3.48.2

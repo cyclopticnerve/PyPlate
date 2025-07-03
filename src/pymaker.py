@@ -96,14 +96,14 @@ class PyMaker(PyPlate):
 
     # pyplate: replace=True
 
-    # I18N: short description
+    # I18N: short desc in pymaker
     S_PP_SHORT_DESC = _(
         "A program for creating CLI/GUI/Package projects in Python from a " \
         "template"
     )
 
     # version string
-    S_PP_VERSION = "Version 0.0.1+20250507.9"
+    S_PP_VERSION = "Version 0.0.1"
 
     # pyplate: replace=False
 
@@ -137,7 +137,6 @@ class PyMaker(PyPlate):
         program, and performing its steps.
         """
 
-        print("child main")
         # do super main
         super().main()
 
@@ -175,9 +174,10 @@ class PyMaker(PyPlate):
         Perform some mundane stuff like setting properties.
         """
 
-        print("child setup")
-        # do setup and parse command line
+        # do parent setup
         super()._setup()
+
+        # parse command line
         self._do_cmd_line()
         if self._debug:
             self._dict_debug = C.D_DBG_PM
@@ -186,25 +186,6 @@ class PyMaker(PyPlate):
         if self._dir_prj.is_relative_to(self.P_DIR_PP):
             print(C.S_ERR_PRJ_DIR_IS_PP)
             sys.exit()
-
-        # create global and calculated settings dicts in private.json
-        self._dict_prv = {
-            C.S_KEY_PRV_ALL: C.D_PRV_ALL,
-            C.S_KEY_PRV_PRJ: C.D_PRV_PRJ,
-        }
-
-        # create individual dicts in pyplate.py
-        self._dict_pub = {
-            C.S_KEY_PUB_BL: C.D_PUB_BL,
-            C.S_KEY_PUB_DBG: C.D_PUB_DBG,
-            # NB: placeholder until we get prj type
-            C.S_KEY_PUB_DIST: [],
-            C.S_KEY_PUB_I18N: C.D_PUB_I18N,
-            C.S_KEY_PUB_META: C.D_PUB_META,
-        }
-
-        # reload dict pointers after dict change
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -217,7 +198,6 @@ class PyMaker(PyPlate):
         self._dict_prv_prj.
         """
 
-        print("child get prj info")
         # ----------------------------------------------------------------------
         # first question is type
         # NB: this makes the string to display in terminal
@@ -363,6 +343,27 @@ class PyMaker(PyPlate):
                 name_sec_pascal = F.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
+
+        # create global and calculated settings dicts in private.json
+        self._dict_prv = {
+            C.S_KEY_PRV_ALL: C.D_PRV_ALL,
+            C.S_KEY_PRV_PRJ: C.D_PRV_PRJ,
+        }
+
+        # create individual dicts in pyplate.py
+        self._dict_pub = {
+            C.S_KEY_PUB_BL: C.D_PUB_BL,
+            C.S_KEY_PUB_DBG: C.D_PUB_DBG,
+            # NB: placeholder until we get prj type
+            C.S_KEY_PUB_DIST: {},
+            C.S_KEY_PUB_I18N: C.D_PUB_I18N,
+            C.S_KEY_PUB_META: C.D_PUB_META,
+        }
+
+        # reload dict pointers after dict change
+        self._reload_dicts()
+
+        # ----------------------------------------------------------------------
         # calculate dunder values now that we have project info
 
         # save project stuff
@@ -374,7 +375,6 @@ class PyMaker(PyPlate):
         self._dict_prv_prj["__PP_NAME_SEC_BIG__"] = name_sec_big
         self._dict_prv_prj["__PP_NAME_SEC_SMALL__"] = name_sec_small
         self._dict_prv_prj["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
-        # self._dict_prv_prj["__PP_DATE__"] = info_date
         self._dict_prv_prj["__PP_NAME_VENV__"] = C.S_VENV_FMT_NAME.format(
             name_prj_small
         )
@@ -388,8 +388,7 @@ class PyMaker(PyPlate):
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
 
         # add dist stuff
-        self._dict_pub[C.S_KEY_PUB_DIST] = C.D_PUB_DIST[prj_type]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub[C.S_KEY_PUB_DIST] = C.D_PUB_DIST[prj_type].copy()
 
         # ----------------------------------------------------------------------
 
@@ -403,6 +402,9 @@ class PyMaker(PyPlate):
 
         # blank line before printing progress
         print()
+
+        # reload dicts after modify
+        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Do any work before template copy
@@ -438,7 +440,7 @@ class PyMaker(PyPlate):
         # do template/all
 
         # copy template/all
-        src = self.P_DIR_PP / C.S_PATH_TMP_ALL
+        src = self.P_DIR_PP / C.S_DIR_TEMPLATE / C.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 

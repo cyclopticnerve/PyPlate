@@ -13,15 +13,16 @@
 
 __PP_RM_LICENSE__
 
-<!-- __RM_SHORT_DESC__ -->
-__PP_SHORT_DESC__
-<!-- __RM_SHORT_DESC__ -->
-
 <!-- __RM_VERSION__ -->
 __PP_VER_DISP__
 <!-- __RM_VERSION__ -->
 
-<!-- ![alt-text](readme/screenshot.png) -->
+<!-- __RM_SHORT_DESC__ -->
+__PP_SHORT_DESC__
+<!-- __RM_SHORT_DESC__ -->
+
+<!-- __RM_SCREENSHOT__ -->
+<!-- __RM_SCREENSHOT__ -->
 
 ## Table of Contents
 - [Requirements](#requirements)
@@ -116,7 +117,7 @@ $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
 <!-- __RM_PKG__ -->
 <!-- __RM_APP__ -->
-Go to the source folder for __PPNAME_PRJ_BIG__ and run the uninstaller:
+Go to the source folder for __PP_NAME_PRJ_BIG__ and run the uninstaller:
 ```bash
 $ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
 $ ./uninstall.py

@@ -31,8 +31,7 @@ import sys
 import tarfile
 
 # local imports
-import cnlib.cnfunctions as F
-from cnlib.cninstall import CNInstall
+from cnlib import cnfunctions as F
 from cnlib.cnpot import CNPotPy
 from cnlib.cntree import CNTree
 from cnlib.cnvenv import CNVenv
@@ -97,19 +96,18 @@ S_DATE_FMT = _("%m/%d/%Y")
 # I18N: def deps
 S_DEPS_NONE = _("None")
 # default image ext
-# NB: MAKE SURE TO INCLUDE DOT AND CASE (NOT SANITIZED)
 S_IMG_EXT = ".png"
 # terminal command to go up one level
 S_LVL_UP = "../"
 
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
-# NB: format params are meta version, date, and __PP_VER_BUILD__
+# NB: format params are meta version, date, and __PP_VER_MMR__
 # S_VER_SEM_FMT = "{}+{}.{}"
-# NB: format param is __PP_VER_SEM__
+# NB: format param is __PP_VER_MMR__
 # I18N: printable version number
 S_VER_DISP_FMT = _("Version {}")
-# # NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_SEM__
+# # NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_MMR__
 S_VER_DIST_FMT = "{}-{}"
 
 # ask questions
@@ -183,6 +181,9 @@ S_ERR_DESK_CAT = _(
     '"{}" is not a valid desktop category, see '
     "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
 )
+# NB: format param is S_PATH_SCREENSHOT
+# I18N: alternate text for screenshot in README.md
+S_ERR_NO_SCREENSHOT = _("Create the file {}")
 
 # debug-specific strings
 # I18N: warn if running in debug mode
@@ -253,6 +254,8 @@ S_KEY_PUB_DBG = "PUB_DBG"
 S_KEY_PUB_DIST = "PUB_DIST"
 S_KEY_PUB_I18N = "PUB_I18N"
 S_KEY_PUB_META = "PUB_META"
+S_KEY_PUB_INST = "PUB_INST"
+S_KEY_PUB_UNINST = "PUB_UNINST"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -307,6 +310,12 @@ S_KEY_NAME_START = "S_KEY_NAME_START"
 S_KEY_NAME_END = "S_KEY_NAME_END"
 S_KEY_NAME_MID = "S_KEY_NAME_MID"
 
+# keys for install/uninstall
+S_KEY_INST_NAME = "INST_NAME"
+S_KEY_INST_VER = "INST_VER"
+S_KEY_INST_DESK = "INST_DESK"
+S_KEY_INST_CONT = "INST_CONT"
+
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
 # and make any appropriate changes
@@ -337,7 +346,6 @@ S_DIR_DESKTOP = "desktop"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
-S_DIR_UNINSTALL = "uninstall"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -349,11 +357,14 @@ S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_LOGO = "logo.mako"
+S_FILE_SCREENSHOT = "screenshot.png"
 
-# concatenate some paths
-S_PATH_TMP_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}"
+# concatenate some paths for install/uninstall
 S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
-S_PATH_UNINST_CFG = f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}"
+S_PATH_UNINST_CFG = f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}"
+
+# screenshot path for readme
+S_PATH_SCREENSHOT = f"{S_DIR_IMAGES}/{S_FILE_SCREENSHOT}"
 
 # fix reqs cmds
 S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
@@ -428,20 +439,26 @@ S_CMD_DOC = (
 # regex stuff
 
 # fix readme
-S_RM_PKG = r"<!-- __RM_PKG__ -->(.*?)<!-- __RM_PKG__ -->\n"
-S_RM_APP = r"<!-- __RM_APP__ -->(.*?)<!-- __RM_APP__ -->\n"
+S_RM_PKG = r"<!--[\t ]*__RM_PKG__[\t ]*-->(.*?)<!--[\t ]*__RM_PKG__[\t ]*-->"
+S_RM_APP = r"<!--[\t ]*__RM_APP__[\t ]*-->(.*?)<!--[\t ]*__RM_APP__[\t ]*-->"
+S_RM_VER_SCH = (
+    r"(<!--[\t ]*__RM_VERSION__[\t ]*-->)"
+    r"(.*?)"
+    r"(<!--[\t ]*__RM_VERSION__[\t ]*-->)"
+)
+S_RM_VER_REP = r"\g<1>\n{}\n\g<3>"
 S_RM_DESC_SCH = (
     r"(<!--[\t ]*__RM_SHORT_DESC__[\t ]*-->)"
     r"(.*?)"
     r"(<!--[\t ]*__RM_SHORT_DESC__[\t ]*-->)"
 )
 S_RM_DESC_REP = r"\g<1>\n{}\n\g<3>"
-S_RM_VER_SCH = (
-    r"(<!--[\t ]*__RM_VERSION__[\t ]*-->[\t\n ]*)"
+S_RM_SS_SCH = (
+    r"(<!--[\t ]*__RM_SCREENSHOT__[\t ]*-->)"
     r"(.*?)"
-    r"([\t\n ]*<!--[\t ]*__RM_VERSION__[\t ]*-->)"
+    r"(<!--[\t ]*__RM_SCREENSHOT__[\t ]*-->)"
 )
-S_RM_VER_REP = r"\g<1>{}\g<3>"
+S_RM_SS_REP = r"\g<1>\n{}\n\g<3>"
 S_RM_DEPS_SCH = (
     r"(<!--[\t ]*__RM_DEPS__[\t ]*-->)"
     r"(.*?)"
@@ -538,6 +555,13 @@ S_APP_ID_FMT = "org.{}.{}"
 S_DIST_EXT = ".tar.gz"
 S_DIST_MODE = "w:gz"
 S_DIST_REMOVE = ".py"
+
+
+# ------------------------------------------------------------------------------
+# readme stuff
+
+# NB: format params are alt text and path to image
+S_RM_SCREENSHOT = "![{}]({})"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -759,6 +783,9 @@ L_PKG_INSTALL = ["p"]
 # prj type(s) for making .desktop file
 L_MAKE_DESK = ["g"]
 
+# prj type(s) for making screenshot in README
+L_SCREENSHOT = ["g"]
+
 # ------------------------------------------------------------------------------
 # Dictionaries
 # ------------------------------------------------------------------------------
@@ -819,7 +846,7 @@ D_PRV_ALL = {
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
     "__PP_LOGO_FILE__": f"{S_DIR_DOCS_TPLT}/{S_FILE_LOGO}",
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
-    "__PP_UNINST_CONF_FILE__": f"{S_DIR_UNINSTALL}/{S_FILE_UNINST_CFG}",
+    "__PP_UNINST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}",
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's prj name
     # i.e. /home/dev/Documents/Projects/Python/MyProject
@@ -880,7 +907,7 @@ D_PRV_PRJ = {
     "__PP_IMG_ABOUT__": "",  # image for about logo
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
-    "__PP_VER_SEM__": "",  # semantic version string, ie. "0.0.1+20250505.17653"
+    "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.1+20250505.17653"
     # "__PP_VER_BUILD__": "",  # build number, inc every run of pm/pb, def 0
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1+20250505.17653"
 }
@@ -914,36 +941,21 @@ D_PUB_DIST = {
     "c": {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
-        S_DIR_IMAGES: S_DIR_ASSETS,
-        S_DIR_README: S_DIR_ASSETS,
-        S_DIR_SRC: S_DIR_ASSETS,
-        S_FILE_LICENSE: S_DIR_ASSETS,
-        S_FILE_README: S_DIR_ASSETS,
-        # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        S_PATH_LOCALE: f"{S_DIR_ASSETS}/{S_DIR_I18N}",
-        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
-        # install.json in assets/install folder
-        "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-        S_DIR_UNINSTALL: S_DIR_ASSETS,
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_DIR_INSTALL: S_DIR_ASSETS,
+        S_DIR_SRC: S_DIR_ASSETS,
         # requirements.txt in assets/install folder
         S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
     },
     "g": {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
-        S_DIR_IMAGES: S_DIR_ASSETS,
-        S_DIR_README: S_DIR_ASSETS,
-        S_DIR_SRC: S_DIR_ASSETS,
-        S_FILE_LICENSE: S_DIR_ASSETS,
-        S_FILE_README: S_DIR_ASSETS,
-        # extended stuff (put in assets folder)
         S_DIR_CONF: S_DIR_ASSETS,
-        S_PATH_LOCALE: f"{S_DIR_ASSETS}/{S_DIR_I18N}",
-        f"{S_DIR_INSTALL}/{S_FILE_INST_PY}": "",  # install.py at top level
-        # install.json in assets/install folder
-        "__PP_INST_CONF_FILE__": f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-        S_DIR_UNINSTALL: S_DIR_ASSETS,
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_DIR_IMAGES: S_DIR_ASSETS,
+        S_DIR_INSTALL: S_DIR_ASSETS,
+        S_DIR_SRC: S_DIR_ASSETS,
         # requirements.txt in assets/install folder
         S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
     },
@@ -951,7 +963,7 @@ D_PUB_DIST = {
         # basic stuff (put at top level)
         S_DIR_IMAGES: "",
         S_DIR_README: "",
-        S_DIR_SRC: "",
+        "__PP_NAME_PRJ_SMALL__": "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
         S_DIR_DOCS: "",
@@ -1081,6 +1093,76 @@ D_DBG_PB = {
     S_KEY_DBG_DIST: False,
 }
 
+# dictionary of default stuff to put in install.json
+# NB: in S_KEY_INST_CONT, key is rel to assets, val is rel to home
+# these are the defaults, they can be edited in install/install.json before
+# running pybaker
+D_INSTALL = {
+    "c": {
+        S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
+        S_KEY_INST_VER: "__PP_VER_MMR__",
+        S_KEY_INST_DESK: False,
+        S_KEY_INST_CONT: {
+            f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
+            S_DIR_CONF: "__PP_USR_INST__",
+            S_DIR_I18N: "__PP_USR_INST__",
+            S_DIR_INSTALL: "__PP_USR_INST__",
+            S_DIR_SRC: "__PP_USR_INST__",
+            S_FILE_UNINST_PY: "__PP_USR_INST__",
+            # S_DIR_IMAGES: "__PP_USR_INST__",
+            # S_DIR_LIB: "__PP_USR_INST__",
+            # S_DIR_README: "__PP_USR_INST__",
+            # S_FILE_LICENSE: "__PP_USR_INST__",
+            # S_FILE_README: "__PP_USR_INST__",
+        },
+    },
+    "g": {
+        S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
+        S_KEY_INST_VER: "__PP_VER_MMR__",
+        S_KEY_INST_DESK: True,
+        S_KEY_INST_CONT: {
+            f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
+            S_DIR_CONF: "__PP_USR_INST__",
+            S_DIR_I18N: "__PP_USR_INST__",
+            S_DIR_IMAGES: "__PP_USR_INST__",
+            S_DIR_INSTALL: "__PP_USR_INST__",
+            S_DIR_SRC: "__PP_USR_INST__",
+            S_FILE_UNINST_PY: "__PP_USR_INST__",
+            # S_DIR_LIB: "__PP_USR_INST__",
+            # S_DIR_README: "__PP_USR_INST__",
+            # S_FILE_LICENSE: "__PP_USR_INST__",
+            # S_FILE_README: "__PP_USR_INST__",
+            # extra for gui
+            "__PP_FILE_DESK__": "__PP_USR_APPS__",
+        },
+    },
+}
+
+# dict to remove when uninstalling
+# NB: in S_KEY_INST_CONT, items are files or folders to delete
+# these are the defaults, they can be edited in install/uninstall.json before
+# running pybaker
+D_UNINSTALL = {
+    "c": {
+        S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
+        S_KEY_INST_VER: "__PP_VER_MMR__",
+        S_KEY_INST_CONT: [
+            "__PP_USR_INST__",
+            "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
+        ],
+    },
+    "g": {
+        S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
+        S_KEY_INST_VER: "__PP_VER_MMR__",
+        S_KEY_INST_CONT: [
+            "__PP_USR_INST__",
+            "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
+            # extra for gui
+            "__PP_USR_APPS__/__PP_NAME_PRJ_BIG__.desktop",
+        ],
+    },
+}
+
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
 # this is so that when you update a file in the PyPlate project, it gets copied
@@ -1099,53 +1181,6 @@ D_COPY = {
 #     "c": ["cnlib"],
 #     "g": ["cnlib"],  # "cnguilib"],
 # }
-
-# dictionary of default stuff to put in install.json
-# NB: key is rel to prj, val is rel to home
-# these are the defaults, they can be edited in prj/install/install.json before
-# running pybaker
-D_INSTALL = {
-    "c": {
-        S_DIR_CONF: "__PP_USR_INST__",
-        S_DIR_IMAGES: "__PP_USR_INST__",
-        S_DIR_LIB: "__PP_USR_INST__",
-        S_DIR_README: "__PP_USR_INST__",
-        S_DIR_SRC: "__PP_USR_INST__",
-        S_DIR_I18N: "__PP_USR_INST__",
-        S_FILE_LICENSE: "__PP_USR_INST__",
-        S_FILE_README: "__PP_USR_INST__",
-        S_DIR_UNINSTALL: "__PP_USR_INST__",
-        f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
-    },
-    "g": {
-        S_DIR_CONF: "__PP_USR_INST__",
-        S_DIR_IMAGES: "__PP_USR_INST__",
-        S_DIR_LIB: "__PP_USR_INST__",
-        S_DIR_README: "__PP_USR_INST__",
-        S_DIR_SRC: "__PP_USR_INST__",
-        S_DIR_I18N: "__PP_USR_INST__",
-        S_FILE_LICENSE: "__PP_USR_INST__",
-        S_FILE_README: "__PP_USR_INST__",
-        S_DIR_UNINSTALL: "__PP_USR_INST__",
-        f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
-        # extra for gui
-        "__PP_FILE_DESK__": "__PP_USR_APPS__",
-    },
-}
-
-# dict to remove when uninstalling
-D_UNINSTALL = {
-    "c": [
-        "__PP_USR_INST__",
-        "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
-    ],
-    "g": [
-        "__PP_USR_INST__",
-        "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
-        # extra for gui
-        "__PP_USR_APPS__/__PP_NAME_PRJ_BIG__.desktop",
-    ],
-}
 
 # map file ext to rep type
 D_TYPE_RULES = {
@@ -1214,7 +1249,7 @@ D_NAME = {
     S_KEY_NAME_MID: r"(^[a-zA-Z\d\-_ ]*$)",
 }
 
-# dirs to remove after the project is done
+# dirs to remove after the project is fixed by either pm or pb
 D_PURGE_DIRS = {
     "p": [
         S_DIR_BIN,
@@ -1223,7 +1258,6 @@ D_PURGE_DIRS = {
         S_DIR_I18N,
         S_DIR_INSTALL,
         S_DIR_SRC,
-        S_DIR_UNINSTALL,
     ]
 }
 
@@ -1353,8 +1387,8 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         # show info
         print(S_ACTION_DONE)
 
-    # ----------------------------------------------------------------------
-    # install/uninstall
+    # --------------------------------------------------------------------------
+    # install/uninstall config files
 
     # if install flag is set
     if dict_dbg[S_KEY_DBG_INST]:
@@ -1365,34 +1399,17 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
             # show info
             print(S_ACTION_INST, end="", flush=True)
 
-            # get params
-            name = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ__"]
-
-            # get version number
-            version = dict_prv[S_KEY_PRV_PRJ]["__PP_VER_SEM__"]
-
-            # get an install instance
-            inst = CNInstall()
-
             # create a template install cfg file
-            dict_inst = inst.make_install_cfg(
-                name,
-                version,
-                D_INSTALL[prj_type],
-            )
+            dict_inst = D_INSTALL[prj_type]
 
             # fix dunders in inst cfg file
             path_inst = dir_prj / S_PATH_INST_CFG
             F.save_dict(dict_inst, [path_inst])
 
             # create a template uninstall cfg file
-            dict_uninst = inst.make_uninstall_cfg(
-                name,
-                version,
-                D_UNINSTALL[prj_type],
-            )
+            dict_uninst = D_UNINSTALL[prj_type]
 
-            # fix dunders in inst cfg file
+            # fix dunders in uninst cfg file
             path_uninst = dir_prj / S_PATH_UNINST_CFG
             F.save_dict(dict_uninst, [path_uninst])
 
@@ -1454,6 +1471,9 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # get base version
     ver_base = dict_pub_meta[S_KEY_META_VERSION]
 
+    # set display of version
+    dict_prv_prj["__PP_VER_DISP__"] = S_VER_DISP_FMT.format(ver_base)
+
     # get current date and format it according to dev fmt
     # now = datetime.now()
     # ver_date = now.strftime(S_VER_DATE_FMT)
@@ -1471,11 +1491,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # semantic version with meta info
     # str_sem = S_VER_SEM_FMT.format(ver_base, ver_date, str(int_build))
     str_sem = ver_base
-    dict_prv_prj["__PP_VER_SEM__"] = str_sem
-
-    # display
-    str_disp = S_VER_DISP_FMT.format(str_sem)
-    dict_prv_prj["__PP_VER_DISP__"] = str_disp
+    dict_prv_prj["__PP_VER_MMR__"] = str_sem
 
     # fix ver for dist filename
     ver_dist = str_sem
@@ -1530,6 +1546,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_IMG_ABOUT__"] = (
         f"{"../../.."}/{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1685,7 +1702,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         potpy = CNPotPy(
             # header
             str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
-            str_version=dict_prv[S_KEY_PRV_PRJ]["__PP_VER_SEM__"],
+            str_version=dict_prv[S_KEY_PRV_PRJ]["__PP_VER_MMR__"],
             str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
             str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
             # base prj dir
@@ -1708,7 +1725,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         potpy.main()
 
         # ----------------------------------------------------------------------
-        # do .desktop
+        # do .desktop i18n/version
 
         # check if we want template
         if prj_type in L_MAKE_DESK and not path_dsk_tmp.exists():
@@ -1740,7 +1757,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
                 # replace version
                 str_pattern = S_PO_VER_SCH
-                pp_version = dict_prv_prj["__PP_VER_SEM__"]
+                pp_version = dict_prv_prj["__PP_VER_MMR__"]
                 str_rep = S_PO_VER_REP.format(pp_version)
                 text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1904,7 +1921,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # replace version
             str_pattern = S_PO_VER_SCH
-            pp_version = dict_prv_prj["__PP_VER_SEM__"]
+            pp_version = dict_prv_prj["__PP_VER_MMR__"]
             str_rep = S_PO_VER_REP.format(pp_version)
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -1982,19 +1999,22 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # purge package dirs
 
+    # if project type in dict
     if prj_type in D_PURGE_DIRS:
+
+        # get list and make items absolute
         l_purge = D_PURGE_DIRS[prj_type]
+        l_purge = [Path(item) for item in l_purge]
         l_purge = [
-            (
-                Path(dir_prj) / item
-                if not Path(item).is_absolute()
-                else Path(item)
-            )
+            dir_prj / item if not item.is_absolute() else item
             for item in l_purge
         ]
+
+        # purge dirs
         for item in l_purge:
-            if item.exists():
+            if item.exists() and item.is_dir():
                 shutil.rmtree(item)
+
 
 # ------------------------------------------------------------------------------
 # Do any work after making dist
@@ -2020,6 +2040,29 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     dist = Path(dir_prj) / S_DIR_DIST
     name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_DIR__"]
     p_dist = dist / name_fmt
+
+    # --------------------------------------------------------------------------
+    # move some files around between end of dist and start of install
+
+    # get project type
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
+    if prj_type in L_APP_INSTALL:
+        # move install.py to above assets
+        file_inst = p_dist / S_DIR_ASSETS / S_DIR_INSTALL / S_FILE_INST_PY
+        if file_inst.exists():
+            shutil.move(file_inst, p_dist)
+
+        # move uninstall.py to top of assets
+        file_uninst = p_dist / S_DIR_ASSETS / S_DIR_INSTALL / S_FILE_UNINST_PY
+        if file_uninst.exists():
+            dest = p_dist / S_DIR_ASSETS
+            shutil.move(file_uninst, dest)
+
+    # # move reqs to install
+    # file_reqs = p_dist / S_FILE_REQS
+    # dest = p_dist / S_DIR_INSTALL
+    # shutil.move(file_reqs, dest)
 
     # --------------------------------------------------------------------------
     # remove all "ABOUT" files
@@ -2174,7 +2217,7 @@ def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
 
     # replace version
     str_pattern = S_RM_VER_SCH
-    pp_ver_disp = dict_prv_prj["__PP_VER_DISP__"]
+    pp_ver_disp = dict_prv_prj["__PP_VER_MMR__"]
     str_rep = S_RM_VER_REP.format(pp_ver_disp)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
@@ -2199,8 +2242,6 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     fixes metadata in the file when dict_meta is present.
     """
 
-    # TODO: still has literals, but very tight and specific
-
     # the whole text of the file
     text = ""
 
@@ -2220,14 +2261,41 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     str_rep = S_RM_DESC_REP.format(pp_short_desc)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
-    # get deps as links for readme
+    # --------------------------------------------------------------------------
+
+    # not technically metadata, but other stuff we gotta fix anyway
+
+    # fix readme screenshot
+
+    # get project type
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
+
+    # should we futz with the readme?
+    if prj_type in L_SCREENSHOT:
+
+        # format the alt text
+        s_alt = S_ERR_NO_SCREENSHOT.format(S_PATH_SCREENSHOT)
+        s_img = S_RM_SCREENSHOT.format(s_alt, S_PATH_SCREENSHOT)
+
+        # replace screenshot
+        str_pattern = S_RM_SS_SCH
+        str_rep = S_RM_SS_REP.format(s_img)
+        text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
+    # --------------------------------------------------------------------------
+
+    # TODO: still has literals, but very tight and specific
+
+    # fix deps in readme
+
+    # get deps as links
     d_py_deps = dict_pub_meta[S_KEY_META_DEPS]
     l_rm_deps = [
         f"[{key}]({val})" if val != "" else key
         for key, val in d_py_deps.items()
     ]
 
-    # get rm deps as links
+    # make a pretty string
     s_rm_deps = "<br>\n".join(l_rm_deps)
     if len(s_rm_deps) == 0:
         s_rm_deps = S_DEPS_NONE
@@ -2236,6 +2304,8 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     str_pattern = S_RM_DEPS_SCH
     str_rep = S_RM_DEPS_REP.format(s_rm_deps)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
+    # --------------------------------------------------------------------------
 
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
@@ -2266,7 +2336,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
 
     # replace version
     str_pattern = S_TOML_VER_SCH
-    str_rep = dict_prv_prj["__PP_VER_SEM__"]
+    str_rep = dict_prv_prj["__PP_VER_MMR__"]
     str_rep = S_TOML_VER_REP.format(str_rep)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -2303,21 +2373,21 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
 
-    Fixes the version number and short description in any file whose name
-    matches S_FILE_INST_CFG or S_FILE_UNINST_CFG.
+    Fixes the version number in any file whose name matches S_FILE_INST_CFG or
+    S_FILE_UNINST_CFG.
     """
 
     # get version from project.json
-    version = dict_prv_prj["__PP_VER_SEM__"]
+    version = dict_prv_prj["__PP_VER_MMR__"]
 
     # load/change/save
     a_dict = F.load_dicts([path])
-    a_dict[CNInstall.S_KEY_VERSION] = version
+    a_dict[S_KEY_INST_VER] = version
     F.save_dict(a_dict, [path])
 
     # load/change/save
     a_dict = F.load_dicts([path])
-    a_dict[CNInstall.S_KEY_VERSION] = version
+    a_dict[S_KEY_INST_VER] = version
     F.save_dict(a_dict, [path])
 
 
@@ -2403,7 +2473,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
 
     # replace version
     str_pattern = S_UI_VER_SCH
-    pp_version = dict_prv_prj["__PP_VER_SEM__"]
+    pp_version = dict_prv_prj["__PP_VER_MMR__"]
     str_rep = S_UI_VER_REP.format(pp_version)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -2513,7 +2583,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
         # ----------------------------------------------------------------------
 
         # replace version in line
-        ver = dict_prv_prj["__PP_VER_DISP__"]
+        ver = dict_prv_prj["__PP_VER_MMR__"]
         str_sch = S_SRC_VER_SCH
         str_rep = S_SRC_VER_REP.format(ver)
         line = re.sub(str_sch, str_rep, line, flags=re.M)

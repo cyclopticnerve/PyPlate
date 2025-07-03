@@ -34,7 +34,7 @@ from pathlib import Path
 import sys
 
 # cnlib imports
-from cnlib.cnformatter import CNFormatter
+# from cnlib.cnformatter import CNFormatter
 import cnlib.cnfunctions as F
 
 # ------------------------------------------------------------------------------
@@ -75,6 +75,25 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # Classes
 # ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# A dummy class to combine multiple argparse formatters
+# ------------------------------------------------------------------------------
+class CNFormatter(
+    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
+):
+    """
+    A dummy class to combine multiple argparse formatters
+
+    Args:
+        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
+        including argument descriptions.
+        RawDescriptionHelpFormatter: Indicates that description and epilog are
+        already correctly formatted and should not be line-wrapped.
+
+    A dummy class to combine multiple argparse formatters.
+    """
 
 
 # ------------------------------------------------------------------------------
@@ -133,7 +152,7 @@ class __PP_NAME_PRJ_PASCAL__:
     # about string
     S_ABOUT = (
         "\n"
-        f"{'__PP_NAME_PRJ__'}\n"
+        "__PP_NAME_PRJ_BIG__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
         "__PP_URL__/__PP_NAME_PRJ_BIG__\n"

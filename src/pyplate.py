@@ -33,7 +33,6 @@ import re
 import sys
 
 # local imports
-from cnlib.cnformatter import CNFormatter
 import cnlib.cnfunctions as F
 
 # ------------------------------------------------------------------------------
@@ -74,6 +73,25 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # Classes
 # ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# A dummy class to combine multiple argparse formatters
+# ------------------------------------------------------------------------------
+class CNFormatter(
+    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
+):
+    """
+    A dummy class to combine multiple argparse formatters
+
+    Args:
+        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
+        including argument descriptions.
+        RawDescriptionHelpFormatter: Indicates that description and epilog are
+        already correctly formatted and should not be line-wrapped.
+
+    A dummy class to combine multiple argparse formatters.
+    """
 
 
 # ------------------------------------------------------------------------------
@@ -195,7 +213,6 @@ class PyPlate:
         program, and performing its steps.
         """
 
-        print("super main")
         # call boilerplate code
         self._setup()
 
@@ -218,7 +235,6 @@ class PyPlate:
         Perform some mundane stuff like setting properties.
         """
 
-        print("super setup")
         # print default about text
         print(self.S_ABOUT)
 
@@ -252,20 +268,6 @@ class PyPlate:
         )
 
     # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        The implementation of this function in the superclass is just a dummy
-        placeholder. The real work should be done in the subclass.
-        """
-
-        print("super get prj info")
-    # ------------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
     # Parse the arguments from the command line
     # --------------------------------------------------------------------------
     def _do_cmd_line(self):
@@ -276,7 +278,6 @@ class PyPlate:
         set up.
         """
 
-        print("super get cmd line")
         # get namespace object
         args = self._parser.parse_args()
 
@@ -327,6 +328,17 @@ class PyPlate:
         # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SWITCH_DEF)
         self._dict_sw_line = dict(self._dict_sw_block)
+
+    # --------------------------------------------------------------------------
+    # Get project info
+    # --------------------------------------------------------------------------
+    def _get_project_info(self):
+        """
+        Get project info
+
+        The implementation of this function in the superclass is just a dummy
+        placeholder. The real work should be done in the subclass.
+        """
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -893,6 +905,8 @@ class PyPlate:
 
         # reload dict from fixed file
         dict_pub = F.load_dicts([path_pub])
+
+        # reload dict pointers after dict change
         self._reload_dicts()
 
     # --------------------------------------------------------------------------

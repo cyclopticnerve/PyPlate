@@ -11,14 +11,14 @@
             "cwd": "${workspaceFolder}/.."
         },
         {
-            "name": "PM Args",
+            "name": "PM debug",
             "type": "debugpy",
             "request": "launch",
             "program": "PyPlate/src/pymaker.py",
             "console": "integratedTerminal",
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
-            "args": "${command:pickArgs}"
+            "args": ["-d"]
         },
         {
             "name": "PB",
@@ -41,8 +41,8 @@
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
             "args": [
-                "-i",
-                "${command:pickArgs}"
+                "-d",
+                "-i"
             ]
         }
     ]

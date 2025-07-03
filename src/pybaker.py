@@ -213,7 +213,7 @@ class PyBaker(PyPlate):
             action=self.S_ARG_IDE_ACTION,
         )
 
-        # and parse command line
+        # parse command line
         self._do_cmd_line()
         if self._debug:
             self._dict_debug = C.D_DBG_PB
@@ -223,6 +223,7 @@ class PyBaker(PyPlate):
 
         # if ide=yes, ask for prj name
         if self._ide:
+
             # ask for prj name rel to cwd
             in_str = C.S_ASK_IDE.format(self._dir_prj)
             while True:
@@ -232,11 +233,14 @@ class PyBaker(PyPlate):
 
                 # if running in ide, cwd is pyplate prj dir, so move up and down
                 tmp_dir = Path(self._dir_prj / prj_name).resolve()
+
+                # check if project exists
                 if not tmp_dir.exists():
                     e_str = C.S_ERR_NOT_EXIST.format(tmp_dir)
                     print(e_str)
                     continue
 
+                # set project dir and exit loop
                 self._dir_prj = tmp_dir
                 print()
                 break
