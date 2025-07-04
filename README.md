@@ -135,7 +135,7 @@ $ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
 
-## Note
+## Notes
 If you make any changes to this template to better suit your own style/setup,
 please let me know or send a pull request. I will take a look and see if I can
 incorporate your changes to make them user, system, and/or IDE agnostic. This
