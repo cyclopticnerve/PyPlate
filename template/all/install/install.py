@@ -93,7 +93,6 @@ class CNFormatter(
     A dummy class to combine multiple argparse formatters.
     """
 
-
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
 # ------------------------------------------------------------------------------
