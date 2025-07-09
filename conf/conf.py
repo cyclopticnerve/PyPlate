@@ -1061,7 +1061,7 @@ D_PUB_DBG = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
@@ -1362,7 +1362,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         #     add_str = S_CMD_INST_LIB.format(add_path)
         #     cmd += add_str + ";"
 
-        # cmd += " python -m pip install -e '/home/dana/Documents/Projects/Python/CNLib'"
+        # cmd += " python -m pip install -e '~/Documents/Projects/Python/CNLib'"
         # the command to install libs
         # try:
         #     F.sh(cmd, shell=True)
