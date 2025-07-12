@@ -30,6 +30,7 @@ __PP_SHORT_DESC__
 - [Installing](#installing)
 - [Usage](#usage)
 - [Uninstalling](#uninstalling)
+- [Documentation](#documentation)
 - [Notes](#notes)
 
 ## Requirements
@@ -123,6 +124,9 @@ $ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
 $ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
+
+## Documentation
+See the [documentation](__PP_AUTHOR__.gitub.io/__PP_NAME_PRJ_BIG__)
 
 ## Notes
 blah blah blah

@@ -97,8 +97,6 @@ S_DATE_FMT = _("%m/%d/%Y")
 S_DEPS_NONE = _("None")
 # default image ext
 S_IMG_EXT = ".png"
-# terminal command to go up one level
-S_LVL_UP = "../"
 
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
@@ -221,8 +219,6 @@ S_ACTION_LIB = _("Install libs in venv... ")
 S_ACTION_I18N = _("Make i18n folder... ")
 # I18N: Make docs folder
 S_ACTION_DOCS = _("Make docs folder... ")
-# I18N: fix docs images
-S_ACTION_DOCS_IMG = _("Fixing docs images... ")
 # I18N: Make tree file
 S_ACTION_TREE = _("Make tree file... ")
 # I18N: Install package in venv
@@ -328,7 +324,6 @@ S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_DOCS = "docs"
-S_DIR_DOCS_TPLT = "pdoc3"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -356,7 +351,6 @@ S_FILE_INST_CFG = "install.json"
 S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
-S_FILE_LOGO = "logo.mako"
 S_FILE_SCREENSHOT = "screenshot.png"
 
 # concatenate some paths for install/uninstall
@@ -421,16 +415,7 @@ S_CMD_GIT_CREATE = "git init {} -q"
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
 # NB: format params are prj dir and src dir
 # S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ./{}"
-# cmd for pdoc3
-# NB: format params are path to pp, path to pp venv, path to project, path to
-# project's template, path to project's docs dir, and path to project's input
-# (src) dir
-S_CMD_DOC = (
-    "cd {};"
-    ". {}/bin/activate;"
-    "cd {};"
-    "pdoc --html --force --template-dir {} -o {} {}"
-)
+
 # cmd to install libs as editable
 # NB: format param is relative path to cnlib dir
 # S_CMD_INST_LIB = "python -m pip install -e {}"
@@ -527,10 +512,6 @@ S_SEM_VER_VALID = (
     r"))?"
     r"$"
 )
-
-# use local image in docs
-S_DOC_IMG_SCH = r"(<header>.*<img src=\")(.*?)(\")"
-S_DOC_IMG_REP = r"\g<1>{}\g<3>"
 
 # ------------------------------------------------------------------------------
 # gui stuff
@@ -844,7 +825,6 @@ D_PRV_ALL = {
     "__PP_DIR_LIB__": S_DIR_LIB,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
-    "__PP_LOGO_FILE__": f"{S_DIR_DOCS_TPLT}/{S_FILE_LOGO}",
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
     "__PP_UNINST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}",
     # --------------------------------------------------------------------------
@@ -901,7 +881,6 @@ D_PRV_PRJ = {
     # these strings are calculated in do_before_fix
     "__PP_FILE_DESK__": "",  # final desk file, not template
     "__PP_IMG_README__": "",  # image for readme file logo
-    "__PP_IMG_DOCS__": "",  # image for docs header logo
     "__PP_IMG_DESK__": "",  # image for .desktop logo
     "__PP_IMG_DASH__": "",  # image for dash/win logo
     "__PP_IMG_ABOUT__": "",  # image for about logo
@@ -1076,7 +1055,7 @@ D_DBG_PM = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1087,7 +1066,7 @@ D_DBG_PB = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1532,9 +1511,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     dict_prv_prj["__PP_IMG_README__"] = (
         f"{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
     )
-    dict_prv_prj["__PP_IMG_DOCS__"] = (
-        f"{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
-    )
     # NB: .desktop needs abs path to img
     dict_prv_prj["__PP_IMG_DESK__"] = (
         f"{usr_inst}/{S_DIR_IMAGES}/{name_prj_small}{img_ext}"
@@ -1774,85 +1750,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
-        # print info
-        print(S_ACTION_DOCS, end="", flush=True)
-
-        # get template and output dirs
-        dir_docs_tplt = dir_prj / S_DIR_DOCS_TPLT
-        dir_docs_out = dir_prj / S_DIR_DOCS
-
-        # nuke old docs
-        if dir_docs_out.exists():
-            shutil.rmtree(dir_docs_out)
-            dir_docs_out.mkdir(parents=True)
-
-        # format cmd using pdoc template dir, output dir, and start dir
-        cmd_docs = S_CMD_DOC.format(
-            P_DIR_PP,
-            P_DIR_PP_VENV,
-            dir_prj,
-            dir_docs_tplt,
-            dir_docs_out,
-            # dir_prj / S_DIR_SRC,
-            dir_prj,
-        )
-
-        # the command to run pdoc
-        cmd = f"{cmd_docs}"
-        try:
-            F.sh(cmd, shell=True)
-            print(S_ACTION_DONE)
-        except Exception as e:
-            print(S_ACTION_FAIL)
-            raise e
-
-        # ----------------------------------------------------------------------
-        # use local image in docs
-
-        # print info
-        print(S_ACTION_DOCS_IMG, end="", flush=True)
-
-        # initial "../" level
-        level = 0
-
-        # walk the docs tree
-        for root, _dirs, files in dir_docs_out.walk():
-
-            # next level
-            level += 1
-
-            # get full paths
-            files = [root / f for f in files]
-            # files = [f for f in files if f.suffix.lower() == ".html"]
-            files = [f for f in files if PP.is_path_in_list(f, L_EXT_HTML)]
-
-            # for each html file
-            for f in files:
-
-                # build the dots, one set for each level
-                dots = ""
-                for _i in range(level):
-                    dots += S_LVL_UP
-
-                # add the image path rel to prj dir
-                dots += dict_prv[S_KEY_PRV_PRJ]["__PP_IMG_DOCS__"]
-
-                # format the rep str
-                img_rep = S_DOC_IMG_REP.format(dots)
-
-                # open html file for read
-                with open(f, "r", encoding=S_ENCODING) as a_file:
-                    text = a_file.read()
-
-                # replace img src with dots
-                text = re.sub(S_DOC_IMG_SCH, img_rep, text, flags=re.S)
-
-                # write text back to file
-                with open(f, "w", encoding=S_ENCODING) as a_file:
-                    a_file.write(text)
-
-        # done
-        print(S_ACTION_DONE)
+        _make_docs(dir_prj, dict_prv, dict_pub)
 
     # --------------------------------------------------------------------------
     # tree
@@ -2160,10 +2058,6 @@ def _fix_meta(path, dict_prv, dict_pub):
     # do md/html/xml separately (needs special handling)
     dict_type_rules = PP.get_type_rules(path)
 
-    # fix docs
-    if path.name == S_FILE_LOGO:
-        _fix_docs(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
-
     # fix readme
     if path.name == S_FILE_README:
         _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
@@ -2191,39 +2085,6 @@ def _fix_meta(path, dict_prv, dict_pub):
     # fix src files
     if PP.is_path_in_list(path, L_EXT_SRC):
         _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
-
-
-# ------------------------------------------------------------------------------
-# Remove/replace parts of the docs logo.mako file
-# ------------------------------------------------------------------------------
-def _fix_docs(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
-    """
-    Remove/replace parts of the docs logo file
-
-    Args:
-        path: Path for the logo.mako file to modify text
-        dict_prv_prj: Private calculated proj dict
-        dict_pub_meta: Dict of metadata to replace in the file
-
-    Fixes metadata in the docs logo.mako file to adjust version number.
-    """
-
-    # the whole text of the file
-    text = ""
-
-    # open and read whole file
-    with open(path, "r", encoding=S_ENCODING) as a_file:
-        text = a_file.read()
-
-    # replace version
-    str_pattern = S_RM_VER_SCH
-    pp_ver_disp = dict_prv_prj["__PP_VER_MMR__"]
-    str_rep = S_RM_VER_REP.format(pp_ver_disp)
-    text = re.sub(str_pattern, str_rep, text, flags=re.S)
-
-    # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
-        a_file.write(text)
 
 
 # ------------------------------------------------------------------------------
@@ -2488,9 +2349,9 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
         a_file.write(text)
 
 
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Fix the version number and short description in source files
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     """
     Fix the version number and short description in source files
@@ -2601,5 +2462,56 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
+
+# ------------------------------------------------------------------------------
+# Make docs using preferred tool
+# ------------------------------------------------------------------------------
+def _make_docs(dir_prj, dict_prv, dict_pub):
+    """
+    Make docs using preferred tool
+
+    Args:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+
+    Make docs using preferred tool.
+    """
+
+    # --------------------------------------------------------------------------
+    # pdoc3
+
+    # pylint: disable=import-outside-toplevel
+    # pylint: disable=no-name-in-module
+    from . import pdoc
+
+    # print info
+    print(S_ACTION_DOCS, end="", flush=True)
+
+    # the command to run pdoc
+    try:
+        pdoc.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
+        print(S_ACTION_DONE)
+    except Exception as e:
+        print(S_ACTION_FAIL)
+        raise e
+
+    # # --------------------------------------------------------------------------
+    # # mkdocs
+
+    # # pylint: disable=import-outside-toplevel
+    # # pylint: disable=no-name-in-module
+    # from . import mkdocs
+
+    # # print info
+    # print(S_ACTION_DOCS, end="", flush=True)
+
+    # # the command to run pdoc
+    # try:
+    #     mkdocs.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
+    #     print(S_ACTION_DONE)
+    # except Exception as e:
+    #     print(S_ACTION_FAIL)
+    #     raise e
 
 # -)
