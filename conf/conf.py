@@ -972,6 +972,7 @@ D_PUB_BL = {
         S_FILE_LICENSE,
         S_FILE_REQS,
         "**/__pycache__",
+        "site",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -2478,40 +2479,40 @@ def _make_docs(dir_prj, dict_prv, dict_pub):
     Make docs using preferred tool.
     """
 
-    # --------------------------------------------------------------------------
-    # pdoc3
-
-    # pylint: disable=import-outside-toplevel
-    # pylint: disable=no-name-in-module
-    from . import pdoc
-
-    # print info
-    print(S_ACTION_DOCS, end="", flush=True)
-
-    # the command to run pdoc
-    try:
-        pdoc.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
-        print(S_ACTION_DONE)
-    except Exception as e:
-        print(S_ACTION_FAIL)
-        raise e
-
     # # --------------------------------------------------------------------------
-    # # mkdocs
+    # # pdoc3
 
     # # pylint: disable=import-outside-toplevel
     # # pylint: disable=no-name-in-module
-    # from . import mkdocs
+    # from . import pdoc
 
     # # print info
     # print(S_ACTION_DOCS, end="", flush=True)
 
     # # the command to run pdoc
     # try:
-    #     mkdocs.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
+    #     pdoc.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
     #     print(S_ACTION_DONE)
     # except Exception as e:
     #     print(S_ACTION_FAIL)
     #     raise e
+
+    # --------------------------------------------------------------------------
+    # mkdocs
+
+    # pylint: disable=import-outside-toplevel
+    # pylint: disable=no-name-in-module
+    from . import mkdocs
+
+    # print info
+    print(S_ACTION_DOCS, end="", flush=True)
+
+    # the command to run pdoc
+    try:
+        mkdocs.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
+        print(S_ACTION_DONE)
+    except Exception as e:
+        print(S_ACTION_FAIL)
+        raise e
 
 # -)

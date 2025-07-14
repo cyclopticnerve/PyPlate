@@ -184,11 +184,11 @@ def make_docs(dir_prj, dict_prv, _dict_pub, p_dir_pp, p_dir_pp_venv):
         for f in files:
 
             # get it's rel path to docs folder
-            rel_path = f.relative_to(dir_docs_out)
+            path_rel = f.relative_to(dir_docs_out)
 
             # calculate number of ups based on depth from docs
             # NB: subtract 1 for no dots if same parent
-            level = len(rel_path.parents) - 1
+            level = len(path_rel.parents) - 1
 
             # build the dots, one set for each level
             dots = ""

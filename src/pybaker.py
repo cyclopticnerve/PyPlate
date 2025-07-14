@@ -93,7 +93,7 @@ class PyBaker(PyPlate):
     # Class constants
     # --------------------------------------------------------------------------
 
-    # # pyplate: replace=True
+    # pyplate: replace=True
 
     # I18N: short description
     S_PP_SHORT_DESC = _(

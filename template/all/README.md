@@ -126,7 +126,7 @@ $ ./uninstall.py
 <!-- __RM_APP__ -->
 
 ## Documentation
-See the [documentation](__PP_AUTHOR__.gitub.io/__PP_NAME_PRJ_BIG__)
+See the [documentation](__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__)
 
 ## Notes
 blah blah blah
