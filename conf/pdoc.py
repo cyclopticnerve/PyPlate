@@ -36,10 +36,12 @@ from . import conf
 
 # relative path to config file
 S_PATH_MAKO = "pdoc3/logo.mako"
+
 # name of config dir
 S_DIR_PDOC = "pdoc3"
 # dir to put image in
 S_DIR_IMG = "img"
+
 # cmd for pdoc3
 # NB: format params are path to pp, path to pp venv, path to project, path
 # to project's template, path to project's docs dir, and path to project's
@@ -50,6 +52,7 @@ S_CMD_DOC = (
     "cd {};"
     "pdoc --html --force --template-dir {} -o {} {}"
 )
+
 # ext for fixing image
 S_HTML_EXT = ".html"
 
@@ -58,6 +61,7 @@ S_HTML_EXT = ".html"
 
 # use local image in docs
 S_DOC_IMG_SCH = r"(<header>.*<img src=\")(.*?)(\")"
+# NB: format param is relative image path
 S_DOC_IMG_REP = r"\g<1>{}\g<3>"
 
 

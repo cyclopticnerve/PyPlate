@@ -126,6 +126,24 @@ the project (since it may not know the current directory). Give it the name of
 the project's directory as it was created by pymaker, relative to the current
 dir in VSCode's terminal.
 
+## Documenting you project
+You can document your project using either pdoc3 or MkDocs.
+
+Step 1:
+- Create your project using pymaker
+- Publish your repo to GitHub
+
+Step 2:
+   - To use pdoc3, you have to:
+      - Open you GitHub repo in a browser
+      - Go to the repo's Settings/Pages
+      - Set the source to your main branch / docs folder
+      - Wait a few seconds, your docs should appear at
+      https://\<username\>.github.io/\<repo_name\>
+
+   - To use MkDocs, you have to:
+      - run 'pybaker' from your project directory
+
 ## Uninstalling
 <!-- __RM_APP__ -->
 Go to the source folder for PyPlate and run the uninstaller:

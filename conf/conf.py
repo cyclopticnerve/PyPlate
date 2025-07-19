@@ -36,6 +36,10 @@ from cnlib.cnpot import CNPotPy
 from cnlib.cntree import CNTree
 from cnlib.cnvenv import CNVenv
 
+# pylint: disable=no-name-in-module
+from . import mkdocs
+from . import pdoc
+
 # ------------------------------------------------------------------------------
 # local imports
 
@@ -45,8 +49,10 @@ from cnlib.cnvenv import CNVenv
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
+# pylint: disable=wrong-import-order
 import src.pyplate as PP
 
+# pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
@@ -190,6 +196,9 @@ S_MSG_DEBUG = _(
     "PROJECTS!\n"
 )
 
+# error installing reqs
+S_MSG_NO_INTERNET = _("Make sure you are connected to the internet")
+
 # ------------------------------------------------------------------------------
 # output msg for steps
 
@@ -219,6 +228,8 @@ S_ACTION_LIB = _("Install libs in venv... ")
 S_ACTION_I18N = _("Make i18n folder... ")
 # I18N: Make docs folder
 S_ACTION_DOCS = _("Make docs folder... ")
+# I18N: Deploy docs folder
+S_ACTION_DEPLOY_DOCS = _("Deploy docs folder... ")
 # I18N: Make tree file
 S_ACTION_TREE = _("Make tree file... ")
 # I18N: Install package in venv
@@ -248,6 +259,7 @@ S_KEY_PRV_PRJ = "PRV_PRJ"
 S_KEY_PUB_BL = "PUB_BL"
 S_KEY_PUB_DBG = "PUB_DBG"
 S_KEY_PUB_DIST = "PUB_DIST"
+S_KEY_PUB_DOCS = "PUB_DOCS"
 S_KEY_PUB_I18N = "PUB_I18N"
 S_KEY_PUB_META = "PUB_META"
 S_KEY_PUB_INST = "PUB_INST"
@@ -537,12 +549,22 @@ S_DIST_EXT = ".tar.gz"
 S_DIST_MODE = "w:gz"
 S_DIST_REMOVE = ".py"
 
-
 # ------------------------------------------------------------------------------
 # readme stuff
 
 # NB: format params are alt text and path to image
 S_RM_SCREENSHOT = "![{}]({})"
+
+# ------------------------------------------------------------------------------
+# docs stuff
+
+S_MKDOCS = "mkdocs"
+S_PDOCS = "pdoc3"
+
+# mkdocs stuff
+S_THEME_RTD = "readthedocs"
+# default mkdocs theme
+S_MKDOCS_THEME = "" #  S_THEME_RTD  # or anything else = default/empty
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -1047,6 +1069,13 @@ D_PUB_DBG = {
     S_KEY_DBG_DIST: True,
 }
 
+# which docs maker to use, based on project type
+D_PUB_DOCS = {
+    "c": S_MKDOCS,
+    "g": S_MKDOCS,
+    "p": S_PDOCS,
+}
+
 # ------------------------------------------------------------------------------
 # Other dictionaries
 # ------------------------------------------------------------------------------
@@ -1315,6 +1344,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 print(S_ACTION_DONE)
             except Exception as e:
                 print(S_ACTION_FAIL)
+                print(S_MSG_NO_INTERNET)
                 raise e
         else:
             # no venv, no reqs
@@ -1747,13 +1777,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         print(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
-    # docs
-
-    # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-        _make_docs(dir_prj, dict_prv, dict_pub)
-
-    # --------------------------------------------------------------------------
     # tree
     # NB: run last so it includes .git and .venv folders
     # NB: this will wipe out all previous checks (maybe good?)
@@ -1848,11 +1871,41 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # print done
     print(S_ACTION_DONE)
 
+    # --------------------------------------------------------------------------
+    # docs
+
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
+
+        # get the maker from the project type
+        doc_type = dict_pub[S_KEY_PUB_DOCS]
+        doc_maker = None
+        if doc_type == S_PDOCS:
+            doc_maker = pdoc
+        elif doc_type == S_MKDOCS:
+            doc_maker = mkdocs
+
+        # if we found a maker
+        if doc_maker:
+
+            # print info
+            print(S_ACTION_DOCS, end="", flush=True)
+
+            # the command to run pdoc/mkdocs/...
+            try:
+                doc_maker.make_docs(
+                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
+                )
+                print(S_ACTION_DONE)
+            except Exception as e:
+                print(S_ACTION_FAIL)
+                raise e
+
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
-def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
+def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
     Do any work before making dist
 
@@ -1870,7 +1923,35 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # get project type
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
-    # ----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # docs
+
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
+
+        # get the maker from the project type
+        doc_type = dict_pub[S_KEY_PUB_DOCS]
+        doc_maker = None
+        if doc_type == S_MKDOCS:
+            doc_maker = mkdocs
+
+        # if we found a maker
+        if doc_maker:
+
+            # print info
+            print(S_ACTION_DEPLOY_DOCS, end="", flush=True)
+
+            # the command to run pdoc/mkdocs/...
+            try:
+                doc_maker.deploy_docs(
+                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
+                )
+                print(S_ACTION_DONE)
+            except Exception as e:
+                print(S_ACTION_FAIL)
+                raise e
+
+    # --------------------------------------------------------------------------
     # venv
 
     # if venv flag is set
@@ -2463,56 +2544,5 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
-
-# ------------------------------------------------------------------------------
-# Make docs using preferred tool
-# ------------------------------------------------------------------------------
-def _make_docs(dir_prj, dict_prv, dict_pub):
-    """
-    Make docs using preferred tool
-
-    Args:
-        dir_prj: The root of the new project
-        dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data
-
-    Make docs using preferred tool.
-    """
-
-    # # --------------------------------------------------------------------------
-    # # pdoc3
-
-    # # pylint: disable=import-outside-toplevel
-    # # pylint: disable=no-name-in-module
-    # from . import pdoc
-
-    # # print info
-    # print(S_ACTION_DOCS, end="", flush=True)
-
-    # # the command to run pdoc
-    # try:
-    #     pdoc.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
-    #     print(S_ACTION_DONE)
-    # except Exception as e:
-    #     print(S_ACTION_FAIL)
-    #     raise e
-
-    # --------------------------------------------------------------------------
-    # mkdocs
-
-    # pylint: disable=import-outside-toplevel
-    # pylint: disable=no-name-in-module
-    from . import mkdocs
-
-    # print info
-    print(S_ACTION_DOCS, end="", flush=True)
-
-    # the command to run pdoc
-    try:
-        mkdocs.make_docs(dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV)
-        print(S_ACTION_DONE)
-    except Exception as e:
-        print(S_ACTION_FAIL)
-        raise e
 
 # -)

@@ -354,13 +354,15 @@ class PyMaker(PyPlate):
         self._dict_pub = {
             C.S_KEY_PUB_BL: C.D_PUB_BL,
             C.S_KEY_PUB_DBG: C.D_PUB_DBG,
+            C.S_KEY_PUB_DOCS: C.D_PUB_DOCS[prj_type],
             # NB: placeholder until we get prj type
             C.S_KEY_PUB_DIST: {},
             C.S_KEY_PUB_I18N: C.D_PUB_I18N,
             C.S_KEY_PUB_META: C.D_PUB_META,
         }
 
-        # reload dict pointers after dict change
+        # reload dicts after modify
+        # NB: VERY IMPORTANT!!!
         self._reload_dicts()
 
         # ----------------------------------------------------------------------
@@ -400,11 +402,11 @@ class PyMaker(PyPlate):
         # NB: change global val
         self._dict_prv_prj["__PP_DEV_PP__"] = p
 
-        # blank line before printing progress
-        print()
-
         # reload dicts after modify
         self._reload_dicts()
+
+        # blank line before printing progress
+        print()
 
     # --------------------------------------------------------------------------
     # Do any work before template copy

@@ -6,8 +6,7 @@
 <!-- License : __PP_LICENSE_NAME__                             \          /  -->
 <!----------------------------------------------------------------------------->
 
-!(images/__PP_NAME_PRJ_SMALL__.png)
-# __PP_NAME_PRJ_BIG__
+# ![](images/__PP_NAME_PRJ_SMALL__.png) __PP_NAME_PRJ_BIG__
 
 ## "It mostly works" ™©®
 
@@ -126,7 +125,7 @@ $ ./uninstall.py
 <!-- __RM_APP__ -->
 
 ## Documentation
-See the [documentation](__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__)
+See the [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__)
 
 ## Notes
 blah blah blah
