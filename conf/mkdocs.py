@@ -71,7 +71,6 @@ S_EXT_OUT = ".md"
 
 # more out dirs
 S_DIR_API = "docs/API"
-S_DIR_IMG = "images"
 
 # default to include mkdocstrings content in .md file
 # NB: format params are file name, pkg (parent dir) name, and module name
@@ -160,8 +159,8 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     # copy image for index.md as README.md
     prj_name = dict_prv[conf.S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
     prj_img = prj_name + ".png"
-    img_src = dir_prj / "images" / prj_img
-    dir_img_dest = dir_docs_out / S_DIR_IMG
+    img_src = dir_prj / conf.S_DIR_IMAGES / prj_img
+    dir_img_dest = dir_docs_out / conf.S_DIR_IMAGES
     dir_img_dest.mkdir(parents=True, exist_ok=True)
 
     shutil.copy(img_src, dir_img_dest)

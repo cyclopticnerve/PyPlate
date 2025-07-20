@@ -4,7 +4,7 @@
     "INSTALL": {
         "conf": ".local/share/pyplate",
         "i18n": ".local/share/pyplate",
-        "images": ".local/share/pyplate",
+        "img": ".local/share/pyplate",
         "readme": ".local/share/pyplate",
         "src": ".local/share/pyplate",
         "uninstall": ".local/share/pyplate",

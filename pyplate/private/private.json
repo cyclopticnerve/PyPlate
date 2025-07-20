@@ -50,11 +50,11 @@
         "__PP_VER_MMR__": "0.0.1",
         "__PP_VER_DISP__": "Version 0.0.1",
         "__PP_FILE_DESK__": "src/gui/desktop/PyPlate.desktop",
-        "__PP_IMG_README__": "images/pyplate.png",
-        "__PP_IMG_DOCS__": "images/pyplate.png",
-        "__PP_IMG_DESK__": ".local/share/pyplate/images/pyplate.png",
-        "__PP_IMG_DASH__": "../../../images/pyplate.png",
-        "__PP_IMG_ABOUT__": "../../../images/pyplate.png",
+        "__PP_IMG_README__": "img/pyplate.png",
+        "__PP_IMG_DOCS__": "img/pyplate.png",
+        "__PP_IMG_DESK__": ".local/share/pyplate/img/pyplate.png",
+        "__PP_IMG_DASH__": "../../../img/pyplate.png",
+        "__PP_IMG_ABOUT__": "../../../img/pyplate.png",
         "__PP_USR_INST__": ".local/share/pyplate",
         "__PP_APP_ID__": "org.cyclopticnerve.pyplate"
     }

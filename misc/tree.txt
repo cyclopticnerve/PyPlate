@@ -33,7 +33,7 @@
    │     │     └─ [] LINGUAS
    │     └─ [] pot/
    │           └─ [] pyplate.pot
-   ├─ [] images/
+   ├─ [] img/
    │     └─ [] pyplate.png
    ├─ [] install/
    │     ├─ [] install.json
@@ -98,7 +98,7 @@
    │     │     │     │                 └─ [] ABOUT
    │     │     │     └─ [] po/
    │     │     │           └─ [] LINGUAS
-   │     │     ├─ [] images/
+   │     │     ├─ [] img/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
    │     │     ├─ [] install/
    │     │     │     └─ [] install.py

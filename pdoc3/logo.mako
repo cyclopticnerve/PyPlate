@@ -1,7 +1,7 @@
 <header>
    <a class="homelink" rel="home" title="PyPlate on GitHub" href="https://github.com/cyclopticnerve/PyPlate">
       <!-- image will get fixed into local img -->
-      <img src="../../images/pyplate.png"/>PyPlate
+      <img src="../../img/pyplate.png"/>PyPlate
    </a>
    <br/>
    <!-- __RM_VERSION__ -->

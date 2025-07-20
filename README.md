@@ -6,7 +6,7 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-![](images/pyplate.png)
+![](img/pyplate.png)
 # PyPlate
 
 ## "It mostly works" ™©®
@@ -22,7 +22,7 @@ A program for creating and building CLI/GUI/Package projects in Python from a te
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_SCREENSHOT__ -->
-<!-- ![alt-text](images/screenshot.png "screenshot") -->
+<!-- ![alt-text](img/screenshot.png "screenshot") -->
 <!-- __RM_SCREENSHOT__ -->
 
 ## Table of Contents
