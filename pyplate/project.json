@@ -20,7 +20,8 @@
         ],
         "SKIP_HEADER": [],
         "SKIP_CODE": [
-            ".gitignore"
+            ".gitignore",
+            "conf"
         ],
         "SKIP_PATH": [],
         "SKIP_TREE": [
