@@ -73,8 +73,8 @@ S_EXT_OUT = ".md"
 S_DIR_API = "docs/API"
 
 # default to include mkdocstrings content in .md file
-# NB: format params are file name, pkg (parent dir) name, and module name
-S_DEF_FILE = "# {}\n::: {}.{}"
+# NB: format params are file name and formatted pkg name, done in make_docs
+S_DEF_FILE = "# {}\n::: {}"
 
 # config file name (will be made abs to prj dir)
 S_YML_NAME = "mkdocs.yml"
@@ -212,12 +212,12 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     # --------------------------------------------------------------------------
     # make structure
 
+    # make the api folder
+    dir_docs_api = dir_prj / S_DIR_API
+    dir_docs_api.mkdir(parents=True, exist_ok=True)
+
     # for each py file
     for f in files_out:
-
-        # make the api folder
-        dir_docs_api = dir_prj / S_DIR_API
-        dir_docs_api.mkdir(parents=True, exist_ok=True)
 
         # make a parent folder in docs (goes in nav bar)
         # NB: basically we find every .py file and get its path relative to
@@ -232,8 +232,13 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
         # NB: just swap ".py" ext for ".md"
         file_md = path_doc / Path(str(f.stem) + S_EXT_OUT)
 
+        # fix rel path into package dot notation
+        s_parts = ".".join(path_rel.parts)
+        if s_parts.endswith(S_EXT_IN):
+            s_parts = s_parts.removesuffix(S_EXT_IN)
+
         # format contents of file
-        file_fmt = S_DEF_FILE.format(f.name, f.parent.name, f.stem)
+        file_fmt = S_DEF_FILE.format(f.name, s_parts)
         with open(file_md, "w", encoding=conf.S_ENCODING) as a_file:
             a_file.write(file_fmt)
 
