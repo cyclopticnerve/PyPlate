@@ -102,7 +102,7 @@ class PyBaker(PyPlate):
     )
 
     # version string
-    S_PP_VERSION = "Version 0.0.1+20250507.9"
+    S_PP_VERSION = "0.0.2"
 
     # pyplate: replace=False
 

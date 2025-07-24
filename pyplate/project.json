@@ -84,14 +84,16 @@
     "PUB_META": {
         "META_VERSION": "0.0.2",
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Package projects in Python from a template",
-        "META_KEYWORDS": ["python",
+        "META_KEYWORDS": [
+            "python",
             "cli",
             "template",
             "app",
             "package",
             "gui",
             "module",
-            "gtk3"],
+            "gtk3"
+        ],
         "META_DEPS": {
             "Python 3.10+": "https://python.org"
         },

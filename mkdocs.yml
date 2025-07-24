@@ -1,0 +1,5 @@
+site_name: PyPlate
+theme: 
+plugins:
+- search
+- mkdocstrings

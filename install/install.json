@@ -11,5 +11,6 @@
         "LICENSE.txt": ".local/share/pyplate",
         "README.md": ".local/share/pyplate",
         "bin/pyplate": ".local/bin"
-    }
+    },
+    "INST_VER": "0.0.2"
 }

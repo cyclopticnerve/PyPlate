@@ -415,7 +415,7 @@ S_SW_REPLACE = "replace"
 # NB: leave as string, no start dir yet
 S_PRJ_PP_DIR = "pyplate"
 S_PRJ_PUB_CFG = f"{S_PRJ_PP_DIR}/project.json"
-S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/.private"
+S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/private"
 S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # ------------------------------------------------------------------------------

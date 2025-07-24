@@ -4,5 +4,6 @@
     "UNINSTALL": [
         ".local/share/pyplate",
         ".local/bin/pyplate"
-    ]
+    ],
+    "INST_VER": "0.0.2"
 }

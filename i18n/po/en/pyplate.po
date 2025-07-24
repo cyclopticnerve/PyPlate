@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: pyplate 0.0.1\n"
+"Project-Id-Version: 0.0.2\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-05-07 16:26-0400\n"
+"POT-Creation-Date: 2025-07-23 21:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,150 +18,306 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. I18N: default date format
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:101
 msgid "%m/%d/%Y"
 msgstr ""
 
 #. I18N: def deps
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:103
 msgid "None"
 msgstr ""
 
 #. I18N: printable version number
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:113
 msgid "Version {}"
 msgstr ""
 
 #. I18N: ask prj name
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:119
 msgid "Project name: "
 msgstr ""
 
 #. I18N: ask prj type
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:126
 msgid "Project type [{}]: "
 msgstr ""
 
 #. I18N: ask module name
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:129
 msgid "Module name (default: {}): "
 msgstr ""
 
 #. I18N: ask window class name
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:132
 msgid "Window class name (default: {}): "
 msgstr ""
 
 #. I18N: ask prj name if running pybaker in IDE
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:135
 msgid "Project name: (relative to {}): "
 msgstr ""
 
 #. I18N: Type must be one of {}
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:140
 msgid "Type must be one of {}"
 msgstr ""
 
 #. I18N: Project names must be more than 1 character
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:142
 msgid "Name must be more than 1 character"
 msgstr ""
 
 #. I18N: Project names must start with a letter
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:144
 msgid "Name must start with a letter"
 msgstr ""
 
 #. I18N: Project names must end with a letter or number
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:146
 msgid "Name must end with a letter or number"
 msgstr ""
 
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:149
 msgid ""
 "Name must contain only letters, numbers, spaces, dashes (-), or underscores "
 "(_)"
 msgstr ""
 
 #. I18N: project already exists
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:154
 msgid "Project \"{}\" already exists"
 msgstr ""
 
 #. I18N: run pybaker on project that does not exist
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:157
 msgid "Project \"{}\" does not exist"
 msgstr ""
 
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:160
 msgid ""
-"This folder does not have a 'pyplate' folder.\n"
+"This project does not have a 'pyplate' folder.\n"
 "Are you sure this is a PyPlate project?"
 msgstr ""
 
+#. I18N: pyplate/private/private.json or pyplate/project.json not found
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:164
+msgid "One or more PyPlate data files are missing"
+msgstr ""
+
+#. I18N: pyplate/private/private.json or pyplate/project.json not valid
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:166
+msgid "One or more PyPlate data files are corrupted"
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:169
 msgid ""
 "Warning: version number does not match S_SEM_VER_VALID \n"
-"See https://semver.org/"
+"See https://semver.org/\n"
+"Do you wish to continue? y/N"
+msgstr ""
+
+#. I18N: continue with bad sem ver
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:174
+msgid "y"
+msgstr ""
+
+#. I18N: quit if bad sem ver (the default, should be capitalized)
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:176
+msgid "N"
 msgstr ""
 
 #. I18N: Cannot run pymaker in PyPlate dir
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:178
 msgid "Cannot run pymaker in PyPlate dir"
 msgstr ""
 
 #. I18N: we want i18n but the template desktop doesn't exist
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:181
 msgid "Warning: file '{}' does not exist, using '{}'"
 msgstr ""
 
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:185
 msgid ""
 "\"{}\" is not a valid desktop category, see https://specifications."
 "freedesktop.org/menu-spec/latest/apa.html"
 msgstr ""
 
+#. I18N: alternate text for screenshot in README.md
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:190
+msgid "Create the file {}"
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:195
 msgid ""
 "WARNING! YOU ARE IN DEBUG MODE!\n"
 "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
 msgstr ""
 
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:200
+msgid "Make sure you are connected to the internet"
+msgstr ""
+
 #. I18N: Copy template files
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:206
 msgid "Copy template files... "
 msgstr ""
 
+#. I18N fix readme
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:208
+msgid "Fixing README... "
+msgstr ""
+
+#. I18N: fix other files
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:210
+msgid "Fixing metadata... "
+msgstr ""
+
+#. I18N: fix other files
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:212
+msgid "Fixing po files... "
+msgstr ""
+
 #. I18N: Do before fix
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:214
 msgid "Do before fix... "
 msgstr ""
 
 #. I18N: Do fix
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:216
 msgid "Do fix... "
 msgstr ""
 
 #. I18N: Do after fix
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:218
 msgid "Do after fix... "
 msgstr ""
 
 #. I18N: Make git folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:220
 msgid "Make git folder... "
 msgstr ""
 
 #. I18N: Make venv folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:222
 msgid "Make venv folder... "
 msgstr ""
 
+#. I18N: freeze venv folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:224
+msgid "Freezing venv... "
+msgstr ""
+
 #. I18N: Install libs in venv
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:226
 msgid "Install libs in venv... "
 msgstr ""
 
 #. I18N: Make i18n folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:228
 msgid "Make i18n folder... "
 msgstr ""
 
 #. I18N: Make docs folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:230
 msgid "Make docs folder... "
 msgstr ""
 
+#. I18N: Deploy docs folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:232
+msgid "Deploy docs folder... "
+msgstr ""
+
 #. I18N: Make tree file
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:234
 msgid "Make tree file... "
 msgstr ""
 
 #. I18N: Install package in venv
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:236
 msgid "Install package in venv... "
 msgstr ""
 
 #. I18N: Make dist folder
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:238
 msgid "Copy dist files... "
 msgstr ""
 
 #. I18N: Make install file
-msgid "Make install file... "
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:240
+msgid "Make install/uninstall files... "
+msgstr ""
+
+#. I18N: purge non-essential files
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:242
+msgid "Purge non-essential files... "
+msgstr ""
+
+#. I18N: compress files
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:244
+msgid "Compress files... "
+msgstr ""
+
+#. I18N: remove dist
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:246
+msgid "Remove dist source... "
 msgstr ""
 
 #. I18N: Done
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:248
 msgid "Done"
 msgstr ""
 
 #. I18N: Failed
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/conf.py:250
 msgid "Failed"
+msgstr ""
+
+#. I18N: name of home link in nav
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/mkdocs.py:96
+msgid "Home"
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/conf/mkdocs.py:100
+msgid ""
+"MkDocs failed to deploy. Make sure you have published your repo and run\n"
+"'pybaker' from your project directory to publish your docs using MkDocs."
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pybaker.py:100
+msgid ""
+"A program for building CLI/Gui/Package projects in Python from a template"
+msgstr ""
+
+#. I18N help string for ide cmd line option
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pybaker.py:114
+msgid "ask for project folder when running in IDE"
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pybaker.py:127
+msgid ""
+"Run this program from the parent directory of the project you want to build."
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pymaker.py:101
+msgid ""
+"A program for creating CLI/GUI/Package projects in Python from a template"
+msgstr ""
+
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pymaker.py:121
+msgid "Run this program from the directory where you want to create a project."
+msgstr ""
+
+#. I18N: help option help
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pyplate.py:133
+msgid "show this help message and exit"
+msgstr ""
+
+#. I18N help string for debug cmd line option
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pyplate.py:140
+msgid "enable debugging mode"
+msgstr ""
+
+#. I18N if using argparse, add help at end of about
+#: /home/dana/Documents/Projects/Python/PyPlate/src/pyplate.py:146
+msgid "Use -h for help"
 msgstr ""

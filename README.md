@@ -14,7 +14,7 @@
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
 <!-- __RM_VERSION__ -->
-Version 0.0.1
+Version 0.0.2
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SHORT_DESC__ -->

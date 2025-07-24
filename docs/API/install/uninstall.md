@@ -1,0 +1,2 @@
+# uninstall.py
+::: install.uninstall

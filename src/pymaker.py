@@ -103,7 +103,7 @@ class PyMaker(PyPlate):
     )
 
     # version string
-    S_PP_VERSION = "Version 0.0.1"
+    S_PP_VERSION = "0.0.2"
 
     # pyplate: replace=False
 

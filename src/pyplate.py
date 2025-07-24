@@ -118,10 +118,10 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description (to be set by subclass)
-    S_PP_SHORT_DESC = ""
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Package projects in Python from a template"
 
     # version string (to be set by subclass)
-    S_PP_VERSION = ""
+    S_PP_VERSION = "0.0.2"
 
     # pyplate: replace=False
 
