@@ -4,14 +4,16 @@
             ".git",
             "**/.venv*",
             ".VSCodeCounter",
-            "**/__pycache__",
             "dist",
             "docs",
             "i18n",
             "misc",
-            "template",
             "todo",
-            "LICENSE.txt"
+            "LICENSE.txt",
+            "requirements.txt",
+            "**/__pycache__",
+            "site",
+            "template"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
@@ -21,6 +23,7 @@
         "SKIP_HEADER": [],
         "SKIP_CODE": [
             ".gitignore",
+            ".desktop",
             "conf"
         ],
         "SKIP_PATH": [],
@@ -42,16 +45,13 @@
     },
     "PUB_DIST": {
         "bin": "assets",
-        "src": "assets",
-        "LICENSE.txt": "assets",
-        "README.md": "assets",
         "conf": "assets",
-        "i18n/locale": "assets/i18n",
-        "install/install.py": "",
-        "install/install.json": "assets/install",
-        "uninstall": "assets",
+        "i18n": "assets",
+        "install": "assets",
+        "src": "assets",
         "requirements.txt": "assets/install"
     },
+    "PUB_DOCS": "mkdocs",
     "PUB_I18N": {
         "DOMAIN": "pyplate",
         "SOURCES": [

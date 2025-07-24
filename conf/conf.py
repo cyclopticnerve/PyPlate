@@ -332,7 +332,7 @@ S_KEY_INST_CONT = "INST_CONT"
 S_DIR_TEMPLATE = "template"
 S_DIR_ALL = "all"
 S_DIR_BIN = "bin"
-S_DIR_LIB = "lib"
+# S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_DOCS = "docs"
@@ -340,6 +340,7 @@ S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
 S_DIR_SUPPORT = "support"
+S_DIR_TODO = "todo"
 S_DIR_UI = "ui"
 S_DIR_I18N = "i18n"
 S_DIR_IMAGES = "img"
@@ -844,7 +845,7 @@ D_PRV_ALL = {
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,
-    "__PP_DIR_LIB__": S_DIR_LIB,
+    # "__PP_DIR_LIB__": S_DIR_LIB,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
@@ -989,10 +990,11 @@ D_PUB_BL = {
         S_DIR_DIST,
         S_DIR_DOCS,
         S_DIR_I18N,
-        S_DIR_LIB,
+        # S_DIR_LIB,
         S_DIR_MISC,
         S_FILE_LICENSE,
         S_FILE_REQS,
+        S_DIR_TODO,
         "**/__pycache__",
         "site",
     ],
@@ -1010,7 +1012,6 @@ D_PUB_BL = {
     # NB: mostly used for files that contain dunders that will be replaced
     # later or files we only want to replace headers in
     S_KEY_SKIP_CODE: [
-        "MANIFEST.in",
         ".gitignore",
         ".desktop",
     ],
