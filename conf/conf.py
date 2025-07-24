@@ -1727,6 +1727,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
             list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
             charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
+            location=False,
         )
 
         # make .pot, .po, and .mo files
