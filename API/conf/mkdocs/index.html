@@ -472,14 +472,15 @@ As much code/settings/constants as can be are reused from conf.py.</p>
     # --------------------------------------------------------------------------
     # make yaml
 
+    # get theme from dict_pub
+    dict_docs = dict_pub[conf.S_KEY_PUB_DOCS]
+    theme = dict_docs.get(conf.S_KEY_DOCS_THEME, "")
+
     # path to file
     yaml_file = dir_prj / S_YML_NAME
     if not yaml_file.exists():
 
-        # file text
-        theme = ""
-        if conf.S_MKDOCS_THEME == conf.S_THEME_RTD:
-            theme = conf.S_THEME_RTD
+        # create a new yaml with default text
         text = S_YML_TEXT.format(dir_prj.name, theme)
 
         # write file

@@ -347,11 +347,6 @@ package, making for one (or two) less steps in the user's install process.</p>
             dest = p_dist / S_DIR_ASSETS
             shutil.move(file_uninst, dest)
 
-    # # move reqs to install
-    # file_reqs = p_dist / S_FILE_REQS
-    # dest = p_dist / S_DIR_INSTALL
-    # shutil.move(file_reqs, dest)
-
     # --------------------------------------------------------------------------
     # remove all "ABOUT" files
 
@@ -594,32 +589,6 @@ applied.</p>
     print(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
-    # if we are a package, here is where we will install ourselves in the venv
-
-    # # pkg
-    # if prj_type in L_PKG_INSTALL:
-
-    #     # let user know
-    #     print(S_ACTION_INST_PKG, end="", flush=True)
-
-    #     # need to activate prj venv
-    #     dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-    #     cmd_activate = S_CMD_VENV_ACTIVATE.format(dir_prj, dir_prj / dir_venv)
-
-    #     # cmd to install
-    #     # NB: installed as editable b/c we need to use it in tests/foo.py
-    #     cmd_install = S_CMD_INSTALL_PKG.format(dir_prj, S_DIR_SRC)
-
-    #     # the command to install pkg
-    #     cmd = f"{cmd_activate};" f"{cmd_install}"
-    #     try:
-    #         F.sh(cmd, shell=True)
-    #         print(S_ACTION_DONE)
-    #     except Exception as e:
-    #         print(S_ACTION_FAIL)
-    #         raise e
-
-    # --------------------------------------------------------------------------
     # readme chop section
 
     path_readme = dir_prj / D_PRV_ALL["__PP_README_FILE__"]
@@ -689,6 +658,7 @@ applied.</p>
             dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
             list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
             charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
+            location=False,
         )
 
         # make .pot, .po, and .mo files
@@ -840,23 +810,24 @@ applied.</p>
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
 
-        # get the maker from the project type
-        doc_type = dict_pub[S_KEY_PUB_DOCS]
-        doc_maker = None
-        if doc_type == S_PDOCS:
-            doc_maker = pdoc
-        elif doc_type == S_MKDOCS:
-            doc_maker = mkdocs
+        # get the doc tool from the project info
+        # NB: doc_tool is the import file name
+        str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
+        doc_tool = None
+        if str_doc_tool == S_DOCS_PDOCS:
+            doc_tool = pdoc
+        elif str_doc_tool == S_DOCS_MKDOCS:
+            doc_tool = mkdocs
 
-        # if we found a maker
-        if doc_maker:
+        # if we found a tool
+        if doc_tool:
 
             # print info
             print(S_ACTION_DOCS, end="", flush=True)
 
             # the command to run pdoc/mkdocs/...
             try:
-                doc_maker.make_docs(
+                doc_tool.make_docs(
                     dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
                 )
                 print(S_ACTION_DONE)
@@ -1014,37 +985,6 @@ fixing, like chopping the readme file sections.</p>
         else:
             # no venv, no reqs
             (Path(dir_prj) / S_FILE_REQS).unlink()
-
-        # ----------------------------------------------------------------------
-        # install libs in project venv
-
-        # print(S_ACTION_LIB, end="", flush=True)
-
-        # # get activate cmd
-        # cmd_activate = S_CMD_VENV_ACTIVATE.format(str(dir_prj), dir_venv)
-
-        # # start the full command
-        # cmd = f"{cmd_activate};"
-
-        # get list of libs for this prj type
-        # val = D_COPY_LIB.get(prj_type, [])
-
-        # # copy libs to command
-        # for item in val:
-
-        #     # get lib
-        #     add_path = P_DIR_PP_LIB / item
-        #     add_str = S_CMD_INST_LIB.format(add_path)
-        #     cmd += add_str + ";"
-
-        # cmd += " python -m pip install -e '~/Documents/Projects/Python/CNLib'"
-        # the command to install libs
-        # try:
-        #     F.sh(cmd, shell=True)
-        #     print(S_ACTION_DONE)
-        # except Exception as e:
-        #     print(S_ACTION_FAIL)
-        #     raise e
 
     # --------------------------------------------------------------------------
     # git
@@ -1212,21 +1152,22 @@ after _do_after_fix, and before _do_dist.</p>
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
 
-        # get the maker from the project type
-        doc_type = dict_pub[S_KEY_PUB_DOCS]
-        doc_maker = None
-        if doc_type == S_MKDOCS:
-            doc_maker = mkdocs
+        # get the doc tool from the project info
+        # NB: doc_tool is the import file name
+        str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
+        doc_tool = None
+        if str_doc_tool == S_DOCS_MKDOCS:
+            doc_tool = mkdocs
 
-        # if we found a maker
-        if doc_maker:
+        # if we found a tool
+        if doc_tool:
 
             # print info
             print(S_ACTION_DEPLOY_DOCS, end="", flush=True)
 
             # the command to run pdoc/mkdocs/...
             try:
-                doc_maker.deploy_docs(
+                doc_tool.deploy_docs(
                     dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
                 )
                 print(S_ACTION_DONE)
@@ -1433,29 +1374,12 @@ configured, but before any files have been modified.</p>
     # set display of version
     dict_prv_prj["__PP_VER_DISP__"] = S_VER_DISP_FMT.format(ver_base)
 
-    # get current date and format it according to dev fmt
-    # now = datetime.now()
-    # ver_date = now.strftime(S_VER_DATE_FMT)
-
-    # # get current build number, add 1
-    # str_build = dict_prv_prj["__PP_VER_BUILD__"]
-    # int_build = 0
-    # try:
-    #     int_build = int(str_build)
-    # except ValueError:
-    #     int_build = 0
-    # int_build += 1
-    # dict_prv_prj["__PP_VER_BUILD__"] = str(int_build)
-
     # semantic version with meta info
-    # str_sem = S_VER_SEM_FMT.format(ver_base, ver_date, str(int_build))
     str_sem = ver_base
     dict_prv_prj["__PP_VER_MMR__"] = str_sem
 
     # fix ver for dist filename
     ver_dist = str_sem
-    # ver_dist = ver_dist.replace(".", "-")
-    # ver_dist = ver_dist.replace("+", "_")
 
     # format dist dir name with prj and ver
     name_fmt = S_VER_DIST_FMT.format(name_prj_small, ver_dist)
