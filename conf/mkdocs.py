@@ -81,7 +81,7 @@ S_YML_NAME = "mkdocs.yml"
 
 # config file content
 # NB: format params are prj dir name (same as __PP_NAME_PRJ_BIG__),
-# conf.S_MKDOCS_THEME
+# D_PUB_DOCS[S_KEY_DOCS_THEME]
 S_YML_TEXT = (
     "site_name: {}\n"
     "theme: {}\n"
@@ -96,6 +96,7 @@ S_INDEX_NAME = "index.md"
 S_HOME_NAME = _("Home")
 
 # err message if no remote repo
+# I18N: error message when no remote repo exists
 S_ERR_NO_REPO = _(
     "MkDocs failed to deploy. Make sure you have published your repo and run\n"
     "'pybaker' from your project directory to publish your docs using MkDocs."
@@ -125,14 +126,15 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     # --------------------------------------------------------------------------
     # make yaml
 
+    # get theme from dict_pub
+    dict_docs = dict_pub[conf.S_KEY_PUB_DOCS]
+    theme = dict_docs.get(conf.S_KEY_DOCS_THEME, "")
+
     # path to file
     yaml_file = dir_prj / S_YML_NAME
     if not yaml_file.exists():
 
-        # file text
-        theme = ""
-        if conf.S_MKDOCS_THEME == conf.S_THEME_RTD:
-            theme = conf.S_THEME_RTD
+        # create a new yaml with default text
         text = S_YML_TEXT.format(dir_prj.name, theme)
 
         # write file

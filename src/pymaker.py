@@ -98,7 +98,7 @@ class PyMaker(PyPlate):
 
     # I18N: short desc in pymaker
     S_PP_SHORT_DESC = _(
-        "A program for creating CLI/GUI/Package projects in Python from a " \
+        "A program for creating CLI/GUI/Package projects in Python from a " 
         "template"
     )
 

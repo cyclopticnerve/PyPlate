@@ -1,16 +1,14 @@
 {
-    "NAME": "PyPlate",
-    "VERSION": "0.0.1",
-    "INSTALL": {
+    "INST_NAME": "PyPlate",
+    "INST_VER": "0.0.2",
+    "INST_DESK": false,
+    "INST_CONT": {
+        "bin/pyplate": ".local/bin",
         "conf": ".local/share/pyplate",
         "i18n": ".local/share/pyplate",
         "img": ".local/share/pyplate",
-        "readme": ".local/share/pyplate",
+        "install": ".local/share/pyplate",
         "src": ".local/share/pyplate",
-        "uninstall": ".local/share/pyplate",
-        "LICENSE.txt": ".local/share/pyplate",
-        "README.md": ".local/share/pyplate",
-        "bin/pyplate": ".local/bin"
-    },
-    "INST_VER": "0.0.2"
+        "uninstall.py": ".local/share/pyplate"
+    }
 }

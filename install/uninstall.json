@@ -1,9 +1,8 @@
 {
-    "NAME": "PyPlate",
-    "VERSION": "0.0.1",
-    "UNINSTALL": [
+    "INST_NAME": "PyPlate",
+    "INST_VER": "0.0.2",
+    "INST_CONT": [
         ".local/share/pyplate",
         ".local/bin/pyplate"
-    ],
-    "INST_VER": "0.0.2"
+    ]
 }

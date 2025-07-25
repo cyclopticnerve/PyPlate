@@ -8,8 +8,6 @@
 
 # pylint: disable=too-many-lines
 
-# pyplate: replace=False
-
 """
 This module separates out the constants from pymaker.py. It also includes hook
 functions to extend the functionality of pymaker.py and pybaker.py.
@@ -44,12 +42,12 @@ from . import pdoc
 # local imports
 
 # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
 
-# fudge the path to import conf stuff
+# fudge the path to import pyplate stuff
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
-# pylint: disable=wrong-import-order
 import src.pyplate as PP
 
 # pylint: enable=wrong-import-order
@@ -106,8 +104,6 @@ S_IMG_EXT = ".png"
 
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
-# NB: format params are meta version, date, and __PP_VER_MMR__
-# S_VER_SEM_FMT = "{}+{}.{}"
 # NB: format param is __PP_VER_MMR__
 # I18N: printable version number
 S_VER_DISP_FMT = _("Version {}")
@@ -197,6 +193,7 @@ S_MSG_DEBUG = _(
 )
 
 # error installing reqs
+# I18N: need internet connection to install requirements
 S_MSG_NO_INTERNET = _("Make sure you are connected to the internet")
 
 # ------------------------------------------------------------------------------
@@ -290,6 +287,10 @@ S_KEY_DBG_INST = "DBG_INST"
 S_KEY_DBG_TREE = "DBG_TREE"
 S_KEY_DBG_DIST = "DBG_DIST"
 
+# keys for D_PUB_DOCS
+S_KEY_DOCS_TOOL = "DOCS_TOOL"
+S_KEY_DOCS_THEME = "DOCS_THEME"
+
 # keys for meta dict
 S_KEY_META_VERSION = "META_VERSION"
 S_KEY_META_SHORT_DESC = "META_SHORT_DESC"
@@ -327,12 +328,9 @@ S_KEY_INST_CONT = "INST_CONT"
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
 # and make any appropriate changes
-# also make sure that these names don't appear in the blacklist, or else
-# pymaker won't touch them
 S_DIR_TEMPLATE = "template"
 S_DIR_ALL = "all"
 S_DIR_BIN = "bin"
-# S_DIR_LIB = "lib"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
 S_DIR_DOCS = "docs"
@@ -419,19 +417,13 @@ S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/private"
 S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # ------------------------------------------------------------------------------
-# commands for _do_after_fix
+# commands for do_after_fix
 
 # cmd for git
 # NB: format param is proj dir
 S_CMD_GIT_CREATE = "git init {} -q"
 # NB: format params are prj dir and venv name
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
-# NB: format params are prj dir and src dir
-# S_CMD_INSTALL_PKG = "cd {};python -m pip install -e ./{}"
-
-# cmd to install libs as editable
-# NB: format param is relative path to cnlib dir
-# S_CMD_INST_LIB = "python -m pip install -e {}"
 
 # ------------------------------------------------------------------------------
 # regex stuff
@@ -559,13 +551,9 @@ S_RM_SCREENSHOT = "![{}]({})"
 # ------------------------------------------------------------------------------
 # docs stuff
 
-S_MKDOCS = "mkdocs"
-S_PDOCS = "pdoc3"
-
-# mkdocs stuff
-S_THEME_RTD = "readthedocs"
-# default mkdocs theme
-S_MKDOCS_THEME = "" #  S_THEME_RTD  # or anything else = default/empty
+S_DOCS_MKDOCS = "mkdocs"
+S_DOCS_PDOCS = "pdoc3"
+S_DOCS_THEME_RTD = "readthedocs"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -593,7 +581,7 @@ L_TYPES = [
     ],
 ]
 
-# list of filetypes that use hash for comments
+# list of filetypes that use hash (#) for comments
 L_EXT_HASH = [
     ".py",
     ".toml",
@@ -601,7 +589,7 @@ L_EXT_HASH = [
     ".desktop",
 ]
 
-# list of file types to use md/html/xml comments
+# list of file types to use md/html/xml comments (<!-- ... -->)
 L_EXT_MARKUP = [
     ".md",
     ".html",
@@ -610,7 +598,7 @@ L_EXT_MARKUP = [
     ".glade",
 ]
 
-# file exts for _do_after_fix
+# file exts for do_after_fix
 L_EXT_DESKTOP = [".desktop"]
 L_EXT_GTK = [".ui", ".glade"]
 L_EXT_SRC = [".py"]
@@ -622,6 +610,7 @@ L_PURGE_FILES = [
     "ABOUT",
 ]
 
+# which project types have a venv
 L_MAKE_VENV = [
     "c",
     "g",
@@ -781,9 +770,6 @@ L_APP_INSTALL = [
     "g",
 ]
 
-# prj types(s) for making install pkg in venv
-L_PKG_INSTALL = ["p"]
-
 # prj type(s) for making .desktop file
 L_MAKE_DESK = ["g"]
 
@@ -845,7 +831,6 @@ D_PRV_ALL = {
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,
-    # "__PP_DIR_LIB__": S_DIR_LIB,
     "__PP_INST_ASSETS__": S_DIR_ASSETS,
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
     "__PP_INST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}",
@@ -909,9 +894,8 @@ D_PRV_PRJ = {
     "__PP_IMG_ABOUT__": "",  # image for about logo
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
-    "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.1+20250505.17653"
-    # "__PP_VER_BUILD__": "",  # build number, inc every run of pm/pb, def 0
-    "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1+20250505.17653"
+    "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.13"
+    "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
 }
 
 # ------------------------------------------------------------------------------
@@ -929,7 +913,7 @@ D_PUB_META = {
     S_KEY_META_KEYWORDS: [],
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
-    # key is dep name, val is link to dep (optional)
+    # NB: key is dep name, val is link to dep (optional)
     S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
     # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
     S_KEY_META_CATS: [],
@@ -990,7 +974,6 @@ D_PUB_BL = {
         S_DIR_DIST,
         S_DIR_DOCS,
         S_DIR_I18N,
-        # S_DIR_LIB,
         S_DIR_MISC,
         S_FILE_LICENSE,
         S_FILE_REQS,
@@ -1059,6 +1042,19 @@ D_PUB_I18N = {
     S_KEY_PUB_I18N_CHAR: S_ENCODING,
 }
 
+# which docs maker to use, based on project type
+D_PUB_DOCS = {
+    "c": {
+        S_KEY_DOCS_TOOL: S_DOCS_MKDOCS,
+        S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD
+    },
+    "g": {
+        S_KEY_DOCS_TOOL: S_DOCS_MKDOCS,
+        S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD
+    },
+    "p": {S_KEY_DOCS_TOOL: S_DOCS_PDOCS, S_KEY_DOCS_THEME: ""},
+}
+
 # dict in project to control post processing
 D_PUB_DBG = {
     S_KEY_DBG_GIT: True,
@@ -1070,13 +1066,6 @@ D_PUB_DBG = {
     S_KEY_DBG_DIST: True,
 }
 
-# which docs maker to use, based on project type
-D_PUB_DOCS = {
-    "c": S_MKDOCS,
-    "g": S_MKDOCS,
-    "p": S_PDOCS,
-}
-
 # ------------------------------------------------------------------------------
 # Other dictionaries
 # ------------------------------------------------------------------------------
@@ -1086,7 +1075,7 @@ D_DBG_PM = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1097,7 +1086,7 @@ D_DBG_PB = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1116,14 +1105,10 @@ D_INSTALL = {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
             S_DIR_CONF: "__PP_USR_INST__",
             S_DIR_I18N: "__PP_USR_INST__",
+            S_DIR_IMAGES: "__PP_USR_INST__",
             S_DIR_INSTALL: "__PP_USR_INST__",
             S_DIR_SRC: "__PP_USR_INST__",
             S_FILE_UNINST_PY: "__PP_USR_INST__",
-            # S_DIR_IMAGES: "__PP_USR_INST__",
-            # S_DIR_LIB: "__PP_USR_INST__",
-            # S_DIR_README: "__PP_USR_INST__",
-            # S_FILE_LICENSE: "__PP_USR_INST__",
-            # S_FILE_README: "__PP_USR_INST__",
         },
     },
     "g": {
@@ -1138,10 +1123,6 @@ D_INSTALL = {
             S_DIR_INSTALL: "__PP_USR_INST__",
             S_DIR_SRC: "__PP_USR_INST__",
             S_FILE_UNINST_PY: "__PP_USR_INST__",
-            # S_DIR_LIB: "__PP_USR_INST__",
-            # S_DIR_README: "__PP_USR_INST__",
-            # S_FILE_LICENSE: "__PP_USR_INST__",
-            # S_FILE_README: "__PP_USR_INST__",
             # extra for gui
             "__PP_FILE_DESK__": "__PP_USR_APPS__",
         },
@@ -1184,14 +1165,6 @@ D_COPY = {
     f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
 }
 
-# which libs to add to which type of project
-# key is prj short type
-# val is list of libs to add to prj type
-# D_COPY_LIB = {
-#     "c": ["cnlib"],
-#     "g": ["cnlib"],  # "cnguilib"],
-# }
-
 # map file ext to rep type
 D_TYPE_RULES = {
     S_KEY_RULES_HASH: {
@@ -1220,16 +1193,6 @@ D_TYPE_RULES = {
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_PAD: 3,
-            # code stuff
-            # NB: match first occurrence of unquoted marker to end of line
-            # S_KEY_SPLIT: r"[\'\"].*[\'\"]|(<!--.*)",
-            # match whole line (block sw only)
-            # S_KEY_SPLIT: r"[\'\"].*?[\'\"]|(<!--.*?-->)",
-            # S_KEY_SPLIT_COMM: 1,
-            # # switch stuff
-            # S_KEY_SW_SCH: r"pyplate\s*:\s*(\S*?)\s*=\s*(\S*?)(\s|-->)",
-            # S_KEY_SW_KEY: 1,
-            # S_KEY_SW_VAL: 2,
         },
     },
 }
@@ -1351,37 +1314,6 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
             # no venv, no reqs
             (Path(dir_prj) / S_FILE_REQS).unlink()
 
-        # ----------------------------------------------------------------------
-        # install libs in project venv
-
-        # print(S_ACTION_LIB, end="", flush=True)
-
-        # # get activate cmd
-        # cmd_activate = S_CMD_VENV_ACTIVATE.format(str(dir_prj), dir_venv)
-
-        # # start the full command
-        # cmd = f"{cmd_activate};"
-
-        # get list of libs for this prj type
-        # val = D_COPY_LIB.get(prj_type, [])
-
-        # # copy libs to command
-        # for item in val:
-
-        #     # get lib
-        #     add_path = P_DIR_PP_LIB / item
-        #     add_str = S_CMD_INST_LIB.format(add_path)
-        #     cmd += add_str + ";"
-
-        # cmd += " python -m pip install -e '~/Documents/Projects/Python/CNLib'"
-        # the command to install libs
-        # try:
-        #     F.sh(cmd, shell=True)
-        #     print(S_ACTION_DONE)
-        # except Exception as e:
-        #     print(S_ACTION_FAIL)
-        #     raise e
-
     # --------------------------------------------------------------------------
     # git
 
@@ -1485,29 +1417,12 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # set display of version
     dict_prv_prj["__PP_VER_DISP__"] = S_VER_DISP_FMT.format(ver_base)
 
-    # get current date and format it according to dev fmt
-    # now = datetime.now()
-    # ver_date = now.strftime(S_VER_DATE_FMT)
-
-    # # get current build number, add 1
-    # str_build = dict_prv_prj["__PP_VER_BUILD__"]
-    # int_build = 0
-    # try:
-    #     int_build = int(str_build)
-    # except ValueError:
-    #     int_build = 0
-    # int_build += 1
-    # dict_prv_prj["__PP_VER_BUILD__"] = str(int_build)
-
     # semantic version with meta info
-    # str_sem = S_VER_SEM_FMT.format(ver_base, ver_date, str(int_build))
     str_sem = ver_base
     dict_prv_prj["__PP_VER_MMR__"] = str_sem
 
     # fix ver for dist filename
     ver_dist = str_sem
-    # ver_dist = ver_dist.replace(".", "-")
-    # ver_dist = ver_dist.replace("+", "_")
 
     # format dist dir name with prj and ver
     name_fmt = S_VER_DIST_FMT.format(name_prj_small, ver_dist)
@@ -1630,32 +1545,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # print done
     print(S_ACTION_DONE)
-
-    # --------------------------------------------------------------------------
-    # if we are a package, here is where we will install ourselves in the venv
-
-    # # pkg
-    # if prj_type in L_PKG_INSTALL:
-
-    #     # let user know
-    #     print(S_ACTION_INST_PKG, end="", flush=True)
-
-    #     # need to activate prj venv
-    #     dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-    #     cmd_activate = S_CMD_VENV_ACTIVATE.format(dir_prj, dir_prj / dir_venv)
-
-    #     # cmd to install
-    #     # NB: installed as editable b/c we need to use it in tests/foo.py
-    #     cmd_install = S_CMD_INSTALL_PKG.format(dir_prj, S_DIR_SRC)
-
-    #     # the command to install pkg
-    #     cmd = f"{cmd_activate};" f"{cmd_install}"
-    #     try:
-    #         F.sh(cmd, shell=True)
-    #         print(S_ACTION_DONE)
-    #     except Exception as e:
-    #         print(S_ACTION_FAIL)
-    #         raise e
 
     # --------------------------------------------------------------------------
     # readme chop section
@@ -1879,23 +1768,24 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
 
-        # get the maker from the project type
-        doc_type = dict_pub[S_KEY_PUB_DOCS]
-        doc_maker = None
-        if doc_type == S_PDOCS:
-            doc_maker = pdoc
-        elif doc_type == S_MKDOCS:
-            doc_maker = mkdocs
+        # get the doc tool from the project info
+        # NB: doc_tool is the import file name
+        str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
+        doc_tool = None
+        if str_doc_tool == S_DOCS_PDOCS:
+            doc_tool = pdoc
+        elif str_doc_tool == S_DOCS_MKDOCS:
+            doc_tool = mkdocs
 
-        # if we found a maker
-        if doc_maker:
+        # if we found a tool
+        if doc_tool:
 
             # print info
             print(S_ACTION_DOCS, end="", flush=True)
 
             # the command to run pdoc/mkdocs/...
             try:
-                doc_maker.make_docs(
+                doc_tool.make_docs(
                     dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
                 )
                 print(S_ACTION_DONE)
@@ -1931,21 +1821,22 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
 
-        # get the maker from the project type
-        doc_type = dict_pub[S_KEY_PUB_DOCS]
-        doc_maker = None
-        if doc_type == S_MKDOCS:
-            doc_maker = mkdocs
+        # get the doc tool from the project info
+        # NB: doc_tool is the import file name
+        str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
+        doc_tool = None
+        if str_doc_tool == S_DOCS_MKDOCS:
+            doc_tool = mkdocs
 
-        # if we found a maker
-        if doc_maker:
+        # if we found a tool
+        if doc_tool:
 
             # print info
             print(S_ACTION_DEPLOY_DOCS, end="", flush=True)
 
             # the command to run pdoc/mkdocs/...
             try:
-                doc_maker.deploy_docs(
+                doc_tool.deploy_docs(
                     dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
                 )
                 print(S_ACTION_DONE)
@@ -2040,11 +1931,6 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         if file_uninst.exists():
             dest = p_dist / S_DIR_ASSETS
             shutil.move(file_uninst, dest)
-
-    # # move reqs to install
-    # file_reqs = p_dist / S_FILE_REQS
-    # dest = p_dist / S_DIR_INSTALL
-    # shutil.move(file_reqs, dest)
 
     # --------------------------------------------------------------------------
     # remove all "ABOUT" files
@@ -2228,9 +2114,6 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
         text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # --------------------------------------------------------------------------
-
-    # TODO: still has literals, but very tight and specific
-
     # fix deps in readme
 
     # get deps as links

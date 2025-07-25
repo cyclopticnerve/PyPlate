@@ -33,7 +33,7 @@ import re
 import sys
 
 # local imports
-import cnlib.cnfunctions as F
+from cnlib import cnfunctions as F
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -118,7 +118,10 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description (to be set by subclass)
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Package projects in Python from a template"
+    S_PP_SHORT_DESC = (
+        "A program for creating and building CLI/GUI/Package projects in "
+        "Python from a template"
+    )
 
     # version string (to be set by subclass)
     S_PP_VERSION = "0.0.2"
@@ -186,7 +189,7 @@ class PyPlate:
         self._dict_pub_bl = {}
         self._dict_pub_dbg = {}
         self._dict_pub_dist = {}
-        self._docs_maker = ""
+        self._dict_pub_docs = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
@@ -855,7 +858,7 @@ class PyPlate:
         self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
         self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
         self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
-        self._docs_maker = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
         self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
 
@@ -892,7 +895,7 @@ class PyPlate:
             C.S_KEY_PUB_BL: self._dict_pub_bl,
             C.S_KEY_PUB_DBG: self._dict_pub_dbg,
             C.S_KEY_PUB_DIST: self._dict_pub_dist,
-            C.S_KEY_PUB_DOCS: self._docs_maker,
+            C.S_KEY_PUB_DOCS: self._dict_pub_docs,
             C.S_KEY_PUB_I18N: self._dict_pub_i18n,
             C.S_KEY_PUB_META: self._dict_pub_meta,
         }
