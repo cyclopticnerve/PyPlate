@@ -51,7 +51,10 @@
         "src": "assets",
         "requirements.txt": "assets/install"
     },
-    "PUB_DOCS": "mkdocs",
+    "PUB_DOCS": {
+        "DOCS_TOOL": "mkdocs",
+        "DOCS_THEME": "readthedocs"
+    },
     "PUB_I18N": {
         "DOMAIN": "pyplate",
         "SOURCES": [
