@@ -153,8 +153,8 @@ S_ERR_EXIST = _('Project "{}" already exists')
 S_ERR_NOT_EXIST = _('Project "{}" does not exist')
 # I18N: run pybaker on non-pyplate project dir
 S_ERR_NOT_PRJ = _(
-    "This project does not have a 'pyplate' folder.\nAre you sure this is a "
-    "PyPlate project?"
+    "This project does not have a 'pyplate' folder.\nAre you "
+    "sure this is a PyPlate project?"
 )
 # I18N: pyplate/private/private.json or pyplate/project.json not found
 S_ERR_PP_MISSING = _("One or more PyPlate data files are missing")
@@ -292,8 +292,8 @@ S_KEY_DOCS_TOOL = "DOCS_TOOL"
 S_KEY_DOCS_THEME = "DOCS_THEME"
 
 # keys for meta dict
-S_KEY_META_VERSION = "META_VERSION"
 S_KEY_META_SHORT_DESC = "META_SHORT_DESC"
+S_KEY_META_VERSION = "META_VERSION"
 S_KEY_META_KEYWORDS = "META_KEYWORDS"
 S_KEY_META_DEPS = "META_DEPS"
 S_KEY_META_CATS = "META_CATS"
@@ -498,10 +498,10 @@ S_TOML_KW_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 S_TOML_KW_REP = r"\g<1>\g<2>\g<3>[{}]"
 
 # desc/version in all files
-S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=)(.*?\")([^\"]*)(.*)"
-S_SRC_VER_REP = r"\g<1>\g<2>{}\g<4>"
-S_SRC_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=)(.*?\")([^\"]*)(.*)"
-S_SRC_DESC_REP = r"\g<1>\g<2>{}\g<4>"
+S_SRC_DESC_SCH = r"(^\s*S_PP_SHORT_DESC\s*=\s*)(_\()*(.*?)(\n|\))"
+S_SRC_DESC_REP = r'\g<1>\g<2>"{}"\g<4>'
+S_SRC_VER_SCH = r"(^\s*S_PP_VERSION\s*=\s*)(.*)"
+S_SRC_VER_REP = r'\g<1>"{}"'
 
 # make sure ver num entered in pybaker is valid
 S_SEM_VER_VALID = (
@@ -905,10 +905,10 @@ D_PRV_PRJ = {
 # these are settings that will be changed before running pybaker.py
 # consider them the "each build" settings
 D_PUB_META = {
-    # the version number to use in __PP_README_FILE__ and pyproject.toml
-    S_KEY_META_VERSION: "0.0.0",
     # the short description to use in __PP_README_FILE__ and pyproject.toml
     S_KEY_META_SHORT_DESC: "Short description",
+    # the version number to use in __PP_README_FILE__ and pyproject.toml
+    S_KEY_META_VERSION: "0.0.0",
     # the keywords to use in pyproject.toml and github
     S_KEY_META_KEYWORDS: [],
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
@@ -2080,16 +2080,16 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
 
-    # replace version
-    str_pattern = S_RM_VER_SCH
-    pp_ver_disp = dict_prv_prj["__PP_VER_DISP__"]
-    str_rep = S_RM_VER_REP.format(pp_ver_disp)
-    text = re.sub(str_pattern, str_rep, text, flags=re.S)
-
     # replace short description
     str_pattern = S_RM_DESC_SCH
     pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
     str_rep = S_RM_DESC_REP.format(pp_short_desc)
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
+
+    # replace version
+    str_pattern = S_RM_VER_SCH
+    pp_ver_disp = dict_prv_prj["__PP_VER_DISP__"]
+    str_rep = S_RM_VER_REP.format(pp_ver_disp)
     text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # --------------------------------------------------------------------------

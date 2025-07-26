@@ -10,8 +10,25 @@
    │     ├─ [] mkdocs.py
    │     └─ [] pdoc.py
    ├─ [] dist/
-   │     └─ [] ABOUT
+   │     └─ [] pyplate-0.0.4.tar.gz
    ├─ [] docs/
+   │     ├─ [] API/
+   │     │     ├─ [] bin/
+   │     │     │     ├─ [] pybaker.md
+   │     │     │     └─ [] pymaker.md
+   │     │     ├─ [] conf/
+   │     │     │     ├─ [] conf.md
+   │     │     │     ├─ [] mkdocs.md
+   │     │     │     └─ [] pdoc.md
+   │     │     ├─ [] install/
+   │     │     │     ├─ [] install.md
+   │     │     │     └─ [] uninstall.md
+   │     │     └─ [] src/
+   │     │           ├─ [] pybaker.md
+   │     │           ├─ [] pymaker.md
+   │     │           └─ [] pyplate.md
+   │     ├─ [] img/
+   │     │     └─ [] pyplate.png
    │     └─ [] index.md
    ├─ [] i18n/
    │     ├─ [] locale/
@@ -31,14 +48,6 @@
    │     ├─ [] install.py
    │     ├─ [] uninstall.json
    │     └─ [] uninstall.py
-   ├─ [] lib/
-   │     └─ [] cnlib/
-   │           └─ [] src/
-   │                 └─ [] CNLib.egg-info/
-   │                       ├─ [] dependency_links.txt
-   │                       ├─ [] PKG-INFO
-   │                       ├─ [] SOURCES.txt
-   │                       └─ [] top_level.txt
    ├─ [] misc/
    │     ├─ [] checklists/
    │     │     ├─ [] checklist.html
@@ -54,13 +63,74 @@
    │     ├─ [] how_to/
    │     │     └─ [] i18n_tips.txt
    │     └─ [] tree.txt
-   ├─ [] pdoc3/
-   │     ├─ [] head.mako
-   │     └─ [] logo.mako
    ├─ [] pyplate/
    │     ├─ [] private/
    │     │     └─ [] private.json
    │     └─ [] project.json
+   ├─ [] site/
+   │     ├─ [] API/
+   │     │     ├─ [] bin/
+   │     │     │     ├─ [] pybaker/
+   │     │     │     │     └─ [] index.html
+   │     │     │     └─ [] pymaker/
+   │     │     │           └─ [] index.html
+   │     │     ├─ [] conf/
+   │     │     │     ├─ [] conf/
+   │     │     │     │     └─ [] index.html
+   │     │     │     ├─ [] mkdocs/
+   │     │     │     │     └─ [] index.html
+   │     │     │     └─ [] pdoc/
+   │     │     │           └─ [] index.html
+   │     │     ├─ [] install/
+   │     │     │     ├─ [] install/
+   │     │     │     │     └─ [] index.html
+   │     │     │     └─ [] uninstall/
+   │     │     │           └─ [] index.html
+   │     │     └─ [] src/
+   │     │           ├─ [] pybaker/
+   │     │           │     └─ [] index.html
+   │     │           ├─ [] pymaker/
+   │     │           │     └─ [] index.html
+   │     │           └─ [] pyplate/
+   │     │                 └─ [] index.html
+   │     ├─ [] assets/
+   │     │     └─ [] _mkdocstrings.css
+   │     ├─ [] css/
+   │     │     ├─ [] base.css
+   │     │     ├─ [] bootstrap.min.css
+   │     │     ├─ [] bootstrap.min.css.map
+   │     │     ├─ [] brands.min.css
+   │     │     ├─ [] fontawesome.min.css
+   │     │     ├─ [] solid.min.css
+   │     │     └─ [] v4-font-face.min.css
+   │     ├─ [] img/
+   │     │     ├─ [] favicon.ico
+   │     │     ├─ [] grid.png
+   │     │     └─ [] pyplate.png
+   │     ├─ [] js/
+   │     │     ├─ [] base.js
+   │     │     ├─ [] bootstrap.bundle.min.js
+   │     │     ├─ [] bootstrap.bundle.min.js.map
+   │     │     └─ [] darkmode.js
+   │     ├─ [] search/
+   │     │     ├─ [] lunr.js
+   │     │     ├─ [] main.js
+   │     │     ├─ [] search_index.json
+   │     │     └─ [] worker.js
+   │     ├─ [] webfonts/
+   │     │     ├─ [] fa-brands-400.ttf
+   │     │     ├─ [] fa-brands-400.woff2
+   │     │     ├─ [] fa-regular-400.ttf
+   │     │     ├─ [] fa-regular-400.woff2
+   │     │     ├─ [] fa-solid-900.ttf
+   │     │     ├─ [] fa-solid-900.woff2
+   │     │     ├─ [] fa-v4compatibility.ttf
+   │     │     └─ [] fa-v4compatibility.woff2
+   │     ├─ [] 404.html
+   │     ├─ [] index.html
+   │     ├─ [] objects.inv
+   │     ├─ [] sitemap.xml
+   │     └─ [] sitemap.xml.gz
    ├─ [] src/
    │     ├─ [] pybaker.py
    │     ├─ [] pymaker.py
@@ -179,6 +249,7 @@
    │     └─ [] todo.txt
    ├─ [] .gitignore
    ├─ [] LICENSE.txt
+   ├─ [] mkdocs.yml
    ├─ [] pyproject.toml
    ├─ [] README.md
    └─ [] requirements.txt

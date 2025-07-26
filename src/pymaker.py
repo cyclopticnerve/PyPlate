@@ -94,25 +94,12 @@ class PyMaker(PyPlate):
     # Class constants
     # --------------------------------------------------------------------------
 
-    # pyplate: replace=True
-
-    # I18N: short desc in pymaker
-    S_PP_SHORT_DESC = _(
-        "A program for creating CLI/GUI/Package projects in Python from a " 
-        "template"
-    )
-
-    # version string
-    S_PP_VERSION = "0.0.2"
-
-    # pyplate: replace=False
-
     # about string
     S_ABOUT = (
         "\n"
         f"{'PyPlate/PyMaker'}\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VERSION}\n"
+        f"{PyPlate.S_PP_SHORT_DESC}\n"
+        f"{PyPlate.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate\n"
     )
 

@@ -1,6 +1,6 @@
 {
     "INST_NAME": "PyPlate",
-    "INST_VER": "0.0.2",
+    "INST_VER": "0.0.3",
     "INST_CONT": [
         ".local/share/pyplate",
         ".local/bin/pyplate"

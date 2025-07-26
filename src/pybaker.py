@@ -93,19 +93,6 @@ class PyBaker(PyPlate):
     # Class constants
     # --------------------------------------------------------------------------
 
-    # pyplate: replace=True
-
-    # I18N: short description
-    S_PP_SHORT_DESC = _(
-        "A program for building CLI/Gui/Package projects in Python from a "
-        "template"
-    )
-
-    # version string
-    S_PP_VERSION = "0.0.2"
-
-    # pyplate: replace=False
-
     # ide option strings
     S_ARG_IDE_OPTION = "-i"
     S_ARG_IDE_ACTION = "store_true"
@@ -117,8 +104,8 @@ class PyBaker(PyPlate):
     S_ABOUT = (
         "\n"
         f"{'PyPlate/PyBaker'}\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VERSION}\n"
+        f"{PyPlate.S_PP_SHORT_DESC}\n"
+        f"{PyPlate.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate\n"
     )
 

@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 07/25/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -47,8 +47,8 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 T_DIR_PRJ = P_DIR_PRJ
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -61,10 +61,10 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 
 # get dirs
-P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
 
 # get files
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
+P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
 
 
 # ------------------------------------------------------------------------------
@@ -113,10 +113,10 @@ class CNUninstall:
 
     # short description
     # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Packages in Python from a template")
 
     # version string
-    S_PP_VERSION = "__PP_VER_MMR__"
+    S_PP_VERSION = "0.0.3"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"
@@ -135,10 +135,10 @@ class CNUninstall:
     # about string (to be set by subclass)
     S_ABOUT = (
         "\n"
-        "__PP_NAME_PRJ_BIG__\n"
+        "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        "https://github.com/cyclopticnerve/PyPlate\n"
     )
 
     # I18N if using argparse, add help at end of about

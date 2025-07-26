@@ -12,8 +12,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyPlate"
-version = "0.0.2"
-description = "A program for creating and building CLI/GUI/Package projects in Python from a template"
+version = "0.0.3"
+description = "A program for creating and building CLI/GUI/Packages in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.txt" }

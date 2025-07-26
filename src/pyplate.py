@@ -118,13 +118,13 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description (to be set by subclass)
-    S_PP_SHORT_DESC = (
-        "A program for creating and building CLI/GUI/Package projects in "
-        "Python from a template"
-    )
+    # pylint: disable=line-too-long
+    # I18N: short description of parent class
+    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Packages in Python from a template")
+    # pylint: enable=line-too-long
 
     # version string (to be set by subclass)
-    S_PP_VERSION = "0.0.2"
+    S_PP_VERSION = "0.0.3"
 
     # pyplate: replace=False
 
