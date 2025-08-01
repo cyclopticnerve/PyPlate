@@ -93,6 +93,7 @@ class CNFormatter(
     A dummy class to combine multiple argparse formatters.
     """
 
+
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
 # ------------------------------------------------------------------------------
@@ -114,10 +115,12 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
+    # NB: MUST BE ALL ON ONE LINE!!!
     # I18N: short desc in installer
     S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
     # version string
+    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "__PP_VER_MMR__"
 
     # debug option strings
@@ -175,27 +178,37 @@ class CNInstall:
     S_MSG_ABORT = _("Installation aborted")
 
     # questions
-
-    # I18N: ask to overwrite same version
-    S_ASK_VER_INST = _(
-        "The current version of this program will be installed.\n"
-        "Do you want to continue? [Y/n] "
-    )
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
-        "The current version of this program is already installed.\n"
-        "Do you want to overwrite? [y/N] "
+        "The current version of this program is already \
+                       installed.\nDo you want to overwrite?"
     )
     # I18N: ask to overwrite newer version
     S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently installed.\n"
-        "Do you want to overwrite? [y/N] "
+        "A newer version of this program is currently \
+                        installed.\nDo you want to overwrite?"
     )
-    # I18N: confirm overwrite install
-    S_ASK_CONFIRM = _("y")
+    # I18N: ask to write first version
+    # S_ASK_VER_NEWER = _("The current version of this program will be \
+    #                   installed.\nDo you want to continue?"
+    # )
+
+    # version check results
+    S_VER_OLDER = -1
+    S_VER_SAME = 0
+    S_VER_NEWER = 1
+
+    # regex to compare version numbers
+    R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
+    R_VERSION_GROUP_MAJ = 1
+    R_VERSION_GROUP_MIN = 2
+    R_VERSION_GROUP_REV = 3
 
     # errors
-
     # NB: format param is file path
     # I18N: config file not found
     S_ERR_NOT_FOUND = _("File {} not found")
@@ -513,51 +526,39 @@ class CNInstall:
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
-            res = self._do_compare_versions(ver_old, ver_new)
+
+            # FIXME: local version compare
+            res = self.check_ver(ver_old, ver_new)
 
             # same version is installed
-            if res == 0:
+            if res == self.S_VER_SAME:
 
                 # ask to install same version
-                str_ask = input(self.S_ASK_VER_SAME)
+                str_ask = self._dialog(
+                    self.S_ASK_VER_SAME,
+                    [self.S_ASK_YES, self.S_ASK_NO],
+                    self.S_ASK_NO,
+                )
 
                 # user hit enter or typed anything else except "y"
-                if (
-                    len(str_ask) == 0
-                    or str_ask.lower()[0] != self.S_ASK_CONFIRM
-                ):
+                if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
                     sys.exit()
 
             # newer version is installed
-            elif res == -1:
+            elif res == self.S_VER_OLDER:  # -1:
 
                 # ask to install old version over newer
-                str_ask = input(self.S_ASK_VER_OLDER)
+                str_ask = self._dialog(
+                    self.S_ASK_VER_OLDER,
+                    [self.S_ASK_YES, self.S_ASK_NO],
+                    self.S_ASK_NO,
+                )
 
                 # user hit enter or typed anything else except "y"
-                if (
-                    len(str_ask) == 0
-                    or str_ask.lower()[0] != self.S_ASK_CONFIRM
-                ):
+                if len(str_ask) == 0 or str_ask.lower()[0] != self.S_ASK_YES:
                     print(self.S_MSG_ABORT)
                     sys.exit()
-
-        # fresh install
-        else:
-
-            # ask to install old version over newer
-            str_ask = input(self.S_ASK_VER_INST)
-
-            # user hit "y" or "Enter"
-            if (
-                len(str_ask) == 0
-                or str_ask.lower()[0] == self.S_ASK_CONFIRM
-            ):
-                pass
-            else:
-                print(self.S_MSG_ABORT)
-                sys.exit()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -790,9 +791,84 @@ class CNInstall:
         return a_dict
 
     # --------------------------------------------------------------------------
+    # Create a dialog-like question and return the result
+    # --------------------------------------------------------------------------
+    def _dialog(
+        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
+    ):
+        """
+        Create a dialog-like question and return the result
+        
+        Args:
+            message: The message to display
+            buttons: List of single char answers to the question
+            default: The button item to return when the user presses Enter at the 
+                question (default: "")
+            btn_sep: Char to use to separate button items
+            msg_fmt: Format string to present message/buttons to the user
+
+        Returns:
+            A lowercased string that matches a button (or an empty string if the \
+                entered option is not in the button list)
+
+        This method returns the string entered on the command line in response to a
+        question. If the entered option does not match any of the buttons, a blank
+        string is returned. If you set a default and the option entered is just the
+        Return key, the default string will be returned. If no default is present,
+        the entered string must match one of the buttons array values. All returned
+        values are lowercased. The question will be repeatedly printed to the 
+        screen until a valid entry is made.
+
+        Note that if default == "", pressing Enter is not considered a valid entry.
+        """
+
+        # make all params lowercase
+        buttons = [item.lower() for item in buttons]
+        default = default.lower()
+
+        # --------------------------------------------------------------------------
+
+        # if we passes a default
+        if default != "":
+
+            # find the default
+            if not default in buttons:
+
+                # not found, add at end of buttons
+                buttons.append(default)
+
+            # upper case it
+            buttons[buttons.index(default)] = default.upper()
+
+        # --------------------------------------------------------------------------
+
+        # add buttons to message
+        btns_all = btn_sep.join(buttons)
+        str_fmt = msg_fmt.format(message, btns_all)
+
+        # lower everything again for compare
+        buttons = [item.lower() for item in buttons]
+
+        # --------------------------------------------------------------------------
+
+        while True:
+
+            # ask the question, get the result
+            inp = input(str_fmt)
+            inp = inp.lower()
+
+            # # no input (empty)
+            if inp == "" and default != "":
+                return default
+
+            # input a button
+            if inp in buttons:
+                return inp
+
+    # --------------------------------------------------------------------------
     # Compare two version strings for relativity
     # --------------------------------------------------------------------------
-    def _do_compare_versions(self, ver_old, ver_new):
+    def check_ver(self, ver_old, ver_new):
         """
         Compare two version strings for relativity
 
@@ -814,11 +890,11 @@ class CNInstall:
 
         # test for new install (don't try to regex)
         if ver_old == "":
-            return 1
+            return self.S_VER_NEWER
 
         # test for equal (just save some cpu cycles)
         if ver_old == ver_new:
-            return 0
+            return self.S_VER_SAME
 
         # compare version string parts (only x.x.x)
         res_old = re.search(self.R_VERSION, ver_old)
@@ -841,9 +917,9 @@ class CNInstall:
 
                 # slide out at the first difference
                 if old_val < new_val:
-                    return 1
+                    return self.S_VER_NEWER
                 elif old_val > new_val:
-                    return -1
+                    return self.S_VER_OLDER
                 else:
                     continue
         else:
@@ -851,6 +927,69 @@ class CNInstall:
 
         # return 0 if equal
         return 0
+
+    # # --------------------------------------------------------------------------
+    # # Compare two version strings for relativity
+    # # --------------------------------------------------------------------------
+    # def _do_compare_versions(self, ver_old, ver_new):
+    #     """
+    #     Compare two version strings for relativity
+
+    #     Args:
+    #         ver_old: Old version string
+    #         ver_new: New version string
+
+    #     Returns:
+    #         An integer representing the relativity of the two version strings.
+    #         0 means the two versions are equal,
+    #         1 means new_ver is newer than old_ver (or there is no old_ver), and
+    #         -1 means new_ver is older than old_ver.
+
+    #     This method compares two version strings and determines which is older,
+    #     which is newer, or if they are equal. Note that this method converts
+    #     only the first three parts of a semantic version string
+    #     (https://semver.org/).
+    #     """
+
+    #     # test for new install (don't try to regex)
+    #     if ver_old == "":
+    #         return 1
+
+    #     # test for equal (just save some cpu cycles)
+    #     if ver_old == ver_new:
+    #         return 0
+
+    #     # compare version string parts (only x.x.x)
+    #     res_old = re.search(self.R_VERSION, ver_old)
+    #     res_new = re.search(self.R_VERSION, ver_new)
+
+    #     # if both version strings are valid
+    #     if res_old and res_new:
+
+    #         # make a list of groups to check
+    #         lst_groups = [
+    #             self.R_VERSION_GROUP_MAJ,
+    #             self.R_VERSION_GROUP_MIN,
+    #             self.R_VERSION_GROUP_REV,
+    #         ]
+
+    #         # for each part as int
+    #         for group in lst_groups:
+    #             old_val = int(res_old.group(group))
+    #             new_val = int(res_new.group(group))
+
+    #             # slide out at the first difference
+    #             if old_val < new_val:
+    #                 return 1
+    #             elif old_val > new_val:
+    #                 return -1
+    #             else:
+    #                 continue
+    #     else:
+    #         raise OSError(self.S_ERR_VERSION)
+
+    #     # return 0 if equal
+    #     return 0
 
 
 # ------------------------------------------------------------------------------

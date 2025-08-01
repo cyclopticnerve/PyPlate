@@ -58,8 +58,9 @@
     "PUB_I18N": {
         "DOMAIN": "pyplate",
         "SOURCES": [
-            "src",
-            "conf"
+            "conf",
+            "install",
+            "src"
         ],
         "CLANGS": {
             "Python": [
@@ -85,7 +86,7 @@
         "CHARSET": "UTF-8"
     },
     "PUB_META": {
-        "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
+        "META_SHORT_DESC": "foobar",
         "META_VERSION": "0.0.3",
         "META_KEYWORDS": [
             "python",

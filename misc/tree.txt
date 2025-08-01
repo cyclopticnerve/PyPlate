@@ -10,7 +10,7 @@
    │     ├─ [] mkdocs.py
    │     └─ [] pdoc.py
    ├─ [] dist/
-   │     └─ [] pyplate-0.0.4.tar.gz
+   │     └─ [] pyplate-0.0.3.tar.gz
    ├─ [] docs/
    │     ├─ [] API/
    │     │     ├─ [] bin/

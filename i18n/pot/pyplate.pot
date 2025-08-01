@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pyplate 0.0.3\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-07-26 12:05-0400\n"
+"POT-Creation-Date: 2025-07-26 21:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,6 +65,7 @@ msgstr ""
 msgid "Name must end with a letter or number"
 msgstr ""
 
+#. I18N: name contains invalid char
 msgid ""
 "Name must contain only letters, numbers, spaces, dashes (-), or underscores "
 "(_)"
@@ -78,6 +79,7 @@ msgstr ""
 msgid "Project \"{}\" does not exist"
 msgstr ""
 
+#. I18N: run pybaker on non-pyplate project dir
 msgid ""
 "This project does not have a 'pyplate' folder.\n"
 "Are you sure this is a PyPlate project?"
@@ -91,13 +93,15 @@ msgstr ""
 msgid "One or more PyPlate data files are corrupted"
 msgstr ""
 
+#. I18N: invalid version string format
 msgid ""
-"Warning: version number does not match S_SEM_VER_VALID \n"
+"Warning: version number does not match S_SEM_VER_VALID\n"
 "See https://semver.org/\n"
 "Do you wish to continue? y/N"
 msgstr ""
 
 #. I18N: continue with bad sem ver
+#. I18N: confirm overwrite install
 msgid "y"
 msgstr ""
 
@@ -113,15 +117,17 @@ msgstr ""
 msgid "Warning: file '{}' does not exist, using '{}'"
 msgstr ""
 
+#. I18N: invalid desktop category
 msgid ""
-"\"{}\" is not a valid desktop category, see https://specifications."
-"freedesktop.org/menu-spec/latest/apa.html"
+"\"{}\" is not a valid desktop category, see \"https://specifications."
+"freedesktop.org/menu-spec/latest/apa.html\""
 msgstr ""
 
 #. I18N: alternate text for screenshot in README.md
 msgid "Create the file {}"
 msgstr ""
 
+#. I18N: warn if running in debug mode
 msgid ""
 "WARNING! YOU ARE IN DEBUG MODE!\n"
 "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
@@ -216,6 +222,7 @@ msgid "Remove dist source... "
 msgstr ""
 
 #. I18N: Done
+#. I18N: done with step
 msgid "Done"
 msgstr ""
 
@@ -227,36 +234,134 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+#. I18N: error message when no remote repo exists
 msgid ""
-"MkDocs failed to deploy. Make sure you have published your repo and run\n"
-"'pybaker' from your project directory to publish your docs using MkDocs."
+"MkDocs failed to deploy. Make sure you have published your repo and "
+"run'pybaker' from your project directory to publish your docs using MkDocs."
 msgstr ""
 
-#. I18N help string for ide cmd line option
-msgid "ask for project folder when running in IDE"
-msgstr ""
-
-msgid ""
-"Run this program from the parent directory of the project you want to build."
-msgstr ""
-
-msgid "Run this program from the directory where you want to create a project."
-msgstr ""
-
+#. I18N: short desc in installer
 #. I18N: short description of parent class
-msgid ""
-"A program for creating and building CLI/GUI/Packages in Python from a "
-"template"
+msgid "foobar"
+msgstr ""
+
+#. I18N help string for debug cmd line option
+msgid "enable dry run mode"
 msgstr ""
 
 #. I18N: help option help
 msgid "show this help message and exit"
 msgstr ""
 
-#. I18N help string for debug cmd line option
-msgid "enable debugging mode"
-msgstr ""
-
 #. I18N if using argparse, add help at end of about
 msgid "Use -h for help"
+msgstr ""
+
+#. I18N: install the program
+msgid "Installing {} Version {}"
+msgstr ""
+
+#. I18N: done installing
+msgid "{} installed"
+msgstr ""
+
+#. I18N: step failed
+msgid "Fail"
+msgstr ""
+
+#. I18N: show the copy step
+msgid "Copying files... "
+msgstr ""
+
+#. I18N: show the venv step
+msgid "Making venv folder... "
+msgstr ""
+
+#. I18N: show the reqs step
+msgid "Installing requirements... "
+msgstr ""
+
+#. I18N: show desktop step
+msgid "Fixing .desktop file... "
+msgstr ""
+
+#. I18N: install aborted
+msgid "Installation aborted"
+msgstr ""
+
+#. I18N: ask to overwrite same version
+msgid ""
+"The current version of this program will be installed.\n"
+"Do you want to continue? [Y/n] "
+msgstr ""
+
+#. I18N: ask to overwrite same version
+msgid ""
+"The current version of this program is already installed.\n"
+"Do you want to overwrite? [y/N] "
+msgstr ""
+
+#. I18N: ask to overwrite newer version
+msgid ""
+"A newer version of this program is currently installed.\n"
+"Do you want to overwrite? [y/N] "
+msgstr ""
+
+#. I18N: config file not found
+msgid "File {} not found"
+msgstr ""
+
+#. I18N: config file is not valid json
+msgid "File {} is not a JSON file"
+msgstr ""
+
+#. I18N: version numbers invalid
+msgid "One or both version numbers are invalid"
+msgstr ""
+
+#. I18N: src path invalid
+msgid "Source path can not be {}"
+msgstr ""
+
+#. I18N: dst path invalid
+msgid "Destination path can not be {}"
+msgstr ""
+
+#. I18N: uninstall the program
+msgid "Uninstalling {}"
+msgstr ""
+
+#. I18N: done uninstalling
+msgid "{} uninstalled"
+msgstr ""
+
+#. I18N: show the copy step
+msgid "Deleting files... "
+msgstr ""
+
+#. I18N: uninstall aborted
+msgid "Uninstallation aborted"
+msgstr ""
+
+#. I18N: ask to overwrite same version
+msgid ""
+"This will uninstall {}.\n"
+"Do you want to continue? [y/N] "
+msgstr ""
+
+#. I18N help string for ide cmd line option
+msgid "ask for project folder when running in IDE"
+msgstr ""
+
+#. I18N cmd line instructions string
+msgid ""
+"Run this program from the parent directory of the project you want to build."
+msgstr ""
+
+#. I18N cmd line instructions string
+msgid "Run this program from the directory where you want to create a project."
+msgstr ""
+
+#. I18N help string for debug cmd line option
+msgid "enable debugging mode"
 msgstr ""

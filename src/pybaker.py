@@ -110,10 +110,8 @@ class PyBaker(PyPlate):
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _(
-        "Run this program from the parent directory of the project you want "
-        "to build."
-    )
+    S_EPILOG = _("Run this program from the parent directory of the project " \
+    "you want to build.")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -218,7 +216,7 @@ class PyBaker(PyPlate):
                 if prj_name == "":
                     continue
 
-                # if running in ide, cwd is pyplate prj dir, so move up and down
+                # if running in ide, cwd is pyplate prj dir, so move up + down
                 tmp_dir = Path(self._dir_prj / prj_name).resolve()
 
                 # check if project exists

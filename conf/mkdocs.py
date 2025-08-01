@@ -97,10 +97,9 @@ S_HOME_NAME = _("Home")
 
 # err message if no remote repo
 # I18N: error message when no remote repo exists
-S_ERR_NO_REPO = _(
-    "MkDocs failed to deploy. Make sure you have published your repo and run\n"
-    "'pybaker' from your project directory to publish your docs using MkDocs."
-)
+S_ERR_NO_REPO = _("MkDocs failed to deploy. Make sure you have published " \
+"your repo and run'pybaker' from your project directory to publish your docs " \
+"using MkDocs.")
 
 
 # ------------------------------------------------------------------------------

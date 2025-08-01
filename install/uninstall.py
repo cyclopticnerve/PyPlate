@@ -112,10 +112,12 @@ class CNUninstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
+    # NB: MUST BE ALL ON ONE LINE!!!
     # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Packages in Python from a template")
+    S_PP_SHORT_DESC = _("foobar")
 
     # version string
+    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "0.0.3"
 
     # debug option strings
@@ -169,12 +171,12 @@ class CNUninstall:
     # questions
 
     # NB: format parma is prog name
-    # I18N: ask to overwrite same version
-    S_ASK_UNINST = _(
-        "This will uninstall {}.\nDo you want to continue? [y/N] "
-    )
-    # I18N: confirm overwrite install
-    S_ASK_CONFIRM = _("y")
+    # I18N: ask to uninstall
+    S_ASK_UNINST_Q = _("This will uninstall {}.\nDo you want to continue?")
+    # I18N: confirm uninstall
+    S_ASK_UNINST_Y = _("y")
+    # I18N: deny uninstall
+    S_ASK_UNINST_N = _("N")
 
     # errors
 
@@ -357,10 +359,12 @@ class CNUninstall:
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
 
         # ask to install same version
-        str_ask = input(self.S_ASK_UNINST.format(prog_name))
+        # str_ask = input(self.S_ASK_UNINST.format(prog_name))
+        str_ask = self._dialog(self.S_ASK_UNINST_Q, [self.S_ASK_UNINST_Y, self.S_ASK_UNINST_N], self.S_ASK_UNINST_N)
 
         # user hit enter or typed anything else except "y"
-        if len(str_ask) == 0 or str_ask.lower()[0] != self.S_ASK_CONFIRM:
+        # if len(str_ask) == 0 or str_ask.lower()[0] != self.S_ASK_CONFIRM:
+        if str_ask == self.S_ASK_UNINST_N:
             print(self.S_MSG_ABORT)
             sys.exit()
 
@@ -471,6 +475,76 @@ class CNUninstall:
 
         # return result
         return a_dict
+
+    # --------------------------------------------------------------------------
+    # Create a dialog-like question and return the result
+    # --------------------------------------------------------------------------
+    def _dialog(
+        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
+    ):
+        """
+        Create a dialog-like question and return the result
+
+        Args:
+            message: The message to display
+            buttons: List of single char answers to the question
+            default: The button item to return when the user presses Enter at the question (default: "")
+            btn_sep: Char to use to separate button items
+            msg_fmt: Format string to present message/buttons to the user
+
+        Returns:
+            String that matches button (or empty string if entered option is not in button list)
+
+        This method returns the string entered on the command line in response
+        to a question. If the entered option does not match any of the buttons,
+        a blank string is returned. If you set a default and the option entered
+        is just the Return key, the default string will be returned. If no
+        default is present, the entered string must match one of the buttons
+        array values. All returned values are lowercased.
+        """
+
+        # make all params lowercase
+        buttons = [item.lower() for item in buttons]
+        default = default.lower()
+
+        # --------------------------------------------------------------------------
+
+        # if we passes a default
+        if default != "":
+
+            # find the default
+            if not default in buttons:
+
+                # not found, add at end of buttons
+                buttons.append(default)
+
+            # upper case it
+            buttons[buttons.index(default)] = default.upper()
+
+        # --------------------------------------------------------------------------
+
+        # add buttons to message
+        btns_all = btn_sep.join(buttons)
+        str_fmt = msg_fmt.format(message, btns_all)
+
+        # lower everything again for compare
+        buttons = [item.lower() for item in buttons]
+
+        # --------------------------------------------------------------------------
+
+        while True:
+
+            # ask the question, get the result
+            inp = input(str_fmt)
+            inp = inp.lower()
+
+            # # no input (empty)
+            if inp == "" and default != "":
+                return default
+
+            # input a button
+            if inp in buttons:
+                return inp
 
 
 # ------------------------------------------------------------------------------

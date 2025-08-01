@@ -121,10 +121,12 @@ class __PP_NAME_PRJ_PASCAL__:
 
     # --------------------------------------------------------------------------
 
+    # NB: MUST BE ALL ON ONE LINE!!!
     # I18N: short description
     S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
     # version string
+    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "__PP_VER_DISP__"
 
     # config option strings

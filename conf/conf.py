@@ -141,10 +141,8 @@ S_ERR_START = _("Name must start with a letter")
 # I18N: Project names must end with a letter or number
 S_ERR_END = _("Name must end with a letter or number")
 # I18N: name contains invalid char
-S_ERR_MID = _(
-    "Name must contain only letters, numbers, spaces, dashes (-), or "
-    "underscores (_)"
-)
+S_ERR_MID = _("Name must contain only letters, numbers, spaces, dashes (-), " \
+"or underscores (_)")
 # NB: format param is __PP_NAME_PRJ_BIG__
 # I18N: project already exists
 S_ERR_EXIST = _('Project "{}" already exists')
@@ -152,20 +150,15 @@ S_ERR_EXIST = _('Project "{}" already exists')
 # I18N: run pybaker on project that does not exist
 S_ERR_NOT_EXIST = _('Project "{}" does not exist')
 # I18N: run pybaker on non-pyplate project dir
-S_ERR_NOT_PRJ = _(
-    "This project does not have a 'pyplate' folder.\nAre you "
-    "sure this is a PyPlate project?"
-)
+S_ERR_NOT_PRJ = _("This project does not have a 'pyplate' folder.\n" \
+"Are you sure this is a PyPlate project?")
 # I18N: pyplate/private/private.json or pyplate/project.json not found
 S_ERR_PP_MISSING = _("One or more PyPlate data files are missing")
 # I18N: pyplate/private/private.json or pyplate/project.json not valid
 S_ERR_PP_INVALID = _("One or more PyPlate data files are corrupted")
 # I18N: invalid version string format
-S_ERR_SEM_VER = _(
-    "Warning: version number does not match S_SEM_VER_VALID \n"
-    "See https://semver.org/\n"
-    "Do you wish to continue? y/N"
-)
+S_ERR_SEM_VER = _("Warning: version number does not match S_SEM_VER_VALID\n" \
+"See https://semver.org/\nDo you wish to continue?")
 # I18N: continue with bad sem ver
 S_ERR_SEM_VER_Y = _("y")
 # I18N: quit if bad sem ver (the default, should be capitalized)
@@ -176,21 +169,17 @@ S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
 # I18N: we want i18n but the template desktop doesn't exist
 S_ERR_DESK_NO_TEMP = _("Warning: file '{}' does not exist, using '{}'")
 # NB: format param is item in L_CATS
-# I18N: invalid ,desktop category
-S_ERR_DESK_CAT = _(
-    '"{}" is not a valid desktop category, see '
-    "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
-)
+# I18N: invalid desktop category
+S_ERR_DESK_CAT = _('"{}" is not a valid desktop category, see ' \
+'"https://specifications.freedesktop.org/menu-spec/latest/apa.html"')
 # NB: format param is S_PATH_SCREENSHOT
 # I18N: alternate text for screenshot in README.md
 S_ERR_NO_SCREENSHOT = _("Create the file {}")
 
 # debug-specific strings
 # I18N: warn if running in debug mode
-S_MSG_DEBUG = _(
-    "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING "
-    "PROJECTS!\n"
-)
+S_MSG_DEBUG = _("WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO \
+                OVERWRITE EXISTING PROJECTS!\n")
 
 # error installing reqs
 # I18N: need internet connection to install requirements
@@ -2428,6 +2417,5 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
-
 
 # -)

@@ -117,13 +117,18 @@ class PyPlate:
 
     # pyplate: replace=True
 
-    # short description (to be set by subclass)
+    # short description
+    # NB: MUST BE ALL ON ONE LINE!!!
     # pylint: disable=line-too-long
     # I18N: short description of parent class
-    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Packages in Python from a template")
+    S_PP_SHORT_DESC = _(
+        "A program for creating and building "
+        "CLI/GUI/Packages in Python from a template"
+    )
     # pylint: enable=line-too-long
 
     # version string (to be set by subclass)
+    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "0.0.3"
 
     # pyplate: replace=False
@@ -379,7 +384,11 @@ class PyPlate:
         # check version before we start
         version = self._dict_pub_meta[C.S_KEY_META_VERSION]
         if not self._check_sem_ver(version):
-            res = input(C.S_ERR_SEM_VER).strip()
+            res = F.dialog(
+                C.S_ERR_SEM_VER,
+                [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
+                C.S_ERR_SEM_VER_N,
+            )
             if res in ["", C.S_ERR_SEM_VER_N]:
                 sys.exit()
 

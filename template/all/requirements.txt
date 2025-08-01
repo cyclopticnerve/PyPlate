@@ -1,1 +1,1 @@
-CNLib @ git+https://github.com/cyclopticnerve/CNLib@v0.0.1
+# CNLib @ git+https://github.com/cyclopticnerve/CNLib@v0.0.2
