@@ -359,7 +359,7 @@ class CNUninstall:
 
         # ask to install same version
         str_ask = self._dialog(
-            self.S_ASK_UNINST,
+            self.S_ASK_UNINST.format(prog_name),
             [self.S_ASK_YES, self.S_ASK_NO],
             self.S_ASK_NO,
         )
@@ -528,25 +528,24 @@ class CNUninstall:
         btns_all = btn_sep.join(buttons)
         str_fmt = msg_fmt.format(message, btns_all)
 
-        # ask the question, get the result
-        inp = input(str_fmt)
+        # lower everything again for compare
+        buttons = [item.lower() for item in buttons]
 
         # --------------------------------------------------------------------------
 
-        # lower everything again for compare
-        buttons = [item.lower() for item in buttons]
-        inp = inp.lower()
+        while True:
 
-        # # no input (empty)
-        if inp == "" and default != "":
-            return default
+            # ask the question, get the result
+            inp = input(str_fmt)
+            inp = inp.lower()
 
-        # input a button
-        if inp in buttons:
-            return inp
+            # # no input (empty)
+            if inp == "" and default != "":
+                return default
 
-        # not blank, not a button
-        return ""
+            # input a button
+            if inp in buttons:
+                return inp
 
 
 # ------------------------------------------------------------------------------

@@ -1570,7 +1570,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # i18n
 
-    # path to desktop template
+    # # path to desktop template
     path_dsk_tmp = dir_prj / S_FILE_DSK_TMP
     # path to desktop output
     path_dsk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]

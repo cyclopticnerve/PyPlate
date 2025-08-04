@@ -30,6 +30,7 @@ import gettext
 import locale
 from pathlib import Path
 import re
+import shutil
 import sys
 
 # local imports
@@ -383,13 +384,17 @@ class PyPlate:
 
         # check version before we start
         version = self._dict_pub_meta[C.S_KEY_META_VERSION]
-        if not self._check_sem_ver(version):
+        pattern = C.S_SEM_VER_VALID
+        ver_ok = re.search(pattern, version) is not None
+
+        # ask if user wants to keep invalid version or quit
+        if not ver_ok:
             res = F.dialog(
                 C.S_ERR_SEM_VER,
                 [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
                 C.S_ERR_SEM_VER_N,
             )
-            if res in ["", C.S_ERR_SEM_VER_N]:
+            if res == C.S_ERR_SEM_VER_N:
                 sys.exit()
 
         # combine dicts for string replacement
@@ -795,6 +800,7 @@ class PyPlate:
     # Rename dirs/files in the project
     # --------------------------------------------------------------------------
     def _fix_path(self, path):
+        # FIXME
         """
         Rename dirs/files in the project
 
@@ -825,28 +831,10 @@ class PyPlate:
             return
 
         # do rename
-        path.rename(path_new)
-
-    # --------------------------------------------------------------------------
-    # Check project type for allowed characters
-    # --------------------------------------------------------------------------
-    def _check_sem_ver(self, version):
-        """
-        Check if new version number is semantic
-
-        Args:
-            version: New version number to check
-
-        Returns:
-            True if a valid version is found, False otherwise
-
-        This method checks to see if the version string passed is valid for
-        semantic versioning.
-        """
-
-        # match semantic version from start of string
-        pattern = C.S_SEM_VER_VALID
-        return re.search(pattern, version)
+        if path.is_dir():
+            shutil.move(path, path_new)
+        else:
+            path.rename(path_new)
 
     # --------------------------------------------------------------------------
     # Reload dicts after any outside changes

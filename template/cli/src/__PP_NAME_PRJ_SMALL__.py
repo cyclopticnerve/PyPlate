@@ -31,10 +31,11 @@ import argparse
 import gettext
 import locale
 from pathlib import Path
+import subprocess
 import sys
 
 # cnlib imports
-# from cnlib.cnformatter import CNFormatter
+from cnlib.cnformatter import CNFormatter
 import cnlib.cnfunctions as F
 
 # ------------------------------------------------------------------------------
@@ -64,23 +65,23 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 
 
-# ------------------------------------------------------------------------------
-# A dummy class to combine multiple argparse formatters
-# ------------------------------------------------------------------------------
-class CNFormatter(
-    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
-):
-    """
-    A dummy class to combine multiple argparse formatters
+# # ------------------------------------------------------------------------------
+# # A dummy class to combine multiple argparse formatters
+# # ------------------------------------------------------------------------------
+# class CNFormatter(
+#     argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
+# ):
+#     """
+#     A dummy class to combine multiple argparse formatters
 
-    Args:
-        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
-        including argument descriptions.
-        RawDescriptionHelpFormatter: Indicates that description and epilog are
-        already correctly formatted and should not be line-wrapped.
+#     Args:
+#         RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
+#         including argument descriptions.
+#         RawDescriptionHelpFormatter: Indicates that description and epilog are
+#         already correctly formatted and should not be line-wrapped.
 
-    A dummy class to combine multiple argparse formatters.
-    """
+#     A dummy class to combine multiple argparse formatters.
+#     """
 
 
 # ------------------------------------------------------------------------------
@@ -137,6 +138,13 @@ class __PP_NAME_PRJ_PASCAL__:
     S_ARG_HLP_DEST = "HLP_DEST"
     # I18N: help option help
     S_ARG_HLP_HELP = _("show this help message and exit")
+
+    # config option strings
+    S_ARG_UNINST_OPTION = "--uninstall"
+    S_ARG_UNINST_ACTION = "store_true"
+    S_ARG_UNINST_DEST = "UNINST_DEST"
+    # I18N: uninstall option help
+    S_ARG_UNINST_HELP = _("uninstall this program")
 
     # about string
     S_ABOUT = (
@@ -270,12 +278,12 @@ class __PP_NAME_PRJ_PASCAL__:
         # add help text to about block
         print(self.S_ABOUT_HELP)
 
-        # add help option
+        # add cfg option
         parser.add_argument(
-            self.S_ARG_HLP_OPTION,
-            action=self.S_ARG_HLP_ACTION,
-            dest=self.S_ARG_HLP_DEST,
-            help=self.S_ARG_HLP_HELP,
+            self.S_ARG_CFG_OPTION,
+            dest=self.S_ARG_CFG_DEST,
+            help=self.S_ARG_CFG_HELP,
+            metavar=self.S_ARG_CFG_METAVAR,
         )
 
         # add debug option
@@ -286,12 +294,20 @@ class __PP_NAME_PRJ_PASCAL__:
             help=self.S_ARG_DBG_HELP,
         )
 
-        # add cfg option
+        # add help option
         parser.add_argument(
-            self.S_ARG_CFG_OPTION,
-            dest=self.S_ARG_CFG_DEST,
-            help=self.S_ARG_CFG_HELP,
-            metavar=self.S_ARG_CFG_METAVAR,
+            self.S_ARG_HLP_OPTION,
+            action=self.S_ARG_HLP_ACTION,
+            dest=self.S_ARG_HLP_DEST,
+            help=self.S_ARG_HLP_HELP,
+        )
+
+        # add help option
+        parser.add_argument(
+            self.S_ARG_UNINST_OPTION,
+            action=self.S_ARG_UNINST_ACTION,
+            dest=self.S_ARG_UNINST_DEST,
+            help=self.S_ARG_UNINST_HELP,
         )
 
         # run the parser
@@ -309,6 +325,10 @@ class __PP_NAME_PRJ_PASCAL__:
         self._path_cfg_arg = self._dict_args.get(
             self.S_ARG_CFG_DEST, self._path_cfg_arg
         )
+
+        # punt to sub func
+        if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
+            self._do_uninstall()
 
         # ----------------------------------------------------------------------
         # use cfg
@@ -423,6 +443,19 @@ class __PP_NAME_PRJ_PASCAL__:
         if self._debug:
             print("save cfg to:", self._path_cfg)
             F.pp(self._dict_cfg, label="save cfg")
+
+    # --------------------------------------------------------------------------
+    # Handle the --uninstall cmd line op
+    # --------------------------------------------------------------------------
+    def _do_uninstall(self):
+        """
+        Handle the -- uninstall cmd line op
+        """
+
+        cmd = "~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall.py"
+        subprocess.run(cmd, shell=True, check=True)
+
+        sys.exit()
 
 
 # ------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+# pylint: disable=too-many-lines
 """
 The install script for this project
 
@@ -197,17 +198,6 @@ class CNInstall:
     #                   installed.\nDo you want to continue?"
     # )
 
-    # version check results
-    S_VER_OLDER = -1
-    S_VER_SAME = 0
-    S_VER_NEWER = 1
-
-    # regex to compare version numbers
-    R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
-    R_VERSION_GROUP_MAJ = 1
-    R_VERSION_GROUP_MIN = 2
-    R_VERSION_GROUP_REV = 3
-
     # errors
     # NB: format param is file path
     # I18N: config file not found
@@ -240,17 +230,22 @@ class CNInstall:
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
-    # regex
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
+
+    # ------------------------------------------------------------------------------
+
+    # version check results
+    S_VER_OLDER = -1
+    S_VER_SAME = 0
+    S_VER_NEWER = 1
 
     # regex to compare version numbers
     R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
     R_VERSION_GROUP_MAJ = 1
     R_VERSION_GROUP_MIN = 2
     R_VERSION_GROUP_REV = 3
-
-    # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -393,7 +388,7 @@ class CNInstall:
         self._get_project_info()
 
         # check for existing/old version
-        self._check_ver()
+        self._check_version()
 
         # make the venv on the user's comp
         self._make_venv()
@@ -508,7 +503,7 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
-    def _check_ver(self):
+    def _check_version(self):
         """
         Check version info
 
@@ -527,8 +522,8 @@ class CNInstall:
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
 
-            # FIXME: local version compare
-            res = self.check_ver(ver_old, ver_new)
+            # do the compare and get S_VER__OLDER, S_VER_SAME, S_VER_NEWER
+            res = self._compare_version(ver_old, ver_new)
 
             # same version is installed
             if res == self.S_VER_SAME:
@@ -546,7 +541,7 @@ class CNInstall:
                     sys.exit()
 
             # newer version is installed
-            elif res == self.S_VER_OLDER:  # -1:
+            elif res == self.S_VER_OLDER:
 
                 # ask to install old version over newer
                 str_ask = self._dialog(
@@ -556,7 +551,7 @@ class CNInstall:
                 )
 
                 # user hit enter or typed anything else except "y"
-                if len(str_ask) == 0 or str_ask.lower()[0] != self.S_ASK_YES:
+                if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
                     sys.exit()
 
@@ -798,28 +793,23 @@ class CNInstall:
     ):
         """
         Create a dialog-like question and return the result
-        
+
         Args:
             message: The message to display
             buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at the 
-                question (default: "")
+            default: The button item to return when the user presses Enter at the question (default: "")
             btn_sep: Char to use to separate button items
             msg_fmt: Format string to present message/buttons to the user
 
         Returns:
-            A lowercased string that matches a button (or an empty string if the \
-                entered option is not in the button list)
+            String that matches button (or empty string if entered option is not in button list)
 
         This method returns the string entered on the command line in response to a
         question. If the entered option does not match any of the buttons, a blank
         string is returned. If you set a default and the option entered is just the
         Return key, the default string will be returned. If no default is present,
         the entered string must match one of the buttons array values. All returned
-        values are lowercased. The question will be repeatedly printed to the 
-        screen until a valid entry is made.
-
-        Note that if default == "", pressing Enter is not considered a valid entry.
+        values are lowercased.
         """
 
         # make all params lowercase
@@ -868,7 +858,7 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Compare two version strings for relativity
     # --------------------------------------------------------------------------
-    def check_ver(self, ver_old, ver_new):
+    def _compare_version(self, ver_old, ver_new):
         """
         Compare two version strings for relativity
 
@@ -878,9 +868,9 @@ class CNInstall:
 
         Returns:
             An integer representing the relativity of the two version strings.
-            0 means the two versions are equal,
-            1 means new_ver is newer than old_ver (or there is no old_ver), and
-            -1 means new_ver is older than old_ver.
+            S_VER_SAME means the two versions are equal,
+            S_VER_NEWER means new_ver is newer than old_ver (or there is no old_ver), and
+            S_VER_OLDER means new_ver is older than old_ver.
 
         This method compares two version strings and determines which is older,
         which is newer, or if they are equal. Note that this method converts
@@ -889,7 +879,7 @@ class CNInstall:
         """
 
         # test for new install (don't try to regex)
-        if ver_old == "":
+        if not ver_old or ver_old == "":
             return self.S_VER_NEWER
 
         # test for equal (just save some cpu cycles)
@@ -920,76 +910,14 @@ class CNInstall:
                     return self.S_VER_NEWER
                 elif old_val > new_val:
                     return self.S_VER_OLDER
+                # parts are equal, go to the next one
                 else:
                     continue
         else:
             raise OSError(self.S_ERR_VERSION)
 
         # return 0 if equal
-        return 0
-
-    # # --------------------------------------------------------------------------
-    # # Compare two version strings for relativity
-    # # --------------------------------------------------------------------------
-    # def _do_compare_versions(self, ver_old, ver_new):
-    #     """
-    #     Compare two version strings for relativity
-
-    #     Args:
-    #         ver_old: Old version string
-    #         ver_new: New version string
-
-    #     Returns:
-    #         An integer representing the relativity of the two version strings.
-    #         0 means the two versions are equal,
-    #         1 means new_ver is newer than old_ver (or there is no old_ver), and
-    #         -1 means new_ver is older than old_ver.
-
-    #     This method compares two version strings and determines which is older,
-    #     which is newer, or if they are equal. Note that this method converts
-    #     only the first three parts of a semantic version string
-    #     (https://semver.org/).
-    #     """
-
-    #     # test for new install (don't try to regex)
-    #     if ver_old == "":
-    #         return 1
-
-    #     # test for equal (just save some cpu cycles)
-    #     if ver_old == ver_new:
-    #         return 0
-
-    #     # compare version string parts (only x.x.x)
-    #     res_old = re.search(self.R_VERSION, ver_old)
-    #     res_new = re.search(self.R_VERSION, ver_new)
-
-    #     # if both version strings are valid
-    #     if res_old and res_new:
-
-    #         # make a list of groups to check
-    #         lst_groups = [
-    #             self.R_VERSION_GROUP_MAJ,
-    #             self.R_VERSION_GROUP_MIN,
-    #             self.R_VERSION_GROUP_REV,
-    #         ]
-
-    #         # for each part as int
-    #         for group in lst_groups:
-    #             old_val = int(res_old.group(group))
-    #             new_val = int(res_new.group(group))
-
-    #             # slide out at the first difference
-    #             if old_val < new_val:
-    #                 return 1
-    #             elif old_val > new_val:
-    #                 return -1
-    #             else:
-    #                 continue
-    #     else:
-    #         raise OSError(self.S_ERR_VERSION)
-
-    #     # return 0 if equal
-    #     return 0
+        return self.S_VER_SAME
 
 
 # ------------------------------------------------------------------------------
@@ -1000,9 +928,6 @@ if __name__ == "__main__":
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
-
-    # run main function
-    # main(b_dry)
 
     # create an instance of the class
     inst = CNInstall()

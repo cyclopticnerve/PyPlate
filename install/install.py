@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: install.py                                            |     ()     |
-# Date    : 07/25/2025                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
+# pylint: disable=too-many-lines
 """
 The install script for this project
 
@@ -32,10 +33,10 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# define assets dir
+# add assets dir to path
 
 P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_ASSETS = P_DIR_PRJ / "assets"
+P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -50,8 +51,8 @@ P_DIR_ASSETS = P_DIR_PRJ / "assets"
 T_DIR_PRJ = P_DIR_ASSETS
 
 # init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
+T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -64,15 +65,15 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 
 # get dirs
-P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
-P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
+P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
 
 # get files
-P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
-P_FILE_REQS = P_DIR_ASSETS / "install" / "requirements.txt"
-P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "img/pyplate.png"
+P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
+P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
+P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
+P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
 
 
 # ------------------------------------------------------------------------------
@@ -117,11 +118,11 @@ class CNInstall:
     # short description
     # NB: MUST BE ALL ON ONE LINE!!!
     # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("foobar")
+    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
 
     # version string
     # NB: MUST BE ALL ON ONE LINE!!!
-    S_PP_VERSION = "0.0.3"
+    S_PP_VERSION = "__PP_VER_MMR__"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"
@@ -140,10 +141,10 @@ class CNInstall:
     # about string (to be set by subclass)
     S_ABOUT = (
         "\n"
-        "PyPlate\n"
+        "__PP_NAME_PRJ_BIG__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "https://github.com/cyclopticnerve/PyPlate\n"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
     )
 
     # I18N if using argparse, add help at end of about
@@ -178,31 +179,26 @@ class CNInstall:
     S_MSG_ABORT = _("Installation aborted")
 
     # questions
-
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
-    S_ASK_VER_INST_Q = _(
-        "The current version of this program will be "
-        "installed.\nDo you want to continue?"
+    S_ASK_VER_SAME = _(
+        "The current version of this program is already \
+                       installed.\nDo you want to overwrite?"
     )
-    S_ASK_VER_INST_Y = _("y")
-    S_ASK_VER_INST_N = _("N")
-    # I18N: ask to overwrite same version
-    S_ASK_VER_SAME_Q = _(
-        "The current version of this program is already "
-        "installed.\nDo you want to overwrite?"
-    )
-    S_ASK_VER_SAME_Y = _("y")
-    S_ASK_VER_SAME_N = _("N")
     # I18N: ask to overwrite newer version
-    S_ASK_VER_OLDER_Q = _(
-        "A newer version of this program is currently "
-        "installed.\nDo you want to overwrite?"
+    S_ASK_VER_OLDER = _(
+        "A newer version of this program is currently \
+                        installed.\nDo you want to overwrite?"
     )
-    S_ASK_VER_OLDER_Y = _("y")
-    S_ASK_VER_OLDER_N = _("N")
+    # I18N: ask to write first version
+    # S_ASK_VER_NEWER = _("The current version of this program will be \
+    #                   installed.\nDo you want to continue?"
+    # )
 
     # errors
-
     # NB: format param is file path
     # I18N: config file not found
     S_ERR_NOT_FOUND = _("File {} not found")
@@ -234,17 +230,22 @@ class CNInstall:
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
-    # regex
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
+
+    # ------------------------------------------------------------------------------
+
+    # version check results
+    S_VER_OLDER = -1
+    S_VER_SAME = 0
+    S_VER_NEWER = 1
 
     # regex to compare version numbers
     R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
     R_VERSION_GROUP_MAJ = 1
     R_VERSION_GROUP_MIN = 2
     R_VERSION_GROUP_REV = 3
-
-    # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -265,6 +266,7 @@ class CNInstall:
         self._dry_run = False
 
         # project stuff
+        # NB: set to path objects to avoid comparing to None
         self._dir_assets = Path()
         self._dir_usr_inst = Path()
         self._path_cfg_inst = Path()
@@ -278,6 +280,7 @@ class CNInstall:
         self._dict_cfg = {}
 
         # cmd line stuff
+        # NB: placeholder to avoid comparing to None
         self._parser = argparse.ArgumentParser()
 
     # --------------------------------------------------------------------------
@@ -291,8 +294,8 @@ class CNInstall:
         path_cfg_uninst,
         dir_venv,
         path_reqs,
-        file_desk="",
-        file_desk_icon="",
+        file_desk=None,
+        file_desk_icon=None,
     ):
         """
         Install the program
@@ -309,63 +312,69 @@ class CNInstall:
             dir_venv: The path to the venv folder to create
             path_reqs: Path to the requirements.txt file to add requirements to
             the venv
-            file_desk: Path to the .desktop file (if GUI) (default: "")
+            file_desk: Path to the .desktop file (if GUI) (default: None)
             file_desk_icon: Path to the .desktop file icon (if GUI) (default:
-            "")
+            None)
 
         Runs the install operation.
         """
 
         # set props from params
-        dir_assets = Path(dir_assets)
-        if not dir_assets.is_absolute():
-            # make abs rel to self
-            dir_assets = P_DIR_PRJ / dir_assets
+        if dir_assets:
+            dir_assets = Path(dir_assets)
+            if not dir_assets.is_absolute():
+                # make abs rel to self
+                dir_assets = P_DIR_PRJ / dir_assets
         self._dir_assets = dir_assets
 
-        dir_usr_inst = Path(dir_usr_inst)
-        if not dir_usr_inst.is_absolute():
-            # make abs rel to self
-            dir_usr_inst = self._dir_assets / dir_usr_inst
+        if dir_usr_inst:
+            dir_usr_inst = Path(dir_usr_inst)
+            if not dir_usr_inst.is_absolute():
+                # make abs rel to self
+                dir_usr_inst = self._dir_assets / dir_usr_inst
         self._dir_usr_inst = dir_usr_inst
 
-        path_cfg_inst = Path(path_cfg_inst)
-        if not path_cfg_inst.is_absolute():
-            # make abs rel to self
-            path_cfg_inst = self._dir_assets / path_cfg_inst
+        if path_cfg_inst:
+            path_cfg_inst = Path(path_cfg_inst)
+            if not path_cfg_inst.is_absolute():
+                # make abs rel to self
+                path_cfg_inst = self._dir_assets / path_cfg_inst
         self._path_cfg_inst = path_cfg_inst
 
-        path_cfg_uninst = Path(path_cfg_uninst)
-        if not path_cfg_uninst.is_absolute():
-            # make abs rel to self
-            path_cfg_uninst = self._dir_assets / path_cfg_uninst
+        if path_cfg_uninst:
+            path_cfg_uninst = Path(path_cfg_uninst)
+            if not path_cfg_uninst.is_absolute():
+                # make abs rel to self
+                path_cfg_uninst = self._dir_assets / path_cfg_uninst
         self._path_cfg_uninst = path_cfg_uninst
 
-        dir_venv = Path(dir_venv)
-        if not dir_venv.is_absolute():
-            # make abs rel to self
-            dir_venv = self._dir_assets / dir_venv
+        if dir_venv:
+            dir_venv = Path(dir_venv)
+            if not dir_venv.is_absolute():
+                # make abs rel to self
+                dir_venv = self._dir_assets / dir_venv
         self._dir_venv = dir_venv
 
-        path_reqs = Path(path_reqs)
-        if not path_reqs.is_absolute():
-            # make abs rel to self
-            path_reqs = self._dir_assets / path_reqs
+        if path_reqs:
+            path_reqs = Path(path_reqs)
+            if not path_reqs.is_absolute():
+                # make abs rel to self
+                path_reqs = self._dir_assets / path_reqs
         self._path_reqs = path_reqs
 
-        if file_desk != "":
+        if file_desk:
             file_desk = Path(file_desk)
             if not file_desk.is_absolute():
                 # make abs rel to self
                 file_desk = self._dir_assets / file_desk
-        self._file_desk = Path(file_desk)
+        self._file_desk = file_desk
 
-        if file_desk_icon != "":
+        if file_desk_icon:
             file_desk_icon = Path(file_desk_icon)
             if not file_desk_icon.is_absolute():
                 # make abs rel to self
                 file_desk_icon = self._dir_assets / file_desk_icon
-        self._file_desk_icon = Path(file_desk_icon)
+        self._file_desk_icon = file_desk_icon
 
         # ----------------------------------------------------------------------
 
@@ -379,7 +388,7 @@ class CNInstall:
         self._get_project_info()
 
         # check for existing/old version
-        self._check_ver()
+        self._check_version()
 
         # make the venv on the user's comp
         self._make_venv()
@@ -494,7 +503,7 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
-    def _check_ver(self):
+    def _check_version(self):
         """
         Check version info
 
@@ -512,59 +521,39 @@ class CNInstall:
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
-            res = self._do_compare_versions(ver_old, ver_new)
+
+            # do the compare and get S_VER__OLDER, S_VER_SAME, S_VER_NEWER
+            res = self._compare_version(ver_old, ver_new)
 
             # same version is installed
-            if res == 0:
+            if res == self.S_VER_SAME:
 
                 # ask to install same version
                 str_ask = self._dialog(
-                    self.S_ASK_VER_SAME_Q,
-                    [self.S_ASK_VER_SAME_Y, self.S_ASK_VER_SAME_N],
-                    self.S_ASK_VER_SAME_N,
+                    self.S_ASK_VER_SAME,
+                    [self.S_ASK_YES, self.S_ASK_NO],
+                    self.S_ASK_NO,
                 )
 
                 # user hit enter or typed anything else except "y"
-                if str_ask == self.S_ASK_VER_SAME_N:
+                if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
                     sys.exit()
 
             # newer version is installed
-            elif res == -1:
+            elif res == self.S_VER_OLDER:
 
                 # ask to install old version over newer
-                # str_ask = input(self.S_ASK_VER_OLDER_Q)
                 str_ask = self._dialog(
-                    self.S_ASK_VER_OLDER_Q,
-                    [self.S_ASK_VER_OLDER_Y, self.S_ASK_VER_OLDER_N],
-                    self.S_ASK_VER_OLDER_N,
+                    self.S_ASK_VER_OLDER,
+                    [self.S_ASK_YES, self.S_ASK_NO],
+                    self.S_ASK_NO,
                 )
 
                 # user hit enter or typed anything else except "y"
-                if str_ask == self.S_ASK_VER_OLDER_N:
+                if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
                     sys.exit()
-
-        # fresh install
-        else:
-
-            # ask to install old version over newer
-            # str_ask = input(self.S_ASK_VER_INST)
-            str_ask = self._dialog(
-                self.S_ASK_VER_INST_Q,
-                [
-                    self.S_ASK_VER_INST_Y,
-                    self.S_ASK_VER_INST_Y,
-                    self.S_ASK_VER_INST_N,
-                ],
-                self.S_ASK_VER_INST_N,
-            )
-
-            # user hit "y" or "Enter"
-            # if len(str_ask) == 0 or str_ask.lower()[0] == self.S_ASK_CONFIRM:
-            if str_ask != self.S_ASK_VER_INST_Y:
-                print(self.S_MSG_ABORT)
-                sys.exit()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -658,9 +647,9 @@ class CNInstall:
             return
 
         # check both files for None and exist
-        if self._file_desk != "" or not self._file_desk.exists():
+        if not self._file_desk or not self._file_desk.exists():
             raise OSError(self.S_ERR_NOT_FOUND.format(self._file_desk))
-        if self._file_desk_icon != "" or not self._file_desk_icon.exists():
+        if not self._file_desk_icon or not self._file_desk_icon.exists():
             raise OSError(self.S_ERR_NOT_FOUND.format(self._file_desk_icon))
 
         # print info
@@ -797,9 +786,84 @@ class CNInstall:
         return a_dict
 
     # --------------------------------------------------------------------------
-    # Compare two version strings for relativity
+    # Create a dialog-like question and return the result
     # --------------------------------------------------------------------------
-    def _do_compare_versions(self, ver_old, ver_new):
+    def _dialog(
+        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
+    ):
+        """
+        Create a dialog-like question and return the result
+        
+        Args:
+            message: The message to display
+            buttons: List of single char answers to the question
+            default: The button item to return when the user presses Enter at the 
+                question (default: "")
+            btn_sep: Char to use to separate button items
+            msg_fmt: Format string to present message/buttons to the user
+
+        Returns:
+            A lowercased string that matches a button (or an empty string if the \
+                entered option is not in the button list)
+
+        This method returns the string entered on the command line in response to a
+        question. If the entered option does not match any of the buttons, a blank
+        string is returned. If you set a default and the option entered is just the
+        Return key, the default string will be returned. If no default is present,
+        the entered string must match one of the buttons array values. All returned
+        values are lowercased. The question will be repeatedly printed to the 
+        screen until a valid entry is made.
+
+        Note that if default == "", pressing Enter is not considered a valid entry.
+        """
+
+        # make all params lowercase
+        buttons = [item.lower() for item in buttons]
+        default = default.lower()
+
+        # ----------------------------------------------------------------------
+
+        # if we passes a default
+        if default != "":
+
+            # find the default
+            if not default in buttons:
+
+                # not found, add at end of buttons
+                buttons.append(default)
+
+            # upper case it
+            buttons[buttons.index(default)] = default.upper()
+
+        # ----------------------------------------------------------------------
+
+        # add buttons to message
+        btns_all = btn_sep.join(buttons)
+        str_fmt = msg_fmt.format(message, btns_all)
+
+        # lower everything again for compare
+        buttons = [item.lower() for item in buttons]
+
+        # ----------------------------------------------------------------------
+
+        while True:
+
+            # ask the question, get the result
+            inp = input(str_fmt)
+            inp = inp.lower()
+
+            # # no input (empty)
+            if inp == "" and default != "":
+                return default
+
+            # input a button
+            if inp in buttons:
+                return inp
+
+    # --------------------------------------------------------------------------
+    # Compare two version strings for relativity
+
+    def _compare_version(self, ver_old, ver_new):
         """
         Compare two version strings for relativity
 
@@ -809,9 +873,9 @@ class CNInstall:
 
         Returns:
             An integer representing the relativity of the two version strings.
-            0 means the two versions are equal,
-            1 means new_ver is newer than old_ver (or there is no old_ver), and
-            -1 means new_ver is older than old_ver.
+            S_VER_SAME means the two versions are equal,
+            S_VER_NEWER means new_ver is newer than old_ver (or there is no old_ver), and
+            S_VER_OLDER means new_ver is older than old_ver.
 
         This method compares two version strings and determines which is older,
         which is newer, or if they are equal. Note that this method converts
@@ -821,11 +885,11 @@ class CNInstall:
 
         # test for new install (don't try to regex)
         if ver_old == "":
-            return 1
+            return self.S_VER_NEWER
 
         # test for equal (just save some cpu cycles)
         if ver_old == ver_new:
-            return 0
+            return self.S_VER_SAME
 
         # compare version string parts (only x.x.x)
         res_old = re.search(self.R_VERSION, ver_old)
@@ -848,9 +912,9 @@ class CNInstall:
 
                 # slide out at the first difference
                 if old_val < new_val:
-                    return 1
+                    return self.S_VER_NEWER
                 elif old_val > new_val:
-                    return -1
+                    return self.S_VER_OLDER
                 else:
                     continue
         else:
@@ -858,76 +922,6 @@ class CNInstall:
 
         # return 0 if equal
         return 0
-
-    # --------------------------------------------------------------------------
-    # Create a dialog-like question and return the result
-    # --------------------------------------------------------------------------
-    def _dialog(
-        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
-    ):
-        """
-        Create a dialog-like question and return the result
-
-        Args:
-            message: The message to display
-            buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at the question (default: "")
-            btn_sep: Char to use to separate button items
-            msg_fmt: Format string to present message/buttons to the user
-
-        Returns:
-            String that matches button (or empty string if entered option is not in button list)
-
-        This method returns the string entered on the command line in response
-        to a question. If the entered option does not match any of the buttons,
-        a blank string is returned. If you set a default and the option entered
-        is just the Return key, the default string will be returned. If no
-        default is present, the entered string must match one of the buttons
-        array values. All returned values are lowercased.
-        """
-
-        # make all params lowercase
-        buttons = [item.lower() for item in buttons]
-        default = default.lower()
-
-        # --------------------------------------------------------------------------
-
-        # if we passes a default
-        if default != "":
-
-            # find the default
-            if not default in buttons:
-
-                # not found, add at end of buttons
-                buttons.append(default)
-
-            # upper case it
-            buttons[buttons.index(default)] = default.upper()
-
-        # --------------------------------------------------------------------------
-
-        # add buttons to message
-        btns_all = btn_sep.join(buttons)
-        str_fmt = msg_fmt.format(message, btns_all)
-
-        # lower everything again for compare
-        buttons = [item.lower() for item in buttons]
-
-        # --------------------------------------------------------------------------
-
-        while True:
-
-            # ask the question, get the result
-            inp = input(str_fmt)
-            inp = inp.lower()
-
-            # # no input (empty)
-            if inp == "" and default != "":
-                return default
-
-            # input a button
-            if inp in buttons:
-                return inp
 
 
 # ------------------------------------------------------------------------------
@@ -938,9 +932,6 @@ if __name__ == "__main__":
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
-
-    # run main function
-    # main(b_dry)
 
     # create an instance of the class
     inst = CNInstall()
@@ -955,8 +946,8 @@ if __name__ == "__main__":
             P_FILE_CFG_UNINST,
             P_DIR_VENV,
             P_FILE_REQS,
-            # P_FILE_DESK,
-            # P_FILE_DESK_ICON,
+            P_FILE_DESK,
+            P_FILE_DESK_ICON,
         )
     except Exception as e:
         raise e
