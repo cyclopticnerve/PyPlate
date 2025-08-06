@@ -34,7 +34,8 @@ import shutil
 import sys
 
 # local imports
-from cnlib import cnfunctions as F
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -75,26 +76,6 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # Classes
 # ------------------------------------------------------------------------------
 
-
-# ------------------------------------------------------------------------------
-# A dummy class to combine multiple argparse formatters
-# ------------------------------------------------------------------------------
-class CNFormatter(
-    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
-):
-    """
-    A dummy class to combine multiple argparse formatters
-
-    Args:
-        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
-        including argument descriptions.
-        RawDescriptionHelpFormatter: Indicates that description and epilog are
-        already correctly formatted and should not be line-wrapped.
-
-    A dummy class to combine multiple argparse formatters.
-    """
-
-
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
@@ -119,14 +100,8 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # pylint: disable=line-too-long
     # I18N: short description of parent class
-    S_PP_SHORT_DESC = _(
-        "A program for creating and building "
-        "CLI/GUI/Packages in Python from a template"
-    )
-    # pylint: enable=line-too-long
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string (to be set by subclass)
     # NB: MUST BE ALL ON ONE LINE!!!
@@ -800,7 +775,6 @@ class PyPlate:
     # Rename dirs/files in the project
     # --------------------------------------------------------------------------
     def _fix_path(self, path):
-        # FIXME
         """
         Rename dirs/files in the project
 

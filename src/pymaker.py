@@ -33,7 +33,7 @@ import shutil
 import sys
 
 # local imports
-from cnlib import cnfunctions as F
+from cnlib import cnfunctions as F  # type: ignore
 from pyplate import PyPlate
 
 # ------------------------------------------------------------------------------
@@ -104,8 +104,8 @@ class PyMaker(PyPlate):
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _("Run this program from the directory where you want to " \
-    "create a project.")
+    S_EPILOG = _("Run this program from the directory where you want to create \
+a project.")
 
     # --------------------------------------------------------------------------
     # Public methods

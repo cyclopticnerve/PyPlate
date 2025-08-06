@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pyplate 0.0.3\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-07-26 21:52-0400\n"
+"POT-Creation-Date: 2025-08-06 18:43-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,11 +97,11 @@ msgstr ""
 msgid ""
 "Warning: version number does not match S_SEM_VER_VALID\n"
 "See https://semver.org/\n"
-"Do you wish to continue? y/N"
+"Do you wish to continue?"
 msgstr ""
 
 #. I18N: continue with bad sem ver
-#. I18N: confirm overwrite install
+#. I18N: answer yes
 msgid "y"
 msgstr ""
 
@@ -236,13 +236,9 @@ msgstr ""
 
 #. I18N: error message when no remote repo exists
 msgid ""
-"MkDocs failed to deploy. Make sure you have published your repo and "
-"run'pybaker' from your project directory to publish your docs using MkDocs."
-msgstr ""
-
-#. I18N: short desc in installer
-#. I18N: short description of parent class
-msgid "foobar"
+"MkDocs failed to deploy.\n"
+"Make sure you have published your repo and run'pybaker' from your project "
+"directory to publish your docs using MkDocs."
 msgstr ""
 
 #. I18N help string for debug cmd line option
@@ -289,22 +285,20 @@ msgstr ""
 msgid "Installation aborted"
 msgstr ""
 
-#. I18N: ask to overwrite same version
-msgid ""
-"The current version of this program will be installed.\n"
-"Do you want to continue? [Y/n] "
+#. I18N: answer no
+msgid "n"
 msgstr ""
 
 #. I18N: ask to overwrite same version
 msgid ""
 "The current version of this program is already installed.\n"
-"Do you want to overwrite? [y/N] "
+"Do you want to overwrite?"
 msgstr ""
 
 #. I18N: ask to overwrite newer version
 msgid ""
 "A newer version of this program is currently installed.\n"
-"Do you want to overwrite? [y/N] "
+"Do you want to overwrite?"
 msgstr ""
 
 #. I18N: config file not found
@@ -343,10 +337,10 @@ msgstr ""
 msgid "Uninstallation aborted"
 msgstr ""
 
-#. I18N: ask to overwrite same version
+#. I18N: ask to uninstall
 msgid ""
 "This will uninstall {}.\n"
-"Do you want to continue? [y/N] "
+"Do you want to continue?"
 msgstr ""
 
 #. I18N help string for ide cmd line option

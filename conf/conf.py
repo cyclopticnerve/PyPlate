@@ -29,10 +29,10 @@ import sys
 import tarfile
 
 # local imports
-from cnlib import cnfunctions as F
-from cnlib.cnpot import CNPotPy
-from cnlib.cntree import CNTree
-from cnlib.cnvenv import CNVenv
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib.cntree import CNTree  # type: ignore
+from cnlib.cnvenv import CNVenv  # type: ignore
 
 # pylint: disable=no-name-in-module
 from . import mkdocs
@@ -179,7 +179,7 @@ S_ERR_NO_SCREENSHOT = _("Create the file {}")
 # debug-specific strings
 # I18N: warn if running in debug mode
 S_MSG_DEBUG = _("WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO \
-                OVERWRITE EXISTING PROJECTS!\n")
+OVERWRITE EXISTING PROJECTS!\n")
 
 # error installing reqs
 # I18N: need internet connection to install requirements
@@ -1829,9 +1829,9 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
                     dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
                 )
                 print(S_ACTION_DONE)
-            except Exception as e:
+            except OSError as e:
                 print(S_ACTION_FAIL)
-                raise e
+                print(e)
 
     # --------------------------------------------------------------------------
     # venv

@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 08/06/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
@@ -36,7 +36,7 @@ import sys
 # add assets dir to path
 
 P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
+P_DIR_ASSETS = P_DIR_PRJ / "assets"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -51,8 +51,8 @@ P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
 T_DIR_PRJ = P_DIR_ASSETS
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -65,15 +65,15 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 
 # get dirs
-P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
-P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
+P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
 
 # get files
-P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
-P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
-P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
+P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"
+P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
+P_FILE_REQS = P_DIR_ASSETS / "install" / "requirements.txt"
+P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "img/pyplate.png"
 
 
 # ------------------------------------------------------------------------------
@@ -116,13 +116,10 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string
-    # NB: MUST BE ALL ON ONE LINE!!!
-    S_PP_VERSION = "__PP_VER_MMR__"
+    S_PP_VERSION = "0.0.3"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"
@@ -141,10 +138,10 @@ class CNInstall:
     # about string (to be set by subclass)
     S_ABOUT = (
         "\n"
-        "__PP_NAME_PRJ_BIG__\n"
+        "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        "https://github.com/cyclopticnerve/PyPlate\n"
     )
 
     # I18N if using argparse, add help at end of about
@@ -184,19 +181,13 @@ class CNInstall:
     # I18N: answer no
     S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
-    S_ASK_VER_SAME = _(
-        "The current version of this program is already \
-                       installed.\nDo you want to overwrite?"
+    S_ASK_VER_SAME = _("The current version of this program is already \
+installed.\nDo you want to overwrite?"
     )
     # I18N: ask to overwrite newer version
-    S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently \
-                        installed.\nDo you want to overwrite?"
+    S_ASK_VER_OLDER = _("A newer version of this program is currently \
+installed.\nDo you want to overwrite?"
     )
-    # I18N: ask to write first version
-    # S_ASK_VER_NEWER = _("The current version of this program will be \
-    #                   installed.\nDo you want to continue?"
-    # )
 
     # errors
     # NB: format param is file path
@@ -793,25 +784,24 @@ class CNInstall:
     ):
         """
         Create a dialog-like question and return the result
-        
+
         Args:
             message: The message to display
             buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at the 
-                question (default: "")
+            default: The button item to return when the user presses Enter at \
+                the question (default: "")
             btn_sep: Char to use to separate button items
             msg_fmt: Format string to present message/buttons to the user
 
         Returns:
-            A lowercased string that matches a button (or an empty string if the \
-                entered option is not in the button list)
+            String that matches button (or empty string if entered option is not in button list)
 
         This method returns the string entered on the command line in response to a
         question. If the entered option does not match any of the buttons, a blank
         string is returned. If you set a default and the option entered is just the
         Return key, the default string will be returned. If no default is present,
         the entered string must match one of the buttons array values. All returned
-        values are lowercased. The question will be repeatedly printed to the 
+        values are lowercased. The question will be repeatedly printed to the
         screen until a valid entry is made.
 
         Note that if default == "", pressing Enter is not considered a valid entry.
@@ -862,7 +852,7 @@ class CNInstall:
 
     # --------------------------------------------------------------------------
     # Compare two version strings for relativity
-
+    # --------------------------------------------------------------------------
     def _compare_version(self, ver_old, ver_new):
         """
         Compare two version strings for relativity
@@ -884,7 +874,7 @@ class CNInstall:
         """
 
         # test for new install (don't try to regex)
-        if ver_old == "":
+        if not ver_old or ver_old == "":
             return self.S_VER_NEWER
 
         # test for equal (just save some cpu cycles)
@@ -915,13 +905,14 @@ class CNInstall:
                     return self.S_VER_NEWER
                 elif old_val > new_val:
                     return self.S_VER_OLDER
+                # parts are equal, go to the next one
                 else:
                     continue
         else:
             raise OSError(self.S_ERR_VERSION)
 
         # return 0 if equal
-        return 0
+        return self.S_VER_SAME
 
 
 # ------------------------------------------------------------------------------

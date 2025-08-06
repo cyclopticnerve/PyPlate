@@ -112,12 +112,9 @@ class CNUninstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
     # version string
-    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "__PP_VER_MMR__"
 
     # debug option strings
@@ -174,7 +171,7 @@ class CNUninstall:
     # I18N: answer no
     S_ASK_NO = _("n")
     # NB: format param is prog name
-    # I18N: ask to overwrite same version
+    # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
 
     # errors
@@ -357,7 +354,7 @@ class CNUninstall:
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
 
-        # ask to install same version
+        # ask to uninstall
         str_ask = self._dialog(
             self.S_ASK_UNINST.format(prog_name),
             [self.S_ASK_YES, self.S_ASK_NO],
@@ -489,19 +486,20 @@ class CNUninstall:
         Args:
             message: The message to display
             buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at the question (default: "")
+            default: The button item to return when the user presses Enter at \
+                the question (default: "")
             btn_sep: Char to use to separate button items
             msg_fmt: Format string to present message/buttons to the user
 
         Returns:
             String that matches button (or empty string if entered option is not in button list)
 
-        This method returns the string entered on the command line in response to a
-        question. If the entered option does not match any of the buttons, a blank
-        string is returned. If you set a default and the option entered is just the
-        Return key, the default string will be returned. If no default is present,
-        the entered string must match one of the buttons array values. All returned
-        values are lowercased.
+        This method returns the string entered on the command line in response
+        to a question. If the entered option does not match any of the buttons,
+        a blank string is returned. If you set a default and the option entered
+        is just the Return key, the default string will be returned. If no
+        default is present, the entered string must match one of the buttons
+        array values. All returned values are lowercased.
         """
 
         # make all params lowercase

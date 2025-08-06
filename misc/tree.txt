@@ -23,10 +23,12 @@
    │     │     ├─ [] install/
    │     │     │     ├─ [] install.md
    │     │     │     └─ [] uninstall.md
-   │     │     └─ [] src/
-   │     │           ├─ [] pybaker.md
-   │     │           ├─ [] pymaker.md
-   │     │           └─ [] pyplate.md
+   │     │     ├─ [] src/
+   │     │     │     ├─ [] pybaker.md
+   │     │     │     ├─ [] pymaker.md
+   │     │     │     └─ [] pyplate.md
+   │     │     └─ [] tests/
+   │     │           └─ [] dialog.md
    │     ├─ [] img/
    │     │     └─ [] pyplate.png
    │     └─ [] index.md
@@ -62,75 +64,13 @@
    │     │     └─ [] window.py
    │     ├─ [] how_to/
    │     │     └─ [] i18n_tips.txt
+   │     ├─ [] testing.txt
    │     └─ [] tree.txt
    ├─ [] pyplate/
    │     ├─ [] private/
    │     │     └─ [] private.json
    │     └─ [] project.json
    ├─ [] site/
-   │     ├─ [] API/
-   │     │     ├─ [] bin/
-   │     │     │     ├─ [] pybaker/
-   │     │     │     │     └─ [] index.html
-   │     │     │     └─ [] pymaker/
-   │     │     │           └─ [] index.html
-   │     │     ├─ [] conf/
-   │     │     │     ├─ [] conf/
-   │     │     │     │     └─ [] index.html
-   │     │     │     ├─ [] mkdocs/
-   │     │     │     │     └─ [] index.html
-   │     │     │     └─ [] pdoc/
-   │     │     │           └─ [] index.html
-   │     │     ├─ [] install/
-   │     │     │     ├─ [] install/
-   │     │     │     │     └─ [] index.html
-   │     │     │     └─ [] uninstall/
-   │     │     │           └─ [] index.html
-   │     │     └─ [] src/
-   │     │           ├─ [] pybaker/
-   │     │           │     └─ [] index.html
-   │     │           ├─ [] pymaker/
-   │     │           │     └─ [] index.html
-   │     │           └─ [] pyplate/
-   │     │                 └─ [] index.html
-   │     ├─ [] assets/
-   │     │     └─ [] _mkdocstrings.css
-   │     ├─ [] css/
-   │     │     ├─ [] base.css
-   │     │     ├─ [] bootstrap.min.css
-   │     │     ├─ [] bootstrap.min.css.map
-   │     │     ├─ [] brands.min.css
-   │     │     ├─ [] fontawesome.min.css
-   │     │     ├─ [] solid.min.css
-   │     │     └─ [] v4-font-face.min.css
-   │     ├─ [] img/
-   │     │     ├─ [] favicon.ico
-   │     │     ├─ [] grid.png
-   │     │     └─ [] pyplate.png
-   │     ├─ [] js/
-   │     │     ├─ [] base.js
-   │     │     ├─ [] bootstrap.bundle.min.js
-   │     │     ├─ [] bootstrap.bundle.min.js.map
-   │     │     └─ [] darkmode.js
-   │     ├─ [] search/
-   │     │     ├─ [] lunr.js
-   │     │     ├─ [] main.js
-   │     │     ├─ [] search_index.json
-   │     │     └─ [] worker.js
-   │     ├─ [] webfonts/
-   │     │     ├─ [] fa-brands-400.ttf
-   │     │     ├─ [] fa-brands-400.woff2
-   │     │     ├─ [] fa-regular-400.ttf
-   │     │     ├─ [] fa-regular-400.woff2
-   │     │     ├─ [] fa-solid-900.ttf
-   │     │     ├─ [] fa-solid-900.woff2
-   │     │     ├─ [] fa-v4compatibility.ttf
-   │     │     └─ [] fa-v4compatibility.woff2
-   │     ├─ [] 404.html
-   │     ├─ [] index.html
-   │     ├─ [] objects.inv
-   │     ├─ [] sitemap.xml
-   │     └─ [] sitemap.xml.gz
    ├─ [] src/
    │     ├─ [] pybaker.py
    │     ├─ [] pymaker.py
@@ -168,7 +108,7 @@
    │     │     │     ├─ [] head.mako
    │     │     │     └─ [] logo.mako
    │     │     ├─ [] pyplate/
-   │     │     │     └─ [] .private/
+   │     │     │     └─ [] private/
    │     │     │           └─ [] ABOUT
    │     │     ├─ [] src/
    │     │     │     └─ [] ABOUT
@@ -212,7 +152,8 @@
    │           └─ [] tests/
    │                 └─ [] __PP_NAME_PRJ_SMALL___test.py
    ├─ [] tests/
-   │     └─ [] ABOUT
+   │     ├─ [] ABOUT
+   │     └─ [] dialog.py
    ├─ [] todo/
    │     ├─ [] other/
    │     │     ├─ [] bin-dev/

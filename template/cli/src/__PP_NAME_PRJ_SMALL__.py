@@ -35,8 +35,8 @@ import subprocess
 import sys
 
 # cnlib imports
-from cnlib.cnformatter import CNFormatter
-import cnlib.cnfunctions as F
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -64,26 +64,6 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # Classes
 # ------------------------------------------------------------------------------
 
-
-# # ------------------------------------------------------------------------------
-# # A dummy class to combine multiple argparse formatters
-# # ------------------------------------------------------------------------------
-# class CNFormatter(
-#     argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
-# ):
-#     """
-#     A dummy class to combine multiple argparse formatters
-
-#     Args:
-#         RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
-#         including argument descriptions.
-#         RawDescriptionHelpFormatter: Indicates that description and epilog are
-#         already correctly formatted and should not be line-wrapped.
-
-#     A dummy class to combine multiple argparse formatters.
-#     """
-
-
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
@@ -109,12 +89,10 @@ class __PP_NAME_PRJ_PASCAL__:
 
     # --------------------------------------------------------------------------
 
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # I18N: short description
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    # short description
+    S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
     # version string
-    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "__PP_VER_DISP__"
 
     # config option strings
@@ -160,6 +138,10 @@ class __PP_NAME_PRJ_PASCAL__:
 
     # path to default config file
     P_CFG_DEF = Path("__PP_DIR_CONF__/__PP_NAME_PRJ_SMALL__.json")
+
+    # uninst not found
+    # I18N: uninstall not found
+    S_ERR_NO_UNINST = _("Uninstall files not found")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -452,10 +434,19 @@ class __PP_NAME_PRJ_PASCAL__:
         Handle the -- uninstall cmd line op
         """
 
-        cmd = "~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall.py"
-        subprocess.run(cmd, shell=True, check=True)
+        # find uninstall file
+        path_uninst = Path.home() / ".local/share/__PP_NAME_PRJ_SMALL__/uninstall.py"
 
-        sys.exit()
+        # if path exists
+        if path_uninst.exists():
+
+            # run uninstall and exit
+            cmd = str(path_uninst)
+            subprocess.run(cmd, shell=True, check=True)
+            sys.exit()
+        else:
+            print(self.S_ERR_NO_UNINST)
+            sys.exit()
 
 
 # ------------------------------------------------------------------------------

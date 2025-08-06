@@ -116,12 +116,9 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("__PP_SHORT_DESC__")
+    S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
     # version string
-    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "__PP_VER_MMR__"
 
     # debug option strings
@@ -184,19 +181,13 @@ class CNInstall:
     # I18N: answer no
     S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
-    S_ASK_VER_SAME = _(
-        "The current version of this program is already \
-                       installed.\nDo you want to overwrite?"
+    S_ASK_VER_SAME = _("The current version of this program is already \
+    installed.\nDo you want to overwrite?"
     )
     # I18N: ask to overwrite newer version
-    S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently \
-                        installed.\nDo you want to overwrite?"
+    S_ASK_VER_OLDER = _("A newer version of this program is currently \
+    installed.\nDo you want to overwrite?"
     )
-    # I18N: ask to write first version
-    # S_ASK_VER_NEWER = _("The current version of this program will be \
-    #                   installed.\nDo you want to continue?"
-    # )
 
     # errors
     # NB: format param is file path
@@ -797,7 +788,8 @@ class CNInstall:
         Args:
             message: The message to display
             buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at the question (default: "")
+            default: The button item to return when the user presses Enter at \
+                the question (default: "")
             btn_sep: Char to use to separate button items
             msg_fmt: Format string to present message/buttons to the user
 
@@ -809,14 +801,17 @@ class CNInstall:
         string is returned. If you set a default and the option entered is just the
         Return key, the default string will be returned. If no default is present,
         the entered string must match one of the buttons array values. All returned
-        values are lowercased.
+        values are lowercased. The question will be repeatedly printed to the
+        screen until a valid entry is made.
+
+        Note that if default == "", pressing Enter is not considered a valid entry.
         """
 
         # make all params lowercase
         buttons = [item.lower() for item in buttons]
         default = default.lower()
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # if we passes a default
         if default != "":
@@ -830,7 +825,7 @@ class CNInstall:
             # upper case it
             buttons[buttons.index(default)] = default.upper()
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # add buttons to message
         btns_all = btn_sep.join(buttons)
@@ -839,7 +834,7 @@ class CNInstall:
         # lower everything again for compare
         buttons = [item.lower() for item in buttons]
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         while True:
 
