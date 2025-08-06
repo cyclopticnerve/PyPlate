@@ -105,6 +105,16 @@
 </li>
     </ul>
   </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Tests</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../tests/dialog/" class="dropdown-item">dialog.py</a>
+</li>
+    </ul>
+  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -121,7 +131,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" class="nav-link disabled">
+                                <a rel="next" href="../../tests/dialog/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -146,10 +156,6 @@
             <li class="nav-item" data-bs-level="1"><a href="#pyplatepy" class="nav-link">pyplate.py</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-bs-level="2"><a href="#src.pyplate" class="nav-link">pyplate</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.CNFormatter" class="nav-link">CNFormatter</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -214,98 +220,6 @@ names in the resulting files.</p>
 
 
 
-<h2 id="src.pyplate.CNFormatter" class="doc doc-heading">
-            <code>CNFormatter</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="argparse.RawTextHelpFormatter">RawTextHelpFormatter</span></code>, <code><span title="argparse.RawDescriptionHelpFormatter">RawDescriptionHelpFormatter</span></code></p>
-
-
-        <p>A dummy class to combine multiple argparse formatters</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>RawTextHelpFormatter</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maintains whitespace for all sorts of help text,</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>RawDescriptionHelpFormatter</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indicates that description and epilog are</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-        <p>A dummy class to combine multiple argparse formatters.</p>
-
-
-
-
-
-
-
-              <details class="quote">
-                <summary>Source code in <code>src/pyplate.py</code></summary>
-                <pre class="highlight"><code class="language-python">class CNFormatter(
-    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
-):
-    """
-    A dummy class to combine multiple argparse formatters
-
-    Args:
-        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
-        including argument descriptions.
-        RawDescriptionHelpFormatter: Indicates that description and epilog are
-        already correctly formatted and should not be line-wrapped.
-
-    A dummy class to combine multiple argparse formatters.
-    """</code></pre>
-              </details>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h2 id="src.pyplate.PyPlate" class="doc doc-heading">
             <code>PyPlate</code>
 
@@ -354,12 +268,8 @@ PyPlate project from a template.</p>
     # pyplate: replace=True
 
     # short description
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # pylint: disable=line-too-long
     # I18N: short description of parent class
-    S_PP_SHORT_DESC = _("foobar")
-    # S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Packages in Python from a template")
-    # pylint: enable=line-too-long
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string (to be set by subclass)
     # NB: MUST BE ALL ON ONE LINE!!!
@@ -617,9 +527,17 @@ PyPlate project from a template.</p>
 
         # check version before we start
         version = self._dict_pub_meta[C.S_KEY_META_VERSION]
-        if not self._check_sem_ver(version):
-            res = input(C.S_ERR_SEM_VER).strip()
-            if res in ["", C.S_ERR_SEM_VER_N]:
+        pattern = C.S_SEM_VER_VALID
+        ver_ok = re.search(pattern, version) is not None
+
+        # ask if user wants to keep invalid version or quit
+        if not ver_ok:
+            res = F.dialog(
+                C.S_ERR_SEM_VER,
+                [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
+                C.S_ERR_SEM_VER_N,
+            )
+            if res == C.S_ERR_SEM_VER_N:
                 sys.exit()
 
         # combine dicts for string replacement
@@ -1055,28 +973,10 @@ PyPlate project from a template.</p>
             return
 
         # do rename
-        path.rename(path_new)
-
-    # --------------------------------------------------------------------------
-    # Check project type for allowed characters
-    # --------------------------------------------------------------------------
-    def _check_sem_ver(self, version):
-        """
-        Check if new version number is semantic
-
-        Args:
-            version: New version number to check
-
-        Returns:
-            True if a valid version is found, False otherwise
-
-        This method checks to see if the version string passed is valid for
-        semantic versioning.
-        """
-
-        # match semantic version from start of string
-        pattern = C.S_SEM_VER_VALID
-        return re.search(pattern, version)
+        if path.is_dir():
+            shutil.move(path, path_new)
+        else:
+            path.rename(path_new)
 
     # --------------------------------------------------------------------------
     # Reload dicts after any outside changes

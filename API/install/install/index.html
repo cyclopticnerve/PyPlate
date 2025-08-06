@@ -105,6 +105,16 @@
 </li>
     </ul>
   </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Tests</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../tests/dialog/" class="dropdown-item">dialog.py</a>
+</li>
+    </ul>
+  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -331,12 +341,9 @@ appropriate locations on the user's computer.</p>
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
-    # NB: MUST BE ALL ON ONE LINE!!!
-    # I18N: short desc in installer
-    S_PP_SHORT_DESC = _("foobar")
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string
-    # NB: MUST BE ALL ON ONE LINE!!!
     S_PP_VERSION = "0.0.3"
 
     # debug option strings
@@ -394,18 +401,20 @@ appropriate locations on the user's computer.</p>
     S_MSG_ABORT = _("Installation aborted")
 
     # questions
-
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
-    S_ASK_VER_INST = _("The current version of this program will be installed.\nDo you want to continue? [Y/n] ")
-    # I18N: ask to overwrite same version
-    S_ASK_VER_SAME = _("The current version of this program is already installed.\nDo you want to overwrite? [y/N] ")
+    S_ASK_VER_SAME = _("The current version of this program is already \
+installed.\nDo you want to overwrite?"
+    )
     # I18N: ask to overwrite newer version
-    S_ASK_VER_OLDER = _("A newer version of this program is currently installed.\nDo you want to overwrite? [y/N] ")
-    # I18N: confirm overwrite install
-    S_ASK_CONFIRM = _("y")
+    S_ASK_VER_OLDER = _("A newer version of this program is currently \
+installed.\nDo you want to overwrite?"
+    )
 
     # errors
-
     # NB: format param is file path
     # I18N: config file not found
     S_ERR_NOT_FOUND = _("File {} not found")
@@ -437,17 +446,22 @@ appropriate locations on the user's computer.</p>
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
-    # regex
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g&lt;1&gt;{}"  # Icon=&lt;home/__PP_IMG_DESK__&gt;
+
+    # ------------------------------------------------------------------------------
+
+    # version check results
+    S_VER_OLDER = -1
+    S_VER_SAME = 0
+    S_VER_NEWER = 1
 
     # regex to compare version numbers
     R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
     R_VERSION_GROUP_MAJ = 1
     R_VERSION_GROUP_MIN = 2
     R_VERSION_GROUP_REV = 3
-
-    # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g&lt;1&gt;{}"  # Icon=&lt;home/__PP_IMG_DESK__&gt;
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -590,7 +604,7 @@ appropriate locations on the user's computer.</p>
         self._get_project_info()
 
         # check for existing/old version
-        self._check_ver()
+        self._check_version()
 
         # make the venv on the user's comp
         self._make_venv()
@@ -705,7 +719,7 @@ appropriate locations on the user's computer.</p>
     # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
-    def _check_ver(self):
+    def _check_version(self):
         """
         Check version info
 
@@ -723,48 +737,39 @@ appropriate locations on the user's computer.</p>
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
-            res = self._do_compare_versions(ver_old, ver_new)
+
+            # do the compare and get S_VER__OLDER, S_VER_SAME, S_VER_NEWER
+            res = self._compare_version(ver_old, ver_new)
 
             # same version is installed
-            if res == 0:
+            if res == self.S_VER_SAME:
 
                 # ask to install same version
-                str_ask = input(self.S_ASK_VER_SAME)
+                str_ask = self._dialog(
+                    self.S_ASK_VER_SAME,
+                    [self.S_ASK_YES, self.S_ASK_NO],
+                    self.S_ASK_NO,
+                )
 
                 # user hit enter or typed anything else except "y"
-                if (
-                    len(str_ask) == 0
-                    or str_ask.lower()[0] != self.S_ASK_CONFIRM
-                ):
+                if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
                     sys.exit()
 
             # newer version is installed
-            elif res == -1:
+            elif res == self.S_VER_OLDER:
 
                 # ask to install old version over newer
-                str_ask = input(self.S_ASK_VER_OLDER)
+                str_ask = self._dialog(
+                    self.S_ASK_VER_OLDER,
+                    [self.S_ASK_YES, self.S_ASK_NO],
+                    self.S_ASK_NO,
+                )
 
                 # user hit enter or typed anything else except "y"
-                if (
-                    len(str_ask) == 0
-                    or str_ask.lower()[0] != self.S_ASK_CONFIRM
-                ):
+                if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
                     sys.exit()
-
-        # fresh install
-        else:
-
-            # ask to install old version over newer
-            str_ask = input(self.S_ASK_VER_INST)
-
-            # user hit "y" or "Enter"
-            if len(str_ask) == 0 or str_ask.lower()[0] == self.S_ASK_CONFIRM:
-                pass
-            else:
-                print(self.S_MSG_ABORT)
-                sys.exit()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -997,9 +1002,83 @@ appropriate locations on the user's computer.</p>
         return a_dict
 
     # --------------------------------------------------------------------------
+    # Create a dialog-like question and return the result
+    # --------------------------------------------------------------------------
+    def _dialog(
+        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
+    ):
+        """
+        Create a dialog-like question and return the result
+
+        Args:
+            message: The message to display
+            buttons: List of single char answers to the question
+            default: The button item to return when the user presses Enter at \
+                the question (default: "")
+            btn_sep: Char to use to separate button items
+            msg_fmt: Format string to present message/buttons to the user
+
+        Returns:
+            String that matches button (or empty string if entered option is not in button list)
+
+        This method returns the string entered on the command line in response to a
+        question. If the entered option does not match any of the buttons, a blank
+        string is returned. If you set a default and the option entered is just the
+        Return key, the default string will be returned. If no default is present,
+        the entered string must match one of the buttons array values. All returned
+        values are lowercased. The question will be repeatedly printed to the
+        screen until a valid entry is made.
+
+        Note that if default == "", pressing Enter is not considered a valid entry.
+        """
+
+        # make all params lowercase
+        buttons = [item.lower() for item in buttons]
+        default = default.lower()
+
+        # ----------------------------------------------------------------------
+
+        # if we passes a default
+        if default != "":
+
+            # find the default
+            if not default in buttons:
+
+                # not found, add at end of buttons
+                buttons.append(default)
+
+            # upper case it
+            buttons[buttons.index(default)] = default.upper()
+
+        # ----------------------------------------------------------------------
+
+        # add buttons to message
+        btns_all = btn_sep.join(buttons)
+        str_fmt = msg_fmt.format(message, btns_all)
+
+        # lower everything again for compare
+        buttons = [item.lower() for item in buttons]
+
+        # ----------------------------------------------------------------------
+
+        while True:
+
+            # ask the question, get the result
+            inp = input(str_fmt)
+            inp = inp.lower()
+
+            # # no input (empty)
+            if inp == "" and default != "":
+                return default
+
+            # input a button
+            if inp in buttons:
+                return inp
+
+    # --------------------------------------------------------------------------
     # Compare two version strings for relativity
     # --------------------------------------------------------------------------
-    def _do_compare_versions(self, ver_old, ver_new):
+    def _compare_version(self, ver_old, ver_new):
         """
         Compare two version strings for relativity
 
@@ -1009,9 +1088,9 @@ appropriate locations on the user's computer.</p>
 
         Returns:
             An integer representing the relativity of the two version strings.
-            0 means the two versions are equal,
-            1 means new_ver is newer than old_ver (or there is no old_ver), and
-            -1 means new_ver is older than old_ver.
+            S_VER_SAME means the two versions are equal,
+            S_VER_NEWER means new_ver is newer than old_ver (or there is no old_ver), and
+            S_VER_OLDER means new_ver is older than old_ver.
 
         This method compares two version strings and determines which is older,
         which is newer, or if they are equal. Note that this method converts
@@ -1020,12 +1099,12 @@ appropriate locations on the user's computer.</p>
         """
 
         # test for new install (don't try to regex)
-        if ver_old == "":
-            return 1
+        if not ver_old or ver_old == "":
+            return self.S_VER_NEWER
 
         # test for equal (just save some cpu cycles)
         if ver_old == ver_new:
-            return 0
+            return self.S_VER_SAME
 
         # compare version string parts (only x.x.x)
         res_old = re.search(self.R_VERSION, ver_old)
@@ -1048,16 +1127,17 @@ appropriate locations on the user's computer.</p>
 
                 # slide out at the first difference
                 if old_val &lt; new_val:
-                    return 1
+                    return self.S_VER_NEWER
                 elif old_val &gt; new_val:
-                    return -1
+                    return self.S_VER_OLDER
+                # parts are equal, go to the next one
                 else:
                     continue
         else:
             raise OSError(self.S_ERR_VERSION)
 
         # return 0 if equal
-        return 0</code></pre>
+        return self.S_VER_SAME</code></pre>
               </details>
 
 
@@ -1376,7 +1456,7 @@ appropriate locations on the user's computer.</p>
     self._get_project_info()
 
     # check for existing/old version
-    self._check_ver()
+    self._check_version()
 
     # make the venv on the user's comp
     self._make_venv()

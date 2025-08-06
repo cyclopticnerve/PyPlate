@@ -105,6 +105,16 @@
 </li>
     </ul>
   </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Tests</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../tests/dialog/" class="dropdown-item">dialog.py</a>
+</li>
+    </ul>
+  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -258,7 +268,8 @@ distribution from a PyPlate project.</p>
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _("Run this program from the parent directory of the project you want to build.")
+    S_EPILOG = _("Run this program from the parent directory of the project " \
+    "you want to build.")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -363,7 +374,7 @@ distribution from a PyPlate project.</p>
                 if prj_name == "":
                     continue
 
-                # if running in ide, cwd is pyplate prj dir, so move up and down
+                # if running in ide, cwd is pyplate prj dir, so move up + down
                 tmp_dir = Path(self._dir_prj / prj_name).resolve()
 
                 # check if project exists

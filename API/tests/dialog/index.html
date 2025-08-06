@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../../img/favicon.ico">
-        <title>pdoc.py - PyPlate</title>
+        <title>dialog.py - PyPlate</title>
         <link href="../../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../../css/brands.min.css" rel="stylesheet">
@@ -61,15 +61,15 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="../conf/" class="dropdown-item">conf.py</a>
+    <a href="../../conf/conf/" class="dropdown-item">conf.py</a>
 </li>
             
 <li>
-    <a href="../mkdocs/" class="dropdown-item">mkdocs.py</a>
+    <a href="../../conf/mkdocs/" class="dropdown-item">mkdocs.py</a>
 </li>
             
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">pdoc.py</a>
+    <a href="../../conf/pdoc/" class="dropdown-item">pdoc.py</a>
 </li>
     </ul>
   </li>
@@ -111,7 +111,7 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="../../tests/dialog/" class="dropdown-item">dialog.py</a>
+    <a href="./" class="dropdown-item active" aria-current="page">dialog.py</a>
 </li>
     </ul>
   </li>
@@ -126,12 +126,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../mkdocs/" class="nav-link">
+                                <a rel="prev" href="../../src/pyplate/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../../install/install/" class="nav-link">
+                                <a rel="next" class="nav-link disabled">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -153,13 +153,13 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#pdocpy" class="nav-link">pdoc.py</a>
+            <li class="nav-item" data-bs-level="1"><a href="#dialogpy" class="nav-link">dialog.py</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#conf.pdoc" class="nav-link">pdoc</a>
+            <li class="nav-item" data-bs-level="2"><a href="#tests.dialog" class="nav-link">dialog</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#conf.pdoc.make_docs" class="nav-link">make_docs</a>
+            <li class="nav-item" data-bs-level="2"><a href="#tests.dialog.dialog" class="nav-link">dialog</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -170,22 +170,17 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="pdocpy">pdoc.py</h1>
+<h1 id="dialogpy">dialog.py</h1>
 
 
 <div class="doc doc-object doc-module">
 
 
 
-<a id="conf.pdoc"></a>
+<a id="tests.dialog"></a>
     <div class="doc doc-contents first">
 
-        <p>This module makes documentation for a project using PDoc3. It uses the
-project's source files and the config files in the "pdoc3" folder to create
-html files in the "docs" folder. It then tweaks the file structure to allow
-GitHub Pages to auto-publish your docs at <username>.github.io/<repo_name>. It
-also fixes the version number and icon for your docs.
-As much code/settings/constants as can be are reused from conf.py.</p>
+        <p>file docstring</p>
 
 
 
@@ -208,257 +203,66 @@ As much code/settings/constants as can be are reused from conf.py.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="conf.pdoc.make_docs" class="doc doc-heading">
-            <code class="highlight language-python">make_docs(dir_prj, dict_prv, _dict_pub, p_dir_pp, p_dir_pp_venv)</code>
+<h2 id="tests.dialog.dialog" class="doc doc-heading">
+            <code class="highlight language-python">dialog(message, buttons, default='', btn_sep='/', msg_fmt='{} [{}]: ')</code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Make docs using pdoc3</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>dir_prj</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The root of the new project</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>dict_prv</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary containing private pyplate data</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>dict_pub</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary containing public project data</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>p_dir_pp</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Path to PyPlate program</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>p_dir_pp_env</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Path to PyPlate's venv (to activate pdoc3)</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-        <p>Fix version number, make the docs, move the docs, and fix the icon paths.</p>
+        <p>method docstring</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>conf/pdoc.py</code></summary>
-              <pre class="highlight"><code class="language-python">def make_docs(dir_prj, dict_prv, _dict_pub, p_dir_pp, p_dir_pp_venv):
-    """
-    Make docs using pdoc3
+              <summary>Source code in <code>tests/dialog.py</code></summary>
+              <pre class="highlight"><code class="language-python">def dialog(message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "):
+    """method docstring"""
 
-    Args:
-        dir_prj: The root of the new project
-        dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data
-        p_dir_pp: Path to PyPlate program
-        p_dir_pp_env: Path to PyPlate's venv (to activate pdoc3)
-
-    Fix version number, make the docs, move the docs, and fix the icon paths.
-    """
+    # make all params lowercase
+    buttons = [item.lower() for item in buttons]
+    default = default.lower()
 
     # --------------------------------------------------------------------------
-    # nuke / remake docs dir
 
-    dir_docs_out = dir_prj / conf.S_DIR_DOCS
+    # if we passes a default
+    if default != "":
 
-    # nuke old docs
-    if dir_docs_out.exists():
+        # find the default
+        if not default in buttons:
 
-        # delete and recreate docs dir
-        shutil.rmtree(dir_docs_out)
-        dir_docs_out.mkdir(parents=True)
+            # not found, add at end of buttons
+            buttons.append(default)
 
-    # --------------------------------------------------------------------------
-    # fix version
-
-    path_mako = dir_prj / S_PATH_MAKO
-
-    # open and read whole file
-    with open(path_mako, "r", encoding=conf.S_ENCODING) as a_file:
-        text = a_file.read()
-
-    # replace version
-    str_pattern = conf.S_RM_VER_SCH
-    pp_ver_disp = dict_prv[conf.S_KEY_PRV_PRJ]["__PP_VER_DISP__"]
-    str_rep = conf.S_RM_VER_REP.format(pp_ver_disp)
-    text = re.sub(str_pattern, str_rep, text, flags=re.S)
-
-    # save file
-    with open(path_mako, "w", encoding=conf.S_ENCODING) as a_file:
-        a_file.write(text)
+        # upper case it
+        buttons[buttons.index(default)] = default.upper()
 
     # --------------------------------------------------------------------------
-    # make docs
 
-    # get template and output dirs
-    dir_docs_tplt = dir_prj / S_DIR_PDOC
+    # add buttons to message
+    btns_all = btn_sep.join(buttons)
+    str_fmt = msg_fmt.format(message, btns_all)
 
-    # format cmd using pdoc template dir, output dir, and start dir
-    cmd_docs = S_CMD_DOC.format(
-        p_dir_pp,
-        p_dir_pp_venv,
-        dir_prj,
-        dir_docs_tplt,
-        dir_docs_out,
-        dir_prj,
-    )
-
-    # the command to run pdoc
-    try:
-        subprocess.run(
-            cmd_docs,
-            shell=True,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-    except Exception as e:
-        raise e
+    # lower everything again for compare
+    buttons = [item.lower() for item in buttons]
 
     # --------------------------------------------------------------------------
-    # fix location
 
-    # find the inner docs folder (named for src dir)
-    dir_docs = dir_docs_out / dir_prj.name
+    while True:
 
-    # get all files/dirs in inner dir
-    files = list(dir_docs.iterdir())
+        # ask the question, get the result
+        inp = input(str_fmt)
+        inp = inp.lower()
 
-    # move all files/dirs up one level
-    for file in files:
-        shutil.move(file, dir_docs_out)
+        # ----------------------------------------------------------------------
 
-    # delete empty inner dir
-    dir_docs.rmdir()
+        # # no input (empty)
+        if inp == "" and default != "":
+            return default
 
-    # --------------------------------------------------------------------------
-    # copy image
-
-    # make the inner img dir
-    dir_docs_img = dir_docs_out / S_DIR_IMG
-    dir_docs_img.mkdir(parents=True)
-
-    # copy image to inner img dir
-    img_src = dir_prj / dict_prv[conf.S_KEY_PRV_PRJ]["__PP_IMG_README__"]
-    shutil.copy(img_src, dir_docs_img)
-
-    # --------------------------------------------------------------------------
-    # fix image
-
-    # where is the image now?
-    img_file = Path(S_DIR_IMG) / img_src.name
-
-    # make sure we got a dot ext
-    s_html_ext = S_HTML_EXT if S_HTML_EXT.startswith(".") else "." + S_HTML_EXT
-
-    # walk the docs tree
-    for root, _dirs, files in dir_docs_out.walk():
-
-        # get full paths and filter for html files
-        files = [root / f for f in files]
-        files = [f for f in files if f.suffix.lower() == s_html_ext.lower()]
-
-        # for eac html file
-        for f in files:
-
-            # get it's rel path to docs folder
-            path_rel = f.relative_to(dir_docs_out)
-
-            # calculate number of ups based on depth from docs
-            # NB: subtract 1 for no dots if same parent
-            level = len(path_rel.parents) - 1
-
-            # build the dots, one set for each level
-            dots = ""
-            for _i in range(level):
-                dots += "../"
-
-            # add the image path rel to prj dir
-            dots += str(img_file)
-
-            # format the rep str
-            img_rep = S_DOC_IMG_REP.format(dots)
-
-            # open html file for read
-            with open(f, "r", encoding=conf.S_ENCODING) as a_file:
-                text = a_file.read()
-
-            # replace img src with dots
-            text = re.sub(S_DOC_IMG_SCH, img_rep, text, flags=re.S)
-
-            # write text back to file
-            with open(f, "w", encoding=conf.S_ENCODING) as a_file:
-                a_file.write(text)</code></pre>
+        # input a button
+        if inp in buttons:
+            return inp</code></pre>
             </details>
     </div>
 
