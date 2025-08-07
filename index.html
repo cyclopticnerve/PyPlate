@@ -105,16 +105,6 @@
 </li>
     </ul>
   </li>
-                                    
-  <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Tests</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="API/tests/dialog/" class="dropdown-item">dialog.py</a>
-</li>
-    </ul>
-  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -152,12 +142,208 @@
     
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#pyplate" class="nav-link">PyPlate</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#it-mostly-works-tm" class="nav-link">"It mostly works" ™©®</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#table-of-contents" class="nav-link">Table of Contents</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#requirements" class="nav-link">Requirements</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#downloading" class="nav-link">Downloading</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#installing" class="nav-link">Installing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#usage" class="nav-link">Usage</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pymaker-create-the-project" class="nav-link">PyMaker - Create the project</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#pybaker-build-the-project" class="nav-link">PyBaker - Build the project</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#documenting-you-project" class="nav-link">Documenting you project</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#uninstalling" class="nav-link">Uninstalling</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#notes" class="nav-link">Notes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
         </ul>
     </div>
 </div></div>
                     <div class="col-md-9" role="main">
 
-<p>Coming soon</p></div>
+<!----------------------------------------------------------------------------->
+<!-- Project : PyPlate                                         /          \  -->
+<!-- Filename: README.md                                      |     ()     | -->
+<!-- Date    : 12/19/2022                                     |            | -->
+<!-- Author  : cyclopticnerve                                 |   \____/   | -->
+<!-- License : WTFPLv2                                         \          /  -->
+<!----------------------------------------------------------------------------->
+
+<p><img alt="" src="img/pyplate.png" /></p>
+<h1 id="pyplate">PyPlate</h1>
+<h2 id="it-mostly-works-tm">"It mostly works" ™©®</h2>
+<p><a href="http://www.wtfpl.net"><img alt="License: WTFPLv2" src="https://img.shields.io/badge/License-WTFPL-brightgreen.svg" /></a></p>
+<!-- __RM_VERSION__ -->
+<p>Version 0.0.3</p>
+<!-- __RM_VERSION__ -->
+
+<!-- __RM_SHORT_DESC__ -->
+<p>A program for creating and building CLI/GUI/Packages in Python from a template</p>
+<!-- __RM_SHORT_DESC__ -->
+
+<!-- __RM_SCREENSHOT__ -->
+<!-- ![alt-text](img/screenshot.png "screenshot") -->
+<!-- __RM_SCREENSHOT__ -->
+
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#downloading">Downloading</a></li>
+<li><a href="#installing">Installing</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#uninstalling">Uninstalling</a></li>
+<li><a href="#notes">Notes</a></li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<!-- __RM_DEPS__ -->
+<p><a href="https://python.org">Python 3.10+</a></p>
+<!-- __RM_DEPS__ -->
+
+<h2 id="downloading">Downloading</h2>
+<p>There are two ways to get the code:</p>
+<ol>
+<li>
+<p>Download the <a href="https://github.com/cyclopticnerve/PyPlate/releases/latest">latest
+release</a> (the
+<strong>'Source code (zip)'</strong> file should work an all platforms).</p>
+</li>
+<li>
+<p>Or you can clone the git repo to get the latest (and often broken) code from
+   the main branch:</p>
+</li>
+</ol>
+<pre><code class="language-bash">$ git clone https://github.com/cyclopticnerve/PyPlate
+</code></pre>
+<h2 id="installing">Installing</h2>
+<!-- __RM_APP__ -->
+<p>If you downloaded the zip file, extract it and go to the 'install' directory:</p>
+<pre><code class="language-bash">$ cd ~/Downloads/PyPlate-&lt;version&gt;/install
+</code></pre>
+<p>where \&lt;version&gt; is the version number of the file you downloaded.</p>
+<p>If you cloned the repo, just go to the 'install' directory:</p>
+<pre><code class="language-bash">$ cd ~/Downloads/PyPlate/install
+</code></pre>
+<p>Either way, run the install script:</p>
+<pre><code class="language-bash">$ ./install.py
+</code></pre>
+<!-- __RM_APP__ -->
+
+<h2 id="usage">Usage</h2>
+<p>PyPlate consists of two main programs, 'pymaker' and 'pybaker'. The first
+is used to create the project, and the second is used to build an existing
+project as its development continues.</p>
+<p>Let us start with 'pymaker'.</p>
+<h2 id="pymaker-create-the-project">PyMaker - Create the project</h2>
+<p>Before you do anything, you should take a look at the 'conf.py' file in
+'~/.local/share/pyplate/conf'. This file contains A <strong>LOT</strong> of information that
+is used when creating/building a project. Most of these are string values and
+file/folder names used in the program, which you are free to change. PyPlate
+does not yet support i18n/l10n for itself (meaning any strings in this file
+will not be i18n'ed), but that may be included at a later date.  </p>
+<p>This file also contains some functions that are run at various times during
+creating/building the project, such as before/after creating a project,
+before/after building a project, etc.
+These functions have been extended to the config file so you don't have to do a
+lot of mucking around in the source code, but be sure to take a look at those
+too.</p>
+<p>Now run the script from the command line, in the directory where you want to
+create the project:</p>
+<pre><code class="language-bash">$ cd ~/Documents/Projects/Python
+$ pymaker
+</code></pre>
+<p>Enter the required information, and 'pymaker' will create the required files
+and folders in a subdirectory of the current directory. </p>
+<p>That's it! From there you are free to modify the projects in your favorite IDE.</p>
+<h2 id="pybaker-build-the-project">PyBaker - Build the project</h2>
+<p>Once you have created a project, you can use 'pybaker' in the project's
+directory to update metadata in the project's files and create a
+'dist' folder.
+If you are using VSCode, you can select 'Terminal/Run Build Task...' from the
+menu bar or press 'Ctrl+Shift+B'.</p>
+<p>'pybaker' is a program which will replace certain values in the project
+directory. These values are read/written in the 'project.json' file in your
+project's 'pyplate/project.json' file. Things like version number, short
+description, and other values that might change during a project's lifecycle
+are placed here.</p>
+<p>The values in the 'pyplate/project.json' file can be edited at any time,
+followed by re-running 'pybaker'.</p>
+<p>Note that if you are running pybaker from VSCode, it will ask for the name of
+the project (since it may not know the current directory). Give it the name of
+the project's directory as it was created by pymaker, relative to the current
+dir in VSCode's terminal.</p>
+<h2 id="documenting-you-project">Documenting you project</h2>
+<p>You can document your project using either pdoc3 or MkDocs.</p>
+<p>Step 1:
+- Create your project using pymaker
+- Publish your repo to GitHub</p>
+<p>Step 2:
+   - To use pdoc3, you have to:
+      - Open you GitHub repo in a browser
+      - Go to the repo's Settings/Pages
+      - Set the source to your main branch / docs folder
+      - Wait a few seconds, your docs should appear at
+      https://\&lt;username&gt;.github.io/\&lt;repo_name&gt;</p>
+<ul>
+<li>To use MkDocs, you have to:<ul>
+<li>run 'pybaker' from your project directory</li>
+</ul>
+</li>
+</ul>
+<h2 id="uninstalling">Uninstalling</h2>
+<!-- __RM_APP__ -->
+<p>Go to the source folder for PyPlate and run the uninstaller:</p>
+<pre><code class="language-bash">$ cd ~/.local/share/pyplate/uninstall
+$ ./uninstall.py
+</code></pre>
+<!-- __RM_APP__ -->
+
+<h2 id="notes">Notes</h2>
+<p>If you make any changes to this template to better suit your own style/setup,
+please let me know or send a pull request. I will take a look and see if I can
+incorporate your changes to make them user, system, and/or IDE agnostic. This
+way the template can hopefully become more customizable to suit everyone's
+needs.</p>
+<p>PyPlate currently uses pdoc3 for documentation, mostly because it is easy and
+sphinx is HARD! I don't really want to learn RST, and the Markdown/MyST stuff
+is confusing.
+I am currently looking at mkdocs, will let you know.</p>
+<p>-)</p>
+<!-- -) --></div>
             </div>
         </div>
 
@@ -239,5 +425,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-08-06 22:43:18.859062+00:00
+Build Date UTC : 2025-08-07 16:59:20.385946+00:00
 -->
