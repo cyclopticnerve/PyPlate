@@ -138,11 +138,12 @@ Step 2:
       - Open you GitHub repo in a browser
       - Go to the repo's Settings/Pages
       - Set the source to your main branch / docs folder
-      - Wait a few seconds, your docs should appear at
-      https://\<username\>.github.io/\<repo_name\>
 
    - To use MkDocs, you have to:
       - run 'pybaker' from your project directory
+
+Wait a minute or two, and your docs should appear at
+      https://\<username\>.github.io/\<repo_name\>
 
 ## Uninstalling
 <!-- __RM_APP__ -->
