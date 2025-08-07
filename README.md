@@ -31,6 +31,7 @@ Version 0.0.3
 - [Installing](#installing)
 - [Usage](#usage)
 - [Uninstalling](#uninstalling)
+- [Documentation](#documentation)
 - [Notes](#notes)
 
 ## Requirements
@@ -153,6 +154,9 @@ $ cd ~/.local/share/pyplate/uninstall
 $ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
+
+## Documentation
+See the [documentation](https://cyclopticnerve.github.io/PyPlate)
 
 ## Notes
 If you make any changes to this template to better suit your own style/setup,
