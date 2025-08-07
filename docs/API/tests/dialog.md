@@ -1,2 +1,0 @@
-# dialog.py
-::: tests.dialog
