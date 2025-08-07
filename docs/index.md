@@ -13,13 +13,13 @@
 
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
-<!-- __RM_VERSION__ -->
-Version 0.0.3
-<!-- __RM_VERSION__ -->
-
 <!-- __RM_SHORT_DESC__ -->
 A program for creating and building CLI/GUI/Packages in Python from a template
 <!-- __RM_SHORT_DESC__ -->
+
+<!-- __RM_VERSION__ -->
+Version 0.0.3
+<!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
 <!-- ![alt-text](img/screenshot.png "screenshot") -->
@@ -31,6 +31,7 @@ A program for creating and building CLI/GUI/Packages in Python from a template
 - [Installing](#installing)
 - [Usage](#usage)
 - [Uninstalling](#uninstalling)
+- [Documentation](#documentation)
 - [Notes](#notes)
 
 ## Requirements
@@ -138,11 +139,12 @@ Step 2:
       - Open you GitHub repo in a browser
       - Go to the repo's Settings/Pages
       - Set the source to your main branch / docs folder
-      - Wait a few seconds, your docs should appear at
-      https://\<username\>.github.io/\<repo_name\>
 
    - To use MkDocs, you have to:
       - run 'pybaker' from your project directory
+
+Wait a minute or two, and your docs should appear at
+      https://\<username\>.github.io/\<repo_name\>
 
 ## Uninstalling
 <!-- __RM_APP__ -->
@@ -152,6 +154,9 @@ $ cd ~/.local/share/pyplate/uninstall
 $ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
+
+## Documentation
+See the [documentation](https://cyclopticnerve.github.io/PyPlate)
 
 ## Notes
 If you make any changes to this template to better suit your own style/setup,
