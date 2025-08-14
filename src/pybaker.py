@@ -110,8 +110,10 @@ class PyBaker(PyPlate):
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _("Run this program from the parent directory of the project " \
-    "you want to build.")
+    S_EPILOG = _(
+        "Run this program from the parent directory of the project \
+you want to build."
+    )
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -132,8 +134,11 @@ class PyBaker(PyPlate):
         # do super init
         super().__init__()
 
+        # set flag for do_before_fix/do_after_fix
+        self._is_pm = False
+
         # set the initial values of properties
-        self._ide = False
+        self._is_ide = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -204,10 +209,10 @@ class PyBaker(PyPlate):
             self._dict_debug = C.D_DBG_PB
 
         # get ide flag from cmd line
-        self._ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
+        self._is_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
 
         # if ide=yes, ask for prj name
-        if self._ide:
+        if self._is_ide:
 
             # ask for prj name rel to cwd
             in_str = C.S_ASK_IDE.format(self._dir_prj)
@@ -262,8 +267,8 @@ class PyBaker(PyPlate):
             # get individual dicts in project.json
             self._dict_pub = F.load_dicts([path_pub], {})
 
-            # reload dict pointers after dict change
-            self._reload_dicts()
+            # get sub-dict pointers
+            self._get_sub_dicts()
         except OSError:
             print(C.S_ERR_PP_INVALID)
             sys.exit()
@@ -282,6 +287,9 @@ class PyBaker(PyPlate):
         C.do_before_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
+
+        # save prv/pub
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -345,6 +353,9 @@ class PyBaker(PyPlate):
         C.do_after_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
+
+        # save prv/pub
+        self._save_project_info()
 
 
 # ------------------------------------------------------------------------------

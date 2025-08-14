@@ -104,8 +104,31 @@ class PyMaker(PyPlate):
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _("Run this program from the directory where you want to create \
-a project.")
+    S_EPILOG = _(
+        "Run this program from the directory where you want to create \
+a project."
+    )
+
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
+    def __init__(self):
+        """
+        Initialize the new object
+
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
+        """
+
+        # do super init
+        super().__init__()
+
+        # set flag for do_before_fix/do_after_fix
+        self._is_pm = True
+
+        # set the initial values of properties
+        self._is_ide = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -340,15 +363,13 @@ a project.")
             C.S_KEY_PUB_BL: C.D_PUB_BL,
             C.S_KEY_PUB_DBG: C.D_PUB_DBG,
             C.S_KEY_PUB_DOCS: C.D_PUB_DOCS[prj_type],
-            # NB: placeholder until we get prj type
-            C.S_KEY_PUB_DIST: {},
+            C.S_KEY_PUB_DIST: C.D_PUB_DIST[prj_type],
             C.S_KEY_PUB_I18N: C.D_PUB_I18N,
             C.S_KEY_PUB_META: C.D_PUB_META,
         }
 
-        # reload dicts after modify
-        # NB: VERY IMPORTANT!!!
-        self._reload_dicts()
+        # get sub-dict pointers
+        self._get_sub_dicts()
 
         # ----------------------------------------------------------------------
         # calculate dunder values now that we have project info
@@ -374,9 +395,6 @@ a project.")
         )
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
 
-        # add dist stuff
-        self._dict_pub[C.S_KEY_PUB_DIST] = C.D_PUB_DIST[prj_type].copy()
-
         # ----------------------------------------------------------------------
 
         # remove home dir from PyPlate path
@@ -386,9 +404,6 @@ a project.")
         p = p.lstrip(h).strip("\\")
         # NB: change global val
         self._dict_prv_prj["__PP_DEV_PP__"] = p
-
-        # reload dicts after modify
-        self._reload_dicts()
 
         # blank line before printing progress
         print()
@@ -409,6 +424,9 @@ a project.")
         C.do_before_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
+
+        # save prv/pub
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -489,6 +507,10 @@ a project.")
         C.do_after_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
         )
+
+        # save prv/pub
+        self._save_project_info()
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

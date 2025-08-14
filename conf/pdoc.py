@@ -217,4 +217,23 @@ def make_docs(dir_prj, dict_prv, _dict_pub, p_dir_pp, p_dir_pp_venv):
                 a_file.write(text)
 
 
+# ------------------------------------------------------------------------------
+# Bake docs using pdoc3
+# ------------------------------------------------------------------------------
+def bake_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
+    """
+    Bake docs using pdoc3
+
+    Args:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+        p_dir_pp: Path to PyPlate program
+        p_dir_pp_env: Path to PyPlate's venv (to activate pdoc3)
+
+    Fix version number, make the docs, move the docs, and fix the icon paths.
+    """
+
+    make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv)
+
 # -)

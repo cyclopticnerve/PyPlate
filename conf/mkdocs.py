@@ -29,7 +29,12 @@ import subprocess
 
 # local imports
 # pylint: disable=no-name-in-module
+# pylint: disable=wrong-import-order
 from . import conf
+from cnlib import cnfunctions as F  # type: ignore
+
+# pylint: enable=no-name-in-module
+# pylint: enable=wrong-import-order
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -90,6 +95,9 @@ S_YML_TEXT = (
     "- mkdocstrings\n"
 )
 
+# readme icon extension
+S_IMG_EXT = ".png"
+
 # name of home page file (DO NOT CHANGE!!!)
 S_INDEX_NAME = "index.md"
 # I18N: name of home link in nav
@@ -97,9 +105,16 @@ S_HOME_NAME = _("Home")
 
 # err message if no remote repo
 # I18N: error message when no remote repo exists
-S_ERR_NO_REPO = _("MkDocs failed to deploy.\n\
-Make sure you have published your repo and run'pybaker' from your project \
-directory to publish your docs using MkDocs.")
+S_ERR_NO_REPO = _(
+    "MkDocs failed to deploy.\n \
+Make sure you have published your repo and run 'pybaker' from your project \
+directory to publish your docs using MkDocs."
+)
+
+
+# ------------------------------------------------------------------------------
+# Public functions
+# ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
@@ -114,13 +129,23 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
         p_dir_pp: Path to PyPlate program
-        p_dir_pp_env: Path to PyPlate's venv (to activate pdoc3)
+        p_dir_pp_env: Path to PyPlate's venv (to activate mkdocs)
 
     Make the documents using the specified parameters.
     """
 
-    # where to put the .md files
+    # --------------------------------------------------------------------------
+    # nuke/remake docs dir
+
+    # find docs dir
     dir_docs_out = dir_prj / conf.S_DIR_DOCS
+    if dir_docs_out.exists():
+
+        # delete and recreate dir
+        shutil.rmtree(dir_docs_out)
+
+    # remake either way
+    dir_docs_out.mkdir(parents=True)
 
     # --------------------------------------------------------------------------
     # make yaml
@@ -131,14 +156,146 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
 
     # path to file
     yaml_file = dir_prj / S_YML_NAME
-    if not yaml_file.exists():
 
-        # create a new yaml with default text
-        text = S_YML_TEXT.format(dir_prj.name, theme)
+    # create a new yaml with default text
+    prj_name = dict_prv[conf.S_KEY_PRV_PRJ]["__PP_NAME_PRJ__"]
+    text = S_YML_TEXT.format(prj_name, theme)
 
-        # write file
-        with open(yaml_file, "w", encoding=conf.S_ENCODING) as a_file:
-            a_file.write(text)
+    # write file
+    with open(yaml_file, "w", encoding=conf.S_ENCODING) as a_file:
+        a_file.write(text)
+
+    # --------------------------------------------------------------------------
+    # make index
+
+    # if initial switch is set
+    if dict_docs[conf.S_KEY_DOCS_USE_RM]:
+
+        # make the initial index file
+        _make_index(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv)
+
+        # set pb to False
+        dict_docs[conf.S_KEY_DOCS_USE_RM] = False
+    else:
+
+        # create empty file
+        index_file = dir_docs_out / S_INDEX_NAME
+        with open(index_file, "w", encoding=conf.S_ENCODING) as a_file:
+            a_file.write("")
+
+    # --------------------------------------------------------------------------
+    # make api
+
+    # if switch is set
+    if dict_docs[conf.S_KEY_DOCS_MAKE_API]:
+        _make_api(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv)
+
+    # --------------------------------------------------------------------------
+    # build docs
+
+    # format cmd using PyPlate dir, venv dir, and start dir
+    cmd_docs = S_CMD_DOC_BUILD.format(
+        p_dir_pp,
+        p_dir_pp_venv,
+        dir_prj,
+    )
+
+    # the command to run mkdocs
+    try:
+        subprocess.run(
+            cmd_docs,
+            shell=True,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+        )
+    except Exception as e:
+        raise e
+
+
+# ------------------------------------------------------------------------------
+# Bake docs using mkdocs
+# ------------------------------------------------------------------------------
+def bake_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
+    """
+    Make docs using mkdocs
+
+    Args:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+        p_dir_pp: Path to PyPlate program
+        p_dir_pp_env: Path to PyPlate's venv (to activate mkdocs)
+
+    Make the documents using the specified parameters.
+    """
+
+    # get switch from dict_pub
+    dict_docs = dict_pub[conf.S_KEY_PUB_DOCS]
+
+    # --------------------------------------------------------------------------
+    # make index
+
+    # if initial switch is set
+    if dict_docs[conf.S_KEY_DOCS_USE_RM]:
+
+        # make the initial index file
+        _make_index(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv)
+
+    # --------------------------------------------------------------------------
+    # make api
+
+    # if switch is set
+    if dict_docs[conf.S_KEY_DOCS_MAKE_API]:
+        _make_api(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv)
+
+    # --------------------------------------------------------------------------
+    # deploy docs
+
+    # format cmd using pdoc template dir, output dir, and start dir
+    cmd_docs = S_CMD_DOC_DEPLOY.format(
+        p_dir_pp,
+        p_dir_pp_venv,
+        dir_prj,
+    )
+
+    # the command to run mkdocs
+    try:
+        subprocess.run(
+            cmd_docs,
+            shell=True,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+        )
+    except Exception as e:
+        raise OSError(S_ERR_NO_REPO) from e
+
+
+# ------------------------------------------------------------------------------
+# Private functions
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Make the home file (index.md)
+# ------------------------------------------------------------------------------
+def _make_index(dir_prj, dict_prv, _dict_pub, _p_dir_pp, _p_dir_pp_venv):
+    """
+    Make the home file (index.md)
+
+    Args:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+        p_dir_pp: Path to PyPlate program
+        p_dir_pp_env: Path to PyPlate's venv (to activate mkdocs)
+
+    Make the documents using the specified parameters.
+    """
+
+    # get the out dir
+    dir_docs_out = dir_prj / conf.S_DIR_DOCS
 
     # --------------------------------------------------------------------------
     # make home page
@@ -147,40 +304,57 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     # path to files
     readme_file = dir_prj / conf.S_FILE_README
     index_file = dir_docs_out / S_INDEX_NAME
-    if not index_file.exists():
-        # read input file
-        text = ""
-        with open(readme_file, "r", encoding=conf.S_ENCODING) as a_file:
-            text = a_file.read()
 
-        # write file
-        with open(index_file, "w", encoding=conf.S_ENCODING) as a_file:
-            a_file.write(text)
+    # read input file
+    text = ""
+    with open(readme_file, "r", encoding=conf.S_ENCODING) as a_file:
+        text = a_file.read()
+
+    # write file
+    with open(index_file, "w", encoding=conf.S_ENCODING) as a_file:
+        a_file.write(text)
 
     # copy image for index.md as README.md
     prj_name = dict_prv[conf.S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
-    prj_img = prj_name + ".png"
+    prj_img = prj_name + S_IMG_EXT
     img_src = dir_prj / conf.S_DIR_IMAGES / prj_img
     dir_img_dest = dir_docs_out / conf.S_DIR_IMAGES
-    dir_img_dest.mkdir(parents=True, exist_ok=True)
 
+    # make dest and copy image
+    dir_img_dest.mkdir(parents=True, exist_ok=True)
     shutil.copy(img_src, dir_img_dest)
 
-    # --------------------------------------------------------------------------
-    # run mkdocstrings
+
+# ------------------------------------------------------------------------------
+# Make the home file (index.md)
+# ------------------------------------------------------------------------------
+def _make_api(dir_prj, _dict_prv, dict_pub, _p_dir_pp, _p_dir_pp_venv):
+    """
+    Make the home file (index.md)
+
+    Args:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+        p_dir_pp: Path to PyPlate program
+        p_dir_pp_env: Path to PyPlate's venv (to activate mkdocs)
+
+    Make the documents using the specified parameters.
+    """
 
     # NB: this function uses the blacklist to filter files at the very end of
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
     # dict_prv have been undunderized
-    dict_bl = dict_pub[conf.S_KEY_PUB_BL]
+    dict_bl_glob = dict_pub[conf.S_KEY_PUB_BL]
+    dict_bl = F.fix_globs(dir_prj, dict_bl_glob)
 
     # just shorten the names
     skip_all = dict_bl[conf.S_KEY_SKIP_ALL]
     skip_contents = dict_bl[conf.S_KEY_SKIP_CONTENTS]
 
     # --------------------------------------------------------------------------
-    # do the fixes
+    # gather list of full paths to .py files
 
     files_out = []
 
@@ -213,9 +387,13 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     # --------------------------------------------------------------------------
     # make structure
 
-    # make the api folder
+    # nuke / remake the api folder
     dir_docs_api = dir_prj / S_DIR_API
-    dir_docs_api.mkdir(parents=True, exist_ok=True)
+    if dir_docs_api.exists():
+
+        # delete and recreate dir
+        shutil.rmtree(dir_docs_api)
+        dir_docs_api.mkdir(parents=True)
 
     # for each py file
     for f in files_out:
@@ -242,65 +420,6 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
         file_fmt = S_DEF_FILE.format(f.name, s_parts)
         with open(file_md, "w", encoding=conf.S_ENCODING) as a_file:
             a_file.write(file_fmt)
-
-    # --------------------------------------------------------------------------
-    # make docs
-
-    # format cmd using pdoc template dir, output dir, and start dir
-    cmd_docs = S_CMD_DOC_BUILD.format(
-        p_dir_pp,
-        p_dir_pp_venv,
-        dir_prj,
-    )
-
-    # the command to run pdoc
-    try:
-        subprocess.run(
-            cmd_docs,
-            shell=True,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-    except Exception as e:
-        raise e
-
-
-# ------------------------------------------------------------------------------
-# Deploy docs using mkdocs
-# ------------------------------------------------------------------------------
-def deploy_docs(dir_prj, _dict_prv, _dict_pub, p_dir_pp, p_dir_pp_venv):
-    """
-    Deploy docs using mkdocs
-
-    Args:
-        dir_prj: The root of the new project
-        dict_prv: The dictionary containing private pyplate data
-        dict_pub: The dictionary containing public project data
-        p_dir_pp: Path to PyPlate program
-        p_dir_pp_env: Path to PyPlate's venv (to activate pdoc3)
-
-    Deploy the documents using the specified parameters.
-    """
-
-    # format cmd using pdoc template dir, output dir, and start dir
-    cmd_docs = S_CMD_DOC_DEPLOY.format(
-        p_dir_pp,
-        p_dir_pp_venv,
-        dir_prj,
-    )
-
-    # the command to run mkdocs
-    try:
-        subprocess.run(
-            cmd_docs,
-            shell=True,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-    except Exception as e:
-        raise OSError(S_ERR_NO_REPO) from e
 
 
 # -)

@@ -141,8 +141,10 @@ S_ERR_START = _("Name must start with a letter")
 # I18N: Project names must end with a letter or number
 S_ERR_END = _("Name must end with a letter or number")
 # I18N: name contains invalid char
-S_ERR_MID = _("Name must contain only letters, numbers, spaces, dashes (-), " \
-"or underscores (_)")
+S_ERR_MID = _(
+    "Name must contain only letters, numbers, spaces, dashes (-), "
+    "or underscores (_)"
+)
 # NB: format param is __PP_NAME_PRJ_BIG__
 # I18N: project already exists
 S_ERR_EXIST = _('Project "{}" already exists')
@@ -150,15 +152,19 @@ S_ERR_EXIST = _('Project "{}" already exists')
 # I18N: run pybaker on project that does not exist
 S_ERR_NOT_EXIST = _('Project "{}" does not exist')
 # I18N: run pybaker on non-pyplate project dir
-S_ERR_NOT_PRJ = _("This project does not have a 'pyplate' folder.\n" \
-"Are you sure this is a PyPlate project?")
+S_ERR_NOT_PRJ = _(
+    "This project does not have a 'pyplate' folder.\n"
+    "Are you sure this is a PyPlate project?"
+)
 # I18N: pyplate/private/private.json or pyplate/project.json not found
 S_ERR_PP_MISSING = _("One or more PyPlate data files are missing")
 # I18N: pyplate/private/private.json or pyplate/project.json not valid
 S_ERR_PP_INVALID = _("One or more PyPlate data files are corrupted")
 # I18N: invalid version string format
-S_ERR_SEM_VER = _("Warning: version number does not match S_SEM_VER_VALID\n" \
-"See https://semver.org/\nDo you wish to continue?")
+S_ERR_SEM_VER = _(
+    "Warning: version number does not match S_SEM_VER_VALID\n"
+    "See https://semver.org/\nDo you wish to continue?"
+)
 # I18N: continue with bad sem ver
 S_ERR_SEM_VER_Y = _("y")
 # I18N: quit if bad sem ver (the default, should be capitalized)
@@ -170,16 +176,20 @@ S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
 S_ERR_DESK_NO_TEMP = _("Warning: file '{}' does not exist, using '{}'")
 # NB: format param is item in L_CATS
 # I18N: invalid desktop category
-S_ERR_DESK_CAT = _('"{}" is not a valid desktop category, see ' \
-'"https://specifications.freedesktop.org/menu-spec/latest/apa.html"')
+S_ERR_DESK_CAT = _(
+    '"{}" is not a valid desktop category, see '
+    '"https://specifications.freedesktop.org/menu-spec/latest/apa.html"'
+)
 # NB: format param is S_PATH_SCREENSHOT
 # I18N: alternate text for screenshot in README.md
 S_ERR_NO_SCREENSHOT = _("Create the file {}")
 
 # debug-specific strings
 # I18N: warn if running in debug mode
-S_MSG_DEBUG = _("WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO \
-OVERWRITE EXISTING PROJECTS!\n")
+S_MSG_DEBUG = _(
+    "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO \
+OVERWRITE EXISTING PROJECTS!\n"
+)
 
 # error installing reqs
 # I18N: need internet connection to install requirements
@@ -213,9 +223,9 @@ S_ACTION_LIB = _("Install libs in venv... ")
 # I18N: Make i18n folder
 S_ACTION_I18N = _("Make i18n folder... ")
 # I18N: Make docs folder
-S_ACTION_DOCS = _("Make docs folder... ")
+S_ACTION_MAKE_DOCS = _("Make docs folder... ")
 # I18N: Deploy docs folder
-S_ACTION_DEPLOY_DOCS = _("Deploy docs folder... ")
+S_ACTION_BAKE_DOCS = _("Bake docs folder... ")
 # I18N: Make tree file
 S_ACTION_TREE = _("Make tree file... ")
 # I18N: Install package in venv
@@ -279,6 +289,8 @@ S_KEY_DBG_DIST = "DBG_DIST"
 # keys for D_PUB_DOCS
 S_KEY_DOCS_TOOL = "DOCS_TOOL"
 S_KEY_DOCS_THEME = "DOCS_THEME"
+S_KEY_DOCS_USE_RM = "DOCS_USE_RM"
+S_KEY_DOCS_MAKE_API = "DOCS_MAKE_API"
 
 # keys for meta dict
 S_KEY_META_SHORT_DESC = "META_SHORT_DESC"
@@ -322,6 +334,7 @@ S_DIR_ALL = "all"
 S_DIR_BIN = "bin"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
+# NB: if you change this, it will bork mkdocs!
 S_DIR_DOCS = "docs"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
@@ -541,7 +554,7 @@ S_RM_SCREENSHOT = "![{}]({})"
 # docs stuff
 
 S_DOCS_MKDOCS = "mkdocs"
-S_DOCS_PDOCS = "pdoc3"
+S_DOCS_PDOC3 = "pdoc3"
 S_DOCS_THEME_RTD = "readthedocs"
 
 # ------------------------------------------------------------------------------
@@ -1036,12 +1049,18 @@ D_PUB_DOCS = {
     "c": {
         S_KEY_DOCS_TOOL: S_DOCS_MKDOCS,
         S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD
+        S_KEY_DOCS_USE_RM: True,
+        S_KEY_DOCS_MAKE_API: True,
     },
     "g": {
         S_KEY_DOCS_TOOL: S_DOCS_MKDOCS,
         S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD
+        S_KEY_DOCS_USE_RM: True,
+        S_KEY_DOCS_MAKE_API: True,
     },
-    "p": {S_KEY_DOCS_TOOL: S_DOCS_PDOCS, S_KEY_DOCS_THEME: ""},
+    "p": {
+        S_KEY_DOCS_TOOL: S_DOCS_PDOC3,
+    },
 }
 
 # dict in project to control post processing
@@ -1064,7 +1083,7 @@ D_DBG_PM = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: False,
+    S_KEY_DBG_DOCS: True,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1352,7 +1371,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
+def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg, _pymaker):
     """
     Do any work before fix
 
@@ -1362,6 +1381,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
+        pymaker: True if called by PyMaker, False if called by PyBaker
 
     Do any work before fix.\n
     This function is called by both PyMaker and PyBaker.\n
@@ -1463,7 +1483,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after fix
 # ------------------------------------------------------------------------------
-def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg, pymaker):
     """
     Do any work after fix
 
@@ -1473,6 +1493,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
+        pymaker: True if called by PyMaker, False if called by PyBaker
 
     Do any work after fix.\n
     This function is called by both PyMaker and PyBaker.\n
@@ -1498,7 +1519,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
     # dict_prv have been undunderized
-    dict_bl = dict_pub[S_KEY_PUB_BL]
+    dict_bl_glob = dict_pub[S_KEY_PUB_BL]
+    dict_bl = F.fix_globs(dir_prj, dict_bl_glob)
 
     # just shorten the names
     skip_all = dict_bl[S_KEY_SKIP_ALL]
@@ -1628,7 +1650,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         for root, root_dirs, root_files in path_po.walk():
             files = [root / file for file in root_files]
             files = [
-                file for file in files if PP.is_path_in_list(file, L_EXT_PO)
+                file
+                for file in files
+                if PP.is_path_ext_in_list(file, L_EXT_PO)
             ]
             for item in files:
 
@@ -1711,7 +1735,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # only fix po files
             # if not root_file.suffix.lower() == ".po":
-            if not PP.is_path_in_list(root_file, L_EXT_PO):
+            if not PP.is_path_ext_in_list(root_file, L_EXT_PO):
                 continue
 
             # default text if we can't open file
@@ -1761,7 +1785,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # NB: doc_tool is the import file name
         str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
         doc_tool = None
-        if str_doc_tool == S_DOCS_PDOCS:
+        if str_doc_tool == S_DOCS_PDOC3:
             doc_tool = pdoc
         elif str_doc_tool == S_DOCS_MKDOCS:
             doc_tool = mkdocs
@@ -1770,13 +1794,19 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         if doc_tool:
 
             # print info
-            print(S_ACTION_DOCS, end="", flush=True)
+            print(S_ACTION_MAKE_DOCS, end="", flush=True)
 
-            # the command to run pdoc/mkdocs/...
+            # the command to make pdoc/mkdocs/...
             try:
-                doc_tool.make_docs(
-                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
-                )
+                if pymaker:
+                    doc_tool.make_docs(
+                        dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
+                    )
+                    dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+                else:
+                    doc_tool.bake_docs(
+                        dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
+                    )
                 print(S_ACTION_DONE)
             except Exception as e:
                 print(S_ACTION_FAIL)
@@ -1786,7 +1816,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
-def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work before making dist
 
@@ -1803,35 +1833,6 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # get project type
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-
-    # --------------------------------------------------------------------------
-    # docs
-
-    # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-
-        # get the doc tool from the project info
-        # NB: doc_tool is the import file name
-        str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
-        doc_tool = None
-        if str_doc_tool == S_DOCS_MKDOCS:
-            doc_tool = mkdocs
-
-        # if we found a tool
-        if doc_tool:
-
-            # print info
-            print(S_ACTION_DEPLOY_DOCS, end="", flush=True)
-
-            # the command to run pdoc/mkdocs/...
-            try:
-                doc_tool.deploy_docs(
-                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
-                )
-                print(S_ACTION_DONE)
-            except OSError as e:
-                print(S_ACTION_FAIL)
-                print(e)
 
     # --------------------------------------------------------------------------
     # venv
@@ -2034,15 +2035,15 @@ def _fix_meta(path, dict_prv, dict_pub):
         _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix desktop
-    if PP.is_path_in_list(path, L_EXT_DESKTOP):
+    if PP.is_path_ext_in_list(path, L_EXT_DESKTOP):
         _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix ui files
-    if PP.is_path_in_list(path, L_EXT_GTK):
+    if PP.is_path_ext_in_list(path, L_EXT_GTK):
         _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix src files
-    if PP.is_path_in_list(path, L_EXT_SRC):
+    if PP.is_path_ext_in_list(path, L_EXT_SRC):
         _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
 
@@ -2417,5 +2418,6 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
+
 
 # -)

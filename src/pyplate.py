@@ -46,7 +46,7 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
-import conf.conf as C
+import conf.conf as C  # type: ignore
 
 # pylint: enable=wrong-import-position
 
@@ -76,6 +76,7 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # Classes
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
@@ -100,7 +101,8 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages \
+in Python from a template"
 
     # version string
     S_PP_VERSION = "0.0.3"
@@ -141,8 +143,8 @@ class PyPlate:
         """
         Initialize the new object
 
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
+        Initializes a new instance of the class, setting the default values \
+        of its properties, and any other code that needs to run to create a \
         new object.
         """
 
@@ -179,6 +181,11 @@ class PyPlate:
         # NB: placeholder to avoid comparing to None (to be set by subclass)
         self._parser = argparse.ArgumentParser()
         self._dict_args = {}
+
+        # flag for do_before_fix/do_after_fix
+        self._is_ide = False
+        # flag for running from pm or pb
+        self._is_pm = True
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -337,8 +344,15 @@ class PyPlate:
         """
 
         C.do_before_fix(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj,
+            self._dict_prv,
+            self._dict_pub,
+            self._dict_debug,
+            self._is_pm,
         )
+
+        # save pub to fix dunders
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -355,6 +369,8 @@ class PyPlate:
         # print info
         print(C.S_ACTION_FIX, end="", flush=True)
 
+        # ----------------------------------------------------------------------
+
         # check version before we start
         version = self._dict_pub_meta[C.S_KEY_META_VERSION]
         pattern = C.S_SEM_VER_VALID
@@ -370,13 +386,14 @@ class PyPlate:
             if res == C.S_ERR_SEM_VER_N:
                 sys.exit()
 
-        # combine dicts for string replacement
+        # ----------------------------------------------------------------------
+
+        # combine private dicts for string replacement
         self._dict_rep = F.combine_dicts(
             [self._dict_prv_all, self._dict_prv_prj]
         )
 
-        # save private.json and project.json after all fixes have been done
-        self._save_project_info()
+        # ----------------------------------------------------------------------
 
         # make sure pyplate in in skip_all
         skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
@@ -385,14 +402,14 @@ class PyPlate:
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        self._fix_blacklist_paths(self._dict_pub_bl)
+        dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
 
         # just shorten the names
-        skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
-        skip_contents = self._dict_pub_bl[C.S_KEY_SKIP_CONTENTS]
-        skip_header = self._dict_pub_bl[C.S_KEY_SKIP_HEADER]
-        skip_code = self._dict_pub_bl[C.S_KEY_SKIP_CODE]
-        skip_path = self._dict_pub_bl[C.S_KEY_SKIP_PATH]
+        skip_all = dict_bl[C.S_KEY_SKIP_ALL]
+        skip_contents = dict_bl[C.S_KEY_SKIP_CONTENTS]
+        skip_header = dict_bl[C.S_KEY_SKIP_HEADER]
+        skip_code = dict_bl[C.S_KEY_SKIP_CODE]
+        skip_path = dict_bl[C.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -457,59 +474,19 @@ class PyPlate:
         """
 
         C.do_after_fix(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj,
+            self._dict_prv,
+            self._dict_pub,
+            self._dict_debug,
+            self._is_pm,
         )
+
+        # save again
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Convert items in blacklist to absolute Path objects
-    # --------------------------------------------------------------------------
-    def _fix_blacklist_paths(self, dict_bl):
-        """
-        Convert items in blacklist to absolute Path objects
-
-        Get absolute paths for all entries in the blacklist.
-        """
-
-        # make a copy and remove path separators in one shot
-        # NB: this is mostly for glob support, as globs cannot end in path
-        # separators
-        for key in dict_bl:
-            dict_bl[key] = [item.rstrip("/") for item in dict_bl[key]]
-
-        # support for absolute/relative/glob
-        # NB: taken from cntree.py
-
-        # for each section of blacklist
-        for key, val in dict_bl.items():
-            # convert all items in list to Path objects
-            paths = [Path(item) for item in val]
-
-            # move absolute paths to one list
-            abs_paths = [item for item in paths if item.is_absolute()]
-
-            # move relative/glob paths to another list
-            other_paths = [item for item in paths if not item.is_absolute()]
-
-            # convert relative/glob paths back to strings
-            other_strings = [str(item) for item in other_paths]
-
-            # get glob results as generators
-            glob_results = [self._dir_prj.glob(item) for item in other_strings]
-
-            # start with absolutes
-            result = abs_paths
-
-            # for each generator
-            for item in glob_results:
-                # add results as whole shebang
-                result += list(item)
-
-            # set the list as the result list
-            dict_bl[key] = result
 
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
@@ -534,7 +511,7 @@ class PyPlate:
         if not self._dict_type_rules or len(self._dict_type_rules) == 0:
 
             # do the basic replace (file got here after skip_all/skip_contents
-            # BUT NOT skip_bl/skip/code)
+            # BUT NOT skip_hdr/skip_code)
             self._fix_text(path)
             return
 
@@ -811,7 +788,7 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # Reload dicts after any outside changes
     # --------------------------------------------------------------------------
-    def _reload_dicts(self):
+    def _get_sub_dicts(self):
         """
         Reload dicts after any outside changes
 
@@ -874,14 +851,15 @@ class PyPlate:
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
-        # fix dunders in dict_pub w/o _dict_rep (project.json)
+
+        # fix dunders in dict_pub
         self._fix_contents(path_pub)
 
         # reload dict from fixed file
-        dict_pub = F.load_dicts([path_pub])
+        self._dict_pub = F.load_dicts([path_pub])
 
         # reload dict pointers after dict change
-        self._reload_dicts()
+        self._get_sub_dicts()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -1092,7 +1070,7 @@ def get_type_rules(path):
         exts = val[C.S_KEY_RULES_EXT]
 
         # # if we match ext, return only rep stuff
-        if is_path_in_list(path, exts):
+        if is_path_ext_in_list(path, exts):
             return val[C.S_KEY_RULES_REP]
 
     # default result is py rep
@@ -1102,9 +1080,9 @@ def get_type_rules(path):
 # ------------------------------------------------------------------------------
 # Check if a file is in a list of file extensions
 # ------------------------------------------------------------------------------
-def is_path_in_list(path, lst):
+def is_path_ext_in_list(path, lst):
     """
-    Check if a file is in a list of file extensions
+    Check if a file's extension is in a list of file extensions
 
     Args:
         path: The file to find
@@ -1125,6 +1103,5 @@ def is_path_in_list(path, lst):
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
     return path.suffix.lower() in l_ext or path.name.lower() in l_ext
-
 
 # -)
