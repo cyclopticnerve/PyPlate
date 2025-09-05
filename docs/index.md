@@ -97,7 +97,7 @@ too.
 Now run the script from the command line, in the directory where you want to
 create the project:
 ```bash
-$ cd ~/Documents/Projects/Python
+$ cd ~/Projects/Python
 $ pymaker
 ```
 

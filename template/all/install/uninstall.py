@@ -20,6 +20,7 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 # Imports
 # ------------------------------------------------------------------------------
 
+# NB: pure python
 # system imports
 import argparse
 import gettext
@@ -251,9 +252,6 @@ class CNUninstall:
         # do setup
         self._setup()
 
-        # parse cmd line and get args
-        self._do_cmd_line()
-
         # get prj info from cfg
         self._get_project_info()
 
@@ -308,6 +306,44 @@ class CNUninstall:
             action=self.S_ARG_DRY_ACTION,
         )
 
+        # parse cmd line and get args
+        self._do_cmd_line()
+
+    # --------------------------------------------------------------------------
+    # Get project info
+    # --------------------------------------------------------------------------
+    def _get_project_info(self):
+        """
+        Get project info
+
+        Get the install info from the config file.
+        """
+
+        # get project info
+        self._dict_cfg = self._get_dict_from_file(self._path_cfg_uninst)
+
+        # get prg name/version
+        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
+
+        # ask to uninstall
+        str_ask = self._dialog(
+            self.S_ASK_UNINST.format(prog_name),
+            [self.S_ASK_YES, self.S_ASK_NO],
+            self.S_ASK_NO,
+        )
+
+        # user hit enter or typed "n/N"
+        if str_ask == self.S_ASK_NO:
+            print(self.S_MSG_ABORT)
+            sys.exit(-1)
+
+        # print start msg
+        print(self.S_MSG_UNINST_START.format(prog_name))
+
+    # --------------------------------------------------------------------------
+    # These are the small parts, called from the bigger parts
+    # --------------------------------------------------------------------------
+
     # --------------------------------------------------------------------------
     # Parse the arguments from the command line
     # --------------------------------------------------------------------------
@@ -337,39 +373,6 @@ class CNUninstall:
 
         # get the args
         self._dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
-
-    # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        Get the install info from the config file.
-        """
-
-        # get project info
-        self._dict_cfg = self._get_dict_from_file(self._path_cfg_uninst)
-
-        # get prg name/version
-        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-
-        # ask to uninstall
-        str_ask = self._dialog(
-            self.S_ASK_UNINST.format(prog_name),
-            [self.S_ASK_YES, self.S_ASK_NO],
-            self.S_ASK_NO,
-        )
-
-        # user hit enter or typed "n/N"
-        if str_ask == self.S_ASK_NO:
-            print(self.S_MSG_ABORT)
-            sys.exit()
-
-        # print start msg
-        print(self.S_MSG_UNINST_START.format(prog_name))
-
-    # uninstall
 
     # --------------------------------------------------------------------------
     # Uninstall the program
@@ -459,17 +462,8 @@ class CNUninstall:
         a_dict = {}
 
         # get dict from file
-        try:
-            with open(a_file, "r", encoding="UTF-8") as a_file:
-                a_dict = json.load(a_file)
-
-        # file not found
-        except FileNotFoundError as e:
-            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
-
-        # not valid json in file
-        except json.JSONDecodeError as e:
-            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
+        with open(a_file, "r", encoding="UTF-8") as a_file:
+            a_dict = json.load(a_file)
 
         # return result
         return a_dict
@@ -478,7 +472,7 @@ class CNUninstall:
     # Create a dialog-like question and return the result
     # --------------------------------------------------------------------------
     def _dialog(
-        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
+        self, message, buttons, default="", loop=False, btn_sep="/", msg_fmt="{} [{}]: "
     ):
         """
         Create a dialog-like question and return the result
@@ -486,65 +480,64 @@ class CNUninstall:
         Args:
             message: The message to display
             buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at \
-                the question (default: "")
+            default: The button item to return when the user presses Enter at the
+                question (default: "")
+            loop: If True and the user enters an invalid response, keep asking the
+            question. If False, return an empty string for an invalid response
+            (default: False)
             btn_sep: Char to use to separate button items
             msg_fmt: Format string to present message/buttons to the user
 
         Returns:
-            String that matches button (or empty string if entered option is not in button list)
+            A lowercased string that matches a button, or an empty string under
+            certain conditions
 
-        This method returns the string entered on the command line in response
-        to a question. If the entered option does not match any of the buttons,
-        a blank string is returned. If you set a default and the option entered
-        is just the Return key, the default string will be returned. If no
-        default is present, the entered string must match one of the buttons
-        array values. All returned values are lowercased.
+        This method returns the string entered on the command line in response to a
+        question. If the entered option does not match any of the buttons, the
+        question is asked again. If you set a default and the option entered is
+        just the Return key, the default string will be returned. If no default is
+        present, the entered string must match one of the buttons array values. All
+        returned values are lowercased. The question will be repeatedly printed to
+        the screen until a valid entry is made.
+
+        Note that if default == "", pressing Enter is not considered a valid entry.
+        So if the default is empty and loop is True, the user MUST enter a valid
+        response or the dialog will loop forever.
         """
 
-        # make all params lowercase
-        buttons = [item.lower() for item in buttons]
-        default = default.lower()
-
-        # --------------------------------------------------------------------------
-
-        # if we passes a default
-        if default != "":
-
-            # find the default
-            if not default in buttons:
-
-                # not found, add at end of buttons
-                buttons.append(default)
-
-            # upper case it
-            buttons[buttons.index(default)] = default.upper()
-
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # add buttons to message
         btns_all = btn_sep.join(buttons)
         str_fmt = msg_fmt.format(message, btns_all)
 
-        # lower everything again for compare
-        buttons = [item.lower() for item in buttons]
+        # ----------------------------------------------------------------------
 
-        # --------------------------------------------------------------------------
-
+        # assume loop == True
         while True:
 
-            # ask the question, get the result
+            # ask the question, get the result (first char only/empty)
             inp = input(str_fmt)
-            inp = inp.lower()
+            if len(inp) > 0:
+                inp = inp[0]
 
-            # # no input (empty)
-            if inp == "" and default != "":
-                return default
-
-            # input a button
+            # ----------------------------------------------------------------------
+            # button correct, done
             if inp in buttons:
                 return inp
 
+            # ----------------------------------------------------------------------
+            # wrong answer
+
+            # default set
+            if default != "":
+
+                if inp == "":
+                    return default
+
+            # no loop, return blank
+            if not loop:
+                return ""
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

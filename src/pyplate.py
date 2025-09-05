@@ -20,6 +20,8 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
+# FIXME: setup dget, dprint
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -101,11 +103,11 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages \
-in Python from a template"
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in \
+Python from a template"
 
     # version string
-    S_PP_VERSION = "0.0.3"
+    S_PP_VERSION = "0.0.5"
 
     # pyplate: replace=False
 
@@ -168,14 +170,14 @@ in Python from a template"
         # project.json dicts
         self._dict_pub = {}
         self._dict_pub_bl = {}
-        self._dict_pub_dbg = {}
+        self._dict_pub_dbg = {}  # the one from conf that will go in file
         self._dict_pub_dist = {}
         self._dict_pub_docs = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
         # dictionary to hold current debug settings
-        self._dict_debug = {}
+        self._dict_dbg = {}
 
         # cmd line stuff
         # NB: placeholder to avoid comparing to None (to be set by subclass)
@@ -256,55 +258,6 @@ in Python from a template"
             action=self.S_ARG_DBG_ACTION,
         )
 
-    # --------------------------------------------------------------------------
-    # Parse the arguments from the command line
-    # --------------------------------------------------------------------------
-    def _do_cmd_line(self):
-        """
-        Parse the arguments from the command line
-
-        Parse the arguments from the command line, after the parser has been
-        set up.
-        """
-
-        # get namespace object
-        args = self._parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(args)
-
-        # if -h passed, this will print and exit
-        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
-            self._parser.print_help()
-            sys.exit()
-
-        # no -h, print epilog
-        print(self.S_EPILOG)
-        print()
-
-        # ----------------------------------------------------------------------
-
-        # get the args
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, False)
-
-        # set global prop in conf
-        C.B_DEBUG = self._debug
-
-        # debug turns off some post processing to speed up processing
-        # NB: changing values in self._dict_pub_dbg (through the functions in
-        # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
-        # pyplate.py
-        self._dict_debug = self._dict_pub_dbg
-
-        # ----------------------------------------------------------------------
-
-        # maybe yell
-        if self._debug:
-
-            # yup, yell
-            print(C.S_MSG_DEBUG)
-
         # ----------------------------------------------------------------------
         # set self._dir_prj
 
@@ -347,11 +300,11 @@ in Python from a template"
             self._dir_prj,
             self._dict_prv,
             self._dict_pub,
-            self._dict_debug,
+            self._dict_dbg,
             self._is_pm,
         )
 
-        # save pub to fix dunders
+        # save modified dicts/fix dunders in public/reload sub-dicts
         self._save_project_info()
 
     # --------------------------------------------------------------------------
@@ -371,27 +324,10 @@ in Python from a template"
 
         # ----------------------------------------------------------------------
 
-        # check version before we start
-        version = self._dict_pub_meta[C.S_KEY_META_VERSION]
-        pattern = C.S_SEM_VER_VALID
-        ver_ok = re.search(pattern, version) is not None
-
-        # ask if user wants to keep invalid version or quit
-        if not ver_ok:
-            res = F.dialog(
-                C.S_ERR_SEM_VER,
-                [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
-                C.S_ERR_SEM_VER_N,
-            )
-            if res == C.S_ERR_SEM_VER_N:
-                sys.exit()
-
-        # ----------------------------------------------------------------------
-
-        # combine private dicts for string replacement
-        self._dict_rep = F.combine_dicts(
-            [self._dict_prv_all, self._dict_prv_prj]
-        )
+        # # combine private dicts for string replacement
+        # self._dict_rep = F.combine_dicts(
+        #     [self._dict_prv_all, self._dict_prv_prj]
+        # )
 
         # ----------------------------------------------------------------------
 
@@ -477,16 +413,64 @@ in Python from a template"
             self._dir_prj,
             self._dict_prv,
             self._dict_pub,
-            self._dict_debug,
+            self._dict_dbg,
             self._is_pm,
         )
 
-        # save again
+        # save modified dicts/fix dunders in public/reload sub-dicts
         self._save_project_info()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Parse the arguments from the command line
+    # --------------------------------------------------------------------------
+    def _do_cmd_line(self):
+        """
+        Parse the arguments from the command line
+
+        Parse the arguments from the command line, after the parser has been
+        set up.
+        """
+
+        # get namespace object
+        args = self._parser.parse_args()
+
+        # convert namespace to dict
+        self._dict_args = vars(args)
+
+        # if -h passed, this will print and exit
+        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
+            self._parser.print_help()
+            sys.exit()
+
+        # no -h, print epilog
+        print(self.S_EPILOG)
+        print()
+
+        # ----------------------------------------------------------------------
+        # debug stuff
+
+        # get the args
+        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, False)
+
+        # set global prop in conf
+        C.B_DEBUG = self._debug
+
+        # debug turns off some post processing to speed up processing
+        # NB: changing values in self._dict_pub_dbg (through the functions in
+        # pyplate.py) will not affect the current session when running pymaker
+        # in debug mode. to do that, change the values of D_DBG_PM in
+        # pyplate.py
+        self._dict_dbg = self._dict_pub_dbg.copy()
+
+        # maybe yell
+        if self._debug:
+
+            # yup, yell
+            print(C.S_MSG_DEBUG)
 
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
@@ -786,14 +770,11 @@ in Python from a template"
             path.rename(path_new)
 
     # --------------------------------------------------------------------------
-    # Reload dicts after any outside changes
+    # Reload sub-dict pointers before/after dict change
     # --------------------------------------------------------------------------
-    def _get_sub_dicts(self):
+    def _reload_dicts(self):
         """
-        Reload dicts after any outside changes
-
-        This function is called when a dict is passed to another function, in
-        order to keep it synced with the internal dict.
+        Reload sub-dict pointers before/after dict change
         """
 
         # update individual dicts in dict_prv
@@ -810,14 +791,19 @@ in Python from a template"
 
         # update debug dict
         if not self._debug:
-            self._dict_debug = self._dict_pub_dbg
+            self._dict_dbg = self._dict_pub_dbg
+
+        # combine private dicts for string replacement
+        self._dict_rep = F.combine_dicts(
+            [self._dict_prv_all, self._dict_prv_prj]
+        )
 
     # --------------------------------------------------------------------------
-    # Save project info before fix
+    # Save project info
     # --------------------------------------------------------------------------
     def _save_project_info(self):
         """
-        Save project info before fix
+        Save project info
 
         Saves the private.json and project.json files after all modifications,
         and reloads them to use in _do_fix.
@@ -851,6 +837,15 @@ in Python from a template"
         F.save_dict(dict_pub, [path_pub])
 
         # ----------------------------------------------------------------------
+        # THIS is the whole horrible reason for calling reload/save in separate
+        # functions. we need to un-dunder the public file when running pb,
+        # since it may have been modified to include dunders. to do that, we
+        # need a valid dict_rep. to do THAT, we need a valid public file. to do
+        # THAT, we need a valid project.json. to do THAT, we need ... FUCK IT.
+        # IT WORKS.
+
+        # NB: needed BEFORE _fix_contents (or any _fix_...)
+        self._reload_dicts()
 
         # fix dunders in dict_pub
         self._fix_contents(path_pub)
@@ -858,12 +853,8 @@ in Python from a template"
         # reload dict from fixed file
         self._dict_pub = F.load_dicts([path_pub])
 
-        # reload dict pointers after dict change
-        self._get_sub_dicts()
-
-    # --------------------------------------------------------------------------
-    # These are minor steps called from the main steps
-    # --------------------------------------------------------------------------
+        # NB: reload AFTER save to set sub-dict pointers
+        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -889,7 +880,7 @@ in Python from a template"
             first_char = prj_type[0].lower()
 
             # check if it's one of ours
-            first_char_test = [item[0] for item in C.L_TYPES]
+            first_char_test = [item[0].lower() for item in C.L_TYPES]
             if first_char in first_char_test:
                 return True
 
@@ -999,10 +990,17 @@ in Python from a template"
         with open(dst, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
+# ------------------------------------------------------------------------------
+# Public functions
+# ------------------------------------------------------------------------------
 
-# --------------------------------------------------------------------------
+# NB: these functions are used in pyplate/pymaker/pybaker, but also used in
+# conf. they are placed here and made public because they are not user-defined.
+
+
+# ------------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
     """
     Check if line or trailing comment is a switch
@@ -1092,7 +1090,7 @@ def is_path_ext_in_list(path, lst):
         Whether the file exists in the list
     """
 
-    # lowercase the list
+    # lowercase the file in's ext
     l_ext = [item.lower() for item in lst]
 
     # add dots
@@ -1102,6 +1100,10 @@ def is_path_ext_in_list(path, lst):
 
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
-    return path.suffix.lower() in l_ext or path.name.lower() in l_ext
+    return path.suffix in l_ext
+
 
 # -)
+
+
+# Dr. Manhattan can divide by zero. Fight me.

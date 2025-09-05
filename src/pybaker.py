@@ -28,11 +28,12 @@ Run pybaker -h for more options.
 import gettext
 import locale
 from pathlib import Path
+import re
 import shutil
 import sys
 
 # local imports
-from cnlib import cnfunctions as F
+from cnlib import cnfunctions as F  # type: ignore
 from pyplate import PyPlate
 
 # ------------------------------------------------------------------------------
@@ -100,6 +101,14 @@ class PyBaker(PyPlate):
     # I18N help string for ide cmd line option
     S_ARG_IDE_HELP = _("ask for project folder when running in IDE")
 
+    # ide option strings
+    S_ARG_VER_OPTION = "-v"
+    S_ARG_VER_DEST = "VER_DEST"
+    # I18N help string for version cmd line option
+    S_ARG_VER_HELP = _("set the new version of the project")
+    # I18N: config file dest
+    S_ARG_VER_METAVAR = _("VERSION")
+
     # about string
     S_ABOUT = (
         "\n"
@@ -111,9 +120,13 @@ class PyBaker(PyPlate):
 
     # I18N cmd line instructions string
     S_EPILOG = _(
-        "Run this program from the parent directory of the project \
-you want to build."
+        "Run this program from the parent directory of the project you want \
+to build."
     )
+
+    # I18N: ask for new version
+    # NB: param is current version
+    S_ASK_VER = _("Version ({}): ")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -139,6 +152,7 @@ you want to build."
 
         # set the initial values of properties
         self._is_ide = False
+        self._new_ver = None
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -203,13 +217,42 @@ you want to build."
             action=self.S_ARG_IDE_ACTION,
         )
 
+        # add ver option
+        self._parser.add_argument(
+            self.S_ARG_VER_OPTION,
+            dest=self.S_ARG_VER_DEST,
+            help=self.S_ARG_VER_HELP,
+            metavar=self.S_ARG_VER_METAVAR,
+        )
+
         # parse command line
         self._do_cmd_line()
+
+        # set props based on cmd line
         if self._debug:
-            self._dict_debug = C.D_DBG_PB
+            self._dict_dbg = C.D_DBG_PB
 
         # get ide flag from cmd line
         self._is_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
+
+        # user changed version on cmd line
+        self._new_ver = self._dict_args.get(self.S_ARG_VER_DEST, "")
+
+    # --------------------------------------------------------------------------
+    # Get project info
+    # --------------------------------------------------------------------------
+    def _get_project_info(self):
+        """
+        Get project info
+
+        Raises:
+            OSError if anything goes wrong
+
+        Check that the PyPlate data is present and correct, so we don't crash
+        looking for non-existent files.
+        """
+
+        # ------------------------------------------------------------------------------
 
         # if ide=yes, ask for prj name
         if self._is_ide:
@@ -235,16 +278,7 @@ you want to build."
                 print()
                 break
 
-    # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        Check that the PyPlate data is present and correct, so we don't crash
-        looking for non-existent files.
-        """
+        # ------------------------------------------------------------------------------
 
         # check if dir_prj has pyplate folder for a valid prj
         path_pyplate = self._dir_prj / C.S_PRJ_PP_DIR
@@ -261,17 +295,90 @@ you want to build."
 
         # check if files are valid json
         try:
-            # get global and calculated settings dicts in private.json
+            # get settings dicts in private.json
             self._dict_prv = F.load_dicts([path_prv], {})
 
-            # get individual dicts in project.json
+            # get settings dicts in project.json
+            # NB: may contain dunders
             self._dict_pub = F.load_dicts([path_pub], {})
 
-            # get sub-dict pointers
-            self._get_sub_dicts()
-        except OSError:
+            # NB: reload BEFORE first save to set sub-dict pointers
+            self._reload_dicts()
+
+            # save modified dicts/fix dunders in public/reload sub-dicts
+            self._save_project_info()
+
+        # if there was a problem
+        except OSError as e: # from load_dicts
+            # exit gracefully
             print(C.S_ERR_PP_INVALID)
-            sys.exit()
+            print(e)
+            sys.exit(-1)
+
+        # ----------------------------------------------------------------------
+        # check for new version
+
+        # first check if passed on cmd line
+        if self._new_ver:
+
+            # check version before we start fixing
+            pattern = C.S_SEM_VER_VALID
+            version = self._new_ver
+            ver_ok = re.search(pattern, version) is not None
+
+            # ask if user wants to keep invalid version or quit
+            if not ver_ok:
+                res = F.dialog(
+                    C.S_ERR_SEM_VER,
+                    [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
+                    default=C.S_ERR_SEM_VER_N,
+                    loop=True,
+                )
+                if res == C.S_ERR_SEM_VER_N:
+                    sys.exit()
+
+        # not passed, ask question
+        else:
+
+            # format and ask question
+            old_ver = self._dict_pub_meta[C.S_KEY_META_VERSION]
+            ask_ver = self.S_ASK_VER.format(old_ver)
+
+            # loop until condition
+            while True:
+
+                # ask for new version
+                new_ver = input(ask_ver)
+
+                # user pressed Enter, return original
+                if new_ver == "":
+
+                    # set the same version, and we are done
+                    self._new_ver = old_ver
+                    break
+
+                # check version before we start fixing
+                pattern = C.S_SEM_VER_VALID
+                version = new_ver
+                ver_ok = re.search(pattern, version) is not None
+
+                # ask if user wants to keep invalid version or quit
+                if ver_ok:
+
+                    # set the new version, and we are done
+                    self._new_ver = new_ver
+                    break
+
+                # print version error
+                print(C.S_ERR_SEM_VER)
+
+        # change in project.json
+        self._dict_pub_meta[C.S_KEY_META_VERSION] = self._new_ver
+
+        # ----------------------------------------------------------------------
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist
@@ -285,10 +392,10 @@ you want to build."
         """
 
         C.do_before_dist(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 
-        # save prv/pub
+        # save modified dicts/fix dunders in public/reload sub-dicts
         self._save_project_info()
 
     # --------------------------------------------------------------------------
@@ -351,10 +458,10 @@ you want to build."
         """
 
         C.do_after_dist(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 
-        # save prv/pub
+        # save modified dicts/fix dunders in public/reload sub-dicts
         self._save_project_info()
 
 
@@ -374,3 +481,6 @@ if __name__ == "__main__":
     pb.main()
 
 # -)
+
+# "in little rooms, in buildings, "
+# "in lives which are completely meaningless..."

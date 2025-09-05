@@ -60,7 +60,7 @@ class PyBaker:
     # --------------------------------------------------------------------------
 
     # find path to prj/lib
-    P_DIR_PP = f"{Path.home()}/Documents/Projects/Python/PyPlate"
+    P_DIR_PP = f"{Path.home()}/Projects/Python/PyPlate"
 
     # commands to run (relative to PP dir)
     S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"
@@ -125,8 +125,10 @@ class PyBaker:
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except subprocess.CalledProcessError:
-            print("error")
+        except FileNotFoundError as fnfe:
+            print("error:", fnfe)
+        except subprocess.CalledProcessError as cpe:
+            print("error:", cpe.stderr)
 
 
 # ------------------------------------------------------------------------------

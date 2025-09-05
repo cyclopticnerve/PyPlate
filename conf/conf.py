@@ -36,7 +36,8 @@ from cnlib.cnvenv import CNVenv  # type: ignore
 
 # pylint: disable=no-name-in-module
 from . import mkdocs
-from . import pdoc
+
+# pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -163,7 +164,7 @@ S_ERR_PP_INVALID = _("One or more PyPlate data files are corrupted")
 # I18N: invalid version string format
 S_ERR_SEM_VER = _(
     "Warning: version number does not match S_SEM_VER_VALID\n"
-    "See https://semver.org/\nDo you wish to continue?"
+    "See https://semver.org/"
 )
 # I18N: continue with bad sem ver
 S_ERR_SEM_VER_Y = _("y")
@@ -287,7 +288,6 @@ S_KEY_DBG_TREE = "DBG_TREE"
 S_KEY_DBG_DIST = "DBG_DIST"
 
 # keys for D_PUB_DOCS
-S_KEY_DOCS_TOOL = "DOCS_TOOL"
 S_KEY_DOCS_THEME = "DOCS_THEME"
 S_KEY_DOCS_USE_RM = "DOCS_USE_RM"
 S_KEY_DOCS_MAKE_API = "DOCS_MAKE_API"
@@ -423,7 +423,7 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # cmd for git
 # NB: format param is proj dir
-S_CMD_GIT_CREATE = "git init {} -q"
+S_CMD_GIT_CREATE = "cd {}; git init -q"
 # NB: format params are prj dir and venv name
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
 
@@ -519,6 +519,7 @@ S_SEM_VER_VALID = (
     r"))?"
     r"$"
 )
+S_SEM_VER_PYPRJ = r"\g<1>.\g<2>.\g<3>"
 
 # ------------------------------------------------------------------------------
 # gui stuff
@@ -553,8 +554,6 @@ S_RM_SCREENSHOT = "![{}]({})"
 # ------------------------------------------------------------------------------
 # docs stuff
 
-S_DOCS_MKDOCS = "mkdocs"
-S_DOCS_PDOC3 = "pdoc3"
 S_DOCS_THEME_RTD = "readthedocs"
 
 # ------------------------------------------------------------------------------
@@ -839,7 +838,7 @@ D_PRV_ALL = {
     "__PP_UNINST_CONF_FILE__": f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}",
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's prj name
-    # i.e. /home/dev/Documents/Projects/Python/MyProject
+    # i.e. /home/dev/Projects/Python/MyProject
     "__PP_DIR_CONF__": S_DIR_CONF,
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
@@ -881,12 +880,9 @@ D_PRV_PRJ = {
     "__PP_FILE_WIN__": "",  # my_project_win
     "__PP_CLASS_WIN__": "",  # MyProjectWin
     # --------------------------------------------------------------------------
-    # these paths are calculated at runtime relative to the dev's home dir
-    "__PP_DEV_PP__": "",  # location of PyPlate src dir, rel to dev home
-    # --------------------------------------------------------------------------
     # these paths are calculated in do_before_fix, relative to the user's home
     # dir
-    "__PP_DIST_DIR__": "",  # formatted name of the dist ([name_small]_[version])
+    "__PP_DIST_DIR__": "",  # formatted name of dist ([name_small]_[version])
     # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     "__PP_FILE_DESK__": "",  # final desk file, not template
@@ -1046,21 +1042,9 @@ D_PUB_I18N = {
 
 # which docs maker to use, based on project type
 D_PUB_DOCS = {
-    "c": {
-        S_KEY_DOCS_TOOL: S_DOCS_MKDOCS,
-        S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD
-        S_KEY_DOCS_USE_RM: True,
-        S_KEY_DOCS_MAKE_API: True,
-    },
-    "g": {
-        S_KEY_DOCS_TOOL: S_DOCS_MKDOCS,
-        S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD
-        S_KEY_DOCS_USE_RM: True,
-        S_KEY_DOCS_MAKE_API: True,
-    },
-    "p": {
-        S_KEY_DOCS_TOOL: S_DOCS_PDOC3,
-    },
+    S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD, etc.
+    S_KEY_DOCS_USE_RM: True,
+    S_KEY_DOCS_MAKE_API: True,
 }
 
 # dict in project to control post processing
@@ -1282,6 +1266,9 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         dict_dbg: The dictionary containing the current session's debug
         settings
 
+    Raises:
+        cnlib.cnfunctions.CNRunError if git create fails
+
     Do any work after copying the template. This function is called after
     _do_template, and before _do_before_fix.\n
     Use this function to create any files that your project needs to be created
@@ -1314,10 +1301,12 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 if file_reqs.exists():
                     cv.install_reqs(file_reqs)
                 print(S_ACTION_DONE)
-            except Exception as e:
+            except Exception:
+                # exit gracefully
                 print(S_ACTION_FAIL)
                 print(S_MSG_NO_INTERNET)
-                raise e
+                # print(e.stderr)
+                sys.exit(-1)
         else:
             # no venv, no reqs
             (Path(dir_prj) / S_FILE_REQS).unlink()
@@ -1333,10 +1322,14 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
         # add git dir
         cmd = S_CMD_GIT_CREATE.format(dir_prj)
-        F.sh(cmd, shell=True)
-
-        # show info
-        print(S_ACTION_DONE)
+        try:
+            F.run(cmd, shell=True)
+            print(S_ACTION_DONE)
+        except F.CNRunError:
+            # exit gracefully
+            print(S_ACTION_FAIL)
+            # print(e.stderr)
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # install/uninstall config files
@@ -1422,20 +1415,15 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg, _pymaker):
 
     # get base version
     ver_base = dict_pub_meta[S_KEY_META_VERSION]
+    dict_prv_prj["__PP_VER_MMR__"] = ver_base
 
     # set display of version
-    dict_prv_prj["__PP_VER_DISP__"] = S_VER_DISP_FMT.format(ver_base)
-
-    # semantic version with meta info
-    str_sem = ver_base
-    dict_prv_prj["__PP_VER_MMR__"] = str_sem
-
-    # fix ver for dist filename
-    ver_dist = str_sem
+    ver_disp = S_VER_DISP_FMT.format(ver_base)
+    dict_prv_prj["__PP_VER_DISP__"] = ver_disp
 
     # format dist dir name with prj and ver
-    name_fmt = S_VER_DIST_FMT.format(name_prj_small, ver_dist)
-    dict_prv_prj["__PP_DIST_DIR__"] = name_fmt
+    ver_dist = S_VER_DIST_FMT.format(name_prj_small, ver_base)
+    dict_prv_prj["__PP_DIST_DIR__"] = ver_dist
 
     # ----------------------------------------------------------------------
     # calculate current date
@@ -1781,37 +1769,25 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg, pymaker):
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
 
-        # get the doc tool from the project info
-        # NB: doc_tool is the import file name
-        str_doc_tool = dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_TOOL]
-        doc_tool = None
-        if str_doc_tool == S_DOCS_PDOC3:
-            doc_tool = pdoc
-        elif str_doc_tool == S_DOCS_MKDOCS:
-            doc_tool = mkdocs
+        # print info
+        print(S_ACTION_MAKE_DOCS, end="", flush=True)
 
-        # if we found a tool
-        if doc_tool:
-
-            # print info
-            print(S_ACTION_MAKE_DOCS, end="", flush=True)
-
-            # the command to make pdoc/mkdocs/...
-            try:
-                if pymaker:
-                    doc_tool.make_docs(
-                        dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
-                    )
-                    dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-                else:
-                    doc_tool.bake_docs(
-                        dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
-                    )
-                print(S_ACTION_DONE)
-            except Exception as e:
-                print(S_ACTION_FAIL)
-                raise e
-
+        # the command to make or bake docs
+        try:
+            if pymaker:
+                mkdocs.make_docs(
+                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
+                )
+                dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+            else:
+                mkdocs.bake_docs(
+                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
+                )
+            print(S_ACTION_DONE)
+        except Exception as e:
+            # fail gracefully
+            print(S_ACTION_FAIL)
+            # print(e.stderr)
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1856,8 +1832,10 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 cv.freeze(file_reqs)
                 print(S_ACTION_DONE)
             except Exception as e:
+                # exit gracefully
                 print(S_ACTION_FAIL)
-                raise e
+                # print(e.stderr)
+                sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # purge package dirs
@@ -2145,6 +2123,15 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     Replaces things like the keywords, requirements, etc. in the toml file.
     """
 
+    # convert long ver to mmr
+    str_pattern = S_SEM_VER_VALID
+    str_rep = dict_prv_prj["__PP_VER_MMR__"]
+    res = re.search(str_pattern, str_rep)
+    if res:
+        str_rep = re.sub(str_pattern, S_SEM_VER_PYPRJ, str_rep)
+
+    # --------------------------------------------------------------------------
+
     # default text if we can't open file
     text = ""
 
@@ -2154,7 +2141,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
 
     # replace version
     str_pattern = S_TOML_VER_SCH
-    str_rep = dict_prv_prj["__PP_VER_MMR__"]
+
     str_rep = S_TOML_VER_REP.format(str_rep)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 

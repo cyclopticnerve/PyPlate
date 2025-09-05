@@ -24,7 +24,6 @@
 # TODO: fix every metadata using choice menu for new value
 # gonna need a lot of regex in pybaker.conf
 # TODO: do we need D_PRV_DEF/D_PRV_EXTRA?
-# TODO: what do we need from D_PRV_CFG? just __PP_DEV_PP__?
 
 # replace (or just report) any dunders
 # replace metadata using prj pybaker (context is prj or dev specific)

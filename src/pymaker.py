@@ -29,6 +29,7 @@ Run pymaker -h for more options.
 import gettext
 import locale
 from pathlib import Path
+import re
 import shutil
 import sys
 
@@ -127,9 +128,6 @@ a project."
         # set flag for do_before_fix/do_after_fix
         self._is_pm = True
 
-        # set the initial values of properties
-        self._is_ide = False
-
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
@@ -187,8 +185,10 @@ a project."
 
         # parse command line
         self._do_cmd_line()
+
+        # set props based on cmd line
         if self._debug:
-            self._dict_debug = C.D_DBG_PM
+            self._dict_dbg = C.D_DBG_PM
 
         # do not run pymaker in pyplate dir
         if self._dir_prj.is_relative_to(self.P_DIR_PP):
@@ -205,6 +205,27 @@ a project."
         Asks the user for project info, such as type and name, to be saved to
         self._dict_prv_prj.
         """
+
+        # this does nothing, included for completeness
+        super()._get_project_info()
+
+        # ----------------------------------------------------------------------
+
+        # check version from conf
+        pattern = C.S_SEM_VER_VALID
+        version = C.D_PUB_META[C.S_KEY_META_VERSION]
+        ver_ok = re.search(pattern, version) is not None
+
+        # ask if user wants to keep invalid version or quit
+        if not ver_ok:
+            res = F.dialog(
+                C.S_ERR_SEM_VER,
+                [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
+                default=C.S_ERR_SEM_VER_N,
+                # loop=True
+            )
+            if res == C.S_ERR_SEM_VER_N:
+                sys.exit(-1)
 
         # ----------------------------------------------------------------------
         # first question is type
@@ -358,18 +379,18 @@ a project."
             C.S_KEY_PRV_PRJ: C.D_PRV_PRJ,
         }
 
-        # create individual dicts in pyplate.py
+        # create individual dicts in project.json
         self._dict_pub = {
             C.S_KEY_PUB_BL: C.D_PUB_BL,
             C.S_KEY_PUB_DBG: C.D_PUB_DBG,
-            C.S_KEY_PUB_DOCS: C.D_PUB_DOCS[prj_type],
             C.S_KEY_PUB_DIST: C.D_PUB_DIST[prj_type],
+            C.S_KEY_PUB_DOCS: C.D_PUB_DOCS,
             C.S_KEY_PUB_I18N: C.D_PUB_I18N,
             C.S_KEY_PUB_META: C.D_PUB_META,
         }
 
-        # get sub-dict pointers
-        self._get_sub_dicts()
+        # NB: reload BEFORE first save to set sub-dict pointers
+        self._reload_dicts()
 
         # ----------------------------------------------------------------------
         # calculate dunder values now that we have project info
@@ -397,16 +418,13 @@ a project."
 
         # ----------------------------------------------------------------------
 
-        # remove home dir from PyPlate path
-        h = str(Path.home())
-        p = str(self.P_DIR_PP)
-        p = p.lstrip(h).strip("/")
-        p = p.lstrip(h).strip("\\")
-        # NB: change global val
-        self._dict_prv_prj["__PP_DEV_PP__"] = p
-
         # blank line before printing progress
         print()
+
+        # ----------------------------------------------------------------------
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Do any work before template copy
@@ -422,10 +440,10 @@ a project."
         """
 
         C.do_before_template(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 
-        # save prv/pub
+        # save modified dicts/fix dunders in public/reload sub-dicts
         self._save_project_info()
 
     # --------------------------------------------------------------------------
@@ -505,10 +523,10 @@ a project."
         """
 
         C.do_after_template(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 
-        # save prv/pub
+        # save modified dicts/fix dunders in public/reload sub-dicts
         self._save_project_info()
 
 

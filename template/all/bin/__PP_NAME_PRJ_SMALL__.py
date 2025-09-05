@@ -121,8 +121,12 @@ class __PP_NAME_PRJ_PASCAL__:
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except subprocess.CalledProcessError:
-            print("error")
+        except FileNotFoundError as fnfe:
+            print("error:", fnfe)
+            sys.exit(-1)
+        except subprocess.CalledProcessError as cpe:
+            print("error:", cpe.stderr)
+            sys.exit(-1)
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

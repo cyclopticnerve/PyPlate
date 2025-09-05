@@ -21,6 +21,7 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 # Imports
 # ------------------------------------------------------------------------------
 
+# NB: pure python
 # system imports
 import argparse
 import gettext
@@ -231,12 +232,26 @@ class CNInstall:
     S_VER_OLDER = -1
     S_VER_SAME = 0
     S_VER_NEWER = 1
+    S_VER_ERROR = -2
 
     # regex to compare version numbers
-    R_VERSION = r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
+    R_VERSION_VALID = (
+        r"^"
+        r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+        r"(?:-("
+        r"(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+        r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*"
+        r"))?"
+        r"(?:\+("
+        r"[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*"
+        r"))?"
+        r"$"
+    )
     R_VERSION_GROUP_MAJ = 1
     R_VERSION_GROUP_MIN = 2
     R_VERSION_GROUP_REV = 3
+    R_VERSION_GROUP_PRE = 4
+    R_VERSION_GROUP_META = 5
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -372,9 +387,6 @@ class CNInstall:
         # do setup
         self._setup()
 
-        # parse cmd line and get args
-        self._do_cmd_line()
-
         # get prj info from cfg
         self._get_project_info()
 
@@ -441,6 +453,33 @@ class CNInstall:
             action=self.S_ARG_DRY_ACTION,
         )
 
+        # parse command line
+        self._do_cmd_line()
+
+    # --------------------------------------------------------------------------
+    # Get project info
+    # --------------------------------------------------------------------------
+    def _get_project_info(self):
+        """
+        Get project info
+
+        Get the install info from the config file.
+        """
+
+        # get project info
+        self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
+
+        # get prg name/version
+        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
+        prog_version = self._dict_cfg[self.S_KEY_INST_VER]
+
+        # print start msg
+        print(self.S_MSG_INST_START.format(prog_name, prog_version))
+
+    # --------------------------------------------------------------------------
+    # These are the small parts, called from the bigger parts
+    # --------------------------------------------------------------------------
+
     # --------------------------------------------------------------------------
     # Parse the arguments from the command line
     # --------------------------------------------------------------------------
@@ -472,26 +511,6 @@ class CNInstall:
         self._dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
 
     # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        Get the install info from the config file.
-        """
-
-        # get project info
-        self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
-
-        # get prg name/version
-        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        prog_version = self._dict_cfg[self.S_KEY_INST_VER]
-
-        # print start msg
-        print(self.S_MSG_INST_START.format(prog_name, prog_version))
-
-    # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
     def _check_version(self):
@@ -514,7 +533,7 @@ class CNInstall:
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
 
             # do the compare and get S_VER__OLDER, S_VER_SAME, S_VER_NEWER
-            res = self._compare_version(ver_old, ver_new)
+            res = self._comp_sem_ver(ver_old, ver_new)
 
             # same version is installed
             if res == self.S_VER_SAME:
@@ -575,9 +594,12 @@ class CNInstall:
         try:
             subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
-        except Exception as e:
-            print(self.S_MSG_FAIL)
-            raise e
+        except FileNotFoundError as fnfe:
+            print("error:", fnfe)
+            sys.exit(-1)
+        except subprocess.CalledProcessError as cpe:
+            print("error:", cpe.stderr)
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # Install requirements.txt
@@ -614,9 +636,12 @@ class CNInstall:
                 cmd, shell=True, check=True, stdout=subprocess.DEVNULL
             )
             print(self.S_MSG_DONE)
-        except Exception as e:
+        except FileNotFoundError as fnfe:
             print(self.S_MSG_FAIL)
-            raise e
+            print("error:", fnfe)
+        except subprocess.CalledProcessError as cpe:
+            print(self.S_MSG_FAIL)
+            print("error:", cpe.stderr)
 
     # --------------------------------------------------------------------------
     # Fix .desktop file, for paths and such
@@ -637,12 +662,6 @@ class CNInstall:
         if not use_desk:
             return
 
-        # check both files for None and exist
-        if not self._file_desk or not self._file_desk.exists():
-            raise OSError(self.S_ERR_NOT_FOUND.format(self._file_desk))
-        if not self._file_desk_icon or not self._file_desk_icon.exists():
-            raise OSError(self.S_ERR_NOT_FOUND.format(self._file_desk_icon))
-
         # print info
         print(self.S_MSG_DSK_START, end="", flush=True)
 
@@ -650,6 +669,11 @@ class CNInstall:
         if self._dry_run:
             print(self.S_DRY_DESK_ICON.format(self._file_desk_icon))
             print(self.S_MSG_DONE)
+            return
+
+        # sanity check (params to main might be None)
+        if not self._file_desk or not self._file_desk_icon:
+            print("no desktop files present")
             return
 
         # open file
@@ -761,17 +785,8 @@ class CNInstall:
         a_dict = {}
 
         # get dict from file
-        try:
-            with open(a_file, "r", encoding="UTF-8") as a_file:
-                a_dict = json.load(a_file)
-
-        # file not found
-        except FileNotFoundError as e:
-            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
-
-        # not valid json in file
-        except json.JSONDecodeError as e:
-            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
+        with open(a_file, "r", encoding="UTF-8") as a_file:
+            a_dict = json.load(a_file)
 
         # return result
         return a_dict
@@ -850,70 +865,135 @@ class CNInstall:
             if inp in buttons:
                 return inp
 
-    # --------------------------------------------------------------------------
-    # Compare two version strings for relativity
-    # --------------------------------------------------------------------------
-    def _compare_version(self, ver_old, ver_new):
+    # ------------------------------------------------------------------------------
+    # Compare two semantic versions
+    # ------------------------------------------------------------------------------
+    def _comp_sem_ver(self, ver_old, ver_new):
         """
-        Compare two version strings for relativity
+        Compare two semantic versions
 
         Args:
-            ver_old: Old version string
-            ver_new: New version string
+            ver_old: The old version to compare
+            ver_new: The new version to compare
 
         Returns:
-            An integer representing the relativity of the two version strings.
-            S_VER_SAME means the two versions are equal,
-            S_VER_NEWER means new_ver is newer than old_ver (or there is no old_ver), and
-            S_VER_OLDER means new_ver is older than old_ver.
+            An integer showing the relationship between the two version
 
-        This method compares two version strings and determines which is older,
-        which is newer, or if they are equal. Note that this method converts
-        only the first three parts of a semantic version string
-        (https://semver.org/).
+        Compare two semantic versions
         """
 
-        # test for new install (don't try to regex)
+        # sanity checks
         if not ver_old or ver_old == "":
-            return self.S_VER_NEWER
-
-        # test for equal (just save some cpu cycles)
+            return self.S_VER_ERROR
+        if not ver_new or ver_new == "":
+            return self.S_VER_ERROR
         if ver_old == ver_new:
             return self.S_VER_SAME
 
+        # --------------------------------------------------------------------------
+
         # compare version string parts (only x.x.x)
-        res_old = re.search(self.R_VERSION, ver_old)
-        res_new = re.search(self.R_VERSION, ver_new)
+        res_old = re.search(self.R_VERSION_VALID, ver_old)
+        res_new = re.search(self.R_VERSION_VALID, ver_new)
 
-        # if both version strings are valid
-        if res_old and res_new:
+        # if either version string is None
+        if not res_old or not res_new:
+            return self.S_VER_ERROR
 
-            # make a list of groups to check
-            lst_groups = [
-                self.R_VERSION_GROUP_MAJ,
-                self.R_VERSION_GROUP_MIN,
-                self.R_VERSION_GROUP_REV,
-            ]
+        # make a list of groups to check
+        lst_groups = [
+            self.R_VERSION_GROUP_MAJ,
+            self.R_VERSION_GROUP_MIN,
+            self.R_VERSION_GROUP_REV,
+        ]
 
-            # for each part as int
-            for group in lst_groups:
-                old_val = int(res_old.group(group))
-                new_val = int(res_new.group(group))
+        # for each part as int
+        for group in lst_groups:
+            old_val = int(res_old.group(group))
+            new_val = int(res_new.group(group))
+
+            # slide out at the first difference
+            if old_val < new_val:
+                return self.S_VER_NEWER
+            if old_val > new_val:
+                return self.S_VER_OLDER
+
+        # --------------------------------------------------------------------------
+
+        # still going, check pre
+        pre_old = res_old.group(self.R_VERSION_GROUP_PRE)
+        pre_new = res_new.group(self.R_VERSION_GROUP_PRE)
+
+        # simple pre rule compare
+        if not pre_old and pre_new:
+            return self.S_VER_OLDER
+        if pre_old and not pre_new:
+            return self.S_VER_NEWER
+        if not pre_old and not pre_new:
+            return self.S_VER_SAME
+
+        # --------------------------------------------------------------------------
+
+        # if pre_old and pre_new:
+
+        # split pre on dots
+        lst_pre_old = pre_old.split(".")
+        lst_pre_new = pre_new.split(".")
+
+        # get number of parts
+        len_pre_old = len(lst_pre_old)
+        len_pre_new = len(lst_pre_new)
+
+        # get shorter of two
+        shortest = len_pre_old if len_pre_old <= len_pre_new else len_pre_new
+
+        # for each part in shortest
+        for index in range(shortest):
+
+            # get each value at position
+            old_val = lst_pre_old[index]
+            new_val = lst_pre_new[index]
+
+            # 1. both numbers
+            if old_val.isdigit() and new_val.isdigit():
+                tmp_old_val = int(old_val)
+                tmp_new_val = int(new_val)
 
                 # slide out at the first difference
-                if old_val < new_val:
-                    return self.S_VER_NEWER
-                elif old_val > new_val:
+                if tmp_old_val > tmp_new_val:
                     return self.S_VER_OLDER
-                # parts are equal, go to the next one
-                else:
-                    continue
-        else:
-            raise OSError(self.S_ERR_VERSION)
+                if tmp_old_val < tmp_new_val:
+                    return self.S_VER_NEWER
 
-        # return 0 if equal
-        return self.S_VER_SAME
+            # 2. both alphanumeric
+            if not old_val.isdigit() and not new_val.isdigit():
+                lst_alpha = [old_val, new_val]
+                lst_alpha.sort()
 
+                idx_old = lst_alpha.index(old_val)
+                idx_new = lst_alpha.index(new_val)
+
+                if idx_old > idx_new:
+                    return self.S_VER_OLDER
+                if idx_old < idx_new:
+                    return self.S_VER_NEWER
+
+            # 3 num vs alphanumeric
+            if old_val.isdigit() and not new_val.isdigit():
+                return self.S_VER_OLDER
+            if not old_val.isdigit() and new_val.isdigit():
+                return self.S_VER_NEWER
+
+            # 4 len
+            if len_pre_old > len_pre_new:
+                return self.S_VER_OLDER
+            if len_pre_new > len_pre_old:
+                return self.S_VER_NEWER
+
+        # --------------------------------------------------------------------------
+
+        # error in one or both versions
+        return self.S_VER_ERROR
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: pyplate 0.0.3\n"
+"Project-Id-Version: pyplate 0.0.5\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-08-07 13:36-0400\n"
+"POT-Creation-Date: 2025-08-14 15:57-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,6 @@ msgstr ""
 msgid "Name must end with a letter or number"
 msgstr ""
 
-#. I18N: name contains invalid char
 msgid ""
 "Name must contain only letters, numbers, spaces, dashes (-), or underscores "
 "(_)"
@@ -79,7 +78,6 @@ msgstr ""
 msgid "Project \"{}\" does not exist"
 msgstr ""
 
-#. I18N: run pybaker on non-pyplate project dir
 msgid ""
 "This project does not have a 'pyplate' folder.\n"
 "Are you sure this is a PyPlate project?"
@@ -93,7 +91,6 @@ msgstr ""
 msgid "One or more PyPlate data files are corrupted"
 msgstr ""
 
-#. I18N: invalid version string format
 msgid ""
 "Warning: version number does not match S_SEM_VER_VALID\n"
 "See https://semver.org/\n"
@@ -117,7 +114,6 @@ msgstr ""
 msgid "Warning: file '{}' does not exist, using '{}'"
 msgstr ""
 
-#. I18N: invalid desktop category
 msgid ""
 "\"{}\" is not a valid desktop category, see \"https://specifications."
 "freedesktop.org/menu-spec/latest/apa.html\""
@@ -127,7 +123,6 @@ msgstr ""
 msgid "Create the file {}"
 msgstr ""
 
-#. I18N: warn if running in debug mode
 msgid ""
 "WARNING! YOU ARE IN DEBUG MODE!\n"
 "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
@@ -190,7 +185,7 @@ msgid "Make docs folder... "
 msgstr ""
 
 #. I18N: Deploy docs folder
-msgid "Deploy docs folder... "
+msgid "Bake docs folder... "
 msgstr ""
 
 #. I18N: Make tree file
@@ -234,10 +229,9 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#. I18N: error message when no remote repo exists
 msgid ""
 "MkDocs failed to deploy.\n"
-"Make sure you have published your repo and run'pybaker' from your project "
+" Make sure you have published your repo and run 'pybaker' from your project "
 "directory to publish your docs using MkDocs."
 msgstr ""
 
@@ -347,12 +341,23 @@ msgstr ""
 msgid "ask for project folder when running in IDE"
 msgstr ""
 
-#. I18N cmd line instructions string
+#. I18N help string for version cmd line option
+msgid "set the new version of the project"
+msgstr ""
+
+#. I18N: config file dest
+msgid "VERSION"
+msgstr ""
+
 msgid ""
 "Run this program from the parent directory of the project you want to build."
 msgstr ""
 
-#. I18N cmd line instructions string
+#. I18N: ask for new version
+#. NB: param is current version
+msgid "Version ({}): "
+msgstr ""
+
 msgid "Run this program from the directory where you want to create a project."
 msgstr ""
 

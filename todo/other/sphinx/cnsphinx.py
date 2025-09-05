@@ -94,9 +94,8 @@ class CNSphinx:
             dir_prj) (default: None)
             theme: Name of the theme to use for the docs (default: "")
 
-
         Raises:
-            cnfunctions.CNShellError if an error occurs
+            cnlib.cnfunctions.CNRunError if create fails
 
         Creates a new docs folder with the parameters provided.
         """
@@ -136,9 +135,9 @@ class CNSphinx:
             "--extensions sphinx.ext.napoleon"
         )
         try:
-            F.sh(cmd, shell=True)
+            F.run(cmd, shell=True)
             self._modify(dirs_import, theme)
-        except Exception as e:
+        except F.CNRunError as e:
             raise e
 
     # --------------------------------------------------------------------------
@@ -153,7 +152,7 @@ class CNSphinx:
             the project's virtual environment version of sphinx
 
         Raises:
-            cnfunctions.CNShellError if an error occurs
+            cnlib.cnfunctions.CNRunError if build fails
 
         Creates the docs/build folder and creates the output html files in the
         docs/build/html folder.
@@ -173,10 +172,10 @@ class CNSphinx:
             "make html"
         )
         try:
-            res = F.sh(cmd, shell=True)
+            res = F.run(cmd, shell=True)
             print(res.stdout)
             print(res.stderr)
-        except Exception as e:
+        except F.CNRunError as e:
             raise e
 
     # --------------------------------------------------------------------------

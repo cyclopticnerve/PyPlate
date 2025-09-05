@@ -53,7 +53,9 @@
     },
     "PUB_DOCS": {
         "DOCS_TOOL": "mkdocs",
-        "DOCS_THEME": "readthedocs"
+        "DOCS_THEME": "",
+        "DOCS_USE_RM": false,
+        "DOCS_MAKE_API": true
     },
     "PUB_I18N": {
         "DOMAIN": "pyplate",
@@ -87,7 +89,7 @@
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "0.0.3",
+        "META_VERSION": "0.0.5",
         "META_KEYWORDS": [
             "python",
             "cli",

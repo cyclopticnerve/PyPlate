@@ -18,7 +18,7 @@ A program for creating and building CLI/GUI/Packages in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 0.0.3
+Version 0.0.5
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -97,7 +97,7 @@ too.
 Now run the script from the command line, in the directory where you want to
 create the project:
 ```bash
-$ cd ~/Documents/Projects/Python
+$ cd ~/Projects/Python
 $ pymaker
 ```
 
@@ -159,6 +159,9 @@ $ ./uninstall.py
 See the [documentation](https://cyclopticnerve.github.io/PyPlate)
 
 ## Notes
+If you have any sort of spellchecker in your IDE, *FOR GOD'S SAKE TURN IT OFF!*
+or at least blacklist me. It would brick a fucking quantum computer.
+
 If you make any changes to this template to better suit your own style/setup,
 please let me know or send a pull request. I will take a look and see if I can
 incorporate your changes to make them user, system, and/or IDE agnostic. This

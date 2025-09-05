@@ -17,12 +17,12 @@
 # keys for state dict
 # class name as string
 KEY_CLASS = "KEY_CLASS"
-# size sub dict
+# size sub-dict
 KEY_SIZE = "KEY_SIZE"
 KEY_SIZE_W = "KEY_SIZE_W"
 KEY_SIZE_H = "KEY_SIZE_H"
 KEY_SIZE_M = "KEY_SIZE_M"
-# controls sub dict
+# controls sub-dict
 KEY_CTLS = "KEY_CTLS"
 # last set title
 KEY_TITLE = "KEY_TITLE"

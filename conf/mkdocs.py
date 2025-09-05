@@ -24,8 +24,8 @@ As much code/settings/constants as can be are reused from conf.py.
 import gettext
 import locale
 from pathlib import Path
+import re
 import shutil
-import subprocess
 
 # local imports
 # pylint: disable=no-name-in-module
@@ -103,14 +103,10 @@ S_INDEX_NAME = "index.md"
 # I18N: name of home link in nav
 S_HOME_NAME = _("Home")
 
-# err message if no remote repo
-# I18N: error message when no remote repo exists
-S_ERR_NO_REPO = _(
-    "MkDocs failed to deploy.\n \
-Make sure you have published your repo and run 'pybaker' from your project \
-directory to publish your docs using MkDocs."
-)
-
+# regex for theme
+R_YAML_THEME_FIND = r"(theme:)(.*)"
+# NB: format param is theme name or blank
+R_YAML_THEME_REP = r"\g<1> {}"
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -130,6 +126,9 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
         dict_pub: The dictionary containing public project data
         p_dir_pp: Path to PyPlate program
         p_dir_pp_env: Path to PyPlate's venv (to activate mkdocs)
+
+    Raises:
+        cnlib.cnfunctions.CNRunError if make fails
 
     Make the documents using the specified parameters.
     """
@@ -202,14 +201,8 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
 
     # the command to run mkdocs
     try:
-        subprocess.run(
-            cmd_docs,
-            shell=True,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-    except Exception as e:
+        F.run(cmd_docs, shell=True)
+    except F.CNRunError as e:
         raise e
 
 
@@ -227,11 +220,35 @@ def bake_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
         p_dir_pp: Path to PyPlate program
         p_dir_pp_env: Path to PyPlate's venv (to activate mkdocs)
 
+    Raises:
+        cnlib.cnfunctions.CNRunError if bake fails
+
     Make the documents using the specified parameters.
     """
 
-    # get switch from dict_pub
+    # --------------------------------------------------------------------------
+    # fix yaml
+
+    # get theme from dict_pub
     dict_docs = dict_pub[conf.S_KEY_PUB_DOCS]
+    theme = dict_docs.get(conf.S_KEY_DOCS_THEME, "")
+
+    # path to file
+    yaml_file = dir_prj / S_YML_NAME
+
+    # read input file
+    text = ""
+    with open(yaml_file, "r", encoding=conf.S_ENCODING) as a_file:
+        text = a_file.read()
+
+    # replace theme name
+    find = R_YAML_THEME_FIND
+    repl = R_YAML_THEME_REP.format(theme)
+    text = re.sub(find, repl, text)
+
+    # write file
+    with open(yaml_file, "w", encoding=conf.S_ENCODING) as a_file:
+        a_file.write(text)
 
     # --------------------------------------------------------------------------
     # make index
@@ -261,16 +278,9 @@ def bake_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
 
     # the command to run mkdocs
     try:
-        subprocess.run(
-            cmd_docs,
-            shell=True,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-    except Exception as e:
-        raise OSError(S_ERR_NO_REPO) from e
-
+        F.run(cmd_docs, shell=True)
+    except F.CNRunError as e:
+        raise e
 
 # ------------------------------------------------------------------------------
 # Private functions
