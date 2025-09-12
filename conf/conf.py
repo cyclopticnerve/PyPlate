@@ -33,11 +33,7 @@ from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
-
-# pylint: disable=no-name-in-module
-from . import mkdocs
-
-# pylint: enable=no-name-in-module
+from cnlib.cnmkdocs import CNMkDocs  # type: ignore
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -62,7 +58,7 @@ import src.pyplate as PP
 P_DIR_PP = Path(__file__).parents[1].resolve()
 # NB: these dirs are "blessed". if you fuck with them, bad juju will happen.
 # you have been warned.
-P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
+P_DIR_PP_VENV = P_DIR_PP / ".venv"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -130,6 +126,9 @@ S_ASK_SEC_G = _("Window class name (default: {}): ")
 # NB: format param is current working dir
 # I18N: ask prj name if running pybaker in IDE
 S_ASK_IDE = _("Project name: (relative to {}): ")
+# NB: param is current version
+# I18N: ask for new version
+S_ASK_VER = _("Version ({}): ")
 
 # error strings
 # NB: format param is joined list of project types from L_TYPES
@@ -184,6 +183,9 @@ S_ERR_DESK_CAT = _(
 # NB: format param is S_PATH_SCREENSHOT
 # I18N: alternate text for screenshot in README.md
 S_ERR_NO_SCREENSHOT = _("Create the file {}")
+
+# I18N: name of home folder in docs
+S_DOCS_HOME = _("Home")
 
 # debug-specific strings
 # I18N: warn if running in debug mode
@@ -334,8 +336,7 @@ S_DIR_ALL = "all"
 S_DIR_BIN = "bin"
 S_DIR_GIT = ".git"
 S_DIR_CONF = "conf"
-# NB: if you change this, it will bork mkdocs!
-S_DIR_DOCS = "docs"
+S_DIR_API = "API"
 S_DIR_MISC = "misc"
 S_DIR_README = "readme"
 S_DIR_SRC = "src"
@@ -521,6 +522,10 @@ S_SEM_VER_VALID = (
 )
 S_SEM_VER_PYPRJ = r"\g<1>.\g<2>.\g<3>"
 
+# mkdocs.yml
+S_THEME_SCH = r"(theme:)(.*)"
+S_THEME_REP = r"\g<1> {}"
+
 # ------------------------------------------------------------------------------
 # gui stuff
 
@@ -553,8 +558,7 @@ S_RM_SCREENSHOT = "![{}]({})"
 
 # ------------------------------------------------------------------------------
 # docs stuff
-
-S_DOCS_THEME_RTD = "readthedocs"
+S_FILE_MKDOCS_YML = "mkdocs.yml"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -950,7 +954,7 @@ D_PUB_DIST = {
         "__PP_NAME_PRJ_SMALL__": "",
         S_FILE_LICENSE: "",
         S_FILE_README: "",
-        S_DIR_DOCS: "",
+        CNMkDocs.S_DIR_DOCS: "",
         S_FILE_TOML: "",
     },
 }
@@ -970,7 +974,7 @@ D_PUB_BL = {
         "**/.venv*",
         ".VSCodeCounter",
         S_DIR_DIST,
-        S_DIR_DOCS,
+        CNMkDocs.S_DIR_DOCS,
         S_DIR_I18N,
         S_DIR_MISC,
         S_FILE_LICENSE,
@@ -1042,7 +1046,7 @@ D_PUB_I18N = {
 
 # which docs maker to use, based on project type
 D_PUB_DOCS = {
-    S_KEY_DOCS_THEME: "",  # S_DOCS_THEME_RTD, etc.
+    S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
     S_KEY_DOCS_USE_RM: True,
     S_KEY_DOCS_MAKE_API: True,
 }
@@ -1255,7 +1259,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
-def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
+def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
     Do any work after template copy
 
@@ -1301,7 +1305,7 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 if file_reqs.exists():
                     cv.install_reqs(file_reqs)
                 print(S_ACTION_DONE)
-            except Exception:
+            except F.CNRunError:
                 # exit gracefully
                 print(S_ACTION_FAIL)
                 print(S_MSG_NO_INTERNET)
@@ -1360,11 +1364,44 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
             # show info
             print(S_ACTION_DONE)
 
+    # --------------------------------------------------------------------------
+    # docs
+
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
+
+        # print info
+        print(S_ACTION_MAKE_DOCS, end="", flush=True)
+
+        # the command to make or bake docs
+        try:
+
+            dict_docs = dict_pub[S_KEY_PUB_DOCS]
+            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+
+            # make docs
+            mkdocs = CNMkDocs()
+            mkdocs.make_docs(
+                dir_prj,
+                use_rm,
+                use_api,
+                S_FILE_README,
+                S_DIR_API,
+                S_DIR_IMAGES,
+            )
+            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+            print(S_ACTION_DONE)
+        except F.CNRunError as e:
+            # fail gracefully
+            print(S_ACTION_FAIL)
+            print(e.stderr)
+
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg, _pymaker):
+def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     """
     Do any work before fix
 
@@ -1471,7 +1508,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg, _pymaker):
 # ------------------------------------------------------------------------------
 # Do any work after fix
 # ------------------------------------------------------------------------------
-def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg, pymaker):
+def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
     Do any work after fix
 
@@ -1507,8 +1544,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg, pymaker):
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
     # dict_prv have been undunderized
-    dict_bl_glob = dict_pub[S_KEY_PUB_BL]
-    dict_bl = F.fix_globs(dir_prj, dict_bl_glob)
+    dict_bl = dict_pub[S_KEY_PUB_BL]
 
     # just shorten the names
     skip_all = dict_bl[S_KEY_SKIP_ALL]
@@ -1763,36 +1799,11 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg, pymaker):
     # print done
     print(S_ACTION_DONE)
 
-    # --------------------------------------------------------------------------
-    # docs
-
-    # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-
-        # print info
-        print(S_ACTION_MAKE_DOCS, end="", flush=True)
-
-        # the command to make or bake docs
-        try:
-            if pymaker:
-                mkdocs.make_docs(
-                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
-                )
-                dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-            else:
-                mkdocs.bake_docs(
-                    dir_prj, dict_prv, dict_pub, P_DIR_PP, P_DIR_PP_VENV
-                )
-            print(S_ACTION_DONE)
-        except Exception as e:
-            # fail gracefully
-            print(S_ACTION_FAIL)
-            # print(e.stderr)
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
-def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
+def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
     Do any work before making dist
 
@@ -1831,7 +1842,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
             try:
                 cv.freeze(file_reqs)
                 print(S_ACTION_DONE)
-            except Exception as e:
+            except F.CNRunError:
                 # exit gracefully
                 print(S_ACTION_FAIL)
                 # print(e.stderr)
@@ -1855,6 +1866,39 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         for item in l_purge:
             if item.exists() and item.is_dir():
                 shutil.rmtree(item)
+
+    # --------------------------------------------------------------------------
+    # docs
+
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
+
+        # print info
+        print(S_ACTION_MAKE_DOCS, end="", flush=True)
+
+        # the command to make or bake docs
+        try:
+
+            dict_docs = dict_pub[S_KEY_PUB_DOCS]
+            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+
+            # bake docs
+            mkdocs = CNMkDocs()
+            mkdocs.bake_docs(
+                P_DIR_PP,
+                P_DIR_PP_VENV,
+                dir_prj,
+                use_rm,
+                use_api,
+                S_DIR_API,
+                S_DIR_IMAGES,
+            )
+            print(S_ACTION_DONE)
+        except F.CNRunError as e:
+            # fail gracefully
+            print(S_ACTION_FAIL)
+            print(e.stderr)
 
 
 # ------------------------------------------------------------------------------
@@ -2023,6 +2067,10 @@ def _fix_meta(path, dict_prv, dict_pub):
     # fix src files
     if PP.is_path_ext_in_list(path, L_EXT_SRC):
         _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+
+    # fix mkdocs.yml
+    if path.name == S_FILE_MKDOCS_YML:
+        _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
 
 
 # ------------------------------------------------------------------------------
@@ -2405,6 +2453,41 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
+
+
+# ------------------------------------------------------------------------------
+# Fix the theme name in mkdocs.yml
+# ------------------------------------------------------------------------------
+def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
+    """
+    Fix the theme name in mkdocs.yml
+
+    Args:
+        path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict
+        dict_pub_meta: Dict of metadata to replace in the file
+
+    Fixes the theme name in mkdocs.yml.
+    """
+
+    dict_pub_docs = dict_pub[S_KEY_PUB_DOCS]
+    theme = dict_pub_docs[S_KEY_DOCS_THEME]
+
+    # default text if we can't open file
+    text = ""
+
+    # open file and get contents
+    with open(path, "r", encoding=S_ENCODING) as a_file:
+        text = a_file.read()
+
+    # replace theme
+    str_pattern = S_THEME_SCH
+    str_rep = S_THEME_REP.format(theme)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # save file
+    with open(path, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(text)
 
 
 # -)

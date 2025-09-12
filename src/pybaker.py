@@ -124,10 +124,6 @@ class PyBaker(PyPlate):
 to build."
     )
 
-    # I18N: ask for new version
-    # NB: param is current version
-    S_ASK_VER = _("Version ({}): ")
-
     # --------------------------------------------------------------------------
     # Instance methods
     # --------------------------------------------------------------------------
@@ -284,14 +280,14 @@ to build."
         path_pyplate = self._dir_prj / C.S_PRJ_PP_DIR
         if not path_pyplate.exists():
             print(C.S_ERR_NOT_PRJ)
-            sys.exit()
+            sys.exit(-1)
 
         # check if data files exist
         path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
         path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
         if not path_prv.exists() or not path_pub.exists():
             print(C.S_ERR_PP_MISSING)
-            sys.exit()
+            sys.exit(-1)
 
         # check if files are valid json
         try:
@@ -309,7 +305,7 @@ to build."
             self._save_project_info()
 
         # if there was a problem
-        except OSError as e: # from load_dicts
+        except OSError as e:  # from load_dicts
             # exit gracefully
             print(C.S_ERR_PP_INVALID)
             print(e)
@@ -335,14 +331,14 @@ to build."
                     loop=True,
                 )
                 if res == C.S_ERR_SEM_VER_N:
-                    sys.exit()
+                    sys.exit(-1)
 
         # not passed, ask question
         else:
 
             # format and ask question
             old_ver = self._dict_pub_meta[C.S_KEY_META_VERSION]
-            ask_ver = self.S_ASK_VER.format(old_ver)
+            ask_ver = C.S_ASK_VER.format(old_ver)
 
             # loop until condition
             while True:

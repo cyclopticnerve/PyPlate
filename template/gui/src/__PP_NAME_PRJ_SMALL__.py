@@ -36,7 +36,7 @@ import sys
 
 # cnlib imports
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnformatter import CNFormatter  #type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -76,6 +76,7 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # Classes
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
@@ -286,7 +287,7 @@ class __PP_NAME_PRJ_PASCAL__:
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             parser.print_help()
             print()
-            sys.exit()
+            sys.exit(-1)
 
         # set props from args
         self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
@@ -431,10 +432,10 @@ class __PP_NAME_PRJ_PASCAL__:
             # run uninstall and exit
             cmd = str(path_uninst)
             subprocess.run(cmd, shell=True, check=True)
-            sys.exit()
+            sys.exit(-1)
         else:
             print(self.S_ERR_NO_UNINST)
-            sys.exit()
+            sys.exit(-1)
 
 
 # ------------------------------------------------------------------------------

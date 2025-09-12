@@ -52,7 +52,6 @@
         "requirements.txt": "assets/install"
     },
     "PUB_DOCS": {
-        "DOCS_TOOL": "mkdocs",
         "DOCS_THEME": "",
         "DOCS_USE_RM": false,
         "DOCS_MAKE_API": true

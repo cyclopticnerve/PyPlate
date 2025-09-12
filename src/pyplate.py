@@ -301,7 +301,6 @@ Python from a template"
             self._dict_prv,
             self._dict_pub,
             self._dict_dbg,
-            self._is_pm,
         )
 
         # save modified dicts/fix dunders in public/reload sub-dicts
@@ -414,7 +413,6 @@ Python from a template"
             self._dict_prv,
             self._dict_pub,
             self._dict_dbg,
-            self._is_pm,
         )
 
         # save modified dicts/fix dunders in public/reload sub-dicts
@@ -444,7 +442,7 @@ Python from a template"
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             self._parser.print_help()
-            sys.exit()
+            sys.exit(-1)
 
         # no -h, print epilog
         print(self.S_EPILOG)
@@ -989,6 +987,7 @@ Python from a template"
         joint = "\n".join(new_file)
         with open(dst, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(joint)
+
 
 # ------------------------------------------------------------------------------
 # Public functions

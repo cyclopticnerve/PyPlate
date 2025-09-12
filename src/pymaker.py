@@ -193,7 +193,7 @@ a project."
         # do not run pymaker in pyplate dir
         if self._dir_prj.is_relative_to(self.P_DIR_PP):
             print(C.S_ERR_PRJ_DIR_IS_PP)
-            sys.exit()
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # Get project info

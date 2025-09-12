@@ -364,7 +364,7 @@ class CNUninstall:
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             self._parser.print_help()
-            sys.exit()
+            sys.exit(-1)
 
         # no -h, print epilog
         print(self.S_EPILOG)
@@ -472,7 +472,13 @@ class CNUninstall:
     # Create a dialog-like question and return the result
     # --------------------------------------------------------------------------
     def _dialog(
-        self, message, buttons, default="", loop=False, btn_sep="/", msg_fmt="{} [{}]: "
+        self,
+        message,
+        buttons,
+        default="",
+        loop=False,
+        btn_sep="/",
+        msg_fmt="{} [{}]: ",
     ):
         """
         Create a dialog-like question and return the result
@@ -538,6 +544,7 @@ class CNUninstall:
             # no loop, return blank
             if not loop:
                 return ""
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

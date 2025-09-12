@@ -64,6 +64,7 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # Classes
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
@@ -300,7 +301,7 @@ class __PP_NAME_PRJ_PASCAL__:
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             parser.print_help()
             print()
-            sys.exit()
+            sys.exit(-1)
 
         # set props from args
         self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
@@ -435,7 +436,9 @@ class __PP_NAME_PRJ_PASCAL__:
         """
 
         # find uninstall file
-        path_uninst = Path.home() / ".local/share/__PP_NAME_PRJ_SMALL__/uninstall.py"
+        path_uninst = (
+            Path.home() / ".local/share/__PP_NAME_PRJ_SMALL__/uninstall.py"
+        )
 
         # if path exists
         if path_uninst.exists():
@@ -443,10 +446,10 @@ class __PP_NAME_PRJ_PASCAL__:
             # run uninstall and exit
             cmd = str(path_uninst)
             subprocess.run(cmd, shell=True, check=True)
-            sys.exit()
+            sys.exit(-1)
         else:
             print(self.S_ERR_NO_UNINST)
-            sys.exit()
+            sys.exit(-1)
 
 
 # ------------------------------------------------------------------------------

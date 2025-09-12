@@ -21,42 +21,17 @@ As much code/settings/constants as can be are reused from conf.py.
 # ------------------------------------------------------------------------------
 
 # system imports
-import gettext
-import locale
 from pathlib import Path
-import re
 import shutil
 
 # local imports
 # pylint: disable=no-name-in-module
 # pylint: disable=wrong-import-order
-from . import conf
+from ..conf import conf
 from cnlib import cnfunctions as F  # type: ignore
 
 # pylint: enable=no-name-in-module
 # pylint: enable=wrong-import-order
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
-
-# path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -75,7 +50,7 @@ S_EXT_IN = ".py"
 S_EXT_OUT = ".md"
 
 # more out dirs
-S_DIR_API = "docs/API"
+S_DIR_DOCS = "docs"
 
 # default to include mkdocstrings content in .md file
 # NB: format params are file name and formatted pkg name, done in make_docs
@@ -84,29 +59,11 @@ S_DEF_FILE = "# {}\n::: {}"
 # config file name (will be made abs to prj dir)
 S_YML_NAME = "mkdocs.yml"
 
-# config file content
-# NB: format params are prj dir name (same as __PP_NAME_PRJ_BIG__),
-# D_PUB_DOCS[S_KEY_DOCS_THEME]
-S_YML_TEXT = (
-    "site_name: {}\n"
-    "theme: {}\n"
-    "plugins:\n"
-    "- search\n"
-    "- mkdocstrings\n"
-)
-
 # readme icon extension
 S_IMG_EXT = ".png"
 
 # name of home page file (DO NOT CHANGE!!!)
 S_INDEX_NAME = "index.md"
-# I18N: name of home link in nav
-S_HOME_NAME = _("Home")
-
-# regex for theme
-R_YAML_THEME_FIND = r"(theme:)(.*)"
-# NB: format param is theme name or blank
-R_YAML_THEME_REP = r"\g<1> {}"
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -137,32 +94,16 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     # nuke/remake docs dir
 
     # find docs dir
-    dir_docs_out = dir_prj / conf.S_DIR_DOCS
-    if dir_docs_out.exists():
+    dir_docs = dir_prj / S_DIR_DOCS
+    if dir_docs.exists():
 
         # delete and recreate dir
-        shutil.rmtree(dir_docs_out)
+        shutil.rmtree(dir_docs)
 
     # remake either way
-    dir_docs_out.mkdir(parents=True)
+    dir_docs.mkdir(parents=True)
 
-    # --------------------------------------------------------------------------
-    # make yaml
-
-    # get theme from dict_pub
     dict_docs = dict_pub[conf.S_KEY_PUB_DOCS]
-    theme = dict_docs.get(conf.S_KEY_DOCS_THEME, "")
-
-    # path to file
-    yaml_file = dir_prj / S_YML_NAME
-
-    # create a new yaml with default text
-    prj_name = dict_prv[conf.S_KEY_PRV_PRJ]["__PP_NAME_PRJ__"]
-    text = S_YML_TEXT.format(prj_name, theme)
-
-    # write file
-    with open(yaml_file, "w", encoding=conf.S_ENCODING) as a_file:
-        a_file.write(text)
 
     # --------------------------------------------------------------------------
     # make index
@@ -173,12 +114,10 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
         # make the initial index file
         _make_index(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv)
 
-        # set pb to False
-        dict_docs[conf.S_KEY_DOCS_USE_RM] = False
     else:
 
         # create empty file
-        index_file = dir_docs_out / S_INDEX_NAME
+        index_file = dir_docs / S_INDEX_NAME
         with open(index_file, "w", encoding=conf.S_ENCODING) as a_file:
             a_file.write("")
 
@@ -211,7 +150,7 @@ def make_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
 # ------------------------------------------------------------------------------
 def bake_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     """
-    Make docs using mkdocs
+    Bake docs using mkdocs
 
     Args:
         dir_prj: The root of the new project
@@ -226,29 +165,7 @@ def bake_docs(dir_prj, dict_prv, dict_pub, p_dir_pp, p_dir_pp_venv):
     Make the documents using the specified parameters.
     """
 
-    # --------------------------------------------------------------------------
-    # fix yaml
-
-    # get theme from dict_pub
     dict_docs = dict_pub[conf.S_KEY_PUB_DOCS]
-    theme = dict_docs.get(conf.S_KEY_DOCS_THEME, "")
-
-    # path to file
-    yaml_file = dir_prj / S_YML_NAME
-
-    # read input file
-    text = ""
-    with open(yaml_file, "r", encoding=conf.S_ENCODING) as a_file:
-        text = a_file.read()
-
-    # replace theme name
-    find = R_YAML_THEME_FIND
-    repl = R_YAML_THEME_REP.format(theme)
-    text = re.sub(find, repl, text)
-
-    # write file
-    with open(yaml_file, "w", encoding=conf.S_ENCODING) as a_file:
-        a_file.write(text)
 
     # --------------------------------------------------------------------------
     # make index
@@ -305,7 +222,7 @@ def _make_index(dir_prj, dict_prv, _dict_pub, _p_dir_pp, _p_dir_pp_venv):
     """
 
     # get the out dir
-    dir_docs_out = dir_prj / conf.S_DIR_DOCS
+    dir_docs_out = dir_prj / S_DIR_DOCS
 
     # --------------------------------------------------------------------------
     # make home page
@@ -336,11 +253,11 @@ def _make_index(dir_prj, dict_prv, _dict_pub, _p_dir_pp, _p_dir_pp_venv):
 
 
 # ------------------------------------------------------------------------------
-# Make the home file (index.md)
+# Make the api files
 # ------------------------------------------------------------------------------
 def _make_api(dir_prj, _dict_prv, dict_pub, _p_dir_pp, _p_dir_pp_venv):
     """
-    Make the home file (index.md)
+    Make the api files
 
     Args:
         dir_prj: The root of the new project
@@ -356,8 +273,7 @@ def _make_api(dir_prj, _dict_prv, dict_pub, _p_dir_pp, _p_dir_pp_venv):
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
     # dict_prv have been undunderized
-    dict_bl_glob = dict_pub[conf.S_KEY_PUB_BL]
-    dict_bl = F.fix_globs(dir_prj, dict_bl_glob)
+    dict_bl = dict_pub[conf.S_KEY_PUB_BL]
 
     # just shorten the names
     skip_all = dict_bl[conf.S_KEY_SKIP_ALL]
@@ -398,7 +314,7 @@ def _make_api(dir_prj, _dict_prv, dict_pub, _p_dir_pp, _p_dir_pp_venv):
     # make structure
 
     # nuke / remake the api folder
-    dir_docs_api = dir_prj / S_DIR_API
+    dir_docs_api = dir_prj / S_DIR_DOCS / conf.S_DIR_API
     if dir_docs_api.exists():
 
         # delete and recreate dir

@@ -182,11 +182,13 @@ class CNInstall:
     # I18N: answer no
     S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
-    S_ASK_VER_SAME = _("The current version of this program is already \
+    S_ASK_VER_SAME = _(
+        "The current version of this program is already \
     installed.\nDo you want to overwrite?"
     )
     # I18N: ask to overwrite newer version
-    S_ASK_VER_OLDER = _("A newer version of this program is currently \
+    S_ASK_VER_OLDER = _(
+        "A newer version of this program is currently \
     installed.\nDo you want to overwrite?"
     )
 
@@ -500,7 +502,7 @@ class CNInstall:
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             self._parser.print_help()
-            sys.exit()
+            sys.exit(-1)
 
         # no -h, print epilog
         print(self.S_EPILOG)
@@ -548,7 +550,7 @@ class CNInstall:
                 # user hit enter or typed anything else except "y"
                 if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
-                    sys.exit()
+                    sys.exit(-1)
 
             # newer version is installed
             elif res == self.S_VER_OLDER:
@@ -563,7 +565,7 @@ class CNInstall:
                 # user hit enter or typed anything else except "y"
                 if str_ask == self.S_ASK_NO:
                     print(self.S_MSG_ABORT)
-                    sys.exit()
+                    sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -994,6 +996,7 @@ class CNInstall:
 
         # error in one or both versions
         return self.S_VER_ERROR
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
