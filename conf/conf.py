@@ -1788,11 +1788,11 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
-
-        print(S_ACTION_EDIT, end="", flush=True)
-
         # if it is the right type (package)
         if prj_type in L_EDIT_VENV:
+
+            print(S_ACTION_EDIT, end="", flush=True)
+
             try:
                 dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
                 F.run(
@@ -1871,7 +1871,7 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         try:
             cv.freeze(file_reqs)
             print(S_ACTION_DONE)
-        except F.CNRunError:
+        except F.CNRunError:# as e:
             # exit gracefully
             print(S_ACTION_FAIL)
             # print(e.stderr)
@@ -2512,7 +2512,7 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
     # replace theme
     str_pattern = S_THEME_SCH
     str_rep = S_THEME_REP.format(theme)
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+    text = re.sub(str_pattern, str_rep, text)
 
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:

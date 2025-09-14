@@ -13,7 +13,8 @@
             "requirements.txt",
             "**/__pycache__",
             "site",
-            "template"
+            "template",
+            "pyplate"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",

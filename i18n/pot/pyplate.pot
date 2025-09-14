@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pyplate 0.0.5\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-08-14 15:57-0400\n"
+"POT-Creation-Date: 2025-09-14 10:55-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,6 +47,10 @@ msgstr ""
 
 #. I18N: ask prj name if running pybaker in IDE
 msgid "Project name: (relative to {}): "
+msgstr ""
+
+#. I18N: ask for new version
+msgid "Version ({}): "
 msgstr ""
 
 #. I18N: Type must be one of {}
@@ -93,12 +97,10 @@ msgstr ""
 
 msgid ""
 "Warning: version number does not match S_SEM_VER_VALID\n"
-"See https://semver.org/\n"
-"Do you wish to continue?"
+"See https://semver.org/"
 msgstr ""
 
 #. I18N: continue with bad sem ver
-#. I18N: answer yes
 msgid "y"
 msgstr ""
 
@@ -123,6 +125,10 @@ msgstr ""
 msgid "Create the file {}"
 msgstr ""
 
+#. I18N: name of home folder in docs
+msgid "Home"
+msgstr ""
+
 msgid ""
 "WARNING! YOU ARE IN DEBUG MODE!\n"
 "IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
@@ -133,7 +139,7 @@ msgid "Make sure you are connected to the internet"
 msgstr ""
 
 #. I18N: Copy template files
-msgid "Copy template files... "
+msgid "Copying template files... "
 msgstr ""
 
 #. I18N fix readme
@@ -148,193 +154,68 @@ msgstr ""
 msgid "Fixing po files... "
 msgstr ""
 
-#. I18N: Do before fix
-msgid "Do before fix... "
-msgstr ""
-
 #. I18N: Do fix
-msgid "Do fix... "
-msgstr ""
-
-#. I18N: Do after fix
-msgid "Do after fix... "
+msgid "Fixing dunders... "
 msgstr ""
 
 #. I18N: Make git folder
-msgid "Make git folder... "
+msgid "Making git folder... "
 msgstr ""
 
 #. I18N: Make venv folder
-msgid "Make venv folder... "
+msgid "Making venv folder... "
 msgstr ""
 
 #. I18N: freeze venv folder
 msgid "Freezing venv... "
 msgstr ""
 
-#. I18N: Install libs in venv
-msgid "Install libs in venv... "
-msgstr ""
-
 #. I18N: Make i18n folder
-msgid "Make i18n folder... "
+msgid "Making i18n folder... "
 msgstr ""
 
 #. I18N: Make docs folder
-msgid "Make docs folder... "
+msgid "Making docs folder... "
 msgstr ""
 
 #. I18N: Deploy docs folder
-msgid "Bake docs folder... "
+msgid "Baking docs folder... "
 msgstr ""
 
 #. I18N: Make tree file
-msgid "Make tree file... "
-msgstr ""
-
-#. I18N: Install package in venv
-msgid "Install package in venv... "
+msgid "Making tree file... "
 msgstr ""
 
 #. I18N: Make dist folder
-msgid "Copy dist files... "
+msgid "Copying dist files... "
 msgstr ""
 
 #. I18N: Make install file
-msgid "Make install/uninstall files... "
+msgid "Making install/uninstall files... "
+msgstr ""
+
+#. I18N: install package in own venv
+msgid "Installing package... "
 msgstr ""
 
 #. I18N: purge non-essential files
-msgid "Purge non-essential files... "
+msgid "Purging non-essential files... "
 msgstr ""
 
 #. I18N: compress files
-msgid "Compress files... "
+msgid "Compressing files... "
 msgstr ""
 
 #. I18N: remove dist
-msgid "Remove dist source... "
+msgid "Removing dist source... "
 msgstr ""
 
 #. I18N: Done
-#. I18N: done with step
 msgid "Done"
 msgstr ""
 
 #. I18N: Failed
 msgid "Failed"
-msgstr ""
-
-#. I18N: name of home link in nav
-msgid "Home"
-msgstr ""
-
-msgid ""
-"MkDocs failed to deploy.\n"
-" Make sure you have published your repo and run 'pybaker' from your project "
-"directory to publish your docs using MkDocs."
-msgstr ""
-
-#. I18N help string for debug cmd line option
-msgid "enable dry run mode"
-msgstr ""
-
-#. I18N: help option help
-msgid "show this help message and exit"
-msgstr ""
-
-#. I18N if using argparse, add help at end of about
-msgid "Use -h for help"
-msgstr ""
-
-#. I18N: install the program
-msgid "Installing {} Version {}"
-msgstr ""
-
-#. I18N: done installing
-msgid "{} installed"
-msgstr ""
-
-#. I18N: step failed
-msgid "Fail"
-msgstr ""
-
-#. I18N: show the copy step
-msgid "Copying files... "
-msgstr ""
-
-#. I18N: show the venv step
-msgid "Making venv folder... "
-msgstr ""
-
-#. I18N: show the reqs step
-msgid "Installing requirements... "
-msgstr ""
-
-#. I18N: show desktop step
-msgid "Fixing .desktop file... "
-msgstr ""
-
-#. I18N: install aborted
-msgid "Installation aborted"
-msgstr ""
-
-#. I18N: answer no
-msgid "n"
-msgstr ""
-
-#. I18N: ask to overwrite same version
-msgid ""
-"The current version of this program is already installed.\n"
-"Do you want to overwrite?"
-msgstr ""
-
-#. I18N: ask to overwrite newer version
-msgid ""
-"A newer version of this program is currently installed.\n"
-"Do you want to overwrite?"
-msgstr ""
-
-#. I18N: config file not found
-msgid "File {} not found"
-msgstr ""
-
-#. I18N: config file is not valid json
-msgid "File {} is not a JSON file"
-msgstr ""
-
-#. I18N: version numbers invalid
-msgid "One or both version numbers are invalid"
-msgstr ""
-
-#. I18N: src path invalid
-msgid "Source path can not be {}"
-msgstr ""
-
-#. I18N: dst path invalid
-msgid "Destination path can not be {}"
-msgstr ""
-
-#. I18N: uninstall the program
-msgid "Uninstalling {}"
-msgstr ""
-
-#. I18N: done uninstalling
-msgid "{} uninstalled"
-msgstr ""
-
-#. I18N: show the copy step
-msgid "Deleting files... "
-msgstr ""
-
-#. I18N: uninstall aborted
-msgid "Uninstallation aborted"
-msgstr ""
-
-#. I18N: ask to uninstall
-msgid ""
-"This will uninstall {}.\n"
-"Do you want to continue?"
 msgstr ""
 
 #. I18N help string for ide cmd line option
@@ -353,14 +234,17 @@ msgid ""
 "Run this program from the parent directory of the project you want to build."
 msgstr ""
 
-#. I18N: ask for new version
-#. NB: param is current version
-msgid "Version ({}): "
+msgid "Run this program from the directory where you want to create a project."
 msgstr ""
 
-msgid "Run this program from the directory where you want to create a project."
+#. I18N: help option help
+msgid "show this help message and exit"
 msgstr ""
 
 #. I18N help string for debug cmd line option
 msgid "enable debugging mode"
+msgstr ""
+
+#. I18N if using argparse, add help at end of about
+msgid "Use -h for help"
 msgstr ""

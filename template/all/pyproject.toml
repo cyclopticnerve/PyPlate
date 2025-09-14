@@ -12,8 +12,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "__PP_NAME_PRJ_BIG__"
-version = "__PP_VER_MMR__"
-description = "__PP_SHORT_DESC__"
+version = "0.0.5"
+description = "A program for creating and building CLI/GUI/Packages in Python from a template"
 authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
 readme = "__PP_README_FILE__"
 license = { file = "__PP_LICENSE_FILE__" }
@@ -23,14 +23,11 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["__PP_KW_STR__"]
+keywords = ["python", "cli", "template", "app", "package", "gui", "module", "gtk3"]
 dependencies = []
 requires-python = ">=3.10"
 
 [project.urls]
 homepage = "__PP_URL__/__PP_NAME_PRJ_BIG__"
-
-[tool.setuptools]
-packages = ["__PP_NAME_PRJ_SMALL__"]
 
 # -)

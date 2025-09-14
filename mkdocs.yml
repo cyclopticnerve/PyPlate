@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 
 site_name: PyPlate
-theme:
+theme: 
 plugins:
 - search
 - mkdocstrings

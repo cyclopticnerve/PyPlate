@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 
 site_name: __PP_NAME_PRJ__
-theme:
+theme: 
 plugins:
 - search
 - mkdocstrings

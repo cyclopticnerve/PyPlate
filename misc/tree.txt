@@ -1,14 +1,14 @@
 [] PyPlate/
    ├─ [] .vscode/
    │     ├─ [] launch.json
+   │     ├─ [] settings.json
    │     └─ [] tasks.json
    ├─ [] bin/
    │     ├─ [] pybaker.py
+   │     ├─ [] pybaker-dev.py
    │     └─ [] pymaker.py
    ├─ [] conf/
-   │     ├─ [] conf.py
-   │     ├─ [] mkdocs.py
-   │     └─ [] pdoc.py
+   │     └─ [] conf.py
    ├─ [] dist/
    │     └─ [] pyplate-0.0.3.tar.gz
    ├─ [] docs/
@@ -28,6 +28,7 @@
    │     │           ├─ [] pymaker.md
    │     │           └─ [] pyplate.md
    │     ├─ [] img/
+   │     │     ├─ [] favicon.ico
    │     │     └─ [] pyplate.png
    │     └─ [] index.md
    ├─ [] i18n/
@@ -43,11 +44,6 @@
    │           └─ [] pyplate.pot
    ├─ [] img/
    │     └─ [] pyplate.png
-   ├─ [] install/
-   │     ├─ [] install.json
-   │     ├─ [] install.py
-   │     ├─ [] uninstall.json
-   │     └─ [] uninstall.py
    ├─ [] misc/
    │     ├─ [] checklists/
    │     │     ├─ [] checklist.html
@@ -62,6 +58,7 @@
    │     │     └─ [] window.py
    │     ├─ [] how_to/
    │     │     └─ [] i18n_tips.txt
+   │     ├─ [] mkdocs.py
    │     ├─ [] testing.txt
    │     └─ [] tree.txt
    ├─ [] pyplate/
@@ -133,12 +130,18 @@
    │     ├─ [] sitemap.xml
    │     └─ [] sitemap.xml.gz
    ├─ [] src/
+   │     ├─ [] PyPlate.egg-info/
+   │     │     ├─ [] dependency_links.txt
+   │     │     ├─ [] PKG-INFO
+   │     │     ├─ [] SOURCES.txt
+   │     │     └─ [] top_level.txt
    │     ├─ [] pybaker.py
    │     ├─ [] pymaker.py
    │     └─ [] pyplate.py
    ├─ [] template/
    │     ├─ [] all/
    │     │     ├─ [] .vscode/
+   │     │     │     ├─ [] settings.json
    │     │     │     └─ [] tasks.json
    │     │     ├─ [] bin/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
@@ -147,7 +150,8 @@
    │     │     ├─ [] dist/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] docs/
-   │     │     │     └─ [] ABOUT
+   │     │     │     └─ [] img/
+   │     │     │           └─ [] favicon.ico
    │     │     ├─ [] i18n/
    │     │     │     ├─ [] locale/
    │     │     │     │     └─ [] en/
@@ -165,9 +169,6 @@
    │     │     │           ├─ [] checklist.html
    │     │     │           ├─ [] checklist.txt
    │     │     │           └─ [] style.txt
-   │     │     ├─ [] pdoc3/
-   │     │     │     ├─ [] head.mako
-   │     │     │     └─ [] logo.mako
    │     │     ├─ [] pyplate/
    │     │     │     └─ [] private/
    │     │     │           └─ [] ABOUT
@@ -179,6 +180,7 @@
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] .gitignore
    │     │     ├─ [] LICENSE.txt
+   │     │     ├─ [] mkdocs.yml
    │     │     ├─ [] pyproject.toml
    │     │     ├─ [] README.md
    │     │     └─ [] requirements.txt
@@ -252,5 +254,6 @@
    ├─ [] LICENSE.txt
    ├─ [] mkdocs.yml
    ├─ [] pyproject.toml
+   ├─ [] pyvenv.cfg
    ├─ [] README.md
    └─ [] requirements.txt

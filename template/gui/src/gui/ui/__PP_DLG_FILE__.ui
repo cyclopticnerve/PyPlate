@@ -8,8 +8,8 @@
     <property name="icon">__PP_IMG_DASH__</property>
     <property name="type-hint">dialog</property>
     <property name="program-name">__PP_NAME_PRJ__</property>
-    <property name="version">version</property>
-    <property name="comments" translatable="yes" context="comment for program description translation">Short description</property>
+    <property name="version">0.0.5</property>
+    <property name="comments" translatable="yes" context="comment for program description translation">A program for creating and building CLI/GUI/Packages in Python from a template</property>
     <property name="website">https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__</property>
     <property name="website-label" translatable="yes" context="Github repository translation">GitHub repository</property>
     <property name="license" context="license for program">__PP_LICENSE_NAME__

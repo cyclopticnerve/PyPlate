@@ -20,8 +20,6 @@ names in the resulting files.
 Run pymaker -h for more options.
 """
 
-# FIXME: setup dget, dprint
-
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------
@@ -103,8 +101,7 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in \
-Python from a template"
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string
     S_PP_VERSION = "0.0.5"

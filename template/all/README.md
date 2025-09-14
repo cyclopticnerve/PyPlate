@@ -13,11 +13,11 @@
 __PP_RM_LICENSE__
 
 <!-- __RM_VERSION__ -->
-__PP_VER_DISP__
+Version 0.0.5
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SHORT_DESC__ -->
-__PP_SHORT_DESC__
+A program for creating and building CLI/GUI/Packages in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -34,7 +34,7 @@ __PP_SHORT_DESC__
 
 ## Requirements
 <!-- __RM_DEPS__ -->
-__PP_PY_DEPS__
+[Python 3.10+](https://python.org)
 <!-- __RM_DEPS__ -->
 
 ## Downloading
