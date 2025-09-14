@@ -36,7 +36,7 @@ import shutil
 import sys
 
 # local imports
-from cnlib import cnfunctions as F  # type: ignore
+import cnlib.cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # ------------------------------------------------------------------------------
