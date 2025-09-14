@@ -58,7 +58,7 @@ import src.pyplate as PP
 P_DIR_PP = Path(__file__).parents[1].resolve()
 # NB: these dirs are "blessed". if you fuck with them, bad juju will happen.
 # you have been warned.
-P_DIR_PP_VENV = P_DIR_PP / ".venv"
+P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -202,47 +202,41 @@ S_MSG_NO_INTERNET = _("Make sure you are connected to the internet")
 # output msg for steps
 
 # I18N: Copy template files
-S_ACTION_COPY = _("Copy template files... ")
+S_ACTION_COPY = _("Copying template files... ")
 # I18N fix readme
 S_ACTION_README = _("Fixing README... ")
 # I18N: fix other files
 S_ACTION_META = _("Fixing metadata... ")
 # I18N: fix other files
 S_ACTION_PO = _("Fixing po files... ")
-# I18N: Do before fix
-S_ACTION_BEFORE = _("Do before fix... ")
 # I18N: Do fix
-S_ACTION_FIX = _("Do fix... ")
-# I18N: Do after fix
-S_ACTION_AFTER = _("Do after fix... ")
+S_ACTION_FIX = _("Fixing dunders... ")
 # I18N: Make git folder
-S_ACTION_GIT = _("Make git folder... ")
+S_ACTION_GIT = _("Making git folder... ")
 # I18N: Make venv folder
-S_ACTION_VENV = _("Make venv folder... ")
+S_ACTION_VENV = _("Making venv folder... ")
 # I18N: freeze venv folder
 S_ACTION_FREEZE = _("Freezing venv... ")
-# I18N: Install libs in venv
-S_ACTION_LIB = _("Install libs in venv... ")
 # I18N: Make i18n folder
-S_ACTION_I18N = _("Make i18n folder... ")
+S_ACTION_I18N = _("Making i18n folder... ")
 # I18N: Make docs folder
-S_ACTION_MAKE_DOCS = _("Make docs folder... ")
+S_ACTION_MAKE_DOCS = _("Making docs folder... ")
 # I18N: Deploy docs folder
-S_ACTION_BAKE_DOCS = _("Bake docs folder... ")
+S_ACTION_BAKE_DOCS = _("Baking docs folder... ")
 # I18N: Make tree file
-S_ACTION_TREE = _("Make tree file... ")
-# I18N: Install package in venv
-S_ACTION_INST_PKG = _("Install package in venv... ")
+S_ACTION_TREE = _("Making tree file... ")
 # I18N: Make dist folder
-S_ACTION_DIST = _("Copy dist files... ")
+S_ACTION_DIST = _("Copying dist files... ")
 # I18N: Make install file
-S_ACTION_INST = _("Make install/uninstall files... ")
+S_ACTION_INST = _("Making install/uninstall files... ")
+# I18N: install package in own venv
+S_ACTION_EDIT = _("Installing package... ")
 # I18N: purge non-essential files
-S_ACTION_PURGE = _("Purge non-essential files... ")
+S_ACTION_PURGE = _("Purging non-essential files... ")
 # I18N: compress files
-S_ACTION_COMPRESS = _("Compress files... ")
+S_ACTION_COMPRESS = _("Compressing files... ")
 # I18N: remove dist
-S_ACTION_REM_DIST = _("Remove dist source... ")
+S_ACTION_REM_DIST = _("Removing dist source... ")
 # I18N: Done
 S_ACTION_DONE = _("Done")
 # I18N: Failed
@@ -427,6 +421,8 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 S_CMD_GIT_CREATE = "cd {}; git init -q"
 # NB: format params are prj dir and venv name
 S_CMD_VENV_ACTIVATE = "cd {};. {}/bin/activate"
+# NB: format params are prj dir and venv name
+S_CMD_VENV_SELF = "cd {};. {}/bin/activate;python -m pip install -e ."
 
 # ------------------------------------------------------------------------------
 # regex stuff
@@ -592,6 +588,7 @@ L_EXT_HASH = [
     ".toml",
     ".gitignore",
     ".desktop",
+    ".yml",
 ]
 
 # list of file types to use md/html/xml comments (<!-- ... -->)
@@ -616,10 +613,13 @@ L_PURGE_FILES = [
 ]
 
 # which project types have a venv
-L_MAKE_VENV = [
-    "c",
-    "g",
-]
+# L_MAKE_VENV = [
+#     "c",
+#     "g",
+# ]
+
+# install in own venv for testing
+L_EDIT_VENV = ["p"]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -1289,31 +1289,32 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
 
-        # venv only for certain project types
-        if prj_type in L_MAKE_VENV:
+        # # venv only for certain project types
+        # if prj_type in L_MAKE_VENV:
 
-            print(S_ACTION_VENV, end="", flush=True)
+        print(S_ACTION_VENV, end="", flush=True)
 
-            # get name ov venv folder and reqs file
-            dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-            file_reqs = dir_prj / S_FILE_REQS
+        # get name ov venv folder and reqs file
+        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+        file_reqs = dir_prj / S_FILE_REQS
 
-            # do the thing with the thing
-            cv = CNVenv(dir_prj, dir_venv)
-            try:
-                cv.create()
-                if file_reqs.exists():
-                    cv.install_reqs(file_reqs)
-                print(S_ACTION_DONE)
-            except F.CNRunError:
-                # exit gracefully
-                print(S_ACTION_FAIL)
-                print(S_MSG_NO_INTERNET)
-                # print(e.stderr)
-                sys.exit(-1)
-        else:
-            # no venv, no reqs
-            (Path(dir_prj) / S_FILE_REQS).unlink()
+        # do the thing with the thing
+        cv = CNVenv(dir_prj, dir_venv)
+        try:
+            cv.create()
+            if file_reqs.exists():
+                cv.install_reqs(file_reqs)
+            print(S_ACTION_DONE)
+        except F.CNRunError:
+            # exit gracefully
+            print(S_ACTION_FAIL)
+            print(S_MSG_NO_INTERNET)
+            # print(e.stderr)
+            sys.exit(-1)
+
+        # else:
+        #     # no venv, no reqs
+        #     (Path(dir_prj) / S_FILE_REQS).unlink()
 
     # --------------------------------------------------------------------------
     # git
@@ -1779,10 +1780,38 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             with open(root_file, "w", encoding=S_ENCODING) as a_file:
                 a_file.write(text)
 
+    # print done
+    print(S_ACTION_DONE)
+
+    # --------------------------------------------------------------------------
+    # install package in itself
+
+    # if venv flag is set
+    if dict_dbg[S_KEY_DBG_VENV]:
+
+        print(S_ACTION_EDIT, end="", flush=True)
+
+        # if it is the right type (package)
+        if prj_type in L_EDIT_VENV:
+            try:
+                dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+                F.run(
+                    S_CMD_VENV_SELF.format(dir_prj, dir_venv),
+                    shell=True,
+                )
+                print(S_ACTION_DONE)
+            except F.CNRunError:  # as e:
+                print(S_ACTION_FAIL)
+                # print(e.stderr)
+                # sys.exit(-1)
+
     # --------------------------------------------------------------------------
     # purge package dirs
 
     if prj_type in D_PURGE_DIRS:
+
+        print(S_ACTION_PURGE, end="", flush=True)
+
         l_purge = D_PURGE_DIRS[prj_type]
         l_purge = [
             (
@@ -1796,8 +1825,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             if item.exists():
                 shutil.rmtree(item)
 
-    # print done
-    print(S_ACTION_DONE)
+        # print done
+        print(S_ACTION_DONE)
 
 
 # ------------------------------------------------------------------------------
@@ -1827,26 +1856,26 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
 
-        # venv only for certain project types
-        if prj_type in L_MAKE_VENV:
+        # # venv only for certain project types
+        # if prj_type in L_MAKE_VENV:
 
-            # print info
-            print(S_ACTION_FREEZE, end="", flush=True)
+        # print info
+        print(S_ACTION_FREEZE, end="", flush=True)
 
-            # get name ov venv folder and reqs file
-            dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-            file_reqs = dir_prj / S_FILE_REQS
+        # get name ov venv folder and reqs file
+        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+        file_reqs = dir_prj / S_FILE_REQS
 
-            # do the thing with the thing
-            cv = CNVenv(dir_prj, dir_venv)
-            try:
-                cv.freeze(file_reqs)
-                print(S_ACTION_DONE)
-            except F.CNRunError:
-                # exit gracefully
-                print(S_ACTION_FAIL)
-                # print(e.stderr)
-                sys.exit(-1)
+        # do the thing with the thing
+        cv = CNVenv(dir_prj, dir_venv)
+        try:
+            cv.freeze(file_reqs)
+            print(S_ACTION_DONE)
+        except F.CNRunError:
+            # exit gracefully
+            print(S_ACTION_FAIL)
+            # print(e.stderr)
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # purge package dirs
