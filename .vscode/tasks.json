@@ -16,6 +16,18 @@
                 "kind": "build",
                 "isDefault": true
             }
-        }
+        },
+        {
+            "label": "PyMaker",
+            "type": "shell",
+            "command": "pymaker",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build"
+            }
+        },
     ]
 }

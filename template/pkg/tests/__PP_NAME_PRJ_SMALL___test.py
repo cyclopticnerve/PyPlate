@@ -15,8 +15,11 @@ A simple script to test a package from within the project itself
 # Imports
 # ------------------------------------------------------------------------------
 
-# pylint: disable=no-name-in-module
+# local imports
+
+# pylint: disable=import-error
 from __PP_NAME_PRJ_SMALL__ import __PP_NAME_SEC_SMALL__
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

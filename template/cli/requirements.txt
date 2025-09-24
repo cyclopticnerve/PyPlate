@@ -1,3 +1,1 @@
-pycairo==1.27.0
-PyGObject==3.48.2
 cnlib @ git+https://github.com/cyclopticnerve/CNLib@v0.0.4

@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: mkdocs.yml                                            |     ()     |
-# Date    : 09/13/2025                                           |            |
-# Author  : cyclopticnerve                                         |   \____/   |
-# License : WTFPLv2                                    \          /
+# Date    : 09/13/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 site_name: PyPlate

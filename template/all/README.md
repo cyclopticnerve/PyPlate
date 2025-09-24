@@ -13,11 +13,11 @@
 __PP_RM_LICENSE__
 
 <!-- __RM_VERSION__ -->
-Version 0.0.5
+Version 0.0.0
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SHORT_DESC__ -->
-A program for creating and building CLI/GUI/Packages in Python from a template
+Shirt description
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_SCREENSHOT__ -->

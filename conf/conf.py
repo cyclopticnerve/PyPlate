@@ -56,9 +56,6 @@ import src.pyplate as PP
 
 # ABSOLUTE CURRENT PATH OF PyPlate
 P_DIR_PP = Path(__file__).parents[1].resolve()
-# NB: these dirs are "blessed". if you fuck with them, bad juju will happen.
-# you have been warned.
-P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -129,6 +126,13 @@ S_ASK_IDE = _("Project name: (relative to {}): ")
 # NB: param is current version
 # I18N: ask for new version
 S_ASK_VER = _("Version ({}): ")
+
+# placeholder files
+# NB: this should be the same as the ones preexisting in template
+# I18N: the name of the placeholder file
+S_PH_NAME = _("ABOUT")
+# I18N: the text to put in the default placeholder file
+S_PH_TEXT = _("A placeholder file since GitHub does not allow syncing empty folders")
 
 # error strings
 # NB: format param is joined list of project types from L_TYPES
@@ -231,8 +235,10 @@ S_ACTION_DIST = _("Copying dist files... ")
 S_ACTION_INST = _("Making install/uninstall files... ")
 # I18N: install package in own venv
 S_ACTION_EDIT = _("Installing package... ")
-# I18N: purge non-essential files
-S_ACTION_PURGE = _("Purging non-essential files... ")
+# I18N: purge unnecessary files
+S_ACTION_PURGE = _("Purging unnecessary files... ")
+# I18N: Make placeholder files
+S_ACTION_PLACE = _("Making placeholder files... ")
 # I18N: compress files
 S_ACTION_COMPRESS = _("Compressing files... ")
 # I18N: remove dist
@@ -287,6 +293,7 @@ S_KEY_DBG_DIST = "DBG_DIST"
 S_KEY_DOCS_THEME = "DOCS_THEME"
 S_KEY_DOCS_USE_RM = "DOCS_USE_RM"
 S_KEY_DOCS_MAKE_API = "DOCS_MAKE_API"
+S_KEY_DOCS_DIR_API = "DOCS_DIR_API"
 
 # keys for meta dict
 S_KEY_META_SHORT_DESC = "META_SHORT_DESC"
@@ -305,7 +312,6 @@ S_KEY_LEAD = "S_KEY_GRP_LEAD"
 S_KEY_VAL = "S_KEY_GRP_VAL"
 S_KEY_PAD = "S_KEY_GRP_PAD"
 S_KEY_SW_SCH = "S_KEY_SW_SCH"
-S_KEY_SW_PRE = "S_KEY_SW_PRE"
 S_KEY_SW_KEY = "S_KEY_SW_KEY"
 S_KEY_SW_VAL = "S_KEY_SW_VAL"
 S_KEY_SPLIT = "S_KEY_SPLIT"
@@ -610,6 +616,7 @@ L_EXT_HTML = [".html"]
 # files to remove after the project is done
 L_PURGE_FILES = [
     "ABOUT",
+    "__pycache__",
 ]
 
 # which project types have a venv
@@ -971,17 +978,18 @@ D_PUB_BL = {
     # NB: this is mostly to speed up processing by not even looking at them
     S_KEY_SKIP_ALL: [
         ".git",
-        "**/.venv*",
+        ".venv*",
         ".VSCodeCounter",
         S_DIR_DIST,
-        CNMkDocs.S_DIR_DOCS,
+        # CNMkDocs.S_DIR_DOCS,  # NB: DONT CHANGE THIS!!!
         S_DIR_I18N,
         S_DIR_MISC,
+        CNMkDocs.S_DIR_SITE,  # NB: DONT CHANGE THIS!!!
+        S_DIR_TODO,
         S_FILE_LICENSE,
         S_FILE_REQS,
-        S_DIR_TODO,
         "**/__pycache__",
-        "site",
+        "**/*.egg-info",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -989,6 +997,7 @@ D_PUB_BL = {
         "**/*.png",
         "**/*.jpg",
         "**/*.jpeg",
+        "**/*.ico",
     ],
     # skip header, fix text, fix path (0 1 1)
     # NB: not sure what this is useful for, but here it is
@@ -997,7 +1006,7 @@ D_PUB_BL = {
     # NB: mostly used for files that contain dunders that will be replaced
     # later or files we only want to replace headers in
     S_KEY_SKIP_CODE: [
-        ".gitignore",
+        "**/*.gitignore*",
         ".desktop",
     ],
     # fix header, fix text, skip path (1 1 0)
@@ -1049,6 +1058,7 @@ D_PUB_DOCS = {
     S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
     S_KEY_DOCS_USE_RM: True,
     S_KEY_DOCS_MAKE_API: True,
+    S_KEY_DOCS_DIR_API: [S_DIR_SRC, "__PP_NAME_PRJ_SMALL__"],
 }
 
 # dict in project to control post processing
@@ -1071,7 +1081,7 @@ D_DBG_PM = {
     S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: False,
     S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_DOCS: False,
     S_KEY_DBG_INST: False,
     S_KEY_DBG_TREE: False,
     S_KEY_DBG_DIST: False,
@@ -1134,18 +1144,18 @@ D_UNINSTALL = {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
         S_KEY_INST_VER: "__PP_VER_MMR__",
         S_KEY_INST_CONT: [
-            "__PP_USR_INST__",
             "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
+            "__PP_USR_INST__",
         ],
     },
     "g": {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
         S_KEY_INST_VER: "__PP_VER_MMR__",
         S_KEY_INST_CONT: [
-            "__PP_USR_INST__",
             "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
+            "__PP_USR_INST__",
             # extra for gui
-            "__PP_USR_APPS__/__PP_NAME_PRJ_BIG__.desktop",
+            "__PP_USR_APPS__/__PP_FILE_DESK__",
         ],
     },
 }
@@ -1193,6 +1203,15 @@ D_TYPE_RULES = {
     },
 }
 
+D_PLACEHOLDER = {
+}
+
+# D_PUB_DOCS_SRC = {
+#     "c": [S_DIR_SRC],
+#     "g": [S_DIR_SRC],
+#     "p": "__PP_NAME_PRJ_SMALL__"
+# }
+
 # the type of projects that will ask for a second name
 D_NAME_SEC = {
     "p": S_ASK_SEC_P,
@@ -1223,10 +1242,8 @@ D_PURGE_DIRS = {
     "p": [
         S_DIR_BIN,
         S_DIR_CONF,
-        S_DIR_DIST,
         S_DIR_I18N,
         S_DIR_INSTALL,
-        S_DIR_SRC,
     ]
 }
 
@@ -1259,7 +1276,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
-def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work after template copy
 
@@ -1366,37 +1383,27 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             print(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
-    # docs
+    # purge package dirs
 
-    # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
+    if prj_type in D_PURGE_DIRS:
 
-        # print info
-        print(S_ACTION_MAKE_DOCS, end="", flush=True)
+        print(S_ACTION_PURGE, end="", flush=True)
 
-        # the command to make or bake docs
-        try:
-
-            dict_docs = dict_pub[S_KEY_PUB_DOCS]
-            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-
-            # make docs
-            mkdocs = CNMkDocs()
-            mkdocs.make_docs(
-                dir_prj,
-                use_rm,
-                use_api,
-                S_FILE_README,
-                S_DIR_API,
-                S_DIR_IMAGES,
+        l_purge = D_PURGE_DIRS[prj_type]
+        l_purge = [
+            (
+                Path(dir_prj) / item
+                if not Path(item).is_absolute()
+                else Path(item)
             )
-            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-            print(S_ACTION_DONE)
-        except F.CNRunError as e:
-            # fail gracefully
-            print(S_ACTION_FAIL)
-            print(e.stderr)
+            for item in l_purge
+        ]
+        for item in l_purge:
+            if item.exists():
+                shutil.rmtree(item)
+
+        # print done
+        print(S_ACTION_DONE)
 
 
 # ------------------------------------------------------------------------------
@@ -1706,41 +1713,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         print(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
-    # tree
-    # NB: run last so it includes .git and .venv folders
-    # NB: this will wipe out all previous checks (maybe good?)
-
-    # if tree flag is set
-    if dict_dbg[S_KEY_DBG_TREE]:
-
-        # print info
-        print(S_ACTION_TREE, end="", flush=True)
-
-        # get path to tree
-        file_tree = dir_prj / S_TREE_FILE
-
-        # create the file so it includes itself
-        with open(file_tree, "w", encoding=S_ENCODING) as a_file:
-            a_file.write("")
-
-        # create tree object and call
-        tree_obj = CNTree(
-            str(dir_prj),
-            filter_list=dict_pub[S_KEY_PUB_BL][S_KEY_SKIP_TREE],
-            dir_format=S_TREE_DIR_FORMAT,
-            file_format=S_TREE_FILE_FORMAT,
-        )
-        tree_str = tree_obj.main()
-
-        # write to file
-        with open(file_tree, "w", encoding=S_ENCODING) as a_file:
-            a_file.write(tree_str)
-
-        # ----------------------------------------------------------------------
-        # we are done
-        print(S_ACTION_DONE)
-
-    # --------------------------------------------------------------------------
     # fix po files outside blacklist
 
     # print info
@@ -1784,10 +1756,46 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     print(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
+    # tree
+    # NB: run last so it includes .git and .venv folders
+    # NB: this will wipe out all previous checks (maybe good?)
+
+    # if tree flag is set
+    if dict_dbg[S_KEY_DBG_TREE]:
+
+        # print info
+        print(S_ACTION_TREE, end="", flush=True)
+
+        # get path to tree
+        file_tree = dir_prj / S_TREE_FILE
+
+        # create the file so it includes itself
+        with open(file_tree, "w", encoding=S_ENCODING) as a_file:
+            a_file.write("")
+
+        # create tree object and call
+        tree_obj = CNTree(
+            str(dir_prj),
+            filter_list=dict_pub[S_KEY_PUB_BL][S_KEY_SKIP_TREE],
+            dir_format=S_TREE_DIR_FORMAT,
+            file_format=S_TREE_FILE_FORMAT,
+        )
+        tree_str = tree_obj.main()
+
+        # write to file
+        with open(file_tree, "w", encoding=S_ENCODING) as a_file:
+            a_file.write(tree_str)
+
+        # ----------------------------------------------------------------------
+        # we are done
+        print(S_ACTION_DONE)
+
+    # --------------------------------------------------------------------------
     # install package in itself
 
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
+
         # if it is the right type (package)
         if prj_type in L_EDIT_VENV:
 
@@ -1806,28 +1814,58 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 # sys.exit(-1)
 
     # --------------------------------------------------------------------------
-    # purge package dirs
+    # docs
 
-    if prj_type in D_PURGE_DIRS:
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
 
-        print(S_ACTION_PURGE, end="", flush=True)
+        # print info
+        print(S_ACTION_MAKE_DOCS, end="", flush=True)
 
-        l_purge = D_PURGE_DIRS[prj_type]
-        l_purge = [
-            (
-                Path(dir_prj) / item
-                if not Path(item).is_absolute()
-                else Path(item)
+        # the command to make or bake docs
+        try:
+
+            dict_docs = dict_pub[S_KEY_PUB_DOCS]
+            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
+
+            # make docs
+            mkdocs = CNMkDocs()
+            mkdocs.make_docs(
+                dir_prj,
+                use_rm,
+                use_api,
+                lst_api_in,
+                S_FILE_README,
+                S_DIR_API,
+                S_DIR_IMAGES,
             )
-            for item in l_purge
-        ]
-        for item in l_purge:
-            if item.exists():
-                shutil.rmtree(item)
+            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+            print(S_ACTION_DONE)
+        except F.CNRunError as e:
+            # fail gracefully
+            print(S_ACTION_FAIL)
+            print(e.stderr)
 
-        # print done
-        print(S_ACTION_DONE)
+    # --------------------------------------------------------------------------
+    # fill empty dirs with placeholder
 
+    # print info
+    print(S_ACTION_PLACE, end="", flush=True)
+
+    # for all dirs/subdirs
+    for root, root_dirs, root_files in dir_prj.walk():
+
+        # if dir is empty
+        if len(root_dirs) == 0 and len(root_files) == 0:
+
+            # make a dummy file
+            with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
+                a_file.write(S_PH_TEXT)
+
+    # all done
+    print(S_ACTION_DONE)
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1848,7 +1886,7 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
 
     # get project type
-    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    # prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # --------------------------------------------------------------------------
     # venv
@@ -1871,30 +1909,11 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         try:
             cv.freeze(file_reqs)
             print(S_ACTION_DONE)
-        except F.CNRunError:# as e:
+        except F.CNRunError:  # as e:
             # exit gracefully
             print(S_ACTION_FAIL)
             # print(e.stderr)
             sys.exit(-1)
-
-    # --------------------------------------------------------------------------
-    # purge package dirs
-
-    # if project type in dict
-    if prj_type in D_PURGE_DIRS:
-
-        # get list and make items absolute
-        l_purge = D_PURGE_DIRS[prj_type]
-        l_purge = [Path(item) for item in l_purge]
-        l_purge = [
-            dir_prj / item if not item.is_absolute() else item
-            for item in l_purge
-        ]
-
-        # purge dirs
-        for item in l_purge:
-            if item.exists() and item.is_dir():
-                shutil.rmtree(item)
 
     # --------------------------------------------------------------------------
     # docs
@@ -1908,20 +1927,24 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         # the command to make or bake docs
         try:
 
+            # get props from dicts
             dict_docs = dict_pub[S_KEY_PUB_DOCS]
             use_rm = dict_docs[S_KEY_DOCS_USE_RM]
             use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
+            dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
 
             # bake docs
             mkdocs = CNMkDocs()
             mkdocs.bake_docs(
                 P_DIR_PP,
-                P_DIR_PP_VENV,
+                dir_venv,
                 dir_prj,
                 use_rm,
                 use_api,
+                lst_api_in,
+                S_FILE_README,
                 S_DIR_API,
-                S_DIR_IMAGES,
             )
             print(S_ACTION_DONE)
         except F.CNRunError as e:
@@ -1974,7 +1997,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
             shutil.move(file_uninst, dest)
 
     # --------------------------------------------------------------------------
-    # remove all "ABOUT" files
+    # remove all L_PURGE_FILES files
 
     # print info
     print(S_ACTION_PURGE, end="", flush=True)
@@ -1990,7 +2013,10 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
             # if it is in purge list, delete it
             if item.name in L_PURGE_FILES:
-                item.unlink()
+                if item.is_dir():
+                    shutil.rmtree(item)
+                else:
+                    item.unlink()
 
     # print info
     print(S_ACTION_DONE)
@@ -2464,16 +2490,18 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
 
         # ----------------------------------------------------------------------
 
-        # replace version in line
-        ver = dict_prv_prj["__PP_VER_MMR__"]
-        str_sch = S_SRC_VER_SCH
-        str_rep = S_SRC_VER_REP.format(ver)
+        # replace short desc in line
+        str_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
+        str_sch = S_SRC_DESC_SCH
+        str_rep = S_SRC_DESC_REP.format(str_desc)
         line = re.sub(str_sch, str_rep, line, flags=re.M)
 
-        # replace short desc in line
-        desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-        str_sch = S_SRC_DESC_SCH
-        str_rep = S_SRC_DESC_REP.format(desc)
+        # replace version in line
+        str_ver = dict_prv_prj["__PP_VER_DISP__"]
+        # ver = dict_prv_prj["__PP_VER_MMR__"]
+        str_sch = S_SRC_VER_SCH
+        # str_rep = S_SRC_VER_REP.format(ver)
+        str_rep = S_SRC_VER_REP.format(str_ver)
         line = re.sub(str_sch, str_rep, line, flags=re.M)
 
         # replace line in lines

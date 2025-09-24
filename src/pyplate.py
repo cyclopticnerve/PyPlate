@@ -101,7 +101,8 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages \
+in Python from a template"
 
     # version string
     S_PP_VERSION = "0.0.5"
@@ -491,6 +492,7 @@ class PyPlate:
 
             # do the basic replace (file got here after skip_all/skip_contents
             # BUT NOT skip_hdr/skip_code)
+            # print("no rules:", path)
             self._fix_text(path)
             return
 
@@ -1096,7 +1098,7 @@ def is_path_ext_in_list(path, lst):
 
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
-    return path.suffix in l_ext
+    return path.suffix in l_ext or path.name in l_ext
 
 
 # -)

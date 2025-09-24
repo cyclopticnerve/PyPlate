@@ -117,10 +117,10 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
 
     # version string
-    S_PP_VERSION = "0.0.5"
+    S_PP_VERSION = "__PP_VER_DISP__"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"
