@@ -21,10 +21,6 @@ A program for creating and building CLI/GUI/Packages in Python from a template
 Version 0.0.5
 <!-- __RM_VERSION__ -->
 
-<!-- __RM_SCREENSHOT__ -->
-<!-- ![alt-text](img/screenshot.png "screenshot") -->
-<!-- __RM_SCREENSHOT__ -->
-
 ## Table of Contents
 - [Requirements](#requirements)
 - [Downloading](#downloading)

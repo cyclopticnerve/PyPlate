@@ -1,0 +1,14 @@
+{
+    "INST_NAME": "CLI_Test",
+    "INST_VER": "0.0.0",
+    "INST_DESK": false,
+    "INST_CONT": {
+        "bin/cli_test": ".local/bin",
+        "conf": ".local/share/cli_test",
+        "i18n": ".local/share/cli_test",
+        "img": ".local/share/cli_test",
+        "install": ".local/share/cli_test",
+        "src": ".local/share/cli_test",
+        "uninstall.py": ".local/share/cli_test"
+    }
+}

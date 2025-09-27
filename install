@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : CLI_Test                                               /          \
 # Filename: install.py                                            |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 09/23/2025                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
@@ -37,7 +37,7 @@ import sys
 # add assets dir to path
 
 P_DIR_PRJ = Path(__file__).parent.resolve()
-P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
+P_DIR_ASSETS = P_DIR_PRJ / "assets"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -52,8 +52,8 @@ P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
 T_DIR_PRJ = P_DIR_ASSETS
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "cli_test"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -66,15 +66,15 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 
 # get dirs
-P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
-P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
+P_DIR_USR_INST = Path.home() / ".local/share/cli_test"
+P_DIR_VENV = P_DIR_USR_INST / ".venv-cli_test"
 
 # get files
-P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
-P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
-P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
+P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"
+P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
+P_FILE_REQS = P_DIR_ASSETS / "install" / "requirements.txt"
+P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/CLI_Test.desktop"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "img/cli_test.png"
 
 
 # ------------------------------------------------------------------------------
@@ -117,10 +117,10 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
-    S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
+    S_PP_SHORT_DESC = "Short description"
 
     # version string
-    S_PP_VERSION = "__PP_VER_DISP__"
+    S_PP_VERSION = "Version 0.0.0"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"
@@ -139,10 +139,10 @@ class CNInstall:
     # about string (to be set by subclass)
     S_ABOUT = (
         "\n"
-        "__PP_NAME_PRJ_BIG__\n"
+        "CLI_Test\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        "https://github.com/cyclopticnerve/CLI_Test\n"
     )
 
     # I18N if using argparse, add help at end of about
@@ -183,13 +183,13 @@ class CNInstall:
     S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
-        "The current version of this program is already installed.\nDo you \
-want to overwrite?"
+        "The current version of this program is already \
+    installed.\nDo you want to overwrite?"
     )
     # I18N: ask to overwrite newer version
     S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently installed.\nDo you want \
-to overwrite?"
+        "A newer version of this program is currently \
+    installed.\nDo you want to overwrite?"
     )
 
     # errors

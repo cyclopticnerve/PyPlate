@@ -105,7 +105,7 @@ class PyPlate:
 in Python from a template"
 
     # version string
-    S_PP_VERSION = "0.0.5"
+    S_PP_VERSION = "Version 0.0.5"
 
     # pyplate: replace=False
 
