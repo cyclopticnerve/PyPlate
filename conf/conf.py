@@ -30,7 +30,7 @@ import tarfile
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnpot import CNPotPy  # type: ignore
+from cnlib.cnpotpy import CNPotPy  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib.cnmkdocs import CNMkDocs  # type: ignore
@@ -100,6 +100,9 @@ S_IMG_FMT = "{}.png"
 S_EXT_SRC = ".py"
 S_EXT_DESKTOP = ".desktop"
 S_EXT_PO = ".po"
+
+# I18N: name of home folder in docs
+S_DOCS_HOME = _("Home")
 
 # spice up version number
 S_VER_DATE_FMT = "%Y%m%d"
@@ -195,8 +198,13 @@ S_ERR_DESK_CAT = _(
 # I18N: alternate text for screenshot in README.md
 S_ERR_NO_SCREENSHOT = _("Create the file {}")
 
-# I18N: name of home folder in docs
-S_DOCS_HOME = _("Home")
+# error installing reqs
+# I18N: need internet connection to install requirements
+S_MSG_NO_INTERNET = _("Make sure you are connected to the internet")
+
+# error pushing docs
+# I18N: make sure repo exists
+S_ERR_NO_REPO = _("Make sure you have pushed your repo after PyMaker")
 
 # debug-specific strings
 # I18N: warn if running in debug mode
@@ -204,10 +212,6 @@ S_MSG_DEBUG = _(
     "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO \
 OVERWRITE EXISTING PROJECTS!\n"
 )
-
-# error installing reqs
-# I18N: need internet connection to install requirements
-S_MSG_NO_INTERNET = _("Make sure you are connected to the internet")
 
 # ------------------------------------------------------------------------------
 # output msg for steps
@@ -555,7 +559,6 @@ S_APP_ID_FMT = "org.{}.{}"
 
 S_DIST_EXT = ".tar.gz"
 S_DIST_MODE = "w:gz"
-L_DIST_REMOVE_EXT = ["bin/{}.py", "install.py", "uninstall.py"]
 
 # ------------------------------------------------------------------------------
 # readme stuff
@@ -624,6 +627,9 @@ L_PURGE_FILES = [
 
 # install in own venv for testing
 L_EDIT_VENV = ["p"]
+
+# skip placeholder files
+L_PH_SKIP = [".git", ".venv*"]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -784,6 +790,13 @@ L_MAKE_DESK = ["g"]
 
 # prj type(s) for making screenshot in README
 L_SCREENSHOT = ["g"]
+
+# remove exts from bin files
+L_DIST_REMOVE_EXT = [
+    f"{S_DIR_DIST}/*/{S_DIR_ASSETS}/{S_DIR_BIN}/*.py",
+    f"{S_DIR_DIST}/*/{S_FILE_INST_PY}",
+    f"{S_DIR_DIST}/*/{S_DIR_ASSETS}/{S_FILE_UNINST_PY}",
+]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
@@ -1313,19 +1326,14 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         cv = CNVenv(dir_prj, dir_venv)
         try:
             cv.create()
-            if file_reqs.exists():
+            if file_reqs.exists() and file_reqs.stat().st_size > 0:
                 cv.install_reqs(file_reqs)
-            print(S_ACTION_DONE)
+            PP.print_green(S_ACTION_DONE)
         except F.CNRunError:
             # exit gracefully
-            print(S_ACTION_FAIL)
-            print(S_MSG_NO_INTERNET)
-            # print(e.stderr)
+            PP.print_red(S_ACTION_FAIL)
+            PP.print_red(S_MSG_NO_INTERNET)
             sys.exit(-1)
-
-        # else:
-        #     # no venv, no reqs
-        #     (Path(dir_prj) / S_FILE_REQS).unlink()
 
     # --------------------------------------------------------------------------
     # git
@@ -1340,11 +1348,10 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         cmd = S_CMD_GIT_CREATE.format(dir_prj)
         try:
             F.run(cmd, shell=True)
-            print(S_ACTION_DONE)
+            PP.print_green(S_ACTION_DONE)
         except F.CNRunError:
             # exit gracefully
-            print(S_ACTION_FAIL)
-            # print(e.stderr)
+            PP.print_red(S_ACTION_FAIL)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -1374,7 +1381,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             F.save_dict(dict_uninst, [path_uninst])
 
             # show info
-            print(S_ACTION_DONE)
+            PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # purge package dirs
@@ -1397,8 +1404,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
                 shutil.rmtree(item)
 
         # print done
-        print(S_ACTION_DONE)
-
+        PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # docs
@@ -1429,11 +1435,12 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
                 S_DIR_IMAGES,
             )
             dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-            print(S_ACTION_DONE)
+            PP.print_green(S_ACTION_DONE)
         except F.CNRunError as e:
             # fail gracefully
-            print(S_ACTION_FAIL)
-            print(e.stderr)
+            PP.print_red(S_ACTION_FAIL)
+            PP.print_red(e.stderr)
+
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -1607,7 +1614,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 _fix_meta(item, dict_prv, dict_pub)
 
     # print done
-    print(S_ACTION_DONE)
+    PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # readme chop section
@@ -1639,7 +1646,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             a_file.write(text)
 
         # show info
-        print(S_ACTION_DONE)
+        PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # i18n
@@ -1683,7 +1690,12 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         )
 
         # make .pot, .po, and .mo files
-        potpy.main()
+        try:
+            potpy.main()
+        except F.CNRunError as _e:
+            # TODO: don't try desktop
+            # TODO: color/err
+            pass
 
         # ----------------------------------------------------------------------
         # do .desktop i18n/version
@@ -1695,10 +1707,11 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             print("\n" + S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out))
         else:
             # do the thing
-            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
-
-        # we are done
-        print(S_ACTION_DONE)
+            try:
+                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+            except F.CNRunError as _e:
+                # TODO: color/err
+                pass
 
     # --------------------------------------------------------------------------
     # fix po files outside blacklist
@@ -1732,9 +1745,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         with open(item, "w", encoding=S_ENCODING) as a_file:
             a_file.write(text)
 
-
     # print done
-    print(S_ACTION_DONE)
+    PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # tree
@@ -1769,7 +1781,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # ----------------------------------------------------------------------
         # we are done
-        print(S_ACTION_DONE)
+        PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # install package in itself
@@ -1788,71 +1800,46 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                     S_CMD_VENV_SELF.format(dir_prj, dir_venv),
                     shell=True,
                 )
-                print(S_ACTION_DONE)
-            except F.CNRunError:  # as e:
-                print(S_ACTION_FAIL)
-                # print(e.stderr)
-                # sys.exit(-1)
-
-    # # --------------------------------------------------------------------------
-    # # docs
-
-    # # if docs flag is set
-    # if dict_dbg[S_KEY_DBG_DOCS]:
-
-    #     # print info
-    #     print(S_ACTION_MAKE_DOCS, end="", flush=True)
-
-    #     # the command to make or bake docs
-    #     try:
-
-    #         dict_docs = dict_pub[S_KEY_PUB_DOCS]
-    #         use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-    #         use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-    #         lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
-
-    #         # make docs
-    #         mkdocs = CNMkDocs()
-    #         mkdocs.make_docs(
-    #             dir_prj,
-    #             use_rm,
-    #             use_api,
-    #             lst_api_in,
-    #             S_FILE_README,
-    #             S_DIR_API,
-    #             S_DIR_IMAGES,
-    #         )
-    #         dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-    #         print(S_ACTION_DONE)
-    #     except F.CNRunError as e:
-    #         # fail gracefully
-    #         print(S_ACTION_FAIL)
-    #         print(e.stderr)
+                PP.print_green(S_ACTION_DONE)
+            except F.CNRunError as e:
+                PP.print_red(S_ACTION_FAIL)
+                PP.print_red(e.stderr)
 
     # --------------------------------------------------------------------------
     # fill empty dirs with placeholder
 
-    # # print info
-    # print(S_ACTION_PLACE, end="", flush=True)
+    # print info
+    print(S_ACTION_PLACE, end="", flush=True)
 
-    # # for all dirs/subdirs
-    # for root, root_dirs, root_files in dir_prj.walk():
+    new_skip = []
+    for item in L_PH_SKIP:
+        res = dir_prj.rglob(item)
+        for item2 in list(res):
+            new_skip.append(item2)
 
-    #     # if dir is empty
-    #     if len(root_dirs) == 0 and len(root_files) == 0:
+    # for all dirs/subdirs
+    for root, root_dirs, root_files in dir_prj.walk():
 
-    #         # make a dummy file
-    #         with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
-    #             a_file.write(S_PH_TEXT)
+        # skip .git, etc
+        if root in new_skip:
+            root_dirs.clear()
+            continue
 
-    # # all done
-    # print(S_ACTION_DONE)
+        # if dir is empty
+        if len(root_dirs) == 0 and len(root_files) == 0:
+
+            # make a dummy file
+            with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
+                a_file.write(S_PH_TEXT)
+
+    # all done
+    PP.print_green(S_ACTION_DONE)
 
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
-def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work before making dist
 
@@ -1884,11 +1871,11 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         cv = CNVenv(dir_prj, dir_venv)
         try:
             cv.freeze(file_reqs)
-            print(S_ACTION_DONE)
-        except F.CNRunError:  # as e:
+            PP.print_green(S_ACTION_DONE)
+        except F.CNRunError as e:
             # exit gracefully
-            print(S_ACTION_FAIL)
-            # print(e.stderr)
+            PP.print_red(S_ACTION_FAIL)
+            PP.print_red(e.stderr)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -1904,30 +1891,21 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_dbg):
         try:
 
             # get props from dicts
-            dict_docs = dict_pub[S_KEY_PUB_DOCS]
-            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
             dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
             dir_venv = dir_prj / dir_venv
 
             # bake docs
             mkdocs = CNMkDocs()
             mkdocs.bake_docs(
+                dir_prj,
                 P_DIR_PP,
                 dir_venv,
-                dir_prj,
-                use_rm,
-                use_api,
-                lst_api_in,
-                S_FILE_README,
-                S_DIR_API,
             )
-            print(S_ACTION_DONE)
-        except F.CNRunError as e:
+            PP.print_green(S_ACTION_DONE)
+        except F.CNRunError:
             # fail gracefully
-            print(S_ACTION_FAIL)
-            print(e.stderr)
+            PP.print_red(S_ACTION_FAIL)
+            PP.print_red(S_ERR_NO_REPO)
 
 
 # ------------------------------------------------------------------------------
@@ -1977,48 +1955,38 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # remove all useless files
 
     # print info
-    # print(S_ACTION_PURGE, end="", flush=True)
+    print(S_ACTION_PURGE, end="", flush=True)
 
-    # # for each file name to purge
-    # for item in L_PURGE_FILES:
+    # for each file name to purge
+    for item in L_PURGE_FILES:
 
-    #     # glob it
-    #     lst = list(p_dist.rglob(item))
+        # glob it
+        lst = list(p_dist.rglob(item))
 
-    #     # for each item in glob, remove dir or file
-    #     for item2 in lst:
-    #         if item2.is_dir():
-    #             shutil.rmtree(item2)
-    #         else:
-    #             item2.unlink()
+        # for each item in glob, remove dir or file
+        for item2 in lst:
+            if item2.is_dir():
+                shutil.rmtree(item2)
+            else:
+                item2.unlink()
 
-    # # print info
-    # print(S_ACTION_DONE)
+    # print info
+    PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # remove extensions of some files
 
-    # get prj type
-    # name_small = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"]
+    # glob L_DIST_REMOVE_EXT
+    dir_del = []
+    for item in L_DIST_REMOVE_EXT:
+        dir_n = list(dir_prj.rglob(item))
+        for item2 in dir_n:
+            dir_del.append(item2)
 
-    # remove ext from bin file
-    # old_bin = (
-    #     p_dist / S_DIR_ASSETS / S_DIR_BIN / f"{name_small}{L_DIST_REMOVE_EXT}"
-    # )
-    # new_bin = p_dist / S_DIR_ASSETS / S_DIR_BIN / f"{name_small}"
-    # if old_bin.exists():
-    #     old_bin.rename(new_bin)
-
-    # # for each file name to purge
-    # for item in L_DIST_REMOVE_EXT:
-
-    #     # glob it
-    #     lst = list(p_dist.rglob(item))
-
-    #     # for each item in glob, remove dir or file
-    #     for item2 in lst:
-    #         if item2.is_file():
-    #             item2.rename(Path(item2.parent, item2.stem))
+    # rename stuff
+    for item in dir_del:
+        if item.is_file():
+            item.rename(Path(item.parent, item.stem))
 
     # --------------------------------------------------------------------------
     # compress dist
@@ -2033,7 +2001,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         compressed.add(in_dir, arcname=Path(in_dir).name)
 
     # print info
-    print(S_ACTION_DONE)
+    PP.print_green(S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # delete the origin dir, if key set
@@ -2053,7 +2021,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         shutil.rmtree(p_dist)
 
         # show info
-        print(S_ACTION_DONE)
+        PP.print_green(S_ACTION_DONE)
 
 
 # ------------------------------------------------------------------------------

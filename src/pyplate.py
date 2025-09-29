@@ -391,7 +391,7 @@ in Python from a template"
                 self._fix_path(root)
 
         # done
-        print(C.S_ACTION_DONE)
+        print_green(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -1099,6 +1099,38 @@ def is_path_ext_in_list(path, lst):
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
     return path.suffix in l_ext or path.name in l_ext
+
+
+# ------------------------------------------------------------------------------
+# Print in red
+# ------------------------------------------------------------------------------
+def print_red(string):
+    """
+    Print in red
+
+    Args:
+        string: The string to print
+
+    Prints a string to the terminal in red
+    """
+
+    print(f"\033[91;1m{string}\033[0m")
+
+
+# ------------------------------------------------------------------------------
+# Print in green
+# ------------------------------------------------------------------------------
+def print_green(string):
+    """
+    Print in green
+
+    Args:
+        string: The string to print
+
+    Prints a string to the terminal in green
+    """
+
+    print(f"\033[92;1m{string}\033[0m")
 
 
 # -)

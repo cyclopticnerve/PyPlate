@@ -34,6 +34,7 @@ import sys
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
+import pyplate
 from pyplate import PyPlate
 
 # ------------------------------------------------------------------------------
@@ -271,7 +272,7 @@ to build."
 
                 # set project dir and exit loop
                 self._dir_prj = tmp_dir
-                print()
+                # print()
                 break
 
         # ------------------------------------------------------------------------------
@@ -368,6 +369,7 @@ to build."
                 # print version error
                 print(C.S_ERR_SEM_VER)
 
+        print()
         # change in project.json
         self._dict_pub_meta[C.S_KEY_META_VERSION] = self._new_ver
 
@@ -437,7 +439,7 @@ to build."
                 shutil.copy2(src, dst)
 
         # done copying project files
-        print(C.S_ACTION_DONE)
+        pyplate.print_green(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Do any work after making dist

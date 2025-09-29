@@ -35,6 +35,7 @@ import sys
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
+import pyplate
 from pyplate import PyPlate
 
 # ------------------------------------------------------------------------------
@@ -509,7 +510,7 @@ a project."
 
         # ----------------------------------------------------------------------
         # done
-        print(C.S_ACTION_DONE)
+        pyplate.print_green(C.S_ACTION_DONE)
 
     # --------------------------------------------------------------------------
     # Do any work after template copy

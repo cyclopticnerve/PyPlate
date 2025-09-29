@@ -1,8 +1,0 @@
-{
-    "INST_NAME": "CLI_Test",
-    "INST_VER": "0.0.0",
-    "INST_CONT": [
-        ".local/bin/cli_test",
-        ".local/share/cli_test"
-    ]
-}
