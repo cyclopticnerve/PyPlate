@@ -261,6 +261,9 @@ S_ACTION_FAIL = _("Failed")
 
 # ------------------------------------------------------------------------------
 
+# NB: DO NOT DELETE/CHANGE S_KEY_XXX !!!
+# ONLY ADD !!!
+
 # keys for pybaker private dict
 S_KEY_PRV_ALL = "PRV_ALL"
 S_KEY_PRV_PRJ = "PRV_PRJ"
@@ -1323,17 +1326,20 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         file_reqs = dir_prj / S_FILE_REQS
 
         # do the thing with the thing
-        cv = CNVenv(dir_prj, dir_venv)
         try:
+            cv = CNVenv(dir_prj, dir_venv)
             cv.create()
-            if file_reqs.exists() and file_reqs.stat().st_size > 0:
-                cv.install_reqs(file_reqs)
-            PP.print_green(S_ACTION_DONE)
-        except F.CNRunError:
+            cv.install_reqs(file_reqs)
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except OSError as e:
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
+            # sys.exit(-1)
+        except F.CNRunError as e:
             # exit gracefully
-            PP.print_red(S_ACTION_FAIL)
-            PP.print_red(S_MSG_NO_INTERNET)
-            sys.exit(-1)
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
+            # sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # git
@@ -1348,11 +1354,12 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         cmd = S_CMD_GIT_CREATE.format(dir_prj)
         try:
             F.run(cmd, shell=True)
-            PP.print_green(S_ACTION_DONE)
-        except F.CNRunError:
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except F.CNRunError as e:
             # exit gracefully
-            PP.print_red(S_ACTION_FAIL)
-            sys.exit(-1)
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
+            # sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # install/uninstall config files
@@ -1368,20 +1375,23 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # create a template install cfg file
             dict_inst = D_INSTALL[prj_type]
-
             # fix dunders in inst cfg file
             path_inst = dir_prj / S_PATH_INST_CFG
-            F.save_dict(dict_inst, [path_inst])
-
             # create a template uninstall cfg file
             dict_uninst = D_UNINSTALL[prj_type]
-
             # fix dunders in uninst cfg file
             path_uninst = dir_prj / S_PATH_UNINST_CFG
-            F.save_dict(dict_uninst, [path_uninst])
 
-            # show info
-            PP.print_green(S_ACTION_DONE)
+            try:
+                F.save_dict(dict_inst, [path_inst])
+                F.save_dict(dict_uninst, [path_uninst])
+
+                # show info
+                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
+            except OSError as e:  # from save_dict
+                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+                F.printd("error:", e, debug=B_DEBUG)
 
     # --------------------------------------------------------------------------
     # purge package dirs
@@ -1404,7 +1414,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
                 shutil.rmtree(item)
 
         # print done
-        PP.print_green(S_ACTION_DONE)
+        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # docs
@@ -1435,11 +1445,11 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
                 S_DIR_IMAGES,
             )
             dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-            PP.print_green(S_ACTION_DONE)
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:
             # fail gracefully
-            PP.print_red(S_ACTION_FAIL)
-            PP.print_red(e.stderr)
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
 
 
 # ------------------------------------------------------------------------------
@@ -1614,7 +1624,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 _fix_meta(item, dict_prv, dict_pub)
 
     # print done
-    PP.print_green(S_ACTION_DONE)
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # readme chop section
@@ -1646,7 +1656,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             a_file.write(text)
 
         # show info
-        PP.print_green(S_ACTION_DONE)
+        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # i18n
@@ -1692,26 +1702,25 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # make .pot, .po, and .mo files
         try:
             potpy.main()
-        except F.CNRunError as _e:
-            # TODO: don't try desktop
-            # TODO: color/err
-            pass
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except F.CNRunError as e:
+            # fail gracefully
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
 
         # ----------------------------------------------------------------------
         # do .desktop i18n/version
 
         # check if we want template
-        if prj_type in L_MAKE_DESK and not path_dsk_tmp.exists():
+        if prj_type in L_MAKE_DESK:
 
-            # we want template, but does not exist
-            print("\n" + S_ERR_DESK_NO_TEMP.format(path_dsk_tmp, path_dsk_out))
-        else:
             # do the thing
             try:
                 potpy.make_desktop(path_dsk_tmp, path_dsk_out)
-            except F.CNRunError as _e:
-                # TODO: color/err
-                pass
+            except F.CNRunError as e:
+                # fail gracefully
+                # F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+                F.printd("error:", e, debug=B_DEBUG)
 
     # --------------------------------------------------------------------------
     # fix po files outside blacklist
@@ -1746,7 +1755,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             a_file.write(text)
 
     # print done
-    PP.print_green(S_ACTION_DONE)
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # tree
@@ -1781,7 +1790,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # ----------------------------------------------------------------------
         # we are done
-        PP.print_green(S_ACTION_DONE)
+        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # install package in itself
@@ -1800,10 +1809,10 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                     S_CMD_VENV_SELF.format(dir_prj, dir_venv),
                     shell=True,
                 )
-                PP.print_green(S_ACTION_DONE)
+                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
             except F.CNRunError as e:
-                PP.print_red(S_ACTION_FAIL)
-                PP.print_red(e.stderr)
+                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+                F.printd("error:", e, debug=B_DEBUG)
 
     # --------------------------------------------------------------------------
     # fill empty dirs with placeholder
@@ -1833,7 +1842,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 a_file.write(S_PH_TEXT)
 
     # all done
-    PP.print_green(S_ACTION_DONE)
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
 
 # ------------------------------------------------------------------------------
@@ -1871,12 +1880,12 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         cv = CNVenv(dir_prj, dir_venv)
         try:
             cv.freeze(file_reqs)
-            PP.print_green(S_ACTION_DONE)
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:
             # exit gracefully
-            PP.print_red(S_ACTION_FAIL)
-            PP.print_red(e.stderr)
-            sys.exit(-1)
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
+            # sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # docs
@@ -1901,11 +1910,11 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 P_DIR_PP,
                 dir_venv,
             )
-            PP.print_green(S_ACTION_DONE)
-        except F.CNRunError:
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except F.CNRunError as e:
             # fail gracefully
-            PP.print_red(S_ACTION_FAIL)
-            PP.print_red(S_ERR_NO_REPO)
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", e, debug=B_DEBUG)
 
 
 # ------------------------------------------------------------------------------
@@ -1971,7 +1980,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 item2.unlink()
 
     # print info
-    PP.print_green(S_ACTION_DONE)
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # remove extensions of some files
@@ -2001,7 +2010,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         compressed.add(in_dir, arcname=Path(in_dir).name)
 
     # print info
-    PP.print_green(S_ACTION_DONE)
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # delete the origin dir, if key set
@@ -2021,7 +2030,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         shutil.rmtree(p_dist)
 
         # show info
-        PP.print_green(S_ACTION_DONE)
+        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
 
 # ------------------------------------------------------------------------------
@@ -2244,16 +2253,18 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
     # get version from project.json
     version = dict_prv_prj["__PP_VER_MMR__"]
 
-    # load/change/save
-    a_dict = F.load_dicts([path])
-    a_dict[S_KEY_INST_VER] = version
-    F.save_dict(a_dict, [path])
+    try:
+        # load/change/save
+        a_dict = F.load_dicts([path])
+        a_dict[S_KEY_INST_VER] = version
+        F.save_dict(a_dict, [path])
 
-    # load/change/save
-    a_dict = F.load_dicts([path])
-    a_dict[S_KEY_INST_VER] = version
-    F.save_dict(a_dict, [path])
-
+        # load/change/save
+        a_dict = F.load_dicts([path])
+        a_dict[S_KEY_INST_VER] = version
+        F.save_dict(a_dict, [path])
+    except OSError as e:  # from load_dicts/save_dict
+        F.printd("error:", e, debug=B_DEBUG)
 
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file

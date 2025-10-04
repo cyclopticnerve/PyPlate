@@ -383,7 +383,10 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # if one or the other, load it
         if self._path_cfg and self._path_cfg.exists():
-            self._dict_cfg = F.load_dicts([self._path_cfg], self._dict_cfg)
+            try:
+                self._dict_cfg = F.load_dicts([self._path_cfg], self._dict_cfg)
+            except OSError as e:  # from load_dicts
+                F.printd("error:", e, debug=self._debug)
 
         # throw in a debug test
         if self._debug:
@@ -405,8 +408,11 @@ class __PP_NAME_PRJ_PASCAL__:
 
         # save dict to path
         if self._path_cfg:
-            self._path_cfg.parent.mkdir(parents=True, exist_ok=True)
-            F.save_dict(self._dict_cfg, [self._path_cfg])
+            try:
+                self._path_cfg.parent.mkdir(parents=True, exist_ok=True)
+                F.save_dict(self._dict_cfg, [self._path_cfg])
+            except OSError as e:  # from save_dict
+                F.printd("error:", e, debug=self._debug)
 
         # throw in a debug test
         if self._debug:

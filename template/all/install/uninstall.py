@@ -318,8 +318,11 @@ class CNUninstall:
         Get the install info from the config file.
         """
 
-        # get project info
-        self._dict_cfg = self._get_dict_from_file(self._path_cfg_uninst)
+        try:
+            # get project info
+            self._dict_cfg = self._get_dict_from_file(self._path_cfg_uninst)
+        except OSError as e:
+            print("error:", e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -460,9 +463,18 @@ class CNUninstall:
         # default result
         a_dict = {}
 
-        # get dict from file
-        with open(a_file, "r", encoding="UTF-8") as a_file:
-            a_dict = json.load(a_file)
+        try:
+            # get dict from file
+            with open(a_file, "r", encoding="UTF-8") as a_file:
+                a_dict = json.load(a_file)
+
+        # file not found
+        except FileNotFoundError as e:
+            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
+
+        # not valid json in file
+        except json.JSONDecodeError as e:
+            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
 
         # return result
         return a_dict
@@ -557,12 +569,6 @@ if __name__ == "__main__":
     inst = CNUninstall()
 
     # run the instance
-    try:
-        inst.main(
-            P_DIR_USR_INST,
-            P_FILE_CFG_UNINST,
-        )
-    except Exception as e:
-        raise e
+    inst.main(P_DIR_USR_INST, P_FILE_CFG_UNINST)
 
 # -)

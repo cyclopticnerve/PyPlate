@@ -121,11 +121,8 @@ class __PP_NAME_PRJ_PASCAL__:
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except FileNotFoundError as fnfe:
-            print("error:", fnfe)
-            sys.exit(-1)
-        except subprocess.CalledProcessError as cpe:
-            print("error:", cpe.stderr)
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            print("error: ", e)
             sys.exit(-1)
 
 # ------------------------------------------------------------------------------

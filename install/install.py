@@ -231,10 +231,10 @@ class CNInstall:
     # ------------------------------------------------------------------------------
 
     # version check results
-    S_VER_OLDER = -1
-    S_VER_SAME = 0
-    S_VER_NEWER = 1
-    S_VER_ERROR = -2
+    I_VER_OLDER = -1
+    I_VER_SAME = 0
+    I_VER_NEWER = 1
+    I_VER_ERROR = -2
 
     # regex to compare version numbers
     R_VERSION_VALID = (
@@ -468,8 +468,11 @@ class CNInstall:
         Get the install info from the config file.
         """
 
-        # get project info
-        self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
+        try:
+            # get project info
+            self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
+        except OSError as e:
+            print("error:", e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -527,18 +530,21 @@ class CNInstall:
         # be the first install but we will want to check on later updates)
         if self._path_cfg_uninst and Path(self._path_cfg_uninst).exists():
 
-            # get info from old cfg
-            dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
+            try:
+                # get info from old cfg
+                dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
+            except OSError as e:
+                print("error:", e)
 
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
 
-            # do the compare and get S_VER__OLDER, S_VER_SAME, S_VER_NEWER
+            # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
             res = self._comp_sem_ver(ver_old, ver_new)
 
             # same version is installed
-            if res == self.S_VER_SAME:
+            if res == self.I_VER_SAME:
 
                 # ask to install same version
                 str_ask = self._dialog(
@@ -553,7 +559,7 @@ class CNInstall:
                     sys.exit(-1)
 
             # newer version is installed
-            elif res == self.S_VER_OLDER:
+            elif res == self.I_VER_OLDER:
 
                 # ask to install old version over newer
                 str_ask = self._dialog(
@@ -596,11 +602,10 @@ class CNInstall:
         try:
             subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
-        except FileNotFoundError as fnfe:
-            print("error:", fnfe)
-            sys.exit(-1)
-        except subprocess.CalledProcessError as cpe:
-            print("error:", cpe.stderr)
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            print(self.S_MSG_FAIL)
+            print()
+            print("error:", e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -638,12 +643,11 @@ class CNInstall:
                 cmd, shell=True, check=True, stdout=subprocess.DEVNULL
             )
             print(self.S_MSG_DONE)
-        except FileNotFoundError as fnfe:
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
-            print("error:", fnfe)
-        except subprocess.CalledProcessError as cpe:
-            print(self.S_MSG_FAIL)
-            print("error:", cpe.stderr)
+            print()
+            print("error: ", e)
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # Fix .desktop file, for paths and such
@@ -786,9 +790,18 @@ class CNInstall:
         # default result
         a_dict = {}
 
-        # get dict from file
-        with open(a_file, "r", encoding="UTF-8") as a_file:
-            a_dict = json.load(a_file)
+        try:
+            # get dict from file
+            with open(a_file, "r", encoding="UTF-8") as a_file:
+                a_dict = json.load(a_file)
+
+        # file not found
+        except FileNotFoundError as e:
+            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
+
+        # not valid json in file
+        except json.JSONDecodeError as e:
+            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
 
         # return result
         return a_dict
@@ -886,11 +899,11 @@ class CNInstall:
 
         # sanity checks
         if not ver_old or ver_old == "":
-            return self.S_VER_ERROR
+            return self.I_VER_ERROR
         if not ver_new or ver_new == "":
-            return self.S_VER_ERROR
+            return self.I_VER_ERROR
         if ver_old == ver_new:
-            return self.S_VER_SAME
+            return self.I_VER_SAME
 
         # --------------------------------------------------------------------------
 
@@ -900,7 +913,7 @@ class CNInstall:
 
         # if either version string is None
         if not res_old or not res_new:
-            return self.S_VER_ERROR
+            return self.I_VER_ERROR
 
         # make a list of groups to check
         lst_groups = [
@@ -916,9 +929,9 @@ class CNInstall:
 
             # slide out at the first difference
             if old_val < new_val:
-                return self.S_VER_NEWER
+                return self.I_VER_NEWER
             if old_val > new_val:
-                return self.S_VER_OLDER
+                return self.I_VER_OLDER
 
         # --------------------------------------------------------------------------
 
@@ -928,11 +941,11 @@ class CNInstall:
 
         # simple pre rule compare
         if not pre_old and pre_new:
-            return self.S_VER_OLDER
+            return self.I_VER_OLDER
         if pre_old and not pre_new:
-            return self.S_VER_NEWER
+            return self.I_VER_NEWER
         if not pre_old and not pre_new:
-            return self.S_VER_SAME
+            return self.I_VER_SAME
 
         # --------------------------------------------------------------------------
 
@@ -963,9 +976,9 @@ class CNInstall:
 
                 # slide out at the first difference
                 if tmp_old_val > tmp_new_val:
-                    return self.S_VER_OLDER
+                    return self.I_VER_OLDER
                 if tmp_old_val < tmp_new_val:
-                    return self.S_VER_NEWER
+                    return self.I_VER_NEWER
 
             # 2. both alphanumeric
             if not old_val.isdigit() and not new_val.isdigit():
@@ -976,26 +989,26 @@ class CNInstall:
                 idx_new = lst_alpha.index(new_val)
 
                 if idx_old > idx_new:
-                    return self.S_VER_OLDER
+                    return self.I_VER_OLDER
                 if idx_old < idx_new:
-                    return self.S_VER_NEWER
+                    return self.I_VER_NEWER
 
             # 3 num vs alphanumeric
             if old_val.isdigit() and not new_val.isdigit():
-                return self.S_VER_OLDER
+                return self.I_VER_OLDER
             if not old_val.isdigit() and new_val.isdigit():
-                return self.S_VER_NEWER
+                return self.I_VER_NEWER
 
             # 4 len
             if len_pre_old > len_pre_new:
-                return self.S_VER_OLDER
+                return self.I_VER_OLDER
             if len_pre_new > len_pre_old:
-                return self.S_VER_NEWER
+                return self.I_VER_NEWER
 
         # --------------------------------------------------------------------------
 
         # error in one or both versions
-        return self.S_VER_ERROR
+        return self.I_VER_ERROR
 
 
 # ------------------------------------------------------------------------------
@@ -1011,20 +1024,16 @@ if __name__ == "__main__":
     inst = CNInstall()
 
     # run the instance
-    try:
-        # run main
-        inst.main(
-            P_DIR_ASSETS,
-            P_DIR_USR_INST,
-            P_FILE_CFG_INST,
-            P_FILE_CFG_UNINST,
-            P_DIR_VENV,
-            P_FILE_REQS,
-            P_FILE_DESK,
-            P_FILE_DESK_ICON,
-        )
-    except Exception as e:
-        raise e
+    inst.main(
+        P_DIR_ASSETS,
+        P_DIR_USR_INST,
+        P_FILE_CFG_INST,
+        P_FILE_CFG_UNINST,
+        P_DIR_VENV,
+        P_FILE_REQS,
+        P_FILE_DESK,
+        P_FILE_DESK_ICON,
+    )
 
 
 # -)

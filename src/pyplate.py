@@ -391,7 +391,7 @@ in Python from a template"
                 self._fix_path(root)
 
         # done
-        print_green(C.S_ACTION_DONE)
+        F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -815,9 +815,12 @@ in Python from a template"
             C.S_KEY_PRV_PRJ: self._dict_prv_prj,
         }
 
-        # save private settings
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-        F.save_dict(dict_prv, [path_prv])
+        try:
+            # save private settings
+            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+            F.save_dict(dict_prv, [path_prv])
+        except OSError as e:  # from save_dict
+            F.printd("error:", e, debug=self._debug)
 
         # create public settings
         dict_pub = {
@@ -829,9 +832,12 @@ in Python from a template"
             C.S_KEY_PUB_META: self._dict_pub_meta,
         }
 
-        # save public settings
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-        F.save_dict(dict_pub, [path_pub])
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict(dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd("error:", e, self._debug)
 
         # ----------------------------------------------------------------------
         # THIS is the whole horrible reason for calling reload/save in separate
@@ -847,8 +853,11 @@ in Python from a template"
         # fix dunders in dict_pub
         self._fix_contents(path_pub)
 
-        # reload dict from fixed file
-        self._dict_pub = F.load_dicts([path_pub])
+        try:
+            # reload dict from fixed file
+            self._dict_pub = F.load_dicts([path_pub])
+        except OSError as e:  # from load_dicts
+            F.printd("error:", e, self._debug)
 
         # NB: reload AFTER save to set sub-dict pointers
         self._reload_dicts()
@@ -961,7 +970,9 @@ in Python from a template"
         """
 
         # get sources and filter out sources that don't exist
-        reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
+        reqs_prj = self.P_DIR_PP / C.S_FILE_REQS_TYPE.format(prj_type_long)
+
+        # get src
         src = [
             self.P_DIR_PP / C.S_FILE_REQS_ALL,
             self.P_DIR_PP / reqs_prj,
@@ -971,7 +982,9 @@ in Python from a template"
         # get dst to put file lines
         dst = self._dir_prj / C.S_FILE_REQS
 
-        # # the new set of lines for requirements.txt
+        # ----------------------------------------------------------------------
+
+        # the new set of lines for requirements.txt
         new_file = []
 
         # read reqs files and put in result
@@ -1100,40 +1113,6 @@ def is_path_ext_in_list(path, lst):
     # NB: also checks for dot files
     return path.suffix in l_ext or path.name in l_ext
 
-
-# ------------------------------------------------------------------------------
-# Print in red
-# ------------------------------------------------------------------------------
-def print_red(string):
-    """
-    Print in red
-
-    Args:
-        string: The string to print
-
-    Prints a string to the terminal in red
-    """
-
-    print(f"\033[91;1m{string}\033[0m")
-
-
-# ------------------------------------------------------------------------------
-# Print in green
-# ------------------------------------------------------------------------------
-def print_green(string):
-    """
-    Print in green
-
-    Args:
-        string: The string to print
-
-    Prints a string to the terminal in green
-    """
-
-    print(f"\033[92;1m{string}\033[0m")
-
-
 # -)
-
 
 # Dr. Manhattan can divide by zero. Fight me.

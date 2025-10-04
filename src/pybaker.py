@@ -34,7 +34,6 @@ import sys
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
-import pyplate
 from pyplate import PyPlate
 
 # ------------------------------------------------------------------------------
@@ -299,18 +298,17 @@ to build."
             # NB: may contain dunders
             self._dict_pub = F.load_dicts([path_pub], {})
 
-            # NB: reload BEFORE first save to set sub-dict pointers
-            self._reload_dicts()
-
-            # save modified dicts/fix dunders in public/reload sub-dicts
-            self._save_project_info()
-
         # if there was a problem
         except OSError as e:  # from load_dicts
             # exit gracefully
-            print(C.S_ERR_PP_INVALID)
-            print(e)
+            print("error:", e)
             sys.exit(-1)
+
+        # NB: reload BEFORE first save to set sub-dict pointers
+        self._reload_dicts()
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
 
         # ----------------------------------------------------------------------
         # check for new version
@@ -439,7 +437,7 @@ to build."
                 shutil.copy2(src, dst)
 
         # done copying project files
-        pyplate.print_green(C.S_ACTION_DONE)
+        F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after making dist

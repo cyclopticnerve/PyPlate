@@ -11,7 +11,7 @@
 """
 The install script for this project
 
-THis module installs the project, copying its files and folders to the
+THis file installs the project, copying its files and folders to the
 appropriate locations on the user's computer.
 
 This file is real ugly b/c we can't access the venv, so we do it manually.
@@ -49,11 +49,11 @@ P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
 
 # path to project dir
-T_DIR_PRJ = P_DIR_ASSETS
+T_DIR_PRJ = P_DIR_PRJ
 
 # init gettext
 T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DIR_LOCALE = T_DIR_PRJ / P_DIR_ASSETS / "__PP_PATH_LOCALE__"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -110,6 +110,12 @@ class CNInstall:
     # Class constants
     # --------------------------------------------------------------------------
 
+    # version check results
+    I_VER_OLDER = -1
+    I_VER_SAME = 0
+    I_VER_NEWER = 1
+    I_VER_ERROR = -2
+
     # keys
     S_KEY_INST_NAME = "INST_NAME"
     S_KEY_INST_VER = "INST_VER"
@@ -154,7 +160,6 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # messages
-
     # NB: format params are prog_name and prog_version
     # I18N: install the program
     S_MSG_INST_START = _("Installing {} Version {}")
@@ -164,7 +169,7 @@ class CNInstall:
     # I18N: done with step
     S_MSG_DONE = _("Done")
     # I18N: step failed
-    S_MSG_FAIL = _("Fail")
+    S_MSG_FAIL = _("Failed")
     # I18N: show the copy step
     S_MSG_COPY_START = _("Copying files... ")
     # I18N: show the venv step
@@ -209,7 +214,6 @@ to overwrite?"
     S_ERR_DST_PATH = _("Destination path can not be {}")
 
     # dry run messages
-
     S_DRY_VENV = "\nvenv cmd:"
     S_DRY_REQS = "\nreqs cmd:"
     # NB: format params are source and destination file/dir
@@ -218,23 +222,12 @@ to overwrite?"
     S_DRY_DESK_ICON = "set desktop icon: {}"
 
     # commands
-
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
-    # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
-
-    # ------------------------------------------------------------------------------
-
-    # version check results
-    S_VER_OLDER = -1
-    S_VER_SAME = 0
-    S_VER_NEWER = 1
-    S_VER_ERROR = -2
+    # --------------------------------------------------------------------------
 
     # regex to compare version numbers
     R_VERSION_VALID = (
@@ -254,6 +247,10 @@ to overwrite?"
     R_VERSION_GROUP_REV = 3
     R_VERSION_GROUP_PRE = 4
     R_VERSION_GROUP_META = 5
+
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -468,8 +465,11 @@ to overwrite?"
         Get the install info from the config file.
         """
 
-        # get project info
-        self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
+        try:
+            # get project info
+            self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
+        except OSError as e:
+            print("error:", e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -527,18 +527,21 @@ to overwrite?"
         # be the first install but we will want to check on later updates)
         if self._path_cfg_uninst and Path(self._path_cfg_uninst).exists():
 
-            # get info from old cfg
-            dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
+            try:
+                # get info from old cfg
+                dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
+            except OSError as e:
+                print("error:", e)
 
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
             ver_new = self._dict_cfg[self.S_KEY_INST_VER]
 
-            # do the compare and get S_VER__OLDER, S_VER_SAME, S_VER_NEWER
+            # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
             res = self._comp_sem_ver(ver_old, ver_new)
 
             # same version is installed
-            if res == self.S_VER_SAME:
+            if res == self.I_VER_SAME:
 
                 # ask to install same version
                 str_ask = self._dialog(
@@ -553,7 +556,7 @@ to overwrite?"
                     sys.exit(-1)
 
             # newer version is installed
-            elif res == self.S_VER_OLDER:
+            elif res == self.I_VER_OLDER:
 
                 # ask to install old version over newer
                 str_ask = self._dialog(
@@ -596,11 +599,10 @@ to overwrite?"
         try:
             subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
-        except FileNotFoundError as fnfe:
-            print("error:", fnfe)
-            sys.exit(-1)
-        except subprocess.CalledProcessError as cpe:
-            print("error:", cpe.stderr)
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            print(self.S_MSG_FAIL)
+            print()
+            print("error: ", e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -638,12 +640,11 @@ to overwrite?"
                 cmd, shell=True, check=True, stdout=subprocess.DEVNULL
             )
             print(self.S_MSG_DONE)
-        except FileNotFoundError as fnfe:
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
-            print("error:", fnfe)
-        except subprocess.CalledProcessError as cpe:
-            print(self.S_MSG_FAIL)
-            print("error:", cpe.stderr)
+            print()
+            print("error: ", e)
+            sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # Fix .desktop file, for paths and such
@@ -786,9 +787,18 @@ to overwrite?"
         # default result
         a_dict = {}
 
-        # get dict from file
-        with open(a_file, "r", encoding="UTF-8") as a_file:
-            a_dict = json.load(a_file)
+        try:
+            # get dict from file
+            with open(a_file, "r", encoding="UTF-8") as a_file:
+                a_dict = json.load(a_file)
+
+        # file not found
+        except FileNotFoundError as e:
+            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
+
+        # not valid json in file
+        except json.JSONDecodeError as e:
+            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
 
         # return result
         return a_dict
@@ -886,11 +896,11 @@ to overwrite?"
 
         # sanity checks
         if not ver_old or ver_old == "":
-            return self.S_VER_ERROR
+            return self.I_VER_ERROR
         if not ver_new or ver_new == "":
-            return self.S_VER_ERROR
+            return self.I_VER_ERROR
         if ver_old == ver_new:
-            return self.S_VER_SAME
+            return self.I_VER_SAME
 
         # --------------------------------------------------------------------------
 
@@ -900,7 +910,7 @@ to overwrite?"
 
         # if either version string is None
         if not res_old or not res_new:
-            return self.S_VER_ERROR
+            return self.I_VER_ERROR
 
         # make a list of groups to check
         lst_groups = [
@@ -916,9 +926,9 @@ to overwrite?"
 
             # slide out at the first difference
             if old_val < new_val:
-                return self.S_VER_NEWER
+                return self.I_VER_NEWER
             if old_val > new_val:
-                return self.S_VER_OLDER
+                return self.I_VER_OLDER
 
         # --------------------------------------------------------------------------
 
@@ -928,11 +938,11 @@ to overwrite?"
 
         # simple pre rule compare
         if not pre_old and pre_new:
-            return self.S_VER_OLDER
+            return self.I_VER_OLDER
         if pre_old and not pre_new:
-            return self.S_VER_NEWER
+            return self.I_VER_NEWER
         if not pre_old and not pre_new:
-            return self.S_VER_SAME
+            return self.I_VER_SAME
 
         # --------------------------------------------------------------------------
 
@@ -963,9 +973,9 @@ to overwrite?"
 
                 # slide out at the first difference
                 if tmp_old_val > tmp_new_val:
-                    return self.S_VER_OLDER
+                    return self.I_VER_OLDER
                 if tmp_old_val < tmp_new_val:
-                    return self.S_VER_NEWER
+                    return self.I_VER_NEWER
 
             # 2. both alphanumeric
             if not old_val.isdigit() and not new_val.isdigit():
@@ -976,26 +986,26 @@ to overwrite?"
                 idx_new = lst_alpha.index(new_val)
 
                 if idx_old > idx_new:
-                    return self.S_VER_OLDER
+                    return self.I_VER_OLDER
                 if idx_old < idx_new:
-                    return self.S_VER_NEWER
+                    return self.I_VER_NEWER
 
             # 3 num vs alphanumeric
             if old_val.isdigit() and not new_val.isdigit():
-                return self.S_VER_OLDER
+                return self.I_VER_OLDER
             if not old_val.isdigit() and new_val.isdigit():
-                return self.S_VER_NEWER
+                return self.I_VER_NEWER
 
             # 4 len
             if len_pre_old > len_pre_new:
-                return self.S_VER_OLDER
+                return self.I_VER_OLDER
             if len_pre_new > len_pre_old:
-                return self.S_VER_NEWER
+                return self.I_VER_NEWER
 
         # --------------------------------------------------------------------------
 
         # error in one or both versions
-        return self.S_VER_ERROR
+        return self.I_VER_ERROR
 
 
 # ------------------------------------------------------------------------------
@@ -1011,20 +1021,16 @@ if __name__ == "__main__":
     inst = CNInstall()
 
     # run the instance
-    try:
-        # run main
-        inst.main(
-            P_DIR_ASSETS,
-            P_DIR_USR_INST,
-            P_FILE_CFG_INST,
-            P_FILE_CFG_UNINST,
-            P_DIR_VENV,
-            P_FILE_REQS,
-            P_FILE_DESK,
-            P_FILE_DESK_ICON,
-        )
-    except Exception as e:
-        raise e
+    inst.main(
+        P_DIR_ASSETS,
+        P_DIR_USR_INST,
+        P_FILE_CFG_INST,
+        P_FILE_CFG_UNINST,
+        P_DIR_VENV,
+        P_FILE_REQS,
+        P_FILE_DESK,
+        P_FILE_DESK_ICON,
+    )
 
 
 # -)
