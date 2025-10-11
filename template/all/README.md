@@ -30,6 +30,7 @@ Shirt description
 - [Usage](#usage)
 - [Uninstalling](#uninstalling)
 - [Documentation](#documentation)
+- [Developing](#developing)
 - [Notes](#notes)
 
 ## Requirements
@@ -101,7 +102,7 @@ $ cd ~/Downloads/__PP_NAME_PRJ_BIG__/install
 
 Either way, run the install script:
 ```bash
-$ ./install.py
+$ ./install
 ```
 <!-- __RM_APP__ -->
 
@@ -112,7 +113,7 @@ blah blah blah
 <!-- __RM_PKG__ -->
 In your project folder:
 ```bash
-$ . .venv/bin/activate
+$ . .__PP_NAME_VENV__/bin/activate
 $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
 <!-- __RM_PKG__ -->
@@ -120,9 +121,13 @@ $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 Go to the source folder for __PP_NAME_PRJ_BIG__ and run the uninstaller:
 ```bash
 $ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
-$ ./uninstall.py
+$ ./uninstall
 ```
 <!-- __RM_APP__ -->
+
+## Developing
+If you are developing this project, make sure you run the "develop.py" script
+first to create the proper virtual environment (venv). 
 
 ## Documentation
 See the [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__)

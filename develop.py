@@ -40,7 +40,7 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
 # NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./develop.py
 
 # path to project dir
 T_DIR_PRJ = P_DIR_PRJ
@@ -61,9 +61,9 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 class CNDevelop:
     """
-    The class to use for installing a PyPlate program
+    The class to use for developing a PyPlate program
 
-    This class performs the install operation.
+    This class performs the developer install operation.
     """
 
     # --------------------------------------------------------------------------
@@ -93,7 +93,9 @@ class CNDevelop:
     # NB: format params are path to prj, name of venv
     S_CMD_INST_PKG = "cd {};. {}/bin/activate;python -m pip install -e ."
     # NB: format params are path to prj, name of venv, and name of reqs file
-    S_CMD_INST_APP = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    S_CMD_INST_APP = (
+        "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    )
 
     # --------------------------------------------------------------------------
     # Class methods

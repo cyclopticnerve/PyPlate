@@ -93,7 +93,9 @@ class CNDevelop:
     # NB: format params are path to prj, path to venv
     S_CMD_INST_PKG = "cd {};. {}/bin/activate;python -m pip install -e ."
     # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_INST_APP = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    S_CMD_INST_APP = (
+        "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    )
 
     # --------------------------------------------------------------------------
     # Class methods

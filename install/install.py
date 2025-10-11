@@ -222,7 +222,7 @@ class CNInstall:
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"

@@ -820,7 +820,7 @@ in Python from a template"
             path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
             F.save_dict(dict_prv, [path_prv])
         except OSError as e:  # from save_dict
-            F.printd("error:", e, debug=self._debug)
+            F.printd("error:", str(e), debug=self._debug)
 
         # create public settings
         dict_pub = {
@@ -837,7 +837,7 @@ in Python from a template"
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict(dict_pub, [path_pub])
         except OSError as e:  # from save_dict
-            F.printd("error:", e, self._debug)
+            F.printd("error:", str(e), self._debug)
 
         # ----------------------------------------------------------------------
         # THIS is the whole horrible reason for calling reload/save in separate
@@ -857,7 +857,7 @@ in Python from a template"
             # reload dict from fixed file
             self._dict_pub = F.load_dicts([path_pub])
         except OSError as e:  # from load_dicts
-            F.printd("error:", e, self._debug)
+            F.printd("error:", str(e), self._debug)
 
         # NB: reload AFTER save to set sub-dict pointers
         self._reload_dicts()
@@ -1112,6 +1112,7 @@ def is_path_ext_in_list(path, lst):
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
     return path.suffix in l_ext or path.name in l_ext
+
 
 # -)
 

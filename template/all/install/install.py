@@ -225,7 +225,9 @@ to overwrite?"
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    S_CMD_INSTALL = (
+        "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    )
 
     # --------------------------------------------------------------------------
 
@@ -469,13 +471,14 @@ to overwrite?"
             # get project info
             self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
         except OSError as e:
-            print("error:", e)
+            raise e
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
         prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
         # print start msg
+        print()
         print(self.S_MSG_INST_START.format(prog_name, prog_version))
 
     # --------------------------------------------------------------------------
@@ -531,7 +534,7 @@ to overwrite?"
                 # get info from old cfg
                 dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
             except OSError as e:
-                print("error:", e)
+                raise e
 
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]

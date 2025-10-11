@@ -16,10 +16,7 @@ A simple script to test a package from within the project itself
 # ------------------------------------------------------------------------------
 
 # local imports
-
-# pylint: disable=import-error
 from __PP_NAME_PRJ_SMALL__ import __PP_NAME_SEC_SMALL__
-# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -31,7 +28,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    res = __PP_NAME_SEC_SMALL__.func()
-    print(res)
+    RES = __PP_NAME_SEC_SMALL__.func()
+    print(RES)
 
 # -)

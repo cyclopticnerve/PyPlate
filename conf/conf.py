@@ -30,7 +30,7 @@ import tarfile
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnpotpy import CNPotPy  # type: ignore
+from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
 from cnlib.cnmkdocs import CNMkDocs  # type: ignore
@@ -141,7 +141,8 @@ S_ASK_VER = _("Version ({}): ")
 S_PH_NAME = _("ABOUT")
 # I18N: the text to put in the default placeholder file
 S_PH_TEXT = _(
-    "A placeholder file since GitHub does not allow syncing empty folders"
+    "A placeholder file since GitHub does not allow syncing empty folders\n"
+    "These files are automatically managed by PyPlate"
 )
 
 # error strings
@@ -249,7 +250,7 @@ S_ACTION_EDIT = _("Installing package... ")
 # I18N: purge unnecessary files
 S_ACTION_PURGE = _("Purging unnecessary files... ")
 # I18N: Make placeholder files
-S_ACTION_PLACE = _("Making placeholder files... ")
+S_ACTION_PLACE = _("Fixing placeholder files... ")
 # I18N: compress files
 S_ACTION_COMPRESS = _("Compressing files... ")
 # I18N: remove dist
@@ -503,6 +504,8 @@ S_UI_VER_REP = r"\g<1>\g<2>{}\g<4>"
 # po files
 S_PO_VER_SCH = r"(\"Project-Id-Version: )(.*?)(\\n\")"
 S_PO_VER_REP = r"\g<1>{}\g<3>"
+S_PO_LANG_SCH = r"(\"Language: )(.*?)(\\n\")"
+S_PO_LANG_REP = r"\g<1>{}\g<3>"
 
 # pyproject.toml
 S_TOML_VER_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
@@ -631,7 +634,7 @@ L_PURGE_FILES = [
 # install in own venv for testing
 L_EDIT_VENV = ["p"]
 
-# skip placeholder files
+# skip placeholder files in these dirs
 L_PH_SKIP = [".git", ".venv*"]
 
 # get list of approved categories
@@ -871,6 +874,8 @@ D_PRV_ALL = {
     "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
+    "__PP_USR_SHARE__": S_USR_SHARE,
+    "__PP_NAME_UNINST__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
     # gui stuff
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
@@ -1042,7 +1047,7 @@ D_PUB_I18N = {
     # name of the project as domain
     S_KEY_PUB_I18N_DOM: "__PP_NAME_PRJ_SMALL__",
     # list of sources per domain
-    S_KEY_PUB_I18N_SRC: [S_DIR_SRC],
+    S_KEY_PUB_I18N_SRC: [S_DIR_SRC, S_DIR_INSTALL, "develop.py"],
     # computer languages
     S_KEY_PUB_I18N_CLANGS: {
         "Python": [
@@ -1091,24 +1096,24 @@ D_PUB_DBG = {
 
 # dict in pymaker to control post processing in debug mode
 D_DBG_PM = {
-    S_KEY_DBG_GIT: False,
-    S_KEY_DBG_VENV: False,
-    S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: False,
-    S_KEY_DBG_INST: False,
-    S_KEY_DBG_TREE: False,
-    S_KEY_DBG_DIST: False,
+    S_KEY_DBG_GIT: True,
+    S_KEY_DBG_VENV: True,
+    S_KEY_DBG_I18N: True,
+    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_INST: True,
+    S_KEY_DBG_TREE: True,
+    S_KEY_DBG_DIST: True,
 }
 
 # dict in pybaker to control post processing in debug mode
 D_DBG_PB = {
-    S_KEY_DBG_GIT: False,
-    S_KEY_DBG_VENV: False,
-    S_KEY_DBG_I18N: False,
-    S_KEY_DBG_DOCS: False,
-    S_KEY_DBG_INST: False,
-    S_KEY_DBG_TREE: False,
-    S_KEY_DBG_DIST: False,
+    S_KEY_DBG_GIT: True,
+    S_KEY_DBG_VENV: True,
+    S_KEY_DBG_I18N: True,
+    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_INST: True,
+    S_KEY_DBG_TREE: True,
+    S_KEY_DBG_DIST: True,
 }
 
 # dictionary of default stuff to put in install.json
@@ -1288,7 +1293,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
-def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
     Do any work after template copy
 
@@ -1331,14 +1336,10 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             cv.create()
             cv.install_reqs(file_reqs)
             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except OSError as e:
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
-            # sys.exit(-1)
         except F.CNRunError as e:
             # exit gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
+            F.printd("error:", str(e), debug=B_DEBUG)
             # sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -1358,7 +1359,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         except F.CNRunError as e:
             # exit gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
+            F.printd("error:", str(e), debug=B_DEBUG)
             # sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -1391,7 +1392,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             except OSError as e:  # from save_dict
                 F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd("error:", e, debug=B_DEBUG)
+                F.printd("error:", str(e), debug=B_DEBUG)
 
     # --------------------------------------------------------------------------
     # purge package dirs
@@ -1415,42 +1416,6 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # print done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
-    # docs
-
-    # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-
-        # print info
-        print(S_ACTION_MAKE_DOCS, end="", flush=True)
-
-        # the command to make or bake docs
-        try:
-
-            dict_docs = dict_pub[S_KEY_PUB_DOCS]
-            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
-
-            # make docs
-            mkdocs = CNMkDocs()
-            mkdocs.make_docs(
-                dir_prj,
-                use_rm,
-                use_api,
-                lst_api_in,
-                S_FILE_README,
-                S_DIR_API,
-                S_DIR_IMAGES,
-            )
-            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # fail gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
-
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -1696,7 +1661,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
             list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
             charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
-            location=False,
+            location=B_DEBUG,
         )
 
         # make .pot, .po, and .mo files
@@ -1706,7 +1671,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         except F.CNRunError as e:
             # fail gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
+            F.printd("error:", str(e), debug=B_DEBUG)
 
         # ----------------------------------------------------------------------
         # do .desktop i18n/version
@@ -1720,7 +1685,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             except F.CNRunError as e:
                 # fail gracefully
                 # F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd("error:", e, debug=B_DEBUG)
+                F.printd("error:", str(e), debug=B_DEBUG)
 
     # --------------------------------------------------------------------------
     # fix po files outside blacklist
@@ -1733,15 +1698,22 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # get sub-dicts we need
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+
+    # replace version
     pp_version = dict_prv_prj["__PP_VER_MMR__"]
     str_pattern = S_PO_VER_SCH
     str_rep = S_PO_VER_REP.format(pp_version)
 
     # find all files matching ext
-    lst_pos = path.rglob(S_EXT_PO)
+    lst_pos = list(path.rglob("*.po"))
 
     # for each file
     for item in lst_pos:
+
+        # replace lang
+        lang = Path(item).parent.stem
+        str_pattern2 = S_PO_LANG_SCH
+        str_rep2 = S_PO_LANG_REP.format(lang)
 
         # open file and get contents
         with open(item, "r", encoding=S_ENCODING) as a_file:
@@ -1749,6 +1721,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # replace version
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        # replace lang
+        text = re.sub(str_pattern2, str_rep2, text, flags=re.M | re.S)
 
         # save file
         with open(item, "w", encoding=S_ENCODING) as a_file:
@@ -1812,38 +1786,45 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
             except F.CNRunError as e:
                 F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd("error:", e, debug=B_DEBUG)
+                F.printd("error:", str(e), debug=B_DEBUG)
+
+    # add/remove placeholders
+    _fix_placeholders(dir_prj)
 
     # --------------------------------------------------------------------------
-    # fill empty dirs with placeholder
+    # docs
 
-    # print info
-    print(S_ACTION_PLACE, end="", flush=True)
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
 
-    new_skip = []
-    for item in L_PH_SKIP:
-        res = dir_prj.rglob(item)
-        for item2 in list(res):
-            new_skip.append(item2)
+        # print info
+        print(S_ACTION_MAKE_DOCS, end="", flush=True)
 
-    # for all dirs/subdirs
-    for root, root_dirs, root_files in dir_prj.walk():
+        # the command to make or bake docs
+        try:
 
-        # skip .git, etc
-        if root in new_skip:
-            root_dirs.clear()
-            continue
+            dict_docs = dict_pub[S_KEY_PUB_DOCS]
+            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
 
-        # if dir is empty
-        if len(root_dirs) == 0 and len(root_files) == 0:
-
-            # make a dummy file
-            with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
-                a_file.write(S_PH_TEXT)
-
-    # all done
-    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
+            # make docs
+            mkdocs = CNMkDocs()
+            mkdocs.make_docs(
+                dir_prj,
+                use_rm,
+                use_api,
+                lst_api_in,
+                S_FILE_README,
+                S_DIR_API,
+                S_DIR_IMAGES,
+            )
+            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except F.CNRunError as e:
+            # fail gracefully
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd("error:", str(e), debug=B_DEBUG)
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1884,7 +1865,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         except F.CNRunError as e:
             # exit gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
+            F.printd("error:", str(e), debug=B_DEBUG)
             # sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -1914,7 +1895,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         except F.CNRunError as e:
             # fail gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd("error:", e, debug=B_DEBUG)
+            F.printd("error:", str(e), debug=B_DEBUG)
 
 
 # ------------------------------------------------------------------------------
@@ -1961,28 +1942,6 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
             shutil.move(file_uninst, dest)
 
     # --------------------------------------------------------------------------
-    # remove all useless files
-
-    # print info
-    print(S_ACTION_PURGE, end="", flush=True)
-
-    # for each file name to purge
-    for item in L_PURGE_FILES:
-
-        # glob it
-        lst = list(p_dist.rglob(item))
-
-        # for each item in glob, remove dir or file
-        for item2 in lst:
-            if item2.is_dir():
-                shutil.rmtree(item2)
-            else:
-                item2.unlink()
-
-    # print info
-    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
     # remove extensions of some files
 
     # glob L_DIST_REMOVE_EXT
@@ -1996,6 +1955,18 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     for item in dir_del:
         if item.is_file():
             item.rename(Path(item.parent, item.stem))
+
+    # --------------------------------------------------------------------------
+    # remove unnecessary files from dist
+
+    for item in L_PURGE_FILES:
+
+        lst = list(p_dist.rglob(item))
+        for item2 in lst:
+            if item2.is_dir():
+                shutil.rmtree(item2)
+            elif item2.is_file():
+                item2.unlink()
 
     # --------------------------------------------------------------------------
     # compress dist
@@ -2264,7 +2235,7 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
         a_dict[S_KEY_INST_VER] = version
         F.save_dict(a_dict, [path])
     except OSError as e:  # from load_dicts/save_dict
-        F.printd("error:", e, debug=B_DEBUG)
+        F.printd("error:", str(e), debug=B_DEBUG)
 
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file
@@ -2512,6 +2483,57 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
+
+# ------------------------------------------------------------------------------
+# Add or remove placeholder files as necessary
+# ------------------------------------------------------------------------------
+def _fix_placeholders(dir_prj):
+    """
+    Add or remove placeholder files as necessary
+
+    Args:
+        dir_prj: The base project directory
+
+    This function will add placeholder files to empty directories, to allow Git
+    to sync normally empty folders. It will also remove placeholder files from
+    non-empty folders (excluding placeholder files in that directory, obvs).
+    """
+    # --------------------------------------------------------------------------
+    # fill empty dirs with placeholder
+
+    # print info
+    print(S_ACTION_PLACE, end="", flush=True)
+
+    new_skip = []
+    for item in L_PH_SKIP:
+        res = list(dir_prj.rglob(item))
+        for item2 in list(res):
+            new_skip.append(item2)
+
+    # for all dirs/subdirs
+    for root, root_dirs, root_files in dir_prj.walk():
+
+        # skip .git, etc
+        if root in new_skip:
+            root_dirs.clear()
+            continue
+
+        # if dir is empty
+        if len(root_dirs) == 0 and len(root_files) == 0:
+
+            # make a dummy file
+            with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
+                a_file.write(S_PH_TEXT)
+
+        # if dir has files/folders and placeholder
+        if len(root_dirs) > 0 or len(root_files) > 1:
+            for a_file in root_files:
+                if a_file == S_PH_NAME:
+                    a_path = root / a_file
+                    a_path.unlink()
+
+    # print info
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
 
 # -)
