@@ -29,6 +29,7 @@ Typical usage is show in the main() method.
 # system imports
 import gettext
 import locale
+import logging
 from pathlib import Path
 
 # local imports
@@ -77,6 +78,23 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     """
 
     # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
+    # def __init__(self):
+    #     """
+    #     Initialize the new object
+
+    #     Initializes a new instance of the class, setting the default values
+    #     of its properties, and any other code that needs to run to create a
+    #     new object.
+    #     """
+
+    #     # do super init
+    #     super().__init__()
+
+    # NB: add class properties here
+
+    # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
@@ -94,8 +112,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         # ----------------------------------------------------------------------
         # setup
 
-        # call boilerplate code
-        self._setup()
+        super().main()
 
         # ----------------------------------------------------------------------
         # main stuff
@@ -108,6 +125,42 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
 
         # call boilerplate code
         self._teardown()
+
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
+
+    # NB: these are the main steps, called in order from main
+
+    # --------------------------------------------------------------------------
+    # Boilerplate to use at the start of main
+    # --------------------------------------------------------------------------
+    def _setup(self):
+        """
+        Boilerplate to use at the start of main
+
+        Perform some mundane stuff like setting properties.
+        """
+
+        # do setup
+        super()._setup()
+
+        # add cfg option
+        self._parser.add_argument(
+            self.S_ARG_CFG_OPTION,
+            dest=self.S_ARG_CFG_DEST,
+            help=self.S_ARG_CFG_HELP,
+            metavar=self.S_ARG_CFG_METAVAR,
+        )
+
+        # add debug option
+        self._parser.add_argument(
+            self.S_ARG_DBG_OPTION,
+            action=self.S_ARG_DBG_ACTION,
+            dest=self.S_ARG_DBG_DEST,
+            help=self.S_ARG_DBG_HELP,
+        )
+
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -131,6 +184,8 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
 
         Long description (including HTML).
         """
+
+        logging.info("_func")
 
         # check for debug flag
         if self._debug:

@@ -127,6 +127,7 @@ class PyBaker:
         try:
             subprocess.run(cmd, shell=True, check=True)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            # NB: no i18n
             print("error: ", e)
             sys.exit(-1)
 

@@ -70,10 +70,9 @@ class CNDevelop:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # file names and project type
+    # venv and reqs names
     S_NAME_VENV = "__PP_NAME_VENV__"
     S_FILE_REQS = "__PP_REQS_FILE__"
-    S_TYPE_PRJ = "__PP_TYPE_PRJ__"
 
     # messages
 
@@ -86,33 +85,20 @@ class CNDevelop:
     # I18N: show the reqs step
     S_MSG_REQS_START = _("Installing requirements... ")
 
+    # errors
+
+    # I18N: an error occurred
+    S_ERR_ERR = _("Error: ")
+
     # commands
 
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
-    # NB: format params are path to prj, path to venv
-    S_CMD_INST_PKG = "cd {};. {}/bin/activate;python -m pip install -e ."
-    # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_INST_APP = (
-        "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
-    )
+    S_CMD_INSTALL = "__PP_DEV_INST__"
 
     # --------------------------------------------------------------------------
     # Class methods
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Initialize the class
-    # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initialize the class
-
-        Creates a new instance of the object and initializes its properties.
-        """
-
-        # set the initial vals
-        self._is_pkg = False
 
     # --------------------------------------------------------------------------
     # Run the program
@@ -156,7 +142,7 @@ class CNDevelop:
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -175,29 +161,21 @@ class CNDevelop:
 
         # ----------------------------------------------------------------------
 
-        if self.S_TYPE_PRJ == "p":
-            cmd = self.S_CMD_INST_PKG.format(P_DIR_PRJ, self.S_NAME_VENV)
-        else:
-            cmd = self.S_CMD_INST_APP.format(
-                P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
-            )
-
-        # ----------------------------------------------------------------------
-
         # show progress
         print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
+        cmd = self.S_CMD_INSTALL.format(
+            P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
+        )
         try:
             # NB: hide output
-            subprocess.run(
-                cmd, shell=True, check=True, stdout=subprocess.DEVNULL
-            )
+            subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
 

@@ -151,6 +151,11 @@ class CNInstall:
     # cmd line instructions string
     S_EPILOG = ""
 
+    # errors
+
+    # I18N: an error occurred
+    S_ERR_ERR = _("Error: ")
+
     # --------------------------------------------------------------------------
 
     # messages
@@ -192,7 +197,9 @@ class CNInstall:
     installed.\nDo you want to overwrite?"
     )
 
-    # errors
+    # error strings
+    # I18N: general error start
+    S_ERR_ERR = _("Error:")
     # NB: format param is file path
     # I18N: config file not found
     S_ERR_NOT_FOUND = _("File {} not found")
@@ -222,7 +229,9 @@ class CNInstall:
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    S_CMD_INSTALL = (
+        "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    )
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"
@@ -472,7 +481,7 @@ class CNInstall:
             # get project info
             self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
         except OSError as e:
-            print("error:", e)
+            print(self.S_ERR_ERR, e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -534,7 +543,7 @@ class CNInstall:
                 # get info from old cfg
                 dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
             except OSError as e:
-                print("error:", e)
+                print(self.S_ERR_ERR, e)
 
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
@@ -605,7 +614,7 @@ class CNInstall:
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error:", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -646,7 +655,7 @@ class CNInstall:
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------

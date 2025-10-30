@@ -60,9 +60,9 @@
     "PUB_I18N": {
         "DOMAIN": "pyplate",
         "SOURCES": [
-            "conf",
+            "src",
             "install",
-            "src"
+            "develop.py"
         ],
         "CLANGS": {
             "Python": [

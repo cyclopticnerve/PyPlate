@@ -6,7 +6,7 @@
 <!-- License : __PP_LICENSE_NAME__                             \          /  -->
 <!----------------------------------------------------------------------------->
 
-# ![](img/__PP_NAME_PRJ_SMALL__.png) __PP_NAME_PRJ_BIG__
+# ![](__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png) __PP_NAME_PRJ_BIG__
 
 ## "It mostly works" ™©®
 

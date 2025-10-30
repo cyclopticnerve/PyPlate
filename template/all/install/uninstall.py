@@ -39,6 +39,8 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # Globals
 # ------------------------------------------------------------------------------
 
+S_ENCODING = "UTF-8"
+
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
 # NB: keep global
@@ -182,6 +184,8 @@ class CNUninstall:
     # NB: format param is file path
     # I18N: config file is not valid json
     S_ERR_NOT_JSON = _("File {} is not a JSON file")
+    # I18N: general error start
+    S_ERR_ERR = _("Error:")
 
     # dry run messages
 
@@ -322,7 +326,7 @@ class CNUninstall:
             # get project info
             self._dict_cfg = self._get_dict_from_file(self._path_cfg_uninst)
         except OSError as e:
-            print("error:", e)
+            print(self.S_ERR_ERR, e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -465,7 +469,7 @@ class CNUninstall:
 
         try:
             # get dict from file
-            with open(a_file, "r", encoding="UTF-8") as a_file:
+            with open(a_file, "r", encoding=S_ENCODING) as a_file:
                 a_dict = json.load(a_file)
 
         # file not found

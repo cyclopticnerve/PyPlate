@@ -72,6 +72,11 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     S_ACTION_DELETE_EVENT = "delete-event"
     S_ACTION_DESTROY = "destroy"
 
+    S_WIN_UI = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
+    S_CLASS_WIN = "__PP_CLASS_WIN__"
+    P_DLG_ABOUT = P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE__.ui"
+    S_DLG_ABOUT = "__PP_DLG_ABOUT__"
+
     # --------------------------------------------------------------------------
     # Instance methods
     # --------------------------------------------------------------------------
@@ -94,7 +99,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         self._app = app
 
         # props necessary tro create a basic window
-        ui_file = self.P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
+        ui_file = self.S_WIN_UI
         ui_path = Path(ui_file).resolve()
 
         # create a builder and set i18n domain
@@ -103,7 +108,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
         # load file and get window
         self.builder.add_from_file(str(ui_path))
-        self.window = self.builder.get_object("__PP_CLASS_WIN__")
+        self.window = self.builder.get_object(self.S_CLASS_WIN)
 
         # connect all control signals
         self.builder.connect_signals(self)  # pylint: disable=no-member
@@ -131,9 +136,9 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
         # get dialog, run, hide (standard for reusable modal dialogs)
         # NB: no ext (will find .ui, .glade, .xml...)
-        dlg_file = self.P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE__.ui"
+        dlg_file = self.P_DLG_ABOUT
         dlg_path = Path(dlg_file).resolve()
-        self._app.show_dialog(dlg_path, "__PP_DLG_ABOUT__")
+        self._app.show_dialog(dlg_path, self.S_DLG_ABOUT)
 
     # --------------------------------------------------------------------------
     # Called when the New button is clicked
@@ -247,10 +252,9 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
         The Window is about to close via the 'X' button (or some other system
         event, like closing from the overview or the dock). Note that this
-        handler expects to return THE OPPOSITE of the _can_close method's
-        result. That is, returning False here lets the window close, while
-        returning True means the window will not close. This is easy to work
-        around since _can_close returns a boolean value.
+        handler expects to return THE OPPOSITE of what you might expect. That
+        is, returning False here lets the window close, while
+        returning True means the window will not close.
         """
 
         print("_evt_win_delete")

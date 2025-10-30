@@ -8,8 +8,10 @@
 
 site_name: __PP_NAME_PRJ__
 theme: 
+docs_dir: __PP_DOCS_DOCS_DIR__
+site_dir: __PP_DOCS_SITE_DIR__
 plugins:
-- search
-- mkdocstrings
+    - search
+    - mkdocstrings
 
 # -)

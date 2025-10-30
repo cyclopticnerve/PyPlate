@@ -34,10 +34,22 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# add assets dir to path
-
+# get prj dir
 P_DIR_PRJ = Path(__file__).parent.resolve()
+
+# get dirs
 P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
+P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
+
+# get files
+P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
+P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
+P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
+P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
+
+S_ENCODING = "UTF-8"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -64,18 +76,6 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
-
-# get dirs
-P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
-P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
-
-# get files
-P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
-P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__" / "__PP_REQS_FILE__"
-P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
-
 
 # ------------------------------------------------------------------------------
 # A dummy class to combine multiple argparse formatters
@@ -198,6 +198,8 @@ to overwrite?"
     )
 
     # errors
+    # I18N: an error occurred
+    S_ERR_ERR = _("Error: ")
     # NB: format param is file path
     # I18N: config file not found
     S_ERR_NOT_FOUND = _("File {} not found")
@@ -212,6 +214,8 @@ to overwrite?"
     # NB: format param is dest path
     # I18N: dst path invalid
     S_ERR_DST_PATH = _("Destination path can not be {}")
+    # can't find .desktop
+    S_ERR_NO_DESK = _("No desktop files present")
 
     # dry run messages
     S_DRY_VENV = "\nvenv cmd:"
@@ -605,7 +609,7 @@ to overwrite?"
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -639,14 +643,12 @@ to overwrite?"
         # the cmd to install the reqs
         try:
             # NB: hide output
-            subprocess.run(
-                cmd, shell=True, check=True, stdout=subprocess.DEVNULL
-            )
+            subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -679,12 +681,12 @@ to overwrite?"
 
         # sanity check (params to main might be None)
         if not self._file_desk or not self._file_desk_icon:
-            print("no desktop files present")
+            print(self.S_ERR_NO_DESK)
             return
 
         # open file
         text = ""
-        with open(self._file_desk, "r", encoding="UTF-8") as a_file:
+        with open(self._file_desk, "r", encoding=S_ENCODING) as a_file:
             text = a_file.read()
 
         # find icon line and fix
@@ -701,7 +703,7 @@ to overwrite?"
             # ------------------------------------------------------------------
 
             # write fixed text back to file
-            with open(self._file_desk, "w", encoding="UTF-8") as a_file:
+            with open(self._file_desk, "w", encoding=S_ENCODING) as a_file:
                 a_file.write(text)
 
         # show some info
@@ -792,7 +794,7 @@ to overwrite?"
 
         try:
             # get dict from file
-            with open(a_file, "r", encoding="UTF-8") as a_file:
+            with open(a_file, "r", encoding=S_ENCODING) as a_file:
                 a_dict = json.load(a_file)
 
         # file not found

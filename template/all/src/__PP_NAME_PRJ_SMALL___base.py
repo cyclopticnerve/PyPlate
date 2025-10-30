@@ -25,6 +25,7 @@ directory).
 import argparse
 import gettext
 import locale
+import logging
 from pathlib import Path
 import sys
 
@@ -79,10 +80,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # find path to project
-    P_DIR_PRJ = Path(__file__).parents[1].resolve()
+    # bools
 
-    # --------------------------------------------------------------------------
     # set load/save oder
     # NB: if true, only load first file found (cmdline, conf dir, internal)
     # if false, load all and combine (internal, conf dir, cmdline)
@@ -92,6 +91,27 @@ class __PP_NAME_PRJ_PASCAL__Base:
     B_SAVE_HIGH = False
 
     # --------------------------------------------------------------------------
+    # paths
+
+    # find path to project
+    P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+    # path to default config file
+    # NB: if not using, set to None
+    P_CFG_DEF = P_DIR_PRJ / "__PP_DIR_CONF__/__PP_NAME_PRJ_SMALL__.json"
+
+    # path to default log file
+    # NB: if not using, set to None
+    P_LOG_DEF = P_DIR_PRJ / "__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log"
+
+    # path to uninst
+    P_UNINST = (
+        Path.home()
+        / "__PP_USR_SHARE__/__PP_NAME_PRJ_SMALL__/__PP_NAME_UNINST__"
+    )
+
+    # --------------------------------------------------------------------------
+    # strings
 
     # short description
     S_PP_SHORT_DESC = "__PP_SHORT_DESC__"
@@ -137,10 +157,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
         "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
     )
 
-    # path to default config file
-    # NB: if not using, set to None
-    P_CFG_DEF = P_DIR_PRJ / "__PP_DIR_CONF__/__PP_NAME_PRJ_SMALL__.json"
+    # contents of default config file
+    S_CFG_DEF = "{}"
 
+    # --------------------------------------------------------------------------
     # error messages
 
     # general error
@@ -169,16 +189,48 @@ class __PP_NAME_PRJ_PASCAL__Base:
         new object.
         """
 
-        # set defaults
-        self._path_cfg_def = self.P_CFG_DEF
+        print("super ", __name__)
 
-        # cmd line args
+        # set defaults
+
+        # cfg stuff
+        self._path_cfg_def = self.P_CFG_DEF
+        self._dict_cfg = {}
+
+        # log stuff
+        self._path_log_def = self.P_LOG_DEF
+        self._logger = logging.getLogger(__name__)
+
+        # cmd line stuff
+        # NB: placeholder to avoid comparing to None (to be set by subclass)
+        self._parser = argparse.ArgumentParser()
         self._dict_args = {}
         self._debug = False
         self._path_cfg_arg = None
 
-        # the final cfg dict
-        self._dict_cfg = {}
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # The main method of the program
+    # --------------------------------------------------------------------------
+    def main(self):
+        """
+        The main method of the program
+
+        This method is the main entry point for the program, initializing the
+        program, and performing its steps.
+
+        The implementation of this function in the superclass is just a dummy
+        placeholder. The real work should be done in the subclass.
+        """
+
+        # call boilerplate code
+        self._setup()
+
+        # parse cmd line in super
+        self._do_cmd_line()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -199,28 +251,12 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # use cmd line
 
         # create a parser object in case we need it
-        parser = argparse.ArgumentParser(
+        self._parser = argparse.ArgumentParser(
             formatter_class=CNFormatter, add_help=False
         )
 
-        # add cfg option
-        parser.add_argument(
-            self.S_ARG_CFG_OPTION,
-            dest=self.S_ARG_CFG_DEST,
-            help=self.S_ARG_CFG_HELP,
-            metavar=self.S_ARG_CFG_METAVAR,
-        )
-
-        # add debug option
-        parser.add_argument(
-            self.S_ARG_DBG_OPTION,
-            action=self.S_ARG_DBG_ACTION,
-            dest=self.S_ARG_DBG_DEST,
-            help=self.S_ARG_DBG_HELP,
-        )
-
         # add help option
-        parser.add_argument(
+        self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
             action=self.S_ARG_HLP_ACTION,
             dest=self.S_ARG_HLP_DEST,
@@ -228,15 +264,35 @@ class __PP_NAME_PRJ_PASCAL__Base:
         )
 
         # add help option
-        parser.add_argument(
+        self._parser.add_argument(
             self.S_ARG_UNINST_OPTION,
             action=self.S_ARG_UNINST_ACTION,
             dest=self.S_ARG_UNINST_DEST,
             help=self.S_ARG_UNINST_HELP,
         )
 
+        logging.basicConfig(
+            filename="__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log",
+            level=logging.INFO,
+        )
+
+    # --------------------------------------------------------------------------
+    # These are minor steps called from the main steps
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Parse the arguments from the command line
+    # --------------------------------------------------------------------------
+    def _do_cmd_line(self):
+        """
+        Parse the arguments from the command line
+
+        Parse the arguments from the command line, after the parser has been
+        set up.
+        """
+
         # run the parser
-        args = parser.parse_args()
+        args = self._parser.parse_args()
         self._dict_args = vars(args)
 
         # ----------------------------------------------------------------------
@@ -248,26 +304,26 @@ class __PP_NAME_PRJ_PASCAL__Base:
             # print default about text
             print(self.S_ABOUT)
 
-            # print usage and arg info
-            parser.print_help()
-
-            # print blank line for clarity
+            # print usage and arg info and exit
+            self._parser.print_help()
             print()
-
-            # nothing else to do
             sys.exit(-1)
 
         # punt to uninstall func
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
-            self._do_uninstall()
 
-            # nothing else to do
+            # uninstall and exit
+            self._do_uninstall()
             sys.exit(-1)
 
         # ----------------------------------------------------------------------
         # set props from args
 
+        # set self and lib debug
         self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
+        F.B_DEBUG = self._debug
+
+        # set cfg path
         self._path_cfg_arg = self._dict_args.get(
             self.S_ARG_CFG_DEST, self._path_cfg_arg
         )
@@ -340,7 +396,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
                         # if we get here, we have loaded the highest file
                         return
                     except OSError as e:  # from load_dicts
-                        F.printd(self.S_ERR_ERR, str(e), debug=self._debug)
+                        F.printd(self.S_ERR_ERR, str(e))
 
                 else:
 
@@ -348,7 +404,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
                     F.printd(
                         self.S_ERR_ERR,
                         self.S_ERR_NO_CFG.format(a_path),
-                        debug=self._debug,
                     )
 
         # ----------------------------------------------------------------------
@@ -358,7 +413,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             try:
                 self._dict_cfg = F.load_dicts(l_paths, self._dict_cfg)
             except OSError as e:  # from load_dicts
-                F.printd(self.S_ERR_ERR, str(e), debug=self._debug)
+                F.printd(self.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # Save config data to a file
@@ -390,7 +445,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
                     # if we get here, we have saved the file
                     return
                 except OSError as e:  # from save_dict
-                    F.printd(self.S_ERR_ERR, str(e), debug=self._debug)
+                    F.printd(self.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # save to both
@@ -399,7 +454,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             try:
                 F.save_dict(self._dict_cfg, l_paths)
             except OSError as e:  # from save_dict
-                F.printd(self.S_ERR_ERR, str(e), debug=self._debug)
+                F.printd(self.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
@@ -409,17 +464,11 @@ class __PP_NAME_PRJ_PASCAL__Base:
         Handle the -- uninstall cmd line op
         """
 
-        # find uninstall file
-        path_uninst = (
-            Path.home()
-            / "__PP_USR_SHARE__/__PP_NAME_PRJ_SMALL__/__PP_NAME_UNINST__"
-        )
-
         # if path exists
-        if path_uninst.exists():
+        if self.P_UNINST.exists():
 
             # run uninstall and exit
-            cmd = str(path_uninst)
+            cmd = str(self.P_UNINST)
             try:
                 F.run(cmd, shell=True)
             except F.CNRunError as e:

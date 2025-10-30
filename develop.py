@@ -73,7 +73,6 @@ class CNDevelop:
     # file names and project type
     S_NAME_VENV = "__PP_NAME_VENV__"
     S_FILE_REQS = "__PP_REQS_FILE__"
-    S_TYPE_PRJ = "__PP_TYPE_PRJ__"
 
     # messages
 
@@ -89,13 +88,13 @@ class CNDevelop:
     # commands
 
     # NB: format param is dir_venv
-    S_CMD_CREATE = "python -m venv {}"
-    # NB: format params are path to prj, name of venv
-    S_CMD_INST_PKG = "cd {};. {}/bin/activate;python -m pip install -e ."
-    # NB: format params are path to prj, name of venv, and name of reqs file
-    S_CMD_INST_APP = (
-        "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
-    )
+    S_CMD_VENV_CREATE = "python -m venv {}"
+    S_CMD_VENV_INST = "__PP_DEV_INST__"
+
+    # errors
+
+    # I18N: an error occurred
+    S_ERR_ERR = _("Error: ")
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -134,7 +133,7 @@ class CNDevelop:
         print(self.S_MSG_VENV_START, flush=True, end="")
 
         # the command to create a venv
-        cmd = self.S_CMD_CREATE.format(self.S_NAME_VENV)
+        cmd = self.S_CMD_VENV_CREATE.format(self.S_NAME_VENV)
 
         # the cmd to create the venv
         try:
@@ -143,7 +142,7 @@ class CNDevelop:
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
     # --------------------------------------------------------------------------
@@ -162,29 +161,21 @@ class CNDevelop:
 
         # ----------------------------------------------------------------------
 
-        if self.S_TYPE_PRJ == "p":
-            cmd = self.S_CMD_INST_PKG.format(P_DIR_PRJ, self.S_NAME_VENV)
-        else:
-            cmd = self.S_CMD_INST_APP.format(
-                P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
-            )
-
-        # ----------------------------------------------------------------------
-
         # show progress
         print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
+        cmd = self.S_CMD_VENV_INST.format(
+            P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
+        )
         try:
             # NB: hide output
-            subprocess.run(
-                cmd, shell=True, check=True, stdout=subprocess.DEVNULL
-            )
+            subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
 

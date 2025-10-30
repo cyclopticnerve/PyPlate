@@ -176,6 +176,8 @@ class CNUninstall:
 
     # errors
 
+    # I18N: general error start
+    S_ERR_ERR = _("Error:")
     # NB: format param is file path
     # I18N: config file not found
     S_ERR_NOT_FOUND = _("File {} not found")
@@ -322,7 +324,7 @@ class CNUninstall:
             # get project info
             self._dict_cfg = self._get_dict_from_file(self._path_cfg_uninst)
         except OSError as e:
-            print("error:", e)
+            print(self.S_ERR_ERR, e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]

@@ -30,9 +30,38 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
+import gettext
+import locale
 from pathlib import Path
 import subprocess
 import sys
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# get dirs
+P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+P_DIR_VENV = "__PP_NAME_VENV__"
+P_FILE_RUN = "__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
+
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI
+# NB: keep global
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
+
+# path to project dir
+T_DIR_PRJ = P_DIR_USR_INST
+
+# init gettext
+T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+_ = T_TRANSLATION.gettext
+
+# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# use for CLI in the interest of common code)
+locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -60,13 +89,12 @@ class __PP_NAME_PRJ_PASCAL__:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # find path to prj/lib
-    P_DIR_PRJ = Path.home() / "__PP_USR_INST__"
+    # errors
+    S_ERR_ERR = _("Error :")
 
-    # commands to run
-    S_CMD_ACTIVATE = ". __PP_NAME_VENV__/bin/activate"
-    S_CMD_RUN = "./__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
-    S_CMD_RUN_ARGS = "{} {}"
+    # commands
+    # NB: format params are inst dir, venv name, prog name, and cmd line
+    S_CMD_RUN = "cd {};. {}/bin/activate;{} {}"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -99,31 +127,17 @@ class __PP_NAME_PRJ_PASCAL__:
         # put args back together with spaces
         args = " ".join(args)
 
-        # def cmd line - no args
-        src_run = self.S_CMD_RUN
-
-        # add args if present
-        if len(args) > 0:
-            src_run = self.S_CMD_RUN_ARGS.format(self.S_CMD_RUN, args)
-
         # ----------------------------------------------------------------------
-
-        # build cmd
-        cmd = (
-            # cd to inst
-            f"cd {self.P_DIR_PRJ};"
-            # activate venv
-            f"{self.S_CMD_ACTIVATE};"
-            # call src w/ args
-            f"{src_run}"
-        )
-
         # run cmd
+        cmd = self.S_CMD_RUN.format(
+            P_DIR_USR_INST, P_DIR_VENV, P_FILE_RUN, args
+        )
         try:
             subprocess.run(cmd, shell=True, check=True)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            print("error: ", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

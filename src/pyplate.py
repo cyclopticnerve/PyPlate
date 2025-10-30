@@ -132,6 +132,10 @@ in Python from a template"
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
 
+    # error strings
+    # I18N: general error start
+    S_ERR_ERR = _("Error:")
+
     # --------------------------------------------------------------------------
     # Instance methods
     # --------------------------------------------------------------------------
@@ -149,9 +153,6 @@ in Python from a template"
         """
 
         # set the initial values of properties
-
-        # command line options
-        self._debug = False
 
         # internal props
         self._dir_prj = Path()
@@ -181,11 +182,8 @@ in Python from a template"
         # NB: placeholder to avoid comparing to None (to be set by subclass)
         self._parser = argparse.ArgumentParser()
         self._dict_args = {}
-
-        # flag for do_before_fix/do_after_fix
-        self._is_ide = False
-        # flag for running from pm or pb
-        self._is_pm = True
+        self._debug = False
+        self._ide = False
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -270,7 +268,7 @@ in Python from a template"
         self._dict_sw_line = dict(self._dict_sw_block)
 
     # --------------------------------------------------------------------------
-    # Get project info
+    # Boilerplate to use at the start of main
     # --------------------------------------------------------------------------
     def _get_project_info(self):
         """
@@ -437,6 +435,9 @@ in Python from a template"
         # convert namespace to dict
         self._dict_args = vars(args)
 
+        # ----------------------------------------------------------------------
+        # check for one-shot args
+
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             self._parser.print_help()
@@ -450,9 +451,10 @@ in Python from a template"
         # debug stuff
 
         # get the args
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, False)
+        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
 
-        # set global prop in conf
+        # set debug flags in cnfunctions and conf
+        F.B_DEBUG = self._debug
         C.B_DEBUG = self._debug
 
         # debug turns off some post processing to speed up processing
@@ -466,7 +468,8 @@ in Python from a template"
         if self._debug:
 
             # yup, yell
-            print(C.S_MSG_DEBUG)
+            F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
+            print()
 
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
@@ -820,7 +823,7 @@ in Python from a template"
             path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
             F.save_dict(dict_prv, [path_prv])
         except OSError as e:  # from save_dict
-            F.printd("error:", str(e), debug=self._debug)
+            F.printd(self.S_ERR_ERR, str(e))
 
         # create public settings
         dict_pub = {
@@ -837,7 +840,7 @@ in Python from a template"
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict(dict_pub, [path_pub])
         except OSError as e:  # from save_dict
-            F.printd("error:", str(e), self._debug)
+            F.printd(self.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # THIS is the whole horrible reason for calling reload/save in separate
@@ -857,7 +860,7 @@ in Python from a template"
             # reload dict from fixed file
             self._dict_pub = F.load_dicts([path_pub])
         except OSError as e:  # from load_dicts
-            F.printd("error:", str(e), self._debug)
+            F.printd(self.S_ERR_ERR, str(e))
 
         # NB: reload AFTER save to set sub-dict pointers
         self._reload_dicts()

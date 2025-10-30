@@ -5,7 +5,7 @@
             "name": "Project",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/__PP_NAME_PRJ_SMALL__.py",
+            "program": "__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         },
@@ -13,7 +13,7 @@
             "name": "Prj Args",
             "type": "debugpy",
             "request": "launch",
-            "program": "src/__PP_NAME_PRJ_SMALL__.py",
+            "program": "__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "args": "${command:pickArgs}"

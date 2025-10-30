@@ -124,6 +124,10 @@ class PyBaker(PyPlate):
 to build."
     )
 
+    # error strings
+    # I18N: general error start
+    S_ERR_ERR = _("Error:")
+
     # --------------------------------------------------------------------------
     # Instance methods
     # --------------------------------------------------------------------------
@@ -143,12 +147,9 @@ to build."
         # do super init
         super().__init__()
 
-        # set flag for do_before_fix/do_after_fix
-        self._is_pm = False
-
         # set the initial values of properties
-        self._is_ide = False
-        self._new_ver = None
+        self._cmd_ide = False
+        self._cmd_ver = None
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -213,7 +214,7 @@ to build."
             action=self.S_ARG_IDE_ACTION,
         )
 
-        # add ver option
+        # add version option
         self._parser.add_argument(
             self.S_ARG_VER_OPTION,
             dest=self.S_ARG_VER_DEST,
@@ -229,10 +230,10 @@ to build."
             self._dict_dbg = C.D_DBG_PB
 
         # get ide flag from cmd line
-        self._is_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
+        self._cmd_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
 
         # user changed version on cmd line
-        self._new_ver = self._dict_args.get(self.S_ARG_VER_DEST, "")
+        self._cmd_ver = self._dict_args.get(self.S_ARG_VER_DEST, "")
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -251,7 +252,7 @@ to build."
         # ----------------------------------------------------------------------
 
         # if ide=yes, ask for prj name
-        if self._is_ide:
+        if self._cmd_ide:
 
             # ask for prj name rel to cwd
             in_str = C.S_ASK_IDE.format(self._dir_prj)
@@ -301,7 +302,7 @@ to build."
         # if there was a problem
         except OSError as e:  # from load_dicts
             # exit gracefully
-            print("error:", e)
+            print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
         # NB: reload BEFORE first save to set sub-dict pointers
@@ -314,11 +315,11 @@ to build."
         # check for new version
 
         # first check if passed on cmd line
-        if self._new_ver:
+        if self._cmd_ver:
 
             # check version before we start fixing
             pattern = C.S_SEM_VER_VALID
-            version = self._new_ver
+            version = self._cmd_ver
             ver_ok = re.search(pattern, version) is not None
 
             # ask if user wants to keep invalid version or quit
@@ -349,7 +350,7 @@ to build."
                 if new_ver == "":
 
                     # set the same version, and we are done
-                    self._new_ver = old_ver
+                    self._cmd_ver = old_ver
                     break
 
                 # check version before we start fixing
@@ -361,7 +362,7 @@ to build."
                 if ver_ok:
 
                     # set the new version, and we are done
-                    self._new_ver = new_ver
+                    self._cmd_ver = new_ver
                     break
 
                 # print version error
@@ -369,7 +370,7 @@ to build."
 
         print()
         # change in project.json
-        self._dict_pub_meta[C.S_KEY_META_VERSION] = self._new_ver
+        self._dict_pub_meta[C.S_KEY_META_VERSION] = self._cmd_ver
 
         # ----------------------------------------------------------------------
 
@@ -479,4 +480,5 @@ if __name__ == "__main__":
 # -)
 
 # "in little rooms, in buildings, "
-# "in lives which are completely meaningless..."
+# "in the middle of these lives "
+# "which are completely meaningless..."

@@ -113,20 +113,17 @@ a project."
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initialize the new object
+    # def __init__(self):
+    #     """
+    #     Initialize the new object
 
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
-        new object.
-        """
+    #     Initializes a new instance of the class, setting the default values
+    #     of its properties, and any other code that needs to run to create a
+    #     new object.
+    #     """
 
-        # do super init
-        super().__init__()
-
-        # set flag for do_before_fix/do_after_fix
-        self._is_pm = True
+    #     # do super init
+    #     super().__init__()
 
     # --------------------------------------------------------------------------
     # Public methods

@@ -12,7 +12,7 @@
         "__PP_README_FILE__": "README.md",
         "__PP_TOML_FILE__": "pyproject.toml",
         "__PP_REQS_FILE__": "requirements.txt",
-        "__PP_DIR_IMAGES__": "img",
+        "__PP_DIR_IMAGES__": "images",
         "__PP_DIR_LIB__": "lib",
         "__PP_INST_ASSETS__": "assets",
         "__PP_DIR_INSTALL__": "install",
