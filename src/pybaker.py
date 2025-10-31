@@ -20,6 +20,8 @@ necessary files to create a complete distribution of the project.
 Run pybaker -h for more options.
 """
 
+# TODO: add -l option to add language
+
 # ------------------------------------------------------------------------------
 # Imports
 # ------------------------------------------------------------------------------

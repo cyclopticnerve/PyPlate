@@ -160,6 +160,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # contents of default config file
     S_CFG_DEF = "{}"
 
+    # default format af log files
+    S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
+    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
+
     # --------------------------------------------------------------------------
     # error messages
 
@@ -189,8 +193,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         new object.
         """
 
-        print("super ", __name__)
-
         # set defaults
 
         # cfg stuff
@@ -198,7 +200,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._dict_cfg = {}
 
         # log stuff
-        self._path_log_def = self.P_LOG_DEF
         self._logger = logging.getLogger(__name__)
 
         # cmd line stuff
@@ -207,30 +208,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._dict_args = {}
         self._debug = False
         self._path_cfg_arg = None
-
-    # --------------------------------------------------------------------------
-    # Public methods
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # The main method of the program
-    # --------------------------------------------------------------------------
-    def main(self):
-        """
-        The main method of the program
-
-        This method is the main entry point for the program, initializing the
-        program, and performing its steps.
-
-        The implementation of this function in the superclass is just a dummy
-        placeholder. The real work should be done in the subclass.
-        """
-
-        # call boilerplate code
-        self._setup()
-
-        # parse cmd line in super
-        self._do_cmd_line()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -246,6 +223,14 @@ class __PP_NAME_PRJ_PASCAL__Base:
         Perform some mundane stuff like running the arg parser and loading
         config files.
         """
+
+        # set up logging
+        logging.basicConfig(
+            filename=self.P_LOG_DEF,
+            level=logging.INFO,
+            format=self.S_LOG_FMT,
+            datefmt=self.S_LOG_DATE_FMT,
+        )
 
         # ----------------------------------------------------------------------
         # use cmd line
@@ -263,7 +248,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             help=self.S_ARG_HLP_HELP,
         )
 
-        # add help option
+        # add uninstall option
         self._parser.add_argument(
             self.S_ARG_UNINST_OPTION,
             action=self.S_ARG_UNINST_ACTION,
@@ -271,10 +256,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
             help=self.S_ARG_UNINST_HELP,
         )
 
-        logging.basicConfig(
-            filename="__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log",
-            level=logging.INFO,
-        )
+        # parse cmd line in super
+        self._do_cmd_line()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -307,14 +290,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
             # print usage and arg info and exit
             self._parser.print_help()
             print()
-            sys.exit(-1)
+            sys.exit(0)
 
         # punt to uninstall func
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
             self._do_uninstall()
-            sys.exit(-1)
 
         # ----------------------------------------------------------------------
         # set props from args
@@ -347,20 +329,27 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._load_config()
 
     # --------------------------------------------------------------------------
-    # Boilerplate to use at the end of main
+    # Handle the --uninstall cmd line op
     # --------------------------------------------------------------------------
-    def _teardown(self):
+    def _do_uninstall(self):
         """
-        Boilerplate to use at the end of main
-
-        Perform some mundane stuff like saving config files.
+        Handle the --uninstall cmd line op
         """
 
-        # ----------------------------------------------------------------------
-        # use cfg
+        # if path exists
+        if self.P_UNINST.exists():
 
-        # call to save config
-        self._save_config()
+            # run uninstall and exit
+            cmd = str(self.P_UNINST)
+            try:
+                F.run(cmd, shell=True)
+            except F.CNRunError as e:
+                print(self.S_ERR_ERR, e)
+        else:
+            print(self.S_ERR_NO_UNINST)
+
+        # bye bye
+        sys.exit(0)
 
     # --------------------------------------------------------------------------
     # Load config data from a file
@@ -416,6 +405,27 @@ class __PP_NAME_PRJ_PASCAL__Base:
                 F.printd(self.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
+    # Boilerplate to use at the end of main
+    # --------------------------------------------------------------------------
+    def _teardown(self):
+        """
+        Boilerplate to use at the end of main
+
+        Perform some mundane stuff like saving config files.
+        """
+
+        # ----------------------------------------------------------------------
+        # use cfg
+
+        # call to save config
+        self._save_config()
+
+        # separate session logs
+        self._logger.info(
+            "\n--------------------------------------------------------------------------------"
+        )
+
+    # --------------------------------------------------------------------------
     # Save config data to a file
     # --------------------------------------------------------------------------
     def _save_config(self):
@@ -455,29 +465,5 @@ class __PP_NAME_PRJ_PASCAL__Base:
                 F.save_dict(self._dict_cfg, l_paths)
             except OSError as e:  # from save_dict
                 F.printd(self.S_ERR_ERR, str(e))
-
-    # --------------------------------------------------------------------------
-    # Handle the --uninstall cmd line op
-    # --------------------------------------------------------------------------
-    def _do_uninstall(self):
-        """
-        Handle the -- uninstall cmd line op
-        """
-
-        # if path exists
-        if self.P_UNINST.exists():
-
-            # run uninstall and exit
-            cmd = str(self.P_UNINST)
-            try:
-                F.run(cmd, shell=True)
-            except F.CNRunError as e:
-                print(self.S_ERR_ERR, e)
-        else:
-            print(self.S_ERR_NO_UNINST)
-
-        # bye bye
-        sys.exit(-1)
-
 
 # -)

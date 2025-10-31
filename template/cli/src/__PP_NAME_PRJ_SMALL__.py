@@ -13,7 +13,7 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file]$ ./__PP_NAME_PRJ_SMALL__.py [cmd line]
+foo@bar:~[path to directory of this file] ./__PP_NAME_PRJ_SMALL__.py [cmd line]
 
 or if installed in a global location:
 
@@ -26,36 +26,9 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
-# system imports
-import gettext
-import locale
-import logging
-from pathlib import Path
-
 # local imports
+from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI and GUI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
-
-# path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -77,9 +50,9 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     required for the program.
     """
 
-    # --------------------------------------------------------------------------
-    # Initialize the new object
-    # --------------------------------------------------------------------------
+    # # --------------------------------------------------------------------------
+    # # Initialize the new object
+    # # --------------------------------------------------------------------------
     # def __init__(self):
     #     """
     #     Initialize the new object
@@ -92,7 +65,8 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     # do super init
     #     super().__init__()
 
-    # NB: add class properties here
+    #     # NB: add class properties here
+    #     self._foo = True
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -112,7 +86,8 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         # ----------------------------------------------------------------------
         # setup
 
-        super().main()
+        # call boilerplate code
+        self._setup()
 
         # ----------------------------------------------------------------------
         # main stuff
@@ -132,39 +107,35 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
 
     # NB: these are the main steps, called in order from main
 
-    # --------------------------------------------------------------------------
-    # Boilerplate to use at the start of main
-    # --------------------------------------------------------------------------
-    def _setup(self):
-        """
-        Boilerplate to use at the start of main
+    # # --------------------------------------------------------------------------
+    # # Boilerplate to use at the start of main
+    # # --------------------------------------------------------------------------
+    # def _setup(self):
+    #     """
+    #     Boilerplate to use at the start of main
 
-        Perform some mundane stuff like setting properties.
-        """
+    #     Perform some mundane stuff like setting properties.
+    #     If you implement this function. make sure to call super() LAST!!!
+    #     """
 
-        # do setup
-        super()._setup()
+    #     # add debug option
+    #     self._parser.add_argument(
+    #         self.S_ARG_DBG_OPTION,
+    #         action=self.S_ARG_DBG_ACTION,
+    #         dest=self.S_ARG_DBG_DEST,
+    #         help=self.S_ARG_DBG_HELP,
+    #     )
 
-        # add cfg option
-        self._parser.add_argument(
-            self.S_ARG_CFG_OPTION,
-            dest=self.S_ARG_CFG_DEST,
-            help=self.S_ARG_CFG_HELP,
-            metavar=self.S_ARG_CFG_METAVAR,
-        )
+    #     # add cfg option
+    #     self._parser.add_argument(
+    #         self.S_ARG_CFG_OPTION,
+    #         dest=self.S_ARG_CFG_DEST,
+    #         help=self.S_ARG_CFG_HELP,
+    #         metavar=self.S_ARG_CFG_METAVAR,
+    #     )
 
-        # add debug option
-        self._parser.add_argument(
-            self.S_ARG_DBG_OPTION,
-            action=self.S_ARG_DBG_ACTION,
-            dest=self.S_ARG_DBG_DEST,
-            help=self.S_ARG_DBG_HELP,
-        )
-
-
-    # --------------------------------------------------------------------------
-    # Private methods
-    # --------------------------------------------------------------------------
+    #     # do setup
+    #     super()._setup()
 
     # --------------------------------------------------------------------------
     # Short description
@@ -185,7 +156,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         Long description (including HTML).
         """
 
-        logging.info("_func")
+        self._logger.info("_func")
 
         # check for debug flag
         if self._debug:
@@ -195,6 +166,26 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         # no debug, return normal result
         # I18N: context for this string
         return _("this is func")
+
+    # # --------------------------------------------------------------------------
+    # # Boilerplate to use at the end of main
+    # # --------------------------------------------------------------------------
+    # def _teardown(self):
+    #     """
+    #     Boilerplate to use at the end of main
+
+    #     Perform some mundane stuff like saving properties.
+    #     If you implement this function. make sure to call super() LAST!!!
+    #     """
+
+    #     print("sub ", .f_code.co_name)
+
+    #     # save a prop
+    #     self._dict_cfg["foo"] = "bar"
+
+    #     # do teardown
+    #     super()._teardown()
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
