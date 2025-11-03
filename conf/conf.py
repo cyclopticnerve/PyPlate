@@ -1436,7 +1436,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # set DOCS_DIR_API
     if prj_type in D_DOCS_DIR_API:
-        dict_pub[S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
+        dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
