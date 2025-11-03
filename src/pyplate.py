@@ -28,9 +28,9 @@ Run pymaker -h for more options.
 import argparse
 import gettext
 import locale
+import logging
 from pathlib import Path
 import re
-import shutil
 import sys
 
 # local imports
@@ -57,10 +57,10 @@ import conf.conf as C  # type: ignore
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
 # NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./py[m|b]aker.py
 
 # path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
+T_DIR_PRJ = P_DIR_PRJ
 
 # init gettext
 T_DOMAIN = "pyplate"
@@ -95,8 +95,9 @@ class PyPlate:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # find path to pyplate project
-    P_DIR_PP = Path(__file__).parents[1].resolve()
+    # path to default log file
+    # NB: if not using, set to None
+    P_LOG_DEF = P_DIR_PRJ / "log/pyplate.log"
 
     # pyplate: replace=True
 
@@ -109,19 +110,19 @@ in Python from a template"
 
     # pyplate: replace=False
 
-    # config option strings
-    S_ARG_HLP_OPTION = "-h"
-    S_ARG_HLP_ACTION = "store_true"
-    S_ARG_HLP_DEST = "HLP_DEST"
-    # I18N: help option help
-    S_ARG_HLP_HELP = _("show this help message and exit")
-
     # debug option strings
     S_ARG_DBG_OPTION = "-d"
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
     # I18N help string for debug cmd line option
     S_ARG_DBG_HELP = _("enable debugging mode")
+
+    # config option strings
+    S_ARG_HLP_OPTION = "-h"
+    S_ARG_HLP_ACTION = "store_true"
+    S_ARG_HLP_DEST = "HLP_DEST"
+    # I18N: help option help
+    S_ARG_HLP_HELP = _("show this help message and exit")
 
     # about string (to be set by subclass)
     S_ABOUT = ""
@@ -131,6 +132,10 @@ in Python from a template"
 
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
+
+    # default format af log files
+    S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
+    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
     # error strings
     # I18N: general error start
@@ -178,33 +183,37 @@ in Python from a template"
         # dictionary to hold current debug settings
         self._dict_dbg = {}
 
+        # log stuff
+        self._logger = logging.getLogger(__name__)
+        logging.basicConfig(
+            filename=self.P_LOG_DEF,
+            level=logging.INFO,
+            format=self.S_LOG_FMT,
+            datefmt=self.S_LOG_DATE_FMT,
+        )
+
         # cmd line stuff
         # NB: placeholder to avoid comparing to None (to be set by subclass)
-        self._parser = argparse.ArgumentParser()
+        self._parser = argparse.ArgumentParser(
+            add_help=False,
+            epilog=self.S_EPILOG,
+            formatter_class=CNFormatter,
+        )
         self._dict_args = {}
         self._debug = False
-        self._ide = False
 
-    # --------------------------------------------------------------------------
-    # Public methods
-    # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # set self._dir_prj
 
-    # --------------------------------------------------------------------------
-    # The main method of the program
-    # --------------------------------------------------------------------------
-    def main(self):
-        """
-        The main method of the program
+        # assume we are running in the project dir
+        # this is used in a lot of places, so just shorthand it
+        self._dir_prj = Path.cwd()
 
-        This method is the main entry point for the program, initializing the
-        program, and performing its steps.
-        """
+        # ----------------------------------------------------------------------
 
-        # call boilerplate code
-        self._setup()
-
-        # ask user for project info
-        self._get_project_info()
+        # set switch dicts to defaults
+        self._dict_sw_block = dict(C.D_SWITCH_DEF)
+        self._dict_sw_line = dict(self._dict_sw_block)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -224,27 +233,10 @@ in Python from a template"
 
         # print default about text
         print(self.S_ABOUT)
+        print(self.S_ABOUT_HELP)
 
         # ----------------------------------------------------------------------
         # use cmd line
-
-        # create a parser object in case we need it
-        self._parser = argparse.ArgumentParser(
-            add_help=False,
-            epilog=self.S_EPILOG,
-            formatter_class=CNFormatter,
-        )
-
-        # add help text to about block
-        print(self.S_ABOUT_HELP)
-
-        # add help option
-        self._parser.add_argument(
-            self.S_ARG_HLP_OPTION,
-            dest=self.S_ARG_HLP_DEST,
-            help=self.S_ARG_HLP_HELP,
-            action=self.S_ARG_HLP_ACTION,
-        )
 
         # add debug option
         self._parser.add_argument(
@@ -254,28 +246,65 @@ in Python from a template"
             action=self.S_ARG_DBG_ACTION,
         )
 
+        # add help option
+        self._parser.add_argument(
+            self.S_ARG_HLP_OPTION,
+            dest=self.S_ARG_HLP_DEST,
+            help=self.S_ARG_HLP_HELP,
+            action=self.S_ARG_HLP_ACTION,
+        )
+
+        # run the parser
+        args = self._parser.parse_args()
+        self._dict_args = vars(args)
+
         # ----------------------------------------------------------------------
-        # set self._dir_prj
+        # check for one-shot args
 
-        # assume we are running in the project dir
-        # this is used in a lot of places, so just shorthand it
-        self._dir_prj = Path.cwd()
+        # if -h passed, this will print and exit
+        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
+
+            # print usage and arg info and exit
+            self._parser.print_help()
+            print()
+            sys.exit(0)
+
+        # no -h, print epilog
+        print(self.S_EPILOG)
+        print()
 
         # ----------------------------------------------------------------------
+        # debug stuff
 
-        # set switch dicts to defaults
-        self._dict_sw_block = dict(C.D_SWITCH_DEF)
-        self._dict_sw_line = dict(self._dict_sw_block)
+        # get the args
+        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
+
+        # set debug flags in cnfunctions and conf
+        F.B_DEBUG = self._debug
+        C.B_DEBUG = self._debug
+
+        # debug turns off some post processing to speed up processing
+        # NB: changing values in self._dict_pub_dbg (through the functions in
+        # pyplate.py) will not affect the current session when running pymaker
+        # in debug mode. to do that, change the values of D_DBG_PM in
+        # pyplate.py
+        self._dict_dbg = self._dict_pub_dbg.copy()
+
+        # maybe yell
+        if self._debug:
+
+            # yup, yell
+            F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
+            print()
 
     # --------------------------------------------------------------------------
-    # Boilerplate to use at the start of main
+    # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _get_project_info(self):
+    def _teardown(self):
         """
-        Get project info
+        Boilerplate to use at the end of main
 
-        The implementation of this function in the superclass is just a dummy
-        placeholder. The real work should be done in the subclass.
+        Perform some mundane stuff like saving config files.
         """
 
     # --------------------------------------------------------------------------
@@ -316,13 +345,6 @@ in Python from a template"
 
         # print info
         print(C.S_ACTION_FIX, end="", flush=True)
-
-        # ----------------------------------------------------------------------
-
-        # # combine private dicts for string replacement
-        # self._dict_rep = F.combine_dicts(
-        #     [self._dict_prv_all, self._dict_prv_prj]
-        # )
 
         # ----------------------------------------------------------------------
 
@@ -417,59 +439,6 @@ in Python from a template"
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Parse the arguments from the command line
-    # --------------------------------------------------------------------------
-    def _do_cmd_line(self):
-        """
-        Parse the arguments from the command line
-
-        Parse the arguments from the command line, after the parser has been
-        set up.
-        """
-
-        # get namespace object
-        args = self._parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(args)
-
-        # ----------------------------------------------------------------------
-        # check for one-shot args
-
-        # if -h passed, this will print and exit
-        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
-            self._parser.print_help()
-            sys.exit(-1)
-
-        # no -h, print epilog
-        print(self.S_EPILOG)
-        print()
-
-        # ----------------------------------------------------------------------
-        # debug stuff
-
-        # get the args
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
-
-        # set debug flags in cnfunctions and conf
-        F.B_DEBUG = self._debug
-        C.B_DEBUG = self._debug
-
-        # debug turns off some post processing to speed up processing
-        # NB: changing values in self._dict_pub_dbg (through the functions in
-        # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
-        # pyplate.py
-        self._dict_dbg = self._dict_pub_dbg.copy()
-
-        # maybe yell
-        if self._debug:
-
-            # yup, yell
-            F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
-            print()
 
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
@@ -764,10 +733,7 @@ in Python from a template"
             return
 
         # do rename
-        if path.is_dir():
-            shutil.move(path, path_new)
-        else:
-            path.rename(path_new)
+        path.rename(path_new)
 
     # --------------------------------------------------------------------------
     # Reload sub-dict pointers before/after dict change
@@ -973,12 +939,12 @@ in Python from a template"
         """
 
         # get sources and filter out sources that don't exist
-        reqs_prj = self.P_DIR_PP / C.S_FILE_REQS_TYPE.format(prj_type_long)
+        reqs_prj = P_DIR_PRJ / C.S_FILE_REQS_TYPE.format(prj_type_long)
 
         # get src
         src = [
-            self.P_DIR_PP / C.S_FILE_REQS_ALL,
-            self.P_DIR_PP / reqs_prj,
+            P_DIR_PRJ / C.S_FILE_REQS_ALL,
+            P_DIR_PRJ / reqs_prj,
         ]
         src = [str(item) for item in src if item.exists()]
 

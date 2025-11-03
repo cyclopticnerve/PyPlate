@@ -26,51 +26,13 @@ Run pymaker -h for more options.
 # ------------------------------------------------------------------------------
 
 # system imports
-import gettext
-import locale
-from pathlib import Path
-import re
 import shutil
-import sys
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
+import pyplate as P
+from pyplate import _
 from pyplate import PyPlate
-
-# ------------------------------------------------------------------------------
-# local imports
-
-# pylint: disable=wrong-import-position
-
-# fudge the path to import conf stuff
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
-
-import conf.conf as C
-
-# pylint: enable=wrong-import-position
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
-
-# path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -111,21 +73,6 @@ a project."
     )
 
     # --------------------------------------------------------------------------
-    # Initialize the new object
-    # --------------------------------------------------------------------------
-    # def __init__(self):
-    #     """
-    #     Initialize the new object
-
-    #     Initializes a new instance of the class, setting the default values
-    #     of its properties, and any other code that needs to run to create a
-    #     new object.
-    #     """
-
-    #     # do super init
-    #     super().__init__()
-
-    # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
 
@@ -140,8 +87,17 @@ a project."
         program, and performing its steps.
         """
 
-        # do super main
-        super().main()
+        # ----------------------------------------------------------------------
+        # setup
+
+        # call boilerplate code
+        self._setup()
+
+        # ----------------------------------------------------------------------
+        # main stuff
+
+        # get project info
+        self._get_project_info()
 
         # do before template
         self._do_before_template()
@@ -160,6 +116,12 @@ a project."
 
         # do extra stuff to final dir after fix
         self._do_after_fix()
+
+        # ----------------------------------------------------------------------
+        # teardown
+
+        # call boilerplate code
+        self._teardown()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -180,17 +142,15 @@ a project."
         # do parent setup
         super()._setup()
 
-        # parse command line
-        self._do_cmd_line()
-
         # set props based on cmd line
         if self._debug:
-            self._dict_dbg = C.D_DBG_PM
+            self._dict_dbg = P.C.D_DBG_PM
 
         # do not run pymaker in pyplate dir
-        if self._dir_prj.is_relative_to(self.P_DIR_PP):
-            print(C.S_ERR_PRJ_DIR_IS_PP)
-            sys.exit(-1)
+        if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
+            print(P.C.S_ERR_PRJ_DIR_IS_PP)
+            P.sys.exit(-1)
+
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -203,26 +163,21 @@ a project."
         self._dict_prv_prj.
         """
 
-        # this does nothing, included for completeness
-        super()._get_project_info()
-
-        # ----------------------------------------------------------------------
-
         # check version from conf
-        pattern = C.S_SEM_VER_VALID
-        version = C.D_PUB_META[C.S_KEY_META_VERSION]
-        ver_ok = re.search(pattern, version) is not None
+        pattern = P.C.S_SEM_VER_VALID
+        version = P.C.D_PUB_META[P.C.S_KEY_META_VERSION]
+        ver_ok = P.re.search(pattern, version) is not None
 
         # ask if user wants to keep invalid version or quit
         if not ver_ok:
             res = F.dialog(
-                C.S_ERR_SEM_VER,
-                [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
-                default=C.S_ERR_SEM_VER_N,
+                P.C.S_ERR_SEM_VER,
+                [P.C.S_ERR_SEM_VER_Y, P.C.S_ERR_SEM_VER_N],
+                default=P.C.S_ERR_SEM_VER_N,
                 # loop=True
             )
-            if res == C.S_ERR_SEM_VER_N:
-                sys.exit(-1)
+            if res == P.C.S_ERR_SEM_VER_N:
+                P.sys.exit(-1)
 
         # ----------------------------------------------------------------------
         # first question is type
@@ -233,13 +188,13 @@ a project."
 
         # build the input question
         types = []
-        for item in C.L_TYPES:
-            s = C.S_ASK_TYPE_FMT.format(item[0], item[1])
+        for item in P.C.L_TYPES:
+            s = P.C.S_ASK_TYPE_FMT.format(item[0], item[1])
             types.append(s)
-        str_types = C.S_ASK_TYPE_JOIN.join(types)
+        str_types = P.C.S_ASK_TYPE_JOIN.join(types)
 
         # format the question
-        in_type = C.S_ASK_TYPE.format(str_types)
+        in_type = P.C.S_ASK_TYPE.format(str_types)
 
         # loop forever until we get a valid type
         while True:
@@ -258,13 +213,13 @@ a project."
         # next question is name
 
         # sanity check
-        cwd = Path.cwd()
+        cwd = P.Path.cwd()
 
         # if in debug mode
         if self._debug:
 
             # get long name
-            for item in C.L_TYPES:
+            for item in P.C.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
                     name_prj = f"{item[1]} DEBUG"
@@ -292,7 +247,7 @@ a project."
             while True:
 
                 # ask for name of project
-                name_prj = input(C.S_ASK_NAME)
+                name_prj = input(P.C.S_ASK_NAME)
                 name_prj = name_prj.strip(" ")
 
                 # check for valid name
@@ -308,7 +263,7 @@ a project."
                     if tmp_dir.exists():
 
                         # tell the user that the old name exists
-                        print(C.S_ERR_EXIST.format(name_prj_big))
+                        print(P.C.S_ERR_EXIST.format(name_prj_big))
                     else:
                         break
 
@@ -332,7 +287,7 @@ a project."
         name_sec_pascal = ""
 
         # do we need a second name?
-        if prj_type in C.D_NAME_SEC:
+        if prj_type in P.C.D_NAME_SEC:
 
             # dup prj names if debug
             if self._debug:
@@ -345,7 +300,7 @@ a project."
             else:
 
                 # format question for second name
-                s_sec_ask = C.D_NAME_SEC[prj_type]
+                s_sec_ask = P.C.D_NAME_SEC[prj_type]
                 s_sec_ask_fmt = s_sec_ask.format(name_prj_small)
 
                 # loop forever until we get a valid name or empty string
@@ -372,18 +327,18 @@ a project."
 
         # create global and calculated settings dicts in private.json
         self._dict_prv = {
-            C.S_KEY_PRV_ALL: C.D_PRV_ALL,
-            C.S_KEY_PRV_PRJ: C.D_PRV_PRJ,
+            P.C.S_KEY_PRV_ALL: P.C.D_PRV_ALL,
+            P.C.S_KEY_PRV_PRJ: P.C.D_PRV_PRJ,
         }
 
         # create individual dicts in project.json
         self._dict_pub = {
-            C.S_KEY_PUB_BL: C.D_PUB_BL,
-            C.S_KEY_PUB_DBG: C.D_PUB_DBG,
-            C.S_KEY_PUB_DIST: C.D_PUB_DIST[prj_type],
-            C.S_KEY_PUB_DOCS: C.D_PUB_DOCS,
-            C.S_KEY_PUB_I18N: C.D_PUB_I18N,
-            C.S_KEY_PUB_META: C.D_PUB_META,
+            P.C.S_KEY_PUB_BL: P.C.D_PUB_BL,
+            P.C.S_KEY_PUB_DBG: P.C.D_PUB_DBG,
+            P.C.S_KEY_PUB_DIST: P.C.D_PUB_DIST[prj_type],
+            P.C.S_KEY_PUB_DOCS: P.C.D_PUB_DOCS,
+            P.C.S_KEY_PUB_I18N: P.C.D_PUB_I18N,
+            P.C.S_KEY_PUB_META: P.C.D_PUB_META,
         }
 
         # NB: reload BEFORE first save to set sub-dict pointers
@@ -401,14 +356,14 @@ a project."
         self._dict_prv_prj["__PP_NAME_SEC_BIG__"] = name_sec_big
         self._dict_prv_prj["__PP_NAME_SEC_SMALL__"] = name_sec_small
         self._dict_prv_prj["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
-        self._dict_prv_prj["__PP_NAME_VENV__"] = C.S_VENV_FMT_NAME.format(
+        self._dict_prv_prj["__PP_NAME_VENV__"] = P.C.S_VENV_FMT_NAME.format(
             name_prj_small
         )
-        self._dict_prv_prj["__PP_FILE_APP__"] = C.S_APP_FILE_FMT.format(
+        self._dict_prv_prj["__PP_FILE_APP__"] = P.C.S_APP_FILE_FMT.format(
             name_prj_small
         )
         self._dict_prv_prj["__PP_CLASS_APP__"] = name_prj_pascal
-        self._dict_prv_prj["__PP_FILE_WIN__"] = C.S_WIN_FILE_FMT.format(
+        self._dict_prv_prj["__PP_FILE_WIN__"] = P.C.S_WIN_FILE_FMT.format(
             name_sec_small
         )
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
@@ -436,7 +391,7 @@ a project."
         'dict_pub' dicts before any copying occurs.
         """
 
-        C.do_before_template(
+        P.C.do_before_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 
@@ -454,13 +409,13 @@ a project."
         """
 
         # show info
-        print(C.S_ACTION_COPY, end="", flush=True)
+        print(P.C.S_ACTION_COPY, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
 
         # copy template/all
-        src = self.P_DIR_PP / C.S_DIR_TEMPLATE / C.S_DIR_ALL
+        src = P.P_DIR_PRJ / P.C.S_DIR_TEMPLATE / P.C.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -472,13 +427,13 @@ a project."
         prj_type_long = ""
 
         # get long type of project
-        for item in C.L_TYPES:
+        for item in P.C.L_TYPES:
             if item[0] == prj_type_short:
                 prj_type_long = item[2]
                 break
 
         # get the src dir in the template dir
-        src = self.P_DIR_PP / C.S_DIR_TEMPLATE / prj_type_long
+        src = P.P_DIR_PRJ / P.C.S_DIR_TEMPLATE / prj_type_long
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -486,10 +441,10 @@ a project."
         # do stuff outside template all/type
 
         # copy linked files
-        for key, val in C.D_COPY.items():
+        for key, val in P.C.D_COPY.items():
 
             # get src/dst
-            src = self.P_DIR_PP / key
+            src = P.P_DIR_PRJ / key
             dst = self._dir_prj / val
 
             # copy dir/file
@@ -506,7 +461,7 @@ a project."
 
         # ----------------------------------------------------------------------
         # done
-        F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after template copy
@@ -519,7 +474,7 @@ a project."
         _do_template, and before _do_before_fix.
         """
 
-        C.do_after_template(
+        P.C.do_after_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 

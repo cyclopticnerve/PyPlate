@@ -86,6 +86,7 @@ B_DEBUG = False
 # Strings
 # ------------------------------------------------------------------------------
 
+# default i18n lang
 S_WLANG = "en"
 # default encoding
 S_ENCODING = "UTF-8"
@@ -1066,7 +1067,12 @@ D_PUB_I18N = {
     # name of the project as domain
     S_KEY_PUB_I18N_DOM: "__PP_NAME_PRJ_SMALL__",
     # list of sources per domain
-    S_KEY_PUB_I18N_SRC: [S_DIR_BIN, S_DIR_INSTALL, S_DIR_SRC, "develop.py", ],
+    S_KEY_PUB_I18N_SRC: [
+        S_DIR_BIN,
+        S_DIR_INSTALL,
+        S_DIR_SRC,
+        "develop.py",
+    ],
     # computer languages
     S_KEY_PUB_I18N_CLANGS: {
         "Python": [
@@ -1076,7 +1082,9 @@ D_PUB_I18N = {
             ".ui",
             ".glade",
         ],
-        "Desktop": [".desktop"],
+        "Desktop": [
+            ".desktop",
+        ],
     },
     # dict of clangs and no exts (ie file names)
     S_KEY_PUB_I18N_NO_EXT: {
@@ -1543,6 +1551,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     else:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
 
+
 # ------------------------------------------------------------------------------
 # Do any work after fix
 # ------------------------------------------------------------------------------
@@ -1654,110 +1663,10 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # i18n
 
-    # # path to desktop template
-    path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
-    # path to desktop output
-    path_dsk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
-
+    # NB: needs to be callable from pybaker
     # if i18n flag is set
     if dict_dbg[S_KEY_DBG_I18N]:
-
-        # print info
-        print(S_ACTION_I18N, end="", flush=True)
-
-        # ----------------------------------------------------------------------
-        # do bulk of i18n
-
-        # create CNPotPy object
-        potpy = CNPotPy(
-            # header
-            str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
-            str_version=dict_prv[S_KEY_PRV_PRJ]["__PP_VER_MMR__"],
-            str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
-            str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
-            # base prj dir
-            dir_prj=dir_prj,
-            # in
-            list_src=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_SRC],
-            # out
-            dir_pot=S_PATH_POT,
-            dir_po=S_PATH_PO,
-            dir_locale=S_PATH_LOCALE,
-            # optional in
-            str_tag=S_I18N_TAG,
-            dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
-            dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
-            list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
-            charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
-            location=B_DEBUG,
-        )
-
-        # make .pot, .po, and .mo files
-        try:
-            potpy.main()
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # fail gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-        # do .desktop i18n/version
-
-        # check if we want template
-        if prj_type in L_MAKE_DESK:
-
-            # do the thing
-            try:
-                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
-            except F.CNRunError as e:
-                # fail gracefully
-                # F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd(S_ERR_ERR, str(e))
-
-    # --------------------------------------------------------------------------
-    # fix po files outside blacklist
-
-    # print info
-    print(S_ACTION_PO, end="", flush=True)
-
-    # get i18n path
-    path = dir_prj / S_DIR_I18N / S_DIR_PO
-
-    # get sub-dicts we need
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-
-    # replace version
-    pp_version = dict_prv_prj["__PP_VER_MMR__"]
-    str_pattern = S_PO_VER_SCH
-    str_rep = S_PO_VER_REP.format(pp_version)
-
-    # find all files matching ext
-    lst_pos = list(path.rglob("*.po"))
-
-    # for each file
-    for item in lst_pos:
-
-        # replace lang
-        lang = Path(item).parent.stem
-        str_pattern2 = S_PO_LANG_SCH
-        str_rep2 = S_PO_LANG_REP.format(lang)
-
-        # open file and get contents
-        with open(item, "r", encoding=S_ENCODING) as a_file:
-            text = a_file.read()
-
-        # replace version
-        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-        # replace lang
-        text = re.sub(str_pattern2, str_rep2, text, flags=re.M | re.S)
-
-        # save file
-        with open(item, "w", encoding=S_ENCODING) as a_file:
-            a_file.write(text)
-
-    # print done
-    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        do_i18n(dir_prj, dict_prv, dict_pub, dict_dbg)
 
     # --------------------------------------------------------------------------
     # add/remove placeholders
@@ -2074,6 +1983,128 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         # show info
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
+
+# ------------------------------------------------------------------------------
+# Add a language
+# ------------------------------------------------------------------------------
+def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
+    """
+    Add a language
+
+    Args:
+        dir_prj: The root of the new project
+        dict_prv: The dictionary containing private pyplate data
+        dict_pub: The dictionary containing public project data
+        dict_dbg: The dictionary containing the current session's debug
+        settings
+    """
+
+    # get project type
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
+    # print info
+    print(S_ACTION_I18N, end="", flush=True)
+
+    # --------------------------------------------------------------------------
+    # do bulk of i18n
+
+    # create CNPotPy object
+    potpy = CNPotPy(
+        # header
+        str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
+        str_version=dict_prv[S_KEY_PRV_PRJ]["__PP_VER_MMR__"],
+        str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
+        str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
+        # base prj dir
+        dir_prj=dir_prj,
+        # in
+        list_src=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_SRC],
+        # out
+        dir_pot=S_PATH_POT,
+        dir_po=S_PATH_PO,
+        dir_locale=S_PATH_LOCALE,
+        # optional in
+        str_tag=S_I18N_TAG,
+        dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
+        dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
+        list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
+        charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
+        location=B_DEBUG,
+    )
+
+    # make .pot, .po, and .mo files
+    try:
+        potpy.main()
+        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+    except F.CNRunError as e:
+        # fail gracefully
+        F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+        F.printd(S_ERR_ERR, str(e))
+
+    # --------------------------------------------------------------------------
+    # do .desktop i18n/version
+
+    # check if we want template
+    if prj_type in L_MAKE_DESK:
+
+        # path to desktop template
+        path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
+        # path to desktop output
+        path_dsk_out = (
+            dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
+        )
+
+        # do the thing
+        try:
+            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+        except F.CNRunError as e:
+            # fail gracefully
+            # F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd(S_ERR_ERR, str(e))
+
+    # --------------------------------------------------------------------------
+    # fix po files outside blacklist
+
+    # print info
+    print(S_ACTION_PO, end="", flush=True)
+
+    # get i18n path
+    path = dir_prj / S_DIR_I18N / S_DIR_PO
+
+    # get sub-dicts we need
+    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+
+    # replace version
+    pp_version = dict_prv_prj["__PP_VER_MMR__"]
+    str_pattern = S_PO_VER_SCH
+    str_rep = S_PO_VER_REP.format(pp_version)
+
+    # find all files matching ext
+    lst_pos = list(path.rglob("*.po"))
+
+    # for each file
+    for item in lst_pos:
+
+        # replace lang
+        lang = Path(item).parent.stem
+        str_pattern2 = S_PO_LANG_SCH
+        str_rep2 = S_PO_LANG_REP.format(lang)
+
+        # open file and get contents
+        with open(item, "r", encoding=S_ENCODING) as a_file:
+            text = a_file.read()
+
+        # replace version
+        text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+        # replace lang
+        text = re.sub(str_pattern2, str_rep2, text, flags=re.M | re.S)
+
+        # save file
+        with open(item, "w", encoding=S_ENCODING) as a_file:
+            a_file.write(text)
+
+    # print done
+    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
 # ------------------------------------------------------------------------------
 # Private functions
@@ -2555,5 +2586,6 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
+
 
 # -)

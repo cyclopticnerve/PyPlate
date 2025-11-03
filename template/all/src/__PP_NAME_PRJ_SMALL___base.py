@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # ------------------------------------------------------------------------------
 # Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
@@ -37,13 +36,16 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 # Globals
 # ------------------------------------------------------------------------------
 
+# project dir
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI and GUI
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
 
 # path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
+T_DIR_PRJ = P_DIR_PRJ
 
 # init gettext
 T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
@@ -92,9 +94,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
     # --------------------------------------------------------------------------
     # paths
-
-    # find path to project
-    P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
     # path to default config file
     # NB: if not using, set to None
@@ -201,10 +200,17 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # log stuff
         self._logger = logging.getLogger(__name__)
+        logging.basicConfig(
+            filename=self.P_LOG_DEF,
+            level=logging.INFO,
+            format=self.S_LOG_FMT,
+            datefmt=self.S_LOG_DATE_FMT,
+        )
 
         # cmd line stuff
-        # NB: placeholder to avoid comparing to None (to be set by subclass)
-        self._parser = argparse.ArgumentParser()
+        self._parser = argparse.ArgumentParser(
+            formatter_class=CNFormatter, add_help=False
+        )
         self._dict_args = {}
         self._debug = False
         self._path_cfg_arg = None
@@ -224,29 +230,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
         config files.
         """
 
-        # set up logging
-        logging.basicConfig(
-            filename=self.P_LOG_DEF,
-            level=logging.INFO,
-            format=self.S_LOG_FMT,
-            datefmt=self.S_LOG_DATE_FMT,
-        )
-
         # ----------------------------------------------------------------------
         # use cmd line
-
-        # create a parser object in case we need it
-        self._parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter, add_help=False
-        )
-
-        # add help option
-        self._parser.add_argument(
-            self.S_ARG_HLP_OPTION,
-            action=self.S_ARG_HLP_ACTION,
-            dest=self.S_ARG_HLP_DEST,
-            help=self.S_ARG_HLP_HELP,
-        )
 
         # add uninstall option
         self._parser.add_argument(
@@ -256,23 +241,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
             help=self.S_ARG_UNINST_HELP,
         )
 
-        # parse cmd line in super
-        self._do_cmd_line()
-
-    # --------------------------------------------------------------------------
-    # These are minor steps called from the main steps
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Parse the arguments from the command line
-    # --------------------------------------------------------------------------
-    def _do_cmd_line(self):
-        """
-        Parse the arguments from the command line
-
-        Parse the arguments from the command line, after the parser has been
-        set up.
-        """
+        # add help option
+        self._parser.add_argument(
+            self.S_ARG_HLP_OPTION,
+            action=self.S_ARG_HLP_ACTION,
+            dest=self.S_ARG_HLP_DEST,
+            help=self.S_ARG_HLP_HELP,
+        )
 
         # run the parser
         args = self._parser.parse_args()
@@ -315,14 +290,14 @@ class __PP_NAME_PRJ_PASCAL__Base:
             self._path_cfg_def = Path(self._path_cfg_def)
             if not self._path_cfg_def.is_absolute():
                 # make abs rel to self
-                self._path_cfg_def = self.P_DIR_PRJ / self._path_cfg_def
+                self._path_cfg_def = P_DIR_PRJ / self._path_cfg_def
 
         # accept path or str
         if self._path_cfg_arg:
             self._path_cfg_arg = Path(self._path_cfg_arg)
             if not self._path_cfg_arg.is_absolute():
                 # make abs rel to self
-                self._path_cfg_arg = self.P_DIR_PRJ / self._path_cfg_arg
+                self._path_cfg_arg = P_DIR_PRJ / self._path_cfg_arg
 
         # ----------------------------------------------------------------------
         # use cfg

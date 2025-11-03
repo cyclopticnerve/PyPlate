@@ -448,20 +448,20 @@ class CNInstall:
         # add help text to about block
         print(self.S_ABOUT_HELP)
 
-        # add help option
-        self._parser.add_argument(
-            self.S_ARG_HLP_OPTION,
-            dest=self.S_ARG_HLP_DEST,
-            help=self.S_ARG_HLP_HELP,
-            action=self.S_ARG_HLP_ACTION,
-        )
-
         # add dry run option
         self._parser.add_argument(
             self.S_ARG_DRY_OPTION,
             dest=self.S_ARG_DRY_DEST,
             help=self.S_ARG_DRY_HELP,
             action=self.S_ARG_DRY_ACTION,
+        )
+
+        # add help option
+        self._parser.add_argument(
+            self.S_ARG_HLP_OPTION,
+            dest=self.S_ARG_HLP_DEST,
+            help=self.S_ARG_HLP_HELP,
+            action=self.S_ARG_HLP_ACTION,
         )
 
         # parse command line

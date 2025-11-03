@@ -118,20 +118,20 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
 
-    #     # add debug option
-    #     self._parser.add_argument(
-    #         self.S_ARG_DBG_OPTION,
-    #         action=self.S_ARG_DBG_ACTION,
-    #         dest=self.S_ARG_DBG_DEST,
-    #         help=self.S_ARG_DBG_HELP,
-    #     )
-
     #     # add cfg option
     #     self._parser.add_argument(
     #         self.S_ARG_CFG_OPTION,
     #         dest=self.S_ARG_CFG_DEST,
     #         help=self.S_ARG_CFG_HELP,
     #         metavar=self.S_ARG_CFG_METAVAR,
+    #     )
+
+    #     # add debug option
+    #     self._parser.add_argument(
+    #         self.S_ARG_DBG_OPTION,
+    #         action=self.S_ARG_DBG_ACTION,
+    #         dest=self.S_ARG_DBG_DEST,
+    #         help=self.S_ARG_DBG_HELP,
     #     )
 
     #     # do setup
