@@ -43,52 +43,6 @@
                                 <ul class="dropdown-menu">
                                     
   <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Bin</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="../../bin/pybaker/" class="dropdown-item">pybaker.py</a>
-</li>
-            
-<li>
-    <a href="../../bin/pymaker/" class="dropdown-item">pymaker.py</a>
-</li>
-    </ul>
-  </li>
-                                    
-  <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Conf</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="../../conf/conf/" class="dropdown-item">conf.py</a>
-</li>
-            
-<li>
-    <a href="../../conf/mkdocs/" class="dropdown-item">mkdocs.py</a>
-</li>
-            
-<li>
-    <a href="../../conf/pdoc/" class="dropdown-item">pdoc.py</a>
-</li>
-    </ul>
-  </li>
-                                    
-  <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Install</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="../../install/install/" class="dropdown-item">install.py</a>
-</li>
-            
-<li>
-    <a href="../../install/uninstall/" class="dropdown-item">uninstall.py</a>
-</li>
-    </ul>
-  </li>
-                                    
-  <li class="dropdown-submenu">
     <a href="#" class="dropdown-item">Src</a>
     <ul class="dropdown-menu">
             
@@ -116,7 +70,7 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../../install/uninstall/" class="nav-link">
+                                <a rel="prev" href="../../.." class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
@@ -248,6 +202,26 @@ distribution from a PyPlate project.</p>
     # I18N help string for ide cmd line option
     S_ARG_IDE_HELP = _("ask for project folder when running in IDE")
 
+    # lang option strings
+    S_ARG_LANG_OPTION = "-l"
+    S_ARG_LANG_DEST = "LANG_DEST"
+    # I18N: help option help
+    S_ARG_LANG_HELP = _(
+        "add a language code ('en', 'en_US', etc.)\n(if used, -v is ignored)"
+    )
+    # I18N: config file dest
+    S_ARG_LANG_METAVAR = _("LANG")
+
+    # ide option strings
+    S_ARG_VER_OPTION = "-v"
+    S_ARG_VER_DEST = "VER_DEST"
+    # I18N help string for version cmd line option
+    S_ARG_VER_HELP = _(
+        "set the new version of the project\n(if used, -l is ignored)"
+    )
+    # I18N: config file dest
+    S_ARG_VER_METAVAR = _("VERSION")
+
     # about string
     S_ABOUT = (
         "\n"
@@ -258,8 +232,14 @@ distribution from a PyPlate project.</p>
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _("Run this program from the parent directory of the project " \
-    "you want to build.")
+    S_EPILOG = _(
+        "Run this program from the directory of the project you want to build."
+    )
+
+    # error strings
+
+    # I18N: language already exists in project.json and i18n folder
+    S_ERR_LANG_EXIST = _("Language already exists")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -281,7 +261,9 @@ distribution from a PyPlate project.</p>
         super().__init__()
 
         # set the initial values of properties
-        self._ide = False
+        self._cmd_ide = False
+        self._add_lang = None
+        self._cmd_ver = None
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -298,8 +280,17 @@ distribution from a PyPlate project.</p>
         program, and performing its steps.
         """
 
-        # do super main
-        super().main()
+        # ----------------------------------------------------------------------
+        # setup
+
+        # call boilerplate code
+        self._setup()
+
+        # ----------------------------------------------------------------------
+        # main stuff
+
+        # get project info
+        self._get_project_info()
 
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_before_fix()
@@ -319,6 +310,12 @@ distribution from a PyPlate project.</p>
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_after_dist()
 
+        # ----------------------------------------------------------------------
+        # teardown
+
+        # call boilerplate code
+        # self._teardown()
+
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
@@ -335,9 +332,6 @@ distribution from a PyPlate project.</p>
         Perform some mundane stuff like setting properties.
         """
 
-        # do setup
-        super()._setup()
-
         # add ide option
         self._parser.add_argument(
             self.S_ARG_IDE_OPTION,
@@ -346,37 +340,41 @@ distribution from a PyPlate project.</p>
             action=self.S_ARG_IDE_ACTION,
         )
 
-        # parse command line
-        self._do_cmd_line()
+        # make a mutually exclusive group (one or the other or none, but not
+        # both)
+        group = self._parser.add_mutually_exclusive_group()
+
+        # add lang option
+        group.add_argument(
+            self.S_ARG_LANG_OPTION,
+            dest=self.S_ARG_LANG_DEST,
+            help=self.S_ARG_LANG_HELP,
+            metavar=self.S_ARG_LANG_METAVAR,
+        )
+
+        # add version option
+        group.add_argument(
+            self.S_ARG_VER_OPTION,
+            dest=self.S_ARG_VER_DEST,
+            help=self.S_ARG_VER_HELP,
+            metavar=self.S_ARG_VER_METAVAR,
+        )
+
+        # do setup
+        super()._setup()
+
+        # set props based on cmd line
         if self._debug:
-            self._dict_debug = C.D_DBG_PB
+            self._dict_dbg = P.C.D_DBG_PB
 
         # get ide flag from cmd line
-        self._ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
+        self._cmd_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
 
-        # if ide=yes, ask for prj name
-        if self._ide:
+        # add a language and rebuild i18n
+        self._add_lang = self._dict_args.get(self.S_ARG_LANG_DEST, None)
 
-            # ask for prj name rel to cwd
-            in_str = C.S_ASK_IDE.format(self._dir_prj)
-            while True:
-                prj_name = input(in_str)
-                if prj_name == "":
-                    continue
-
-                # if running in ide, cwd is pyplate prj dir, so move up + down
-                tmp_dir = Path(self._dir_prj / prj_name).resolve()
-
-                # check if project exists
-                if not tmp_dir.exists():
-                    e_str = C.S_ERR_NOT_EXIST.format(tmp_dir)
-                    print(e_str)
-                    continue
-
-                # set project dir and exit loop
-                self._dir_prj = tmp_dir
-                print()
-                break
+        # user changed version on cmd line
+        self._cmd_ver = self._dict_args.get(self.S_ARG_VER_DEST, None)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -385,36 +383,173 @@ distribution from a PyPlate project.</p>
         """
         Get project info
 
+        Raises:
+            OSError if anything goes wrong
+
         Check that the PyPlate data is present and correct, so we don't crash
-        looking for non-existent files.
+        looking for non-existent files. Also handles command line settings.
         """
 
+        # ----------------------------------------------------------------------
+
+        # if ide=yes, ask for prj name
+        if self._cmd_ide:
+
+            # ask for prj name rel to cwd
+            in_str = P.C.S_ASK_IDE.format(self._dir_prj)
+            while True:
+                prj_name = input(in_str)
+                if prj_name == "":
+                    continue
+
+                # if running in ide, cwd is pyplate prj dir, so move up + down
+                tmp_dir = P.Path(self._dir_prj / prj_name).resolve()
+
+                # check if project exists
+                if not tmp_dir.exists():
+                    e_str = P.C.S_ERR_NOT_EXIST.format(tmp_dir)
+                    print(e_str)
+                    continue
+
+                # set project dir and exit loop
+                self._dir_prj = tmp_dir
+                # print()
+                break
+
+        # ----------------------------------------------------------------------
+
         # check if dir_prj has pyplate folder for a valid prj
-        path_pyplate = self._dir_prj / C.S_PRJ_PP_DIR
+        path_pyplate = self._dir_prj / P.C.S_PRJ_PP_DIR
         if not path_pyplate.exists():
-            print(C.S_ERR_NOT_PRJ)
-            sys.exit()
+            print(P.C.S_ERR_NOT_PRJ)
+            P.sys.exit(-1)
 
         # check if data files exist
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+        path_prv = self._dir_prj / P.C.S_PRJ_PRV_CFG
+        path_pub = self._dir_prj / P.C.S_PRJ_PUB_CFG
         if not path_prv.exists() or not path_pub.exists():
-            print(C.S_ERR_PP_MISSING)
-            sys.exit()
+            print(P.C.S_ERR_PP_MISSING)
+            P.sys.exit(-1)
 
         # check if files are valid json
         try:
-            # get global and calculated settings dicts in private.json
+            # get settings dicts in private.json
             self._dict_prv = F.load_dicts([path_prv], {})
 
-            # get individual dicts in project.json
+            # get settings dicts in project.json
+            # NB: may contain dunders
             self._dict_pub = F.load_dicts([path_pub], {})
 
-            # reload dict pointers after dict change
-            self._reload_dicts()
-        except OSError:
-            print(C.S_ERR_PP_INVALID)
-            sys.exit()
+        # if there was a problem
+        except OSError as e:  # from load_dicts
+            # exit gracefully
+            print(self.S_ERR_ERR, e)
+            P.sys.exit(-1)
+
+        # NB: reload BEFORE first save to set sub-dict pointers
+        self._reload_dicts()
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
+
+        # ----------------------------------------------------------------------
+        # handle -l
+        if self._add_lang:
+
+            # get lang dict from props
+            dict_lang = self._dict_pub_i18n[P.C.S_KEY_PUB_I18N_WLANGS]
+
+            # only add once
+            if not self._add_lang in dict_lang:
+
+                # add lang to dict
+                dict_lang.append(self._add_lang)
+
+                # do the thing
+                P.C.do_i18n(
+                    self._dir_prj,
+                    self._dict_prv,
+                    self._dict_pub,
+                    self._dict_dbg,
+                )
+
+                # save new lang dict
+                self._save_project_info()
+            else:
+
+                # lang exists, print msg
+                print(self.S_ERR_LANG_EXIST)
+
+            # pass or fail, we are done
+            P.sys.exit(0)
+
+        # ----------------------------------------------------------------------
+        # check for new version
+
+        # first check if passed on cmd line
+        if self._cmd_ver:
+
+            # check version before we start fixing
+            pattern = P.C.S_SEM_VER_VALID
+            version = self._cmd_ver
+            ver_ok = P.re.search(pattern, version) is not None
+
+            # ask if user wants to keep invalid version or quit
+            if not ver_ok:
+                res = F.dialog(
+                    P.C.S_ERR_SEM_VER,
+                    [P.C.S_ERR_SEM_VER_Y, P.C.S_ERR_SEM_VER_N],
+                    default=P.C.S_ERR_SEM_VER_N,
+                    loop=True,
+                )
+                if res == P.C.S_ERR_SEM_VER_N:
+                    P.sys.exit(-1)
+
+        # not passed, ask question
+        else:
+
+            # format and ask question
+            old_ver = self._dict_pub_meta[P.C.S_KEY_META_VERSION]
+            ask_ver = P.C.S_ASK_VER.format(old_ver)
+
+            # loop until condition
+            while True:
+
+                # ask for new version
+                new_ver = input(ask_ver)
+
+                # user pressed Enter, return original
+                if new_ver == "":
+
+                    # set the same version, and we are done
+                    self._cmd_ver = old_ver
+                    break
+
+                # check version before we start fixing
+                pattern = P.C.S_SEM_VER_VALID
+                version = new_ver
+                ver_ok = P.re.search(pattern, version) is not None
+
+                # ask if user wants to keep invalid version or quit
+                if ver_ok:
+
+                    # set the new version, and we are done
+                    self._cmd_ver = new_ver
+                    break
+
+                # print version error
+                print(P.C.S_ERR_SEM_VER)
+
+        # change in project.json
+        self._dict_pub_meta[P.C.S_KEY_META_VERSION] = self._cmd_ver
+
+        # ----------------------------------------------------------------------
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
+
+        # make look nice
+        print()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist
@@ -427,9 +562,12 @@ distribution from a PyPlate project.</p>
         called after _do_after_fix, and before _do_dist.
         """
 
-        C.do_before_dist(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+        P.C.do_before_dist(
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -442,13 +580,13 @@ distribution from a PyPlate project.</p>
         """
 
         # print info
-        print(C.S_ACTION_DIST, end="", flush=True)
+        print(P.C.S_ACTION_DIST, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do common dist stuff
 
         # find old dist? nuke it from orbit! it's the only way to be sure!
-        a_dist = self._dir_prj / C.S_DIR_DIST
+        a_dist = self._dir_prj / P.C.S_DIR_DIST
         if a_dist.is_dir():
             shutil.rmtree(a_dist)
 
@@ -474,7 +612,7 @@ distribution from a PyPlate project.</p>
                 shutil.copy2(src, dst)
 
         # done copying project files
-        print(C.S_ACTION_DONE)
+        F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after making dist
@@ -490,9 +628,12 @@ distribution from a PyPlate project.</p>
         install process.
         """
 
-        C.do_after_dist(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
-        )</code></pre>
+        P.C.do_after_dist(
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
+        )
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()</code></pre>
               </details>
 
 
@@ -539,7 +680,9 @@ new object.</p>
     super().__init__()
 
     # set the initial values of properties
-    self._ide = False</code></pre>
+    self._cmd_ide = False
+    self._add_lang = None
+    self._cmd_ver = None</code></pre>
             </details>
     </div>
 
@@ -571,8 +714,17 @@ program, and performing its steps.</p>
     program, and performing its steps.
     """
 
-    # do super main
-    super().main()
+    # ----------------------------------------------------------------------
+    # setup
+
+    # call boilerplate code
+    self._setup()
+
+    # ----------------------------------------------------------------------
+    # main stuff
+
+    # get project info
+    self._get_project_info()
 
     # do any fixing up of dicts (like meta keywords, etc)
     self._do_before_fix()

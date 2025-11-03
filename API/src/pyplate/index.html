@@ -43,52 +43,6 @@
                                 <ul class="dropdown-menu">
                                     
   <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Bin</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="../../bin/pybaker/" class="dropdown-item">pybaker.py</a>
-</li>
-            
-<li>
-    <a href="../../bin/pymaker/" class="dropdown-item">pymaker.py</a>
-</li>
-    </ul>
-  </li>
-                                    
-  <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Conf</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="../../conf/conf/" class="dropdown-item">conf.py</a>
-</li>
-            
-<li>
-    <a href="../../conf/mkdocs/" class="dropdown-item">mkdocs.py</a>
-</li>
-            
-<li>
-    <a href="../../conf/pdoc/" class="dropdown-item">pdoc.py</a>
-</li>
-    </ul>
-  </li>
-                                    
-  <li class="dropdown-submenu">
-    <a href="#" class="dropdown-item">Install</a>
-    <ul class="dropdown-menu">
-            
-<li>
-    <a href="../../install/install/" class="dropdown-item">install.py</a>
-</li>
-            
-<li>
-    <a href="../../install/uninstall/" class="dropdown-item">uninstall.py</a>
-</li>
-    </ul>
-  </li>
-                                    
-  <li class="dropdown-submenu">
     <a href="#" class="dropdown-item">Src</a>
     <ul class="dropdown-menu">
             
@@ -161,7 +115,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.is_path_in_list" class="nav-link">is_path_in_list</a>
+            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.is_path_ext_in_list" class="nav-link">is_path_ext_in_list</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -252,25 +206,21 @@ PyPlate project from a template.</p>
     # Class constants
     # --------------------------------------------------------------------------
 
-    # find path to pyplate project
-    P_DIR_PP = Path(__file__).parents[1].resolve()
+    # path to default log file
+    # NB: if not using, set to None
+    P_LOG_DEF = P_DIR_PRJ / "log/pyplate.log"
 
     # pyplate: replace=True
 
     # short description
+    # pylint: disable=line-too-long
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    # pylint enable=line-too-long
 
     # version string
-    S_PP_VERSION = "0.0.3"
+    S_PP_VERSION = "Version 0.0.6"
 
     # pyplate: replace=False
-
-    # config option strings
-    S_ARG_HLP_OPTION = "-h"
-    S_ARG_HLP_ACTION = "store_true"
-    S_ARG_HLP_DEST = "HLP_DEST"
-    # I18N: help option help
-    S_ARG_HLP_HELP = _("show this help message and exit")
 
     # debug option strings
     S_ARG_DBG_OPTION = "-d"
@@ -278,6 +228,13 @@ PyPlate project from a template.</p>
     S_ARG_DBG_DEST = "DBG_DEST"
     # I18N help string for debug cmd line option
     S_ARG_DBG_HELP = _("enable debugging mode")
+
+    # config option strings
+    S_ARG_HLP_OPTION = "-h"
+    S_ARG_HLP_ACTION = "store_true"
+    S_ARG_HLP_DEST = "HLP_DEST"
+    # I18N: help option help
+    S_ARG_HLP_HELP = _("show this help message and exit")
 
     # about string (to be set by subclass)
     S_ABOUT = ""
@@ -287,6 +244,14 @@ PyPlate project from a template.</p>
 
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
+
+    # default format af log files
+    S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
+    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
+
+    # error strings
+    # I18N: general error start
+    S_ERR_ERR = _("Error:")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -299,15 +264,12 @@ PyPlate project from a template.</p>
         """
         Initialize the new object
 
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
+        Initializes a new instance of the class, setting the default values \
+        of its properties, and any other code that needs to run to create a \
         new object.
         """
 
         # set the initial values of properties
-
-        # command line options
-        self._debug = False
 
         # internal props
         self._dir_prj = Path()
@@ -324,40 +286,46 @@ PyPlate project from a template.</p>
         # project.json dicts
         self._dict_pub = {}
         self._dict_pub_bl = {}
-        self._dict_pub_dbg = {}
+        self._dict_pub_dbg = {}  # the one from conf that will go in file
         self._dict_pub_dist = {}
         self._dict_pub_docs = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
         # dictionary to hold current debug settings
-        self._dict_debug = {}
+        self._dict_dbg = {}
+
+        # log stuff
+        self._logger = logging.getLogger(__name__)
+        logging.basicConfig(
+            filename=self.P_LOG_DEF,
+            level=logging.INFO,
+            format=self.S_LOG_FMT,
+            datefmt=self.S_LOG_DATE_FMT,
+        )
 
         # cmd line stuff
         # NB: placeholder to avoid comparing to None (to be set by subclass)
-        self._parser = argparse.ArgumentParser()
+        self._parser = argparse.ArgumentParser(
+            add_help=False,
+            epilog=self.S_EPILOG,
+            formatter_class=CNFormatter,
+        )
         self._dict_args = {}
+        self._debug = False
 
-    # --------------------------------------------------------------------------
-    # Public methods
-    # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # set self._dir_prj
 
-    # --------------------------------------------------------------------------
-    # The main method of the program
-    # --------------------------------------------------------------------------
-    def main(self):
-        """
-        The main method of the program
+        # assume we are running in the project dir
+        # this is used in a lot of places, so just shorthand it
+        self._dir_prj = Path.cwd()
 
-        This method is the main entry point for the program, initializing the
-        program, and performing its steps.
-        """
+        # ----------------------------------------------------------------------
 
-        # call boilerplate code
-        self._setup()
-
-        # ask user for project info
-        self._get_project_info()
+        # set switch dicts to defaults
+        self._dict_sw_block = dict(C.D_SWITCH_DEF)
+        self._dict_sw_line = dict(self._dict_sw_block)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -377,27 +345,10 @@ PyPlate project from a template.</p>
 
         # print default about text
         print(self.S_ABOUT)
+        print(self.S_ABOUT_HELP)
 
         # ----------------------------------------------------------------------
         # use cmd line
-
-        # create a parser object in case we need it
-        self._parser = argparse.ArgumentParser(
-            add_help=False,
-            epilog=self.S_EPILOG,
-            formatter_class=CNFormatter,
-        )
-
-        # add help text to about block
-        print(self.S_ABOUT_HELP)
-
-        # add help option
-        self._parser.add_argument(
-            self.S_ARG_HLP_OPTION,
-            dest=self.S_ARG_HLP_DEST,
-            help=self.S_ARG_HLP_HELP,
-            action=self.S_ARG_HLP_ACTION,
-        )
 
         # add debug option
         self._parser.add_argument(
@@ -407,38 +358,41 @@ PyPlate project from a template.</p>
             action=self.S_ARG_DBG_ACTION,
         )
 
-    # --------------------------------------------------------------------------
-    # Parse the arguments from the command line
-    # --------------------------------------------------------------------------
-    def _do_cmd_line(self):
-        """
-        Parse the arguments from the command line
+        # add help option
+        self._parser.add_argument(
+            self.S_ARG_HLP_OPTION,
+            dest=self.S_ARG_HLP_DEST,
+            help=self.S_ARG_HLP_HELP,
+            action=self.S_ARG_HLP_ACTION,
+        )
 
-        Parse the arguments from the command line, after the parser has been
-        set up.
-        """
-
-        # get namespace object
+        # run the parser
         args = self._parser.parse_args()
-
-        # convert namespace to dict
         self._dict_args = vars(args)
+
+        # ----------------------------------------------------------------------
+        # check for one-shot args
 
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
+
+            # print usage and arg info and exit
             self._parser.print_help()
-            sys.exit()
+            print()
+            sys.exit(0)
 
         # no -h, print epilog
         print(self.S_EPILOG)
         print()
 
         # ----------------------------------------------------------------------
+        # debug stuff
 
         # get the args
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, False)
+        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
 
-        # set global prop in conf
+        # set debug flags in cnfunctions and conf
+        F.B_DEBUG = self._debug
         C.B_DEBUG = self._debug
 
         # debug turns off some post processing to speed up processing
@@ -446,39 +400,14 @@ PyPlate project from a template.</p>
         # pyplate.py) will not affect the current session when running pymaker
         # in debug mode. to do that, change the values of D_DBG_PM in
         # pyplate.py
-        self._dict_debug = self._dict_pub_dbg
-
-        # ----------------------------------------------------------------------
+        self._dict_dbg = self._dict_pub_dbg.copy()
 
         # maybe yell
         if self._debug:
 
             # yup, yell
-            print(C.S_MSG_DEBUG)
-
-        # ----------------------------------------------------------------------
-        # set self._dir_prj
-
-        # assume we are running in the project dir
-        # this is used in a lot of places, so just shorthand it
-        self._dir_prj = Path.cwd()
-
-        # ----------------------------------------------------------------------
-
-        # set switch dicts to defaults
-        self._dict_sw_block = dict(C.D_SWITCH_DEF)
-        self._dict_sw_line = dict(self._dict_sw_block)
-
-    # --------------------------------------------------------------------------
-    # Get project info
-    # --------------------------------------------------------------------------
-    def _get_project_info(self):
-        """
-        Get project info
-
-        The implementation of this function in the superclass is just a dummy
-        placeholder. The real work should be done in the subclass.
-        """
+            F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
+            print()
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -495,8 +424,14 @@ PyPlate project from a template.</p>
         """
 
         C.do_before_fix(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj,
+            self._dict_prv,
+            self._dict_pub,
+            self._dict_dbg,
         )
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
@@ -513,44 +448,17 @@ PyPlate project from a template.</p>
         # print info
         print(C.S_ACTION_FIX, end="", flush=True)
 
-        # check version before we start
-        version = self._dict_pub_meta[C.S_KEY_META_VERSION]
-        pattern = C.S_SEM_VER_VALID
-        ver_ok = re.search(pattern, version) is not None
-
-        # ask if user wants to keep invalid version or quit
-        if not ver_ok:
-            res = F.dialog(
-                C.S_ERR_SEM_VER,
-                [C.S_ERR_SEM_VER_Y, C.S_ERR_SEM_VER_N],
-                C.S_ERR_SEM_VER_N,
-            )
-            if res == C.S_ERR_SEM_VER_N:
-                sys.exit()
-
-        # combine dicts for string replacement
-        self._dict_rep = F.combine_dicts(
-            [self._dict_prv_all, self._dict_prv_prj]
-        )
-
-        # save private.json and project.json after all fixes have been done
-        self._save_project_info()
-
-        # make sure pyplate in in skip_all
-        skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
-        if not C.S_PRJ_PP_DIR in skip_all:
-            skip_all.append(C.S_PRJ_PP_DIR)
+        # ----------------------------------------------------------------------
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        self._fix_blacklist_paths(self._dict_pub_bl)
+        dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
 
         # just shorten the names
-        skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
-        skip_contents = self._dict_pub_bl[C.S_KEY_SKIP_CONTENTS]
-        skip_header = self._dict_pub_bl[C.S_KEY_SKIP_HEADER]
-        skip_code = self._dict_pub_bl[C.S_KEY_SKIP_CODE]
-        skip_path = self._dict_pub_bl[C.S_KEY_SKIP_PATH]
+        skip_all = dict_bl[C.S_KEY_SKIP_ALL]
+        skip_contents = dict_bl[C.S_KEY_SKIP_CONTENTS]
+        skip_header = dict_bl[C.S_KEY_SKIP_HEADER]
+        skip_code = dict_bl[C.S_KEY_SKIP_CODE]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -590,16 +498,14 @@ PyPlate project from a template.</p>
                     # fix content with appropriate dict
                     self._fix_contents(item, bl_hdr, bl_code)
 
-                # handle files in skip_path
-                if not item in skip_path:
-                    self._fix_path(item)
+                # handle file paths with dunders
+                self._fix_path(item)
 
-            # handle dirs in skip_path
-            if not root in skip_path:
-                self._fix_path(root)
+            # handle dirs with dunders
+            self._fix_path(root)
 
         # done
-        print(C.S_ACTION_DONE)
+        F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -615,59 +521,18 @@ PyPlate project from a template.</p>
         """
 
         C.do_after_fix(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_debug
+            self._dir_prj,
+            self._dict_prv,
+            self._dict_pub,
+            self._dict_dbg,
         )
+
+        # save modified dicts/fix dunders in public/reload sub-dicts
+        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Convert items in blacklist to absolute Path objects
-    # --------------------------------------------------------------------------
-    def _fix_blacklist_paths(self, dict_bl):
-        """
-        Convert items in blacklist to absolute Path objects
-
-        Get absolute paths for all entries in the blacklist.
-        """
-
-        # make a copy and remove path separators in one shot
-        # NB: this is mostly for glob support, as globs cannot end in path
-        # separators
-        for key in dict_bl:
-            dict_bl[key] = [item.rstrip("/") for item in dict_bl[key]]
-
-        # support for absolute/relative/glob
-        # NB: taken from cntree.py
-
-        # for each section of blacklist
-        for key, val in dict_bl.items():
-            # convert all items in list to Path objects
-            paths = [Path(item) for item in val]
-
-            # move absolute paths to one list
-            abs_paths = [item for item in paths if item.is_absolute()]
-
-            # move relative/glob paths to another list
-            other_paths = [item for item in paths if not item.is_absolute()]
-
-            # convert relative/glob paths back to strings
-            other_strings = [str(item) for item in other_paths]
-
-            # get glob results as generators
-            glob_results = [self._dir_prj.glob(item) for item in other_strings]
-
-            # start with absolutes
-            result = abs_paths
-
-            # for each generator
-            for item in glob_results:
-                # add results as whole shebang
-                result += list(item)
-
-            # set the list as the result list
-            dict_bl[key] = result
 
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
@@ -692,7 +557,8 @@ PyPlate project from a template.</p>
         if not self._dict_type_rules or len(self._dict_type_rules) == 0:
 
             # do the basic replace (file got here after skip_all/skip_contents
-            # BUT NOT skip_bl/skip/code)
+            # BUT NOT skip_hdr/skip_code)
+            # print("no rules:", path)
             self._fix_text(path)
             return
 
@@ -961,20 +827,14 @@ PyPlate project from a template.</p>
             return
 
         # do rename
-        if path.is_dir():
-            shutil.move(path, path_new)
-        else:
-            path.rename(path_new)
+        path.rename(path_new)
 
     # --------------------------------------------------------------------------
-    # Reload dicts after any outside changes
+    # Reload sub-dict pointers before/after dict change
     # --------------------------------------------------------------------------
     def _reload_dicts(self):
         """
-        Reload dicts after any outside changes
-
-        This function is called when a dict is passed to another function, in
-        order to keep it synced with the internal dict.
+        Reload sub-dict pointers before/after dict change
         """
 
         # update individual dicts in dict_prv
@@ -991,14 +851,19 @@ PyPlate project from a template.</p>
 
         # update debug dict
         if not self._debug:
-            self._dict_debug = self._dict_pub_dbg
+            self._dict_dbg = self._dict_pub_dbg
+
+        # combine private dicts for string replacement
+        self._dict_rep = F.combine_dicts(
+            [self._dict_prv_all, self._dict_prv_prj]
+        )
 
     # --------------------------------------------------------------------------
-    # Save project info before fix
+    # Save project info
     # --------------------------------------------------------------------------
     def _save_project_info(self):
         """
-        Save project info before fix
+        Save project info
 
         Saves the private.json and project.json files after all modifications,
         and reloads them to use in _do_fix.
@@ -1013,9 +878,12 @@ PyPlate project from a template.</p>
             C.S_KEY_PRV_PRJ: self._dict_prv_prj,
         }
 
-        # save private settings
-        path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-        F.save_dict(dict_prv, [path_prv])
+        try:
+            # save private settings
+            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+            F.save_dict(dict_prv, [path_prv])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
 
         # create public settings
         dict_pub = {
@@ -1027,23 +895,35 @@ PyPlate project from a template.</p>
             C.S_KEY_PUB_META: self._dict_pub_meta,
         }
 
-        # save public settings
-        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-        F.save_dict(dict_pub, [path_pub])
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict(dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
-        # fix dunders in dict_pub w/o _dict_rep (project.json)
-        self._fix_contents(path_pub)
+        # THIS is the whole horrible reason for calling reload/save in separate
+        # functions. we need to un-dunder the public file when running pb,
+        # since it may have been modified to include dunders. to do that, we
+        # need a valid dict_rep. to do THAT, we need a valid public file. to do
+        # THAT, we need a valid project.json. to do THAT, we need ... FUCK IT.
+        # IT WORKS.
 
-        # reload dict from fixed file
-        dict_pub = F.load_dicts([path_pub])
-
-        # reload dict pointers after dict change
+        # NB: needed BEFORE _fix_contents (or any _fix_...)
         self._reload_dicts()
 
-    # --------------------------------------------------------------------------
-    # These are minor steps called from the main steps
-    # --------------------------------------------------------------------------
+        # fix dunders in dict_pub
+        self._fix_contents(path_pub)
+
+        try:
+            # reload dict from fixed file
+            self._dict_pub = F.load_dicts([path_pub])
+        except OSError as e:  # from load_dicts
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # NB: reload AFTER save to set sub-dict pointers
+        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -1069,7 +949,7 @@ PyPlate project from a template.</p>
             first_char = prj_type[0].lower()
 
             # check if it's one of ours
-            first_char_test = [item[0] for item in C.L_TYPES]
+            first_char_test = [item[0].lower() for item in C.L_TYPES]
             if first_char in first_char_test:
                 return True
 
@@ -1153,17 +1033,21 @@ PyPlate project from a template.</p>
         """
 
         # get sources and filter out sources that don't exist
-        reqs_prj = C.S_FILE_REQS_TYPE.format(prj_type_long)
+        reqs_prj = P_DIR_PRJ / C.S_FILE_REQS_TYPE.format(prj_type_long)
+
+        # get src
         src = [
-            self.P_DIR_PP / C.S_FILE_REQS_ALL,
-            self.P_DIR_PP / reqs_prj,
+            P_DIR_PRJ / C.S_FILE_REQS_ALL,
+            P_DIR_PRJ / reqs_prj,
         ]
         src = [str(item) for item in src if item.exists()]
 
         # get dst to put file lines
         dst = self._dir_prj / C.S_FILE_REQS
 
-        # # the new set of lines for requirements.txt
+        # ----------------------------------------------------------------------
+
+        # the new set of lines for requirements.txt
         new_file = []
 
         # read reqs files and put in result
@@ -1204,9 +1088,7 @@ PyPlate project from a template.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the new object</p>
-<p>Initializes a new instance of the class, setting the default values
-of its properties, and any other code that needs to run to create a
-new object.</p>
+<p>Initializes a new instance of the class, setting the default values         of its properties, and any other code that needs to run to create a         new object.</p>
 
 
             <details class="quote">
@@ -1215,15 +1097,12 @@ new object.</p>
     """
     Initialize the new object
 
-    Initializes a new instance of the class, setting the default values
-    of its properties, and any other code that needs to run to create a
+    Initializes a new instance of the class, setting the default values \
+    of its properties, and any other code that needs to run to create a \
     new object.
     """
 
     # set the initial values of properties
-
-    # command line options
-    self._debug = False
 
     # internal props
     self._dir_prj = Path()
@@ -1240,55 +1119,46 @@ new object.</p>
     # project.json dicts
     self._dict_pub = {}
     self._dict_pub_bl = {}
-    self._dict_pub_dbg = {}
+    self._dict_pub_dbg = {}  # the one from conf that will go in file
     self._dict_pub_dist = {}
     self._dict_pub_docs = {}
     self._dict_pub_i18n = {}
     self._dict_pub_meta = {}
 
     # dictionary to hold current debug settings
-    self._dict_debug = {}
+    self._dict_dbg = {}
+
+    # log stuff
+    self._logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        filename=self.P_LOG_DEF,
+        level=logging.INFO,
+        format=self.S_LOG_FMT,
+        datefmt=self.S_LOG_DATE_FMT,
+    )
 
     # cmd line stuff
     # NB: placeholder to avoid comparing to None (to be set by subclass)
-    self._parser = argparse.ArgumentParser()
-    self._dict_args = {}</code></pre>
-            </details>
-    </div>
+    self._parser = argparse.ArgumentParser(
+        add_help=False,
+        epilog=self.S_EPILOG,
+        formatter_class=CNFormatter,
+    )
+    self._dict_args = {}
+    self._debug = False
 
-</div>
+    # ----------------------------------------------------------------------
+    # set self._dir_prj
 
-<div class="doc doc-object doc-function">
+    # assume we are running in the project dir
+    # this is used in a lot of places, so just shorthand it
+    self._dir_prj = Path.cwd()
 
+    # ----------------------------------------------------------------------
 
-<h3 id="src.pyplate.PyPlate.main" class="doc doc-heading">
-            <code class="highlight language-python">main()</code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>The main method of the program</p>
-<p>This method is the main entry point for the program, initializing the
-program, and performing its steps.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/pyplate.py</code></summary>
-              <pre class="highlight"><code class="language-python">def main(self):
-    """
-    The main method of the program
-
-    This method is the main entry point for the program, initializing the
-    program, and performing its steps.
-    """
-
-    # call boilerplate code
-    self._setup()
-
-    # ask user for project info
-    self._get_project_info()</code></pre>
+    # set switch dicts to defaults
+    self._dict_sw_block = dict(C.D_SWITCH_DEF)
+    self._dict_sw_line = dict(self._dict_sw_block)</code></pre>
             </details>
     </div>
 
@@ -1518,7 +1388,7 @@ dict_sw_line.</p>
         exts = val[C.S_KEY_RULES_EXT]
 
         # # if we match ext, return only rep stuff
-        if is_path_in_list(path, exts):
+        if is_path_ext_in_list(path, exts):
             return val[C.S_KEY_RULES_REP]
 
     # default result is py rep
@@ -1531,15 +1401,15 @@ dict_sw_line.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="src.pyplate.is_path_in_list" class="doc doc-heading">
-            <code class="highlight language-python">is_path_in_list(path, lst)</code>
+<h2 id="src.pyplate.is_path_ext_in_list" class="doc doc-heading">
+            <code class="highlight language-python">is_path_ext_in_list(path, lst)</code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-        <p>Check if a file is in a list of file extensions</p>
+        <p>Check if a file's extension is in a list of file extensions</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1611,9 +1481,9 @@ dict_sw_line.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/pyplate.py</code></summary>
-              <pre class="highlight"><code class="language-python">def is_path_in_list(path, lst):
+              <pre class="highlight"><code class="language-python">def is_path_ext_in_list(path, lst):
     """
-    Check if a file is in a list of file extensions
+    Check if a file's extension is in a list of file extensions
 
     Args:
         path: The file to find
@@ -1623,7 +1493,7 @@ dict_sw_line.</p>
         Whether the file exists in the list
     """
 
-    # lowercase the list
+    # lowercase the file in's ext
     l_ext = [item.lower() for item in lst]
 
     # add dots
@@ -1633,7 +1503,7 @@ dict_sw_line.</p>
 
     # check if the suffix or the filename (for dot files) matches
     # NB: also checks for dot files
-    return path.suffix.lower() in l_ext or path.name.lower() in l_ext</code></pre>
+    return path.suffix in l_ext or path.name in l_ext</code></pre>
             </details>
     </div>
 
