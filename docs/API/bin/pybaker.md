@@ -1,2 +1,0 @@
-# pybaker.py
-::: bin.pybaker

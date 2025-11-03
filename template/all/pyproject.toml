@@ -12,8 +12,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "__PP_NAME_PRJ_BIG__"
-version = "__PP_VER_MMR__"
-description = "__PP_SHORT_DESC__"
+version = "0.0.6"
+description = "A program for creating and building CLI/GUI/Packages in Python from a template"
 authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
 readme = "__PP_README_FILE__"
 license = { file = "__PP_LICENSE_FILE__" }

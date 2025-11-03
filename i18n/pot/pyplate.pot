@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: pyplate 0.0.5\n"
+"Project-Id-Version: pyplate 0.0.6\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-09-14 10:55-0400\n"
+"POT-Creation-Date: 2025-11-03 13:29-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,234 +17,213 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. I18N: default date format
-msgid "%m/%d/%Y"
-msgstr ""
-
-#. I18N: def deps
-msgid "None"
-msgstr ""
-
-#. I18N: printable version number
-msgid "Version {}"
-msgstr ""
-
-#. I18N: ask prj name
-msgid "Project name: "
-msgstr ""
-
-#. I18N: ask prj type
-msgid "Project type [{}]: "
-msgstr ""
-
-#. I18N: ask module name
-msgid "Module name (default: {}): "
-msgstr ""
-
-#. I18N: ask window class name
-msgid "Window class name (default: {}): "
-msgstr ""
-
-#. I18N: ask prj name if running pybaker in IDE
-msgid "Project name: (relative to {}): "
-msgstr ""
-
-#. I18N: ask for new version
-msgid "Version ({}): "
-msgstr ""
-
-#. I18N: Type must be one of {}
-msgid "Type must be one of {}"
-msgstr ""
-
-#. I18N: Project names must be more than 1 character
-msgid "Name must be more than 1 character"
-msgstr ""
-
-#. I18N: Project names must start with a letter
-msgid "Name must start with a letter"
-msgstr ""
-
-#. I18N: Project names must end with a letter or number
-msgid "Name must end with a letter or number"
-msgstr ""
-
-msgid ""
-"Name must contain only letters, numbers, spaces, dashes (-), or underscores "
-"(_)"
-msgstr ""
-
-#. I18N: project already exists
-msgid "Project \"{}\" already exists"
-msgstr ""
-
-#. I18N: run pybaker on project that does not exist
-msgid "Project \"{}\" does not exist"
-msgstr ""
-
-msgid ""
-"This project does not have a 'pyplate' folder.\n"
-"Are you sure this is a PyPlate project?"
-msgstr ""
-
-#. I18N: pyplate/private/private.json or pyplate/project.json not found
-msgid "One or more PyPlate data files are missing"
-msgstr ""
-
-#. I18N: pyplate/private/private.json or pyplate/project.json not valid
-msgid "One or more PyPlate data files are corrupted"
-msgstr ""
-
-msgid ""
-"Warning: version number does not match S_SEM_VER_VALID\n"
-"See https://semver.org/"
-msgstr ""
-
-#. I18N: continue with bad sem ver
-msgid "y"
-msgstr ""
-
-#. I18N: quit if bad sem ver (the default, should be capitalized)
-msgid "N"
-msgstr ""
-
-#. I18N: Cannot run pymaker in PyPlate dir
-msgid "Cannot run pymaker in PyPlate dir"
-msgstr ""
-
-#. I18N: we want i18n but the template desktop doesn't exist
-msgid "Warning: file '{}' does not exist, using '{}'"
-msgstr ""
-
-msgid ""
-"\"{}\" is not a valid desktop category, see \"https://specifications."
-"freedesktop.org/menu-spec/latest/apa.html\""
-msgstr ""
-
-#. I18N: alternate text for screenshot in README.md
-msgid "Create the file {}"
-msgstr ""
-
-#. I18N: name of home folder in docs
-msgid "Home"
-msgstr ""
-
-msgid ""
-"WARNING! YOU ARE IN DEBUG MODE!\n"
-"IT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!\n"
-msgstr ""
-
-#. I18N: need internet connection to install requirements
-msgid "Make sure you are connected to the internet"
-msgstr ""
-
-#. I18N: Copy template files
-msgid "Copying template files... "
-msgstr ""
-
-#. I18N fix readme
-msgid "Fixing README... "
-msgstr ""
-
-#. I18N: fix other files
-msgid "Fixing metadata... "
-msgstr ""
-
-#. I18N: fix other files
-msgid "Fixing po files... "
-msgstr ""
-
-#. I18N: Do fix
-msgid "Fixing dunders... "
-msgstr ""
-
-#. I18N: Make git folder
-msgid "Making git folder... "
-msgstr ""
-
-#. I18N: Make venv folder
-msgid "Making venv folder... "
-msgstr ""
-
-#. I18N: freeze venv folder
-msgid "Freezing venv... "
-msgstr ""
-
-#. I18N: Make i18n folder
-msgid "Making i18n folder... "
-msgstr ""
-
-#. I18N: Make docs folder
-msgid "Making docs folder... "
-msgstr ""
-
-#. I18N: Deploy docs folder
-msgid "Baking docs folder... "
-msgstr ""
-
-#. I18N: Make tree file
-msgid "Making tree file... "
-msgstr ""
-
-#. I18N: Make dist folder
-msgid "Copying dist files... "
-msgstr ""
-
-#. I18N: Make install file
-msgid "Making install/uninstall files... "
-msgstr ""
-
-#. I18N: install package in own venv
-msgid "Installing package... "
-msgstr ""
-
-#. I18N: purge non-essential files
-msgid "Purging non-essential files... "
-msgstr ""
-
-#. I18N: compress files
-msgid "Compressing files... "
-msgstr ""
-
-#. I18N: remove dist
-msgid "Removing dist source... "
-msgstr ""
-
-#. I18N: Done
+#. I18N: done with step
+#: /home/dana/Projects/Python/PyPlate/develop.py:80
+#: /home/dana/Projects/Python/PyPlate/install/install.py:170
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:160
 msgid "Done"
 msgstr ""
 
-#. I18N: Failed
+#. I18N: step failed
+#: /home/dana/Projects/Python/PyPlate/develop.py:82
 msgid "Failed"
 msgstr ""
 
-#. I18N help string for ide cmd line option
-msgid "ask for project folder when running in IDE"
+#. I18N: show the venv step
+#: /home/dana/Projects/Python/PyPlate/develop.py:84
+#: /home/dana/Projects/Python/PyPlate/install/install.py:176
+msgid "Making venv folder... "
 msgstr ""
 
-#. I18N help string for version cmd line option
-msgid "set the new version of the project"
+#. I18N: show the reqs step
+#: /home/dana/Projects/Python/PyPlate/develop.py:86
+#: /home/dana/Projects/Python/PyPlate/install/install.py:178
+msgid "Installing requirements... "
 msgstr ""
 
-#. I18N: config file dest
-msgid "VERSION"
-msgstr ""
-
-msgid ""
-"Run this program from the parent directory of the project you want to build."
-msgstr ""
-
-msgid "Run this program from the directory where you want to create a project."
-msgstr ""
-
-#. I18N: help option help
-msgid "show this help message and exit"
+#. I18N: an error occurred
+#: /home/dana/Projects/Python/PyPlate/develop.py:97
+#: /home/dana/Projects/Python/PyPlate/install/install.py:157
+msgid "Error: "
 msgstr ""
 
 #. I18N help string for debug cmd line option
-msgid "enable debugging mode"
+#: /home/dana/Projects/Python/PyPlate/install/install.py:130
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:125
+msgid "enable dry run mode"
+msgstr ""
+
+#. I18N: help option help
+#: /home/dana/Projects/Python/PyPlate/install/install.py:137
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:132
+#: /home/dana/Projects/Python/PyPlate/src/pyplate.py:126
+msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
+#: /home/dana/Projects/Python/PyPlate/install/install.py:149
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:144
+#: /home/dana/Projects/Python/PyPlate/src/pyplate.py:132
 msgid "Use -h for help"
+msgstr ""
+
+#. I18N: install the program
+#: /home/dana/Projects/Python/PyPlate/install/install.py:165
+msgid "Installing {} Version {}"
+msgstr ""
+
+#. I18N: done installing
+#: /home/dana/Projects/Python/PyPlate/install/install.py:168
+msgid "{} installed"
+msgstr ""
+
+#. I18N: step failed
+#: /home/dana/Projects/Python/PyPlate/install/install.py:172
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:162
+msgid "Fail"
+msgstr ""
+
+#. I18N: show the copy step
+#: /home/dana/Projects/Python/PyPlate/install/install.py:174
+msgid "Copying files... "
+msgstr ""
+
+#. I18N: show desktop step
+#: /home/dana/Projects/Python/PyPlate/install/install.py:180
+msgid "Fixing .desktop file... "
+msgstr ""
+
+#. I18N: install aborted
+#: /home/dana/Projects/Python/PyPlate/install/install.py:182
+msgid "Installation aborted"
+msgstr ""
+
+#. I18N: answer yes
+#: /home/dana/Projects/Python/PyPlate/install/install.py:186
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:170
+msgid "y"
+msgstr ""
+
+#. I18N: answer no
+#: /home/dana/Projects/Python/PyPlate/install/install.py:188
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:172
+msgid "n"
+msgstr ""
+
+#: /home/dana/Projects/Python/PyPlate/install/install.py:191
+msgid ""
+"The current version of this program is already     installed.\n"
+"Do you want to overwrite?"
+msgstr ""
+
+#: /home/dana/Projects/Python/PyPlate/install/install.py:196
+msgid ""
+"A newer version of this program is currently     installed.\n"
+"Do you want to overwrite?"
+msgstr ""
+
+#. I18N: general error start
+#: /home/dana/Projects/Python/PyPlate/install/install.py:202
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:180
+#: /home/dana/Projects/Python/PyPlate/src/pyplate.py:143
+msgid "Error:"
+msgstr ""
+
+#. I18N: config file not found
+#: /home/dana/Projects/Python/PyPlate/install/install.py:205
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:183
+msgid "File {} not found"
+msgstr ""
+
+#. I18N: config file is not valid json
+#: /home/dana/Projects/Python/PyPlate/install/install.py:208
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:186
+msgid "File {} is not a JSON file"
+msgstr ""
+
+#. I18N: version numbers invalid
+#: /home/dana/Projects/Python/PyPlate/install/install.py:210
+msgid "One or both version numbers are invalid"
+msgstr ""
+
+#. I18N: src path invalid
+#: /home/dana/Projects/Python/PyPlate/install/install.py:213
+msgid "Source path can not be {}"
+msgstr ""
+
+#. I18N: dst path invalid
+#: /home/dana/Projects/Python/PyPlate/install/install.py:216
+msgid "Destination path can not be {}"
+msgstr ""
+
+#. I18N: uninstall the program
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:155
+msgid "Uninstalling {}"
+msgstr ""
+
+#. I18N: done uninstalling
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:158
+msgid "{} uninstalled"
+msgstr ""
+
+#. I18N: show the copy step
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:164
+msgid "Deleting files... "
+msgstr ""
+
+#. I18N: uninstall aborted
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:166
+msgid "Uninstallation aborted"
+msgstr ""
+
+#. I18N: ask to uninstall
+#: /home/dana/Projects/Python/PyPlate/install/uninstall.py:175
+msgid ""
+"This will uninstall {}.\n"
+"Do you want to continue?"
+msgstr ""
+
+#. I18N help string for ide cmd line option
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:64
+msgid "ask for project folder when running in IDE"
+msgstr ""
+
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:71
+msgid ""
+"add a language code ('en', 'en_US', etc.)\n"
+"(if used, -v is ignored)"
+msgstr ""
+
+#. I18N: config file dest
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:74
+msgid "LANG"
+msgstr ""
+
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:81
+msgid ""
+"set the new version of the project\n"
+"(if used, -l is ignored)"
+msgstr ""
+
+#. I18N: config file dest
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:84
+msgid "VERSION"
+msgstr ""
+
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:97
+msgid "Run this program from the directory of the project you want to build."
+msgstr ""
+
+#. I18N: language already exists in project.json and i18n folder
+#: /home/dana/Projects/Python/PyPlate/src/pybaker.py:103
+msgid "Language already exists"
+msgstr ""
+
+#: /home/dana/Projects/Python/PyPlate/src/pymaker.py:71
+msgid "Run this program from the directory where you want to create a project."
+msgstr ""
+
+#. I18N help string for debug cmd line option
+#: /home/dana/Projects/Python/PyPlate/src/pyplate.py:119
+msgid "enable debugging mode"
 msgstr ""

@@ -175,7 +175,7 @@ class PyBaker(PyPlate):
         # teardown
 
         # call boilerplate code
-        self._teardown()
+        # self._teardown()
 
     # --------------------------------------------------------------------------
     # Private methods

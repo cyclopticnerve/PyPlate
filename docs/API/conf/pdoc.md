@@ -1,2 +1,0 @@
-# pdoc.py
-::: conf.pdoc

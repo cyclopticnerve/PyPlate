@@ -97,10 +97,6 @@ S_DEPS_NONE = _("None")
 # default image ext
 # NB: format param is __PP_NAME_PRJ_SMALL__
 S_IMG_FMT = "{}.png"
-# file exts for do_after_fix
-S_EXT_SRC = ".py"
-S_EXT_DESKTOP = ".desktop"
-S_EXT_PO = ".po"
 
 # I18N: name of home folder in docs
 S_DOCS_HOME = _("Home")
@@ -287,7 +283,6 @@ S_KEY_SKIP_ALL = "SKIP_ALL"
 S_KEY_SKIP_CONTENTS = "SKIP_CONTENTS"
 S_KEY_SKIP_HEADER = "SKIP_HEADER"
 S_KEY_SKIP_CODE = "SKIP_CODE"
-S_KEY_SKIP_PATH = "SKIP_PATH"
 S_KEY_SKIP_TREE = "SKIP_TREE"
 
 # keys for i18n
@@ -388,6 +383,7 @@ S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_SCREENSHOT = "screenshot.png"
 S_FILE_DSK_TMP = "template.desktop"
+S_FILE_DEV_VENV = "develop.py"
 
 # concatenate some paths for install/uninstall
 S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
@@ -591,6 +587,11 @@ S_FILE_MKDOCS_YML = "mkdocs.yml"
 # ------------------------------------------------------------------------------
 # Lists
 # ------------------------------------------------------------------------------
+
+# file exts for do_after_fix
+L_EXT_SRC = [".py"]
+L_EXT_DESKTOP = [".desktop"]
+L_EXT_PO = [".po"]
 
 # the types of projects this script can create
 # val[0] is the char to enter for project type
@@ -1027,6 +1028,7 @@ D_PUB_BL = {
         S_FILE_REQS,
         "**/__pycache__",
         "**/*.egg-info",
+        "pyplate",
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -1037,22 +1039,12 @@ D_PUB_BL = {
         "**/*.ico",
     ],
     # skip header, fix text, fix path (0 1 1)
-    # NB: not sure what this is useful for, but here it is
     S_KEY_SKIP_HEADER: [],
     # fix header, skip text, fix path (1 0 1)
-    # NB: mostly used for files that contain dunders that will be replaced
-    # later or files we only want to replace headers in
     S_KEY_SKIP_CODE: [
-        # "**/*.gitignore*",
-        ".desktop",
+        "conf",
     ],
-    # fix header, fix text, skip path (1 1 0)
-    # NB: not really useful, since we always want to fix paths with dunders,
-    # but included for completeness
-    S_KEY_SKIP_PATH: [],
     # list of dirs/files to ignore in output dir when creating the initial tree
-    # NB: each item can be a partial path relative to the project directory, or
-    # a glob
     S_KEY_SKIP_TREE: [
         ".git",
         ".venv*",
@@ -1071,20 +1063,13 @@ D_PUB_I18N = {
         S_DIR_BIN,
         S_DIR_INSTALL,
         S_DIR_SRC,
-        "develop.py",
+        S_FILE_DEV_VENV,
     ],
     # computer languages
     S_KEY_PUB_I18N_CLANGS: {
-        "Python": [
-            "py",
-        ],
-        "Glade": [
-            ".ui",
-            ".glade",
-        ],
-        "Desktop": [
-            ".desktop",
-        ],
+        "Python": L_EXT_SRC,
+        "Glade": L_EXT_GUI,
+        "Desktop": L_EXT_DESKTOP,
     },
     # dict of clangs and no exts (ie file names)
     S_KEY_PUB_I18N_NO_EXT: {
@@ -1103,7 +1088,6 @@ D_PUB_DOCS = {
     S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
     S_KEY_DOCS_USE_RM: True,
     S_KEY_DOCS_MAKE_API: True,
-    S_KEY_DOCS_DIR_API: [S_DIR_SRC, "__PP_NAME_PRJ_SMALL__"],
 }
 
 # dict in project to control post processing
@@ -1288,6 +1272,11 @@ D_PURGE = {
     ]
 }
 
+D_DOCS_DIR_API = {
+    "c": [S_DIR_SRC],
+    "g": [S_DIR_SRC],
+    "p": ["__PP_NAME_PRJ_SMALL__"],
+}
 # ------------------------------------------------------------------------------
 # Public functions
 # ------------------------------------------------------------------------------
@@ -1317,7 +1306,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
-def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
+def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     """
     Do any work after template copy
 
@@ -1444,6 +1433,10 @@ def do_after_template(dir_prj, dict_prv, _dict_pub, dict_dbg):
         # print done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
+    # --------------------------------------------------------------------------
+    # set DOCS_DIR_API
+    if prj_type in D_DOCS_DIR_API:
+        dict_pub[S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -2050,9 +2043,7 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
         # path to desktop template
         path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
         # path to desktop output
-        path_dsk_out = (
-            dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
-        )
+        path_dsk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
 
         # do the thing
         try:
@@ -2106,6 +2097,7 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
     # print done
     F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
+
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
@@ -2154,11 +2146,11 @@ def _fix_meta(path, dict_prv, dict_pub):
         _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
 
     # fix src files
-    if path.suffix == S_EXT_SRC:
+    if path.suffix in L_EXT_SRC:
         _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix desktop
-    if path.suffix == S_EXT_DESKTOP:
+    if path.suffix in L_EXT_DESKTOP:
         _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix ui files

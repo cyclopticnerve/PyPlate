@@ -5,28 +5,19 @@
    │     └─ [] tasks.json
    ├─ [] bin/
    │     ├─ [] pybaker.py
-   │     ├─ [] pybaker-dev.py
    │     └─ [] pymaker.py
    ├─ [] conf/
    │     └─ [] conf.py
    ├─ [] dist/
-   │     └─ [] pyplate-0.0.3.tar.gz
+   │     └─ [] pyplate-0.0.6.tar.gz
    ├─ [] docs/
    │     ├─ [] API/
-   │     │     ├─ [] bin/
-   │     │     │     ├─ [] pybaker.md
-   │     │     │     └─ [] pymaker.md
-   │     │     ├─ [] conf/
-   │     │     │     ├─ [] conf.md
-   │     │     │     ├─ [] mkdocs.md
-   │     │     │     └─ [] pdoc.md
-   │     │     ├─ [] install/
-   │     │     │     ├─ [] install.md
-   │     │     │     └─ [] uninstall.md
    │     │     └─ [] src/
-   │     │           ├─ [] pybaker.md
-   │     │           ├─ [] pymaker.md
-   │     │           └─ [] pyplate.md
+         ├─ [] pybaker.md
+         ├─ [] pymaker.md
+         └─ [] pyplate.md
+   │     ├─ [] images/
+   │     │     └─ [] pyplate.png
    │     ├─ [] img/
    │     │     ├─ [] favicon.ico
    │     │     └─ [] pyplate.png
@@ -34,16 +25,21 @@
    ├─ [] i18n/
    │     ├─ [] locale/
    │     │     └─ [] en/
-   │     │           └─ [] LC_MESSAGES/
-   │     │                 └─ [] pyplate.mo
+         └─ [] LC_MESSAGES/
+         └─ [] pyplate.mo
    │     ├─ [] po/
    │     │     ├─ [] en/
    │     │     │     └─ [] pyplate.po
    │     │     └─ [] LINGUAS
    │     └─ [] pot/
-   │           └─ [] pyplate.pot
-   ├─ [] img/
+         └─ [] pyplate.pot
+   ├─ [] images/
    │     └─ [] pyplate.png
+   ├─ [] install/
+   │     ├─ [] install.py
+   │     └─ [] uninstall.py
+   ├─ [] log/
+   │     └─ [] pyplate.log
    ├─ [] misc/
    │     ├─ [] checklists/
    │     │     ├─ [] checklist.html
@@ -58,8 +54,7 @@
    │     │     └─ [] window.py
    │     ├─ [] how_to/
    │     │     └─ [] i18n_tips.txt
-   │     ├─ [] mkdocs.py
-   │     ├─ [] testing.txt
+   │     ├─ [] tree.html
    │     └─ [] tree.txt
    ├─ [] pyplate/
    │     ├─ [] private/
@@ -67,30 +62,13 @@
    │     └─ [] project.json
    ├─ [] site/
    │     ├─ [] API/
-   │     │     ├─ [] bin/
-   │     │     │     ├─ [] pybaker/
-   │     │     │     │     └─ [] index.html
-   │     │     │     └─ [] pymaker/
-   │     │     │           └─ [] index.html
-   │     │     ├─ [] conf/
-   │     │     │     ├─ [] conf/
-   │     │     │     │     └─ [] index.html
-   │     │     │     ├─ [] mkdocs/
-   │     │     │     │     └─ [] index.html
-   │     │     │     └─ [] pdoc/
-   │     │     │           └─ [] index.html
-   │     │     ├─ [] install/
-   │     │     │     ├─ [] install/
-   │     │     │     │     └─ [] index.html
-   │     │     │     └─ [] uninstall/
-   │     │     │           └─ [] index.html
    │     │     └─ [] src/
-   │     │           ├─ [] pybaker/
-   │     │           │     └─ [] index.html
-   │     │           ├─ [] pymaker/
-   │     │           │     └─ [] index.html
-   │     │           └─ [] pyplate/
-   │     │                 └─ [] index.html
+         ├─ [] pybaker/
+         │     └─ [] index.html
+         ├─ [] pymaker/
+         │     └─ [] index.html
+         └─ [] pyplate/
+         └─ [] index.html
    │     ├─ [] assets/
    │     │     └─ [] _mkdocstrings.css
    │     ├─ [] css/
@@ -101,6 +79,8 @@
    │     │     ├─ [] fontawesome.min.css
    │     │     ├─ [] solid.min.css
    │     │     └─ [] v4-font-face.min.css
+   │     ├─ [] images/
+   │     │     └─ [] pyplate.png
    │     ├─ [] img/
    │     │     ├─ [] favicon.ico
    │     │     ├─ [] grid.png
@@ -130,11 +110,6 @@
    │     ├─ [] sitemap.xml
    │     └─ [] sitemap.xml.gz
    ├─ [] src/
-   │     ├─ [] PyPlate.egg-info/
-   │     │     ├─ [] dependency_links.txt
-   │     │     ├─ [] PKG-INFO
-   │     │     ├─ [] SOURCES.txt
-   │     │     └─ [] top_level.txt
    │     ├─ [] pybaker.py
    │     ├─ [] pymaker.py
    │     └─ [] pyplate.py
@@ -151,34 +126,37 @@
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] docs/
    │     │     │     └─ [] img/
-   │     │     │           └─ [] favicon.ico
+         └─ [] favicon.ico
    │     │     ├─ [] i18n/
    │     │     │     ├─ [] locale/
    │     │     │     │     └─ [] en/
-   │     │     │     │           └─ [] LC_MESSAGES/
-   │     │     │     │                 └─ [] ABOUT
+         └─ [] LC_MESSAGES/
+         └─ [] ABOUT
    │     │     │     └─ [] po/
-   │     │     │           └─ [] LINGUAS
-   │     │     ├─ [] img/
+         └─ [] LINGUAS
+   │     │     ├─ [] images/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
    │     │     ├─ [] install/
    │     │     │     ├─ [] install.py
    │     │     │     └─ [] uninstall.py
+   │     │     ├─ [] log/
+   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.log
    │     │     ├─ [] misc/
    │     │     │     └─ [] checklists/
-   │     │     │           ├─ [] checklist.html
-   │     │     │           ├─ [] checklist.txt
-   │     │     │           └─ [] style.txt
+         ├─ [] checklist.html
+         ├─ [] checklist.txt
+         └─ [] style.txt
    │     │     ├─ [] pyplate/
    │     │     │     └─ [] private/
-   │     │     │           └─ [] ABOUT
+         └─ [] ABOUT
    │     │     ├─ [] src/
-   │     │     │     └─ [] ABOUT
+   │     │     │     └─ [] __PP_NAME_PRJ_SMALL___base.py
    │     │     ├─ [] tests/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] todo/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] .gitignore
+   │     │     ├─ [] develop.py
    │     │     ├─ [] LICENSE.txt
    │     │     ├─ [] mkdocs.yml
    │     │     ├─ [] pyproject.toml
@@ -188,11 +166,11 @@
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
    │     │     └─ [] src/
-   │     │           └─ [] __PP_NAME_PRJ_SMALL__.py
+         └─ [] __PP_NAME_PRJ_SMALL__.py
    │     ├─ [] gui/
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
-   │     │     ├─ [] img/
+   │     │     ├─ [] images/
    │     │     │     └─ [] screenshot.png
    │     │     ├─ [] src/
    │     │     │     ├─ [] gui/
@@ -203,19 +181,19 @@
    │     │     │     │     │     ├─ [] __PP_FILE_APP__.py
    │     │     │     │     │     └─ [] __PP_FILE_WIN__.py
    │     │     │     │     └─ [] ui/
-   │     │     │     │           ├─ [] __PP_DLG_FILE__.ui
-   │     │     │     │           └─ [] __PP_FILE_WIN__.ui
+         ├─ [] __PP_DLG_FILE__.ui
+         └─ [] __PP_FILE_WIN__.ui
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
    │     │     └─ [] requirements.txt
    │     └─ [] pkg/
-   │           ├─ [] __PP_NAME_PRJ_SMALL__/
-   │           │     └─ [] __PP_NAME_SEC_SMALL__.py
-   │           ├─ [] .vscode/
-   │           │     └─ [] launch.json
-   │           └─ [] tests/
-   │                 └─ [] __PP_NAME_PRJ_SMALL___test.py
+         ├─ [] __PP_NAME_PRJ_SMALL__/
+         │     └─ [] __PP_NAME_SEC_SMALL__.py
+         ├─ [] .vscode/
+         │     └─ [] launch.json
+         └─ [] tests/
+         └─ [] __PP_NAME_PRJ_SMALL___test.py
    ├─ [] tests/
-   │     └─ [] ABOUT
+   │     └─ [] l2s2l.py
    ├─ [] todo/
    │     ├─ [] other/
    │     │     ├─ [] bin-dev/
@@ -226,13 +204,8 @@
    │     │     │     └─ [] unused.py
    │     │     ├─ [] cnguilib/
    │     │     │     └─ [] src/
-   │     │     │           ├─ [] cnguilib.egg-info/
-   │     │     │           │     ├─ [] dependency_links.txt
-   │     │     │           │     ├─ [] PKG-INFO
-   │     │     │           │     ├─ [] SOURCES.txt
-   │     │     │           │     └─ [] top_level.txt
-   │     │     │           ├─ [] cnapp.py
-   │     │     │           └─ [] cnwindow.py
+         ├─ [] cnapp.py
+         └─ [] cnwindow.py
    │     │     ├─ [] cnlib/
    │     │     │     └─ [] cncli.py
    │     │     ├─ [] gui_state/
@@ -248,12 +221,12 @@
    │     │     │     ├─ [] head.mako
    │     │     │     └─ [] logo.mako
    │     │     └─ [] sphinx/
-   │     │           └─ [] cnsphinx.py
+         └─ [] cnsphinx.py
    │     └─ [] todo.txt
    ├─ [] .gitignore
+   ├─ [] develop.py
    ├─ [] LICENSE.txt
    ├─ [] mkdocs.yml
    ├─ [] pyproject.toml
-   ├─ [] pyvenv.cfg
    ├─ [] README.md
    └─ [] requirements.txt

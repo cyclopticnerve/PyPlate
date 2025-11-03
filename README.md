@@ -18,7 +18,7 @@ A program for creating and building CLI/GUI/Packages in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 0.0.5
+Version 0.0.6
 <!-- __RM_VERSION__ -->
 
 ## Table of Contents

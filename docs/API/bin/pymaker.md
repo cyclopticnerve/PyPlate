@@ -1,2 +1,0 @@
-# pymaker.py
-::: bin.pymaker

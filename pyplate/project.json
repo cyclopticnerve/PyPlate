@@ -2,37 +2,37 @@
     "PUB_BL": {
         "SKIP_ALL": [
             ".git",
-            "**/.venv*",
+            ".venv*",
             ".VSCodeCounter",
             "dist",
             "docs",
             "i18n",
             "misc",
+            "site",
             "todo",
             "LICENSE.txt",
             "requirements.txt",
             "**/__pycache__",
-            "site",
-            "template",
-            "pyplate"
+            "**/*.egg-info",
+            "pyplate",
+            "template"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
             "**/*.jpg",
-            "**/*.jpeg"
+            "**/*.jpeg",
+            "**/*.ico"
         ],
         "SKIP_HEADER": [],
         "SKIP_CODE": [
-            ".gitignore",
-            ".desktop",
             "conf"
         ],
-        "SKIP_PATH": [],
         "SKIP_TREE": [
             ".git",
-            "**/.venv*",
+            ".venv*",
             ".VSCodeCounter",
-            "**/__pycache__"
+            "**/__pycache__",
+            "**/*.egg-info"
         ]
     },
     "PUB_DBG": {
@@ -55,18 +55,22 @@
     "PUB_DOCS": {
         "DOCS_THEME": "",
         "DOCS_USE_RM": false,
-        "DOCS_MAKE_API": true
+        "DOCS_MAKE_API": true,
+        "DOCS_DIR_API": [
+            "src"
+        ]
     },
     "PUB_I18N": {
         "DOMAIN": "pyplate",
         "SOURCES": [
-            "src",
+            "bin",
             "install",
+            "src",
             "develop.py"
         ],
         "CLANGS": {
             "Python": [
-                "py"
+                ".py"
             ],
             "Glade": [
                 ".ui",
@@ -89,7 +93,7 @@
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "0.0.5",
+        "META_VERSION": "0.0.6",
         "META_KEYWORDS": [
             "python",
             "cli",

@@ -1,2 +1,0 @@
-# mkdocs.py
-::: conf.mkdocs

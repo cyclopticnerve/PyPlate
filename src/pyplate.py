@@ -102,11 +102,12 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages \
-in Python from a template"
+    # pylint: disable=line-too-long
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    # pylint enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 0.0.5"
+    S_PP_VERSION = "Version 0.0.6"
 
     # pyplate: replace=False
 
@@ -298,16 +299,6 @@ in Python from a template"
             print()
 
     # --------------------------------------------------------------------------
-    # Boilerplate to use at the end of main
-    # --------------------------------------------------------------------------
-    def _teardown(self):
-        """
-        Boilerplate to use at the end of main
-
-        Perform some mundane stuff like saving config files.
-        """
-
-    # --------------------------------------------------------------------------
     # Do any work before fix
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
@@ -348,11 +339,6 @@ in Python from a template"
 
         # ----------------------------------------------------------------------
 
-        # make sure pyplate in in skip_all
-        skip_all = self._dict_pub_bl[C.S_KEY_SKIP_ALL]
-        if not C.S_PRJ_PP_DIR in skip_all:
-            skip_all.append(C.S_PRJ_PP_DIR)
-
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
         dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
@@ -362,7 +348,6 @@ in Python from a template"
         skip_contents = dict_bl[C.S_KEY_SKIP_CONTENTS]
         skip_header = dict_bl[C.S_KEY_SKIP_HEADER]
         skip_code = dict_bl[C.S_KEY_SKIP_CODE]
-        skip_path = dict_bl[C.S_KEY_SKIP_PATH]
 
         # ----------------------------------------------------------------------
         # do the fixes
@@ -402,13 +387,11 @@ in Python from a template"
                     # fix content with appropriate dict
                     self._fix_contents(item, bl_hdr, bl_code)
 
-                # handle files in skip_path
-                if not item in skip_path:
-                    self._fix_path(item)
+                # handle file paths with dunders
+                self._fix_path(item)
 
-            # handle dirs in skip_path
-            if not root in skip_path:
-                self._fix_path(root)
+            # handle dirs with dunders
+            self._fix_path(root)
 
         # done
         F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
