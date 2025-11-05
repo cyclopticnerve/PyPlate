@@ -1584,7 +1584,11 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # the fix process. at this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub and
     # dict_prv have been undunderized
+
+    # fix up blacklist and convert relative or glob paths to absolute Path
+    # objects
     dict_bl = dict_pub[S_KEY_PUB_BL]
+    dict_bl = F.fix_globs(dir_prj, dict_bl)
 
     # just shorten the names
     skip_all = dict_bl[S_KEY_SKIP_ALL]

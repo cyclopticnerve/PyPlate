@@ -12,13 +12,11 @@
 
 __PP_RM_LICENSE__
 
-<!-- __RM_VERSION__ -->
-Version 0.0.0
-<!-- __RM_VERSION__ -->
+<!-- __RM_SHORT_DESC__ -->
+<!-- __RM_SHORT_DESC__ -->
 
-<!-- __RM_SHORT_DESC__ -->
-Short description
-<!-- __RM_SHORT_DESC__ -->
+<!-- __RM_VERSION__ -->
+<!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
 <!-- __RM_SCREENSHOT__ -->

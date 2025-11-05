@@ -113,10 +113,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # strings
 
     # short description
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    S_PP_SHORT_DESC = ""
 
     # version string
-    S_PP_VERSION = "Version 0.0.6"
+    S_PP_VERSION = ""
 
     # config option strings
     S_ARG_CFG_OPTION = "-c"
