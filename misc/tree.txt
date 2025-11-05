@@ -9,32 +9,6 @@
    ├─ [] conf/
    │     └─ [] conf.py
    ├─ [] dist/
-   │     ├─ [] pyplate-0.0.6/
-   │     │     ├─ [] assets/
-   │     │     │     ├─ [] bin/
-   │     │     │     │     ├─ [] pybaker
-   │     │     │     │     └─ [] pymaker
-   │     │     │     ├─ [] conf/
-   │     │     │     │     └─ [] conf.py
-   │     │     │     ├─ [] i18n/
-   │     │     │     │     ├─ [] locale/
-   │     │     │     │     │     └─ [] en/
-         └─ [] LC_MESSAGES/
-         └─ [] pyplate.mo
-   │     │     │     │     ├─ [] po/
-   │     │     │     │     │     ├─ [] en/
-   │     │     │     │     │     │     └─ [] pyplate.po
-   │     │     │     │     │     └─ [] LINGUAS
-   │     │     │     │     └─ [] pot/
-         └─ [] pyplate.pot
-   │     │     │     ├─ [] install/
-   │     │     │     │     └─ [] requirements.txt
-   │     │     │     ├─ [] src/
-   │     │     │     │     ├─ [] pybaker.py
-   │     │     │     │     ├─ [] pymaker.py
-   │     │     │     │     └─ [] pyplate.py
-   │     │     │     └─ [] uninstall
-   │     │     └─ [] install
    │     └─ [] pyplate-0.0.6.tar.gz
    ├─ [] docs/
    │     ├─ [] API/

@@ -159,7 +159,8 @@ See the [documentation](https://cyclopticnerve.github.io/PyPlate)
 
 ## Notes
 If you have any sort of spellchecker in your IDE, *FOR GOD'S SAKE TURN IT OFF!*
-or at least blacklist me. It would brick a fucking quantum computer.
+It would brick a fucking quantum computer. On the other hand, I'm about to use
+an Oxford comma, so \\/ jog on.
 
 If you make any changes to this template to better suit your own style/setup,
 please let me know or send a pull request. I will take a look and see if I can
@@ -167,10 +168,8 @@ incorporate your changes to make them user, system, and/or IDE agnostic. This
 way the template can hopefully become more customizable to suit everyone's
 needs.
 
-PyPlate currently uses pdoc3 for documentation, mostly because it is easy and
-sphinx is HARD! I don't really want to learn RST, and the Markdown/MyST stuff
-is confusing.
-I am currently looking at mkdocs, will let you know.
+PyPlate currently uses [MkDocs](https://https://www.mkdocs.org/) for
+documentation, because pdoc3 is TOO SIMPLE and sphinx is TOO COMPLEX!
 
 -)
 <!-- -) -->
