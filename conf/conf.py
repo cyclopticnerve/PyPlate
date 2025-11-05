@@ -2028,7 +2028,6 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
         list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
         charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
-        location=B_DEBUG,
     )
 
     # make .pot, .po, and .mo files
@@ -2080,7 +2079,7 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
 
     # --------------------------------------------------------------------------
 
-    l_ext = [S_I18N_EXT_POT] + [S_I18N_EXT_PO]
+    l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
     for ext in l_ext:
         a_dict = {
             f"{ext}": [ext],
