@@ -406,6 +406,8 @@ S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
 S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
 S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
 S_I18N_TAG = "I18N"
+S_I18N_EXT_POT = "**/*.pot"
+S_I18N_EXT_PO = "**/*.po"
 
 # paths relative to end user home only
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
@@ -591,7 +593,6 @@ S_FILE_MKDOCS_YML = "mkdocs.yml"
 # file exts for do_after_fix
 L_EXT_SRC = [".py"]
 L_EXT_DESKTOP = [".desktop"]
-L_EXT_PO = [".po"]
 
 # the types of projects this script can create
 # val[0] is the char to enter for project type
@@ -1438,6 +1439,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     if prj_type in D_DOCS_DIR_API:
         dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
 
+
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
@@ -2063,8 +2065,8 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
     # print info
     print(S_ACTION_PO, end="", flush=True)
 
-    # get i18n path
-    path = dir_prj / S_DIR_I18N / S_DIR_PO
+    # get user home
+    usr_home = str(Path.home())
 
     # get sub-dicts we need
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
@@ -2074,11 +2076,25 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
     str_pattern = S_PO_VER_SCH
     str_rep = S_PO_VER_REP.format(pp_version)
 
-    # find all files matching ext
-    lst_pos = list(path.rglob("*.po"))
+    lst_files = []
+
+    # --------------------------------------------------------------------------
+
+    l_ext = [S_I18N_EXT_POT] + [S_I18N_EXT_PO]
+    for ext in l_ext:
+        a_dict = {
+            f"{ext}": [ext],
+        }
+        dict_pox = F.fix_globs(dir_prj, a_dict)
+
+        # could be better? late and drunk
+        a_arr = dict_pox[f"{ext}"]
+        lst_files += a_arr
+
+    # --------------------------------------------------------------------------
 
     # for each file
-    for item in lst_pos:
+    for item in lst_files:
 
         # replace lang
         lang = Path(item).parent.stem
@@ -2093,6 +2109,10 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
         text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
         # replace lang
         text = re.sub(str_pattern2, str_rep2, text, flags=re.M | re.S)
+
+        # delete user home from .pot/.po files (in case of debug)
+        # NB: also no regex or rules, just nuke it everywhere
+        text = text.replace(f"{usr_home}", "")
 
         # save file
         with open(item, "w", encoding=S_ENCODING) as a_file:
