@@ -8,6 +8,8 @@
 
 site_name: PyPlate
 theme: 
+docs_dir: docs
+site_dir: site
 plugins:
 - search
 - mkdocstrings

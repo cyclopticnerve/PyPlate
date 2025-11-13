@@ -402,7 +402,7 @@ class CNInstall:
         self._get_project_info()
 
         # check for existing/old version
-        self._check_version()
+        self._compare_version()
 
         # make the venv on the user's comp
         self._make_venv()
@@ -527,7 +527,7 @@ class CNInstall:
     # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
-    def _check_version(self):
+    def _compare_version(self):
         """
         Check version info
 

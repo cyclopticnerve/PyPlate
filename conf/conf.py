@@ -208,10 +208,7 @@ S_ERR_NO_REPO = _("Make sure you have pushed your repo after PyMaker")
 
 # debug-specific strings
 # I18N: warn if running in debug mode
-S_MSG_DEBUG = _(
-    "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO \
-OVERWRITE EXISTING PROJECTS!"
-)
+S_MSG_DEBUG = "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!"
 
 # ------------------------------------------------------------------------------
 # output msg for steps
@@ -882,7 +879,6 @@ D_PRV_ALL = {
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
     "__PP_DIR_DIST__": S_DIR_DIST,
-    "__PP_DIR_SITE__": S_DIR_SITE,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
@@ -903,8 +899,9 @@ D_PRV_ALL = {
     "__PP_UNINST_CONF_FILE__": S_PATH_UNINST_CFG,
     # --------------------------------------------------------------------------
     # mkdocs stuff
-    "__PP_DOCS_DOCS_DIR__": S_DIR_DOCS,
-    "__PP_DOCS_SITE_DIR__": S_DIR_SITE,
+    "__PP_DIR_DOCS__": S_DIR_DOCS,
+    "__PP_DIR_SITE__": S_DIR_SITE,
+    "__PP_TEST__": "",
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -932,10 +929,6 @@ D_PRV_PRJ = {
     "__PP_FILE_WIN__": "",  # my_project_win
     "__PP_CLASS_WIN__": "",  # MyProjectWin
     # --------------------------------------------------------------------------
-    # these paths are calculated in do_before_fix, relative to the user's home
-    # dir
-    "__PP_DIST_DIR__": "",  # formatted name of dist ([name_small]_[version])
-    # --------------------------------------------------------------------------
     # these strings are calculated in do_before_fix
     "__PP_FILE_DESK__": "",  # final desk file, not template
     "__PP_IMG_README__": "",  # image for readme file logo
@@ -947,27 +940,77 @@ D_PRV_PRJ = {
     "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.13"
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
     "__PP_DEV_INST__": "",  # cmd used by develop.py to install reqs or self
+    "__PP_USR_INST__": "",
+    "__PP_APP_ID__": "",
+    "__PP_FMT_DIST__": "",
+    "__PP_TEST__": "",
 }
 
 # ------------------------------------------------------------------------------
 # Public dictionaries
 # ------------------------------------------------------------------------------
 
-# these are settings that will be changed before running pybaker.py
-# consider them the "each build" settings
-D_PUB_META = {
-    # the short description to use in __PP_README_FILE__ and pyproject.toml
-    S_KEY_META_SHORT_DESC: "Short description",
-    # the version number to use in __PP_README_FILE__ and pyproject.toml
-    S_KEY_META_VERSION: "0.0.0",
-    # the keywords to use in pyproject.toml and github
-    S_KEY_META_KEYWORDS: [],
-    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
-    # github, and install.py
-    # NB: key is dep name, val is link to dep (optional)
-    S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
-    # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
-    S_KEY_META_CATS: [],
+# the lists of dirs/files we don't mess with while running pymaker
+# each item can be a full path, a path relative to the project directory, or a
+# glob
+# see https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
+# NB: you can use dunders here since the path is the last thing to get fixed
+# these dir/file names should match what's in the template dir (before any
+# modifications, hence using dunder keys)
+D_PUB_BL = {
+    # skip header, skip text, skip path (0 0 0)
+    # NB: this is mostly to speed up processing by not even looking at them
+    S_KEY_SKIP_ALL: [
+        ".git",
+        ".venv*",
+        ".VSCodeCounter",
+        "*.code-workspace",
+        S_DIR_DIST,
+        S_DIR_DOCS,
+        S_DIR_I18N,
+        S_DIR_MISC,
+        S_DIR_SITE,
+        S_DIR_TODO,
+        S_FILE_LICENSE,
+        S_FILE_REQS,
+        "**/__pycache__",
+        "**/*.egg-info",
+        "pyplate",
+    ],
+    # skip header, skip text, fix path (0 0 1)
+    # NB: this is used mostly for non-text files
+    S_KEY_SKIP_CONTENTS: [
+        "**/*.png",
+        "**/*.jpg",
+        "**/*.jpeg",
+        "**/*.ico",
+    ],
+    # skip header, fix text, fix path (0 1 1)
+    S_KEY_SKIP_HEADER: [],
+    # fix header, skip text, fix path (1 0 1)
+    S_KEY_SKIP_CODE: [
+        "conf",
+    ],
+    # list of dirs/files to ignore in output dir when creating the initial tree
+    S_KEY_SKIP_TREE: [
+        ".git",
+        ".venv*",
+        ".VSCodeCounter",
+        "**/__pycache__",
+        "**/*.egg-info",
+    ],
+    "TEST": "",
+}
+
+# dict in project to control post processing
+D_PUB_DBG = {
+    S_KEY_DBG_GIT: True,
+    S_KEY_DBG_VENV: True,
+    S_KEY_DBG_I18N: True,
+    S_KEY_DBG_DOCS: True,
+    S_KEY_DBG_INST: True,
+    S_KEY_DBG_TREE: True,
+    S_KEY_DBG_DIST: True,
 }
 
 # dict of files to put in dist folder (defaults, written by pymaker, edited by
@@ -1005,54 +1048,12 @@ D_PUB_DIST = {
     },
 }
 
-# the lists of dirs/files we don't mess with while running pymaker
-# each item can be a full path, a path relative to the project directory, or a
-# glob
-# see https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
-# NB: you can use dunders here since the path is the last thing to get fixed
-# these dir/file names should match what's in the template dir (before any
-# modifications, hence using dunder keys)
-D_PUB_BL = {
-    # skip header, skip text, skip path (0 0 0)
-    # NB: this is mostly to speed up processing by not even looking at them
-    S_KEY_SKIP_ALL: [
-        ".git",
-        ".venv*",
-        ".VSCodeCounter",
-        S_DIR_DIST,
-        S_DIR_DOCS,
-        S_DIR_I18N,
-        S_DIR_MISC,
-        S_DIR_SITE,
-        S_DIR_TODO,
-        S_FILE_LICENSE,
-        S_FILE_REQS,
-        "**/__pycache__",
-        "**/*.egg-info",
-        "pyplate",
-    ],
-    # skip header, skip text, fix path (0 0 1)
-    # NB: this is used mostly for non-text files
-    S_KEY_SKIP_CONTENTS: [
-        "**/*.png",
-        "**/*.jpg",
-        "**/*.jpeg",
-        "**/*.ico",
-    ],
-    # skip header, fix text, fix path (0 1 1)
-    S_KEY_SKIP_HEADER: [],
-    # fix header, skip text, fix path (1 0 1)
-    S_KEY_SKIP_CODE: [
-        "conf",
-    ],
-    # list of dirs/files to ignore in output dir when creating the initial tree
-    S_KEY_SKIP_TREE: [
-        ".git",
-        ".venv*",
-        ".VSCodeCounter",
-        "**/__pycache__",
-        "**/*.egg-info",
-    ],
+# which docs maker to use, based on project type
+D_PUB_DOCS = {
+    S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
+    S_KEY_DOCS_USE_RM: True,
+    S_KEY_DOCS_MAKE_API: True,
+    S_KEY_DOCS_DIR_API: "",  # tbd by do after template
 }
 
 # stuff to be used in pybaker
@@ -1060,12 +1061,7 @@ D_PUB_I18N = {
     # name of the project as domain
     S_KEY_PUB_I18N_DOM: "__PP_NAME_PRJ_SMALL__",
     # list of sources per domain
-    S_KEY_PUB_I18N_SRC: [
-        S_DIR_BIN,
-        S_DIR_INSTALL,
-        S_DIR_SRC,
-        S_FILE_DEV_VENV,
-    ],
+    S_KEY_PUB_I18N_SRC: [],
     # computer languages
     S_KEY_PUB_I18N_CLANGS: {
         "Python": L_EXT_SRC,
@@ -1073,33 +1069,29 @@ D_PUB_I18N = {
         "Desktop": L_EXT_DESKTOP,
     },
     # dict of clangs and no exts (ie file names)
-    S_KEY_PUB_I18N_NO_EXT: {
-        "Python": [
-            "__PP_NAME_PRJ_SMALL__",
-        ],
-    },
+    # TODO: only fill for ptj_type
+    S_KEY_PUB_I18N_NO_EXT: {},
     # list of written languages that are available
     S_KEY_PUB_I18N_WLANGS: [S_WLANG],
     # default charset for .pot/.po files
     S_KEY_PUB_I18N_CHAR: S_ENCODING,
 }
 
-# which docs maker to use, based on project type
-D_PUB_DOCS = {
-    S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
-    S_KEY_DOCS_USE_RM: True,
-    S_KEY_DOCS_MAKE_API: True,
-}
-
-# dict in project to control post processing
-D_PUB_DBG = {
-    S_KEY_DBG_GIT: True,
-    S_KEY_DBG_VENV: True,
-    S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: True,
-    S_KEY_DBG_INST: True,
-    S_KEY_DBG_TREE: True,
-    S_KEY_DBG_DIST: True,
+# these are settings that will be changed before running pybaker.py
+# consider them the "each build" settings
+D_PUB_META = {
+    # the short description to use in __PP_README_FILE__ and pyproject.toml
+    S_KEY_META_SHORT_DESC: "Short description",
+    # the version number to use in __PP_README_FILE__ and pyproject.toml
+    S_KEY_META_VERSION: "0.0.0",
+    # the keywords to use in pyproject.toml and github
+    S_KEY_META_KEYWORDS: [],
+    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
+    # github, and install.py
+    # NB: key is dep name, val is link to dep (optional)
+    S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
+    # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
+    S_KEY_META_CATS: [],
 }
 
 # ------------------------------------------------------------------------------
@@ -1107,6 +1099,7 @@ D_PUB_DBG = {
 # ------------------------------------------------------------------------------
 
 # dict in pymaker to control post processing in debug mode
+# NB: overwrites D_PUB_DBG above
 D_DBG_PM = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
@@ -1118,6 +1111,7 @@ D_DBG_PM = {
 }
 
 # dict in pybaker to control post processing in debug mode
+# NB: overwrites D_PUB_DBG above
 D_DBG_PB = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
@@ -1201,6 +1195,43 @@ D_UNINSTALL = {
 D_COPY = {
     f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
     f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
+}
+
+# list of i18n sources/noexts per prj type
+D_TYPE_I18N = {
+    "c": {
+        S_KEY_PUB_I18N_SRC: [
+            S_DIR_BIN,
+            S_DIR_INSTALL,
+            S_DIR_SRC,
+            S_FILE_DEV_VENV,
+        ],
+        S_KEY_PUB_I18N_NO_EXT: {
+            "Python": [
+                "__PP_NAME_PRJ_SMALL__",
+            ],
+        },
+    },
+    "g": {
+        S_KEY_PUB_I18N_SRC: [
+            S_DIR_BIN,
+            S_DIR_INSTALL,
+            S_DIR_SRC,
+            S_FILE_DEV_VENV,
+        ],
+        S_KEY_PUB_I18N_NO_EXT: {
+            "Python": [
+                "__PP_NAME_PRJ_SMALL__",
+            ],
+        },
+    },
+    "p": {
+        S_KEY_PUB_I18N_SRC: [
+            "__PP_NAME_PRJ_SMALL__",
+            S_FILE_DEV_VENV,
+        ],
+        S_KEY_PUB_I18N_NO_EXT: {},
+    },
 }
 
 # map file ext to rep type
@@ -1439,6 +1470,23 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     if prj_type in D_DOCS_DIR_API:
         dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
 
+    # --------------------------------------------------------------------------
+    # do i18n stuff
+
+    if prj_type in D_TYPE_I18N:
+
+        # get dst/src dict
+        dict_dst = dict_pub[S_KEY_PUB_I18N]
+        dict_src = D_TYPE_I18N[prj_type]
+
+        # fix sources
+        dict_dst[S_KEY_PUB_I18N_SRC] = dict_src[S_KEY_PUB_I18N_SRC].copy()
+
+        # fix no ext
+        dict_dst[S_KEY_PUB_I18N_NO_EXT] = dict_src[
+            S_KEY_PUB_I18N_NO_EXT
+        ].copy()
+
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -1473,6 +1521,12 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # get sub-dicts we need
     dict_prv_all = dict_prv[S_KEY_PRV_ALL]
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+
+    # dict_pub_bl = dict_pub[S_KEY_PUB_BL]
+    # dict_pub_dbg = dict_pub[S_KEY_PUB_DBG]
+    # dict_pub_dist = dict_pub[S_KEY_PUB_DIST]
+    # dict_pub_docs = dict_pub[S_KEY_PUB_DOCS]
+    # dict_pub_i18n = dict_pub[S_KEY_PUB_I18N]
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # get values after pymaker has set them
@@ -1505,7 +1559,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
 
     # format dist dir name with prj and ver
     ver_dist = S_VER_DIST_FMT.format(name_prj_small, ver_base)
-    dict_prv_prj["__PP_DIST_DIR__"] = ver_dist
+    dict_prv_prj["__PP_FMT_DIST__"] = ver_dist
 
     # ----------------------------------------------------------------------
     # calculate current date
@@ -1545,6 +1599,18 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
     else:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
+
+    # check for missing keys
+    # FIXME: dups in arrays
+    # dict_prv[S_KEY_PRV_ALL] = F.combine_dicts(D_PRV_ALL, dict_prv[S_KEY_PRV_ALL])
+    # dict_prv[S_KEY_PRV_PRJ] = F.combine_dicts(D_PRV_PRJ, dict_prv[S_KEY_PRV_PRJ])
+
+    # dict_pub[S_KEY_PUB_BL] = F.combine_dicts(D_PUB_BL, dict_pub[S_KEY_PUB_BL])
+    # dict_pub[S_KEY_PUB_DBG] = F.combine_dicts(D_PUB_DBG, dict_pub[S_KEY_PUB_DBG])
+    # dict_pub[S_KEY_PUB_DIST] = F.combine_dicts(D_PUB_DIST, dict_pub[S_KEY_PUB_DIST])
+    # dict_pub[S_KEY_PUB_DOCS] = F.combine_dicts(D_PUB_DOCS, dict_pub[S_KEY_PUB_DOCS])
+    # dict_pub[S_KEY_PUB_I18N] = F.combine_dicts(D_PUB_I18N, dict_pub[S_KEY_PUB_I18N])
+    # dict_pub[S_KEY_PUB_META] = F.combine_dicts(D_PUB_META, dict_pub[S_KEY_PUB_META])
 
 
 # ------------------------------------------------------------------------------
@@ -1630,7 +1696,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # readme chop section
 
-    path_readme = dir_prj / D_PRV_ALL["__PP_README_FILE__"]
+    path_readme = dir_prj / dict_prv[S_KEY_PRV_ALL]["__PP_README_FILE__"]
     if path_readme.exists():
 
         print(S_ACTION_README, end="", flush=True)
@@ -1662,7 +1728,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # i18n
 
-    # NB: needs to be callable from pybaker
+    # NB: needs to be callable from pybaker for -l option
     # if i18n flag is set
     if dict_dbg[S_KEY_DBG_I18N]:
         do_i18n(dir_prj, dict_prv, dict_pub, dict_dbg)
@@ -1854,7 +1920,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     if dict_dbg[S_KEY_DBG_DOCS]:
 
         # print info
-        print(S_ACTION_MAKE_DOCS, end="", flush=True)
+        print(S_ACTION_BAKE_DOCS, end="", flush=True)
 
         # the command to make or bake docs
         try:
@@ -1902,7 +1968,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
     # get dist dir for all operations
     dist = Path(dir_prj) / S_DIR_DIST
-    name_fmt = str(dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_DIR__"])
+    name_fmt = str(dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"])
     p_dist = dist / name_fmt
 
     # --------------------------------------------------------------------------
@@ -1973,7 +2039,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
         # get dist dir for all operations
         dist = Path(dir_prj) / S_DIR_DIST
-        name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_DIST_DIR__"]
+        name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"]
         p_dist = dist / name_fmt
 
         # delete folder

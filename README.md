@@ -6,8 +6,7 @@
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
 
-![Logo](images/pyplate.png)
-# PyPlate
+# ![Logo](images/pyplate.png) PyPlate
 
 ## "It mostly works" ™©®
 

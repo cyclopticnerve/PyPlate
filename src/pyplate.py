@@ -650,9 +650,9 @@ class PyPlate:
         Returns:
             The new line of code
 
-        Replaces text inside the a file. This is a qnd function to replace any
+        Replaces text inside a file. This is a qnd function to replace any
         dunder in any file, regardless of D_TYPE_RULES. Think of it as an
-        oubliette for fi;es you just want to 'undunderize'.
+        oubliette for files you just want to 'undunderize'.
         """
 
         # default lines
@@ -793,7 +793,7 @@ class PyPlate:
 
         # ----------------------------------------------------------------------
         # THIS is the whole horrible reason for calling reload/save in separate
-        # functions. we need to un-dunder the public file when running pb,
+        # functions. we need to fix dunders in the public file when running pb,
         # since it may have been modified to include dunders. to do that, we
         # need a valid dict_rep. to do THAT, we need a valid public file. to do
         # THAT, we need a valid project.json. to do THAT, we need ... FUCK IT.

@@ -310,8 +310,9 @@ class PyBaker(PyPlate):
         # NB: reload BEFORE first save to set sub-dict pointers
         self._reload_dicts()
 
+        # TODO: do we need this?
         # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
+        # self._save_project_info()
 
         # ----------------------------------------------------------------------
         # handle -l
@@ -452,7 +453,7 @@ class PyBaker(PyPlate):
             shutil.rmtree(a_dist)
 
         # make child dir in case we nuked
-        name_fmt = self._dict_prv_prj["__PP_DIST_DIR__"]
+        name_fmt = self._dict_prv_prj["__PP_FMT_DIST__"]
         p_dist = a_dist / name_fmt
         p_dist.mkdir(parents=True)
 

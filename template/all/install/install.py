@@ -77,6 +77,7 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # Constants
 # ------------------------------------------------------------------------------
 
+
 # ------------------------------------------------------------------------------
 # A dummy class to combine multiple argparse formatters
 # ------------------------------------------------------------------------------
@@ -396,7 +397,7 @@ to overwrite?"
         self._get_project_info()
 
         # check for existing/old version
-        self._check_version()
+        self._compare_version()
 
         # make the venv on the user's comp
         self._make_venv()
@@ -522,7 +523,7 @@ to overwrite?"
     # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
-    def _check_version(self):
+    def _compare_version(self):
         """
         Check version info
 

@@ -4,6 +4,7 @@
             ".git",
             ".venv*",
             ".VSCodeCounter",
+            "*.code-workspace",
             "dist",
             "docs",
             "i18n",
@@ -47,6 +48,7 @@
     "PUB_DIST": {
         "bin": "assets",
         "conf": "assets",
+        "log": "assets",
         "i18n": "assets",
         "install": "assets",
         "src": "assets",
@@ -54,7 +56,7 @@
     },
     "PUB_DOCS": {
         "DOCS_THEME": "",
-        "DOCS_USE_RM": false,
+        "DOCS_USE_RM": true,
         "DOCS_MAKE_API": true,
         "DOCS_DIR_API": [
             "src"

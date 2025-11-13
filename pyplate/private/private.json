@@ -13,21 +13,26 @@
         "__PP_TOML_FILE__": "pyproject.toml",
         "__PP_REQS_FILE__": "requirements.txt",
         "__PP_DIR_IMAGES__": "images",
-        "__PP_DIR_LIB__": "lib",
         "__PP_INST_ASSETS__": "assets",
-        "__PP_DIR_INSTALL__": "install",
-        "__PP_INST_CONF_FILE__": "install/install.json",
-        "__PP_UNINST_CONF_FILE__": "install/uninstall.json",
         "__PP_DIR_CONF__": "conf",
+        "__PP_DIR_LOG__": "log",
         "__PP_DIR_SRC__": "src",
         "__PP_PATH_LOCALE__": "i18n/locale",
-        "__PP_NAME_DSK_TMP__": "template",
+        "__PP_DIR_DIST__": "dist",
+        "__PP_NAME_DSK_TMP__": "template.desktop",
         "__PP_USR_APPS__": ".local/share/applications",
         "__PP_USR_BIN__": ".local/bin",
+        "__PP_USR_SHARE__": ".local/share",
+        "__PP_NAME_UNINST__": "uninstall.py",
         "__PP_DIR_GUI__": "src/gui",
         "__PP_DIR_UI__": "src/gui/ui",
         "__PP_DLG_FILE__": "dialogs",
-        "__PP_DLG_ABOUT__": "dlg_about"
+        "__PP_DLG_ABOUT__": "dlg_about",
+        "__PP_DIR_INSTALL__": "install",
+        "__PP_INST_CONF_FILE__": "install/install.json",
+        "__PP_UNINST_CONF_FILE__": "install/uninstall.json",
+        "__PP_DIR_DOCS__": "docs",
+        "__PP_DIR_SITE__": "site"
     },
     "PRV_PRJ": {
         "__PP_TYPE_PRJ__": "c",
@@ -44,7 +49,6 @@
         "__PP_CLASS_APP__": "pyplateApp",
         "__PP_FILE_WIN__": "_win",
         "__PP_CLASS_WIN__": "Win",
-        "__PP_DIST_DIR__": "pyplate-0.0.6",
         "__PP_FILE_DESK__": "src/gui/desktop/PyPlate.desktop",
         "__PP_IMG_README__": "images/pyplate.png",
         "__PP_IMG_DESK__": ".local/share/pyplate/images/pyplate.png",
@@ -52,8 +56,9 @@
         "__PP_IMG_ABOUT__": "../../../images/pyplate.png",
         "__PP_VER_MMR__": "0.0.6",
         "__PP_VER_DISP__": "Version 0.0.6",
+        "__PP_DEV_INST__": "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1",
         "__PP_USR_INST__": ".local/share/pyplate",
         "__PP_APP_ID__": "org.cyclopticnerve.pyplate",
-        "__PP_DEV_INST__": "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+        "__PP_FMT_DIST__": "pyplate-0.0.6"
     }
 }

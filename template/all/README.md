@@ -105,7 +105,7 @@ $ ./install
 <!-- __RM_APP__ -->
 
 ## Usage
-blah blah blah
+Read the [documentation](https://cyclopticnerve.github.io/__PP_NAME_PRJ_BIG__/).
 
 ## Uninstalling
 <!-- __RM_PKG__ -->
@@ -123,12 +123,12 @@ $ ./uninstall
 ```
 <!-- __RM_APP__ -->
 
+## Documentation
+See the [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__)
+
 ## Developing
 If you are developing this project, make sure you run the "develop.py" script
 first to create the proper virtual environment (venv). 
-
-## Documentation
-See the [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__)
 
 ## Notes
 blah blah blah
