@@ -89,7 +89,7 @@ class CNDevelop:
 
     # NB: format param is dir_venv
     S_CMD_VENV_CREATE = "python -m venv {}"
-    S_CMD_VENV_INST = "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    S_CMD_VENV_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
     # errors
 

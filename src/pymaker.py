@@ -121,7 +121,7 @@ a project."
         # teardown
 
         # call boilerplate code
-        # self._teardown()
+        self._teardown()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -142,15 +142,14 @@ a project."
         # do parent setup
         super()._setup()
 
-        # set props based on cmd line
-        if self._debug:
-            self._dict_dbg = P.C.D_DBG_PM
-
         # do not run pymaker in pyplate dir
         if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
             P.sys.exit(-1)
 
+        # set props based on cmd line
+        if self._debug:
+            self._dict_dbg = dict(P.C.D_DBG_PM)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -324,28 +323,31 @@ a project."
                 name_sec_pascal = F.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
+        # make dicts from conf
 
-        # create global and calculated settings dicts in private.json
+        # create global settings dicts in private.json
         self._dict_prv = {
-            P.C.S_KEY_PRV_ALL: P.C.D_PRV_ALL,
-            P.C.S_KEY_PRV_PRJ: P.C.D_PRV_PRJ,
+            P.C.S_KEY_PRV_ALL: dict(P.C.D_PRV_ALL),
+            P.C.S_KEY_PRV_PRJ: dict(P.C.D_PRV_PRJ),
         }
 
         # create individual dicts in project.json
         self._dict_pub = {
-            P.C.S_KEY_PUB_BL: P.C.D_PUB_BL,
-            P.C.S_KEY_PUB_DBG: P.C.D_PUB_DBG,
-            P.C.S_KEY_PUB_DIST: P.C.D_PUB_DIST[prj_type],
-            P.C.S_KEY_PUB_DOCS: P.C.D_PUB_DOCS,
-            P.C.S_KEY_PUB_I18N: P.C.D_PUB_I18N,
-            P.C.S_KEY_PUB_META: P.C.D_PUB_META,
+            P.C.S_KEY_PUB_BL: dict(P.C.D_PUB_BL),
+            P.C.S_KEY_PUB_DBG: dict(P.C.D_PUB_DBG),
+            P.C.S_KEY_PUB_DIST: dict(P.C.D_PUB_DIST[prj_type]),
+            P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
+            P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
+            P.C.S_KEY_PUB_META: dict(P.C.D_PUB_META),
         }
 
-        # NB: reload BEFORE first save to set sub-dict pointers
-        self._reload_dicts()
+        # ----------------------------------------------------------------------
+        # get sub dicts
+
+        self._reload_public()
 
         # ----------------------------------------------------------------------
-        # calculate dunder values now that we have project info
+        # fill dicts
 
         # save project stuff
         self._dict_prv_prj["__PP_TYPE_PRJ__"] = prj_type
@@ -373,11 +375,6 @@ a project."
         # blank line before printing progress
         print()
 
-        # ----------------------------------------------------------------------
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
     # --------------------------------------------------------------------------
     # Do any work before template copy
     # --------------------------------------------------------------------------
@@ -394,9 +391,6 @@ a project."
         P.C.do_before_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
@@ -477,10 +471,6 @@ a project."
         P.C.do_after_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

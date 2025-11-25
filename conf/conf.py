@@ -106,7 +106,7 @@ S_VER_DATE_FMT = "%Y%m%d"
 # NB: format param is __PP_VER_MMR__
 # I18N: printable version number
 S_VER_DISP_FMT = _("Version {}")
-# # NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_MMR__
+# NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_MMR__
 S_VER_DIST_FMT = "{}-{}"
 
 # ask questions
@@ -441,13 +441,9 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 # cmd for git
 # NB: format param is proj dir
 S_CMD_GIT_CREATE = "cd {}; git init -q"
-# NB: format params are prj dir and venv name
-S_CMD_VENV_INST_SELF = (
-    "cd {};. {}/bin/activate;python -m pip install -e . > /dev/null 2>&1"
-)
 # NB: format params are prj dir, venv name, and reqs file
 S_CMD_VENV_INST_REQS = (
-    "cd {};. {}/bin/activate;python -m pip install -r {} > /dev/null 2>&1"
+    "cd {};. {}/bin/activate;python -m pip install -r {}"
 )
 
 # ------------------------------------------------------------------------------
@@ -588,8 +584,8 @@ S_FILE_MKDOCS_YML = "mkdocs.yml"
 # ------------------------------------------------------------------------------
 
 # file exts for do_after_fix
-L_EXT_SRC = [".py"]
-L_EXT_DESKTOP = [".desktop"]
+L_EXT_PY = [".py"]
+L_EXT_DESK = [".desktop"]
 
 # the types of projects this script can create
 # val[0] is the char to enter for project type
@@ -636,17 +632,14 @@ L_EXT_GUI = [".ui", ".glade"]
 
 # files to remove after the project is done
 L_PURGE_FILES = [
-    S_PH_NAME,
-    "__pycache__",
-    S_PATH_DSK_TMP,
-    S_PATH_SCREENSHOT,
+    f"**/{S_PH_NAME}",
+    "**/__pycache__",
+    f"**/{S_FILE_DSK_TMP}",
+    f"**/{S_FILE_SCREENSHOT}",
 ]
 
 # skip placeholder files in these dirs
 L_PH_SKIP = [".git", ".venv*"]
-
-# project types to install in self venv for develop.py
-L_INST_SELF = ["p"]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -943,7 +936,6 @@ D_PRV_PRJ = {
     "__PP_USR_INST__": "",
     "__PP_APP_ID__": "",
     "__PP_FMT_DIST__": "",
-    "__PP_TEST__": "",
 }
 
 # ------------------------------------------------------------------------------
@@ -951,9 +943,7 @@ D_PRV_PRJ = {
 # ------------------------------------------------------------------------------
 
 # the lists of dirs/files we don't mess with while running pymaker
-# each item can be a full path, a path relative to the project directory, or a
-# glob
-# see https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob
+# each item can be a path relative to the project directory, or a glob
 # NB: you can use dunders here since the path is the last thing to get fixed
 # these dir/file names should match what's in the template dir (before any
 # modifications, hence using dunder keys)
@@ -999,10 +989,9 @@ D_PUB_BL = {
         "**/__pycache__",
         "**/*.egg-info",
     ],
-    "TEST": "",
 }
 
-# dict in project to control post processing
+# dict in project to control pb processing
 D_PUB_DBG = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
@@ -1064,16 +1053,16 @@ D_PUB_I18N = {
     S_KEY_PUB_I18N_SRC: [],
     # computer languages
     S_KEY_PUB_I18N_CLANGS: {
-        "Python": L_EXT_SRC,
+        "Python": L_EXT_PY,
         "Glade": L_EXT_GUI,
-        "Desktop": L_EXT_DESKTOP,
+        "Desktop": L_EXT_DESK,
     },
     # dict of clangs and no exts (ie file names)
-    # TODO: only fill for ptj_type
     S_KEY_PUB_I18N_NO_EXT: {},
     # list of written languages that are available
     S_KEY_PUB_I18N_WLANGS: [S_WLANG],
     # default charset for .pot/.po files
+    # S_KEY_PUB_I18N_CHAR: S_ENCODING,
     S_KEY_PUB_I18N_CHAR: S_ENCODING,
 }
 
@@ -1099,7 +1088,7 @@ D_PUB_META = {
 # ------------------------------------------------------------------------------
 
 # dict in pymaker to control post processing in debug mode
-# NB: overwrites D_PUB_DBG above
+# NB: not related to D_PUB_DBG above
 D_DBG_PM = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
@@ -1111,7 +1100,7 @@ D_DBG_PM = {
 }
 
 # dict in pybaker to control post processing in debug mode
-# NB: overwrites D_PUB_DBG above
+# NB: not related to D_PUB_DBG above
 D_DBG_PB = {
     S_KEY_DBG_GIT: True,
     S_KEY_DBG_VENV: True,
@@ -1304,11 +1293,13 @@ D_PURGE = {
     ]
 }
 
+# where to search for docs api
 D_DOCS_DIR_API = {
     "c": [S_DIR_SRC],
     "g": [S_DIR_SRC],
     "p": ["__PP_NAME_PRJ_SMALL__"],
 }
+
 # ------------------------------------------------------------------------------
 # Public functions
 # ------------------------------------------------------------------------------
@@ -1467,6 +1458,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # --------------------------------------------------------------------------
     # set DOCS_DIR_API
+
     if prj_type in D_DOCS_DIR_API:
         dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
 
@@ -1480,12 +1472,10 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_src = D_TYPE_I18N[prj_type]
 
         # fix sources
-        dict_dst[S_KEY_PUB_I18N_SRC] = dict_src[S_KEY_PUB_I18N_SRC].copy()
+        dict_dst[S_KEY_PUB_I18N_SRC] = list(dict_src[S_KEY_PUB_I18N_SRC])
 
         # fix no ext
-        dict_dst[S_KEY_PUB_I18N_NO_EXT] = dict_src[
-            S_KEY_PUB_I18N_NO_EXT
-        ].copy()
+        dict_dst[S_KEY_PUB_I18N_NO_EXT] = dict(dict_src[S_KEY_PUB_I18N_NO_EXT])
 
 
 # ------------------------------------------------------------------------------
@@ -1512,7 +1502,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     """
 
     # get project type
-    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    # prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # --------------------------------------------------------------------------
     # these paths are formatted here because they are complex and may be
@@ -1595,22 +1585,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     )
 
     # develop.py stuff
-    if prj_type in L_INST_SELF:
-        dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
-    else:
-        dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
-
-    # check for missing keys
-    # FIXME: dups in arrays
-    # dict_prv[S_KEY_PRV_ALL] = F.combine_dicts(D_PRV_ALL, dict_prv[S_KEY_PRV_ALL])
-    # dict_prv[S_KEY_PRV_PRJ] = F.combine_dicts(D_PRV_PRJ, dict_prv[S_KEY_PRV_PRJ])
-
-    # dict_pub[S_KEY_PUB_BL] = F.combine_dicts(D_PUB_BL, dict_pub[S_KEY_PUB_BL])
-    # dict_pub[S_KEY_PUB_DBG] = F.combine_dicts(D_PUB_DBG, dict_pub[S_KEY_PUB_DBG])
-    # dict_pub[S_KEY_PUB_DIST] = F.combine_dicts(D_PUB_DIST, dict_pub[S_KEY_PUB_DIST])
-    # dict_pub[S_KEY_PUB_DOCS] = F.combine_dicts(D_PUB_DOCS, dict_pub[S_KEY_PUB_DOCS])
-    # dict_pub[S_KEY_PUB_I18N] = F.combine_dicts(D_PUB_I18N, dict_pub[S_KEY_PUB_I18N])
-    # dict_pub[S_KEY_PUB_META] = F.combine_dicts(D_PUB_META, dict_pub[S_KEY_PUB_META])
+    dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
 
 
 # ------------------------------------------------------------------------------
@@ -1655,8 +1630,19 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # fix up blacklist and convert relative or glob paths to absolute Path
     # objects
-    dict_bl = dict_pub[S_KEY_PUB_BL]
-    dict_bl = F.fix_globs(dir_prj, dict_bl)
+
+    dict_bl = dict(dict_pub[S_KEY_PUB_BL])
+
+    # for each section of blacklist
+    for key, val in dict_bl.items():
+
+        # convert all items in list to Path objects
+        res = []
+        for item in val:
+            list_res = list(dir_prj.glob(item))
+            res.extend(list_res)
+
+        dict_bl[key] = res
 
     # just shorten the names
     skip_all = dict_bl[S_KEY_SKIP_ALL]
@@ -1686,7 +1672,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # handle dirs/files in skip_contents
             if not root in skip_contents and not item in skip_contents:
-
                 # fix content with appropriate dict
                 _fix_meta(item, dict_prv, dict_pub)
 
@@ -1739,17 +1724,16 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # print info
     print(S_ACTION_PLACE, end="", flush=True)
 
-    new_skip = []
+    list_skip = []
     for item in L_PH_SKIP:
-        res = list(dir_prj.rglob(item))
-        for item2 in list(res):
-            new_skip.append(item2)
+        res = list(dir_prj.glob(item))
+        list_skip.extend(res)
 
     # for all dirs/subdirs
     for root, root_dirs, root_files in dir_prj.walk():
 
         # skip .git, etc
-        if root in new_skip:
+        if root in list_skip:
             root_dirs.clear()
             continue
 
@@ -1769,6 +1753,64 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
     # print info
     F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
+    # # --------------------------------------------------------------------------
+    # # install package in itself
+
+    # # if venv flag is set
+    # if dict_dbg[S_KEY_DBG_VENV]:
+
+    #     # if it is the right type (package)
+    #     if prj_type in L_INST_SELF:
+
+    #         print(S_ACTION_EDIT, end="", flush=True)
+
+    #         try:
+    #             dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+    #             F.run(
+    #                 S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
+    #                 shell=True,
+    #             )
+    #             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+    #         except F.CNRunError as e:
+    #             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+    #             F.printd(S_ERR_ERR, str(e))
+
+    # --------------------------------------------------------------------------
+    # docs
+
+    # if docs flag is set
+    if dict_dbg[S_KEY_DBG_DOCS]:
+
+        # print info
+        print(S_ACTION_MAKE_DOCS, end="", flush=True)
+
+        # the command to make or bake docs
+        try:
+
+            dict_docs = dict_pub[S_KEY_PUB_DOCS]
+            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
+
+            # make docs
+            mkdocs = CNMkDocs()
+            mkdocs.make_docs(
+                dir_prj,
+                S_DIR_DOCS,
+                use_rm,
+                use_api,
+                lst_api_in,
+                S_FILE_README,
+                S_DIR_API,
+                S_DIR_IMAGES,
+            )
+            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except F.CNRunError as e:
+            # fail gracefully
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd(S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # tree
@@ -1811,65 +1853,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # ----------------------------------------------------------------------
         # we are done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
-    # install package in itself
-
-    # if venv flag is set
-    if dict_dbg[S_KEY_DBG_VENV]:
-
-        # if it is the right type (package)
-        if prj_type in L_INST_SELF:
-
-            print(S_ACTION_EDIT, end="", flush=True)
-
-            try:
-                dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-                F.run(
-                    S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
-                    shell=True,
-                )
-                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-            except F.CNRunError as e:
-                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd(S_ERR_ERR, str(e))
-
-    # --------------------------------------------------------------------------
-    # docs
-
-    # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-
-        # print info
-        print(S_ACTION_MAKE_DOCS, end="", flush=True)
-
-        # the command to make or bake docs
-        try:
-
-            dict_docs = dict_pub[S_KEY_PUB_DOCS]
-            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
-
-            # make docs
-            mkdocs = CNMkDocs()
-            mkdocs.make_docs(
-                dir_prj,
-                S_DIR_DOCS,
-                use_rm,
-                use_api,
-                lst_api_in,
-                S_FILE_README,
-                S_DIR_API,
-                S_DIR_IMAGES,
-            )
-            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # fail gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1990,28 +1973,29 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # remove extensions of some files
 
     # glob L_DIST_REMOVE_EXT
-    dir_del = []
+    list_del = []
     for item in L_DIST_REMOVE_EXT:
-        dir_n = list(dir_prj.rglob(item))
-        for item2 in dir_n:
-            dir_del.append(item2)
+        res = list(dir_prj.glob(item))
+        list_del.extend(res)
 
     # rename stuff
-    for item in dir_del:
+    for item in list_del:
         if item.is_file():
             item.rename(Path(item.parent, item.stem))
 
     # --------------------------------------------------------------------------
     # remove unnecessary files from dist
 
+    lst_del = []
     for item in L_PURGE_FILES:
+        res = list(p_dist.glob(item))
+        lst_del.extend(res)
 
-        lst = list(p_dist.rglob(item))
-        for item2 in lst:
-            if item2.is_dir():
-                shutil.rmtree(item2)
-            elif item2.is_file():
-                item2.unlink()
+    for item in lst_del:
+        if item.is_dir():
+            shutil.rmtree(item)
+        elif item.is_file():
+            item.unlink()
 
     # --------------------------------------------------------------------------
     # compress dist
@@ -2050,11 +2034,11 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
 
 # ------------------------------------------------------------------------------
-# Add a language
+# Make i18n stuff
 # ------------------------------------------------------------------------------
 def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
     """
-    Add a language
+    Make i18n stuff
 
     Args:
         dir_prj: The root of the new project
@@ -2121,7 +2105,6 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
             potpy.make_desktop(path_dsk_tmp, path_dsk_out)
         except F.CNRunError as e:
             # fail gracefully
-            # F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
             F.printd(S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
@@ -2129,9 +2112,6 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
 
     # print info
     print(S_ACTION_PO, end="", flush=True)
-
-    # get user home
-    usr_home = str(Path.home())
 
     # get sub-dicts we need
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
@@ -2141,20 +2121,12 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
     str_pattern = S_PO_VER_SCH
     str_rep = S_PO_VER_REP.format(pp_version)
 
-    lst_files = []
-
-    # --------------------------------------------------------------------------
-
     l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
-    for ext in l_ext:
-        a_dict = {
-            f"{ext}": [ext],
-        }
-        dict_pox = F.fix_globs(dir_prj, a_dict)
 
-        # could be better? late and drunk
-        a_arr = dict_pox[f"{ext}"]
-        lst_files += a_arr
+    lst_files = []
+    for item in l_ext:
+        list_res = list(dir_prj.rglob(item))
+        lst_files.extend(list_res)
 
     # --------------------------------------------------------------------------
 
@@ -2175,9 +2147,9 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
         # replace lang
         text = re.sub(str_pattern2, str_rep2, text, flags=re.M | re.S)
 
-        # delete user home from .pot/.po files (in case of debug)
+        # delete path from .pot/.po files (in case of debug)
         # NB: also no regex or rules, just nuke it everywhere
-        text = text.replace(f"{usr_home}", "")
+        text = text.replace(str(dir_prj) + "/", "")
 
         # save file
         with open(item, "w", encoding=S_ENCODING) as a_file:
@@ -2235,11 +2207,11 @@ def _fix_meta(path, dict_prv, dict_pub):
         _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
 
     # fix src files
-    if path.suffix in L_EXT_SRC:
+    if path.suffix in L_EXT_PY:
         _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix desktop
-    if path.suffix in L_EXT_DESKTOP:
+    if path.suffix in L_EXT_DESK:
         _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix ui files
@@ -2409,7 +2381,7 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
 
     try:
         # load/change/save
-        a_dict = F.load_dicts([path])
+        a_dict = F.load_dicts(path)
         a_dict[S_KEY_INST_VER] = version
         F.save_dict(a_dict, [path])
 
@@ -2534,14 +2506,14 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
         The new line of code
 
     Fixes the version number and short description in any file whose extension
-    is in L_EXT_SRC.
+    is in L_EXT_PY.
     """
 
     # NB: this is an example of using switches to control line replacement
 
     # the switch statuses
     dict_sw_block = dict(D_SWITCH_DEF)
-    dict_sw_line = dict(dict_sw_block)
+    dict_sw_line = dict(D_SWITCH_DEF)
 
     # the whole text of the file
     lines = []

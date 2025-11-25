@@ -90,7 +90,7 @@ class __PP_NAME_PRJ_PASCAL__:
     # --------------------------------------------------------------------------
 
     # errors
-    S_ERR_ERR = _("Error :")
+    S_ERR_ERR = _("Error:")
 
     # commands
     # NB: format params are inst dir, venv name, prog name, and cmd line

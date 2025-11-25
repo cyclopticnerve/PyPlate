@@ -1,0 +1,45 @@
+PyBaker
+
+main
+    setup
+
+--------------------------------------------------------------------------------
+
+    get_prj_info
+        load_dicts
+
+        save/fix/reload public/get sub dicts
+        (get sub dicts)
+
+        check for new keys
+
+        fill dicts
+
+--------------------------------------------------------------------------------
+
+    do before fix
+        fill dicts
+
+    do fix
+        make rep
+        fill dicts
+
+    do_after fix
+        fill dicts
+    
+--------------------------------------------------------------------------------
+
+    do before dist
+        fill dicts
+
+    do dist
+        fill dicts
+
+    do_after dist
+        fill dicts
+
+--------------------------------------------------------------------------------
+
+    teardown
+        save private
+        save/fix public

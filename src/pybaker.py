@@ -123,7 +123,7 @@ class PyBaker(PyPlate):
 
         # set the initial values of properties
         self._cmd_ide = False
-        self._add_lang = None
+        self._cmd_lang = None
         self._cmd_ver = None
 
     # --------------------------------------------------------------------------
@@ -175,7 +175,7 @@ class PyBaker(PyPlate):
         # teardown
 
         # call boilerplate code
-        # self._teardown()
+        self._teardown()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -224,15 +224,22 @@ class PyBaker(PyPlate):
         # do setup
         super()._setup()
 
+        # check if dir_prj has pyplate folder for a valid prj
+        # NB: do this after setup to check for -h
+        path_pyplate = self._dir_prj / P.C.S_PRJ_PP_DIR
+        if not path_pyplate.exists():
+            print(P.C.S_ERR_NOT_PRJ)
+            P.sys.exit(-1)
+
         # set props based on cmd line
         if self._debug:
-            self._dict_dbg = P.C.D_DBG_PB
+            self._dict_dbg = dict(P.C.D_DBG_PB)
 
         # get ide flag from cmd line
         self._cmd_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
 
         # add a language and rebuild i18n
-        self._add_lang = self._dict_args.get(self.S_ARG_LANG_DEST, None)
+        self._cmd_lang = self._dict_args.get(self.S_ARG_LANG_DEST, None)
 
         # user changed version on cmd line
         self._cmd_ver = self._dict_args.get(self.S_ARG_VER_DEST, None)
@@ -278,12 +285,7 @@ class PyBaker(PyPlate):
                 break
 
         # ----------------------------------------------------------------------
-
-        # check if dir_prj has pyplate folder for a valid prj
-        path_pyplate = self._dir_prj / P.C.S_PRJ_PP_DIR
-        if not path_pyplate.exists():
-            print(P.C.S_ERR_NOT_PRJ)
-            P.sys.exit(-1)
+        # load dicts
 
         # check if data files exist
         path_prv = self._dir_prj / P.C.S_PRJ_PRV_CFG
@@ -307,25 +309,46 @@ class PyBaker(PyPlate):
             print(self.S_ERR_ERR, e)
             P.sys.exit(-1)
 
-        # NB: reload BEFORE first save to set sub-dict pointers
-        self._reload_dicts()
+        # ----------------------------------------------------------------------
+        # get sub dicts
 
-        # TODO: do we need this?
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        # self._save_project_info()
+        self._reload_public()
+
+        # ----------------------------------------------------------------------
+        # check for new keys
+
+        # dict_prv
+        self._dict_prv_all = F.combine_dicts(self._dict_prv_all, P.C.D_PRV_ALL)
+        self._dict_prv_prj = F.combine_dicts(self._dict_prv_prj, P.C.D_PRV_PRJ)
+
+        # dict_pub
+        self._dict_pub_bl = F.combine_dicts(self._dict_pub_bl, P.C.D_PUB_BL)
+        self._dict_pub_dbg = F.combine_dicts(self._dict_pub_dbg, P.C.D_PUB_DBG)
+        self._dict_pub_dist = F.combine_dicts(
+            self._dict_pub_dist, P.C.D_PUB_DIST
+        )
+        self._dict_pub_docs = F.combine_dicts(
+            self._dict_pub_docs, P.C.D_PUB_DOCS
+        )
+        self._dict_pub_i18n = F.combine_dicts(
+            self._dict_pub_i18n, P.C.D_PUB_I18N
+        )
+        self._dict_pub_meta = F.combine_dicts(
+            self._dict_pub_meta, P.C.D_PUB_META
+        )
 
         # ----------------------------------------------------------------------
         # handle -l
-        if self._add_lang:
+        if self._cmd_lang:
 
             # get lang dict from props
             dict_lang = self._dict_pub_i18n[P.C.S_KEY_PUB_I18N_WLANGS]
 
             # only add once
-            if not self._add_lang in dict_lang:
+            if not self._cmd_lang in dict_lang:
 
                 # add lang to dict
-                dict_lang.append(self._add_lang)
+                dict_lang.append(self._cmd_lang)
 
                 # do the thing
                 P.C.do_i18n(
@@ -336,7 +359,7 @@ class PyBaker(PyPlate):
                 )
 
                 # save new lang dict
-                self._save_project_info()
+                self._teardown()
             else:
 
                 # lang exists, print msg
@@ -346,7 +369,7 @@ class PyBaker(PyPlate):
             P.sys.exit(0)
 
         # ----------------------------------------------------------------------
-        # check for new version
+        # handle -v
 
         # first check if passed on cmd line
         if self._cmd_ver:
@@ -405,11 +428,6 @@ class PyBaker(PyPlate):
         # change in project.json
         self._dict_pub_meta[P.C.S_KEY_META_VERSION] = self._cmd_ver
 
-        # ----------------------------------------------------------------------
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
         # make look nice
         print()
 
@@ -427,9 +445,6 @@ class PyBaker(PyPlate):
         P.C.do_before_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -473,6 +488,31 @@ class PyBaker(PyPlate):
             elif src.exists() and src.is_file():
                 shutil.copy2(src, dst)
 
+        # ----------------------------------------------------------------------
+        # save/fix public
+
+        # FIXME: need this?
+        try:
+            # save public settings
+            path_pub = self._dir_prj / P.C.S_PRJ_PUB_CFG
+            F.save_dict(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # fix dunders in dict_pub
+        self._fix_contents(path_pub)
+
+        # ----------------------------------------------------------------------
+        # reload public
+
+        # FIXME: need this?
+        try:
+            # reload dict from fixed file
+            self._dict_pub = F.load_dicts([path_pub])
+        except OSError as e:  # from load_dicts
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
         # done copying project files
         F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
@@ -493,9 +533,6 @@ class PyBaker(PyPlate):
         P.C.do_after_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
 
 
 # ------------------------------------------------------------------------------

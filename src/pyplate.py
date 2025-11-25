@@ -175,13 +175,13 @@ class PyPlate:
         # project.json dicts
         self._dict_pub = {}
         self._dict_pub_bl = {}
-        self._dict_pub_dbg = {}  # the one from conf that will go in file
+        self._dict_pub_dbg = {}
         self._dict_pub_dist = {}
         self._dict_pub_docs = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
-        # dictionary to hold current debug settings
+        # dictionary to hold current pm/pb debug settings
         self._dict_dbg = {}
 
         # log stuff
@@ -284,19 +284,45 @@ class PyPlate:
         F.B_DEBUG = self._debug
         C.B_DEBUG = self._debug
 
-        # debug turns off some post processing to speed up processing
-        # NB: changing values in self._dict_pub_dbg (through the functions in
-        # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
-        # pyplate.py
-        self._dict_dbg = self._dict_pub_dbg.copy()
-
         # maybe yell
         if self._debug:
 
             # yup, yell
             F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
             print()
+
+    # ------------------------------------------------------------------------------
+    # Boilerplate to use at the start of main
+    # ------------------------------------------------------------------------------
+    def _teardown(self):
+        """
+        Boilerplate to use at the end of main
+
+        Perform some mundane stuff like saving properties.
+        """
+
+        # ----------------------------------------------------------------------
+        # save private
+
+        try:
+            # save private settings
+            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+            F.save_dict(self._dict_prv, [path_prv])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
+        # save/fix public
+
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # fix dunders in dict_pub
+        self._fix_contents(path_pub)
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -319,9 +345,6 @@ class PyPlate:
             self._dict_dbg,
         )
 
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
@@ -338,10 +361,45 @@ class PyPlate:
         print(C.S_ACTION_FIX, end="", flush=True)
 
         # ----------------------------------------------------------------------
+        # make rep
+
+        # combine private dicts for string replacement
+        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
+
+        # save private now to get rid of placeholder
+        try:
+            # save private settings
+            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+            F.save_dict(self._dict_prv, [path_prv])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # save public now to fix tree
+        try:
+            # save private settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
+
+        # dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
+        dict_bl = dict(self._dict_pub_bl)
+
+        # for each section of blacklist
+        for key, val in dict_bl.items():
+
+            # convert all items in list to Path objects
+            res = []
+            for item in val:
+                list_res = list(self._dir_prj.glob(item))
+                res.extend(list_res)
+
+            dict_bl[key] = res
 
         # just shorten the names
         skip_all = dict_bl[C.S_KEY_SKIP_ALL]
@@ -415,9 +473,6 @@ class PyPlate:
             self._dict_pub,
             self._dict_dbg,
         )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
@@ -721,9 +776,9 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # Reload sub-dict pointers before/after dict change
     # --------------------------------------------------------------------------
-    def _reload_dicts(self):
+    def _reload_public(self):
         """
-        Reload sub-dict pointers before/after dict change
+        Reload sub-dict pointers after dict change
         """
 
         # update individual dicts in dict_prv
@@ -737,82 +792,6 @@ class PyPlate:
         self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
         self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-
-        # update debug dict
-        if not self._debug:
-            self._dict_dbg = self._dict_pub_dbg
-
-        # combine private dicts for string replacement
-        self._dict_rep = F.combine_dicts(
-            [self._dict_prv_all, self._dict_prv_prj]
-        )
-
-    # --------------------------------------------------------------------------
-    # Save project info
-    # --------------------------------------------------------------------------
-    def _save_project_info(self):
-        """
-        Save project info
-
-        Saves the private.json and project.json files after all modifications,
-        and reloads them to use in _do_fix.
-        """
-
-        # ----------------------------------------------------------------------
-        # save project settings
-
-        # create private settings
-        dict_prv = {
-            C.S_KEY_PRV_ALL: self._dict_prv_all,
-            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
-        }
-
-        try:
-            # save private settings
-            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-            F.save_dict(dict_prv, [path_prv])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # create public settings
-        dict_pub = {
-            C.S_KEY_PUB_BL: self._dict_pub_bl,
-            C.S_KEY_PUB_DBG: self._dict_pub_dbg,
-            C.S_KEY_PUB_DIST: self._dict_pub_dist,
-            C.S_KEY_PUB_DOCS: self._dict_pub_docs,
-            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            C.S_KEY_PUB_META: self._dict_pub_meta,
-        }
-
-        try:
-            # save public settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-            F.save_dict(dict_pub, [path_pub])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-        # THIS is the whole horrible reason for calling reload/save in separate
-        # functions. we need to fix dunders in the public file when running pb,
-        # since it may have been modified to include dunders. to do that, we
-        # need a valid dict_rep. to do THAT, we need a valid public file. to do
-        # THAT, we need a valid project.json. to do THAT, we need ... FUCK IT.
-        # IT WORKS.
-
-        # NB: needed BEFORE _fix_contents (or any _fix_...)
-        self._reload_dicts()
-
-        # fix dunders in dict_pub
-        self._fix_contents(path_pub)
-
-        try:
-            # reload dict from fixed file
-            self._dict_pub = F.load_dicts([path_pub])
-        except OSError as e:  # from load_dicts
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # NB: reload AFTER save to set sub-dict pointers
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -1031,39 +1010,23 @@ def get_type_rules(path):
         exts = val[C.S_KEY_RULES_EXT]
 
         # # if we match ext, return only rep stuff
-        if is_path_ext_in_list(path, exts):
+        # if is_path_ext_in_list(path, exts):
+        #     return val[C.S_KEY_RULES_REP]
+
+        l_exts = [item.lower() for item in exts]
+
+        # add dots
+        l_exts = [
+            f".{item}" if not item.startswith(".") else item for item in l_exts
+        ]
+
+        # check if the suffix or the filename (for dot files) matches
+        # NB: also checks for dot files
+        if path.suffix in l_exts or path.name in l_exts:
             return val[C.S_KEY_RULES_REP]
 
     # default result is py rep
     return {}
-
-
-# ------------------------------------------------------------------------------
-# Check if a file is in a list of file extensions
-# ------------------------------------------------------------------------------
-def is_path_ext_in_list(path, lst):
-    """
-    Check if a file's extension is in a list of file extensions
-
-    Args:
-        path: The file to find
-        lst: The list to look in
-
-    Returns:
-        Whether the file exists in the list
-    """
-
-    # lowercase the file in's ext
-    l_ext = [item.lower() for item in lst]
-
-    # add dots
-    l_ext = [
-        f".{item}" if not item.startswith(".") else item for item in l_ext
-    ]
-
-    # check if the suffix or the filename (for dot files) matches
-    # NB: also checks for dot files
-    return path.suffix in l_ext or path.name in l_ext
 
 
 # -)
