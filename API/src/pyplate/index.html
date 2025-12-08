@@ -115,10 +115,6 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.is_path_ext_in_list" class="nav-link">is_path_ext_in_list</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
               </ul>
             </li>
         </ul>
@@ -137,11 +133,7 @@
     <div class="doc doc-contents first">
 
         <p>A class to be the base for pymaker/pybaker</p>
-<p>This module gets the project type, the project's destination dir, copies the
-required dirs/files for the project type from the template to the specified
-destination, and performs some initial fixes/replacements of text and path
-names in the resulting files.</p>
-<p>Run pymaker -h for more options.</p>
+<p>This is the base class that contains code common to both PyMaker and PyBaker.</p>
 
 
 
@@ -286,13 +278,13 @@ PyPlate project from a template.</p>
         # project.json dicts
         self._dict_pub = {}
         self._dict_pub_bl = {}
-        self._dict_pub_dbg = {}  # the one from conf that will go in file
+        self._dict_pub_dbg = {}
         self._dict_pub_dist = {}
         self._dict_pub_docs = {}
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
 
-        # dictionary to hold current debug settings
+        # dictionary to hold current pm/pb debug settings
         self._dict_dbg = {}
 
         # log stuff
@@ -395,19 +387,42 @@ PyPlate project from a template.</p>
         F.B_DEBUG = self._debug
         C.B_DEBUG = self._debug
 
-        # debug turns off some post processing to speed up processing
-        # NB: changing values in self._dict_pub_dbg (through the functions in
-        # pyplate.py) will not affect the current session when running pymaker
-        # in debug mode. to do that, change the values of D_DBG_PM in
-        # pyplate.py
-        self._dict_dbg = self._dict_pub_dbg.copy()
-
         # maybe yell
         if self._debug:
 
             # yup, yell
             F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
             print()
+
+    # ------------------------------------------------------------------------------
+    # Boilerplate to use at the start of main
+    # ------------------------------------------------------------------------------
+    def _teardown(self):
+        """
+        Boilerplate to use at the end of main
+
+        Perform some mundane stuff like saving properties.
+        """
+
+        # ----------------------------------------------------------------------
+        # save private
+
+        try:
+            # save private settings
+            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
+            F.save_dict_into_paths(self._dict_prv, [path_prv])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
+        # save public
+
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict_into_paths(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -430,9 +445,6 @@ PyPlate project from a template.</p>
             self._dict_dbg,
         )
 
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
@@ -449,10 +461,28 @@ PyPlate project from a template.</p>
         print(C.S_ACTION_FIX, end="", flush=True)
 
         # ----------------------------------------------------------------------
+        # get reps again
+
+        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
+
+        # ----------------------------------------------------------------------
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
-        dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
+
+        # get a read-only copy of the blacklist
+        dict_bl = dict(self._dict_pub_bl)
+
+        # for each section of blacklist
+        for key, val in dict_bl.items():
+
+            # convert all items in list to Path objects
+            list_res = []
+            for item in val:
+                res = list(self._dir_prj.glob(item))
+                list_res.extend(res)
+
+            dict_bl[key] = list_res
 
         # just shorten the names
         skip_all = dict_bl[C.S_KEY_SKIP_ALL]
@@ -527,9 +557,6 @@ PyPlate project from a template.</p>
             self._dict_dbg,
         )
 
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
     # --------------------------------------------------------------------------
     # These are minor steps called from the main steps
     # --------------------------------------------------------------------------
@@ -558,7 +585,6 @@ PyPlate project from a template.</p>
 
             # do the basic replace (file got here after skip_all/skip_contents
             # BUT NOT skip_hdr/skip_code)
-            # print("no rules:", path)
             self._fix_text(path)
             return
 
@@ -761,9 +787,9 @@ PyPlate project from a template.</p>
         Returns:
             The new line of code
 
-        Replaces text inside the a file. This is a qnd function to replace any
+        Replaces text inside a file. This is a qnd function to replace any
         dunder in any file, regardless of D_TYPE_RULES. Think of it as an
-        oubliette for fi;es you just want to 'undunderize'.
+        oubliette for files you just want to 'undunderize'.
         """
 
         # default lines
@@ -828,102 +854,6 @@ PyPlate project from a template.</p>
 
         # do rename
         path.rename(path_new)
-
-    # --------------------------------------------------------------------------
-    # Reload sub-dict pointers before/after dict change
-    # --------------------------------------------------------------------------
-    def _reload_dicts(self):
-        """
-        Reload sub-dict pointers before/after dict change
-        """
-
-        # update individual dicts in dict_prv
-        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
-
-        # update individual dicts in dict_pub
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
-        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-
-        # update debug dict
-        if not self._debug:
-            self._dict_dbg = self._dict_pub_dbg
-
-        # combine private dicts for string replacement
-        self._dict_rep = F.combine_dicts(
-            [self._dict_prv_all, self._dict_prv_prj]
-        )
-
-    # --------------------------------------------------------------------------
-    # Save project info
-    # --------------------------------------------------------------------------
-    def _save_project_info(self):
-        """
-        Save project info
-
-        Saves the private.json and project.json files after all modifications,
-        and reloads them to use in _do_fix.
-        """
-
-        # ----------------------------------------------------------------------
-        # save project settings
-
-        # create private settings
-        dict_prv = {
-            C.S_KEY_PRV_ALL: self._dict_prv_all,
-            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
-        }
-
-        try:
-            # save private settings
-            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-            F.save_dict(dict_prv, [path_prv])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # create public settings
-        dict_pub = {
-            C.S_KEY_PUB_BL: self._dict_pub_bl,
-            C.S_KEY_PUB_DBG: self._dict_pub_dbg,
-            C.S_KEY_PUB_DIST: self._dict_pub_dist,
-            C.S_KEY_PUB_DOCS: self._dict_pub_docs,
-            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            C.S_KEY_PUB_META: self._dict_pub_meta,
-        }
-
-        try:
-            # save public settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-            F.save_dict(dict_pub, [path_pub])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-        # THIS is the whole horrible reason for calling reload/save in separate
-        # functions. we need to un-dunder the public file when running pb,
-        # since it may have been modified to include dunders. to do that, we
-        # need a valid dict_rep. to do THAT, we need a valid public file. to do
-        # THAT, we need a valid project.json. to do THAT, we need ... FUCK IT.
-        # IT WORKS.
-
-        # NB: needed BEFORE _fix_contents (or any _fix_...)
-        self._reload_dicts()
-
-        # fix dunders in dict_pub
-        self._fix_contents(path_pub)
-
-        try:
-            # reload dict from fixed file
-            self._dict_pub = F.load_dicts([path_pub])
-        except OSError as e:  # from load_dicts
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # NB: reload AFTER save to set sub-dict pointers
-        self._reload_dicts()
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters
@@ -1061,7 +991,125 @@ PyPlate project from a template.</p>
         # put combined reqs into final file
         joint = "\n".join(new_file)
         with open(dst, "w", encoding=C.S_ENCODING) as a_file:
-            a_file.writelines(joint)</code></pre>
+            a_file.writelines(joint)
+
+    # --------------------------------------------------------------------------
+    # Make reps, save public, fix public dunders, reload sub dicts
+    # --------------------------------------------------------------------------
+    def _fix_dicts(self):
+        """
+        Make reps, save/fix public dunders, reload sub dicts
+
+        Make reps, save/fix public dunders, reload sub dicts
+        """
+
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # take top level dicts apart to get sub dicts
+        # NB: we have valid _dict_prv and _dict_pub
+
+        # update individual dicts in dict_prv
+        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
+
+        # update individual dicts in dict_pub
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
+
+        # ----------------------------------------------------------------------
+        # check for new keys
+        # NB: when done, we have changed pointers to sub dirs
+
+        self._dict_prv_all = F.combine_dicts(self._dict_prv_all, C.D_PRV_ALL)
+        self._dict_prv_prj = F.combine_dicts(self._dict_prv_prj, C.D_PRV_PRJ)
+
+        self._dict_pub_bl = F.combine_dicts(self._dict_pub_bl, C.D_PUB_BL)
+        self._dict_pub_dbg = F.combine_dicts(self._dict_pub_dbg, C.D_PUB_DBG)
+        self._dict_pub_dist = F.combine_dicts(
+            self._dict_pub_dist, C.D_PUB_DIST
+        )
+        self._dict_pub_docs = F.combine_dicts(
+            self._dict_pub_docs, C.D_PUB_DOCS
+        )
+        self._dict_pub_i18n = F.combine_dicts(
+            self._dict_pub_i18n, C.D_PUB_I18N
+        )
+        self._dict_pub_meta = F.combine_dicts(
+            self._dict_pub_meta, C.D_PUB_META
+        )
+
+        # put outer dicts back together after new key check
+        # NB: since we have changed pointers to sub dirs, we have invalidated
+        # the parent dirs
+        self._dict_prv = {
+            C.S_KEY_PRV_ALL: self._dict_prv_all,
+            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
+        }
+        self._dict_pub = {
+            C.S_KEY_PUB_BL: self._dict_pub_bl,
+            C.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            C.S_KEY_PUB_DIST: self._dict_pub_dist,
+            C.S_KEY_PUB_DOCS: self._dict_pub_docs,
+            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            C.S_KEY_PUB_META: self._dict_pub_meta,
+        }
+
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # need reps before save/fix/load
+        # NB: must be done after check keys
+        # but before save/fix/load public
+
+        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
+
+        # ----------------------------------------------------------------------
+        # save/fix/load public
+
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict_into_paths(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # fix dunders in dict_pub
+        self._fix_contents(path_pub)
+
+        try:
+            # load public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            self._dict_pub = F.load_paths_into_dict(
+                [path_pub], self._dict_pub
+            )
+        except OSError as e:  # from load dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
+        # get sub dicts again
+        # NB: needed because we changed _dict_pub by reloading it
+
+        # update individual dicts in dict_prv
+        # NB: technically not needed, added for completeness
+        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
+
+        # update individual dicts in dict_pub
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
+
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # set initial debug dict
+        # NB: must be done after pub save/fix/load/subs
+        self._dict_dbg = dict(self._dict_pub_dbg)</code></pre>
               </details>
 
 
@@ -1119,13 +1167,13 @@ PyPlate project from a template.</p>
     # project.json dicts
     self._dict_pub = {}
     self._dict_pub_bl = {}
-    self._dict_pub_dbg = {}  # the one from conf that will go in file
+    self._dict_pub_dbg = {}
     self._dict_pub_dist = {}
     self._dict_pub_docs = {}
     self._dict_pub_i18n = {}
     self._dict_pub_meta = {}
 
-    # dictionary to hold current debug settings
+    # dictionary to hold current pm/pb debug settings
     self._dict_dbg = {}
 
     # log stuff
@@ -1387,123 +1435,21 @@ dict_sw_line.</p>
         # fix ets if necessary
         exts = val[C.S_KEY_RULES_EXT]
 
-        # # if we match ext, return only rep stuff
-        if is_path_ext_in_list(path, exts):
+        # lower case all exts
+        l_exts = [item.lower() for item in exts]
+
+        # add dots
+        l_exts = [
+            f".{item}" if not item.startswith(".") else item for item in l_exts
+        ]
+
+        # check if the suffix or the filename (for dot files) matches
+        # NB: also checks for dot files
+        if path.suffix.lower() in l_exts or path.name.lower() in l_exts:
             return val[C.S_KEY_RULES_REP]
 
     # default result is py rep
     return {}</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="src.pyplate.is_path_ext_in_list" class="doc doc-heading">
-            <code class="highlight language-python">is_path_ext_in_list(path, lst)</code>
-
-</h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Check if a file's extension is in a list of file extensions</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>path</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The file to find</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>lst</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The list to look in</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether the file exists in the list</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/pyplate.py</code></summary>
-              <pre class="highlight"><code class="language-python">def is_path_ext_in_list(path, lst):
-    """
-    Check if a file's extension is in a list of file extensions
-
-    Args:
-        path: The file to find
-        lst: The list to look in
-
-    Returns:
-        Whether the file exists in the list
-    """
-
-    # lowercase the file in's ext
-    l_ext = [item.lower() for item in lst]
-
-    # add dots
-    l_ext = [
-        f".{item}" if not item.startswith(".") else item for item in l_ext
-    ]
-
-    # check if the suffix or the filename (for dot files) matches
-    # NB: also checks for dot files
-    return path.suffix in l_ext or path.name in l_ext</code></pre>
             </details>
     </div>
 

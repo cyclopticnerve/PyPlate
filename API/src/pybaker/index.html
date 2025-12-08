@@ -262,7 +262,7 @@ distribution from a PyPlate project.</p>
 
         # set the initial values of properties
         self._cmd_ide = False
-        self._add_lang = None
+        self._cmd_lang = None
         self._cmd_ver = None
 
     # --------------------------------------------------------------------------
@@ -314,7 +314,7 @@ distribution from a PyPlate project.</p>
         # teardown
 
         # call boilerplate code
-        # self._teardown()
+        self._teardown()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -363,15 +363,11 @@ distribution from a PyPlate project.</p>
         # do setup
         super()._setup()
 
-        # set props based on cmd line
-        if self._debug:
-            self._dict_dbg = P.C.D_DBG_PB
-
         # get ide flag from cmd line
         self._cmd_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
 
         # add a language and rebuild i18n
-        self._add_lang = self._dict_args.get(self.S_ARG_LANG_DEST, None)
+        self._cmd_lang = self._dict_args.get(self.S_ARG_LANG_DEST, None)
 
         # user changed version on cmd line
         self._cmd_ver = self._dict_args.get(self.S_ARG_VER_DEST, None)
@@ -417,6 +413,7 @@ distribution from a PyPlate project.</p>
                 break
 
         # ----------------------------------------------------------------------
+        # sanity checks
 
         # check if dir_prj has pyplate folder for a valid prj
         path_pyplate = self._dir_prj / P.C.S_PRJ_PP_DIR
@@ -431,14 +428,17 @@ distribution from a PyPlate project.</p>
             print(P.C.S_ERR_PP_MISSING)
             P.sys.exit(-1)
 
+        # ----------------------------------------------------------------------
+        # make dicts from files
+
         # check if files are valid json
         try:
             # get settings dicts in private.json
-            self._dict_prv = F.load_dicts([path_prv], {})
+            self._dict_prv = F.load_paths_into_dict([path_prv], {})
 
             # get settings dicts in project.json
             # NB: may contain dunders
-            self._dict_pub = F.load_dicts([path_pub], {})
+            self._dict_pub = F.load_paths_into_dict([path_pub], {})
 
         # if there was a problem
         except OSError as e:  # from load_dicts
@@ -446,45 +446,48 @@ distribution from a PyPlate project.</p>
             print(self.S_ERR_ERR, e)
             P.sys.exit(-1)
 
-        # NB: reload BEFORE first save to set sub-dict pointers
-        self._reload_dicts()
+        # ----------------------------------------------------------------------
+        # combine private dicts for string replacement
+        self._fix_dicts()
 
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
+        # ----------------------------------------------------------------------
+        # handle -d
+        if self._debug:
+            self._dict_dbg = dict(P.C.D_DBG_PB)
 
         # ----------------------------------------------------------------------
         # handle -l
-        if self._add_lang:
+        if self._cmd_lang:
 
             # get lang dict from props
             dict_lang = self._dict_pub_i18n[P.C.S_KEY_PUB_I18N_WLANGS]
 
             # only add once
-            if not self._add_lang in dict_lang:
-
-                # add lang to dict
-                dict_lang.append(self._add_lang)
-
-                # do the thing
-                P.C.do_i18n(
-                    self._dir_prj,
-                    self._dict_prv,
-                    self._dict_pub,
-                    self._dict_dbg,
-                )
-
-                # save new lang dict
-                self._save_project_info()
-            else:
+            if self._cmd_lang in dict_lang:
 
                 # lang exists, print msg
                 print(self.S_ERR_LANG_EXIST)
 
-            # pass or fail, we are done
+                # pass or fail, we are done
+                P.sys.exit(0)
+
+            # add lang to dict
+            dict_lang.append(self._cmd_lang)
+
+            # do the thing
+            P.C.do_i18n(
+                self._dir_prj,
+                self._dict_prv,
+                self._dict_pub,
+                self._dict_dbg,
+            )
+
+            # save new lang dict
+            self._teardown()
             P.sys.exit(0)
 
         # ----------------------------------------------------------------------
-        # check for new version
+        # handle -v
 
         # first check if passed on cmd line
         if self._cmd_ver:
@@ -543,11 +546,6 @@ distribution from a PyPlate project.</p>
         # change in project.json
         self._dict_pub_meta[P.C.S_KEY_META_VERSION] = self._cmd_ver
 
-        # ----------------------------------------------------------------------
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
-
         # make look nice
         print()
 
@@ -565,9 +563,6 @@ distribution from a PyPlate project.</p>
         P.C.do_before_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()
 
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
@@ -591,7 +586,7 @@ distribution from a PyPlate project.</p>
             shutil.rmtree(a_dist)
 
         # make child dir in case we nuked
-        name_fmt = self._dict_prv_prj["__PP_DIST_DIR__"]
+        name_fmt = self._dict_prv_prj["__PP_FMT_DIST__"]
         p_dist = a_dist / name_fmt
         p_dist.mkdir(parents=True)
 
@@ -600,7 +595,7 @@ distribution from a PyPlate project.</p>
 
             # get src/dst rel to prj dir/dist dir
             src = self._dir_prj / key
-            dst = p_dist / val
+            dst = p_dist / str(val)
             if not dst.exists():
                 dst.mkdir(parents=True)
             dst = dst / src.name
@@ -611,6 +606,7 @@ distribution from a PyPlate project.</p>
             elif src.exists() and src.is_file():
                 shutil.copy2(src, dst)
 
+        # ----------------------------------------------------------------------
         # done copying project files
         F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
@@ -630,10 +626,7 @@ distribution from a PyPlate project.</p>
 
         P.C.do_after_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
-        )
-
-        # save modified dicts/fix dunders in public/reload sub-dicts
-        self._save_project_info()</code></pre>
+        )</code></pre>
               </details>
 
 
@@ -681,7 +674,7 @@ new object.</p>
 
     # set the initial values of properties
     self._cmd_ide = False
-    self._add_lang = None
+    self._cmd_lang = None
     self._cmd_ver = None</code></pre>
             </details>
     </div>
@@ -742,7 +735,13 @@ program, and performing its steps.</p>
     self._do_dist()
 
     # do any fixing up of dicts (like meta keywords, etc)
-    self._do_after_dist()</code></pre>
+    self._do_after_dist()
+
+    # ----------------------------------------------------------------------
+    # teardown
+
+    # call boilerplate code
+    self._teardown()</code></pre>
             </details>
     </div>
 
