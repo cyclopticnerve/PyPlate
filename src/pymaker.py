@@ -147,10 +147,6 @@ a project."
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
             P.sys.exit(-1)
 
-        # set props based on cmd line
-        if self._debug:
-            self._dict_dbg = dict(P.C.D_DBG_PM)
-
     # --------------------------------------------------------------------------
     # Get project info
     # --------------------------------------------------------------------------
@@ -342,9 +338,13 @@ a project."
         }
 
         # ----------------------------------------------------------------------
-        # get sub dicts
+        # combine private dicts for string replacement
+        self._fix_dicts()
 
-        self._reload_public()
+        # ----------------------------------------------------------------------
+        # handle -d
+        if self._debug:
+            self._dict_dbg = dict(P.C.D_DBG_PM)
 
         # ----------------------------------------------------------------------
         # fill dicts
@@ -471,6 +471,7 @@ a project."
         P.C.do_after_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

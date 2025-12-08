@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.0.6\n"
+"Project-Id-Version: 0.0.7\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-11-05 01:14-0500\n"
+"POT-Creation-Date: 2025-12-08 12:48-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,212 +18,212 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. I18N: done with step
-#: /Projects/Python/PyPlate/develop.py:80
-#: /Projects/Python/PyPlate/install/install.py:170
-#: /Projects/Python/PyPlate/install/uninstall.py:160
+#: develop.py:80
+#: install/install.py:170
+#: install/uninstall.py:160
 msgid "Done"
 msgstr ""
 
 #. I18N: step failed
-#: /Projects/Python/PyPlate/develop.py:82
+#: develop.py:82
 msgid "Failed"
 msgstr ""
 
 #. I18N: show the venv step
-#: /Projects/Python/PyPlate/develop.py:84
-#: /Projects/Python/PyPlate/install/install.py:176
+#: develop.py:84
+#: install/install.py:176
 msgid "Making venv folder... "
 msgstr ""
 
 #. I18N: show the reqs step
-#: /Projects/Python/PyPlate/develop.py:86
-#: /Projects/Python/PyPlate/install/install.py:178
+#: develop.py:86
+#: install/install.py:178
 msgid "Installing requirements... "
 msgstr ""
 
 #. I18N: an error occurred
-#: /Projects/Python/PyPlate/develop.py:97
-#: /Projects/Python/PyPlate/install/install.py:157
+#: develop.py:97
+#: install/install.py:157
 msgid "Error: "
 msgstr ""
 
 #. I18N help string for debug cmd line option
-#: /Projects/Python/PyPlate/install/install.py:130
-#: /Projects/Python/PyPlate/install/uninstall.py:125
+#: install/install.py:130
+#: install/uninstall.py:125
 msgid "enable dry run mode"
 msgstr ""
 
 #. I18N: help option help
-#: /Projects/Python/PyPlate/install/install.py:137
-#: /Projects/Python/PyPlate/install/uninstall.py:132
-#: /Projects/Python/PyPlate/src/pyplate.py:126
+#: install/install.py:137
+#: install/uninstall.py:132
+#: src/pyplate.py:121
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
-#: /Projects/Python/PyPlate/install/install.py:149
-#: /Projects/Python/PyPlate/install/uninstall.py:144
-#: /Projects/Python/PyPlate/src/pyplate.py:132
+#: install/install.py:149
+#: install/uninstall.py:144
+#: src/pyplate.py:127
 msgid "Use -h for help"
 msgstr ""
 
 #. I18N: install the program
-#: /Projects/Python/PyPlate/install/install.py:165
+#: install/install.py:165
 msgid "Installing {} Version {}"
 msgstr ""
 
 #. I18N: done installing
-#: /Projects/Python/PyPlate/install/install.py:168
+#: install/install.py:168
 msgid "{} installed"
 msgstr ""
 
 #. I18N: step failed
-#: /Projects/Python/PyPlate/install/install.py:172
-#: /Projects/Python/PyPlate/install/uninstall.py:162
+#: install/install.py:172
+#: install/uninstall.py:162
 msgid "Fail"
 msgstr ""
 
 #. I18N: show the copy step
-#: /Projects/Python/PyPlate/install/install.py:174
+#: install/install.py:174
 msgid "Copying files... "
 msgstr ""
 
 #. I18N: show desktop step
-#: /Projects/Python/PyPlate/install/install.py:180
+#: install/install.py:180
 msgid "Fixing .desktop file... "
 msgstr ""
 
 #. I18N: install aborted
-#: /Projects/Python/PyPlate/install/install.py:182
+#: install/install.py:182
 msgid "Installation aborted"
 msgstr ""
 
 #. I18N: answer yes
-#: /Projects/Python/PyPlate/install/install.py:186
-#: /Projects/Python/PyPlate/install/uninstall.py:170
+#: install/install.py:186
+#: install/uninstall.py:170
 msgid "y"
 msgstr ""
 
 #. I18N: answer no
-#: /Projects/Python/PyPlate/install/install.py:188
-#: /Projects/Python/PyPlate/install/uninstall.py:172
+#: install/install.py:188
+#: install/uninstall.py:172
 msgid "n"
 msgstr ""
 
-#: /Projects/Python/PyPlate/install/install.py:191
+#: install/install.py:191
 msgid ""
 "The current version of this program is already     installed.\n"
 "Do you want to overwrite?"
 msgstr ""
 
-#: /Projects/Python/PyPlate/install/install.py:196
+#: install/install.py:196
 msgid ""
 "A newer version of this program is currently     installed.\n"
 "Do you want to overwrite?"
 msgstr ""
 
 #. I18N: general error start
-#: /Projects/Python/PyPlate/install/install.py:202
-#: /Projects/Python/PyPlate/install/uninstall.py:180
-#: /Projects/Python/PyPlate/src/pyplate.py:143
+#: install/install.py:202
+#: install/uninstall.py:180
+#: src/pyplate.py:138
 msgid "Error:"
 msgstr ""
 
 #. I18N: config file not found
-#: /Projects/Python/PyPlate/install/install.py:205
-#: /Projects/Python/PyPlate/install/uninstall.py:183
+#: install/install.py:205
+#: install/uninstall.py:183
 msgid "File {} not found"
 msgstr ""
 
 #. I18N: config file is not valid json
-#: /Projects/Python/PyPlate/install/install.py:208
-#: /Projects/Python/PyPlate/install/uninstall.py:186
+#: install/install.py:208
+#: install/uninstall.py:186
 msgid "File {} is not a JSON file"
 msgstr ""
 
 #. I18N: version numbers invalid
-#: /Projects/Python/PyPlate/install/install.py:210
+#: install/install.py:210
 msgid "One or both version numbers are invalid"
 msgstr ""
 
 #. I18N: src path invalid
-#: /Projects/Python/PyPlate/install/install.py:213
+#: install/install.py:213
 msgid "Source path can not be {}"
 msgstr ""
 
 #. I18N: dst path invalid
-#: /Projects/Python/PyPlate/install/install.py:216
+#: install/install.py:216
 msgid "Destination path can not be {}"
 msgstr ""
 
 #. I18N: uninstall the program
-#: /Projects/Python/PyPlate/install/uninstall.py:155
+#: install/uninstall.py:155
 msgid "Uninstalling {}"
 msgstr ""
 
 #. I18N: done uninstalling
-#: /Projects/Python/PyPlate/install/uninstall.py:158
+#: install/uninstall.py:158
 msgid "{} uninstalled"
 msgstr ""
 
 #. I18N: show the copy step
-#: /Projects/Python/PyPlate/install/uninstall.py:164
+#: install/uninstall.py:164
 msgid "Deleting files... "
 msgstr ""
 
 #. I18N: uninstall aborted
-#: /Projects/Python/PyPlate/install/uninstall.py:166
+#: install/uninstall.py:166
 msgid "Uninstallation aborted"
 msgstr ""
 
 #. I18N: ask to uninstall
-#: /Projects/Python/PyPlate/install/uninstall.py:175
+#: install/uninstall.py:175
 msgid ""
 "This will uninstall {}.\n"
 "Do you want to continue?"
 msgstr ""
 
 #. I18N help string for ide cmd line option
-#: /Projects/Python/PyPlate/src/pybaker.py:64
+#: src/pybaker.py:64
 msgid "ask for project folder when running in IDE"
 msgstr ""
 
-#: /Projects/Python/PyPlate/src/pybaker.py:71
+#: src/pybaker.py:71
 msgid ""
 "add a language code ('en', 'en_US', etc.)\n"
 "(if used, -v is ignored)"
 msgstr ""
 
 #. I18N: config file dest
-#: /Projects/Python/PyPlate/src/pybaker.py:74
+#: src/pybaker.py:74
 msgid "LANG"
 msgstr ""
 
-#: /Projects/Python/PyPlate/src/pybaker.py:81
+#: src/pybaker.py:81
 msgid ""
 "set the new version of the project\n"
 "(if used, -l is ignored)"
 msgstr ""
 
 #. I18N: config file dest
-#: /Projects/Python/PyPlate/src/pybaker.py:84
+#: src/pybaker.py:84
 msgid "VERSION"
 msgstr ""
 
-#: /Projects/Python/PyPlate/src/pybaker.py:97
+#: src/pybaker.py:97
 msgid "Run this program from the directory of the project you want to build."
 msgstr ""
 
 #. I18N: language already exists in project.json and i18n folder
-#: /Projects/Python/PyPlate/src/pybaker.py:103
+#: src/pybaker.py:103
 msgid "Language already exists"
 msgstr ""
 
-#: /Projects/Python/PyPlate/src/pymaker.py:71
+#: src/pymaker.py:71
 msgid "Run this program from the directory where you want to create a project."
 msgstr ""
 
 #. I18N help string for debug cmd line option
-#: /Projects/Python/PyPlate/src/pyplate.py:119
+#: src/pyplate.py:114
 msgid "enable debugging mode"
 msgstr ""

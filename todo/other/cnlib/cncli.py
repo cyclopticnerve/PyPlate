@@ -78,9 +78,11 @@ class CNCli:
         # create a parser object in case we need it
         self._parser = argparse.ArgumentParser(formatter_class=CNFormatter)
 
+
 # --------------------------------------------------------------------------
 # Private methods
 # --------------------------------------------------------------------------
+
 
 # --------------------------------------------------------------------------
 # Set up and run the command line parser
@@ -166,7 +168,9 @@ def _run_parser(self):
 
         # if one or the other, load it
         if self._path_cfg and self._path_cfg.exists():
-            self._dict_cfg = F.load_dicts([self._path_cfg], self._dict_cfg)
+            self._dict_cfg = F.load_paths_into_dict(
+                [self._path_cfg], self._dict_cfg
+            )
 
         # add a debug message
         if self._debug:
@@ -185,7 +189,7 @@ def _run_parser(self):
 
         # save dict to path
         if self._path_cfg:
-            F.save_dict(self._dict_cfg, [self._path_cfg])
+            F.save_dict_into_paths(self._dict_cfg, [self._path_cfg])
 
         # add a debug message
         if self._debug:

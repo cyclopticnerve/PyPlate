@@ -12,12 +12,7 @@
 """
 A class to be the base for pymaker/pybaker
 
-This module gets the project type, the project's destination dir, copies the
-required dirs/files for the project type from the template to the specified
-destination, and performs some initial fixes/replacements of text and path
-names in the resulting files.
-
-Run pymaker -h for more options.
+This is the base class that contains code common to both PyMaker and PyBaker.
 """
 
 # ------------------------------------------------------------------------------
@@ -107,7 +102,7 @@ class PyPlate:
     # pylint enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 0.0.6"
+    S_PP_VERSION = "Version 0.0.7"
 
     # pyplate: replace=False
 
@@ -307,22 +302,19 @@ class PyPlate:
         try:
             # save private settings
             path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-            F.save_dict(self._dict_prv, [path_prv])
+            F.save_dict_into_paths(self._dict_prv, [path_prv])
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
-        # save/fix public
+        # save public
 
         try:
             # save public settings
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-            F.save_dict(self._dict_pub, [path_pub])
+            F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
-
-        # fix dunders in dict_pub
-        self._fix_contents(path_pub)
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -361,45 +353,28 @@ class PyPlate:
         print(C.S_ACTION_FIX, end="", flush=True)
 
         # ----------------------------------------------------------------------
-        # make rep
+        # get reps again
 
-        # combine private dicts for string replacement
         self._dict_rep = self._dict_prv_all | self._dict_prv_prj
-
-        # save private now to get rid of placeholder
-        try:
-            # save private settings
-            path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
-            F.save_dict(self._dict_prv, [path_prv])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # save public now to fix tree
-        try:
-            # save private settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-            F.save_dict(self._dict_pub, [path_pub])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
 
         # fix up blacklist and convert relative or glob paths to absolute Path
         # objects
 
-        # dict_bl = F.fix_globs(self._dir_prj, self._dict_pub_bl)
+        # get a read-only copy of the blacklist
         dict_bl = dict(self._dict_pub_bl)
 
         # for each section of blacklist
         for key, val in dict_bl.items():
 
             # convert all items in list to Path objects
-            res = []
+            list_res = []
             for item in val:
-                list_res = list(self._dir_prj.glob(item))
-                res.extend(list_res)
+                res = list(self._dir_prj.glob(item))
+                list_res.extend(res)
 
-            dict_bl[key] = res
+            dict_bl[key] = list_res
 
         # just shorten the names
         skip_all = dict_bl[C.S_KEY_SKIP_ALL]
@@ -502,7 +477,6 @@ class PyPlate:
 
             # do the basic replace (file got here after skip_all/skip_contents
             # BUT NOT skip_hdr/skip_code)
-            # print("no rules:", path)
             self._fix_text(path)
             return
 
@@ -774,26 +748,6 @@ class PyPlate:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
-    # Reload sub-dict pointers before/after dict change
-    # --------------------------------------------------------------------------
-    def _reload_public(self):
-        """
-        Reload sub-dict pointers after dict change
-        """
-
-        # update individual dicts in dict_prv
-        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
-
-        # update individual dicts in dict_pub
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
-        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-
-    # --------------------------------------------------------------------------
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
     def _check_type(self, prj_type):
@@ -931,6 +885,124 @@ class PyPlate:
         with open(dst, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
+    # --------------------------------------------------------------------------
+    # Make reps, save public, fix public dunders, reload sub dicts
+    # --------------------------------------------------------------------------
+    def _fix_dicts(self):
+        """
+        Make reps, save/fix public dunders, reload sub dicts
+
+        Make reps, save/fix public dunders, reload sub dicts
+        """
+
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # take top level dicts apart to get sub dicts
+        # NB: we have valid _dict_prv and _dict_pub
+
+        # update individual dicts in dict_prv
+        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
+
+        # update individual dicts in dict_pub
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
+
+        # ----------------------------------------------------------------------
+        # check for new keys
+        # NB: when done, we have changed pointers to sub dirs
+
+        self._dict_prv_all = F.combine_dicts(self._dict_prv_all, C.D_PRV_ALL)
+        self._dict_prv_prj = F.combine_dicts(self._dict_prv_prj, C.D_PRV_PRJ)
+
+        self._dict_pub_bl = F.combine_dicts(self._dict_pub_bl, C.D_PUB_BL)
+        self._dict_pub_dbg = F.combine_dicts(self._dict_pub_dbg, C.D_PUB_DBG)
+        self._dict_pub_dist = F.combine_dicts(
+            self._dict_pub_dist, C.D_PUB_DIST
+        )
+        self._dict_pub_docs = F.combine_dicts(
+            self._dict_pub_docs, C.D_PUB_DOCS
+        )
+        self._dict_pub_i18n = F.combine_dicts(
+            self._dict_pub_i18n, C.D_PUB_I18N
+        )
+        self._dict_pub_meta = F.combine_dicts(
+            self._dict_pub_meta, C.D_PUB_META
+        )
+
+        # put outer dicts back together after new key check
+        # NB: since we have changed pointers to sub dirs, we have invalidated
+        # the parent dirs
+        self._dict_prv = {
+            C.S_KEY_PRV_ALL: self._dict_prv_all,
+            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
+        }
+        self._dict_pub = {
+            C.S_KEY_PUB_BL: self._dict_pub_bl,
+            C.S_KEY_PUB_DBG: self._dict_pub_dbg,
+            C.S_KEY_PUB_DIST: self._dict_pub_dist,
+            C.S_KEY_PUB_DOCS: self._dict_pub_docs,
+            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
+            C.S_KEY_PUB_META: self._dict_pub_meta,
+        }
+
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # need reps before save/fix/load
+        # NB: must be done after check keys
+        # but before save/fix/load public
+
+        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
+
+        # ----------------------------------------------------------------------
+        # save/fix/load public
+
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict_into_paths(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # fix dunders in dict_pub
+        self._fix_contents(path_pub)
+
+        try:
+            # load public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            self._dict_pub = F.load_paths_into_dict(
+                [path_pub], self._dict_pub
+            )
+        except OSError as e:  # from load dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
+        # get sub dicts again
+        # NB: needed because we changed _dict_pub by reloading it
+
+        # update individual dicts in dict_prv
+        # NB: technically not needed, added for completeness
+        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
+
+        # update individual dicts in dict_pub
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
+
+        # ----------------------------------------------------------------------
+        # ----------------------------------------------------------------------
+        # set initial debug dict
+        # NB: must be done after pub save/fix/load/subs
+        self._dict_dbg = dict(self._dict_pub_dbg)
+
 
 # ------------------------------------------------------------------------------
 # Public functions
@@ -1009,10 +1081,7 @@ def get_type_rules(path):
         # fix ets if necessary
         exts = val[C.S_KEY_RULES_EXT]
 
-        # # if we match ext, return only rep stuff
-        # if is_path_ext_in_list(path, exts):
-        #     return val[C.S_KEY_RULES_REP]
-
+        # lower case all exts
         l_exts = [item.lower() for item in exts]
 
         # add dots
@@ -1022,7 +1091,7 @@ def get_type_rules(path):
 
         # check if the suffix or the filename (for dot files) matches
         # NB: also checks for dot files
-        if path.suffix in l_exts or path.name in l_exts:
+        if path.suffix.lower() in l_exts or path.name.lower() in l_exts:
             return val[C.S_KEY_RULES_REP]
 
     # default result is py rep

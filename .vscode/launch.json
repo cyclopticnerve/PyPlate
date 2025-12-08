@@ -5,7 +5,7 @@
             "name": "PM",
             "type": "debugpy",
             "request": "launch",
-            "program": "PyPlate/src/pymaker.py",
+            "program": "PyPlate/bin/pymaker.py",
             "console": "integratedTerminal",
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/.."
@@ -14,7 +14,7 @@
             "name": "PM Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "PyPlate/src/pymaker.py",
+            "program": "PyPlate/bin/pymaker.py",
             "console": "integratedTerminal",
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
@@ -24,7 +24,7 @@
             "name": "PB",
             "type": "debugpy",
             "request": "launch",
-            "program": "PyPlate/src/pybaker.py",
+            "program": "PyPlate/bin/pybaker.py",
             "console": "integratedTerminal",
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
@@ -36,7 +36,7 @@
             "name": "PB Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "PyPlate/src/pybaker.py",
+            "program": "PyPlate/bin/pybaker.py",
             "console": "integratedTerminal",
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",

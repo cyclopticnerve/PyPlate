@@ -140,7 +140,7 @@
 #         # windows to be shown at launch
 #         # load_dicts goes through each file in the array, combining dicts with
 #         # the previous result (starting with an empty dict) as it goes
-#         dict_file_state = CF.load_dicts([self._path_state])
+#         dict_file_state = CF.load_paths_into_dict([self._path_state])
 
 #         # if there is a state in the file, try using that
 #         if len(dict_file_state) > 0:
@@ -395,7 +395,7 @@
 #         print("shutdown: ", len(self._dict_inst))
 
 #         # save _dict_state to _path_state
-#         CF.save_dict([self._path_state], self._dict_state)
+#         CF.save_dict_into_paths([self._path_state], self._dict_state)
 
 #         # TODO: is any of this needed?
 
@@ -408,7 +408,7 @@
 #         #     # simulate the 'X' button in window's title bar
 #         #     v.window.destroy()
 
-#         # CF.save_dict([self._path_state], dict_state)
+#         # CF.save_dict_into_paths([self._path_state], dict_state)
 #         # destroy any windows left in the list
 #         # for key, value in self._dict_inst.items():
 

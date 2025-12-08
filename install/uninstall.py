@@ -115,7 +115,7 @@ class CNUninstall:
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string
-    S_PP_VERSION = "Version 0.0.6"
+    S_PP_VERSION = "Version 0.0.7"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"

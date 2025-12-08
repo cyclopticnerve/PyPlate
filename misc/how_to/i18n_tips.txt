@@ -1,8 +1,9 @@
 To add a language to a CLI/GUI app:
 
-add lang to pyplate/project.json
-run pybaker to create folders/files
-edit strings in i18n/po/<lang>.po
+run pybaker -l <lang> to create <prj>/i18n/po/<lang>/<prj>.po
+
+edit strings in <prj>/i18n/po/<lang>/<prj>.po
+
 run pybaker again to create new .mo files
 
 test using $ LANGUAGE=xx ./src/__PP_NAME_PRJ_SMALL__.py

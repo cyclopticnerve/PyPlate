@@ -355,7 +355,9 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
                     # set whole dict to file
                     try:
-                        self._dict_cfg = F.load_dicts(a_path, self._dict_cfg)
+                        self._dict_cfg = F.load_paths_into_dict(
+                            a_path, self._dict_cfg
+                        )
 
                         # if we get here, we have loaded the highest file
                         return
@@ -375,7 +377,9 @@ class __PP_NAME_PRJ_PASCAL__Base:
         else:
 
             try:
-                self._dict_cfg = F.load_dicts(l_paths, self._dict_cfg)
+                self._dict_cfg = F.load_paths_into_dict(
+                    l_paths, self._dict_cfg
+                )
             except OSError as e:  # from load_dicts
                 F.printd(self.S_ERR_ERR, str(e))
 
@@ -425,7 +429,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
                 # set whole file to dict
                 try:
-                    F.save_dict(self._dict_cfg, a_path)
+                    F.save_dict_into_paths(self._dict_cfg, a_path)
 
                     # if we get here, we have saved the file
                     return
@@ -437,8 +441,9 @@ class __PP_NAME_PRJ_PASCAL__Base:
         else:
 
             try:
-                F.save_dict(self._dict_cfg, l_paths)
+                F.save_dict_into_paths(self._dict_cfg, l_paths)
             except OSError as e:  # from save_dict
                 F.printd(self.S_ERR_ERR, str(e))
+
 
 # -)

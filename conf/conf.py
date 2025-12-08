@@ -286,7 +286,6 @@ S_KEY_SKIP_TREE = "SKIP_TREE"
 S_KEY_PUB_I18N_DOM = "DOMAIN"
 S_KEY_PUB_I18N_SRC = "SOURCES"
 S_KEY_PUB_I18N_CLANGS = "CLANGS"
-S_KEY_PUB_I18N_NO_EXT = "NO_EXT"
 S_KEY_PUB_I18N_WLANGS = "WLANGS"
 S_KEY_PUB_I18N_CHAR = "CHARSET"
 
@@ -441,10 +440,10 @@ S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 # cmd for git
 # NB: format param is proj dir
 S_CMD_GIT_CREATE = "cd {}; git init -q"
+# NB: format params are prj dir and venv name
+S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python -m pip install -e ."
 # NB: format params are prj dir, venv name, and reqs file
-S_CMD_VENV_INST_REQS = (
-    "cd {};. {}/bin/activate;python -m pip install -r {}"
-)
+S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
 # ------------------------------------------------------------------------------
 # regex stuff
@@ -795,6 +794,9 @@ L_APP_INSTALL = [
     "g",
 ]
 
+# prj type(s) to install in own venv (packages mostly)
+L_INST_SELF = ["p"]
+
 # prj type(s) for making .desktop file
 L_MAKE_DESK = ["g"]
 
@@ -894,7 +896,6 @@ D_PRV_ALL = {
     # mkdocs stuff
     "__PP_DIR_DOCS__": S_DIR_DOCS,
     "__PP_DIR_SITE__": S_DIR_SITE,
-    "__PP_TEST__": "",
 }
 
 # these are settings that will be calculated for you while running pymaker.py
@@ -986,6 +987,7 @@ D_PUB_BL = {
         ".git",
         ".venv*",
         ".VSCodeCounter",
+        "site",
         "**/__pycache__",
         "**/*.egg-info",
     ],
@@ -1042,7 +1044,7 @@ D_PUB_DOCS = {
     S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
     S_KEY_DOCS_USE_RM: True,
     S_KEY_DOCS_MAKE_API: True,
-    S_KEY_DOCS_DIR_API: "",  # tbd by do after template
+    S_KEY_DOCS_DIR_API: "",  # tbd by do_after_template
 }
 
 # stuff to be used in pybaker
@@ -1057,8 +1059,6 @@ D_PUB_I18N = {
         "Glade": L_EXT_GUI,
         "Desktop": L_EXT_DESK,
     },
-    # dict of clangs and no exts (ie file names)
-    S_KEY_PUB_I18N_NO_EXT: {},
     # list of written languages that are available
     S_KEY_PUB_I18N_WLANGS: [S_WLANG],
     # default charset for .pot/.po files
@@ -1195,11 +1195,6 @@ D_TYPE_I18N = {
             S_DIR_SRC,
             S_FILE_DEV_VENV,
         ],
-        S_KEY_PUB_I18N_NO_EXT: {
-            "Python": [
-                "__PP_NAME_PRJ_SMALL__",
-            ],
-        },
     },
     "g": {
         S_KEY_PUB_I18N_SRC: [
@@ -1208,18 +1203,12 @@ D_TYPE_I18N = {
             S_DIR_SRC,
             S_FILE_DEV_VENV,
         ],
-        S_KEY_PUB_I18N_NO_EXT: {
-            "Python": [
-                "__PP_NAME_PRJ_SMALL__",
-            ],
-        },
     },
     "p": {
         S_KEY_PUB_I18N_SRC: [
             "__PP_NAME_PRJ_SMALL__",
             S_FILE_DEV_VENV,
         ],
-        S_KEY_PUB_I18N_NO_EXT: {},
     },
 }
 
@@ -1289,7 +1278,7 @@ D_PURGE = {
         S_DIR_I18N,
         S_DIR_INSTALL,
         S_DIR_SRC,
-        S_FILE_REQS,
+        # S_FILE_REQS,
     ]
 }
 
@@ -1420,8 +1409,8 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             path_uninst = dir_prj / S_PATH_UNINST_CFG
 
             try:
-                F.save_dict(dict_inst, [path_inst])
-                F.save_dict(dict_uninst, [path_uninst])
+                F.save_dict_into_paths(dict_inst, [path_inst])
+                F.save_dict_into_paths(dict_uninst, [path_uninst])
 
                 # show info
                 F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
@@ -1474,9 +1463,6 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         # fix sources
         dict_dst[S_KEY_PUB_I18N_SRC] = list(dict_src[S_KEY_PUB_I18N_SRC])
 
-        # fix no ext
-        dict_dst[S_KEY_PUB_I18N_NO_EXT] = dict(dict_src[S_KEY_PUB_I18N_NO_EXT])
-
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -1502,7 +1488,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     """
 
     # get project type
-    # prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # --------------------------------------------------------------------------
     # these paths are formatted here because they are complex and may be
@@ -1585,7 +1571,10 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     )
 
     # develop.py stuff
-    dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
+    if prj_type in L_INST_SELF:
+        dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
+    else:
+        dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
 
 
 # ------------------------------------------------------------------------------
@@ -1637,12 +1626,12 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     for key, val in dict_bl.items():
 
         # convert all items in list to Path objects
-        res = []
+        list_res = []
         for item in val:
-            list_res = list(dir_prj.glob(item))
-            res.extend(list_res)
+            res = list(dir_prj.glob(item))
+            list_res.extend(res)
 
-        dict_bl[key] = res
+        dict_bl[key] = list_res
 
     # just shorten the names
     skip_all = dict_bl[S_KEY_SKIP_ALL]
@@ -1754,27 +1743,27 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # print info
     F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
-    # # --------------------------------------------------------------------------
-    # # install package in itself
+    # --------------------------------------------------------------------------
+    # install package in itself
 
-    # # if venv flag is set
-    # if dict_dbg[S_KEY_DBG_VENV]:
+    # if venv flag is set
+    if dict_dbg[S_KEY_DBG_VENV]:
 
-    #     # if it is the right type (package)
-    #     if prj_type in L_INST_SELF:
+        # if it is the right type (package)
+        if prj_type in L_INST_SELF:
 
-    #         print(S_ACTION_EDIT, end="", flush=True)
+            print(S_ACTION_EDIT, end="", flush=True)
 
-    #         try:
-    #             dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-    #             F.run(
-    #                 S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
-    #                 shell=True,
-    #             )
-    #             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-    #         except F.CNRunError as e:
-    #             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-    #             F.printd(S_ERR_ERR, str(e))
+            try:
+                dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+                F.run(
+                    S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
+                    shell=True,
+                )
+                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+            except F.CNRunError as e:
+                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+                F.printd(S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # docs
@@ -1841,8 +1830,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             filter_list=dict_pub[S_KEY_PUB_BL][S_KEY_SKIP_TREE],
             dir_format=S_TREE_DIR_FORMAT,
             file_format=S_TREE_FILE_FORMAT,
+            ignore_case=False,
         )
-        tree_obj.main()
+        tree_obj.make_tree()
 
         # write to file
         with open(file_tree_text, "w", encoding=S_ENCODING) as a_file:
@@ -1853,6 +1843,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # ----------------------------------------------------------------------
         # we are done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -1975,7 +1966,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # glob L_DIST_REMOVE_EXT
     list_del = []
     for item in L_DIST_REMOVE_EXT:
-        res = list(dir_prj.glob(item))
+        res = list(p_dist.glob(item))
         list_del.extend(res)
 
     # rename stuff
@@ -2075,7 +2066,6 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
         # optional in
         str_tag=S_I18N_TAG,
         dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
-        dict_no_ext=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_NO_EXT],
         list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
         charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
     )
@@ -2121,17 +2111,17 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
     str_pattern = S_PO_VER_SCH
     str_rep = S_PO_VER_REP.format(pp_version)
 
-    l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
-
-    lst_files = []
-    for item in l_ext:
-        list_res = list(dir_prj.rglob(item))
-        lst_files.extend(list_res)
-
     # --------------------------------------------------------------------------
 
+    l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
+
+    list_files = []
+    for item in l_ext:
+        res = list(dir_prj.glob(item))
+        list_files.extend(res)
+
     # for each file
-    for item in lst_files:
+    for item in list_files:
 
         # replace lang
         lang = Path(item).parent.stem
@@ -2381,14 +2371,9 @@ def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
 
     try:
         # load/change/save
-        a_dict = F.load_dicts(path)
+        a_dict = F.load_paths_into_dict(path)
         a_dict[S_KEY_INST_VER] = version
-        F.save_dict(a_dict, [path])
-
-        # load/change/save
-        a_dict = F.load_dicts([path])
-        a_dict[S_KEY_INST_VER] = version
-        F.save_dict(a_dict, [path])
+        F.save_dict_into_paths(a_dict, [path])
     except OSError as e:  # from load_dicts/save_dict
         F.printd(S_ERR_ERR, str(e))
 

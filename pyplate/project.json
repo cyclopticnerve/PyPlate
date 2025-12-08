@@ -32,6 +32,7 @@
             ".git",
             ".venv*",
             ".VSCodeCounter",
+            "site",
             "**/__pycache__",
             "**/*.egg-info"
         ]
@@ -46,6 +47,30 @@
         "DBG_DIST": true
     },
     "PUB_DIST": {
+        "c": {
+            "bin": "assets",
+            "conf": "assets",
+            "log": "assets",
+            "i18n": "assets",
+            "install": "assets",
+            "src": "assets",
+            "requirements.txt": "assets/install"
+        },
+        "g": {
+            "bin": "assets",
+            "conf": "assets",
+            "log": "assets",
+            "i18n": "assets",
+            "images": "assets",
+            "install": "assets",
+            "src": "assets",
+            "requirements.txt": "assets/install"
+        },
+        "p": {
+            "__PP_NAME_PRJ_SMALL__": "",
+            "pyproject.toml": "",
+            "pyplate": ""
+        },
         "bin": "assets",
         "conf": "assets",
         "log": "assets",
@@ -56,7 +81,7 @@
     },
     "PUB_DOCS": {
         "DOCS_THEME": "",
-        "DOCS_USE_RM": true,
+        "DOCS_USE_RM": false,
         "DOCS_MAKE_API": true,
         "DOCS_DIR_API": [
             "src"
@@ -82,20 +107,20 @@
                 ".desktop"
             ]
         },
+        "WLANGS": [
+            "en"
+        ],
+        "CHARSET": "UTF-8",
         "NO_EXT": {
             "Python": [
                 "pymaker",
                 "pybaker"
             ]
-        },
-        "WLANGS": [
-            "en"
-        ],
-        "CHARSET": "UTF-8"
+        }
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "0.0.6",
+        "META_VERSION": "0.0.7",
         "META_KEYWORDS": [
             "python",
             "cli",

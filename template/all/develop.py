@@ -7,7 +7,6 @@
 # License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
-# pylint: disable=too-many-lines
 """
 The develop script for this project
 
@@ -61,9 +60,9 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 class CNDevelop:
     """
-    The class to use for installing a PyPlate program
+    The class to use for developing a PyPlate program
 
-    This class performs the install operation.
+    This class performs the develop operation.
     """
 
     # --------------------------------------------------------------------------
@@ -170,7 +169,7 @@ class CNDevelop:
         )
         try:
             # NB: hide output
-            subprocess.run(cmd, shell=True, check=True)
+            subprocess.run(cmd, shell=True, check=True, capture_output=True)
             print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)

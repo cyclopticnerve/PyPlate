@@ -1,4 +1,5 @@
-from pprint import pp
+# from pprint import pp
+from cnlib import cnfunctions as F
 
 # ------------------------------------------------------------------------------
 
@@ -8,51 +9,44 @@ def combine_dicts(dict_a, dict_b):
     if not dict_b:
         dict_b = {}
 
-    # for each k,v pair in dict_new
-    for k, v in dict_a.items():
+    if not isinstance(dict_a, list):
+        dict_a = [dict_a]
 
-        # if the value is a dict
-        if isinstance(v, dict):
-            # recurse using the current key and value
-            dict_b[k] = combine_dicts(v, dict_b.get(k, None))
-            continue
+    for item in dict_a:
 
-        # if the value is not a dict, just copy value from one dict to the other
-        dict_b[k] = v
+        # for each k,v pair in dict_new
+        for k, v in item.items():
+
+            # if the value is a dict
+            if isinstance(v, dict):
+                # recurse using the current key and value
+                dict_b[k] = combine_dicts(v, dict_b.get(k, None))
+                continue
+
+            # if the value is not a dict, just copy value from one dict to the other
+            dict_b[k] = v
 
     return dict_b
 
 # ------------------------------------------------------------------------------
 
 a_dict_a = {
-    "dict_key_1a": {
-        "key_1a": "val_1a",
-    },
-    "dict_key_2a": {
-        "key_2a": "val_2a",
+    "__PP_PRJ_TYPE__": "c",
+    "foo": {
+        "__NEW_KEY__": "",
     },
 }
 
 a_dict_b = {
-    "dict_key_1a": {
-        "key_1b": "val_1b",
-    },
-    "dict_key_2a": {
-        "key_2a": "",
-    },
-    # "dict_key_2b": {
-    #     "key_2b": "",
-    # },
-    # "dict_key_2a": {
-    #     "key_2a": "",
-    # },
-    # "dict_key_3b": {
-    #     "key_3b": "",
-    # },
+    "__PP_PRJ_TYPE__": "c",
 }
 
 # ------------------------------------------------------------------------------
 
-pp(combine_dicts(a_dict_a, a_dict_b), width=1)
+dict_new = combine_dicts([a_dict_a], a_dict_b)
+F.pp(dict_new)
+
 print("-----------------------------------------------------------------------")
-pp(combine_dicts(a_dict_b, a_dict_a), width=1)
+
+dict_new = combine_dicts(a_dict_b, a_dict_a)
+F.pp(dict_new)

@@ -19,8 +19,9 @@ when placed in a folder that is in the default $PATH, ie:
 ~/.local/bin
 etc.
 
+(The extension will be removed by the installer)\n
 All command line options will be passed to the main class, usually located at
-~/.local/share/pyplate/src/pybaker.py. 
+~/.local/share/pyplate/src/pybaker.py.
 
 Typical usage is show in the main() method.
 """
@@ -33,6 +34,15 @@ Typical usage is show in the main() method.
 from pathlib import Path
 import subprocess
 import sys
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# FIXME: fix at dist
+# find path to prj/lib
+# P_DIR_USR_INST = f"{Path.home()}/.local/share/pyplate"
+P_DIR_USR_INST = Path(__file__).parents[1].resolve()
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -60,13 +70,10 @@ class PyBaker:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # find path to prj/lib
-    P_DIR_PP = f"{Path.home()}/.local/share/pyplate"
-
     # commands to run
-    S_CMD_ACTIVATE = f". {P_DIR_PP}/.venv-pyplate/bin/activate"
-    S_CMD_RUN = f"{P_DIR_PP}/src/pybaker.py"
-    S_CMD_RUN_ARGS = "{} {}"
+    S_CMD = (
+        "cd {};. .venv-pyplate/bin/activate;cd {};{}/src/pybaker.py {}"
+    )
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -85,8 +92,6 @@ class PyBaker:
         It then calls the real main module, located in the install dir.
         """
 
-        # ----------------------------------------------------------------------
-
         # save project path to return after venv activate
         start_dir = Path.cwd()
 
@@ -102,34 +107,19 @@ class PyBaker:
         # put args back together with spaces
         args = " ".join(args)
 
-        # def cmd line - no args
-        src_run = self.S_CMD_RUN
-
-        # add args if present
-        if len(args) > 0:
-            src_run = self.S_CMD_RUN_ARGS.format(self.S_CMD_RUN, args)
-
         # ----------------------------------------------------------------------
 
-        # build cmd
-        cmd = (
-            # cd to inst
-            f"cd {self.P_DIR_PP};"
-            # activate venv
-            f"{self.S_CMD_ACTIVATE};"
-            # get back to start dir (where we were called)
-            f"cd {start_dir};"
-            # call src w/ args
-            f"{src_run}"
+        # # build cmd
+        cmd = self.S_CMD.format(
+            P_DIR_USR_INST, start_dir, P_DIR_USR_INST, args
         )
 
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            # NB: no i18n
-            print("error: ", e)
+        except (FileNotFoundError, subprocess.CalledProcessError):
             sys.exit(-1)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

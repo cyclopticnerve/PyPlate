@@ -13,9 +13,9 @@
    ├─ [] docs/
    │     ├─ [] API/
    │     │     └─ [] src/
-         ├─ [] pybaker.md
-         ├─ [] pymaker.md
-         └─ [] pyplate.md
+   │     │           ├─ [] pybaker.md
+   │     │           ├─ [] pymaker.md
+   │     │           └─ [] pyplate.md
    │     ├─ [] images/
    │     │     └─ [] pyplate.png
    │     ├─ [] img/
@@ -25,14 +25,14 @@
    ├─ [] i18n/
    │     ├─ [] locale/
    │     │     └─ [] en/
-         └─ [] LC_MESSAGES/
-         └─ [] pyplate.mo
+   │     │           └─ [] LC_MESSAGES/
+   │     │                 └─ [] pyplate.mo
    │     ├─ [] po/
    │     │     ├─ [] en/
    │     │     │     └─ [] pyplate.po
    │     │     └─ [] LINGUAS
    │     └─ [] pot/
-         └─ [] pyplate.pot
+   │           └─ [] pyplate.pot
    ├─ [] images/
    │     └─ [] pyplate.png
    ├─ [] install/
@@ -42,9 +42,7 @@
    │     └─ [] pyplate.log
    ├─ [] misc/
    │     ├─ [] checklists/
-   │     │     ├─ [] checklist.html
-   │     │     ├─ [] checklist.txt
-   │     │     ├─ [] html checklist
+   │     │     ├─ [] project.txt
    │     │     └─ [] style.txt
    │     ├─ [] default_files/
    │     │     ├─ [] class.py
@@ -60,55 +58,6 @@
    │     ├─ [] private/
    │     │     └─ [] private.json
    │     └─ [] project.json
-   ├─ [] site/
-   │     ├─ [] API/
-   │     │     └─ [] src/
-         ├─ [] pybaker/
-         │     └─ [] index.html
-         ├─ [] pymaker/
-         │     └─ [] index.html
-         └─ [] pyplate/
-         └─ [] index.html
-   │     ├─ [] assets/
-   │     │     └─ [] _mkdocstrings.css
-   │     ├─ [] css/
-   │     │     ├─ [] base.css
-   │     │     ├─ [] bootstrap.min.css
-   │     │     ├─ [] bootstrap.min.css.map
-   │     │     ├─ [] brands.min.css
-   │     │     ├─ [] fontawesome.min.css
-   │     │     ├─ [] solid.min.css
-   │     │     └─ [] v4-font-face.min.css
-   │     ├─ [] images/
-   │     │     └─ [] pyplate.png
-   │     ├─ [] img/
-   │     │     ├─ [] favicon.ico
-   │     │     ├─ [] grid.png
-   │     │     └─ [] pyplate.png
-   │     ├─ [] js/
-   │     │     ├─ [] base.js
-   │     │     ├─ [] bootstrap.bundle.min.js
-   │     │     ├─ [] bootstrap.bundle.min.js.map
-   │     │     └─ [] darkmode.js
-   │     ├─ [] search/
-   │     │     ├─ [] lunr.js
-   │     │     ├─ [] main.js
-   │     │     ├─ [] search_index.json
-   │     │     └─ [] worker.js
-   │     ├─ [] webfonts/
-   │     │     ├─ [] fa-brands-400.ttf
-   │     │     ├─ [] fa-brands-400.woff2
-   │     │     ├─ [] fa-regular-400.ttf
-   │     │     ├─ [] fa-regular-400.woff2
-   │     │     ├─ [] fa-solid-900.ttf
-   │     │     ├─ [] fa-solid-900.woff2
-   │     │     ├─ [] fa-v4compatibility.ttf
-   │     │     └─ [] fa-v4compatibility.woff2
-   │     ├─ [] 404.html
-   │     ├─ [] index.html
-   │     ├─ [] objects.inv
-   │     ├─ [] sitemap.xml
-   │     └─ [] sitemap.xml.gz
    ├─ [] src/
    │     ├─ [] pybaker.py
    │     ├─ [] pymaker.py
@@ -126,14 +75,14 @@
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] docs/
    │     │     │     └─ [] img/
-         └─ [] favicon.ico
+   │     │     │           └─ [] favicon.ico
    │     │     ├─ [] i18n/
    │     │     │     ├─ [] locale/
    │     │     │     │     └─ [] en/
-         └─ [] LC_MESSAGES/
-         └─ [] ABOUT
+   │     │     │     │           └─ [] LC_MESSAGES/
+   │     │     │     │                 └─ [] ABOUT
    │     │     │     └─ [] po/
-         └─ [] LINGUAS
+   │     │     │           └─ [] LINGUAS
    │     │     ├─ [] images/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
    │     │     ├─ [] install/
@@ -143,12 +92,11 @@
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.log
    │     │     ├─ [] misc/
    │     │     │     └─ [] checklists/
-         ├─ [] checklist.html
-         ├─ [] checklist.txt
-         └─ [] style.txt
+   │     │     │           ├─ [] project.txt
+   │     │     │           └─ [] style.txt
    │     │     ├─ [] pyplate/
    │     │     │     └─ [] private/
-         └─ [] ABOUT
+   │     │     │           └─ [] ABOUT
    │     │     ├─ [] src/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL___base.py
    │     │     ├─ [] tests/
@@ -156,11 +104,11 @@
    │     │     ├─ [] todo/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] .gitignore
-   │     │     ├─ [] develop.py
    │     │     ├─ [] LICENSE.txt
+   │     │     ├─ [] README.md
+   │     │     ├─ [] develop.py
    │     │     ├─ [] mkdocs.yml
    │     │     ├─ [] pyproject.toml
-   │     │     ├─ [] README.md
    │     │     └─ [] requirements.txt
    │     ├─ [] cli/
    │     │     ├─ [] .vscode/
@@ -182,19 +130,22 @@
    │     │     │     │     │     ├─ [] __PP_FILE_APP__.py
    │     │     │     │     │     └─ [] __PP_FILE_WIN__.py
    │     │     │     │     └─ [] ui/
-         ├─ [] __PP_DLG_FILE__.ui
-         └─ [] __PP_FILE_WIN__.ui
+   │     │     │     │           ├─ [] __PP_DLG_FILE__.ui
+   │     │     │     │           └─ [] __PP_FILE_WIN__.ui
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
    │     │     └─ [] requirements.txt
    │     └─ [] pkg/
-         ├─ [] __PP_NAME_PRJ_SMALL__/
-         │     └─ [] __PP_NAME_SEC_SMALL__.py
-         ├─ [] .vscode/
-         │     └─ [] launch.json
-         └─ [] tests/
-         └─ [] __PP_NAME_PRJ_SMALL___test.py
+   │           ├─ [] __PP_NAME_PRJ_SMALL__/
+   │           │     └─ [] __PP_NAME_SEC_SMALL__.py
+         │     ├─ [] .vscode/
+         │     │     └─ [] launch.json
+   │     │     └─ [] tests/
+   │     │           └─ [] __PP_NAME_PRJ_SMALL___test.py
    ├─ [] tests/
-   │     └─ [] l2s2l.py
+   │     ├─ [] flow_pb.txt
+   │     ├─ [] flow_pm.txt
+   │     ├─ [] glob_test.py
+   │     └─ [] merge.py
    ├─ [] todo/
    │     ├─ [] other/
    │     │     ├─ [] bin-dev/
@@ -205,8 +156,8 @@
    │     │     │     └─ [] unused.py
    │     │     ├─ [] cnguilib/
    │     │     │     └─ [] src/
-         ├─ [] cnapp.py
-         └─ [] cnwindow.py
+   │     │     │           ├─ [] cnapp.py
+   │     │     │           └─ [] cnwindow.py
    │     │     ├─ [] cnlib/
    │     │     │     └─ [] cncli.py
    │     │     ├─ [] gui_state/
@@ -222,12 +173,13 @@
    │     │     │     ├─ [] head.mako
    │     │     │     └─ [] logo.mako
    │     │     └─ [] sphinx/
-         └─ [] cnsphinx.py
+   │     │           └─ [] cnsphinx.py
    │     └─ [] todo.txt
    ├─ [] .gitignore
-   ├─ [] develop.py
    ├─ [] LICENSE.txt
+   ├─ [] PyPlate.code-workspace
+   ├─ [] README.md
+   ├─ [] develop.py
    ├─ [] mkdocs.yml
    ├─ [] pyproject.toml
-   ├─ [] README.md
    └─ [] requirements.txt

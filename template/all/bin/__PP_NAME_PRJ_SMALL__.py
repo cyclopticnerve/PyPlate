@@ -30,8 +30,7 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
-import gettext
-import locale
+# NB: pure python
 from pathlib import Path
 import subprocess
 import sys
@@ -40,28 +39,8 @@ import sys
 # Globals
 # ------------------------------------------------------------------------------
 
-# get dirs
+# find path to prj/lib
 P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
-P_DIR_VENV = "__PP_NAME_VENV__"
-P_FILE_RUN = "__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py"
-
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
-
-# path to project dir
-T_DIR_PRJ = P_DIR_USR_INST
-
-# init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -89,12 +68,9 @@ class __PP_NAME_PRJ_PASCAL__:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # errors
-    S_ERR_ERR = _("Error:")
-
     # commands
     # NB: format params are inst dir, venv name, prog name, and cmd line
-    S_CMD_RUN = "cd {};. {}/bin/activate;{} {}"
+    S_CMD = "cd {};. {}/bin/activate;d {};{} {}"
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -113,7 +89,8 @@ class __PP_NAME_PRJ_PASCAL__:
         It then calls the real main module, located in the install dir.
         """
 
-        # ----------------------------------------------------------------------
+        # save project path to return after venv activate
+        start_dir = Path.cwd()
 
         # get args
         args = sys.argv
@@ -128,14 +105,16 @@ class __PP_NAME_PRJ_PASCAL__:
         args = " ".join(args)
 
         # ----------------------------------------------------------------------
-        # run cmd
-        cmd = self.S_CMD_RUN.format(
-            P_DIR_USR_INST, P_DIR_VENV, P_FILE_RUN, args
+
+        # build cmd
+        cmd = self.S_CMD.format(
+            P_DIR_USR_INST, start_dir, P_DIR_USR_INST, args
         )
+        
+        # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            print(self.S_ERR_ERR, e)
+        except (FileNotFoundError, subprocess.CalledProcessError):
             sys.exit(-1)
 
 
