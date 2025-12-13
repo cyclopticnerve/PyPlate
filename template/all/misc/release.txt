@@ -1,0 +1,12 @@
+run PB
+
+push w/ tag as desc
+
+use gitgraph to tag local/remote
+
+github:
+    make release
+        select tag
+        set title as tag
+        add dist
+        release
