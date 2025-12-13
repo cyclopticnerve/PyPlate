@@ -67,7 +67,7 @@
             "requirements.txt": "assets/install"
         },
         "p": {
-            "__PP_NAME_PRJ_SMALL__": "",
+            "pyplate": "",
             "pyproject.toml": "",
             "pyplate": ""
         },

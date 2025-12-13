@@ -5,7 +5,7 @@
             "name": "Pkg Test",
             "type": "debugpy",
             "request": "launch",
-            "program": "tests/__PP_NAME_PRJ_SMALL___test.py",
+            "program": "__PP_DIR_TESTS__/__PP_NAME_PRJ_SMALL___test.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
         }

@@ -370,7 +370,8 @@ class CNUninstall:
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
             self._parser.print_help()
-            sys.exit(-1)
+            print()
+            sys.exit(0)
 
         # no -h, print epilog
         print(self.S_EPILOG)

@@ -97,6 +97,7 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
+    # NB: all on one line to make replace easy
     # pylint: disable=line-too-long
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
     # pylint enable=line-too-long
@@ -196,7 +197,7 @@ class PyPlate:
             formatter_class=CNFormatter,
         )
         self._dict_args = {}
-        self._debug = False
+        self._cmd_debug = False
 
         # ----------------------------------------------------------------------
         # set self._dir_prj
@@ -209,7 +210,7 @@ class PyPlate:
 
         # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SWITCH_DEF)
-        self._dict_sw_line = dict(self._dict_sw_block)
+        self._dict_sw_line = dict(C.D_SWITCH_DEF)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -273,14 +274,16 @@ class PyPlate:
         # debug stuff
 
         # get the args
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
+        self._cmd_debug = self._dict_args.get(
+            self.S_ARG_DBG_DEST, self._cmd_debug
+        )
 
         # set debug flags in cnfunctions and conf
-        F.B_DEBUG = self._debug
-        C.B_DEBUG = self._debug
+        F.B_DEBUG = self._cmd_debug
+        C.B_DEBUG = self._cmd_debug
 
         # maybe yell
-        if self._debug:
+        if self._cmd_debug:
 
             # yup, yell
             F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
@@ -352,10 +355,8 @@ class PyPlate:
         # print info
         print(C.S_ACTION_FIX, end="", flush=True)
 
-        # ----------------------------------------------------------------------
-        # get reps again
-
-        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
+        # last chance to do shit w/ dicts
+        self._fix_dicts()
 
         # ----------------------------------------------------------------------
 
@@ -748,6 +749,57 @@ class PyPlate:
         path.rename(path_new)
 
     # --------------------------------------------------------------------------
+    # Make reps, save public, fix public dunders, reload sub dicts
+    # --------------------------------------------------------------------------
+    def _fix_dicts(self):
+        """
+        Make reps, save/fix public dunders, reload sub dicts
+
+        Make reps, save/fix public dunders, reload sub dicts
+        """
+
+        # ----------------------------------------------------------------------
+        # get prv subs
+        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
+
+        # ----------------------------------------------------------------------
+        # get prv subs
+        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
+
+        # ----------------------------------------------------------------------
+        # save/fix/load public
+
+        try:
+            # save public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            F.save_dict_into_paths(self._dict_pub, [path_pub])
+        except OSError as e:  # from save_dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # fix dunders in dict_pub
+        self._fix_contents(path_pub)
+
+        try:
+            # load public settings
+            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
+            self._dict_pub = F.load_paths_into_dict([path_pub])
+        except OSError as e:  # from load dict
+            F.printd(self.S_ERR_ERR, str(e))
+
+        # ----------------------------------------------------------------------
+        # get pub subs
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
+
+        # set initial debug
+        self._dict_dbg = dict(self._dict_pub_dbg)
+
+    # --------------------------------------------------------------------------
     # Check project type for allowed characters
     # --------------------------------------------------------------------------
     def _check_type(self, prj_type):
@@ -885,125 +937,6 @@ class PyPlate:
         with open(dst, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(joint)
 
-    # --------------------------------------------------------------------------
-    # Make reps, save public, fix public dunders, reload sub dicts
-    # --------------------------------------------------------------------------
-    def _fix_dicts(self):
-        """
-        Make reps, save/fix public dunders, reload sub dicts
-
-        Make reps, save/fix public dunders, reload sub dicts
-        """
-
-        # ----------------------------------------------------------------------
-        # ----------------------------------------------------------------------
-        # take top level dicts apart to get sub dicts
-        # NB: we have valid _dict_prv and _dict_pub
-
-        # update individual dicts in dict_prv
-        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
-
-        # update individual dicts in dict_pub
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
-        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-
-        # ----------------------------------------------------------------------
-        # check for new keys
-        # NB: when done, we have changed pointers to sub dirs
-
-        self._dict_prv_all = F.combine_dicts(self._dict_prv_all, C.D_PRV_ALL)
-        self._dict_prv_prj = F.combine_dicts(self._dict_prv_prj, C.D_PRV_PRJ)
-
-        self._dict_pub_bl = F.combine_dicts(self._dict_pub_bl, C.D_PUB_BL)
-        self._dict_pub_dbg = F.combine_dicts(self._dict_pub_dbg, C.D_PUB_DBG)
-        self._dict_pub_dist = F.combine_dicts(
-            self._dict_pub_dist, C.D_PUB_DIST
-        )
-        self._dict_pub_docs = F.combine_dicts(
-            self._dict_pub_docs, C.D_PUB_DOCS
-        )
-        self._dict_pub_i18n = F.combine_dicts(
-            self._dict_pub_i18n, C.D_PUB_I18N
-        )
-        self._dict_pub_meta = F.combine_dicts(
-            self._dict_pub_meta, C.D_PUB_META
-        )
-
-        # put outer dicts back together after new key check
-        # NB: since we have changed pointers to sub dirs, we have invalidated
-        # the parent dirs
-        self._dict_prv = {
-            C.S_KEY_PRV_ALL: self._dict_prv_all,
-            C.S_KEY_PRV_PRJ: self._dict_prv_prj,
-        }
-        self._dict_pub = {
-            C.S_KEY_PUB_BL: self._dict_pub_bl,
-            C.S_KEY_PUB_DBG: self._dict_pub_dbg,
-            C.S_KEY_PUB_DIST: self._dict_pub_dist,
-            C.S_KEY_PUB_DOCS: self._dict_pub_docs,
-            C.S_KEY_PUB_I18N: self._dict_pub_i18n,
-            C.S_KEY_PUB_META: self._dict_pub_meta,
-        }
-
-        # ----------------------------------------------------------------------
-        # ----------------------------------------------------------------------
-        # need reps before save/fix/load
-        # NB: must be done after check keys
-        # but before save/fix/load public
-
-        self._dict_rep = self._dict_prv_all | self._dict_prv_prj
-
-        # ----------------------------------------------------------------------
-        # save/fix/load public
-
-        try:
-            # save public settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-            F.save_dict_into_paths(self._dict_pub, [path_pub])
-        except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # fix dunders in dict_pub
-        self._fix_contents(path_pub)
-
-        try:
-            # load public settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
-            self._dict_pub = F.load_paths_into_dict(
-                [path_pub], self._dict_pub
-            )
-        except OSError as e:  # from load dict
-            F.printd(self.S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-        # get sub dicts again
-        # NB: needed because we changed _dict_pub by reloading it
-
-        # update individual dicts in dict_prv
-        # NB: technically not needed, added for completeness
-        self._dict_prv_all = self._dict_prv[C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
-
-        # update individual dicts in dict_pub
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
-        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-
-        # ----------------------------------------------------------------------
-        # ----------------------------------------------------------------------
-        # set initial debug dict
-        # NB: must be done after pub save/fix/load/subs
-        self._dict_dbg = dict(self._dict_pub_dbg)
-
-
 # ------------------------------------------------------------------------------
 # Public functions
 # ------------------------------------------------------------------------------
@@ -1097,6 +1030,14 @@ def get_type_rules(path):
     # default result is py rep
     return {}
 
+
+# ------------------------------------------------------------------------------
+# Code to run when called from command line
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+
+    # Code to run when called from command line
+    print("WRONG GLASS, SIR !!!")
 
 # -)
 

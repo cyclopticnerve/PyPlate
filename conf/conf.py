@@ -371,6 +371,7 @@ S_DIR_INSTALL = "install"
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
 S_FILE_README = "README.md"
+S_FILE_INDEX = "index.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
 S_FILE_INST_CFG = "install.json"
@@ -805,9 +806,9 @@ L_SCREENSHOT = ["g"]
 
 # remove exts from bin files
 L_DIST_REMOVE_EXT = [
-    f"{S_DIR_DIST}/*/{S_DIR_ASSETS}/{S_DIR_BIN}/*.py",
-    f"{S_DIR_DIST}/*/{S_FILE_INST_PY}",
-    f"{S_DIR_DIST}/*/{S_DIR_ASSETS}/{S_FILE_UNINST_PY}",
+    f"{S_DIR_ASSETS}/{S_DIR_BIN}/*.py",
+    f"{S_FILE_INST_PY}",
+    f"{S_DIR_ASSETS}/{S_FILE_UNINST_PY}",
 ]
 
 # ------------------------------------------------------------------------------
@@ -874,6 +875,9 @@ D_PRV_ALL = {
     "__PP_DIR_SRC__": S_DIR_SRC,
     "__PP_PATH_LOCALE__": S_PATH_LOCALE,
     "__PP_DIR_DIST__": S_DIR_DIST,
+    "__PP_DIR_BIN__": S_DIR_BIN,
+    "__PP_DIR_MISC__": S_DIR_MISC,
+    "__PP_DIR_TESTS__": S_DIR_TESTS,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
     "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
@@ -908,6 +912,7 @@ D_PRV_ALL = {
 # if you need to adjust any of these values based on a dunder, use
 # do_before_fix() in this file
 D_PRV_PRJ = {
+    "__PP_VERSION_PP__": PP.PyPlate.S_PP_VERSION, # make/bake version
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_PRJ__": "",  # My Project
     "__PP_NAME_PRJ_BIG__": "",  # My_Project
@@ -1006,45 +1011,14 @@ D_PUB_DBG = {
 
 # dict of files to put in dist folder (defaults, written by pymaker, edited by
 # hand, read by pybaker)
-# NB: key is src, rel to prj dir
-# NB: val is dst, rel to dist dir
-D_PUB_DIST = {
-    "c": {
-        # basic stuff (put in assets folder)
-        S_DIR_BIN: S_DIR_ASSETS,
-        S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LOG: S_DIR_ASSETS,
-        S_DIR_I18N: S_DIR_ASSETS,
-        S_DIR_INSTALL: S_DIR_ASSETS,
-        S_DIR_SRC: S_DIR_ASSETS,
-        # requirements.txt in assets/install folder
-        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-    },
-    "g": {
-        # basic stuff (put in assets folder)
-        S_DIR_BIN: S_DIR_ASSETS,
-        S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LOG: S_DIR_ASSETS,
-        S_DIR_I18N: S_DIR_ASSETS,
-        S_DIR_IMAGES: S_DIR_ASSETS,
-        S_DIR_INSTALL: S_DIR_ASSETS,
-        S_DIR_SRC: S_DIR_ASSETS,
-        # requirements.txt in assets/install folder
-        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-    },
-    "p": {
-        # basic stuff (put at top level)
-        "__PP_NAME_PRJ_SMALL__": "",
-        S_FILE_TOML: "",
-    },
-}
+D_PUB_DIST = {}  # tbd by do_after_template
 
 # which docs maker to use, based on project type
 D_PUB_DOCS = {
     S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
-    S_KEY_DOCS_USE_RM: True,
+    S_KEY_DOCS_USE_RM: False,
     S_KEY_DOCS_MAKE_API: True,
-    S_KEY_DOCS_DIR_API: "",  # tbd by do_after_template
+    S_KEY_DOCS_DIR_API: [],  # tbd by do_after_template
 }
 
 # stuff to be used in pybaker
@@ -1052,7 +1026,7 @@ D_PUB_I18N = {
     # name of the project as domain
     S_KEY_PUB_I18N_DOM: "__PP_NAME_PRJ_SMALL__",
     # list of sources per domain
-    S_KEY_PUB_I18N_SRC: [],
+    S_KEY_PUB_I18N_SRC: [],  # tbd by do_after_template
     # computer languages
     S_KEY_PUB_I18N_CLANGS: {
         "Python": L_EXT_PY,
@@ -1090,7 +1064,7 @@ D_PUB_META = {
 # dict in pymaker to control post processing in debug mode
 # NB: not related to D_PUB_DBG above
 D_DBG_PM = {
-    S_KEY_DBG_GIT: True,
+    S_KEY_DBG_GIT: False,
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
     S_KEY_DBG_DOCS: True,
@@ -1184,6 +1158,39 @@ D_UNINSTALL = {
 D_COPY = {
     f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
     f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
+}
+
+# NB: key is src, rel to prj dir
+# NB: val is dst, rel to dist dir
+D_TYPE_DIST = {
+    "c": {
+        # basic stuff (put in assets folder)
+        S_DIR_BIN: S_DIR_ASSETS,
+        S_DIR_CONF: S_DIR_ASSETS,
+        S_DIR_LOG: S_DIR_ASSETS,
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_DIR_INSTALL: S_DIR_ASSETS,
+        S_DIR_SRC: S_DIR_ASSETS,
+        # requirements.txt in assets/install folder
+        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
+    },
+    "g": {
+        # basic stuff (put in assets folder)
+        S_DIR_BIN: S_DIR_ASSETS,
+        S_DIR_CONF: S_DIR_ASSETS,
+        S_DIR_LOG: S_DIR_ASSETS,
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_DIR_IMAGES: S_DIR_ASSETS,
+        S_DIR_INSTALL: S_DIR_ASSETS,
+        S_DIR_SRC: S_DIR_ASSETS,
+        # requirements.txt in assets/install folder
+        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
+    },
+    "p": {
+        # basic stuff (put at top level)
+        "__PP_NAME_PRJ_SMALL__": "",
+        S_FILE_TOML: "",
+    },
 }
 
 # list of i18n sources/noexts per prj type
@@ -1464,6 +1471,11 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_dst[S_KEY_PUB_I18N_SRC] = list(dict_src[S_KEY_PUB_I18N_SRC])
 
 
+    # --------------------------------------------------------------------------
+    # figure out dist dict
+
+    dict_pub[S_KEY_PUB_DIST] = dict(D_TYPE_DIST[prj_type])
+
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
@@ -1494,15 +1506,9 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # these paths are formatted here because they are complex and may be
     # changed by dev
 
-    # get sub-dicts we need
+    # get sub dicts we need
     dict_prv_all = dict_prv[S_KEY_PRV_ALL]
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-
-    # dict_pub_bl = dict_pub[S_KEY_PUB_BL]
-    # dict_pub_dbg = dict_pub[S_KEY_PUB_DBG]
-    # dict_pub_dist = dict_pub[S_KEY_PUB_DIST]
-    # dict_pub_docs = dict_pub[S_KEY_PUB_DOCS]
-    # dict_pub_i18n = dict_pub[S_KEY_PUB_I18N]
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
     # get values after pymaker has set them
@@ -1576,7 +1582,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     else:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
 
-
 # ------------------------------------------------------------------------------
 # Do any work after fix
 # ------------------------------------------------------------------------------
@@ -1613,9 +1618,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     print(S_ACTION_META, end="", flush=True)
 
     # NB: this function uses the blacklist to filter files at the very end of
-    # the fix process. at this point you can assume ALL dunders in ALL eligible
-    # files have been fixed, as well as paths/filenames. also dict_pub and
-    # dict_prv have been undunderized
+    # the fix process. At this point you can assume ALL dunders in ALL eligible
+    # files have been fixed, as well as paths/filenames. also dict_pub has been
+    # undunderized
 
     # fix up blacklist and convert relative or glob paths to absolute Path
     # objects
@@ -1774,13 +1779,23 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # print info
         print(S_ACTION_MAKE_DOCS, end="", flush=True)
 
+        # get some props
+        dict_docs = dict_pub[S_KEY_PUB_DOCS]
+        use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+        use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+        lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
+
+        # check if first run
+        index_path = dir_prj / S_DIR_DOCS / S_FILE_INDEX
+        exist = index_path.exists()
+
+        # if use_rm = true, use rm on every run
+        # if use_rm = false, use rm only only on first run
+        if use_rm or not exist:
+            use_rm = True
+
         # the command to make or bake docs
         try:
-
-            dict_docs = dict_pub[S_KEY_PUB_DOCS]
-            use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-            use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-            lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
 
             # make docs
             mkdocs = CNMkDocs()
@@ -1794,7 +1809,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 S_DIR_API,
                 S_DIR_IMAGES,
             )
-            dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_USE_RM] = False
+
             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:
             # fail gracefully

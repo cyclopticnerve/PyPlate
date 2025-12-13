@@ -83,9 +83,6 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         program, and performing its steps.
         """
 
-        # ----------------------------------------------------------------------
-        # setup
-
         # call boilerplate code
         self._setup()
 
@@ -134,6 +131,22 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #         help=self.S_ARG_DBG_HELP,
     #     )
 
+    #     # add install option
+    #     self._parser.add_argument(
+    #         self.S_ARG_INST_OPTION,
+    #         action=self.S_ARG_INST_ACTION,
+    #         dest=self.S_ARG_INST_DEST,
+    #         help=self.S_ARG_INST_HELP,
+    #     )
+
+    #     # add uninstall option
+    #     self._parser.add_argument(
+    #         self.S_ARG_UNINST_OPTION,
+    #         action=self.S_ARG_UNINST_ACTION,
+    #         dest=self.S_ARG_UNINST_DEST,
+    #         help=self.S_ARG_UNINST_HELP,
+    #     )
+
     #     # do setup
     #     super()._setup()
 
@@ -159,7 +172,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         self._logger.info("_func")
 
         # check for debug flag
-        if self._debug:
+        if self._cmd_debug:
             # I18N: context for this string
             return _("this is func (DEBUG)")
 

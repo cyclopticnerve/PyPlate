@@ -102,6 +102,12 @@ class PyBaker(PyPlate):
     # I18N: language already exists in project.json and i18n folder
     S_ERR_LANG_EXIST = _("Language already exists")
 
+    # messages
+
+    # bake msg
+    # NB: param is name of project folder
+    S_MSG_BAKE = _("Baking {}")
+
     # --------------------------------------------------------------------------
     # Instance methods
     # --------------------------------------------------------------------------
@@ -249,7 +255,7 @@ class PyBaker(PyPlate):
 
         # ----------------------------------------------------------------------
 
-        # if ide=yes, ask for prj name
+        # handle -i
         if self._cmd_ide:
 
             # ask for prj name rel to cwd
@@ -295,11 +301,11 @@ class PyBaker(PyPlate):
         # check if files are valid json
         try:
             # get settings dicts in private.json
-            self._dict_prv = F.load_paths_into_dict([path_prv], {})
+            self._dict_prv = F.load_paths_into_dict(path_prv)
 
             # get settings dicts in project.json
             # NB: may contain dunders
-            self._dict_pub = F.load_paths_into_dict([path_pub], {})
+            self._dict_pub = F.load_paths_into_dict(path_pub)
 
         # if there was a problem
         except OSError as e:  # from load_dicts
@@ -308,12 +314,13 @@ class PyBaker(PyPlate):
             P.sys.exit(-1)
 
         # ----------------------------------------------------------------------
-        # combine private dicts for string replacement
+        # fix dicts
         self._fix_dicts()
 
         # ----------------------------------------------------------------------
         # handle -d
-        if self._debug:
+        # NB: do after _fix_dicts
+        if self._cmd_debug:
             self._dict_dbg = dict(P.C.D_DBG_PB)
 
         # ----------------------------------------------------------------------
@@ -407,7 +414,12 @@ class PyBaker(PyPlate):
         # change in project.json
         self._dict_pub_meta[P.C.S_KEY_META_VERSION] = self._cmd_ver
 
-        # make look nice
+        # ----------------------------------------------------------------------
+        # print some info
+        print()
+        print(self.S_MSG_BAKE.format(self._dir_prj.name))
+
+        # blank line before printing progress
         print()
 
     # --------------------------------------------------------------------------

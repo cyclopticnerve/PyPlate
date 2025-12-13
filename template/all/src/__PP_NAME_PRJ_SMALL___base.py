@@ -141,6 +141,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_ARG_HLP_HELP = _("show this help message and exit")
 
     # config option strings
+    S_ARG_INST_OPTION = "--install"
+    S_ARG_INST_ACTION = "store_true"
+    S_ARG_INST_DEST = "INST_DEST"
+    # I18N: install option help
+    S_ARG_INST_HELP = _("install this program")
+
+    # config option strings
     S_ARG_UNINST_OPTION = "--uninstall"
     S_ARG_UNINST_ACTION = "store_true"
     S_ARG_UNINST_DEST = "UNINST_DEST"
@@ -212,7 +219,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             formatter_class=CNFormatter, add_help=False
         )
         self._dict_args = {}
-        self._debug = False
+        self._cmd_debug = False
         self._path_cfg_arg = None
 
     # --------------------------------------------------------------------------
@@ -233,15 +240,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ----------------------------------------------------------------------
         # use cmd line
 
-        # add uninstall option
-        self._parser.add_argument(
-            self.S_ARG_UNINST_OPTION,
-            action=self.S_ARG_UNINST_ACTION,
-            dest=self.S_ARG_UNINST_DEST,
-            help=self.S_ARG_UNINST_HELP,
-        )
-
-        # add help option
+        # always add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
             action=self.S_ARG_HLP_ACTION,
@@ -268,6 +267,12 @@ class __PP_NAME_PRJ_PASCAL__Base:
             sys.exit(0)
 
         # punt to uninstall func
+        if self._dict_args.get(self.S_ARG_INST_DEST, False):
+
+            # uninstall and exit
+            self._do_install()
+
+        # punt to uninstall func
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
@@ -277,8 +282,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # set props from args
 
         # set self and lib debug
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
-        F.B_DEBUG = self._debug
+        self._cmd_debug = self._dict_args.get(
+            self.S_ARG_DBG_DEST, self._cmd_debug
+        )
+        F.B_DEBUG = self._cmd_debug
 
         # set cfg path
         self._path_cfg_arg = self._dict_args.get(
@@ -302,6 +309,16 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ----------------------------------------------------------------------
         # use cfg
         self._load_config()
+
+    # --------------------------------------------------------------------------
+    # Handle the --install cmd line op
+    # --------------------------------------------------------------------------
+    def _do_install(self):
+        """
+        Handle the --install cmd line op
+        """
+
+    # ???
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
@@ -445,5 +462,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
             except OSError as e:  # from save_dict
                 F.printd(self.S_ERR_ERR, str(e))
 
+
+# ------------------------------------------------------------------------------
+# Code to run when called from command line
+# ------------------------------------------------------------------------------
+if __name__ == "__main__":
+
+    # Code to run when called from command line
+    print("WRONG GLASS, SIR !!!")
 
 # -)

@@ -39,10 +39,8 @@ import sys
 # Globals
 # ------------------------------------------------------------------------------
 
-# FIXME: fix at dist
 # find path to prj/lib
-# P_DIR_USR_INST = f"{Path.home()}/.local/share/pyplate"
-P_DIR_USR_INST = Path(__file__).parents[1].resolve()
+P_DIR_USR_INST = f"{Path.home()}/.local/share/pyplate"
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -72,7 +70,14 @@ class PyMaker:
 
     # commands to run
     S_CMD = (
-        "cd {};. .venv-pyplate/bin/activate;cd {};{}/src/pymaker.py {}"
+        # cd to prj dir
+        "cd {};"
+        # activate prj venv
+        ". .venv-pyplate/bin/activate;"
+        # cd to old cwd
+        "cd {};"
+        # call prj with full path
+        "{}/src/pymaker.py {}"
     )
 
     # --------------------------------------------------------------------------

@@ -70,7 +70,16 @@ class __PP_NAME_PRJ_PASCAL__:
 
     # commands
     # NB: format params are inst dir, venv name, prog name, and cmd line
-    S_CMD = "cd {};. {}/bin/activate;d {};{} {}"
+    S_CMD = (
+        # cd to prj dir
+        "cd {};"
+        # activate prj venv
+        ". __PP_NAME_VENV__/bin/activate;"
+        # cd to old cwd
+        "cd {};"
+        # call prj with full pat
+        "{}/__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py {}"
+    )
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -110,7 +119,7 @@ class __PP_NAME_PRJ_PASCAL__:
         cmd = self.S_CMD.format(
             P_DIR_USR_INST, start_dir, P_DIR_USR_INST, args
         )
-        
+
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)

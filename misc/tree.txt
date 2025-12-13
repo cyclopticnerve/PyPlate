@@ -9,7 +9,7 @@
    ├─ [] conf/
    │     └─ [] conf.py
    ├─ [] dist/
-   │     └─ [] pyplate-0.0.6.tar.gz
+   │     └─ [] pyplate-0.0.7.tar.gz
    ├─ [] docs/
    │     ├─ [] API/
    │     │     └─ [] src/
@@ -52,6 +52,9 @@
    │     │     └─ [] window.py
    │     ├─ [] how_to/
    │     │     └─ [] i18n_tips.txt
+   │     ├─ [] launch/
+   │     │     ├─ [] pybaker.py
+   │     │     └─ [] pymaker.py
    │     ├─ [] tree.html
    │     └─ [] tree.txt
    ├─ [] pyplate/
