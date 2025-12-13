@@ -68,8 +68,7 @@
         },
         "p": {
             "pyplate": "",
-            "pyproject.toml": "",
-            "pyplate": ""
+            "pyproject.toml": ""
         },
         "bin": "assets",
         "conf": "assets",
@@ -120,7 +119,7 @@
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "0.0.7",
+        "META_VERSION": "0.0.8",
         "META_KEYWORDS": [
             "python",
             "cli",

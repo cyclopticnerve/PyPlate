@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.0.7\n"
+"Project-Id-Version: 0.0.8\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2025-12-09 12:49-0500\n"
+"POT-Creation-Date: 2025-12-13 14:30-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,14 +56,14 @@ msgstr ""
 #. I18N: help option help
 #: install/install.py:137
 #: install/uninstall.py:132
-#: src/pyplate.py:121
+#: src/pyplate.py:122
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
 #: install/install.py:149
 #: install/uninstall.py:144
-#: src/pyplate.py:127
+#: src/pyplate.py:128
 msgid "Use -h for help"
 msgstr ""
 
@@ -125,7 +125,7 @@ msgstr ""
 #. I18N: general error start
 #: install/install.py:202
 #: install/uninstall.py:180
-#: src/pyplate.py:138
+#: src/pyplate.py:139
 msgid "Error:"
 msgstr ""
 
@@ -219,11 +219,19 @@ msgstr ""
 msgid "Language already exists"
 msgstr ""
 
+#: src/pybaker.py:109
+msgid "Baking {}"
+msgstr ""
+
 #: src/pymaker.py:71
 msgid "Run this program from the directory where you want to create a project."
 msgstr ""
 
+#: src/pymaker.py:79
+msgid "Making {}"
+msgstr ""
+
 #. I18N help string for debug cmd line option
-#: src/pyplate.py:114
+#: src/pyplate.py:115
 msgid "enable debugging mode"
 msgstr ""
