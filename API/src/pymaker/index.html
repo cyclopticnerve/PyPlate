@@ -211,6 +211,12 @@ PyPlate project from a template.</p>
 a project."
     )
 
+    # messages
+
+    # make msg
+    # NB: param is name of project folder
+    S_MSG_MAKE = _("Making {}")
+
     # --------------------------------------------------------------------------
     # Public methods
     # --------------------------------------------------------------------------
@@ -350,7 +356,7 @@ a project."
         cwd = P.Path.cwd()
 
         # if in debug mode
-        if self._debug:
+        if self._cmd_debug:
 
             # get long name
             for item in P.C.L_TYPES:
@@ -424,7 +430,7 @@ a project."
         if prj_type in P.C.D_NAME_SEC:
 
             # dup prj names if debug
-            if self._debug:
+            if self._cmd_debug:
                 name_sec = name_prj
                 name_sec_big = name_prj_big
                 name_sec_small = name_prj_small
@@ -458,7 +464,7 @@ a project."
                 name_sec_pascal = F.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
-        # make dicts from conf
+        # make dicts from conf defaults
 
         # create global settings dicts in private.json
         self._dict_prv = {
@@ -470,23 +476,18 @@ a project."
         self._dict_pub = {
             P.C.S_KEY_PUB_BL: dict(P.C.D_PUB_BL),
             P.C.S_KEY_PUB_DBG: dict(P.C.D_PUB_DBG),
-            P.C.S_KEY_PUB_DIST: dict(P.C.D_PUB_DIST[prj_type]),
+            P.C.S_KEY_PUB_DIST: dict(P.C.D_PUB_DIST),
             P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
             P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
             P.C.S_KEY_PUB_META: dict(P.C.D_PUB_META),
         }
 
         # ----------------------------------------------------------------------
-        # combine private dicts for string replacement
-        self._fix_dicts()
-
-        # ----------------------------------------------------------------------
-        # handle -d
-        if self._debug:
-            self._dict_dbg = dict(P.C.D_DBG_PM)
-
-        # ----------------------------------------------------------------------
         # fill dicts
+
+        # get prv subs
+        self._dict_prv_all = self._dict_prv[P.C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[P.C.S_KEY_PRV_PRJ]
 
         # save project stuff
         self._dict_prv_prj["__PP_TYPE_PRJ__"] = prj_type
@@ -510,6 +511,20 @@ a project."
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
 
         # ----------------------------------------------------------------------
+        # get reps to fix public
+        self._fix_dicts()
+
+        # ----------------------------------------------------------------------
+        # handle -d
+        # NB: do after _fix dicts
+        if self._cmd_debug:
+            self._dict_dbg = dict(P.C.D_DBG_PM)
+
+        # ----------------------------------------------------------------------
+
+        # print some info
+        print()
+        print(self.S_MSG_MAKE.format(name_prj_big))
 
         # blank line before printing progress
         print()
