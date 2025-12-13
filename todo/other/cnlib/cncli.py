@@ -69,7 +69,7 @@ class CNCli:
         # set defaults
         self._dict_args = {}
 
-        self._debug = False
+        self._cmd_debug = False
         self._path_cfg = None
 
         self._dict_cfg = {}
@@ -103,7 +103,7 @@ def _run_parser(self):
     self._dict_args = vars(args)
 
     # set debug if flag is present, else leave init default
-    self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
+    self._cmd_debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._cmd_debug)
 
     # set cfg path if flag is present, else leave init default
     cfg_arg = self._dict_args.get(self.S_ARG_CFG_DEST, self._path_cfg_arg)
@@ -173,7 +173,7 @@ def _run_parser(self):
             )
 
         # add a debug message
-        if self._debug:
+        if self._cmd_debug:
             print("load cfg from:", self._path_cfg)
             F.pp(self._dict_cfg, label="cfg")
 
@@ -192,7 +192,7 @@ def _run_parser(self):
             F.save_dict_into_paths(self._dict_cfg, [self._path_cfg])
 
         # add a debug message
-        if self._debug:
+        if self._cmd_debug:
             print("save cfg to:", self._path_cfg)
             F.pp(self._dict_cfg, label="cfg")
 
