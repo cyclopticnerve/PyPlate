@@ -8,44 +8,6 @@
    │     └─ [] pymaker.py
    ├─ [] conf/
    │     └─ [] conf.py
-   ├─ [] dist/
-   │     ├─ [] pyplate-0.0.8/
-   │     │     ├─ [] assets/
-   │     │     │     ├─ [] bin/
-   │     │     │     │     ├─ [] pybaker
-   │     │     │     │     └─ [] pymaker
-   │     │     │     ├─ [] conf/
-   │     │     │     │     └─ [] conf.py
-   │     │     │     ├─ [] i18n/
-   │     │     │     │     ├─ [] locale/
-   │     │     │     │     │     └─ [] en/
-   │     │     │     │     │           └─ [] LC_MESSAGES/
-   │     │     │     │     │                 └─ [] pyplate.mo
-   │     │     │     │     ├─ [] po/
-   │     │     │     │     │     ├─ [] en/
-   │     │     │     │     │     │     └─ [] pyplate.po
-   │     │     │     │     │     └─ [] LINGUAS
-   │     │     │     │     └─ [] pot/
-   │     │     │     │           └─ [] pyplate.pot
-   │     │     │     ├─ [] install/
-   │     │     │     │     └─ [] requirements.txt
-   │     │     │     ├─ [] log/
-   │     │     │     │     └─ [] pyplate.log
-   │     │     │     ├─ [] src/
-   │     │     │     │     ├─ [] pybaker.py
-   │     │     │     │     ├─ [] pymaker.py
-   │     │     │     │     └─ [] pyplate.py
-   │     │     │     └─ [] uninstall
-   │     │     ├─ [] {'bin': 'assets', 'conf': 'assets', 'log': 'assets', 'i18n': 'assets', 'images': 'assets', 'install': 'assets', 'src': 'assets', 'requirements.txt': 'assets/
-   │     │     │     └─ [] install'}/
-   │     │     │           └─ [] ABOUT
-   │     │     ├─ [] {'bin': 'assets', 'conf': 'assets', 'log': 'assets', 'i18n': 'assets', 'install': 'assets', 'src': 'assets', 'requirements.txt': 'assets/
-   │     │     │     └─ [] install'}/
-   │     │     │           └─ [] ABOUT
-   │     │     ├─ [] {'pyplate': '', 'pyproject.toml': ''}/
-   │     │     │     └─ [] ABOUT
-   │     │     └─ [] install
-   │     └─ [] pyplate-0.0.8.tar.gz
    ├─ [] docs/
    │     ├─ [] API/
    │     │     └─ [] src/
@@ -72,7 +34,9 @@
    ├─ [] images/
    │     └─ [] pyplate.png
    ├─ [] install/
+   │     ├─ [] install.json
    │     ├─ [] install.py
+   │     ├─ [] uninstall.json
    │     └─ [] uninstall.py
    ├─ [] log/
    │     └─ [] pyplate.log

@@ -55,11 +55,11 @@
         "__PP_IMG_DESK__": ".local/share/pyplate/images/pyplate.png",
         "__PP_IMG_DASH__": "../../../images/pyplate.png",
         "__PP_IMG_ABOUT__": "../../../images/pyplate.png",
-        "__PP_VER_MMR__": "0.0.9",
-        "__PP_VER_DISP__": "Version 0.0.9",
+        "__PP_VER_MMR__": "0.0.10",
+        "__PP_VER_DISP__": "Version 0.0.10",
         "__PP_DEV_INST__": "cd {};. {}/bin/activate;python -m pip install -r {}",
         "__PP_USR_INST__": ".local/share/pyplate",
         "__PP_APP_ID__": "org.cyclopticnerve.pyplate",
-        "__PP_FMT_DIST__": "pyplate-0.0.9"
+        "__PP_FMT_DIST__": "pyplate-0.0.10"
     }
 }
