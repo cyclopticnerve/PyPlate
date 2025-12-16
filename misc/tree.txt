@@ -8,6 +8,44 @@
    │     └─ [] pymaker.py
    ├─ [] conf/
    │     └─ [] conf.py
+   ├─ [] dist/
+   │     ├─ [] pyplate-0.0.8/
+   │     │     ├─ [] assets/
+   │     │     │     ├─ [] bin/
+   │     │     │     │     ├─ [] pybaker
+   │     │     │     │     └─ [] pymaker
+   │     │     │     ├─ [] conf/
+   │     │     │     │     └─ [] conf.py
+   │     │     │     ├─ [] i18n/
+   │     │     │     │     ├─ [] locale/
+   │     │     │     │     │     └─ [] en/
+   │     │     │     │     │           └─ [] LC_MESSAGES/
+   │     │     │     │     │                 └─ [] pyplate.mo
+   │     │     │     │     ├─ [] po/
+   │     │     │     │     │     ├─ [] en/
+   │     │     │     │     │     │     └─ [] pyplate.po
+   │     │     │     │     │     └─ [] LINGUAS
+   │     │     │     │     └─ [] pot/
+   │     │     │     │           └─ [] pyplate.pot
+   │     │     │     ├─ [] install/
+   │     │     │     │     └─ [] requirements.txt
+   │     │     │     ├─ [] log/
+   │     │     │     │     └─ [] pyplate.log
+   │     │     │     ├─ [] src/
+   │     │     │     │     ├─ [] pybaker.py
+   │     │     │     │     ├─ [] pymaker.py
+   │     │     │     │     └─ [] pyplate.py
+   │     │     │     └─ [] uninstall
+   │     │     ├─ [] {'bin': 'assets', 'conf': 'assets', 'log': 'assets', 'i18n': 'assets', 'images': 'assets', 'install': 'assets', 'src': 'assets', 'requirements.txt': 'assets/
+   │     │     │     └─ [] install'}/
+   │     │     │           └─ [] ABOUT
+   │     │     ├─ [] {'bin': 'assets', 'conf': 'assets', 'log': 'assets', 'i18n': 'assets', 'install': 'assets', 'src': 'assets', 'requirements.txt': 'assets/
+   │     │     │     └─ [] install'}/
+   │     │     │           └─ [] ABOUT
+   │     │     ├─ [] {'pyplate': '', 'pyproject.toml': ''}/
+   │     │     │     └─ [] ABOUT
+   │     │     └─ [] install
+   │     └─ [] pyplate-0.0.8.tar.gz
    ├─ [] docs/
    │     ├─ [] API/
    │     │     └─ [] src/
@@ -135,10 +173,10 @@
    │     └─ [] pkg/
    │           ├─ [] __PP_NAME_PRJ_SMALL__/
    │           │     └─ [] __PP_NAME_SEC_SMALL__.py
-         │     ├─ [] .vscode/
-         │     │     └─ [] launch.json
-   │     │     └─ [] tests/
-   │     │           └─ [] __PP_NAME_PRJ_SMALL___test.py
+   │           ├─ [] .vscode/
+   │           │     └─ [] launch.json
+   │           └─ [] tests/
+   │                 └─ [] __PP_NAME_PRJ_SMALL___test.py
    ├─ [] tests/
    │     ├─ [] check_keys.py
    │     └─ [] fix_dicts.py

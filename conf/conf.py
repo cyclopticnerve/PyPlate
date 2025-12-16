@@ -992,6 +992,7 @@ D_PUB_BL = {
         ".git",
         ".venv*",
         ".VSCodeCounter",
+        "dist",
         "site",
         "**/__pycache__",
         "**/*.egg-info",
