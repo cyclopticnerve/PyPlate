@@ -47,29 +47,6 @@
         "DBG_DIST": true
     },
     "PUB_DIST": {
-        "c": {
-            "bin": "assets",
-            "conf": "assets",
-            "log": "assets",
-            "i18n": "assets",
-            "install": "assets",
-            "src": "assets",
-            "requirements.txt": "assets/install"
-        },
-        "g": {
-            "bin": "assets",
-            "conf": "assets",
-            "log": "assets",
-            "i18n": "assets",
-            "images": "assets",
-            "install": "assets",
-            "src": "assets",
-            "requirements.txt": "assets/install"
-        },
-        "p": {
-            "pyplate": "",
-            "pyproject.toml": ""
-        },
         "bin": "assets",
         "conf": "assets",
         "log": "assets",

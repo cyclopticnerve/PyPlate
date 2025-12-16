@@ -8,8 +8,6 @@
    │     └─ [] pymaker.py
    ├─ [] conf/
    │     └─ [] conf.py
-   ├─ [] dist/
-   │     └─ [] pyplate-0.0.7.tar.gz
    ├─ [] docs/
    │     ├─ [] API/
    │     │     └─ [] src/
@@ -50,6 +48,7 @@
    │     │     ├─ [] default.md
    │     │     ├─ [] module.py
    │     │     └─ [] window.py
+   │     ├─ [] release.txt
    │     ├─ [] tree.html
    │     └─ [] tree.txt
    ├─ [] pyplate/
@@ -89,9 +88,10 @@
    │     │     ├─ [] log/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.log
    │     │     ├─ [] misc/
-   │     │     │     └─ [] checklists/
-   │     │     │           ├─ [] project.txt
-   │     │     │           └─ [] style.txt
+   │     │     │     ├─ [] checklists/
+   │     │     │     │     ├─ [] project.txt
+   │     │     │     │     └─ [] style.txt
+   │     │     │     └─ [] release.txt
    │     │     ├─ [] pyplate/
    │     │     │     └─ [] private/
    │     │     │           └─ [] ABOUT
