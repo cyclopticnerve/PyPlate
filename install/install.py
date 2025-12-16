@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : CLI_Test                                               /          \
+# Project : PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
 # Date    : 09/23/2025                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -52,7 +52,7 @@ P_DIR_ASSETS = P_DIR_PRJ / "assets"
 T_DIR_PRJ = P_DIR_ASSETS
 
 # init gettext
-T_DOMAIN = "cli_test"
+T_DOMAIN = "pyplate"
 T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
@@ -66,15 +66,15 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 # ------------------------------------------------------------------------------
 
 # get dirs
-P_DIR_USR_INST = Path.home() / ".local/share/cli_test"
-P_DIR_VENV = P_DIR_USR_INST / ".venv-cli_test"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
+P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
 
 # get files
 P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"
 P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
 P_FILE_REQS = P_DIR_ASSETS / "install" / "requirements.txt"
-P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/CLI_Test.desktop"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "img/cli_test.png"
+P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "img/pyplate.png"
 
 
 # ------------------------------------------------------------------------------
@@ -139,10 +139,10 @@ class CNInstall:
     # about string (to be set by subclass)
     S_ABOUT = (
         "\n"
-        "CLI_Test\n"
+        "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "https://github.com/cyclopticnerve/CLI_Test\n"
+        "https://github.com/cyclopticnerve/PyPlate\n"
     )
 
     # I18N if using argparse, add help at end of about

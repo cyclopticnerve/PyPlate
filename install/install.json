@@ -1,0 +1,16 @@
+{
+    "INST_NAME": "PyPlate",
+    "INST_VER": "0.0.9",
+    "INST_DESK": false,
+    "INST_CONT": {
+        "bin/pymaker": ".local/bin",
+        "bin/pybaker": ".local/bin",
+        "conf": ".local/share/pyplate",
+        "log": ".local/share/pyplate",
+        "i18n": ".local/share/pyplate",
+        "images": ".local/share/pyplate",
+        "install": ".local/share/pyplate",
+        "src": ".local/share/pyplate",
+        "uninstall.py": ".local/share/pyplate"
+    }
+}
