@@ -148,7 +148,7 @@ Wait a minute or two, and your docs should appear at
 <!-- __RM_APP__ -->
 Go to the source folder for PyPlate and run the uninstaller:
 ```bash
-$ cd ~/.local/share/pyplate/uninstall
+$ cd ~/.local/share/pyplate
 $ ./uninstall.py
 ```
 <!-- __RM_APP__ -->

@@ -113,7 +113,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # strings
 
     # short description
+    # pylint: disable=line-too-long
+    # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = ""
+    # pylint: enable=line-too-long
 
     # version string
     S_PP_VERSION = ""
@@ -266,10 +269,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
             print()
             sys.exit(0)
 
-        # punt to uninstall func
+        # punt to install func
         if self._dict_args.get(self.S_ARG_INST_DEST, False):
 
-            # uninstall and exit
+            # install and exit
             self._do_install()
 
         # punt to uninstall func

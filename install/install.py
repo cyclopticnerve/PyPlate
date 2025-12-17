@@ -72,7 +72,7 @@ P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
 # get files
 P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"
 P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
-P_FILE_REQS = P_DIR_ASSETS / "install" / "requirements.txt"
+P_FILE_REQS = P_DIR_ASSETS / "install/requirements.txt"
 P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
 P_FILE_DESK_ICON = P_DIR_ASSETS / "img/pyplate.png"
 
@@ -117,6 +117,8 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
+    # pylint: disable=line-too-long
+    # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
 
     # version string
@@ -189,12 +191,12 @@ class CNInstall:
     # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
         "The current version of this program is already \
-    installed.\nDo you want to overwrite?"
+installed.\nDo you want to overwrite?"
     )
     # I18N: ask to overwrite newer version
     S_ASK_VER_OLDER = _(
         "A newer version of this program is currently \
-    installed.\nDo you want to overwrite?"
+installed.\nDo you want to overwrite?"
     )
 
     # error strings

@@ -52,8 +52,10 @@
         "conf": "assets",
         "log": "assets",
         "i18n": "assets",
+        "images": "assets",
         "install": "assets",
         "src": "assets",
+        "template": "assets",
         "requirements.txt": "assets/install"
     },
     "PUB_DOCS": {

@@ -807,8 +807,8 @@ L_SCREENSHOT = ["g"]
 # remove exts from bin files
 L_DIST_REMOVE_EXT = [
     f"{S_DIR_ASSETS}/{S_DIR_BIN}/*.py",
-    f"{S_FILE_INST_PY}",
-    f"{S_DIR_ASSETS}/{S_FILE_UNINST_PY}",
+    # f"{S_FILE_INST_PY}",
+    # f"{S_DIR_ASSETS}/{S_FILE_UNINST_PY}",
 ]
 
 # ------------------------------------------------------------------------------
@@ -866,7 +866,7 @@ D_PRV_ALL = {
     "__PP_TOML_FILE__": S_FILE_TOML,
     "__PP_REQS_FILE__": S_FILE_REQS,
     "__PP_DIR_IMAGES__": S_DIR_IMAGES,
-    "__PP_INST_ASSETS__": S_DIR_ASSETS,
+    "__PP_DIR_ASSETS__": S_DIR_ASSETS,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's prj name
     # i.e. /home/dev/Projects/Python/MyProject
@@ -912,7 +912,7 @@ D_PRV_ALL = {
 # if you need to adjust any of these values based on a dunder, use
 # do_before_fix() in this file
 D_PRV_PRJ = {
-    "__PP_VERSION_PP__": PP.PyPlate.S_PP_VERSION, # make/bake version
+    "__PP_VERSION_PP__": PP.PyPlate.S_PP_VERSION,  # make/bake version
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_PRJ__": "",  # My Project
     "__PP_NAME_PRJ_BIG__": "",  # My_Project
@@ -1471,11 +1471,11 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         # fix sources
         dict_dst[S_KEY_PUB_I18N_SRC] = list(dict_src[S_KEY_PUB_I18N_SRC])
 
-
     # --------------------------------------------------------------------------
     # figure out dist dict
 
     dict_pub[S_KEY_PUB_DIST] = dict(D_TYPE_DIST[prj_type])
+
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -1582,6 +1582,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
     else:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
+
 
 # ------------------------------------------------------------------------------
 # Do any work after fix

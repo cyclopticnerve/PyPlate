@@ -38,7 +38,7 @@ import sys
 P_DIR_PRJ = Path(__file__).parent.resolve()
 
 # get dirs
-P_DIR_ASSETS = P_DIR_PRJ / "__PP_INST_ASSETS__"
+P_DIR_ASSETS = P_DIR_PRJ / "__PP_DIR_ASSETS__"
 P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
 P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
 

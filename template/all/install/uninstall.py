@@ -114,7 +114,10 @@ class CNUninstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
+    # pylint: disable=line-too-long
+    # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = ""
+    # pylint: enable=line-too-long
 
     # version string
     S_PP_VERSION = ""
@@ -171,7 +174,7 @@ class CNUninstall:
     # I18N: answer yes
     S_ASK_YES = _("y")
     # I18N: answer no
-    S_ASK_NO = _("n")
+    S_ASK_NO = _("N")
     # NB: format param is prog name
     # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")

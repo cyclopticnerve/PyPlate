@@ -97,8 +97,8 @@ class PyPlate:
     # pyplate: replace=True
 
     # short description
-    # NB: all on one line to make replace easy
     # pylint: disable=line-too-long
+    # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
     # pylint enable=line-too-long
 

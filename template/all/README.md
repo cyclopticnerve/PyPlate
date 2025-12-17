@@ -118,7 +118,7 @@ $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 <!-- __RM_APP__ -->
 Go to the source folder for __PP_NAME_PRJ_BIG__ and run the uninstaller:
 ```bash
-$ cd ~/.local/share/__PP_NAME_PRJ_SMALL__/uninstall
+$ cd ~/.local/share/__PP_NAME_PRJ_SMALL__
 $ ./uninstall
 ```
 <!-- __RM_APP__ -->
