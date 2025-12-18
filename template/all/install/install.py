@@ -228,7 +228,7 @@ to overwrite?"
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_INSTALL = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
     # --------------------------------------------------------------------------
 
@@ -627,7 +627,7 @@ to overwrite?"
         print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the command to install packages to venv from reqs
-        cmd = self.S_CMD_INSTALL.format(
+        cmd = self.S_CMD_TYPE_INST.format(
             self._dir_venv.parent, self._dir_venv.name, self._path_reqs
         )
 

@@ -341,6 +341,8 @@ class PyMaker(PyPlate):
             P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
             P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
             P.C.S_KEY_PUB_META: dict(P.C.D_PUB_META),
+            P.C.S_KEY_PUB_INST: dict(P.C.D_PUB_INST),
+            P.C.S_KEY_PUB_UNINST: dict(P.C.D_PUB_UNINST),
         }
 
         # ----------------------------------------------------------------------
