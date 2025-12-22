@@ -304,7 +304,11 @@ PyPlate project from a template.</p>
         """
 
         # sanity check
-        # cwd = P.Path.cwd()
+        cwd = P.Path.cwd()
+        print(cwd)
+        if P.Path(__file__).resolve() in cwd.parents:
+            print("nope")
+            P.sys.exit(-1)
 
         # check version from conf
         pattern = P.C.S_SEM_VER_VALID
