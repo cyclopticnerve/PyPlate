@@ -207,8 +207,8 @@ PyPlate project from a template.</p>
 
     # I18N cmd line instructions string
     S_EPILOG = _(
-        "Run this program from the directory where you want to create "\
-            "a project."
+        "Run this program from the directory where you want to create "
+        "a project."
     )
 
     # messages
@@ -288,6 +288,8 @@ PyPlate project from a template.</p>
         super()._setup()
 
         # do not run pymaker in pyplate dir
+        print(self._dir_prj)
+        print(P.P_DIR_PRJ)
         if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
             P.sys.exit(-1)
@@ -302,13 +304,6 @@ PyPlate project from a template.</p>
         Asks the user for project info, such as type and name, to be saved to
         self._dict_prv_prj.
         """
-
-        # sanity check
-        cwd = P.Path.cwd()
-        print(cwd)
-        if P.Path(__file__).resolve() in cwd.parents:
-            print("nope")
-            P.sys.exit(-1)
 
         # check version from conf
         pattern = P.C.S_SEM_VER_VALID
