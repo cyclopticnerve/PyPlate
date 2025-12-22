@@ -303,6 +303,9 @@ PyPlate project from a template.</p>
         self._dict_prv_prj.
         """
 
+        # sanity check
+        # cwd = P.Path.cwd()
+
         # check version from conf
         pattern = P.C.S_SEM_VER_VALID
         version = P.C.D_PUB_META[P.C.S_KEY_META_VERSION]
@@ -352,9 +355,6 @@ PyPlate project from a template.</p>
         # ----------------------------------------------------------------------
         # next question is name
 
-        # sanity check
-        cwd = P.Path.cwd()
-
         # if in debug mode
         if self._cmd_debug:
 
@@ -369,7 +369,7 @@ PyPlate project from a template.</p>
             name_prj_big = name_prj.replace(" ", "_")
 
             # set up for existence check
-            tmp_dir = cwd / name_prj_big
+            tmp_dir = self._dir_prj / name_prj_big
 
             # check if project already exists
             if tmp_dir.exists():
@@ -397,7 +397,7 @@ PyPlate project from a template.</p>
                     name_prj_big = name_prj.replace(" ", "_")
 
                     # set up for existence check
-                    tmp_dir = cwd / name_prj_big
+                    tmp_dir = self._dir_prj / name_prj_big
 
                     # check if project already exists
                     if tmp_dir.exists():
@@ -409,6 +409,7 @@ PyPlate project from a template.</p>
 
         # save global property
         self._dir_prj = tmp_dir
+        print(self._dir_prj)
 
         # save other names
         name_prj_small = name_prj_big.lower()
