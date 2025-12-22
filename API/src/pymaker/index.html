@@ -288,8 +288,6 @@ PyPlate project from a template.</p>
         super()._setup()
 
         # do not run pymaker in pyplate dir
-        print(self._dir_prj)
-        print(P.P_DIR_PRJ)
         if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
             P.sys.exit(-1)
@@ -482,6 +480,8 @@ PyPlate project from a template.</p>
             P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
             P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
             P.C.S_KEY_PUB_META: dict(P.C.D_PUB_META),
+            P.C.S_KEY_PUB_INST: dict(P.C.D_PUB_INST),
+            P.C.S_KEY_PUB_UNINST: dict(P.C.D_PUB_UNINST),
         }
 
         # ----------------------------------------------------------------------
