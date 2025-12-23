@@ -288,8 +288,8 @@ PyPlate project from a template.</p>
         super()._setup()
 
         # do not run pymaker in pyplate dir
-        print(self._dir_prj)
-        print(P.P_DIR_PRJ)
+        # print(self._dir_prj)
+        # print(P.P_DIR_PRJ)
         if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
             P.sys.exit(-1)
@@ -408,7 +408,6 @@ PyPlate project from a template.</p>
 
         # save global property
         self._dir_prj = tmp_dir
-        print(self._dir_prj)
 
         # save other names
         name_prj_small = name_prj_big.lower()
