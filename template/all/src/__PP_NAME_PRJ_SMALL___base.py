@@ -95,9 +95,12 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # paths
 
+    # conf dir
+    P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
+
     # path to default config file
     # NB: if not using, set to None
-    P_CFG_DEF = P_DIR_PRJ / "__PP_DIR_CONF__/__PP_NAME_PRJ_SMALL__.json"
+    P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
 
     # path to default log file
     # NB: if not using, set to None
@@ -106,7 +109,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # path to uninst
     P_UNINST = (
         Path.home()
-        / "__PP_USR_SHARE__/__PP_NAME_PRJ_SMALL__/__PP_NAME_UNINST__"
+        / "__PP_USR_INST__/__PP_NAME_UNINST__"
     )
 
     # --------------------------------------------------------------------------
@@ -418,11 +421,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # call to save config
         self._save_config()
-
-        # separate session logs
-        self._logger.info(
-            "\n--------------------------------------------------------------------------------"
-        )
 
     # --------------------------------------------------------------------------
     # Save config data to a file

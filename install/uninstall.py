@@ -118,7 +118,7 @@ class CNUninstall:
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 0.0.10"
+    S_PP_VERSION = "Version 0.1.0"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"

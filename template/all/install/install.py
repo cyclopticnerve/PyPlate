@@ -11,7 +11,7 @@
 """
 The install script for this project
 
-THis file installs the project, copying its files and folders to the
+THis module installs the project, copying its files and folders to the
 appropriate locations on the user's computer.
 
 This file is real ugly b/c we can't access the venv, so we do it manually.
@@ -34,6 +34,9 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
 # get prj dir
 P_DIR_PRJ = Path(__file__).parent.resolve()
 
@@ -41,9 +44,14 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 P_DIR_ASSETS = P_DIR_PRJ / "__PP_DIR_ASSETS__"
 P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
 P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
+P_DIR_INSTALL = P_DIR_ASSETS / "__PP_DIR_INSTALL__"
 
 # get files
-P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__/__PP_REQS_FILE__"
+P_FILE_CFG_INST = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+P_FILE_CFG_UNINST = (
+    P_DIR_USR_INST / "__PP_DIR_INSTALL__/__PP_FILE_UNINST_CFG__"
+)
+P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
 P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
 P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
 
@@ -59,21 +67,17 @@ S_ENCODING = "UTF-8"
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
 
 # path to project dir
-T_DIR_PRJ = P_DIR_PRJ
+T_DIR_PRJ = P_DIR_ASSETS
 
 # init gettext
 T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / P_DIR_ASSETS / "__PP_PATH_LOCALE__"
+T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
 locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
@@ -122,7 +126,10 @@ class CNInstall:
     S_KEY_INST_CONT = "INST_CONT"
 
     # short description
+    # pylint: disable=line-too-long
+    # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = ""
+    # pylint: enable=line-too-long
 
     # version string
     S_PP_VERSION = ""
@@ -156,6 +163,11 @@ class CNInstall:
     # cmd line instructions string
     S_EPILOG = ""
 
+    # errors
+
+    # I18N: an error occurred
+    S_ERR_ERR = _("Error: ")
+
     # --------------------------------------------------------------------------
 
     # messages
@@ -187,13 +199,13 @@ class CNInstall:
     S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
-        "The current version of this program is already installed.\nDo you \
-want to overwrite?"
+        "The current version of this program is already installed.\nDo you "
+        "want to overwrite?"
     )
     # I18N: ask to overwrite newer version
     S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently installed.\nDo you want \
-to overwrite?"
+        "A newer version of this program is currently installed.\nDo you want "
+        "to overwrite?"
     )
 
     # errors
@@ -213,7 +225,7 @@ to overwrite?"
     # NB: format param is dest path
     # I18N: dst path invalid
     S_ERR_DST_PATH = _("Destination path can not be {}")
-    # can't find .desktop
+    # I18N: can't find .desktop
     S_ERR_NO_DESK = _("No desktop files present")
 
     # dry run messages
@@ -230,7 +242,17 @@ to overwrite?"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
+
     # --------------------------------------------------------------------------
+
+    # version check results
+    I_VER_OLDER = -1
+    I_VER_SAME = 0
+    I_VER_NEWER = 1
+    I_VER_ERROR = -2
 
     # regex to compare version numbers
     R_VERSION_VALID = (
@@ -250,10 +272,6 @@ to overwrite?"
     R_VERSION_GROUP_REV = 3
     R_VERSION_GROUP_PRE = 4
     R_VERSION_GROUP_META = 5
-
-    # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -472,7 +490,7 @@ to overwrite?"
             # get project info
             self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
         except OSError as e:
-            raise e
+            print(self.S_ERR_ERR, e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -535,7 +553,7 @@ to overwrite?"
                 # get info from old cfg
                 dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
             except OSError as e:
-                raise e
+                print(self.S_ERR_ERR, e)
 
             # check versions
             ver_old = dict_cfg_old[self.S_KEY_INST_VER]
@@ -640,7 +658,7 @@ to overwrite?"
         # the cmd to install the reqs
         try:
             # NB: hide output
-            subprocess.run(cmd, shell=True, check=True)
+            subprocess.run(cmd, shell=True, check=True, capture_output=True)
             print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
@@ -1026,6 +1044,8 @@ if __name__ == "__main__":
     inst.main(
         P_DIR_ASSETS,
         P_DIR_USR_INST,
+        P_FILE_CFG_INST,
+        P_FILE_CFG_UNINST,
         P_DIR_VENV,
         P_FILE_REQS,
         P_FILE_DESK,

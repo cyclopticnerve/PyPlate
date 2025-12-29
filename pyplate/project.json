@@ -68,7 +68,7 @@
     },
     "PUB_INST": {
         "INST_NAME": "PyPlate",
-        "INST_VER": "0.0.10",
+        "INST_VER": "0.1.0",
         "INST_DESK": false,
         "INST_CONT": {
             "bin/pymaker": ".local/bin",
@@ -116,7 +116,7 @@
     },
     "PUB_UNINST": {
         "INST_NAME": "PyPlate",
-        "INST_VER": "0.0.10",
+        "INST_VER": "0.1.0",
         "INST_CONT": [
             ".local/bin/pymaker",
             ".local/bin/pybaker",
@@ -125,7 +125,7 @@
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "0.0.10",
+        "META_VERSION": "0.1.0",
         "META_KEYWORDS": [
             "python",
             "cli",

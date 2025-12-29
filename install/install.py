@@ -34,10 +34,28 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# add assets dir to path
+# Constants
+# ------------------------------------------------------------------------------
 
+# get prj dir
 P_DIR_PRJ = Path(__file__).parent.resolve()
+
+# get dirs
 P_DIR_ASSETS = P_DIR_PRJ / "assets"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
+P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
+P_DIR_INSTALL = P_DIR_ASSETS / "install"
+
+# get files
+P_FILE_CFG_INST = P_DIR_INSTALL / "install.json"
+P_FILE_CFG_UNINST = (
+    P_DIR_USR_INST / "install/uninstall.json"
+)
+P_FILE_REQS = P_DIR_INSTALL / "requirements.txt"
+P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/CLI_DEBUG.desktop"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "images/cli_debug.png"
+
+S_ENCODING = "UTF-8"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -60,21 +78,6 @@ _ = T_TRANSLATION.gettext
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
 locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-# get dirs
-P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
-P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
-
-# get files
-P_FILE_CFG_INST = P_DIR_ASSETS / "install/install.json"
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "install/uninstall.json"
-P_FILE_REQS = P_DIR_ASSETS / "install/requirements.txt"
-P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "img/pyplate.png"
 
 
 # ------------------------------------------------------------------------------
@@ -110,6 +113,12 @@ class CNInstall:
     # Class constants
     # --------------------------------------------------------------------------
 
+    # version check results
+    I_VER_OLDER = -1
+    I_VER_SAME = 0
+    I_VER_NEWER = 1
+    I_VER_ERROR = -2
+
     # keys
     S_KEY_INST_NAME = "INST_NAME"
     S_KEY_INST_VER = "INST_VER"
@@ -120,9 +129,10 @@ class CNInstall:
     # pylint: disable=line-too-long
     # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
+    # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 0.0.10"
+    S_PP_VERSION = "Version 0.1.0"
 
     # debug option strings
     S_ARG_DRY_OPTION = "-d"
@@ -161,7 +171,6 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # messages
-
     # NB: format params are prog_name and prog_version
     # I18N: install the program
     S_MSG_INST_START = _("Installing {} Version {}")
@@ -171,7 +180,7 @@ class CNInstall:
     # I18N: done with step
     S_MSG_DONE = _("Done")
     # I18N: step failed
-    S_MSG_FAIL = _("Fail")
+    S_MSG_FAIL = _("Failed")
     # I18N: show the copy step
     S_MSG_COPY_START = _("Copying files... ")
     # I18N: show the venv step
@@ -190,17 +199,17 @@ class CNInstall:
     S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
-        "The current version of this program is already \
-installed.\nDo you want to overwrite?"
+        "The current version of this program is already installed.\nDo you "
+        "want to overwrite?"
     )
     # I18N: ask to overwrite newer version
     S_ASK_VER_OLDER = _(
-        "A newer version of this program is currently \
-installed.\nDo you want to overwrite?"
+        "A newer version of this program is currently installed.\nDo you want "
+        "to overwrite?"
     )
 
-    # error strings
-    # I18N: general error start
+    # errors
+    # I18N: an error occurred
     S_ERR_ERR = _("Error:")
     # NB: format param is file path
     # I18N: config file not found
@@ -216,9 +225,10 @@ installed.\nDo you want to overwrite?"
     # NB: format param is dest path
     # I18N: dst path invalid
     S_ERR_DST_PATH = _("Destination path can not be {}")
+    # I18N: can't find .desktop
+    S_ERR_NO_DESK = _("No desktop files present")
 
     # dry run messages
-
     S_DRY_VENV = "\nvenv cmd:"
     S_DRY_REQS = "\nreqs cmd:"
     # NB: format params are source and destination file/dir
@@ -227,7 +237,6 @@ installed.\nDo you want to overwrite?"
     S_DRY_DESK_ICON = "set desktop icon: {}"
 
     # commands
-
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
@@ -237,7 +246,7 @@ installed.\nDo you want to overwrite?"
     R_ICON_SCH = r"^(Icon=)(.*)$"
     R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
 
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     # version check results
     I_VER_OLDER = -1
@@ -488,6 +497,7 @@ installed.\nDo you want to overwrite?"
         prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
         # print start msg
+        print()
         print(self.S_MSG_INST_START.format(prog_name, prog_version))
 
     # --------------------------------------------------------------------------
@@ -648,9 +658,7 @@ installed.\nDo you want to overwrite?"
         # the cmd to install the reqs
         try:
             # NB: hide output
-            subprocess.run(
-                cmd, shell=True, check=True, stdout=subprocess.DEVNULL
-            )
+            subprocess.run(cmd, shell=True, check=True, capture_output=True)
             print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
@@ -688,12 +696,12 @@ installed.\nDo you want to overwrite?"
 
         # sanity check (params to main might be None)
         if not self._file_desk or not self._file_desk_icon:
-            print("no desktop files present")
+            print(self.S_ERR_NO_DESK)
             return
 
         # open file
         text = ""
-        with open(self._file_desk, "r", encoding="UTF-8") as a_file:
+        with open(self._file_desk, "r", encoding=S_ENCODING) as a_file:
             text = a_file.read()
 
         # find icon line and fix
@@ -710,7 +718,7 @@ installed.\nDo you want to overwrite?"
             # ------------------------------------------------------------------
 
             # write fixed text back to file
-            with open(self._file_desk, "w", encoding="UTF-8") as a_file:
+            with open(self._file_desk, "w", encoding=S_ENCODING) as a_file:
                 a_file.write(text)
 
         # show some info
@@ -801,7 +809,7 @@ installed.\nDo you want to overwrite?"
 
         try:
             # get dict from file
-            with open(a_file, "r", encoding="UTF-8") as a_file:
+            with open(a_file, "r", encoding=S_ENCODING) as a_file:
                 a_dict = json.load(a_file)
 
         # file not found
