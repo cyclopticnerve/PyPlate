@@ -177,7 +177,7 @@ class PyPlate:
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
         self._dict_pub_inst = {}
-        self._dict_pub_uninst = {}
+        # self._dict_pub_uninst = {}
 
         # dictionary to hold current pm/pb debug settings
         self._dict_dbg = {}
@@ -798,7 +798,7 @@ class PyPlate:
         self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
         self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
         self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]
-        self._dict_pub_uninst = self._dict_pub[C.S_KEY_PUB_UNINST]
+        # self._dict_pub_uninst = self._dict_pub[C.S_KEY_PUB_UNINST]
 
 
         # set initial debug
