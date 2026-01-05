@@ -1,4 +1,0 @@
-This file is here to make sure git includes this directory in the repo because 
-git does not currently allow empty directories to be synced.
-
-This directory is used for todo files.

@@ -13,5 +13,10 @@
         "src": ".local/share/pyplate",
         "template": ".local/share/pyplate",
         "uninstall.py": ".local/share/pyplate"
-    }
+    },
+    "UNINST_CONT": [
+        ".local/bin/pymaker",
+        ".local/bin/pybaker",
+        ".local/share/pyplate"
+    ]
 }

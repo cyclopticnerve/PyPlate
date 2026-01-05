@@ -22,15 +22,25 @@ directory).
 
 # system imports
 import argparse
-import gettext
-import locale
+# import gettext
+# import locale
 import logging
 from pathlib import Path
 import sys
 
-# cnlib imports
+# third party imports
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
+
+# ------------------------------------------------------------------------------
+# local imports
+
+# fudge the path to import conf stuff
+# sys.path.append(str(P_DIR_PRJ))
+
+# pylint: disable=wrong-import-position
+# import conf.conf as C  # type: ignore
+# pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -39,27 +49,47 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 # project dir
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
+# conf dir
+P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
+
+# path to default config file
+# NB: if not using, set to None
+P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
+
+# path to default log file
+# NB: if not using, set to None
+P_LOG_DEF = P_DIR_PRJ / "__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log"
+
+# path to uninst
+P_UNINST = P_DIR_PRJ / "__PP_DIR_INSTALL__/__PP_NAME_UNINST__"
+# NB: path changes after dist
+P_UNINST_DIST = P_DIR_PRJ / "__PP_NAME_UNINST__"
+
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI and GUI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
+DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+_ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
 
-# path to project dir
-T_DIR_PRJ = P_DIR_PRJ
+# # ------------------------------------------------------------------------------
+# # gettext stuff for CLI and GUI
+# # NB: keep global
+# # to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
 
-# init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
+# # path to project dir
+# T_DIR_PRJ = P_DIR_PRJ
 
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+# # init gettext
+# T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+# T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+# T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+# _ = T_TRANSLATION.gettext
+
+# # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# # use for CLI in the interest of common code)
+# locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -97,26 +127,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
     B_SAVE_HIGH = False
 
     # --------------------------------------------------------------------------
-    # paths
-
-    # conf dir
-    P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
-
-    # path to default config file
-    # NB: if not using, set to None
-    P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
-
-    # path to default log file
-    # NB: if not using, set to None
-    P_LOG_DEF = P_DIR_PRJ / "__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log"
-
-    # path to uninst
-    P_UNINST = (
-        Path.home()
-        / "__PP_USR_INST__/__PP_NAME_UNINST__"
-    )
-
-    # --------------------------------------------------------------------------
     # strings
 
     # short description
@@ -151,13 +161,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_ARG_HLP_HELP = _("show this help message and exit")
 
     # config option strings
-    S_ARG_INST_OPTION = "--install"
-    S_ARG_INST_ACTION = "store_true"
-    S_ARG_INST_DEST = "INST_DEST"
-    # I18N: install option help
-    S_ARG_INST_HELP = _("install this program")
-
-    # config option strings
     S_ARG_UNINST_OPTION = "--uninstall"
     S_ARG_UNINST_ACTION = "store_true"
     S_ARG_UNINST_DEST = "UNINST_DEST"
@@ -178,14 +181,29 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
     # --------------------------------------------------------------------------
+    # questions
+
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("N")
+    # NB: format param is prog name
+    # I18N: ask to uninstall
+    S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
+
+    # --------------------------------------------------------------------------
+    # messages
+
+    # I18N: process aborted
+    S_MSG_ABORT = _("Aborted")
+
+    # --------------------------------------------------------------------------
     # error messages
 
-    # general error
+    # I18N: an error occurred
     S_ERR_ERR = _("Error:")
-    # uninst not found
     # I18N: uninstall not found
     S_ERR_NO_UNINST = _("Uninstall files not found")
-    # config not found
     # NB: format param is file path
     # I18N: could not find -c file
     S_ERR_NO_CFG = _("Config file {} not found")
@@ -209,13 +227,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # set defaults
 
         # cfg stuff
-        self._path_cfg_def = self.P_CFG_DEF
+        self._path_cfg_def = P_CFG_DEF
         self._dict_cfg = {}
 
         # log stuff
         self._logger = logging.getLogger(__name__)
         logging.basicConfig(
-            filename=self.P_LOG_DEF,
+            filename=P_LOG_DEF,
             level=logging.INFO,
             format=self.S_LOG_FMT,
             datefmt=self.S_LOG_DATE_FMT,
@@ -225,6 +243,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._parser = argparse.ArgumentParser(
             formatter_class=CNFormatter, add_help=False
         )
+
+        # set arg defaults
         self._dict_args = {}
         self._cmd_debug = False
         self._path_cfg_arg = None
@@ -232,6 +252,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
+
+    # NB: these are the main steps, called in order from main()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
@@ -247,6 +269,22 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ----------------------------------------------------------------------
         # use cmd line
 
+        # # add config option
+        # self._parser.add_argument(
+        #     self.S_ARG_CFG_OPTION,
+        #     dest=self.S_ARG_CFG_DEST,
+        #     help=self.S_ARG_CFG_HELP,
+        #     metavar=self.S_ARG_CFG_METAVAR
+        # )
+
+        # # add debug option
+        # self._parser.add_argument(
+        #     self.S_ARG_DBG_OPTION,
+        #     action=self.S_ARG_DBG_ACTION,
+        #     dest=self.S_ARG_DBG_DEST,
+        #     help=self.S_ARG_DBG_HELP,
+        # )
+
         # always add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
@@ -255,8 +293,18 @@ class __PP_NAME_PRJ_PASCAL__Base:
             help=self.S_ARG_HLP_HELP,
         )
 
+        # # add uninstall option
+        # self._parser.add_argument(
+        #     self.S_ARG_UNINST_OPTION,
+        #     action=self.S_ARG_UNINST_ACTION,
+        #     dest=self.S_ARG_UNINST_DEST,
+        #     help=self.S_ARG_UNINST_HELP,
+        # )
+
         # run the parser
         args = self._parser.parse_args()
+
+        # convert namespace to dict
         self._dict_args = vars(args)
 
         # ----------------------------------------------------------------------
@@ -273,11 +321,11 @@ class __PP_NAME_PRJ_PASCAL__Base:
             print()
             sys.exit(0)
 
-        # punt to install func
-        if self._dict_args.get(self.S_ARG_INST_DEST, False):
-
-            # install and exit
-            self._do_install()
+        # set self and lib debug
+        self._cmd_debug = self._dict_args.get(
+            self.S_ARG_DBG_DEST, self._cmd_debug
+        )
+        F.B_DEBUG = self._cmd_debug
 
         # punt to uninstall func
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
@@ -287,12 +335,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # ----------------------------------------------------------------------
         # set props from args
-
-        # set self and lib debug
-        self._cmd_debug = self._dict_args.get(
-            self.S_ARG_DBG_DEST, self._cmd_debug
-        )
-        F.B_DEBUG = self._cmd_debug
 
         # set cfg path
         self._path_cfg_arg = self._dict_args.get(
@@ -318,37 +360,20 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._load_config()
 
     # --------------------------------------------------------------------------
-    # Handle the --install cmd line op
+    # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _do_install(self):
+    def _teardown(self):
         """
-        Handle the --install cmd line op
-        """
+        Boilerplate to use at the end of main
 
-    # ???
-
-    # --------------------------------------------------------------------------
-    # Handle the --uninstall cmd line op
-    # --------------------------------------------------------------------------
-    def _do_uninstall(self):
-        """
-        Handle the --uninstall cmd line op
+        Perform some mundane stuff like saving config files.
         """
 
-        # if path exists
-        if self.P_UNINST.exists():
+        # ----------------------------------------------------------------------
+        # use cfg
 
-            # run uninstall and exit
-            cmd = str(self.P_UNINST)
-            try:
-                F.run(cmd, shell=True)
-            except F.CNRunError as e:
-                print(self.S_ERR_ERR, e)
-        else:
-            print(self.S_ERR_NO_UNINST)
-
-        # bye bye
-        sys.exit(0)
+        # call to save config
+        self._save_config()
 
     # --------------------------------------------------------------------------
     # Load config data from a file
@@ -408,22 +433,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
                 F.printd(self.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
-    # Boilerplate to use at the end of main
-    # --------------------------------------------------------------------------
-    def _teardown(self):
-        """
-        Boilerplate to use at the end of main
-
-        Perform some mundane stuff like saving config files.
-        """
-
-        # ----------------------------------------------------------------------
-        # use cfg
-
-        # call to save config
-        self._save_config()
-
-    # --------------------------------------------------------------------------
     # Save config data to a file
     # --------------------------------------------------------------------------
     def _save_config(self):
@@ -463,6 +472,49 @@ class __PP_NAME_PRJ_PASCAL__Base:
                 F.save_dict_into_paths(self._dict_cfg, l_paths)
             except OSError as e:  # from save_dict
                 F.printd(self.S_ERR_ERR, str(e))
+
+    # --------------------------------------------------------------------------
+    # Handle the --uninstall cmd line op
+    # --------------------------------------------------------------------------
+    def _do_uninstall(self):
+        """
+        Handle the --uninstall cmd line op
+        """
+
+        # ask to uninstall
+        str_ask = F.dialog(
+            self.S_ASK_UNINST.format("__PP_NAME_PRJ_BIG__"),
+            [self.S_ASK_YES, self.S_ASK_NO],
+            self.S_ASK_NO,
+        )
+
+        # user hit enter or typed "n/N"
+        if str_ask != self.S_ASK_YES:
+            print(self.S_MSG_ABORT)
+            sys.exit(0)
+
+        # ------------------------------------------------------------------------------
+
+        # if path exists
+        path_uninst = P_UNINST
+        if not path_uninst.exists():
+            path_uninst = P_UNINST_DIST
+
+        # format cmd line
+        cmd = str(path_uninst) + " -f -q"
+        if self._cmd_debug:
+            cmd += " -d"
+
+        # ----------------------------------------------------------------------
+
+        try:
+            cp = F.run(cmd, shell=True)
+            print(cp.stdout)
+            print(cp.stderr)
+            sys.exit(0)
+        except F.CNRunError as e:
+            print(e.output)
+            sys.exit(e.returncode)
 
 
 # ------------------------------------------------------------------------------

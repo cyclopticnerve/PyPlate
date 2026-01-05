@@ -30,6 +30,7 @@ Version 0.1.0
 - [Usage](#usage)
 - [Uninstalling](#uninstalling)
 - [Documentation](#documentation)
+- [Developing](#developing)
 - [Notes](#notes)
 
 ## Requirements
@@ -42,8 +43,8 @@ Version 0.1.0
 There are two ways to get the code:
 
 1. Download the [latest
-release](https://github.com/cyclopticnerve/PyPlate/releases/latest) (the
-**'Source code (zip)'** file should work an all platforms).
+release](https://github.com/cyclopticnerve/PyPlate/releases/latest)
+(the **'Source code (zip)'** file should work an all platforms).
 
 2. Or you can clone the git repo to get the latest (and often broken) code from
    the main branch:
@@ -52,6 +53,7 @@ $ git clone https://github.com/cyclopticnerve/PyPlate
 ```
 
 ## Installing
+
 <!-- __RM_APP__ -->
 If you downloaded the zip file, extract it and go to the 'install' directory:
 ```bash
@@ -71,6 +73,8 @@ $ ./install.py
 <!-- __RM_APP__ -->
 
 ## Usage
+Read the full [documentation](https://cyclopticnerve.github.io/PyPlate).
+
 PyPlate consists of two main programs, 'pymaker' and 'pybaker'. The first
 is used to create the project, and the second is used to build an existing
 project as its development continues.
@@ -145,6 +149,7 @@ Wait a minute or two, and your docs should appear at
       https://\<username\>.github.io/\<repo_name\>
 
 ## Uninstalling
+
 <!-- __RM_APP__ -->
 Go to the source folder for PyPlate and run the uninstaller:
 ```bash
@@ -154,7 +159,11 @@ $ ./uninstall.py
 <!-- __RM_APP__ -->
 
 ## Documentation
-See the [documentation](https://cyclopticnerve.github.io/PyPlate)
+See the full [documentation](https://cyclopticnerve.github.io/PyPlate)
+
+## Developing
+If you are developing this project, make sure you run the "develop.py" script
+first to create the proper virtual environment (venv). 
 
 ## Notes
 If you have any sort of spellchecker in your IDE, *FOR GOD'S SAKE TURN IT OFF!*

@@ -40,7 +40,7 @@ import sys
 # ------------------------------------------------------------------------------
 
 # find path to prj/lib
-P_DIR_USR_INST = f"{Path.home()}/.local/share/pyplate"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -68,7 +68,8 @@ class PyMaker:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # commands to run
+    # commands
+    # NB: format params are inst dir, venv name, prog name, and cmd line
     S_CMD = (
         # cd to prj dir
         "cd {};"

@@ -9,12 +9,16 @@
 # shamelessly stolen from 
 # https://github.com/github/gitignore/blob/main/Python.gitignore
 
+# ------------------------------------------------------------------------------
+
 # my stuff
 .VSCodeCounter/
 *.code-workspace
 .venv*/
 dist/
 site/
+
+# ------------------------------------------------------------------------------
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

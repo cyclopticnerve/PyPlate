@@ -1,9 +1,0 @@
-{
-    "INST_NAME": "PyPlate",
-    "INST_VER": "0.1.0",
-    "INST_CONT": [
-        ".local/bin/pymaker",
-        ".local/bin/pybaker",
-        ".local/share/pyplate"
-    ]
-}

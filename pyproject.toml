@@ -30,4 +30,7 @@ requires-python = ">=3.10"
 [project.urls]
 Homepage = "https://github.com/cyclopticnerve/PyPlate"
 
+[tool.setuptools]
+packages = ["pyplate"]
+
 # -)

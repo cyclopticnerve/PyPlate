@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-01-04 19:15-0500\n"
+"POT-Creation-Date: 2026-01-04 12:49-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: en\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: develop.py:79
 #: install/install_base.py:161
 msgid "Done"
-msgstr ""
+msgstr "Donezo"
 
 #. I18N: step failed
 #: develop.py:81
@@ -110,19 +110,19 @@ msgstr ""
 
 #. I18N: help option help
 #: install/install_base.py:136
-#: src/pyplate.py:139
+#: src/pyplate.py:136
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
 #: install/install_base.py:148
-#: src/pyplate.py:152
+#: src/pyplate.py:149
 msgid "Use -h for help"
 msgstr ""
 
 #. I18N: process aborted
 #: install/install_base.py:165
-#: src/pyplate.py:176
+#: src/pyplate.py:173
 msgid "Aborted"
 msgstr ""
 
@@ -133,21 +133,19 @@ msgstr ""
 
 #. I18N: answer yes
 #: install/install_base.py:174
-#: src/pybaker.py:117
-#: src/pyplate.py:165
+#: src/pyplate.py:162
 msgid "y"
 msgstr ""
 
 #. I18N: answer no
 #: install/install_base.py:176
-#: src/pybaker.py:119
-#: src/pyplate.py:167
+#: src/pyplate.py:164
 msgid "N"
 msgstr ""
 
 #. I18N: an error occurred
 #: install/install_base.py:182
-#: src/pyplate.py:182
+#: src/pyplate.py:179
 msgid "Error:"
 msgstr ""
 
@@ -162,79 +160,66 @@ msgid "File {} is not a JSON file"
 msgstr ""
 
 #. I18N: uninstall the program
-#: install/uninstall.py:87
+#: install/uninstall.py:84
 msgid "Uninstalling {}"
 msgstr ""
 
 #. I18N: show the copy step
-#: install/uninstall.py:89
+#: install/uninstall.py:86
 msgid "Deleting files... "
 msgstr ""
 
 #. I18N: done uninstalling
-#: install/uninstall.py:92
+#: install/uninstall.py:89
 msgid "{} uninstalled"
 msgstr ""
 
 #. I18N: ask to uninstall
-#: install/uninstall.py:97
-#: src/pyplate.py:170
+#: install/uninstall.py:94
+#: src/pyplate.py:167
 msgid ""
 "This will uninstall {}.\n"
 "Do you want to continue?"
 msgstr ""
 
 #. I18N help string for ide cmd line option
-#: src/pybaker.py:65
+#: src/pybaker.py:64
 msgid "ask for project folder when running in IDE"
 msgstr ""
 
-#. I18N: lang option help
 #: src/pybaker.py:71
-msgid "add a language (*.po) file"
+msgid ""
+"add a language code ('en', 'en_US', etc.)\n"
+"(if used, -v is ignored)"
 msgstr ""
 
-#. I18N: lang file source
-#: src/pybaker.py:73
-msgid "FILE"
+#. I18N: config file dest
+#: src/pybaker.py:74
+msgid "LANG"
 msgstr ""
 
-#: src/pybaker.py:80
+#: src/pybaker.py:81
 msgid ""
 "set the new version of the project\n"
 "(if used, -l is ignored)"
 msgstr ""
 
 #. I18N: config file dest
-#: src/pybaker.py:83
+#: src/pybaker.py:84
 msgid "VERSION"
 msgstr ""
 
-#: src/pybaker.py:96
+#: src/pybaker.py:97
 msgid "Run this program from the directory of the project you want to build."
 msgstr ""
 
 #. I18N: language already exists in project.json and i18n folder
-#: src/pybaker.py:102
-msgid "Language file {} already exists"
-msgstr ""
-
 #: src/pybaker.py:103
-msgid "Could not get language code from {}"
+msgid "Language already exists"
 msgstr ""
 
 #: src/pybaker.py:109
 msgid "Baking {}"
-msgstr ""
-
-#. I18N: add language at cmd line
-#: src/pybaker.py:112
-msgid "Adding language file {}..."
-msgstr ""
-
-#. I18N: ask to overwrite
-#: src/pybaker.py:122
-msgid "The file {} already exists. Do you want to overwrite it?"
 msgstr ""
 
 #: src/pymaker.py:71
@@ -246,21 +231,21 @@ msgid "Making {}"
 msgstr ""
 
 #. I18N: debug mode help
-#: src/pyplate.py:132
+#: src/pyplate.py:129
 msgid "enable debugging mode"
 msgstr ""
 
 #. I18N: uninstall option help
-#: src/pyplate.py:146
+#: src/pyplate.py:143
 msgid "uninstall this program"
 msgstr ""
 
 #. I18N: uninstall not found
-#: src/pyplate.py:184
+#: src/pyplate.py:181
 msgid "Uninstall files not found"
 msgstr ""
 
 #. I18N: could not find -c file
-#: src/pyplate.py:187
+#: src/pyplate.py:184
 msgid "Config file {} not found"
 msgstr ""

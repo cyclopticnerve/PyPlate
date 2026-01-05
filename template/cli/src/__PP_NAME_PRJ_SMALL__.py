@@ -26,9 +26,13 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
-# local imports
+# third party imports
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -115,40 +119,13 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
 
-    #     # add cfg option
-    #     self._parser.add_argument(
-    #         self.S_ARG_CFG_OPTION,
-    #         dest=self.S_ARG_CFG_DEST,
-    #         help=self.S_ARG_CFG_HELP,
-    #         metavar=self.S_ARG_CFG_METAVAR,
-    #     )
-
-    #     # add debug option
-    #     self._parser.add_argument(
-    #         self.S_ARG_DBG_OPTION,
-    #         action=self.S_ARG_DBG_ACTION,
-    #         dest=self.S_ARG_DBG_DEST,
-    #         help=self.S_ARG_DBG_HELP,
-    #     )
-
-    #     # add install option
-    #     self._parser.add_argument(
-    #         self.S_ARG_INST_OPTION,
-    #         action=self.S_ARG_INST_ACTION,
-    #         dest=self.S_ARG_INST_DEST,
-    #         help=self.S_ARG_INST_HELP,
-    #     )
-
-    #     # add uninstall option
-    #     self._parser.add_argument(
-    #         self.S_ARG_UNINST_OPTION,
-    #         action=self.S_ARG_UNINST_ACTION,
-    #         dest=self.S_ARG_UNINST_DEST,
-    #         help=self.S_ARG_UNINST_HELP,
-    #     )
-
-    #     # do setup
+    # add cmd line args here
+    
+    #     # NB: do setup last
     #     super()._setup()
+
+    # NB: self._dict_args are now available
+    # as well as self._dict_cfg
 
     # --------------------------------------------------------------------------
     # Short description
@@ -213,7 +190,7 @@ if __name__ == "__main__":
     # create a new instance of the main class
     obj = __PP_NAME_PRJ_PASCAL__()
 
-    # run the new object
+    # run the instance
     obj.main()
 
 # -)

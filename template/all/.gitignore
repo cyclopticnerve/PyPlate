@@ -14,7 +14,7 @@
 # my stuff
 .VSCodeCounter/
 *.code-workspace
-__PP_NAME_VENV__/
+.venv*/
 __PP_DIR_DIST__/
 __PP_DIR_SITE__/
 

@@ -100,12 +100,12 @@ $ cd ~/Downloads/__PP_NAME_PRJ_BIG__/install
 
 Either way, run the install script:
 ```bash
-$ ./install
+$ ./install.py
 ```
 <!-- __RM_APP__ -->
 
 ## Usage
-Read the [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__).
+Read the full [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__).
 
 ## Uninstalling
 <!-- __RM_PKG__ -->
@@ -119,12 +119,12 @@ $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 Go to the source folder for __PP_NAME_PRJ_BIG__ and run the uninstaller:
 ```bash
 $ cd ~/.local/share/__PP_NAME_PRJ_SMALL__
-$ ./uninstall
+$ ./uninstall.py
 ```
 <!-- __RM_APP__ -->
 
 ## Documentation
-See the [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__).
+See the full [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__).
 
 ## Developing
 If you are developing this project, make sure you run the "develop.py" script

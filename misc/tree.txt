@@ -22,11 +22,16 @@
    │     └─ [] index.md
    ├─ [] i18n/
    │     ├─ [] locale/
-   │     │     └─ [] en/
+   │     │     ├─ [] en/
+   │     │     │     └─ [] LC_MESSAGES/
+   │     │     │           └─ [] pyplate.mo
+   │     │     └─ [] es/
    │     │           └─ [] LC_MESSAGES/
    │     │                 └─ [] pyplate.mo
    │     ├─ [] po/
    │     │     ├─ [] en/
+   │     │     │     └─ [] pyplate.po
+   │     │     ├─ [] es/
    │     │     │     └─ [] pyplate.po
    │     │     └─ [] LINGUAS
    │     └─ [] pot/
@@ -34,9 +39,9 @@
    ├─ [] images/
    │     └─ [] pyplate.png
    ├─ [] install/
+   │     ├─ [] install_base.py
    │     ├─ [] install.json
    │     ├─ [] install.py
-   │     ├─ [] uninstall.json
    │     └─ [] uninstall.py
    ├─ [] log/
    │     └─ [] pyplate.log
@@ -85,6 +90,7 @@
    │     │     ├─ [] images/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
    │     │     ├─ [] install/
+   │     │     │     ├─ [] install_base.py
    │     │     │     ├─ [] install.py
    │     │     │     └─ [] uninstall.py
    │     │     ├─ [] log/
@@ -93,6 +99,12 @@
    │     │     │     ├─ [] checklists/
    │     │     │     │     ├─ [] project.txt
    │     │     │     │     └─ [] style.txt
+   │     │     │     ├─ [] default_files/
+   │     │     │     │     ├─ [] class.py
+   │     │     │     │     ├─ [] default.html
+   │     │     │     │     ├─ [] default.md
+   │     │     │     │     ├─ [] module.py
+   │     │     │     │     └─ [] window.py
    │     │     │     └─ [] release.txt
    │     │     ├─ [] pyplate/
    │     │     │     └─ [] private/
@@ -102,7 +114,7 @@
    │     │     ├─ [] tests/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] todo/
-   │     │     │     └─ [] ABOUT
+   │     │     │     └─ [] todo.txt
    │     │     ├─ [] .gitignore
    │     │     ├─ [] LICENSE.txt
    │     │     ├─ [] README.md
@@ -144,6 +156,8 @@
    ├─ [] tests/
    │     ├─ [] check_keys.py
    │     ├─ [] fix_dicts.py
+   │     ├─ [] lang.py
+   │     ├─ [] spaceoddity.po
    │     └─ [] split.py
    ├─ [] todo/
    │     ├─ [] clean/
@@ -157,12 +171,14 @@
    │     │     ├─ [] cnwindow_w_state.py
    │     │     ├─ [] cnwindow.py
    │     │     └─ [] state.py
-   │     └─ [] todo.txt
+   │     ├─ [] todo.txt
+   │     └─ [] todo2.txt
    ├─ [] .gitignore
    ├─ [] LICENSE.txt
    ├─ [] PyPlate.code-workspace
    ├─ [] README.md
    ├─ [] develop.py
    ├─ [] mkdocs.yml
+   ├─ [] pyplate.po
    ├─ [] pyproject.toml
    └─ [] requirements.txt

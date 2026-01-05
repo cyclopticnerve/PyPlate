@@ -1,13 +1,11 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : SpaceOddity                                            /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: install.py                                            |     ()     |
-# Date    : 12/29/2025                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
-
-# pylint: disable=too-many-lines
 
 """
 The install script for this project
@@ -42,10 +40,20 @@ P_DIR_INSTALL = P_DIR_ASSETS / "__PP_DIR_INSTALL__"
 P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
 
 # get files
+P_FILE_CFG_UNINST = (
+    Path.home() / ".__PP_USR_INST__/__PP_DIR_INSTAL__/_PP_FILE_INST_CFG__"
+)
 P_FILE_CFG = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
 P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
 P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_IMG_DESK__"
+
+P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+
+# ------------------------------------------------------------------------------
+# Local imports
+# ------------------------------------------------------------------------------
 
 # fudge path to load base
 sys.path.append(str(P_DIR_INSTALL))
@@ -55,18 +63,17 @@ sys.path.append(str(P_DIR_INSTALL))
 import install_base as B  # type: ignore
 from install_base import _  # type: ignore
 from install_base import CNInstallBase  # type: ignore
+
 # pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-# get our local local path
-_ = B.get_i18n(P_DIR_ASSETS)
-
 # ------------------------------------------------------------------------------
 # Classes
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
@@ -82,6 +89,7 @@ class CNInstall(CNInstallBase):
     # Class constants
     # --------------------------------------------------------------------------
 
+    # strings
     # NB: format params are prog_name and prog_version
     # I18N: install the program
     S_MSG_INST_START = _("Installing {} Version {}")
@@ -134,6 +142,8 @@ class CNInstall(CNInstallBase):
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    # NB: format param is post install file name
+    S_CMD_RUN_EXT = "python {}"
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"
@@ -170,10 +180,27 @@ class CNInstall(CNInstallBase):
     # Class methods
     # --------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
     def __init__(self):
-        """docstring"""
+        """
+        Initialize the new object
+
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
+        """
+
+        # always call super
         super().__init__()
+
+        # redeclare prop for some reason?
         self._dict_cfg = {}
+
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Install the program
@@ -185,13 +212,14 @@ class CNInstall(CNInstallBase):
         Runs the install operation.
         """
 
-        # ----------------------------------------------------------------------
-
         # do setup
         self._setup()
 
         # get prj info from cfg
         self._get_project_info()
+
+        # do pre uninstall
+        self._do_external(P_FILE_PRE)
 
         # check for existing/old version
         self._compare_version()
@@ -210,6 +238,9 @@ class CNInstall(CNInstallBase):
 
         # wind down
         self._teardown()
+
+        # do post install
+        self._do_external(P_FILE_POST)
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -252,52 +283,58 @@ class CNInstall(CNInstallBase):
         (if present), compare the two values, and either continue or abort.
         """
 
+        # check for force to skip question
+        force = self._dict_args.get(self.S_ARG_FORCE_DEST, False)
+        if force:
+            return
+
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
-        if B.P_FILE_CFG_UNINST and B.P_FILE_CFG_UNINST.exists():
+        if not P_FILE_CFG_UNINST or not P_FILE_CFG_UNINST.exists():
+            return
 
-            try:
-                # get info from old cfg
-                dict_cfg_old = self._get_dict_from_file(B.P_FILE_CFG_UNINST)
-            except OSError as e:
-                print(self.S_ERR_ERR, e)
+        try:
+            # get info from old cfg
+            dict_cfg_old = self._get_dict_from_file(P_FILE_CFG_UNINST)
+        except OSError as e:
+            print(self.S_ERR_ERR, e)
 
-            # check versions
-            ver_old = dict_cfg_old[self.S_KEY_INST_VER]
-            ver_new = self._dict_cfg[self.S_KEY_INST_VER]
+        # check versions
+        ver_old = dict_cfg_old[self.S_KEY_INST_VER]
+        ver_new = self._dict_cfg[self.S_KEY_INST_VER]
 
-            # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
-            res = self._comp_sem_ver(ver_old, ver_new)
+        # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
+        res = self._comp_sem_ver(ver_old, ver_new)
 
-            # same version is installed
-            if res == self.I_VER_SAME:
+        # same version is installed
+        if res == self.I_VER_SAME:
 
-                # ask to install same version
-                str_ask = self._dialog(
-                    self.S_ASK_VER_SAME,
-                    [self.S_ASK_YES, self.S_ASK_NO],
-                    self.S_ASK_NO,
-                )
+            # ask to install same version
+            str_ask = self._dialog(
+                self.S_ASK_VER_SAME,
+                [self.S_ASK_YES, self.S_ASK_NO],
+                self.S_ASK_NO,
+            )
 
-                # user hit enter or typed anything else except "y"
-                if str_ask == self.S_ASK_NO:
-                    print(self.S_MSG_ABORT)
-                    sys.exit(-1)
+            # user hit enter or typed anything else except "y"
+            if str_ask != self.S_ASK_YES:
+                print(self.S_MSG_ABORT)
+                sys.exit(0)
 
-            # newer version is installed
-            elif res == self.I_VER_OLDER:
+        # newer version is installed
+        elif res == self.I_VER_OLDER:
 
-                # ask to install old version over newer
-                str_ask = self._dialog(
-                    self.S_ASK_VER_OLDER,
-                    [self.S_ASK_YES, self.S_ASK_NO],
-                    self.S_ASK_NO,
-                )
+            # ask to install old version over newer
+            str_ask = self._dialog(
+                self.S_ASK_VER_OLDER,
+                [self.S_ASK_YES, self.S_ASK_NO],
+                self.S_ASK_NO,
+            )
 
-                # user hit enter or typed anything else except "y"
-                if str_ask == self.S_ASK_NO:
-                    print(self.S_MSG_ABORT)
-                    sys.exit(-1)
+            # user hit enter or typed anything else except "y"
+            if str_ask != self.S_ASK_YES:
+                print(self.S_MSG_ABORT)
+                sys.exit(0)
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -477,9 +514,9 @@ class CNInstall(CNInstallBase):
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
         print(self.S_MSG_INST_END.format(prog_name))
 
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compare two semantic versions
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _comp_sem_ver(self, ver_old, ver_new):
         """
         Compare two semantic versions
@@ -607,16 +644,18 @@ class CNInstall(CNInstallBase):
         # error in one or both versions
         return self.I_VER_ERROR
 
+
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
+
     # Code to run when called from command line
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # create an instance of the class
+    # create a new instance of the main class
     inst = CNInstall()
 
     # run the instance

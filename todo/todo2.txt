@@ -1,0 +1,18 @@
+
+DONE: add --uninstall to pyplate
+DONE: leave template code to fudge path (used often)
+DONE: test develop.py
+DONE: cmd params not exclusive
+-l bakes in new .po
+-v bakes in new version
+
+NEXT: how to check for missing keys (see configurator in "other" dir)
+NEXT: spinning * at ... Done
+NEXT: don't run pm if 'pyplate' in path (recursion)
+NEXT: break conf into hook files
+NEXT: copy default files from template on make / (bake?)
+        also where does each file in misc come from
+        this should be a hodgepodge but should template be the master or pp?
+        need a chart of sources and dests
+NEXT: F.run that runs in venv
+

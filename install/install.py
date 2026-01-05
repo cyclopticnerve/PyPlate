@@ -2,16 +2,15 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
-# Date    : 09/23/2025                                            |            |
+# Date    : 12/29/2025                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# pylint: disable=too-many-lines
 """
 The install script for this project
 
-THis module installs the project, copying its files and folders to the
+This module installs the project, copying its files and folders to the
 appropriate locations on the user's computer.
 
 This file is real ugly b/c we can't access the venv, so we do it manually.
@@ -21,12 +20,7 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 # Imports
 # ------------------------------------------------------------------------------
 
-# NB: pure python
 # system imports
-import argparse
-import gettext
-import json
-import locale
 from pathlib import Path
 import re
 import shutil
@@ -42,67 +36,49 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 
 # get dirs
 P_DIR_ASSETS = P_DIR_PRJ / "assets"
-P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
-P_DIR_VENV = P_DIR_USR_INST / ".venv-pyplate"
 P_DIR_INSTALL = P_DIR_ASSETS / "install"
+P_DIR_VENV = Path.home() / ".local/share/pyplate/.venv-pyplate"
 
 # get files
-P_FILE_CFG_INST = P_DIR_INSTALL / "install.json"
 P_FILE_CFG_UNINST = (
-    P_DIR_USR_INST / "install/uninstall.json"
+    Path.home() / "..local/share/pyplate/__PP_DIR_INSTAL__/_PP_FILE_INST_CFG__"
 )
+P_FILE_CFG = P_DIR_INSTALL / "install.json"
 P_FILE_REQS = P_DIR_INSTALL / "requirements.txt"
-P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/CLI_DEBUG.desktop"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "images/cli_debug.png"
+P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
+P_FILE_DESK_ICON = P_DIR_ASSETS / ".local/share/pyplate/images/pyplate.png"
 
-S_ENCODING = "UTF-8"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+
+# ------------------------------------------------------------------------------
+# Local imports
+# ------------------------------------------------------------------------------
+
+# fudge path to load base
+sys.path.append(str(P_DIR_INSTALL))
+
+# local imports
+# pylint: disable=wrong-import-position
+import install_base as B  # type: ignore
+from install_base import _  # type: ignore
+from install_base import CNInstallBase  # type: ignore
+
+# pylint: enable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
-
-# path to project dir
-T_DIR_PRJ = P_DIR_ASSETS
-
-# init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
-
+# Classes
 # ------------------------------------------------------------------------------
-# A dummy class to combine multiple argparse formatters
-# ------------------------------------------------------------------------------
-class CNFormatter(
-    argparse.RawTextHelpFormatter, argparse.RawDescriptionHelpFormatter
-):
-    """
-    A dummy class to combine multiple argparse formatters
-
-    Args:
-        RawTextHelpFormatter: Maintains whitespace for all sorts of help text,
-        including argument descriptions.
-        RawDescriptionHelpFormatter: Indicates that description and epilog are
-        already correctly formatted and should not be line-wrapped.
-
-    A dummy class to combine multiple argparse formatters.
-    """
 
 
 # ------------------------------------------------------------------------------
 # The class to use for installing/uninstalling
 # ------------------------------------------------------------------------------
-class CNInstall:
+class CNInstall(CNInstallBase):
     """
     The class to use for installing a PyPlate program
 
@@ -113,74 +89,11 @@ class CNInstall:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # version check results
-    I_VER_OLDER = -1
-    I_VER_SAME = 0
-    I_VER_NEWER = 1
-    I_VER_ERROR = -2
-
-    # keys
-    S_KEY_INST_NAME = "INST_NAME"
-    S_KEY_INST_VER = "INST_VER"
-    S_KEY_INST_DESK = "INST_DESK"
-    S_KEY_INST_CONT = "INST_CONT"
-
-    # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
-    # pylint: enable=line-too-long
-
-    # version string
-    S_PP_VERSION = "Version 0.1.0"
-
-    # debug option strings
-    S_ARG_DRY_OPTION = "-d"
-    S_ARG_DRY_ACTION = "store_true"
-    S_ARG_DRY_DEST = "DRY_DEST"
-    # I18N help string for debug cmd line option
-    S_ARG_DRY_HELP = _("enable dry run mode")
-
-    # config option strings
-    S_ARG_HLP_OPTION = "-h"
-    S_ARG_HLP_ACTION = "store_true"
-    S_ARG_HLP_DEST = "HLP_DEST"
-    # I18N: help option help
-    S_ARG_HLP_HELP = _("show this help message and exit")
-
-    # about string (to be set by subclass)
-    S_ABOUT = (
-        "\n"
-        "PyPlate\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VERSION}\n"
-        "https://github.com/cyclopticnerve/PyPlate\n"
-    )
-
-    # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
-
-    # cmd line instructions string
-    S_EPILOG = ""
-
-    # errors
-
-    # I18N: an error occurred
-    S_ERR_ERR = _("Error: ")
-
-    # --------------------------------------------------------------------------
-
-    # messages
+    # strings
     # NB: format params are prog_name and prog_version
     # I18N: install the program
     S_MSG_INST_START = _("Installing {} Version {}")
     # NB: format param is prog_name
-    # I18N: done installing
-    S_MSG_INST_END = _("{} installed")
-    # I18N: done with step
-    S_MSG_DONE = _("Done")
-    # I18N: step failed
-    S_MSG_FAIL = _("Failed")
     # I18N: show the copy step
     S_MSG_COPY_START = _("Copying files... ")
     # I18N: show the venv step
@@ -189,14 +102,10 @@ class CNInstall:
     S_MSG_REQS_START = _("Installing requirements... ")
     # I18N: show desktop step
     S_MSG_DSK_START = _("Fixing .desktop file... ")
-    # I18N: install aborted
-    S_MSG_ABORT = _("Installation aborted")
+    # I18N: done installing
+    S_MSG_INST_END = _("{} installed")
 
     # questions
-    # I18N: answer yes
-    S_ASK_YES = _("y")
-    # I18N: answer no
-    S_ASK_NO = _("n")
     # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
         "The current version of this program is already installed.\nDo you "
@@ -209,14 +118,6 @@ class CNInstall:
     )
 
     # errors
-    # I18N: an error occurred
-    S_ERR_ERR = _("Error:")
-    # NB: format param is file path
-    # I18N: config file not found
-    S_ERR_NOT_FOUND = _("File {} not found")
-    # NB: format param is file path
-    # I18N: config file is not valid json
-    S_ERR_NOT_JSON = _("File {} is not a JSON file")
     # I18N: version numbers invalid
     S_ERR_VERSION = _("One or both version numbers are invalid")
     # NB: format param is source path
@@ -241,6 +142,8 @@ class CNInstall:
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    # NB: format param is post install file name
+    S_CMD_RUN_EXT = "python {}"
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"
@@ -278,137 +181,45 @@ class CNInstall:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Initialize the class
+    # Initialize the new object
     # --------------------------------------------------------------------------
     def __init__(self):
         """
-        Initialize the class
+        Initialize the new object
 
-        Creates a new instance of the object and initializes its properties.
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
         """
 
-        # set arg properties
-        self._dict_args = {}
-        self._dry_run = False
+        # always call super
+        super().__init__()
 
-        # project stuff
-        # NB: set to path objects to avoid comparing to None
-        self._dir_assets = Path()
-        self._dir_usr_inst = Path()
-        self._path_cfg_inst = Path()
-        self._path_cfg_uninst = Path()
-        self._dir_venv = Path()
-        self._path_reqs = Path()
-        self._file_desk = Path()
-        self._file_desk_icon = Path()
-
-        # config stuff
+        # redeclare prop for some reason?
         self._dict_cfg = {}
 
-        # cmd line stuff
-        # NB: placeholder to avoid comparing to None
-        self._parser = argparse.ArgumentParser()
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Install the program
     # --------------------------------------------------------------------------
-    def main(
-        self,
-        dir_assets,
-        dir_usr_inst,
-        path_cfg_inst,
-        path_cfg_uninst,
-        dir_venv,
-        path_reqs,
-        file_desk=None,
-        file_desk_icon=None,
-    ):
+    def main(self):
         """
         Install the program
 
-        Args:
-            dir_assets: Path to the assets folder where all of the program
-            files are put in dist. This is the base source path to use when
-            copying files to the user's computer
-            dir_usr_inst: The program's install folder in which to place files
-            path_cfg_inst: Path to the file that contains the current install
-            dict info
-            path_cfg_uninst: Path to the currently installed program's
-            uninstall dict info
-            dir_venv: The path to the venv folder to create
-            path_reqs: Path to the requirements.txt file to add requirements to
-            the venv
-            file_desk: Path to the .desktop file (if GUI) (default: None)
-            file_desk_icon: Path to the .desktop file icon (if GUI) (default:
-            None)
-
         Runs the install operation.
         """
-
-        # set props from params
-        if dir_assets:
-            dir_assets = Path(dir_assets)
-            if not dir_assets.is_absolute():
-                # make abs rel to self
-                dir_assets = P_DIR_PRJ / dir_assets
-        self._dir_assets = dir_assets
-
-        if dir_usr_inst:
-            dir_usr_inst = Path(dir_usr_inst)
-            if not dir_usr_inst.is_absolute():
-                # make abs rel to self
-                dir_usr_inst = self._dir_assets / dir_usr_inst
-        self._dir_usr_inst = dir_usr_inst
-
-        if path_cfg_inst:
-            path_cfg_inst = Path(path_cfg_inst)
-            if not path_cfg_inst.is_absolute():
-                # make abs rel to self
-                path_cfg_inst = self._dir_assets / path_cfg_inst
-        self._path_cfg_inst = path_cfg_inst
-
-        if path_cfg_uninst:
-            path_cfg_uninst = Path(path_cfg_uninst)
-            if not path_cfg_uninst.is_absolute():
-                # make abs rel to self
-                path_cfg_uninst = self._dir_assets / path_cfg_uninst
-        self._path_cfg_uninst = path_cfg_uninst
-
-        if dir_venv:
-            dir_venv = Path(dir_venv)
-            if not dir_venv.is_absolute():
-                # make abs rel to self
-                dir_venv = self._dir_assets / dir_venv
-        self._dir_venv = dir_venv
-
-        if path_reqs:
-            path_reqs = Path(path_reqs)
-            if not path_reqs.is_absolute():
-                # make abs rel to self
-                path_reqs = self._dir_assets / path_reqs
-        self._path_reqs = path_reqs
-
-        if file_desk:
-            file_desk = Path(file_desk)
-            if not file_desk.is_absolute():
-                # make abs rel to self
-                file_desk = self._dir_assets / file_desk
-        self._file_desk = file_desk
-
-        if file_desk_icon:
-            file_desk_icon = Path(file_desk_icon)
-            if not file_desk_icon.is_absolute():
-                # make abs rel to self
-                file_desk_icon = self._dir_assets / file_desk_icon
-        self._file_desk_icon = file_desk_icon
-
-        # ----------------------------------------------------------------------
 
         # do setup
         self._setup()
 
         # get prj info from cfg
         self._get_project_info()
+
+        # do pre uninstall
+        self._do_external(P_FILE_PRE)
 
         # check for existing/old version
         self._compare_version()
@@ -428,53 +239,14 @@ class CNInstall:
         # wind down
         self._teardown()
 
+        # do post install
+        self._do_external(P_FILE_POST)
+
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
 
     # NB: these are the main steps, called in order from main()
-
-    # --------------------------------------------------------------------------
-    # Boilerplate to use at the start of main
-    # --------------------------------------------------------------------------
-    def _setup(self):
-        """
-        Boilerplate to use at the start of main
-
-        Perform some mundane stuff like setting properties.
-        """
-
-        # print default about text
-        print(self.S_ABOUT)
-
-        # create a parser object in case we need it
-        self._parser = argparse.ArgumentParser(
-            add_help=False,
-            epilog=self.S_EPILOG,
-            formatter_class=CNFormatter,
-        )
-
-        # add help text to about block
-        print(self.S_ABOUT_HELP)
-
-        # add dry run option
-        self._parser.add_argument(
-            self.S_ARG_DRY_OPTION,
-            dest=self.S_ARG_DRY_DEST,
-            help=self.S_ARG_DRY_HELP,
-            action=self.S_ARG_DRY_ACTION,
-        )
-
-        # add help option
-        self._parser.add_argument(
-            self.S_ARG_HLP_OPTION,
-            dest=self.S_ARG_HLP_DEST,
-            help=self.S_ARG_HLP_HELP,
-            action=self.S_ARG_HLP_ACTION,
-        )
-
-        # parse command line
-        self._do_cmd_line()
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -488,7 +260,7 @@ class CNInstall:
 
         try:
             # get project info
-            self._dict_cfg = self._get_dict_from_file(self._path_cfg_inst)
+            self._dict_cfg = self._get_dict_from_file(P_FILE_CFG)
         except OSError as e:
             print(self.S_ERR_ERR, e)
 
@@ -501,40 +273,6 @@ class CNInstall:
         print(self.S_MSG_INST_START.format(prog_name, prog_version))
 
     # --------------------------------------------------------------------------
-    # These are the small parts, called from the bigger parts
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Parse the arguments from the command line
-    # --------------------------------------------------------------------------
-    def _do_cmd_line(self):
-        """
-        Parse the arguments from the command line
-
-        Parse the arguments from the command line, after the parser has been
-        set up.
-        """
-
-        # get namespace object
-        args = self._parser.parse_args()
-
-        # convert namespace to dict
-        self._dict_args = vars(args)
-
-        # if -h passed, this will print and exit
-        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
-            self._parser.print_help()
-            sys.exit(-1)
-
-        # no -h, print epilog
-        print(self.S_EPILOG)
-
-        # ----------------------------------------------------------------------
-
-        # get the args
-        self._dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
-
-    # --------------------------------------------------------------------------
     # Check version info
     # --------------------------------------------------------------------------
     def _compare_version(self):
@@ -545,52 +283,58 @@ class CNInstall:
         (if present), compare the two values, and either continue or abort.
         """
 
+        # check for force to skip question
+        force = self._dict_args.get(self.S_ARG_FORCE_DEST, False)
+        if force:
+            return
+
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
-        if self._path_cfg_uninst and Path(self._path_cfg_uninst).exists():
+        if not P_FILE_CFG_UNINST or not P_FILE_CFG_UNINST.exists():
+            return
 
-            try:
-                # get info from old cfg
-                dict_cfg_old = self._get_dict_from_file(self._path_cfg_uninst)
-            except OSError as e:
-                print(self.S_ERR_ERR, e)
+        try:
+            # get info from old cfg
+            dict_cfg_old = self._get_dict_from_file(P_FILE_CFG_UNINST)
+        except OSError as e:
+            print(self.S_ERR_ERR, e)
 
-            # check versions
-            ver_old = dict_cfg_old[self.S_KEY_INST_VER]
-            ver_new = self._dict_cfg[self.S_KEY_INST_VER]
+        # check versions
+        ver_old = dict_cfg_old[self.S_KEY_INST_VER]
+        ver_new = self._dict_cfg[self.S_KEY_INST_VER]
 
-            # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
-            res = self._comp_sem_ver(ver_old, ver_new)
+        # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
+        res = self._comp_sem_ver(ver_old, ver_new)
 
-            # same version is installed
-            if res == self.I_VER_SAME:
+        # same version is installed
+        if res == self.I_VER_SAME:
 
-                # ask to install same version
-                str_ask = self._dialog(
-                    self.S_ASK_VER_SAME,
-                    [self.S_ASK_YES, self.S_ASK_NO],
-                    self.S_ASK_NO,
-                )
+            # ask to install same version
+            str_ask = self._dialog(
+                self.S_ASK_VER_SAME,
+                [self.S_ASK_YES, self.S_ASK_NO],
+                self.S_ASK_NO,
+            )
 
-                # user hit enter or typed anything else except "y"
-                if str_ask == self.S_ASK_NO:
-                    print(self.S_MSG_ABORT)
-                    sys.exit(-1)
+            # user hit enter or typed anything else except "y"
+            if str_ask != self.S_ASK_YES:
+                print(self.S_MSG_ABORT)
+                sys.exit(0)
 
-            # newer version is installed
-            elif res == self.I_VER_OLDER:
+        # newer version is installed
+        elif res == self.I_VER_OLDER:
 
-                # ask to install old version over newer
-                str_ask = self._dialog(
-                    self.S_ASK_VER_OLDER,
-                    [self.S_ASK_YES, self.S_ASK_NO],
-                    self.S_ASK_NO,
-                )
+            # ask to install old version over newer
+            str_ask = self._dialog(
+                self.S_ASK_VER_OLDER,
+                [self.S_ASK_YES, self.S_ASK_NO],
+                self.S_ASK_NO,
+            )
 
-                # user hit enter or typed anything else except "y"
-                if str_ask == self.S_ASK_NO:
-                    print(self.S_MSG_ABORT)
-                    sys.exit(-1)
+            # user hit enter or typed anything else except "y"
+            if str_ask != self.S_ASK_YES:
+                print(self.S_MSG_ABORT)
+                sys.exit(0)
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -609,7 +353,7 @@ class CNInstall:
         print(self.S_MSG_VENV_START, flush=True, end="")
 
         # the command to create a venv
-        cmd = self.S_CMD_CREATE.format(self._dir_venv)
+        cmd = self.S_CMD_CREATE.format(P_DIR_VENV)
 
         # if it's a dry run, don't make venv
         if self._dry_run:
@@ -646,7 +390,7 @@ class CNInstall:
 
         # the command to install packages to venv from reqs
         cmd = self.S_CMD_TYPE_INST.format(
-            self._dir_venv.parent, self._dir_venv.name, self._path_reqs
+            P_DIR_VENV.parent, P_DIR_VENV.name, P_FILE_REQS
         )
 
         # if it's a dry run, don't install
@@ -690,18 +434,18 @@ class CNInstall:
 
         # don't mess with file
         if self._dry_run:
-            print(self.S_DRY_DESK_ICON.format(self._file_desk_icon))
+            print(self.S_DRY_DESK_ICON.format(P_FILE_DESK_ICON))
             print(self.S_MSG_DONE)
             return
 
         # sanity check (params to main might be None)
-        if not self._file_desk or not self._file_desk_icon:
+        if not P_FILE_DESK or not P_FILE_DESK_ICON:
             print(self.S_ERR_NO_DESK)
             return
 
         # open file
         text = ""
-        with open(self._file_desk, "r", encoding=S_ENCODING) as a_file:
+        with open(P_FILE_DESK, "r", encoding=B.S_ENCODING) as a_file:
             text = a_file.read()
 
         # find icon line and fix
@@ -709,7 +453,7 @@ class CNInstall:
         if res:
 
             # get user's home and path to icon rel to prj
-            path_icon = Path.home() / self._file_desk_icon
+            path_icon = Path.home() / P_FILE_DESK_ICON
 
             # fix abs path to icon
             r_icon_rep = self.R_ICON_REP.format(path_icon)
@@ -718,7 +462,7 @@ class CNInstall:
             # ------------------------------------------------------------------
 
             # write fixed text back to file
-            with open(self._file_desk, "w", encoding=S_ENCODING) as a_file:
+            with open(P_FILE_DESK, "w", encoding=B.S_ENCODING) as a_file:
                 a_file.write(text)
 
         # show some info
@@ -745,7 +489,7 @@ class CNInstall:
         for k, v in content.items():
 
             # get full paths of source / destination
-            src = self._dir_assets / k
+            src = P_DIR_ASSETS / k
             dst = Path.home() / v / src.name
 
             # debug may omit certain assets
@@ -766,140 +510,13 @@ class CNInstall:
         # show some info
         print(self.S_MSG_DONE)
 
-    # --------------------------------------------------------------------------
-    # Boilerplate to use at the end of main
-    # --------------------------------------------------------------------------
-    def _teardown(self):
-        """
-        Boilerplate to use at the end of main
-
-        Perform some mundane stuff like saving config files.
-        """
-
         # just show we are done
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
         print(self.S_MSG_INST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
-    # These are the minor steps, called from major steps for support
-    # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # Get a dict from a file
-    # --------------------------------------------------------------------------
-    def _get_dict_from_file(self, a_file):
-        """
-        Get a dict from a file
-
-        Args:
-            a_file: The file to load the dict from
-
-        Raises:
-            OSError if the file cannot be found or is not a valid JSON file
-
-        Returns:
-            The dict found in the file
-
-        Get a dict from a file, checking if the file exists and is a valid JSON
-        file
-
-        """
-        # default result
-        a_dict = {}
-
-        try:
-            # get dict from file
-            with open(a_file, "r", encoding=S_ENCODING) as a_file:
-                a_dict = json.load(a_file)
-
-        # file not found
-        except FileNotFoundError as e:
-            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
-
-        # not valid json in file
-        except json.JSONDecodeError as e:
-            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
-
-        # return result
-        return a_dict
-
-    # --------------------------------------------------------------------------
-    # Create a dialog-like question and return the result
-    # --------------------------------------------------------------------------
-    def _dialog(
-        self, message, buttons, default="", btn_sep="/", msg_fmt="{} [{}]: "
-    ):
-        """
-        Create a dialog-like question and return the result
-
-        Args:
-            message: The message to display
-            buttons: List of single char answers to the question
-            default: The button item to return when the user presses Enter at \
-                the question (default: "")
-            btn_sep: Char to use to separate button items
-            msg_fmt: Format string to present message/buttons to the user
-
-        Returns:
-            String that matches button (or empty string if entered option is not in button list)
-
-        This method returns the string entered on the command line in response to a
-        question. If the entered option does not match any of the buttons, a blank
-        string is returned. If you set a default and the option entered is just the
-        Return key, the default string will be returned. If no default is present,
-        the entered string must match one of the buttons array values. All returned
-        values are lowercased. The question will be repeatedly printed to the
-        screen until a valid entry is made.
-
-        Note that if default == "", pressing Enter is not considered a valid entry.
-        """
-
-        # make all params lowercase
-        buttons = [item.lower() for item in buttons]
-        default = default.lower()
-
-        # ----------------------------------------------------------------------
-
-        # if we passes a default
-        if default != "":
-
-            # find the default
-            if not default in buttons:
-
-                # not found, add at end of buttons
-                buttons.append(default)
-
-            # upper case it
-            buttons[buttons.index(default)] = default.upper()
-
-        # ----------------------------------------------------------------------
-
-        # add buttons to message
-        btns_all = btn_sep.join(buttons)
-        str_fmt = msg_fmt.format(message, btns_all)
-
-        # lower everything again for compare
-        buttons = [item.lower() for item in buttons]
-
-        # ----------------------------------------------------------------------
-
-        while True:
-
-            # ask the question, get the result
-            inp = input(str_fmt)
-            inp = inp.lower()
-
-            # # no input (empty)
-            if inp == "" and default != "":
-                return default
-
-            # input a button
-            if inp in buttons:
-                return inp
-
-    # ------------------------------------------------------------------------------
     # Compare two semantic versions
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _comp_sem_ver(self, ver_old, ver_new):
         """
         Compare two semantic versions
@@ -1032,25 +649,17 @@ class CNInstall:
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
+
     # Code to run when called from command line
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # create an instance of the class
+    # create a new instance of the main class
     inst = CNInstall()
 
     # run the instance
-    inst.main(
-        P_DIR_ASSETS,
-        P_DIR_USR_INST,
-        P_FILE_CFG_INST,
-        P_FILE_CFG_UNINST,
-        P_DIR_VENV,
-        P_FILE_REQS,
-        P_FILE_DESK,
-        P_FILE_DESK_ICON,
-    )
+    inst.main()
 
 
 # -)
