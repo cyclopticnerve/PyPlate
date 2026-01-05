@@ -1,4 +1,6 @@
 
+# FIXME: THE FUCKING DOCS_USE_RM !!!
+
 DONE: add --uninstall to pyplate
 DONE: leave template code to fudge path (used often)
 DONE: test develop.py
