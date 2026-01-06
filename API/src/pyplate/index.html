@@ -252,9 +252,9 @@ PyPlate project from a template.</p>
     # questions
 
     # I18N: answer yes
-    S_ASK_YES = _("y")
-    # I18N: answer no
-    S_ASK_NO = _("N")
+    # S_ASK_YES = _("y")
+    # # I18N: answer no
+    # S_ASK_NO = _("N")
     # NB: format param is prog name
     # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
@@ -486,12 +486,12 @@ PyPlate project from a template.</p>
         # ask to uninstall
         str_ask = F.dialog(
             self.S_ASK_UNINST.format("PyPlate"),
-            [self.S_ASK_YES, self.S_ASK_NO],
-            self.S_ASK_NO,
+            [F.S_ASK_YES, F.S_ASK_NO],
+            default=F.S_ASK_NO,
         )
 
         # user hit enter or typed "n/N"
-        if str_ask != self.S_ASK_YES:
+        if str_ask != F.S_ASK_YES:
             print(self.S_MSG_ABORT)
             sys.exit(0)
 
