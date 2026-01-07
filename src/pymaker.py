@@ -170,11 +170,11 @@ class PyMaker(PyPlate):
         if not ver_ok:
             res = F.dialog(
                 P.C.S_ERR_SEM_VER,
-                [P.C.S_ERR_SEM_VER_Y, P.C.S_ERR_SEM_VER_N],
-                default=P.C.S_ERR_SEM_VER_N,
+                [F.S_ASK_YES, F.S_ASK_NO],
+                default=F.S_ASK_NO,
                 # loop=True
             )
-            if res == P.C.S_ERR_SEM_VER_N:
+            if res != F.S_ASK_YES:
                 P.sys.exit(-1)
 
         # ----------------------------------------------------------------------

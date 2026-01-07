@@ -113,10 +113,10 @@ class PyBaker(PyPlate):
 
     # questions
 
-    # I18N: answer yes
-    S_ASK_YES = _("y")
-    # I18N: answer no
-    S_ASK_NO = _("N")
+    # # I18N: answer yes
+    # S_ASK_YES = _("y")
+    # # I18N: answer no
+    # S_ASK_NO = _("N")
     # NB: format param is file name
     # I18N: ask to overwrite
     S_ASK_OVER = _("The file {} already exists. Do you want to overwrite it?")
@@ -447,11 +447,11 @@ class PyBaker(PyPlate):
             if not ver_ok:
                 res = F.dialog(
                     P.C.S_ERR_SEM_VER,
-                    [P.C.S_ERR_SEM_VER_Y, P.C.S_ERR_SEM_VER_N],
-                    default=P.C.S_ERR_SEM_VER_N,
+                    [F.S_ASK_YES, F.S_ASK_NO],
+                    default=F.S_ASK_NO,
                     loop=True,
                 )
-                if res == P.C.S_ERR_SEM_VER_N:
+                if res != F.S_ASK_YES:
                     P.sys.exit(-1)
 
         # not passed, ask question
@@ -555,9 +555,9 @@ class PyBaker(PyPlate):
             # ask to overwrite
             msg = self.S_ASK_OVER.format(lang_file)
             ask = F.dialog(
-                msg, [self.S_ASK_YES, self.S_ASK_NO], default=self.S_ASK_NO
+                msg, [F.S_ASK_YES, F.S_ASK_NO], default=F.S_ASK_NO
             )
-            if ask != self.S_ASK_YES:
+            if ask != F.S_ASK_YES:
                 F.printc(P.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
                 return
 

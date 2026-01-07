@@ -1,5 +1,7 @@
 
-# FIXME: THE FUCKING DOCS_USE_RM !!!
+FIXME: THE FUCKING DOCS_USE_RM !!!
+
+TODO: make pp in pp
 
 DONE: add --uninstall to pyplate
 DONE: leave template code to fudge path (used often)

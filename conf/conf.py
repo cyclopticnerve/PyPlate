@@ -56,6 +56,7 @@ import src.pyplate as PP
 
 # ABSOLUTE CURRENT PATH OF PyPlate
 P_DIR_PP = Path(__file__).parents[1].resolve()
+P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
@@ -110,6 +111,10 @@ S_VER_DISP_FMT = _("Version {}")
 S_VER_DIST_FMT = "{}-{}"
 
 # ask questions
+# # I18N: answer yes
+# S_ASK_YES = _("y")
+# # I18N: answer no
+# S_ASK_NO = _("N")
 # I18N: ask prj name
 S_ASK_NAME = _("Project name: ")
 # NB: format params are L_TYPES[item][0] and L_TYPES[item][1]
@@ -179,10 +184,6 @@ S_ERR_SEM_VER = _(
     "Warning: version number does not match S_SEM_VER_VALID\n"
     "See https://semver.org/"
 )
-# I18N: continue with bad sem ver
-S_ERR_SEM_VER_Y = _("y")
-# I18N: quit if bad sem ver (the default, should be capitalized)
-S_ERR_SEM_VER_N = _("N")
 # I18N: Cannot run pymaker in PyPlate dir
 S_ERR_PRJ_DIR_IS_PP = _("Cannot run pymaker in PyPlate dir")
 # NB: format params are S_FILE_DSK_TMP and __PP_FILE_DESK__
@@ -200,11 +201,12 @@ S_ERR_NO_SCREENSHOT = _("Create the file {}")
 
 # error installing reqs
 # I18N: need internet connection to install requirements
-S_MSG_NO_INTERNET = _("Make sure you are connected to the internet")
-
+S_ERR_NO_INTERNET = _("Make sure you are connected to the internet")
 # error pushing docs
 # I18N: make sure repo exists
 S_ERR_NO_REPO = _("Make sure you have pushed your repo after PyMaker")
+
+# messages
 
 # debug-specific strings
 # I18N: warn if running in debug mode
@@ -450,6 +452,10 @@ S_CMD_GIT_CREATE = "cd {}; git init -q"
 S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python -m pip install -e ."
 # NB: format params are prj dir, venv name, and reqs file
 S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python -m pip install -r {}"
+
+# mkdocs commands
+# S_CMD_DOC_BUILD = "mkdocs build"
+S_CMD_DOC_DEPLOY = "mkdocs gh-deploy"
 
 # ------------------------------------------------------------------------------
 # regex stuff
@@ -1346,7 +1352,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # --------------------------------------------------------------------------
-    # venv
+    # create venv
 
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
@@ -1356,31 +1362,27 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # get name ov venv folder and reqs file
         dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-        # file_reqs = dir_prj / S_FILE_REQS
 
-        # do the thing with the thing
+        # create a cnvenv object
+        cv = CNVenv(dir_prj, dir_venv)
+
+        # create venv
         try:
-            cv = CNVenv(dir_prj, dir_venv)
             cv.create()
-            # cv.install_reqs(file_reqs)
             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:
             # exit gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
             F.printd(S_ERR_ERR, str(e))
-            # sys.exit(-1)
 
         # print info
         print(S_ACTION_REQS, end="", flush=True)
 
-        # get name ov venv folder and reqs file
-        # dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+        # get name of venv folder and reqs file
         file_reqs = dir_prj / S_FILE_REQS
 
-        # do the thing with the thing
+        # install requirements
         try:
-            cv = CNVenv(dir_prj, dir_venv)
-            # cv.create()
             cv.install_reqs(file_reqs)
             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:
@@ -1747,7 +1749,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             # path to desktop template
             path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
             # path to desktop output
-            path_dsk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
+            path_dsk_out = (
+                dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
+            )
 
             # do the thing
             try:
@@ -1784,7 +1788,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # make sure lang matches folder
             # lang = Path(item).parent.stem
-            str_pattern2 = S_PO_LANG_SCH
+            # str_pattern2 = S_PO_LANG_SCH
             # str_rep2 = S_PO_LANG_REP.format(lang)
 
             # open file and get contents
@@ -1806,7 +1810,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
         # print done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
 
     # --------------------------------------------------------------------------
     # add/remove placeholders
@@ -1847,24 +1850,24 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # install package in itself
 
-    # if venv flag is set
-    if dict_dbg[S_KEY_DBG_VENV]:
+    # if venv flag is set and it is the right type (package)
+    if dict_dbg[S_KEY_DBG_VENV] and prj_type in L_INST_SELF:
 
-        # if it is the right type (package)
-        if prj_type in L_INST_SELF:
+        print(S_ACTION_EDIT, end="", flush=True)
 
-            print(S_ACTION_EDIT, end="", flush=True)
+        # get venv name
+        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
 
-            try:
-                dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-                F.run(
-                    S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
-                    shell=True,
-                )
-                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-            except F.CNRunError as e:
-                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd(S_ERR_ERR, str(e))
+        # install
+        try:
+            F.run(
+                S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
+                shell=True, capture_output=True
+            )
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        except F.CNRunError as e:
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd(S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # docs
@@ -2006,7 +2009,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     """
 
     # --------------------------------------------------------------------------
-    # venv
+    # freeze venv
 
     # if venv flag is set
     if dict_dbg[S_KEY_DBG_VENV]:
@@ -2030,7 +2033,6 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
                 # exit gracefully
                 F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
                 F.printd(S_ERR_ERR, str(e))
-                # sys.exit(-1)
 
     # --------------------------------------------------------------------------
     # docs
@@ -2038,12 +2040,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # if docs flag is set
     if dict_dbg[S_KEY_DBG_DOCS]:
 
-        # get props from dicts
-        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-        dir_venv = dir_prj / dir_venv
-
-        # bake docs
-        mkdocs = CNMkDocs()
+        # "I expect the BEST!" - Debbie Hunt
         deploy = True
 
         # ------------------------------------------------------------------------------
@@ -2051,22 +2048,20 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         # print info
         print(S_ACTION_BAKE_DOCS, end="", flush=True)
 
+        # get docs object
+        cm = CNMkDocs()
+
         # the command to make or bake docs
         try:
-            mkdocs.build_docs(
-                dir_prj,
-                P_DIR_PP,
-                dir_venv,
-            )
+            cm.build_docs(P_DIR_PP_VENV, dir_prj)
             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:
+            deploy = False
             # fail gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            # F.printc(S_ERR_NO_REPO, fg=F.C_FG_WHITE, bg=F.C_BG_RED, bold=True)
             F.printd(S_ERR_ERR, str(e))
-            deploy = False
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         if deploy:
 
@@ -2075,11 +2070,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
 
             # the command to make or bake docs
             try:
-                mkdocs.deploy_docs(
-                    dir_prj,
-                    P_DIR_PP,
-                    dir_venv,
-                )
+                cm.deploy_docs(P_DIR_PP_VENV, dir_prj)
                 F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
             except F.CNRunError as e:
                 # fail gracefully

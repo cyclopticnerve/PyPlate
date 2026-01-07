@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-01-04 19:15-0500\n"
+"POT-Creation-Date: 2026-01-07 17:28-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,13 +19,13 @@ msgstr ""
 
 #. I18N: done with step
 #: develop.py:79
-#: install/install_base.py:161
+#: install/install_base.py:168
 msgid "Done"
 msgstr "Donezo"
 
 #. I18N: step failed
 #: develop.py:81
-#: install/install_base.py:163
+#: install/install_base.py:170
 msgid "Failed"
 msgstr ""
 
@@ -103,61 +103,62 @@ msgstr ""
 msgid "enable dry run mode"
 msgstr ""
 
-#. I18N: uninstall option help
+#. I18N: force option help
 #: install/install_base.py:129
 msgid "force install this program"
 msgstr ""
 
-#. I18N: help option help
+#. I18N: quiet option help
 #: install/install_base.py:136
+msgid "do not print about message"
+msgstr ""
+
+#. I18N: help option help
+#: install/install_base.py:143
 #: src/pyplate.py:139
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
-#: install/install_base.py:148
+#: install/install_base.py:155
 #: src/pyplate.py:152
 msgid "Use -h for help"
 msgstr ""
 
 #. I18N: process aborted
-#: install/install_base.py:165
+#: install/install_base.py:172
 #: src/pyplate.py:176
 msgid "Aborted"
 msgstr ""
 
 #. I18N: run external script
-#: install/install_base.py:168
+#: install/install_base.py:175
 msgid "Running {}... "
 msgstr ""
 
 #. I18N: answer yes
-#: install/install_base.py:174
-#: src/pybaker.py:117
-#: src/pyplate.py:165
+#: install/install_base.py:181
 msgid "y"
 msgstr ""
 
 #. I18N: answer no
-#: install/install_base.py:176
-#: src/pybaker.py:119
-#: src/pyplate.py:167
+#: install/install_base.py:183
 msgid "N"
 msgstr ""
 
 #. I18N: an error occurred
-#: install/install_base.py:182
+#: install/install_base.py:189
 #: src/pyplate.py:182
 msgid "Error:"
 msgstr ""
 
 #. I18N: config file not found
-#: install/install_base.py:185
+#: install/install_base.py:192
 msgid "File {} not found"
 msgstr ""
 
 #. I18N: config file is not valid json
-#: install/install_base.py:188
+#: install/install_base.py:195
 msgid "File {} is not a JSON file"
 msgstr ""
 
@@ -176,6 +177,12 @@ msgstr ""
 msgid "{} uninstalled"
 msgstr ""
 
+#. I18N: ask to uninstall
+#. I18N: answer yes
+#. S_ASK_YES = _("y")
+#. # I18N: answer no
+#. S_ASK_NO = _("N")
+#. NB: format param is prog name
 #. I18N: ask to uninstall
 #: install/uninstall.py:97
 #: src/pyplate.py:170
@@ -232,6 +239,11 @@ msgstr ""
 msgid "Adding language file {}..."
 msgstr ""
 
+#. I18N: answer yes
+#. S_ASK_YES = _("y")
+#. I18N: answer no
+#. S_ASK_NO = _("N")
+#. NB: format param is file name
 #. I18N: ask to overwrite
 #: src/pybaker.py:122
 msgid "The file {} already exists. Do you want to overwrite it?"
