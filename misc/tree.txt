@@ -157,7 +157,6 @@
    │     ├─ [] check_keys.py
    │     ├─ [] fix_dicts.py
    │     ├─ [] lang.py
-   │     ├─ [] spaceoddity.po
    │     └─ [] split.py
    ├─ [] todo/
    │     ├─ [] clean/

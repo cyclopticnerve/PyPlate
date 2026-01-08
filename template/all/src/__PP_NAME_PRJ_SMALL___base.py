@@ -183,10 +183,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # questions
 
-    # I18N: answer yes
-    S_ASK_YES = _("y")
-    # I18N: answer no
-    S_ASK_NO = _("N")
     # NB: format param is prog name
     # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
@@ -484,12 +480,12 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ask to uninstall
         str_ask = F.dialog(
             self.S_ASK_UNINST.format("__PP_NAME_PRJ_BIG__"),
-            [self.S_ASK_YES, self.S_ASK_NO],
-            self.S_ASK_NO,
+            [F.S_ASK_YES, F.S_ASK_NO],
+            F.S_ASK_NO,
         )
 
         # user hit enter or typed "n/N"
-        if str_ask != self.S_ASK_YES:
+        if str_ask != F.S_ASK_YES:
             print(self.S_MSG_ABORT)
             sys.exit(0)
 

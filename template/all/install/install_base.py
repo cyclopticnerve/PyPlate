@@ -468,10 +468,7 @@ class CNInstallBase:
 
         # run the external script
         try:
-            cp = subprocess.run(
-                cmd, shell=True, check=True, capture_output=True, text=True
-            )
-            print(cp.stdout)
+            subprocess.run(cmd, shell=True, check=True)
             print(self.S_MSG_DONE)
 
         except FileNotFoundError as e:
