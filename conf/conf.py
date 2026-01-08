@@ -374,8 +374,8 @@ S_FILE_README = "README.md"
 S_FILE_INDEX = "index.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
-S_FILE_INST_CFG = "install.json"
-S_FILE_UNINST_CFG = "uninstall.json"
+# S_FILE_INST_CFG = "install.json"
+# S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_SCREENSHOT = "screenshot.png"
@@ -383,8 +383,8 @@ S_FILE_DSK_TMP = "template.desktop"
 S_FILE_DEV_VENV = "develop.py"
 
 # concatenate some paths for install/uninstall
-S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
-S_PATH_UNINST_CFG = f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}"
+# S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
+# S_PATH_UNINST_CFG = f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}"
 
 # screenshot path for readme
 S_PATH_SCREENSHOT = f"{S_DIR_IMAGES}/{S_FILE_SCREENSHOT}"
@@ -894,8 +894,6 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # install stuff
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
-    "__PP_INST_CONF_FILE__": S_PATH_INST_CFG,
-    "__PP_UNINST_CONF_FILE__": S_PATH_UNINST_CFG,
     # --------------------------------------------------------------------------
     # mkdocs stuff
     "__PP_DIR_DOCS__": S_DIR_DOCS,
@@ -1013,6 +1011,8 @@ D_PUB_DBG = {
 # dict of files to put in dist folder (defaults, written by pymaker, edited by
 # hand, read by pybaker)
 D_PUB_DIST = {}  # tbd by do_after_template
+D_PUB_INST = {}
+D_PUB_UNINST = {}
 
 # which docs maker to use, based on project type
 D_PUB_DOCS = {
@@ -1475,6 +1475,8 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     # figure out dist dict
 
     dict_pub[S_KEY_PUB_DIST] = dict(D_TYPE_DIST[prj_type])
+    dict_pub[S_KEY_PUB_INST] = dict(D_INSTALL[prj_type])
+    dict_pub[S_KEY_PUB_UNINST] = dict(D_UNINSTALL[prj_type])
 
 
 # ------------------------------------------------------------------------------
@@ -2201,13 +2203,13 @@ def _fix_meta(path, dict_prv, dict_pub):
     if path.name == S_FILE_TOML:
         _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
-    # fix inst
-    if path.name == S_FILE_INST_CFG:
-        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+    # # fix inst
+    # if path.name == S_FILE_INST_CFG:
+    #     _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
-    # fix uninst
-    if path.name == S_FILE_UNINST_CFG:
-        _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+    # # fix uninst
+    # if path.name == S_FILE_UNINST_CFG:
+    #     _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix mkdocs.yml
     if path.name == S_FILE_MKDOCS_YML:
@@ -2367,32 +2369,32 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
         a_file.write(text)
 
 
-# --------------------------------------------------------------------------
-# Fix the version number in install/uninstall files
-# --------------------------------------------------------------------------
-def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
-    """
-    Fix the version number in install/uninstall files
+# # --------------------------------------------------------------------------
+# # Fix the version number in install/uninstall files
+# # --------------------------------------------------------------------------
+# def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
+#     """
+#     Fix the version number in install/uninstall files
 
-    Args:
-        path: Path for the file to modify text
-        dict_prv_prj: Private calculated proj dict
-        dict_pub_meta: Dict of metadata to replace in the file
+#     Args:
+#         path: Path for the file to modify text
+#         dict_prv_prj: Private calculated proj dict
+#         dict_pub_meta: Dict of metadata to replace in the file
 
-    Fixes the version number in any file whose name matches S_FILE_INST_CFG or
-    S_FILE_UNINST_CFG.
-    """
+#     Fixes the version number in any file whose name matches S_FILE_INST_CFG or
+#     S_FILE_UNINST_CFG.
+#     """
 
-    # get version from project.json
-    version = dict_prv_prj["__PP_VER_MMR__"]
+#     # get version from project.json
+#     version = dict_prv_prj["__PP_VER_MMR__"]
 
-    try:
-        # load/change/save
-        a_dict = F.load_paths_into_dict(path)
-        a_dict[S_KEY_INST_VER] = version
-        F.save_dict_into_paths(a_dict, [path])
-    except OSError as e:  # from load_dicts/save_dict
-        F.printd(S_ERR_ERR, str(e))
+#     try:
+#         # load/change/save
+#         a_dict = F.load_paths_into_dict(path)
+#         a_dict[S_KEY_INST_VER] = version
+#         F.save_dict_into_paths(a_dict, [path])
+#     except OSError as e:  # from load_dicts/save_dict
+#         F.printd(S_ERR_ERR, str(e))
 
 
 # ------------------------------------------------------------------------------
