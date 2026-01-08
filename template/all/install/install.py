@@ -43,8 +43,6 @@ P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
 P_DIR_VENV = P_DIR_USR_INST / "__PP_NAME_VENV__"
 
 # get files
-P_FILE_CFG_INST = P_DIR_ASSETS / "__PP_INST_CONF_FILE__"
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
 P_FILE_REQS = P_DIR_ASSETS / "__PP_DIR_INSTALL__/__PP_REQS_FILE__"
 P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
 P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_DIR_IMAGES__/__PP_NAME_PRJ_SMALL__.png"
@@ -1028,8 +1026,6 @@ if __name__ == "__main__":
     inst.main(
         P_DIR_ASSETS,
         P_DIR_USR_INST,
-        P_FILE_CFG_INST,
-        P_FILE_CFG_UNINST,
         P_DIR_VENV,
         P_FILE_REQS,
         P_FILE_DESK,

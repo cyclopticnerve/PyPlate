@@ -30,8 +30,6 @@
         "__PP_DLG_FILE__": "dialogs",
         "__PP_DLG_ABOUT__": "dlg_about",
         "__PP_DIR_INSTALL__": "install",
-        "__PP_INST_CONF_FILE__": "install/install.json",
-        "__PP_UNINST_CONF_FILE__": "install/uninstall.json",
         "__PP_DIR_DOCS__": "docs",
         "__PP_DIR_SITE__": "site"
     },
