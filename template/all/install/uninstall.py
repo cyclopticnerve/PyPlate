@@ -33,7 +33,21 @@ import sys
 # ------------------------------------------------------------------------------
 # add assets dir to path
 
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
+# get prj dir
 P_DIR_PRJ = Path(__file__).parent.resolve()
+
+# get dirs
+P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+
+# get files
+P_FILE_CFG_UNINST = (
+    P_DIR_USR_INST / "__PP_DIR_INSTALL__/__PP_FILE_UNINST_CFG__"
+)
+
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -58,16 +72,6 @@ _ = T_TRANSLATION.gettext
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
 locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-# get dirs
-P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
-
-# get files
-P_FILE_CFG_UNINST = P_DIR_USR_INST / "__PP_UNINST_CONF_FILE__"
 
 
 # ------------------------------------------------------------------------------

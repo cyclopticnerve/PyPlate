@@ -68,8 +68,8 @@ class PyMaker(PyPlate):
 
     # I18N cmd line instructions string
     S_EPILOG = _(
-        "Run this program from the directory where you want to create "\
-            "a project."
+        "Run this program from the directory where you want to create "
+        "a project."
     )
 
     # messages
@@ -213,9 +213,6 @@ class PyMaker(PyPlate):
         # ----------------------------------------------------------------------
         # next question is name
 
-        # sanity check
-        cwd = P.Path.cwd()
-
         # if in debug mode
         if self._cmd_debug:
 
@@ -230,7 +227,7 @@ class PyMaker(PyPlate):
             name_prj_big = name_prj.replace(" ", "_")
 
             # set up for existence check
-            tmp_dir = cwd / name_prj_big
+            tmp_dir = self._dir_prj / name_prj_big
 
             # check if project already exists
             if tmp_dir.exists():
@@ -258,7 +255,7 @@ class PyMaker(PyPlate):
                     name_prj_big = name_prj.replace(" ", "_")
 
                     # set up for existence check
-                    tmp_dir = cwd / name_prj_big
+                    tmp_dir = self._dir_prj / name_prj_big
 
                     # check if project already exists
                     if tmp_dir.exists():

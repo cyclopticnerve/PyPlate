@@ -382,10 +382,6 @@ S_FILE_SCREENSHOT = "screenshot.png"
 S_FILE_DSK_TMP = "template.desktop"
 S_FILE_DEV_VENV = "develop.py"
 
-# concatenate some paths for install/uninstall
-S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
-S_PATH_UNINST_CFG = f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}"
-
 # screenshot path for readme
 S_PATH_SCREENSHOT = f"{S_DIR_IMAGES}/{S_FILE_SCREENSHOT}"
 
@@ -639,7 +635,7 @@ L_PURGE_FILES = [
 ]
 
 # skip placeholder files in these dirs
-L_PH_SKIP = [".git", ".venv*"]
+L_PH_SKIP = [S_DIR_GIT, ".venv*"]
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -894,6 +890,8 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # install stuff
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    "__PP_FILE_INST_CFG__": S_FILE_INST_CFG,
+    "__PP_FILE_UNINST_CFG__": S_FILE_UNINST_CFG,
     # --------------------------------------------------------------------------
     # mkdocs stuff
     "__PP_DIR_DOCS__": S_DIR_DOCS,
@@ -955,7 +953,7 @@ D_PUB_BL = {
     # skip header, skip text, skip path (0 0 0)
     # NB: this is mostly to speed up processing by not even looking at them
     S_KEY_SKIP_ALL: [
-        ".git",
+        S_DIR_GIT,
         ".venv*",
         ".VSCodeCounter",
         "*.code-workspace",
@@ -983,15 +981,15 @@ D_PUB_BL = {
     S_KEY_SKIP_HEADER: [],
     # fix header, skip text, fix path (1 0 1)
     S_KEY_SKIP_CODE: [
-        "conf",
+        S_DIR_CONF,
     ],
     # list of dirs/files to ignore in output dir when creating the initial tree
     S_KEY_SKIP_TREE: [
-        ".git",
+        S_DIR_GIT,
         ".venv*",
         ".VSCodeCounter",
-        "dist",
-        "site",
+        S_DIR_DIST,
+        S_DIR_SITE,
         "**/__pycache__",
         "**/*.egg-info",
     ],
@@ -1398,21 +1396,6 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             # sys.exit(-1)
 
     # --------------------------------------------------------------------------
-    # install/uninstall config files
-
-    # if install flag is set
-    if dict_dbg[S_KEY_DBG_INST]:
-
-        # cli/gui
-        if prj_type in L_APP_INSTALL:
-
-            # show info
-            print(S_ACTION_INST, end="", flush=True)
-            # FIXME: no! load from passed dict
-            # call sub to recreate install.json/uninstall.json
-            _fix_inst(dir_prj, prj_type)
-
-    # --------------------------------------------------------------------------
     # purge package dirs
 
     if prj_type in D_PURGE:
@@ -1471,7 +1454,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(dir_prj, dict_prv, dict_pub, _dict_dbg):
+def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     """
     Do any work before fix
 
@@ -1862,9 +1845,28 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # show info
             print(S_ACTION_INST, end="", flush=True)
-            # FIXME: no! load from passed dict
-            # call sub to recreate install.json/uninstall.json
-            _fix_inst(dir_prj, prj_type)
+
+            # ------------------------------------------------------------------
+
+            # create a template install cfg file
+            dict_inst = dict_pub[S_KEY_PUB_INST]
+            # fix dunders in inst cfg file
+            path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
+            # create a template uninstall cfg file
+            dict_uninst = dict_pub[S_KEY_PUB_UNINST]
+            # fix dunders in uninst cfg file
+            path_uninst = dir_prj / S_DIR_INSTALL / S_FILE_UNINST_CFG
+
+            try:
+                F.save_dict_into_paths(dict_inst, [path_inst])
+                F.save_dict_into_paths(dict_uninst, [path_uninst])
+
+                # show info
+                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
+            except OSError as e:  # from save_dict
+                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+                F.printd(S_ERR_ERR, str(e))
 
 
 # ------------------------------------------------------------------------------
@@ -1936,6 +1938,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         except F.CNRunError as e:
             # fail gracefully
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printc(S_ERR_NO_REPO, fg=F.C_FG_WHITE, bg=F.C_BG_RED, bold=True)
             F.printd(S_ERR_ERR, str(e))
 
 
@@ -2365,48 +2368,6 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
-
-# --------------------------------------------------------------------------
-# Fix the version number in install/uninstall files
-# --------------------------------------------------------------------------
-def _fix_inst(dir_prj, prj_type):
-    """
-    Fix the version number in install/uninstall files
-
-    Args:
-        path: Path for the file to modify text
-        dict_prv_prj: Private calculated proj dict
-        dict_pub_meta: Dict of metadata to replace in the file
-
-    Fixes the version number in any file whose name matches S_FILE_INST_CFG or
-    S_FILE_UNINST_CFG.
-    """
-
-    # --------------------------------------------------------------------------
-
-    # FIXME: no! load from passed dict
-    # pm: conf
-    # pb: file
-
-    # create a template install cfg file
-    dict_inst = D_TYPE_INST[prj_type]
-    # fix dunders in inst cfg file
-    path_inst = dir_prj / S_PATH_INST_CFG
-    # create a template uninstall cfg file
-    dict_uninst = D_TYPE_UNINST[prj_type]
-    # fix dunders in uninst cfg file
-    path_uninst = dir_prj / S_PATH_UNINST_CFG
-
-    try:
-        F.save_dict_into_paths(dict_inst, [path_inst])
-        F.save_dict_into_paths(dict_uninst, [path_uninst])
-
-        # show info
-        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    except OSError as e:  # from save_dict
-        F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-        F.printd(S_ERR_ERR, str(e))
 
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file

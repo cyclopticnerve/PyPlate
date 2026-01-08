@@ -413,6 +413,8 @@ class PyBaker(PyPlate):
 
         # change in project.json
         self._dict_pub_meta[P.C.S_KEY_META_VERSION] = self._cmd_ver
+        self._dict_pub_inst[P.C.S_KEY_INST_VER] = self._cmd_ver
+        self._dict_pub_uninst[P.C.S_KEY_INST_VER] = self._cmd_ver
 
         # ----------------------------------------------------------------------
         # print some info
