@@ -273,7 +273,7 @@ S_KEY_PUB_DOCS = "PUB_DOCS"
 S_KEY_PUB_I18N = "PUB_I18N"
 S_KEY_PUB_META = "PUB_META"
 S_KEY_PUB_INST = "PUB_INST"
-S_KEY_PUB_UNINST = "PUB_UNINST"
+# S_KEY_PUB_UNINST = "PUB_UNINST"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -294,7 +294,7 @@ S_KEY_DBG_GIT = "DBG_GIT"
 S_KEY_DBG_VENV = "DBG_VENV"
 S_KEY_DBG_I18N = "DBG_I18N"
 S_KEY_DBG_DOCS = "DBG_DOCS"
-S_KEY_DBG_INST = "DBG_INST"
+# S_KEY_DBG_INST = "DBG_INST"
 S_KEY_DBG_TREE = "DBG_TREE"
 S_KEY_DBG_DIST = "DBG_DIST"
 
@@ -336,6 +336,7 @@ S_KEY_INST_NAME = "INST_NAME"
 S_KEY_INST_VER = "INST_VER"
 S_KEY_INST_DESK = "INST_DESK"
 S_KEY_INST_CONT = "INST_CONT"
+S_KEY_UNINST_CONT = "UNINST_CONT"
 
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
@@ -375,7 +376,7 @@ S_FILE_INDEX = "index.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
 S_FILE_INST_CFG = "install.json"
-S_FILE_UNINST_CFG = "uninstall.json"
+# S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_SCREENSHOT = "screenshot.png"
@@ -885,13 +886,14 @@ D_PRV_ALL = {
     # gui stuff
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
     "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
+    "__PP_DIR_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}",
     "__PP_DLG_FILE__": S_DLG_UI_FILE,
     "__PP_DLG_ABOUT__": S_DLG_ABOUT,
     # --------------------------------------------------------------------------
     # install stuff
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
     "__PP_FILE_INST_CFG__": S_FILE_INST_CFG,
-    "__PP_FILE_UNINST_CFG__": S_FILE_UNINST_CFG,
+    # "__PP_FILE_UNINST_CFG__": S_FILE_UNINST_CFG,
     # --------------------------------------------------------------------------
     # mkdocs stuff
     "__PP_DIR_DOCS__": S_DIR_DOCS,
@@ -967,7 +969,7 @@ D_PUB_BL = {
         S_FILE_REQS,
         "**/__pycache__",
         "**/*.egg-info",
-        "pyplate",
+        S_PRJ_PP_DIR,
     ],
     # skip header, skip text, fix path (0 0 1)
     # NB: this is used mostly for non-text files
@@ -1001,7 +1003,7 @@ D_PUB_DBG = {
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
     S_KEY_DBG_DOCS: True,
-    S_KEY_DBG_INST: True,
+    # S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
 }
@@ -1055,10 +1057,9 @@ D_PUB_META = {
     S_KEY_META_CATS: [],
 }
 
-# default dicts for install.json/uninstall.json
+# default dict for install/uninstall
 # NB: tbd by do_after_template based on prj type
 D_PUB_INST = {}
-D_PUB_UNINST = {}
 
 # ------------------------------------------------------------------------------
 # Other dictionaries
@@ -1071,7 +1072,7 @@ D_DBG_PM = {
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
     S_KEY_DBG_DOCS: True,
-    S_KEY_DBG_INST: True,
+    # S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
 }
@@ -1083,7 +1084,7 @@ D_DBG_PB = {
     S_KEY_DBG_VENV: True,
     S_KEY_DBG_I18N: True,
     S_KEY_DBG_DOCS: True,
-    S_KEY_DBG_INST: True,
+    # S_KEY_DBG_INST: True,
     S_KEY_DBG_TREE: True,
     S_KEY_DBG_DIST: True,
 }
@@ -1132,8 +1133,6 @@ D_TYPE_DIST = {
 
 # dictionary of default stuff to put in install.json
 # NB: in S_KEY_INST_CONT, key is rel to assets, val is rel to home
-# these are the defaults, they can be edited in install/install.json before
-# running pybaker
 D_TYPE_INST = {
     "c": {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
@@ -1149,6 +1148,10 @@ D_TYPE_INST = {
             S_DIR_SRC: "__PP_USR_INST__",
             S_FILE_UNINST_PY: "__PP_USR_INST__",
         },
+        S_KEY_UNINST_CONT: [
+            "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
+            "__PP_USR_INST__",
+        ],
     },
     "g": {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
@@ -1166,26 +1169,7 @@ D_TYPE_INST = {
             # NB: extra for gui
             "__PP_FILE_DESK__": "__PP_USR_APPS__",
         },
-    },
-}
-
-# dict to remove when uninstalling
-# NB: in S_KEY_INST_CONT, items are files or folders to delete
-# these are the defaults, they can be edited in install/uninstall.json before
-# running pybaker
-D_TYPE_UNINST = {
-    "c": {
-        S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
-        S_KEY_INST_VER: "__PP_VER_MMR__",
-        S_KEY_INST_CONT: [
-            "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
-            "__PP_USR_INST__",
-        ],
-    },
-    "g": {
-        S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
-        S_KEY_INST_VER: "__PP_VER_MMR__",
-        S_KEY_INST_CONT: [
+        S_KEY_UNINST_CONT: [
             "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
             "__PP_USR_INST__",
             # NB: extra for gui
@@ -1445,10 +1429,9 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     dict_pub[S_KEY_PUB_DIST] = dict(D_TYPE_DIST[prj_type])
 
     # --------------------------------------------------------------------------
-    # set inst/uninst dicts to default
+    # set inst dict to default
 
     dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
-    dict_pub[S_KEY_PUB_UNINST] = dict(D_TYPE_UNINST[prj_type])
 
 
 # ------------------------------------------------------------------------------
@@ -1834,39 +1817,40 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # we are done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
-    # --------------------------------------------------------------------------
-    # install/uninstall config files
+        # --------------------------------------------------------------------------
+        # install/uninstall config files
 
-    # if install flag is set
-    if dict_dbg[S_KEY_DBG_INST]:
+        # if install flag is set
+        # if dict_dbg[S_KEY_DBG_INST]:
 
-        # cli/gui
-        if prj_type in L_APP_INSTALL:
+        #     # cli/gui
+        #     if prj_type in L_APP_INSTALL:
+
+        # show info
+        print(S_ACTION_INST, end="", flush=True)
+
+        # ------------------------------------------------------------------
+
+        # create a template and save cfg file
+        dict_inst = dict_pub[S_KEY_PUB_INST]
+
+        # dict_inst_cont = dict_inst[S_KEY_INST_CONT]
+        path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
+
+        # # create a template uninstall cfg file
+        # dict_uninst_cont = dict_inst[S_KEY_UNINST_CONT]
+        # path_uninst = dir_prj / S_DIR_INSTALL / S_FILE_UNINST_CFG
+
+        try:
+            F.save_dict_into_paths(dict_inst, [path_inst])
+            # F.save_dict_into_paths(dict_inst, [path_uninst])
 
             # show info
-            print(S_ACTION_INST, end="", flush=True)
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
-            # ------------------------------------------------------------------
-
-            # create a template install cfg file
-            dict_inst = dict_pub[S_KEY_PUB_INST]
-            # fix dunders in inst cfg file
-            path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
-            # create a template uninstall cfg file
-            dict_uninst = dict_pub[S_KEY_PUB_UNINST]
-            # fix dunders in uninst cfg file
-            path_uninst = dir_prj / S_DIR_INSTALL / S_FILE_UNINST_CFG
-
-            try:
-                F.save_dict_into_paths(dict_inst, [path_inst])
-                F.save_dict_into_paths(dict_uninst, [path_uninst])
-
-                # show info
-                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-            except OSError as e:  # from save_dict
-                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd(S_ERR_ERR, str(e))
+        except OSError as e:  # from save_dict
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd(S_ERR_ERR, str(e))
 
 
 # ------------------------------------------------------------------------------

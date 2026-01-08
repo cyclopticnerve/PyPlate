@@ -33,11 +33,15 @@ from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # ------------------------------------------------------------------------------
-# Globals
+# Constants
 # ------------------------------------------------------------------------------
 
 # project dir
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI and GUI
@@ -168,9 +172,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         f"{S_PP_VERSION}\n"
         "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
     )
-
-    # contents of default config file
-    S_CFG_DEF = "{}"
 
     # default format af log files
     S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
