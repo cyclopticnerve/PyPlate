@@ -40,7 +40,7 @@ import sys
 # ------------------------------------------------------------------------------
 
 # find path to prj/lib
-P_DIR_USR_INST = f"{Path.home()}/.local/share/pyplate"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -68,7 +68,8 @@ class PyBaker:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # commands to run
+    # commands
+    # NB: format params are inst dir, venv name, prog name, and cmd line
     S_CMD = (
         # cd to prj dir
         "cd {};"
@@ -114,7 +115,7 @@ class PyBaker:
 
         # ----------------------------------------------------------------------
 
-        # # build cmd
+        # build cmd
         cmd = self.S_CMD.format(
             P_DIR_USR_INST, start_dir, P_DIR_USR_INST, args
         )

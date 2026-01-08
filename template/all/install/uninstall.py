@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : SpaceOddity                                            /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : 12/29/2025                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE__                                         \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -35,12 +35,23 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # get dirs
 P_DIR_INSTALL = P_DIR_PRJ / "__PP_DIR_INSTALL__"
 
+# get files
+P_FILE_CFG = P_DIR_PRJ / "__PP_FILE_INST_CFG__"
+# NB: path changes after dist
+P_FILE_CFG_DIST = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+
+P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+
+# ------------------------------------------------------------------------------
+# Local imports
+# ------------------------------------------------------------------------------
+
 # fudge path to load base
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
 # pylint: disable=wrong-import-position
-import install_base as B  # type: ignore
 from install_base import _  # type: ignore
 from install_base import CNInstallBase  # type: ignore
 
@@ -49,9 +60,6 @@ from install_base import CNInstallBase  # type: ignore
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
-
-# get our local local path
-_ = B.get_i18n(P_DIR_PRJ)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -72,6 +80,7 @@ class CNUninstall(CNInstallBase):
     # Class constants
     # --------------------------------------------------------------------------
 
+    # strings
     # NB: format param is prog_name
     # I18N: uninstall the program
     S_MSG_UNINST_START = _("Uninstalling {}")
@@ -86,10 +95,7 @@ class CNUninstall(CNInstallBase):
     # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
 
-    # errors
-
     # dry run messages
-
     # NB: format param is file or dir path
     S_DRY_REMOVE = "\nremove\n{}"
 
@@ -97,10 +103,27 @@ class CNUninstall(CNInstallBase):
     # Class methods
     # --------------------------------------------------------------------------
 
+    # --------------------------------------------------------------------------
+    # Initialize the new object
+    # --------------------------------------------------------------------------
     def __init__(self):
-        """docstring"""
+        """
+        Initialize the new object
+
+        Initializes a new instance of the class, setting the default values
+        of its properties, and any other code that needs to run to create a
+        new object.
+        """
+
+        # always call super
         super().__init__()
+
+        # redeclare prop for some reason?
         self._dict_cfg = {}
+
+    # --------------------------------------------------------------------------
+    # Public methods
+    # --------------------------------------------------------------------------
 
     # ------------------------------------------------------------------------------
     # Uninstall the program
@@ -118,17 +141,37 @@ class CNUninstall(CNInstallBase):
         # get prj info from cfg
         self._get_project_info()
 
+        # do pre uninstall
+        self._do_external(P_FILE_PRE)
+
         # create an instance of the class
         self._uninstall_content()
 
         # wind down
         self._teardown()
 
+        # do pre uninstall
+        self._do_external(P_FILE_POST)
+
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
 
-    # NB: these are the main steps, called in order from main()
+    # NB: these are the main steps, called in order from main
+
+    # --------------------------------------------------------------------------
+    # Boilerplate to use at the start of main
+    # --------------------------------------------------------------------------
+    # def _setup(self):
+    #     """
+    #     Boilerplate to use at the start of main
+
+    #     Perform some mundane stuff like setting properties.
+    #     If you implement this function. make sure to call super() LAST!!!
+    #     """
+
+    #     # do setup
+    #     super()._setup()
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -140,26 +183,35 @@ class CNUninstall(CNInstallBase):
         Get the install info from the config file.
         """
 
+        # get path to config (ide or dist)
+        path_cfg = P_FILE_CFG
+        if not path_cfg.exists():
+            path_cfg = P_FILE_CFG_DIST
+
         try:
             # get project info
-            self._dict_cfg = self._get_dict_from_file(B.P_FILE_CFG_UNINST)
+            self._dict_cfg = self._get_dict_from_file(path_cfg)
         except OSError as e:
             print(self.S_ERR_ERR, e)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
 
-        # ask to uninstall
-        str_ask = self._dialog(
-            self.S_ASK_UNINST.format(prog_name),
-            [self.S_ASK_YES, self.S_ASK_NO],
-            self.S_ASK_NO,
-        )
+        # check for force to skip question
+        force = self._dict_args.get(self.S_ARG_FORCE_DEST, False)
+        if not force:
 
-        # user hit enter or typed "n/N"
-        if str_ask == self.S_ASK_NO:
-            print(self.S_MSG_ABORT)
-            sys.exit(-1)
+            # ask to uninstall
+            str_ask = self._dialog(
+                self.S_ASK_UNINST.format(prog_name),
+                [self.S_ASK_YES, self.S_ASK_NO],
+                self.S_ASK_NO,
+            )
+
+            # user hit enter or typed "n/N"
+            if str_ask != self.S_ASK_YES:
+                print(self.S_MSG_ABORT)
+                sys.exit(0)
 
         # print start msg
         print()
@@ -215,15 +267,18 @@ class CNUninstall(CNInstallBase):
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
         print(self.S_MSG_UNINST_END.format(prog_name))
 
+
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
+
     # Code to run when called from command line
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
+    # create a new instance of the main class
     inst = CNUninstall()
 
     # run the instance

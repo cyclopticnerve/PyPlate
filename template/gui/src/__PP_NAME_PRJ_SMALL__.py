@@ -29,7 +29,10 @@ Typical usage is show in the main() method.
 # local imports
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
-from gui.python.__PP_FILE_APP__ import __PP_CLASS_APP__
+
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -84,9 +87,6 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         program, and performing its steps.
         """
 
-        # ----------------------------------------------------------------------
-        # setup
-
         # call boilerplate code
         self._setup()
 
@@ -120,23 +120,9 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
 
-    #     # add cfg option
-    #     self._parser.add_argument(
-    #         self.S_ARG_CFG_OPTION,
-    #         dest=self.S_ARG_CFG_DEST,
-    #         help=self.S_ARG_CFG_HELP,
-    #         metavar=self.S_ARG_CFG_METAVAR,
-    #     )
+    # add cmd line args here
 
-    #     # add debug option
-    #     self._parser.add_argument(
-    #         self.S_ARG_DBG_OPTION,
-    #         action=self.S_ARG_DBG_ACTION,
-    #         dest=self.S_ARG_DBG_DEST,
-    #         help=self.S_ARG_DBG_HELP,
-    #     )
-
-    #     # do setup
+    #     # NB: do setup last
     #     super()._setup()
 
     # # --------------------------------------------------------------------------
@@ -172,7 +158,7 @@ if __name__ == "__main__":
     # create a new instance of the main class
     obj = __PP_NAME_PRJ_PASCAL__()
 
-    # run the new object
+    # run the instance
     obj.main()
 
 # -)

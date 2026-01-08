@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: install_base.py                                       |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 01/01/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -49,14 +49,15 @@ S_ENCODING = "UTF-8"
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
 locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -107,11 +108,11 @@ class CNInstallBase:
     # short description
     # pylint: disable=line-too-long
     # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = ""
+    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = ""
+    S_PP_VERSION = "Version 0.1.0"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
@@ -144,10 +145,10 @@ class CNInstallBase:
     # about string
     S_ABOUT = (
         "\n"
-        "__PP_NAME_PRJ_BIG__\n"
+        "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        "https://github.com/cyclopticnerve/PyPlate\n"
     )
 
     # I18N if using argparse, add help at end of about

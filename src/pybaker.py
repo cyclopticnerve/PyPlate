@@ -25,6 +25,7 @@ Run pybaker -h for more options.
 # ------------------------------------------------------------------------------
 
 # system imports
+import re
 import shutil
 
 # local imports
@@ -66,12 +67,10 @@ class PyBaker(PyPlate):
     # lang option strings
     S_ARG_LANG_OPTION = "-l"
     S_ARG_LANG_DEST = "LANG_DEST"
-    # I18N: help option help
-    S_ARG_LANG_HELP = _(
-        "add a language code ('en', 'en_US', etc.)\n(if used, -v is ignored)"
-    )
-    # I18N: config file dest
-    S_ARG_LANG_METAVAR = _("LANG")
+    # I18N: lang option help
+    S_ARG_LANG_HELP = _("add a language (*.po) file")
+    # I18N: lang file source
+    S_ARG_LANG_METAVAR = _("FILE")
 
     # ide option strings
     S_ARG_VER_OPTION = "-v"
@@ -100,13 +99,27 @@ class PyBaker(PyPlate):
     # error strings
 
     # I18N: language already exists in project.json and i18n folder
-    S_ERR_LANG_EXIST = _("Language already exists")
+    S_ERR_LANG_EXIST = _("Language file {} already exists")
+    S_ERR_NO_LANG = _("Could not get language code from {}")
 
     # messages
 
     # bake msg
     # NB: param is name of project folder
     S_MSG_BAKE = _("Baking {}")
+    # NB: format param is file name
+    # I18N: add language at cmd line
+    S_MSG_LANG_ADD = _("Adding language file {}...")
+
+    # questions
+
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("N")
+    # NB: format param is file name
+    # I18N: ask to overwrite
+    S_ASK_OVER = _("The file {} already exists. Do you want to overwrite it?")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -115,22 +128,17 @@ class PyBaker(PyPlate):
     # --------------------------------------------------------------------------
     # Initialize the new object
     # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initialize the new object
+    # def __init__(self):
+    #     """
+    #     Initialize the new object
 
-        Initializes a new instance of the class, setting the default values
-        of its properties, and any other code that needs to run to create a
-        new object.
-        """
+    #     Initializes a new instance of the class, setting the default values
+    #     of its properties, and any other code that needs to run to create a
+    #     new object.
+    #     """
 
-        # do super init
-        super().__init__()
-
-        # set the initial values of properties
-        self._cmd_ide = False
-        self._cmd_lang = None
-        self._cmd_ver = None
+    #     # do super init
+    #     super().__init__()
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -146,9 +154,6 @@ class PyBaker(PyPlate):
         This method is the main entry point for the program, initializing the
         program, and performing its steps.
         """
-
-        # ----------------------------------------------------------------------
-        # setup
 
         # call boilerplate code
         self._setup()
@@ -207,12 +212,8 @@ class PyBaker(PyPlate):
             action=self.S_ARG_IDE_ACTION,
         )
 
-        # make a mutually exclusive group (one or the other or none, but not
-        # both)
-        group = self._parser.add_mutually_exclusive_group()
-
         # add lang option
-        group.add_argument(
+        self._parser.add_argument(
             self.S_ARG_LANG_OPTION,
             dest=self.S_ARG_LANG_DEST,
             help=self.S_ARG_LANG_HELP,
@@ -220,7 +221,7 @@ class PyBaker(PyPlate):
         )
 
         # add version option
-        group.add_argument(
+        self._parser.add_argument(
             self.S_ARG_VER_OPTION,
             dest=self.S_ARG_VER_DEST,
             help=self.S_ARG_VER_HELP,
@@ -229,15 +230,6 @@ class PyBaker(PyPlate):
 
         # do setup
         super()._setup()
-
-        # get ide flag from cmd line
-        self._cmd_ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
-
-        # add a language and rebuild i18n
-        self._cmd_lang = self._dict_args.get(self.S_ARG_LANG_DEST, None)
-
-        # user changed version on cmd line
-        self._cmd_ver = self._dict_args.get(self.S_ARG_VER_DEST, None)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -256,28 +248,7 @@ class PyBaker(PyPlate):
         # ----------------------------------------------------------------------
 
         # handle -i
-        if self._cmd_ide:
-
-            # ask for prj name rel to cwd
-            in_str = P.C.S_ASK_IDE.format(self._dir_prj)
-            while True:
-                prj_name = input(in_str)
-                if prj_name == "":
-                    continue
-
-                # if running in ide, cwd is pyplate prj dir, so move up + down
-                tmp_dir = P.Path(self._dir_prj / prj_name).resolve()
-
-                # check if project exists
-                if not tmp_dir.exists():
-                    e_str = P.C.S_ERR_NOT_EXIST.format(tmp_dir)
-                    print(e_str)
-                    continue
-
-                # set project dir and exit loop
-                self._dir_prj = tmp_dir
-                # print()
-                break
+        self._handle_i()
 
         # ----------------------------------------------------------------------
         # sanity checks
@@ -324,97 +295,12 @@ class PyBaker(PyPlate):
             self._dict_dbg = dict(P.C.D_DBG_PB)
 
         # ----------------------------------------------------------------------
-        # handle -l
-        if self._cmd_lang:
-
-            # get lang dict from props
-            dict_lang = self._dict_pub_i18n[P.C.S_KEY_PUB_I18N_WLANGS]
-
-            # only add once
-            if self._cmd_lang in dict_lang:
-
-                # lang exists, print msg
-                print(self.S_ERR_LANG_EXIST)
-
-                # pass or fail, we are done
-                P.sys.exit(0)
-
-            # add lang to dict
-            dict_lang.append(self._cmd_lang)
-
-            # do the thing
-            P.C.do_i18n(
-                self._dir_prj,
-                self._dict_prv,
-                self._dict_pub,
-                self._dict_dbg,
-            )
-
-            # save new lang dict
-            self._teardown()
-            P.sys.exit(0)
+        # handle -v
+        self._handle_v()
 
         # ----------------------------------------------------------------------
-        # handle -v
-
-        # first check if passed on cmd line
-        if self._cmd_ver:
-
-            # check version before we start fixing
-            pattern = P.C.S_SEM_VER_VALID
-            version = self._cmd_ver
-            ver_ok = P.re.search(pattern, version) is not None
-
-            # ask if user wants to keep invalid version or quit
-            if not ver_ok:
-                res = F.dialog(
-                    P.C.S_ERR_SEM_VER,
-                    [P.C.S_ERR_SEM_VER_Y, P.C.S_ERR_SEM_VER_N],
-                    default=P.C.S_ERR_SEM_VER_N,
-                    loop=True,
-                )
-                if res == P.C.S_ERR_SEM_VER_N:
-                    P.sys.exit(-1)
-
-        # not passed, ask question
-        else:
-
-            # format and ask question
-            old_ver = self._dict_pub_meta[P.C.S_KEY_META_VERSION]
-            ask_ver = P.C.S_ASK_VER.format(old_ver)
-
-            # loop until condition
-            while True:
-
-                # ask for new version
-                new_ver = input(ask_ver)
-
-                # user pressed Enter, return original
-                if new_ver == "":
-
-                    # set the same version, and we are done
-                    self._cmd_ver = old_ver
-                    break
-
-                # check version before we start fixing
-                pattern = P.C.S_SEM_VER_VALID
-                version = new_ver
-                ver_ok = P.re.search(pattern, version) is not None
-
-                # ask if user wants to keep invalid version or quit
-                if ver_ok:
-
-                    # set the new version, and we are done
-                    self._cmd_ver = new_ver
-                    break
-
-                # print version error
-                print(P.C.S_ERR_SEM_VER)
-
-        # change in project.json
-        self._dict_pub_meta[P.C.S_KEY_META_VERSION] = self._cmd_ver
-        self._dict_pub_inst[P.C.S_KEY_INST_VER] = self._cmd_ver
-        # self._dict_pub_uninst[P.C.S_KEY_INST_VER] = self._cmd_ver
+        # handle -l
+        self._handle_l()
 
         # ----------------------------------------------------------------------
         # print some info
@@ -503,20 +389,198 @@ class PyBaker(PyPlate):
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
         )
 
+    # --------------------------------------------------------------------------
+    # Handle the -i option
+    # --------------------------------------------------------------------------
+    def _handle_i(self):
+        """
+        Docstring for _handle_i
+
+        :param self: Description
+        """
+
+        ide = self._dict_args.get(self.S_ARG_IDE_DEST, False)
+        if not ide:
+            return
+
+        # ask for prj name rel to cwd
+        in_str = P.C.S_ASK_IDE.format(self._dir_prj)
+        while True:
+            prj_name = input(in_str)
+            if prj_name == "":
+                continue
+
+            # if running in ide, cwd is pyplate prj dir, so move up + down
+            tmp_dir = P.Path(self._dir_prj / prj_name).resolve()
+
+            # check if project exists
+            if not tmp_dir.exists():
+                e_str = P.C.S_ERR_NOT_EXIST.format(tmp_dir)
+                print(e_str)
+                continue
+
+            # set project dir and exit loop
+            self._dir_prj = tmp_dir
+            # print()
+            break
+
+    # --------------------------------------------------------------------------
+    # Handle the -v option
+    # --------------------------------------------------------------------------
+    def _handle_v(self):
+        """
+        Docstring for _handle_v
+
+        :param self: Description
+        """
+
+        # first check if passed on cmd line
+        ver = self._dict_args.get(self.S_ARG_VER_DEST, None)
+        if ver:
+
+            # check version before we start fixing
+            pattern = P.C.S_SEM_VER_VALID
+            version = ver
+            ver_ok = P.re.search(pattern, version) is not None
+
+            # ask if user wants to keep invalid version or quit
+            if not ver_ok:
+                res = F.dialog(
+                    P.C.S_ERR_SEM_VER,
+                    [P.C.S_ERR_SEM_VER_Y, P.C.S_ERR_SEM_VER_N],
+                    default=P.C.S_ERR_SEM_VER_N,
+                    loop=True,
+                )
+                if res == P.C.S_ERR_SEM_VER_N:
+                    P.sys.exit(-1)
+
+        # not passed, ask question
+        else:
+
+            # format and ask question
+            old_ver = self._dict_pub_meta[P.C.S_KEY_META_VERSION]
+            ask_ver = P.C.S_ASK_VER.format(old_ver)
+
+            # loop until condition
+            while True:
+
+                # ask for new version
+                new_ver = input(ask_ver)
+
+                # user pressed Enter, return original
+                if new_ver == "":
+
+                    # set the same version, and we are done
+                    ver = old_ver
+                    break
+
+                # check version before we start fixing
+                pattern = P.C.S_SEM_VER_VALID
+                version = new_ver
+                ver_ok = P.re.search(pattern, version) is not None
+
+                # ask if user wants to keep invalid version or quit
+                if ver_ok:
+
+                    # set the new version, and we are done
+                    ver = new_ver
+                    break
+
+                # print version error
+                print(P.C.S_ERR_SEM_VER)
+
+        # change in project.json
+        self._dict_pub_meta[P.C.S_KEY_META_VERSION] = ver
+
+        # set version in install dict
+        prj_type = self._dict_prv_prj["__PP_TYPE_PRJ__"]
+        if prj_type in P.C.L_APP_INSTALL:
+            self._dict_pub_inst[P.C.S_KEY_INST_VER] = ver
+
+    # --------------------------------------------------------------------------
+    # Handle the -l option
+    # --------------------------------------------------------------------------
+    def _handle_l(self):
+        """
+        Docstring for _handle_l
+
+        :param self: Description
+        """
+
+        # if no lang, no go
+        lang_file = self._dict_args.get(self.S_ARG_LANG_DEST, None)
+        if not lang_file:
+            return
+
+        print(self.S_MSG_LANG_ADD.format(lang_file), flush=True, end="")
+
+        # default lang code
+        lang_code = ""
+
+        # get code from file
+        p_lang = self._dir_prj / lang_file
+
+        # in case of typo -)
+        if not p_lang.exists():
+            F.printc(P.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            return
+
+        # find the line
+        with open(p_lang, "r", encoding=P.C.S_ENCODING) as a_file:
+            string = a_file.read()
+
+        # find the lang
+        res = re.search(P.C.S_PO_LANG_SCH, string)
+        if res:
+            lang_code = res.group(2)
+
+        # make sure it worked before doing api
+        if lang_code == "":
+            F.printc(P.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            return
+
+        # get lang dict from props
+        dict_lang = self._dict_pub_i18n[P.C.S_KEY_PUB_I18N_WLANGS]
+
+        # only add once (might be old)
+        if not lang_code in dict_lang:
+            dict_lang.append(lang_code)
+
+        # check file exists
+        dst = self._dir_prj / P.C.S_DIR_I18N / P.C.S_DIR_PO / lang_code
+        dst_file = dst / lang_file
+        if dst_file.exists():
+            print()
+
+            # ask to overwrite
+            msg = self.S_ASK_OVER.format(lang_file)
+            ask = F.dialog(
+                msg, [self.S_ASK_YES, self.S_ASK_NO], default=self.S_ASK_NO
+            )
+            if ask != self.S_ASK_YES:
+                F.printc(P.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+                return
+
+        # copy file to dest
+        dst.mkdir(parents=True, exist_ok=True)
+        shutil.copy(p_lang, dst_file)
+
+        F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
+
     # Code to run when called from command line
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # create object
+    # create a new instance of the main class
     pb = PyBaker()
 
-    # run main method with args
+    # run the new object
     pb.main()
 
 # -)

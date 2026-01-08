@@ -39,7 +39,7 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
 # NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./pybaker.py
+# to test translations, run as foo@bar:$ LANGUAGE=xx ./develop.py
 
 # path to project dir
 T_DIR_PRJ = P_DIR_PRJ

@@ -93,9 +93,6 @@ class PyMaker(PyPlate):
         program, and performing its steps.
         """
 
-        # ----------------------------------------------------------------------
-        # setup
-
         # call boilerplate code
         self._setup()
 
@@ -491,15 +488,16 @@ class PyMaker(PyPlate):
 # Code to run when called from command line
 # ------------------------------------------------------------------------------
 if __name__ == "__main__":
+
     # Code to run when called from command line
 
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    # create object
+    # create a new instance of the main class
     pm = PyMaker()
 
-    # run main method with args
+    # run the new object
     pm.main()
 
 # -)

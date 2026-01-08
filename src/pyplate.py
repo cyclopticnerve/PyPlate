@@ -21,26 +21,40 @@ This is the base class that contains code common to both PyMaker and PyBaker.
 
 # system imports
 import argparse
-import gettext
-import locale
+# import gettext
+# import locale
 import logging
 from pathlib import Path
 import re
 import sys
 
-# local imports
-import cnlib.cnfunctions as F  # type: ignore
+# cnlib imports
+from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
+# project dir
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+# path to default log file
+# NB: if not using, set to None
+P_LOG_DEF = P_DIR_PRJ / "log/pyplate.log"
+
+# path to uninst
+P_UNINST = P_DIR_PRJ / "install/uninstall.py"
+# NB: path changes after dist
+P_UNINST_DIST = P_DIR_PRJ / "uninstall.py"
 
 # ------------------------------------------------------------------------------
 # local imports
 
-# pylint: disable=wrong-import-position
-
 # fudge the path to import conf stuff
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
 sys.path.append(str(P_DIR_PRJ))
 
+# pylint: disable=wrong-import-position
 import conf.conf as C  # type: ignore
 
 # pylint: enable=wrong-import-position
@@ -49,23 +63,27 @@ import conf.conf as C  # type: ignore
 # Globals
 # ------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./py[m|b]aker.py
+DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+_ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
 
-# path to project dir
-T_DIR_PRJ = P_DIR_PRJ
+# # ------------------------------------------------------------------------------
+# # gettext stuff for CLI and GUI
+# # NB: keep global
+# # to test translations, run as foo@bar:$ LANGUAGE=xx ./py[m|b]aker.py
 
-# init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
+# # path to project dir
+# T_DIR_PRJ = P_DIR_PRJ
 
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+# # init gettext
+# T_DOMAIN = "pyplate"
+# T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
+# T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+# _ = T_TRANSLATION.gettext
+
+# # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# # use for CLI in the interest of common code)
+# locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -90,9 +108,8 @@ class PyPlate:
     # Class constants
     # --------------------------------------------------------------------------
 
-    # path to default log file
-    # NB: if not using, set to None
-    P_LOG_DEF = P_DIR_PRJ / "log/pyplate.log"
+    # --------------------------------------------------------------------------
+    # strings
 
     # pyplate: replace=True
 
@@ -100,7 +117,7 @@ class PyPlate:
     # pylint: disable=line-too-long
     # NB: need to keep on one line for replacement
     S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
-    # pylint enable=line-too-long
+    # pylint: enable=line-too-long
 
     # version string
     S_PP_VERSION = "Version 0.1.0"
@@ -111,7 +128,7 @@ class PyPlate:
     S_ARG_DBG_OPTION = "-d"
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
-    # I18N help string for debug cmd line option
+    # I18N: debug mode help
     S_ARG_DBG_HELP = _("enable debugging mode")
 
     # config option strings
@@ -120,6 +137,13 @@ class PyPlate:
     S_ARG_HLP_DEST = "HLP_DEST"
     # I18N: help option help
     S_ARG_HLP_HELP = _("show this help message and exit")
+
+    # config option strings
+    S_ARG_UNINST_OPTION = "--uninstall"
+    S_ARG_UNINST_ACTION = "store_true"
+    S_ARG_UNINST_DEST = "UNINST_DEST"
+    # I18N: uninstall option help
+    S_ARG_UNINST_HELP = _("uninstall this program")
 
     # about string (to be set by subclass)
     S_ABOUT = ""
@@ -134,9 +158,33 @@ class PyPlate:
     S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
     S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
 
-    # error strings
-    # I18N: general error start
+    # --------------------------------------------------------------------------
+    # questions
+
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("N")
+    # NB: format param is prog name
+    # I18N: ask to uninstall
+    S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
+
+    # --------------------------------------------------------------------------
+    # messages
+
+    # I18N: process aborted
+    S_MSG_ABORT = _("Aborted")
+
+    # --------------------------------------------------------------------------
+    # error messages
+
+    # I18N: an error occurred
     S_ERR_ERR = _("Error:")
+    # I18N: uninstall not found
+    S_ERR_NO_UNINST = _("Uninstall files not found")
+    # NB: format param is file path
+    # I18N: could not find -c file
+    S_ERR_NO_CFG = _("Config file {} not found")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -185,19 +233,18 @@ class PyPlate:
         # log stuff
         self._logger = logging.getLogger(__name__)
         logging.basicConfig(
-            filename=self.P_LOG_DEF,
+            filename=P_LOG_DEF,
             level=logging.INFO,
             format=self.S_LOG_FMT,
             datefmt=self.S_LOG_DATE_FMT,
         )
 
         # cmd line stuff
-        # NB: placeholder to avoid comparing to None (to be set by subclass)
         self._parser = argparse.ArgumentParser(
-            add_help=False,
-            epilog=self.S_EPILOG,
-            formatter_class=CNFormatter,
+            formatter_class=CNFormatter, add_help=False
         )
+
+        # set arg defaults
         self._dict_args = {}
         self._cmd_debug = False
 
@@ -227,12 +274,9 @@ class PyPlate:
         """
         Boilerplate to use at the start of main
 
-        Perform some mundane stuff like setting properties.
+        Perform some mundane stuff like running the arg parser and loading
+        config files.
         """
-
-        # print default about text
-        print(self.S_ABOUT)
-        print(self.S_ABOUT_HELP)
 
         # ----------------------------------------------------------------------
         # use cmd line
@@ -245,17 +289,31 @@ class PyPlate:
             action=self.S_ARG_DBG_ACTION,
         )
 
-        # add help option
+        # always add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
+            action=self.S_ARG_HLP_ACTION,
             dest=self.S_ARG_HLP_DEST,
             help=self.S_ARG_HLP_HELP,
-            action=self.S_ARG_HLP_ACTION,
+        )
+
+        # add uninstall option
+        self._parser.add_argument(
+            self.S_ARG_UNINST_OPTION,
+            action=self.S_ARG_UNINST_ACTION,
+            dest=self.S_ARG_UNINST_DEST,
+            help=self.S_ARG_UNINST_HELP,
         )
 
         # run the parser
         args = self._parser.parse_args()
+
+        # convert namespace to dict
         self._dict_args = vars(args)
+
+        # print default about text
+        print(self.S_ABOUT)
+        print(self.S_EPILOG)
 
         # ----------------------------------------------------------------------
         # check for one-shot args
@@ -264,25 +322,31 @@ class PyPlate:
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
 
             # print usage and arg info and exit
+            print()
             self._parser.print_help()
             print()
             sys.exit(0)
 
         # no -h, print epilog
-        print(self.S_EPILOG)
+        print()
+        print(self.S_ABOUT_HELP)
         print()
 
         # ----------------------------------------------------------------------
-        # debug stuff
+        # set props from args
 
-        # get the args
+        # set self and lib debug
         self._cmd_debug = self._dict_args.get(
             self.S_ARG_DBG_DEST, self._cmd_debug
         )
-
-        # set debug flags in cnfunctions and conf
         F.B_DEBUG = self._cmd_debug
         C.B_DEBUG = self._cmd_debug
+
+        # punt to uninstall func
+        if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
+
+            # uninstall and exit
+            self._do_uninstall()
 
         # maybe yell
         if self._cmd_debug:
@@ -320,6 +384,49 @@ class PyPlate:
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
+
+    # --------------------------------------------------------------------------
+    # Handle the --uninstall cmd line op
+    # --------------------------------------------------------------------------
+    def _do_uninstall(self):
+        """
+        Handle the --uninstall cmd line op
+        """
+
+        # ask to uninstall
+        str_ask = F.dialog(
+            self.S_ASK_UNINST.format("PyPlate"),
+            [self.S_ASK_YES, self.S_ASK_NO],
+            self.S_ASK_NO,
+        )
+
+        # user hit enter or typed "n/N"
+        if str_ask != self.S_ASK_YES:
+            print(self.S_MSG_ABORT)
+            sys.exit(0)
+
+        # ------------------------------------------------------------------------------
+
+        # if path exists
+        path_uninst = P_UNINST
+        if not path_uninst.exists():
+            path_uninst = P_UNINST_DIST
+
+        # format cmd line
+        cmd = str(path_uninst) + " -f -q"
+        if self._cmd_debug:
+            cmd += " -d"
+
+        # ------------------------------------------------------------------------------
+
+        try:
+            cp = F.run(cmd, shell=True)
+            print(cp.stdout)
+            print(cp.stderr)
+            sys.exit(0)
+        except F.CNRunError as e:
+            print(e.output)
+            sys.exit(e.returncode)
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -800,7 +907,6 @@ class PyPlate:
         self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]
         # self._dict_pub_uninst = self._dict_pub[C.S_KEY_PUB_UNINST]
 
-
         # set initial debug
         self._dict_dbg = dict(self._dict_pub_dbg)
 
@@ -941,6 +1047,7 @@ class PyPlate:
         joint = "\n".join(new_file)
         with open(dst, "w", encoding=C.S_ENCODING) as a_file:
             a_file.writelines(joint)
+
 
 # ------------------------------------------------------------------------------
 # Public functions

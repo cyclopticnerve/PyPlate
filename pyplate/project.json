@@ -43,7 +43,6 @@
         "DBG_VENV": true,
         "DBG_I18N": true,
         "DBG_DOCS": true,
-        "DBG_INST": true,
         "DBG_TREE": true,
         "DBG_DIST": true
     },
@@ -55,33 +54,16 @@
         "images": "assets",
         "install": "assets",
         "src": "assets",
-        "template": "assets",
-        "requirements.txt": "assets/install"
+        "requirements.txt": "assets/install",
+        "template": "assets"
     },
     "PUB_DOCS": {
         "DOCS_THEME": "",
-        "DOCS_USE_RM": false,
+        "DOCS_USE_RM": true,
         "DOCS_MAKE_API": true,
         "DOCS_DIR_API": [
             "src"
         ]
-    },
-    "PUB_INST": {
-        "INST_NAME": "PyPlate",
-        "INST_VER": "0.1.0",
-        "INST_DESK": false,
-        "INST_CONT": {
-            "bin/pymaker": ".local/bin",
-            "bin/pybaker": ".local/bin",
-            "conf": ".local/share/pyplate",
-            "log": ".local/share/pyplate",
-            "i18n": ".local/share/pyplate",
-            "images": ".local/share/pyplate",
-            "install": ".local/share/pyplate",
-            "src": ".local/share/pyplate",
-            "template": ".local/share/pyplate",
-            "uninstall.py": ".local/share/pyplate"
-        }
     },
     "PUB_I18N": {
         "DOMAIN": "pyplate",
@@ -104,24 +86,10 @@
             ]
         },
         "WLANGS": [
-            "en"
+            "en",
+            "es"
         ],
-        "CHARSET": "UTF-8",
-        "NO_EXT": {
-            "Python": [
-                "pymaker",
-                "pybaker"
-            ]
-        }
-    },
-    "PUB_UNINST": {
-        "INST_NAME": "PyPlate",
-        "INST_VER": "0.1.0",
-        "INST_CONT": [
-            ".local/bin/pymaker",
-            ".local/bin/pybaker",
-            ".local/share/pyplate"
-        ]
+        "CHARSET": "UTF-8"
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
@@ -140,5 +108,27 @@
             "Python 3.10+": "https://python.org"
         },
         "META_CATS": []
+    },
+    "PUB_INST": {
+        "INST_NAME": "PyPlate",
+        "INST_VER": "0.1.0",
+        "INST_DESK": false,
+        "INST_CONT": {
+            "bin/pymaker": ".local/bin",
+            "bin/pybaker": ".local/bin",
+            "conf": ".local/share/pyplate",
+            "log": ".local/share/pyplate",
+            "i18n": ".local/share/pyplate",
+            "images": ".local/share/pyplate",
+            "install": ".local/share/pyplate",
+            "src": ".local/share/pyplate",
+            "template": ".local/share/pyplate",
+            "uninstall.py": ".local/share/pyplate"
+        },
+        "UNINST_CONT": [
+            ".local/bin/pymaker",
+            ".local/bin/pybaker",
+            ".local/share/pyplate"
+        ]
     }
 }
