@@ -178,6 +178,5 @@
    ├─ [] README.md
    ├─ [] develop.py
    ├─ [] mkdocs.yml
-   ├─ [] pyplate.po
    ├─ [] pyproject.toml
    └─ [] requirements.txt

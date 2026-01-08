@@ -120,7 +120,7 @@ class PyPlate:
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 0.0.9"
+    S_PP_VERSION = "Version 1.1.1"
 
     # pyplate: replace=False
 
