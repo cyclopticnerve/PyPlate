@@ -1893,7 +1893,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         if use_rm or not exist:
             use_rm = True
 
-        # the command to make or bake docs
+        # the command to make docs
         try:
 
             # make docs
