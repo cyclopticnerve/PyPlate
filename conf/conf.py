@@ -374,8 +374,8 @@ S_FILE_README = "README.md"
 S_FILE_INDEX = "index.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
-# S_FILE_INST_CFG = "install.json"
-# S_FILE_UNINST_CFG = "uninstall.json"
+S_FILE_INST_CFG = "install.json"
+S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_SCREENSHOT = "screenshot.png"
@@ -383,8 +383,8 @@ S_FILE_DSK_TMP = "template.desktop"
 S_FILE_DEV_VENV = "develop.py"
 
 # concatenate some paths for install/uninstall
-# S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
-# S_PATH_UNINST_CFG = f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}"
+S_PATH_INST_CFG = f"{S_DIR_INSTALL}/{S_FILE_INST_CFG}"
+S_PATH_UNINST_CFG = f"{S_DIR_INSTALL}/{S_FILE_UNINST_CFG}"
 
 # screenshot path for readme
 S_PATH_SCREENSHOT = f"{S_DIR_IMAGES}/{S_FILE_SCREENSHOT}"
@@ -583,10 +583,6 @@ S_FILE_MKDOCS_YML = "mkdocs.yml"
 # Lists
 # ------------------------------------------------------------------------------
 
-# file exts for do_after_fix
-L_EXT_PY = [".py"]
-L_EXT_DESK = [".desktop"]
-
 # the types of projects this script can create
 # val[0] is the char to enter for project type
 # val[1] is the display name for project type
@@ -608,6 +604,10 @@ L_TYPES = [
         "pkg",
     ],
 ]
+
+# file exts for do_after_fix
+L_EXT_PY = [".py"]
+L_EXT_DESK = [".desktop"]
 
 # list of filetypes that use hash (#) for comments
 L_EXT_HASH = [
@@ -1010,9 +1010,8 @@ D_PUB_DBG = {
 
 # dict of files to put in dist folder (defaults, written by pymaker, edited by
 # hand, read by pybaker)
-D_PUB_DIST = {}  # tbd by do_after_template
-D_PUB_INST = {}
-D_PUB_UNINST = {}
+# NB: tbd by do_after_template based on prj type
+D_PUB_DIST = {}
 
 # which docs maker to use, based on project type
 D_PUB_DOCS = {
@@ -1058,6 +1057,11 @@ D_PUB_META = {
     S_KEY_META_CATS: [],
 }
 
+# default dicts for install.json/uninstall.json
+# NB: tbd by do_after_template based on prj type
+D_PUB_INST = {}
+D_PUB_UNINST = {}
+
 # ------------------------------------------------------------------------------
 # Other dictionaries
 # ------------------------------------------------------------------------------
@@ -1086,11 +1090,53 @@ D_DBG_PB = {
     S_KEY_DBG_DIST: True,
 }
 
+# dict of files that should be copied from the PyPlate project to the resulting
+# project (outside of the template dir)
+# this is so that when you update a file in the PyPlate project, it gets copied
+# to the project, and cuts down on duplicate files
+# key is the relative path to the source file in PyPlate
+# val is the relative path to the dest file in the project dir
+D_COPY = {
+    f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
+    f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
+}
+
+# NB: key is src, rel to prj dir
+# NB: val is dst, rel to dist dir
+D_TYPE_DIST = {
+    "c": {
+        # basic stuff (put in assets folder)
+        S_DIR_BIN: S_DIR_ASSETS,
+        S_DIR_CONF: S_DIR_ASSETS,
+        S_DIR_LOG: S_DIR_ASSETS,
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_DIR_INSTALL: S_DIR_ASSETS,
+        S_DIR_SRC: S_DIR_ASSETS,
+        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
+    },
+    "g": {
+        # basic stuff (put in assets folder)
+        S_DIR_BIN: S_DIR_ASSETS,
+        S_DIR_CONF: S_DIR_ASSETS,
+        S_DIR_LOG: S_DIR_ASSETS,
+        S_DIR_I18N: S_DIR_ASSETS,
+        S_DIR_IMAGES: S_DIR_ASSETS,
+        S_DIR_INSTALL: S_DIR_ASSETS,
+        S_DIR_SRC: S_DIR_ASSETS,
+        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
+    },
+    "p": {
+        # basic stuff (put at top level)
+        "__PP_NAME_PRJ_SMALL__": "",
+        S_FILE_TOML: "",
+    },
+}
+
 # dictionary of default stuff to put in install.json
 # NB: in S_KEY_INST_CONT, key is rel to assets, val is rel to home
 # these are the defaults, they can be edited in install/install.json before
 # running pybaker
-D_INSTALL = {
+D_TYPE_INST = {
     "c": {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
         S_KEY_INST_VER: "__PP_VER_MMR__",
@@ -1119,7 +1165,7 @@ D_INSTALL = {
             S_DIR_INSTALL: "__PP_USR_INST__",
             S_DIR_SRC: "__PP_USR_INST__",
             S_FILE_UNINST_PY: "__PP_USR_INST__",
-            # extra for gui
+            # NB: extra for gui
             "__PP_FILE_DESK__": "__PP_USR_APPS__",
         },
     },
@@ -1129,7 +1175,7 @@ D_INSTALL = {
 # NB: in S_KEY_INST_CONT, items are files or folders to delete
 # these are the defaults, they can be edited in install/uninstall.json before
 # running pybaker
-D_UNINSTALL = {
+D_TYPE_UNINST = {
     "c": {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
         S_KEY_INST_VER: "__PP_VER_MMR__",
@@ -1144,53 +1190,9 @@ D_UNINSTALL = {
         S_KEY_INST_CONT: [
             "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
             "__PP_USR_INST__",
-            # extra for gui
+            # NB: extra for gui
             "__PP_USR_APPS__/__PP_NAME_PRJ_BIG__.desktop",
         ],
-    },
-}
-
-# dict of files that should be copied from the PyPlate project to the resulting
-# project (outside of the template dir)
-# this is so that when you update a file in the PyPlate project, it gets copied
-# to the project, and cuts down on duplicate files
-# key is the relative path to the source file in PyPlate
-# val is the relative path to the dest file in the project dir
-D_COPY = {
-    f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
-    f"{S_DIR_MISC}/how_to": f"{S_DIR_MISC}/how_to",
-}
-
-# NB: key is src, rel to prj dir
-# NB: val is dst, rel to dist dir
-D_TYPE_DIST = {
-    "c": {
-        # basic stuff (put in assets folder)
-        S_DIR_BIN: S_DIR_ASSETS,
-        S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LOG: S_DIR_ASSETS,
-        S_DIR_I18N: S_DIR_ASSETS,
-        S_DIR_INSTALL: S_DIR_ASSETS,
-        S_DIR_SRC: S_DIR_ASSETS,
-        # requirements.txt in assets/install folder
-        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-    },
-    "g": {
-        # basic stuff (put in assets folder)
-        S_DIR_BIN: S_DIR_ASSETS,
-        S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LOG: S_DIR_ASSETS,
-        S_DIR_I18N: S_DIR_ASSETS,
-        S_DIR_IMAGES: S_DIR_ASSETS,
-        S_DIR_INSTALL: S_DIR_ASSETS,
-        S_DIR_SRC: S_DIR_ASSETS,
-        # requirements.txt in assets/install folder
-        S_FILE_REQS: f"{S_DIR_ASSETS}/{S_DIR_INSTALL}",
-    },
-    "p": {
-        # basic stuff (put at top level)
-        "__PP_NAME_PRJ_SMALL__": "",
-        S_FILE_TOML: "",
     },
 }
 
@@ -1406,26 +1408,9 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 
             # show info
             print(S_ACTION_INST, end="", flush=True)
-
-            # create a template install cfg file
-            dict_inst = D_INSTALL[prj_type]
-            # fix dunders in inst cfg file
-            path_inst = dir_prj / S_PATH_INST_CFG
-            # create a template uninstall cfg file
-            dict_uninst = D_UNINSTALL[prj_type]
-            # fix dunders in uninst cfg file
-            path_uninst = dir_prj / S_PATH_UNINST_CFG
-
-            try:
-                F.save_dict_into_paths(dict_inst, [path_inst])
-                F.save_dict_into_paths(dict_uninst, [path_uninst])
-
-                # show info
-                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-            except OSError as e:  # from save_dict
-                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd(S_ERR_ERR, str(e))
+            # FIXME: no! load from passed dict
+            # call sub to recreate install.json/uninstall.json
+            _fix_inst(dir_prj, prj_type)
 
     # --------------------------------------------------------------------------
     # purge package dirs
@@ -1472,17 +1457,21 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         dict_dst[S_KEY_PUB_I18N_SRC] = list(dict_src[S_KEY_PUB_I18N_SRC])
 
     # --------------------------------------------------------------------------
-    # figure out dist dict
+    # set dist dict to default
 
     dict_pub[S_KEY_PUB_DIST] = dict(D_TYPE_DIST[prj_type])
-    dict_pub[S_KEY_PUB_INST] = dict(D_INSTALL[prj_type])
-    dict_pub[S_KEY_PUB_UNINST] = dict(D_UNINSTALL[prj_type])
+
+    # --------------------------------------------------------------------------
+    # set inst/uninst dicts to default
+
+    dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
+    dict_pub[S_KEY_PUB_UNINST] = dict(D_TYPE_UNINST[prj_type])
 
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
+def do_before_fix(dir_prj, dict_prv, dict_pub, _dict_dbg):
     """
     Do any work before fix
 
@@ -1584,7 +1573,6 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
     else:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
-
 
 # ------------------------------------------------------------------------------
 # Do any work after fix
@@ -1863,6 +1851,21 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # we are done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
+    # --------------------------------------------------------------------------
+    # install/uninstall config files
+
+    # if install flag is set
+    if dict_dbg[S_KEY_DBG_INST]:
+
+        # cli/gui
+        if prj_type in L_APP_INSTALL:
+
+            # show info
+            print(S_ACTION_INST, end="", flush=True)
+            # FIXME: no! load from passed dict
+            # call sub to recreate install.json/uninstall.json
+            _fix_inst(dir_prj, prj_type)
+
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
@@ -2056,6 +2059,8 @@ def do_i18n(dir_prj, dict_prv, dict_pub, _dict_dbg):
         dict_pub: The dictionary containing public project data
         dict_dbg: The dictionary containing the current session's debug
         settings
+
+        This method is public to allow for PyBaker's -l command line option.
     """
 
     # get project type
@@ -2202,14 +2207,6 @@ def _fix_meta(path, dict_prv, dict_pub):
     # fix pyproject
     if path.name == S_FILE_TOML:
         _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
-
-    # # fix inst
-    # if path.name == S_FILE_INST_CFG:
-    #     _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
-
-    # # fix uninst
-    # if path.name == S_FILE_UNINST_CFG:
-    #     _fix_inst(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
     # fix mkdocs.yml
     if path.name == S_FILE_MKDOCS_YML:
@@ -2369,33 +2366,47 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
         a_file.write(text)
 
 
-# # --------------------------------------------------------------------------
-# # Fix the version number in install/uninstall files
-# # --------------------------------------------------------------------------
-# def _fix_inst(path, dict_prv_prj, _dict_pub_meta, _dict_type_rules):
-#     """
-#     Fix the version number in install/uninstall files
+# --------------------------------------------------------------------------
+# Fix the version number in install/uninstall files
+# --------------------------------------------------------------------------
+def _fix_inst(dir_prj, prj_type):
+    """
+    Fix the version number in install/uninstall files
 
-#     Args:
-#         path: Path for the file to modify text
-#         dict_prv_prj: Private calculated proj dict
-#         dict_pub_meta: Dict of metadata to replace in the file
+    Args:
+        path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict
+        dict_pub_meta: Dict of metadata to replace in the file
 
-#     Fixes the version number in any file whose name matches S_FILE_INST_CFG or
-#     S_FILE_UNINST_CFG.
-#     """
+    Fixes the version number in any file whose name matches S_FILE_INST_CFG or
+    S_FILE_UNINST_CFG.
+    """
 
-#     # get version from project.json
-#     version = dict_prv_prj["__PP_VER_MMR__"]
+    # --------------------------------------------------------------------------
 
-#     try:
-#         # load/change/save
-#         a_dict = F.load_paths_into_dict(path)
-#         a_dict[S_KEY_INST_VER] = version
-#         F.save_dict_into_paths(a_dict, [path])
-#     except OSError as e:  # from load_dicts/save_dict
-#         F.printd(S_ERR_ERR, str(e))
+    # FIXME: no! load from passed dict
+    # pm: conf
+    # pb: file
 
+    # create a template install cfg file
+    dict_inst = D_TYPE_INST[prj_type]
+    # fix dunders in inst cfg file
+    path_inst = dir_prj / S_PATH_INST_CFG
+    # create a template uninstall cfg file
+    dict_uninst = D_TYPE_UNINST[prj_type]
+    # fix dunders in uninst cfg file
+    path_uninst = dir_prj / S_PATH_UNINST_CFG
+
+    try:
+        F.save_dict_into_paths(dict_inst, [path_inst])
+        F.save_dict_into_paths(dict_uninst, [path_uninst])
+
+        # show info
+        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
+    except OSError as e:  # from save_dict
+        F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+        F.printd(S_ERR_ERR, str(e))
 
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file

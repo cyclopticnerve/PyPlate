@@ -93,7 +93,7 @@ class CNDevelop:
 
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
-    S_CMD_INSTALL = "__PP_DEV_INST__"
+    S_CMD_TYPE_INST = "__PP_DEV_INST__"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -164,7 +164,7 @@ class CNDevelop:
         print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
-        cmd = self.S_CMD_INSTALL.format(
+        cmd = self.S_CMD_TYPE_INST.format(
             P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
         )
         try:

@@ -66,6 +66,23 @@
             "src"
         ]
     },
+    "PUB_INST": {
+        "INST_NAME": "PyPlate",
+        "INST_VER": "0.0.10",
+        "INST_DESK": false,
+        "INST_CONT": {
+            "bin/pymaker": ".local/bin",
+            "bin/pybaker": ".local/bin",
+            "conf": ".local/share/pyplate",
+            "log": ".local/share/pyplate",
+            "i18n": ".local/share/pyplate",
+            "images": ".local/share/pyplate",
+            "install": ".local/share/pyplate",
+            "src": ".local/share/pyplate",
+            "template": ".local/share/pyplate",
+            "uninstall.py": ".local/share/pyplate"
+        }
+    },
     "PUB_I18N": {
         "DOMAIN": "pyplate",
         "SOURCES": [
@@ -96,6 +113,15 @@
                 "pybaker"
             ]
         }
+    },
+    "PUB_UNINST": {
+        "INST_NAME": "PyPlate",
+        "INST_VER": "0.0.10",
+        "INST_CONT": [
+            ".local/bin/pymaker",
+            ".local/bin/pybaker",
+            ".local/share/pyplate"
+        ]
     },
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
