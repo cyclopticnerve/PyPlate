@@ -2,6 +2,25 @@
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
 TODO: make pp in pp
+TODO: make github repo after template
+Quick setup — if you’ve done this kind of thing before
+https://github.com/cyclopticnerve/PKG_Test.git
+
+or create a new repository on the command line
+
+echo "# PKG_Test" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
+git push -u origin main
+  
+or push an existing repository from the command line
+
+git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
+git branch -M main
+git push -u origin main
 
 DONE: add --uninstall to pyplate
 DONE: leave template code to fudge path (used often)

@@ -47,7 +47,7 @@
         "__PP_NAME_SEC_BIG__": "",
         "__PP_NAME_SEC_SMALL__": "",
         "__PP_NAME_SEC_PASCAL__": "",
-        "__PP_DATE__": "01/08/2026",
+        "__PP_DATE__": "01/09/2026",
         "__PP_NAME_VENV__": ".venv-pyplate",
         "__PP_FILE_APP__": "pyplate_app",
         "__PP_CLASS_APP__": "pyplateApp",
@@ -58,11 +58,11 @@
         "__PP_IMG_DESK__": ".local/share/pyplate/images/pyplate.png",
         "__PP_IMG_DASH__": "../../../images/pyplate.png",
         "__PP_IMG_ABOUT__": "../../../images/pyplate.png",
-        "__PP_VER_MMR__": "1.1.1",
-        "__PP_VER_DISP__": "Version 1.1.1",
+        "__PP_VER_MMR__": "0.1.0",
+        "__PP_VER_DISP__": "Version 0.1.0",
         "__PP_DEV_INST__": "cd {};. {}/bin/activate;python -m pip install -r {}",
         "__PP_USR_INST__": ".local/share/pyplate",
         "__PP_APP_ID__": "org.cyclopticnerve.pyplate",
-        "__PP_FMT_DIST__": "pyplate-1.1.1"
+        "__PP_FMT_DIST__": "pyplate-0.1.0"
     }
 }

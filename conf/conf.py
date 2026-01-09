@@ -126,10 +126,10 @@ S_ASK_TYPE_JOIN = " | "
 S_ASK_TYPE = _("Project type [{}]: ")
 # NB: format param is __PP_NAME_PRJ_SMALL__
 # I18N: ask module name
-S_ASK_SEC_P = _("Module name (default: {}): ")
+S_ASK_SEC_P = _("Module name ({}): ")
 # NB: format param is __PP_NAME_PRJ_SMALL__
 # I18N: ask window class name
-S_ASK_SEC_G = _("Window class name (default: {}): ")
+S_ASK_SEC_G = _("Window class name ({}): ")
 # NB: format param is current working dir
 # I18N: ask prj name if running pybaker in IDE
 S_ASK_IDE = _("Project name: (relative to {}): ")
@@ -2043,7 +2043,7 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         # "I expect the BEST!" - Debbie Hunt
         deploy = True
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # print info
         print(S_ACTION_BAKE_DOCS, end="", flush=True)
