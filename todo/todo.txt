@@ -1,4 +1,10 @@
 
+FIXME: THE FUCKING DOCS_USE_RM !!!
+
+TODO: make pp in pp
+keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
+tests, todo, readme, 
+
 # TODO: all refs to .local, etc. should be relative to prj in ide until uninstall
 # TODO: remove tooltips from docs
 # TODO: combine pyplate.py B_ flags into dict and add to project.json
@@ -147,6 +153,37 @@ how does that affect other stuff
 also why does it try to load png from current dir? (about dlg!)
 
 
+NEXT: make github repo after template
+Quick setup — if you’ve done this kind of thing before
+https://github.com/cyclopticnerve/PKG_Test.git
+
+or create a new repository on the command line
+
+echo "# PKG_Test" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
+git push -u origin main
+  
+or push an existing repository from the command line
+
+git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
+git branch -M main
+git push -u origin main
+
+NEXT: how to check for missing keys (see configurator in "other" dir)
+NEXT: spinning * at ... Done
+NEXT: don't run pm if 'pyplate' in path (recursion)
+NEXT: break conf into hook files
+NEXT: copy default files from template on make / (bake?)
+        also where does each file in misc come from
+        this should be a hodgepodge but should template be the master or pp?
+        need a chart of sources and dests
+NEXT: F.run that runs in venv
+
+
 NEXT: i18n for error messages and file/dir names in settings.py
 NEXT: should we ask for names of files for gui ala module name for pkg?
 NEXT: should we run potpy on a fresh project? any benefit?
@@ -235,7 +272,13 @@ NEXT: check cspell
 NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
-
+DONE: put pp venv cnlib back to github
+DONE: add --uninstall to pyplate
+DONE: leave template code to fudge path (used often)
+DONE: test develop.py
+DONE: cmd params not exclusive
+-l bakes in new .po
+-v bakes in new version
 DONE: prg image in docs
 DONE: prg version in docs
 DONE ask for meta
