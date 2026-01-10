@@ -164,8 +164,7 @@
    │     │     ├─ [] cnwindow_w_state.py
    │     │     ├─ [] cnwindow.py
    │     │     └─ [] state.py
-   │     ├─ [] todo.txt
-   │     └─ [] todo2.txt
+   │     └─ [] todo.txt
    ├─ [] .gitignore
    ├─ [] LICENSE.txt
    ├─ [] PyPlate.code-workspace
