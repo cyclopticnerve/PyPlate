@@ -47,15 +47,11 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="API/src/pybaker/" class="dropdown-item">pybaker.py</a>
-</li>
-            
-<li>
-    <a href="API/src/pymaker/" class="dropdown-item">pymaker.py</a>
-</li>
-            
-<li>
     <a href="API/src/pyplate/" class="dropdown-item">pyplate.py</a>
+</li>
+            
+<li>
+    <a href="API/src/pyplate_base/" class="dropdown-item">pyplate_base.py</a>
 </li>
     </ul>
   </li>
@@ -75,7 +71,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="API/src/pybaker/" class="nav-link">
+                                <a rel="next" href="API/src/pyplate/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -123,18 +119,6 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#pymaker-create-the-project" class="nav-link">PyMaker - Create the project</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#pybaker-build-the-project" class="nav-link">PyBaker - Build the project</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#documenting-you-project" class="nav-link">Documenting you project</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
             <li class="nav-item" data-bs-level="2"><a href="#uninstalling" class="nav-link">Uninstalling</a>
               <ul class="nav flex-column">
               </ul>
@@ -161,7 +145,7 @@
 <!----------------------------------------------------------------------------->
 <!-- Project : PyPlate                                         /          \  -->
 <!-- Filename: README.md                                      |     ()     | -->
-<!-- Date    : 12/19/2022                                     |            | -->
+<!-- Date    : 01/09/2026                                     |            | -->
 <!-- Author  : cyclopticnerve                                 |   \____/   | -->
 <!-- License : WTFPLv2                                         \          /  -->
 <!----------------------------------------------------------------------------->
@@ -227,66 +211,6 @@ release</a>
 
 <h2 id="usage">Usage</h2>
 <p>Read the full <a href="https://cyclopticnerve.github.io/PyPlate">documentation</a>.</p>
-<p>PyPlate consists of two main programs, 'pymaker' and 'pybaker'. The first
-is used to create the project, and the second is used to build an existing
-project as its development continues.</p>
-<p>Let us start with 'pymaker'.</p>
-<h2 id="pymaker-create-the-project">PyMaker - Create the project</h2>
-<p>Before you do anything, you should take a look at the 'conf.py' file in
-'~/.local/share/pyplate/conf'. This file contains A <strong>LOT</strong> of information that
-is used when creating/building a project. Most of these are string values and
-file/folder names used in the program, which you are free to change. PyPlate
-does not yet support i18n/l10n for itself (meaning any strings in this file
-will not be i18n'ed), but that may be included at a later date.  </p>
-<p>This file also contains some functions that are run at various times during
-creating/building the project, such as before/after creating a project,
-before/after building a project, etc.
-These functions have been extended to the config file so you don't have to do a
-lot of mucking around in the source code, but be sure to take a look at those
-too.</p>
-<p>Now run the script from the command line, in the directory where you want to
-create the project:</p>
-<pre><code class="language-bash">$ cd ~/Projects/Python
-$ pymaker
-</code></pre>
-<p>Enter the required information, and 'pymaker' will create the required files
-and folders in a subdirectory of the current directory. </p>
-<p>That's it! From there you are free to modify the projects in your favorite IDE.</p>
-<h2 id="pybaker-build-the-project">PyBaker - Build the project</h2>
-<p>Once you have created a project, you can use 'pybaker' in the project's
-directory to update metadata in the project's files and create a
-'dist' folder.
-If you are using VSCode, you can select 'Terminal/Run Build Task...' from the
-menu bar or press 'Ctrl+Shift+B'.</p>
-<p>'pybaker' is a program which will replace certain values in the project
-directory. These values are read/written in the 'project.json' file in your
-project's 'pyplate/project.json' file. Things like version number, short
-description, and other values that might change during a project's lifecycle
-are placed here.</p>
-<p>The values in the 'pyplate/project.json' file can be edited at any time,
-followed by re-running 'pybaker'.</p>
-<p>Note that if you are running pybaker from VSCode, it will ask for the name of
-the project (since it may not know the current directory). Give it the name of
-the project's directory as it was created by pymaker, relative to the current
-dir in VSCode's terminal.</p>
-<h2 id="documenting-you-project">Documenting you project</h2>
-<p>You can document your project using either pdoc3 or MkDocs.</p>
-<p>Step 1:
-- Create your project using pymaker
-- Publish your repo to GitHub</p>
-<p>Step 2:
-   - To use pdoc3, you have to:
-      - Open you GitHub repo in a browser
-      - Go to the repo's Settings/Pages
-      - Set the source to your main branch / docs folder</p>
-<ul>
-<li>To use MkDocs, you have to:<ul>
-<li>run 'pybaker' from your project directory</li>
-</ul>
-</li>
-</ul>
-<p>Wait a minute or two, and your docs should appear at
-      https://\&lt;username&gt;.github.io/\&lt;repo_name&gt;</p>
 <h2 id="uninstalling">Uninstalling</h2>
 <!-- __RM_APP__ -->
 <p>Go to the source folder for PyPlate and run the uninstaller:</p>
@@ -296,21 +220,12 @@ $ ./uninstall.py
 <!-- __RM_APP__ -->
 
 <h2 id="documentation">Documentation</h2>
-<p>See the full <a href="https://cyclopticnerve.github.io/PyPlate">documentation</a></p>
+<p>See the full <a href="https://cyclopticnerve.github.io/PyPlate">documentation</a>.</p>
 <h2 id="developing">Developing</h2>
 <p>If you are developing this project, make sure you run the "develop.py" script
 first to create the proper virtual environment (venv). </p>
 <h2 id="notes">Notes</h2>
-<p>If you have any sort of spellchecker in your IDE, <em>FOR GOD'S SAKE TURN IT OFF!</em>
-It would brick a fucking quantum computer. On the other hand, I'm about to use
-an Oxford comma, so \/ jog on.</p>
-<p>If you make any changes to this template to better suit your own style/setup,
-please let me know or send a pull request. I will take a look and see if I can
-incorporate your changes to make them user, system, and/or IDE agnostic. This
-way the template can hopefully become more customizable to suit everyone's
-needs.</p>
-<p>PyPlate currently uses <a href="https://https://www.mkdocs.org/">MkDocs</a> for
-documentation, because pdoc3 is TOO SIMPLE and sphinx is TOO COMPLEX!</p>
+<p>blah blah blah</p>
 <p>-)</p>
 <!-- -) --></div>
             </div>
@@ -394,5 +309,5 @@ documentation, because pdoc3 is TOO SIMPLE and sphinx is TOO COMPLEX!</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-01-10 03:22:18.074514+00:00
+Build Date UTC : 2026-01-10 03:51:07.541203+00:00
 -->
