@@ -173,7 +173,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         "__PP_NAME_PRJ_BIG__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__"
     )
 
     # default format af log files

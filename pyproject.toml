@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: pyproject.toml                                        |     ()     |
-# Date    : 10/05/2023                                            |            |
+# Date    : 01/09/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ dependencies = []
 requires-python = ">=3.10"
 
 [project.urls]
-Homepage = "https://github.com/cyclopticnerve/PyPlate"
+homepage = "https://github.com/cyclopticnerve/PyPlate"
 
 [tool.setuptools]
 packages = ["pyplate"]

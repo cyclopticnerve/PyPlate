@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
-# Date    : 12/29/2025                                            |            |
+# Date    : 01/09/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -48,8 +48,8 @@ P_FILE_REQS = P_DIR_INSTALL / "requirements.txt"
 P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
 P_FILE_DESK_ICON = P_DIR_ASSETS / ".local/share/pyplate/images/pyplate.png"
 
-P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "pre_install.py"
+P_FILE_POST = P_DIR_INSTALL / "post_install.py"
 
 # ------------------------------------------------------------------------------
 # Local imports

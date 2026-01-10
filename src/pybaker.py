@@ -88,11 +88,11 @@ class PyBaker(PyPlate):
         f"{'PyPlate/PyBaker'}\n"
         f"{PyPlate.S_PP_SHORT_DESC}\n"
         f"{PyPlate.S_PP_VERSION}\n"
-        f"https://github.com/cyclopticnerve/PyPlate\n"
+        f"https://github.com/cyclopticnerve/PyPlate"
     )
 
     # I18N cmd line instructions string
-    S_EPILOG = _(
+    S_EPILOG = "\n" + _(
         "Run this program from the directory of the project you want to build."
     )
 
@@ -187,6 +187,8 @@ class PyBaker(PyPlate):
 
         # call boilerplate code
         self._teardown()
+
+        print()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -554,9 +556,7 @@ class PyBaker(PyPlate):
 
             # ask to overwrite
             msg = self.S_ASK_OVER.format(lang_file)
-            ask = F.dialog(
-                msg, [F.S_ASK_YES, F.S_ASK_NO], default=F.S_ASK_NO
-            )
+            ask = F.dialog(msg, [F.S_ASK_YES, F.S_ASK_NO], default=F.S_ASK_NO)
             if ask != F.S_ASK_YES:
                 F.printc(P.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
                 return
@@ -566,6 +566,7 @@ class PyBaker(PyPlate):
         shutil.copy(p_lang, dst_file)
 
         F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

@@ -147,11 +147,11 @@ class CNInstallBase:
         "__PP_NAME_PRJ_BIG__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__\n"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__"
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_ABOUT_HELP = "\n" + _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -309,7 +309,6 @@ class CNInstallBase:
 
         # add help text to about block (only if we got past -h)
         if not quiet:
-            print()
             print(self.S_ABOUT_HELP)
             print()
 

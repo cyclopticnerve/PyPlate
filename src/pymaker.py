@@ -63,11 +63,12 @@ class PyMaker(PyPlate):
         f"{'PyPlate/PyMaker'}\n"
         f"{PyPlate.S_PP_SHORT_DESC}\n"
         f"{PyPlate.S_PP_VERSION}\n"
-        f"https://github.com/cyclopticnerve/PyPlate\n"
+        f"https://github.com/cyclopticnerve/PyPlate"
     )
 
     # I18N cmd line instructions string
     S_EPILOG = _(
+        "\n"
         "Run this program from the directory where you want to create "
         "a project."
     )
@@ -119,6 +120,8 @@ class PyMaker(PyPlate):
 
         # do extra stuff to final dir after fix
         self._do_after_fix()
+
+        print()
 
         # ----------------------------------------------------------------------
         # teardown

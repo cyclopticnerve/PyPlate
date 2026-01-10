@@ -1287,7 +1287,7 @@ D_PURGE = {
         S_DIR_I18N,
         S_DIR_INSTALL,
         S_DIR_SRC,
-        # S_FILE_REQS,
+        S_FILE_REQS,
     ]
 }
 

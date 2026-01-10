@@ -149,7 +149,7 @@ class PyPlate:
     S_ABOUT = ""
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help") + "\n"
+    S_ABOUT_HELP = "\n" + _("Use -h for help")
 
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
@@ -328,7 +328,6 @@ class PyPlate:
             sys.exit(0)
 
         # no -h, print epilog
-        print()
         print(self.S_ABOUT_HELP)
         print()
 

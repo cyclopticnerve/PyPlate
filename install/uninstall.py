@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : 12/29/2025                                            |            |
+# Date    : 01/09/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -40,9 +40,8 @@ P_FILE_CFG = P_DIR_PRJ / "install.json"
 # NB: path changes after dist
 P_FILE_CFG_DIST = P_DIR_INSTALL / "install.json"
 
-
-P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "pre_install.py"
+P_FILE_POST = P_DIR_INSTALL / "post_install.py"
 
 # ------------------------------------------------------------------------------
 # Local imports

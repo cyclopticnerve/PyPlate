@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1.0\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-01-09 10:39-0500\n"
+"POT-Creation-Date: 2026-01-10 13:54-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,13 +19,13 @@ msgstr ""
 
 #. I18N: done with step
 #: develop.py:79
-#: install/install_base.py:168
+#: install/install_base.py:167
 msgid "Done"
 msgstr ""
 
 #. I18N: step failed
 #: develop.py:81
-#: install/install_base.py:170
+#: install/install_base.py:169
 msgid "Failed"
 msgstr ""
 
@@ -99,81 +99,81 @@ msgid "No desktop files present"
 msgstr ""
 
 #. I18N: dry mode help
-#: install/install_base.py:122
+#: install/install_base.py:121
 msgid "enable dry run mode"
 msgstr ""
 
 #. I18N: force option help
-#: install/install_base.py:129
+#: install/install_base.py:128
 msgid "force install this program"
 msgstr ""
 
 #. I18N: quiet option help
-#: install/install_base.py:136
+#: install/install_base.py:135
 msgid "do not print about message"
 msgstr ""
 
 #. I18N: help option help
-#: install/install_base.py:143
+#: install/install_base.py:142
 #: src/pyplate.py:139
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
-#: install/install_base.py:155
+#: install/install_base.py:154
 #: src/pyplate.py:152
 msgid "Use -h for help"
 msgstr ""
 
 #. I18N: process aborted
-#: install/install_base.py:172
+#: install/install_base.py:171
 #: src/pyplate.py:176
 msgid "Aborted"
 msgstr ""
 
 #. I18N: run external script
-#: install/install_base.py:175
+#: install/install_base.py:174
 msgid "Running {}... "
 msgstr ""
 
 #. I18N: answer yes
-#: install/install_base.py:181
+#: install/install_base.py:180
 msgid "y"
 msgstr ""
 
 #. I18N: answer no
-#: install/install_base.py:183
+#: install/install_base.py:182
 msgid "N"
 msgstr ""
 
 #. I18N: an error occurred
-#: install/install_base.py:189
+#: install/install_base.py:188
 #: src/pyplate.py:182
 msgid "Error:"
 msgstr ""
 
 #. I18N: config file not found
-#: install/install_base.py:192
+#: install/install_base.py:191
 msgid "File {} not found"
 msgstr ""
 
 #. I18N: config file is not valid json
-#: install/install_base.py:195
+#: install/install_base.py:194
 msgid "File {} is not a JSON file"
 msgstr ""
 
 #. I18N: uninstall the program
-#: install/uninstall.py:87
+#: install/uninstall.py:86
 msgid "Uninstalling {}"
 msgstr ""
 
 #. I18N: show the copy step
-#: install/uninstall.py:89
+#: install/uninstall.py:88
 msgid "Deleting files... "
 msgstr ""
 
 #. I18N: done uninstalling
-#: install/uninstall.py:92
+#: install/uninstall.py:91
 msgid "{} uninstalled"
 msgstr ""
 
@@ -184,7 +184,7 @@ msgstr ""
 #. S_ASK_NO = _("N")
 #. NB: format param is prog name
 #. I18N: ask to uninstall
-#: install/uninstall.py:97
+#: install/uninstall.py:96
 #: src/pyplate.py:170
 msgid ""
 "This will uninstall {}.\n"
@@ -250,10 +250,12 @@ msgid "The file {} already exists. Do you want to overwrite it?"
 msgstr ""
 
 #: src/pymaker.py:71
-msgid "Run this program from the directory where you want to create a project."
+msgid ""
+"\n"
+"Run this program from the directory where you want to create a project."
 msgstr ""
 
-#: src/pymaker.py:79
+#: src/pymaker.py:80
 msgid "Making {}"
 msgstr ""
 

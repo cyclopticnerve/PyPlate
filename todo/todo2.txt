@@ -1,8 +1,19 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
+TODO: put pp venv cnlib back to github
 TODO: make pp in pp
-TODO: make github repo after template
+keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
+tests, todo, readme, 
+
+DONE: add --uninstall to pyplate
+DONE: leave template code to fudge path (used often)
+DONE: test develop.py
+DONE: cmd params not exclusive
+-l bakes in new .po
+-v bakes in new version
+
+NEXT: make github repo after template
 Quick setup — if you’ve done this kind of thing before
 https://github.com/cyclopticnerve/PKG_Test.git
 
@@ -21,13 +32,6 @@ or push an existing repository from the command line
 git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
 git branch -M main
 git push -u origin main
-
-DONE: add --uninstall to pyplate
-DONE: leave template code to fudge path (used often)
-DONE: test develop.py
-DONE: cmd params not exclusive
--l bakes in new .po
--v bakes in new version
 
 NEXT: how to check for missing keys (see configurator in "other" dir)
 NEXT: spinning * at ... Done

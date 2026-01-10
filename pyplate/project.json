@@ -1,4 +1,22 @@
 {
+    "PUB_META": {
+        "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
+        "META_VERSION": "0.1.0",
+        "META_KEYWORDS": [
+            "python",
+            "cli",
+            "template",
+            "app",
+            "package",
+            "gui",
+            "module",
+            "gtk3"
+        ],
+        "META_DEPS": {
+            "Python 3.10+": "https://python.org"
+        },
+        "META_CATS": []
+    },
     "PUB_BL": {
         "SKIP_ALL": [
             ".git",
@@ -44,7 +62,7 @@
         "DBG_I18N": true,
         "DBG_DOCS": true,
         "DBG_TREE": true,
-        "DBG_DIST": true
+        "DBG_DIST": false
     },
     "PUB_DIST": {
         "bin": "assets",
@@ -86,28 +104,9 @@
             ]
         },
         "WLANGS": [
-            "en",
-            "es"
+            "en"
         ],
         "CHARSET": "UTF-8"
-    },
-    "PUB_META": {
-        "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "0.1.0",
-        "META_KEYWORDS": [
-            "python",
-            "cli",
-            "template",
-            "app",
-            "package",
-            "gui",
-            "module",
-            "gtk3"
-        ],
-        "META_DEPS": {
-            "Python 3.10+": "https://python.org"
-        },
-        "META_CATS": []
     },
     "PUB_INST": {
         "INST_NAME": "PyPlate",
@@ -122,8 +121,8 @@
             "images": ".local/share/pyplate",
             "install": ".local/share/pyplate",
             "src": ".local/share/pyplate",
-            "template": ".local/share/pyplate",
-            "uninstall.py": ".local/share/pyplate"
+            "uninstall.py": ".local/share/pyplate",
+            "template": ".local/share/pyplate"
         },
         "UNINST_CONT": [
             ".local/bin/pymaker",

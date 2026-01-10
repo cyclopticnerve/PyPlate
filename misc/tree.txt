@@ -17,21 +17,15 @@
    │     ├─ [] images/
    │     │     └─ [] pyplate.png
    │     ├─ [] img/
-   │     │     ├─ [] favicon.ico
-   │     │     └─ [] pyplate.png
+   │     │     └─ [] favicon.ico
    │     └─ [] index.md
    ├─ [] i18n/
    │     ├─ [] locale/
-   │     │     ├─ [] en/
-   │     │     │     └─ [] LC_MESSAGES/
-   │     │     │           └─ [] pyplate.mo
-   │     │     └─ [] es/
+   │     │     └─ [] en/
    │     │           └─ [] LC_MESSAGES/
    │     │                 └─ [] pyplate.mo
    │     ├─ [] po/
    │     │     ├─ [] en/
-   │     │     │     └─ [] pyplate.po
-   │     │     ├─ [] es/
    │     │     │     └─ [] pyplate.po
    │     │     └─ [] LINGUAS
    │     └─ [] pot/

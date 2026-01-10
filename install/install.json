@@ -11,8 +11,8 @@
         "images": ".local/share/pyplate",
         "install": ".local/share/pyplate",
         "src": ".local/share/pyplate",
-        "template": ".local/share/pyplate",
-        "uninstall.py": ".local/share/pyplate"
+        "uninstall.py": ".local/share/pyplate",
+        "template": ".local/share/pyplate"
     },
     "UNINST_CONT": [
         ".local/bin/pymaker",

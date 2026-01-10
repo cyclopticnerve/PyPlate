@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: install_base.py                                       |     ()     |
-# Date    : 01/01/2026                                            |            |
+# Date    : 01/09/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -57,7 +57,6 @@ _ = T_TRANSLATION.gettext
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
 locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -148,11 +147,11 @@ class CNInstallBase:
         "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "https://github.com/cyclopticnerve/PyPlate\n"
+        "https://github.com/cyclopticnerve/PyPlate"
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_ABOUT_HELP = "\n" + _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -310,7 +309,6 @@ class CNInstallBase:
 
         # add help text to about block (only if we got past -h)
         if not quiet:
-            print()
             print(self.S_ABOUT_HELP)
             print()
 
