@@ -22,8 +22,6 @@ directory).
 
 # system imports
 import argparse
-# import gettext
-# import locale
 import logging
 from pathlib import Path
 import sys
@@ -71,25 +69,6 @@ P_UNINST_DIST = P_DIR_PRJ / "__PP_NAME_UNINST__"
 
 DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
 _ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
-
-# # ------------------------------------------------------------------------------
-# # gettext stuff for CLI and GUI
-# # NB: keep global
-# # to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
-
-# # path to project dir
-# T_DIR_PRJ = P_DIR_PRJ
-
-# # init gettext
-# T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-# T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
-# T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-# _ = T_TRANSLATION.gettext
-
-# # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# # use for CLI in the interest of common code)
-# locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
-
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -311,6 +290,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
             # print default about text
             print(self.S_ABOUT)
+            print()
 
             # print usage and arg info and exit
             self._parser.print_help()

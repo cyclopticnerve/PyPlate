@@ -1,9 +1,7 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
-TODO: make pp in pp
-keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
-tests, todo, readme, 
+TODO: spinner as decorator (ysap)
 
 # TODO: all refs to .local, etc. should be relative to prj in ide until uninstall
 # TODO: remove tooltips from docs
@@ -272,6 +270,9 @@ NEXT: check cspell
 NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
+DONE: make pp in pp
+keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
+tests, todo, readme, 
 DONE: merge no-inst-json with main
 DONE: put pp venv cnlib back to github
 DONE: add --uninstall to pyplate
