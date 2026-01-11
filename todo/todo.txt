@@ -1,6 +1,7 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
+TODO: merge no-inst-json with main
 TODO: make pp in pp
 keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
 tests, todo, readme, 
