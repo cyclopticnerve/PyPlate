@@ -1,7 +1,6 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
-TODO: merge no-inst-json with main
 TODO: make pp in pp
 keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
 tests, todo, readme, 
@@ -273,6 +272,7 @@ NEXT: check cspell
 NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
+DONE: merge no-inst-json with main
 DONE: put pp venv cnlib back to github
 DONE: add --uninstall to pyplate
 DONE: leave template code to fudge path (used often)
