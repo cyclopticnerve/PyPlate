@@ -183,9 +183,14 @@ class CNUninstall(CNInstallBase):
         Get the install info from the config file.
         """
 
+        # get path to config (ide or dist)
+        path_cfg = P_FILE_CFG
+        if not path_cfg.exists():
+            path_cfg = P_FILE_CFG_DIST
+
         try:
             # get project info
-            self._dict_cfg = self._get_dict_from_file(P_FILE_CFG)
+            self._dict_cfg = self._get_dict_from_file(path_cfg)
         except OSError as e:
             print(self.S_ERR_ERR, e)
 

@@ -20,6 +20,7 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 # Imports
 # ------------------------------------------------------------------------------
 
+# NB: pure python
 # system imports
 from pathlib import Path
 import shutil

@@ -41,7 +41,7 @@ P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
 
 # get files
 P_FILE_CFG_UNINST = (
-    Path.home() / ".__PP_USR_INST__/__PP_DIR_INSTAL__/_PP_FILE_INST_CFG__"
+    Path.home() / "__PP_USR_INST__/__PP_DIR_INSTALL__/__PP_FILE_INST_CFG__"
 )
 P_FILE_CFG = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
@@ -242,6 +242,8 @@ class CNInstall(CNInstallBase):
         # do post install
         self._do_external(P_FILE_POST)
 
+        print()
+
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
@@ -269,8 +271,8 @@ class CNInstall(CNInstallBase):
         prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
         # print start msg
-        print()
         print(self.S_MSG_INST_START.format(prog_name, prog_version))
+        print()
 
     # --------------------------------------------------------------------------
     # Check version info
@@ -335,6 +337,8 @@ class CNInstall(CNInstallBase):
             if str_ask != self.S_ASK_YES:
                 print(self.S_MSG_ABORT)
                 sys.exit(0)
+
+        print()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -581,7 +585,7 @@ class CNInstall(CNInstallBase):
         if not pre_old and not pre_new:
             return self.I_VER_SAME
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # if pre_old and pre_new:
 

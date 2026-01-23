@@ -41,7 +41,7 @@ P_DIR_VENV = Path.home() / ".local/share/pyplate/.venv-pyplate"
 
 # get files
 P_FILE_CFG_UNINST = (
-    Path.home() / "..local/share/pyplate/__PP_DIR_INSTAL__/_PP_FILE_INST_CFG__"
+    Path.home() / ".local/share/pyplate/install/install.json"
 )
 P_FILE_CFG = P_DIR_INSTALL / "install.json"
 P_FILE_REQS = P_DIR_INSTALL / "requirements.txt"
@@ -102,8 +102,6 @@ class CNInstall(CNInstallBase):
     S_MSG_REQS_START = _("Installing requirements... ")
     # I18N: show desktop step
     S_MSG_DSK_START = _("Fixing .desktop file... ")
-    # I18N: done installing
-    S_MSG_INST_END = _("{} installed")
 
     # questions
     # I18N: ask to overwrite same version
@@ -236,6 +234,8 @@ class CNInstall(CNInstallBase):
         # move content
         self._install_content()
 
+        print()
+
         # wind down
         self._teardown()
 
@@ -269,8 +269,8 @@ class CNInstall(CNInstallBase):
         prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
         # print start msg
-        print()
         print(self.S_MSG_INST_START.format(prog_name, prog_version))
+        print()
 
     # --------------------------------------------------------------------------
     # Check version info
@@ -335,6 +335,8 @@ class CNInstall(CNInstallBase):
             if str_ask != self.S_ASK_YES:
                 print(self.S_MSG_ABORT)
                 sys.exit(0)
+
+        print()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -509,10 +511,6 @@ class CNInstall(CNInstallBase):
 
         # show some info
         print(self.S_MSG_DONE)
-
-        # just show we are done
-        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        print(self.S_MSG_INST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
     # Compare two semantic versions

@@ -1,7 +1,14 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
-TODO: spinner as decorator (ysap)
+TODO: no yell in pb -d
+TODO: f.dpretty for cpe and no trace
+TODO: spinner as decorator (https://blog.jcharistech.com/2025/02/05/how-to-add-progress-bars-spinners-to-clis-in-python/)
+TODO: man page
+TODO: decorator for debug - need to check debug flag, need func name for
+enter/exit
+TODO: put dunders in sep file for code completion?
+TODO: no commented code in base - should never need to be touched
 
 # TODO: all refs to .local, etc. should be relative to prj in ide until uninstall
 # TODO: remove tooltips from docs

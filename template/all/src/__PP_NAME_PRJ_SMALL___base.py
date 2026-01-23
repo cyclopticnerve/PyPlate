@@ -26,10 +26,9 @@ import logging
 from pathlib import Path
 import sys
 
-# third party imports
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnformatter import CNFormatter  # type: ignore
-
+# cnlib imports
+from cnlib import cnfunctions as F
+from cnlib.cnformatter import CNFormatter
 # ------------------------------------------------------------------------------
 # local imports
 
@@ -162,6 +161,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # questions
 
+    # I18N: answer yes
+    S_ASK_YES = _("y")
+    # I18N: answer no
+    S_ASK_NO = _("N")
     # NB: format param is prog name
     # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
@@ -244,22 +247,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ----------------------------------------------------------------------
         # use cmd line
 
-        # # add config option
-        # self._parser.add_argument(
-        #     self.S_ARG_CFG_OPTION,
-        #     dest=self.S_ARG_CFG_DEST,
-        #     help=self.S_ARG_CFG_HELP,
-        #     metavar=self.S_ARG_CFG_METAVAR
-        # )
-
-        # # add debug option
-        # self._parser.add_argument(
-        #     self.S_ARG_DBG_OPTION,
-        #     action=self.S_ARG_DBG_ACTION,
-        #     dest=self.S_ARG_DBG_DEST,
-        #     help=self.S_ARG_DBG_HELP,
-        # )
-
         # always add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
@@ -268,13 +255,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
             help=self.S_ARG_HLP_HELP,
         )
 
-        # # add uninstall option
-        # self._parser.add_argument(
-        #     self.S_ARG_UNINST_OPTION,
-        #     action=self.S_ARG_UNINST_ACTION,
-        #     dest=self.S_ARG_UNINST_DEST,
-        #     help=self.S_ARG_UNINST_HELP,
-        # )
+        # add uninstall option
+        self._parser.add_argument(
+            self.S_ARG_UNINST_OPTION,
+            action=self.S_ARG_UNINST_ACTION,
+            dest=self.S_ARG_UNINST_DEST,
+            help=self.S_ARG_UNINST_HELP,
+        )
 
         # run the parser
         args = self._parser.parse_args()
@@ -469,7 +456,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             print(self.S_MSG_ABORT)
             sys.exit(0)
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # if path exists
         path_uninst = P_UNINST
@@ -484,14 +471,11 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ----------------------------------------------------------------------
 
         try:
-            cp = F.run(cmd, shell=True)
-            print(cp.stdout)
-            print(cp.stderr)
+            F.run(cmd, shell=True)
             sys.exit(0)
         except F.CNRunError as e:
             print(e.output)
             sys.exit(e.returncode)
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

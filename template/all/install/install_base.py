@@ -171,7 +171,7 @@ class CNInstallBase:
     S_MSG_ABORT = _("Aborted")
     # NB: format param is script name
     # I18N: run external script
-    S_MSG_RUN_EXT = _("Running {}... ")
+    S_MSG_RUN_EXT = _("Running {}")
 
     # --------------------------------------------------------------------------
     # questions
@@ -426,7 +426,7 @@ class CNInstallBase:
             # ask the question, get the result
             inp = input(str_fmt)
 
-            # # no input (empty)
+            # no input (empty)
             if inp == "" and default != "":
                 return default
 
@@ -455,7 +455,7 @@ class CNInstallBase:
             return
 
         # print some info
-        print(self.S_MSG_RUN_EXT.format(path.name), end="", flush=True)
+        print(self.S_MSG_RUN_EXT.format(path.name), flush=True)
 
         # if it's a dry run, don't make venv
         if self._dry_run:
@@ -468,17 +468,12 @@ class CNInstallBase:
         # run the external script
         try:
             subprocess.run(cmd, shell=True, check=True)
-            print(self.S_MSG_DONE)
+            # print(self.S_MSG_DONE)
 
-        except FileNotFoundError as e:
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(self.S_MSG_FAIL)
             print()
-            print(self.S_ERR_ERR, e)
-
-        except subprocess.CalledProcessError as e:
-            print(self.S_MSG_FAIL)
-            print()
-            print(self.S_ERR_ERR, e.stderr)
+            print(e)
 
 
 # ------------------------------------------------------------------------------
