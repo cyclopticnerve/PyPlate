@@ -29,6 +29,7 @@ import sys
 # cnlib imports
 from cnlib import cnfunctions as F
 from cnlib.cnformatter import CNFormatter
+
 # ------------------------------------------------------------------------------
 # local imports
 
@@ -219,7 +220,9 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # cmd line stuff
         self._parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter, add_help=False
+            formatter_class=CNFormatter,
+            add_help=False,
+            prog="__PP_NAME_PRJ_SMALL__",
         )
 
         # set arg defaults
@@ -476,6 +479,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         except F.CNRunError as e:
             print(e.output)
             sys.exit(e.returncode)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

@@ -241,7 +241,7 @@ class PyPlate:
 
         # cmd line stuff
         self._parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter, add_help=False
+            formatter_class=CNFormatter, add_help=False,
         )
 
         # set arg defaults

@@ -145,6 +145,8 @@ class PyMaker(PyPlate):
         Perform some mundane stuff like setting properties.
         """
 
+        self._parser.prog = "pymaker"
+
         # do parent setup
         super()._setup()
 

@@ -206,6 +206,8 @@ class PyBaker(PyPlate):
         Perform some mundane stuff like setting properties.
         """
 
+        self._parser.prog = "pybaker"
+
         # add ide option
         self._parser.add_argument(
             self.S_ARG_IDE_OPTION,
