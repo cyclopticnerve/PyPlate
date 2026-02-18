@@ -1123,7 +1123,7 @@ D_TYPE_DIST = {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LOG: S_DIR_ASSETS,
+        # S_DIR_LOG: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         S_DIR_IMAGES: S_DIR_ASSETS,
         S_DIR_INSTALL: S_DIR_ASSETS,
@@ -1134,7 +1134,7 @@ D_TYPE_DIST = {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
-        S_DIR_LOG: S_DIR_ASSETS,
+        # S_DIR_LOG: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         S_DIR_IMAGES: S_DIR_ASSETS,
         S_DIR_INSTALL: S_DIR_ASSETS,
@@ -1158,7 +1158,7 @@ D_TYPE_INST = {
         S_KEY_INST_CONT: {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
             S_DIR_CONF: "__PP_USR_INST__",
-            S_DIR_LOG: "__PP_USR_INST__",
+            # S_DIR_LOG: ".local/share/pyplate",
             S_DIR_I18N: "__PP_USR_INST__",
             S_DIR_IMAGES: "__PP_USR_INST__",
             S_DIR_INSTALL: "__PP_USR_INST__",
@@ -1177,7 +1177,7 @@ D_TYPE_INST = {
         S_KEY_INST_CONT: {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
             S_DIR_CONF: "__PP_USR_INST__",
-            S_DIR_LOG: "__PP_USR_INST__",
+            # S_DIR_LOG: ".local/share/pyplate",
             S_DIR_I18N: "__PP_USR_INST__",
             S_DIR_IMAGES: "__PP_USR_INST__",
             S_DIR_INSTALL: "__PP_USR_INST__",
