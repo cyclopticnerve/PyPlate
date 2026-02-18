@@ -23,6 +23,7 @@ directory).
 # system imports
 import argparse
 import logging
+import logging.handlers
 from pathlib import Path
 import sys
 
@@ -108,6 +109,9 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # strings
 
+    # NB: used for logger
+    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+
     # short description
     # pylint: disable=line-too-long
     # NB: need to keep on one line for replacement
@@ -187,6 +191,11 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # I18N: could not find -c file
     S_ERR_NO_CFG = _("Config file {} not found")
 
+# TODO: fix these
+    LOG_PATH = ""  # pathto def log P_LOG_DEF
+    LOG_SIZE = 2048  # in bytes
+    LOG_COUNT = 5  # max num files
+
     # --------------------------------------------------------------------------
     # Instance methods
     # --------------------------------------------------------------------------
@@ -210,13 +219,18 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._dict_cfg = {}
 
         # log stuff
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger(self.S_APP_NAME)
         logging.basicConfig(
             filename=P_LOG_DEF,
             level=logging.INFO,
             format=self.S_LOG_FMT,
             datefmt=self.S_LOG_DATE_FMT,
         )
+        # make a rotating handler
+        handler = logging.handlers.RotatingFileHandler(
+            P_LOG_DEF, maxBytes=2048, backupCount=5
+        )
+        self._logger.addHandler(handler)
 
         # cmd line stuff
         self._parser = argparse.ArgumentParser(

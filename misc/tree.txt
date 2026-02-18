@@ -172,4 +172,5 @@
    ├─ [] develop.py
    ├─ [] mkdocs.yml
    ├─ [] pyproject.toml
-   └─ [] requirements.txt
+   ├─ [] requirements.txt
+   └─ [] update.txt

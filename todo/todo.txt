@@ -1,6 +1,8 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
+TODO: use zip in dist (cross platform)
+TODO: in base, add adj for logging size/count
 TODO: no yell in pb -d
 TODO: f.dpretty for cpe and no trace
 TODO: spinner as decorator (https://blog.jcharistech.com/2025/02/05/how-to-add-progress-bars-spinners-to-clis-in-python/)

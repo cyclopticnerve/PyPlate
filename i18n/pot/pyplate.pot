@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.1.0\n"
+"Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-01-11 15:49-0500\n"
+"POT-Creation-Date: 2026-02-18 11:50-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,40 +61,35 @@ msgstr ""
 msgid "Fixing .desktop file... "
 msgstr ""
 
-#. I18N: done installing
-#: install/install.py:106
-msgid "{} installed"
-msgstr ""
-
-#: install/install.py:111
+#: install/install.py:109
 msgid ""
 "The current version of this program is already installed.\n"
 "Do you want to overwrite?"
 msgstr ""
 
-#: install/install.py:116
+#: install/install.py:114
 msgid ""
 "A newer version of this program is currently installed.\n"
 "Do you want to overwrite?"
 msgstr ""
 
 #. I18N: version numbers invalid
-#: install/install.py:122
+#: install/install.py:120
 msgid "One or both version numbers are invalid"
 msgstr ""
 
 #. I18N: src path invalid
-#: install/install.py:125
+#: install/install.py:123
 msgid "Source path can not be {}"
 msgstr ""
 
 #. I18N: dst path invalid
-#: install/install.py:128
+#: install/install.py:126
 msgid "Destination path can not be {}"
 msgstr ""
 
 #. I18N: can't find .desktop
-#: install/install.py:130
+#: install/install.py:128
 msgid "No desktop files present"
 msgstr ""
 

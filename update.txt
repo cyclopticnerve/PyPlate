@@ -1,0 +1,6 @@
+
+run pybaker and change version
+
+git stage all changes
+git commit/push w/ msg "release version x.x.x"
+right click, "create tag...", tag name="vx.x.x"

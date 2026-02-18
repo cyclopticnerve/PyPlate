@@ -164,6 +164,7 @@ class CNDevelop:
         print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
+        # NB: for packages, the last fmt param is ignored (no reqs file)
         cmd = self.S_CMD_TYPE_INST.format(
             P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
         )

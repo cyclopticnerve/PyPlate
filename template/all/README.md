@@ -111,7 +111,7 @@ Read the full [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG_
 <!-- __RM_PKG__ -->
 In your project folder:
 ```bash
-$ . .__PP_NAME_VENV__/bin/activate
+$ . .venv/bin/activate
 $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
 <!-- __RM_PKG__ -->
