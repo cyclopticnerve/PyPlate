@@ -1,7 +1,24 @@
 
-run pybaker and change version
+project
+-------
 
+run pybaker and change version
 git stage all changes
 git commit/push w/ msg "release version x.x.x"
 right click, "create tag...", tag name="vx.x.x"
 
+github
+------
+
+create release using tag
+add dist zip
+
+pyplate
+-------
+
+uninstall old cnlib
+edit reqs for new cnlib:
+    CNLib @ git+https://github.com/cyclopticnerve/CNLib@vx.x.x
+pip install -r requirements.txt
+update template reqs:
+    CNLib @ git+https://github.com/cyclopticnerve/CNLib@vx.x.x
