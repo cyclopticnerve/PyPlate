@@ -2,6 +2,8 @@
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
 TODO: use zip in dist (cross platform)
+hsee test file (need to make tmp zip and move into dist after to avoid recursion)
+https://note.nkmk.me/en/python-zipfile/#zip-a-directory-folder-shutilmake_archive
 TODO: in base, add adj for logging size/count
 TODO: no yell in pb -d
 TODO: f.dpretty for cpe and no trace
