@@ -151,7 +151,8 @@
    │     ├─ [] check_keys.py
    │     ├─ [] fix_dicts.py
    │     ├─ [] lang.py
-   │     └─ [] split.py
+   │     ├─ [] split.py
+   │     └─ [] zip.py
    ├─ [] todo/
    │     ├─ [] clean/
    │     │     ├─ [] collect_strings.py
