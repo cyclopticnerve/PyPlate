@@ -26,13 +26,22 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
+# system imports
+from pathlib import Path
+import sys
+
 # local imports
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 
 # ------------------------------------------------------------------------------
-# Globals
+# Constants
 # ------------------------------------------------------------------------------
+
+# TODO: where does the "python" come from?
+P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI__/python"
+sys.path.insert(0, str(P_GUI))
+from __PP_FILE_APP__ import __PP_CLASS_APP__
 
 # ------------------------------------------------------------------------------
 # Classes
