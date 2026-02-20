@@ -106,7 +106,14 @@ class PyBaker(PyPlate):
 
     # bake msg
     # NB: param is name of project folder
+    # I18N: prep for baking
+    S_MSG_PREP = _("Preparing to bake {}")
+    # NB: param is name of project folder
+    # I18N: start baking
     S_MSG_BAKE = _("Baking {}")
+    # NB: param is name of project folder
+    # I18N: done baking
+    S_MSG_DONE = _("Done baking {}")
     # NB: format param is file name
     # I18N: add language at cmd line
     S_MSG_LANG_ADD = _("Adding language file {}...")
@@ -190,6 +197,10 @@ class PyBaker(PyPlate):
 
         print()
 
+        # just to verify we are in the right project
+        print(self.S_MSG_DONE.format(self._dir_prj.name))
+        print()
+
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
@@ -253,6 +264,10 @@ class PyBaker(PyPlate):
 
         # handle -i
         self._handle_i()
+
+        # just to verify we are in the right project
+        print(self.S_MSG_PREP.format(self._dir_prj.name))
+        print()
 
         # ----------------------------------------------------------------------
         # sanity checks
