@@ -17,7 +17,7 @@ A program for creating and building CLI/GUI/Packages in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 1.0.1
+Version 1.0.3
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -44,7 +44,7 @@ There are two ways to get the code:
 
 1. Download the [latest
 release](https://github.com/cyclopticnerve/PyPlate/releases/latest)
-(the **'Source code (zip)'** file should work an all platforms).
+(the **'pyplate-\<version\>.zip'** file should work on all platforms).
 
 2. Or you can clone the git repo to get the latest (and often broken) code from
    the main branch:
@@ -55,9 +55,9 @@ $ git clone https://github.com/cyclopticnerve/PyPlate
 ## Installing
 
 <!-- __RM_APP__ -->
-If you downloaded the zip file, extract it and go to the 'install' directory:
+If you downloaded the zip file, extract it and go to the main directory:
 ```bash
-$ cd ~/Downloads/PyPlate-<version>/install
+$ cd ~/Downloads/pyplate-<version>
 ```
 where \<version\> is the version number of the file you downloaded.
 
@@ -151,10 +151,9 @@ Wait a minute or two, and your docs should appear at
 ## Uninstalling
 
 <!-- __RM_APP__ -->
-Go to the source folder for PyPlate and run the uninstaller:
+Just type the program name and use the '--uninstall' option:
 ```bash
-$ cd ~/.local/share/pyplate
-$ ./uninstall.py
+$ pyplate --uninstall
 ```
 <!-- __RM_APP__ -->
 
@@ -163,7 +162,8 @@ See the full [documentation](https://cyclopticnerve.github.io/PyPlate)
 
 ## Developing
 If you are developing this project, make sure you run the "develop.py" script
-first to create the proper virtual environment (venv). 
+first to create the proper virtual environment and install the requirements (if
+any). 
 
 ## Notes
 If you have any sort of spellchecker in your IDE, *FOR GOD'S SAKE TURN IT OFF!*

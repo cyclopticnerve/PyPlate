@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.0.1\n"
+"Project-Id-Version: 1.0.3\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-02-20 08:27-0500\n"
+"POT-Creation-Date: 2026-02-20 13:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -225,12 +225,23 @@ msgstr ""
 msgid "Could not get language code from {}"
 msgstr ""
 
-#: src/pybaker.py:109
+#. I18N: prep for baking
+#: src/pybaker.py:110
+msgid "Preparing to bake {}"
+msgstr ""
+
+#. I18N: start baking
+#: src/pybaker.py:113
 msgid "Baking {}"
 msgstr ""
 
+#. I18N: done baking
+#: src/pybaker.py:116
+msgid "Done baking {}"
+msgstr ""
+
 #. I18N: add language at cmd line
-#: src/pybaker.py:112
+#: src/pybaker.py:119
 msgid "Adding language file {}..."
 msgstr ""
 
@@ -240,7 +251,7 @@ msgstr ""
 #. S_ASK_NO = _("N")
 #. NB: format param is file name
 #. I18N: ask to overwrite
-#: src/pybaker.py:122
+#: src/pybaker.py:129
 msgid "The file {} already exists. Do you want to overwrite it?"
 msgstr ""
 

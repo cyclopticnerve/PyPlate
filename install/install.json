@@ -1,6 +1,6 @@
 {
     "INST_NAME": "PyPlate",
-    "INST_VER": "1.0.1",
+    "INST_VER": "1.0.3",
     "INST_DESK": false,
     "INST_CONT": {
         "bin/pymaker": ".local/bin",
