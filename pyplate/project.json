@@ -1,7 +1,7 @@
 {
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "1.0.0",
+        "META_VERSION": "1.0.1",
         "META_KEYWORDS": [
             "python",
             "cli",
@@ -110,7 +110,7 @@
     },
     "PUB_INST": {
         "INST_NAME": "PyPlate",
-        "INST_VER": "1.0.0",
+        "INST_VER": "1.0.1",
         "INST_DESK": false,
         "INST_CONT": {
             "bin/pymaker": ".local/bin",
