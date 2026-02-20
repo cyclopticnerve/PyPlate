@@ -38,10 +38,11 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # project dir
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
+P_DIR_LOG = P_DIR_PRJ / "log"
 
 # path to default log file
 # NB: if not using, set to None
-P_LOG_DEF = P_DIR_PRJ / "log/pyplate.log"
+P_LOG_DEF = P_DIR_LOG / "pyplate.log"
 
 # path to uninst
 P_UNINST = P_DIR_PRJ / "install/uninstall.py"
@@ -229,6 +230,12 @@ class PyPlate:
 
         # dictionary to hold current pm/pb debug settings
         self._dict_dbg = {}
+
+        # ----------------------------------------------------------------------
+
+        # make some folders
+        if not P_DIR_LOG.exists():
+            Path.mkdir(P_DIR_LOG)
 
         # log stuff
         self._logger = logging.getLogger(__name__)
