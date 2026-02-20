@@ -174,7 +174,7 @@
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-<p>Version 1.0.1</p>
+<p>Version 1.0.2</p>
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -202,7 +202,7 @@
 <li>
 <p>Download the <a href="https://github.com/cyclopticnerve/PyPlate/releases/latest">latest
 release</a>
-(the <strong>'Source code (zip)'</strong> file should work an all platforms).</p>
+(the <strong>'pyplate-\&lt;version&gt;.zip'</strong> file should work on all platforms).</p>
 </li>
 <li>
 <p>Or you can clone the git repo to get the latest (and often broken) code from
@@ -213,8 +213,8 @@ release</a>
 </code></pre>
 <h2 id="installing">Installing</h2>
 <!-- __RM_APP__ -->
-<p>If you downloaded the zip file, extract it and go to the 'install' directory:</p>
-<pre><code class="language-bash">$ cd ~/Downloads/PyPlate-&lt;version&gt;/install
+<p>If you downloaded the zip file, extract it and go to the main directory:</p>
+<pre><code class="language-bash">$ cd ~/Downloads/pyplate-&lt;version&gt;
 </code></pre>
 <p>where \&lt;version&gt; is the version number of the file you downloaded.</p>
 <p>If you cloned the repo, just go to the 'install' directory:</p>
@@ -289,9 +289,8 @@ dir in VSCode's terminal.</p>
       https://\&lt;username&gt;.github.io/\&lt;repo_name&gt;</p>
 <h2 id="uninstalling">Uninstalling</h2>
 <!-- __RM_APP__ -->
-<p>Go to the source folder for PyPlate and run the uninstaller:</p>
-<pre><code class="language-bash">$ cd ~/.local/share/pyplate
-$ ./uninstall.py
+<p>Just type the program name and use the '--uninstall' option:</p>
+<pre><code class="language-bash">$ pyplate --uninstall
 </code></pre>
 <!-- __RM_APP__ -->
 
@@ -299,7 +298,8 @@ $ ./uninstall.py
 <p>See the full <a href="https://cyclopticnerve.github.io/PyPlate">documentation</a></p>
 <h2 id="developing">Developing</h2>
 <p>If you are developing this project, make sure you run the "develop.py" script
-first to create the proper virtual environment (venv). </p>
+first to create the proper virtual environment and install the requirements (if
+any). </p>
 <h2 id="notes">Notes</h2>
 <p>If you have any sort of spellchecker in your IDE, <em>FOR GOD'S SAKE TURN IT OFF!</em>
 It would brick a fucking quantum computer. On the other hand, I'm about to use
@@ -394,5 +394,5 @@ documentation, because pdoc3 is TOO SIMPLE and sphinx is TOO COMPLEX!</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-02-20 13:27:33.841078+00:00
+Build Date UTC : 2026-02-20 17:40:11.260793+00:00
 -->
