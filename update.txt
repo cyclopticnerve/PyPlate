@@ -4,8 +4,8 @@ project
 
 run pybaker and change version
 git stage all changes
-git commit/push w/ msg "release version x.x.x"
-right click, "create tag...", tag name="vx.x.x"
+git commit/push w/ msg "baked x.x.x"
+git graph, "create tag...", tag name="vx.x.x", push remote
 
 github
 ------
