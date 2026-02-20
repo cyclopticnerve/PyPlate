@@ -26,7 +26,7 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
-# third party imports
+# local imports
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 
@@ -55,11 +55,9 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     """
 
     # --------------------------------------------------------------------------
-    # Class constants
+    # Constants
     # --------------------------------------------------------------------------
 
-    # NB: used in _enable
-    S_PRG_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # cmd line options
 
@@ -192,7 +190,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         # self._logger.info("func")
 
         # debug_foo
-        if self._cmd_debug:
+        if self._arg_debug:
             # I18N: context for this string
             return _("this is func (DEBUG)")
 
@@ -210,8 +208,6 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     Perform some mundane stuff like saving properties.
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
-
-    #     print("sub ", .f_code.co_name)
 
     #     # save a prop
     #     self._dict_cfg["foo"] = "bar"
