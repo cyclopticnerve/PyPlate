@@ -2163,6 +2163,8 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     out_file = Path(S_DIR_DIST) / f"{in_dir}{S_DIST_EXT}"
     with tarfile.open(out_file, mode=S_DIST_MODE) as compressed:
         compressed.add(in_dir, arcname=Path(in_dir).name)
+    # TODO: make zip
+    # shutil.make_archive()
 
     # print info
     F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
