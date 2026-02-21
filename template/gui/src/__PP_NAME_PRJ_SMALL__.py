@@ -63,6 +63,20 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     required for the program.
     """
 
+    # --------------------------------------------------------------------------
+    # Constants
+    # --------------------------------------------------------------------------
+
+
+    # cmd line options
+
+    # enable option strings
+    # S_ARG_X_OPTION = "-x"
+    # S_ARG_X_ACTION = "store_true"
+    # S_ARG_X_DEST = "X_DEST"
+    # # I18N: enable mode help
+    # S_ARG_X_HELP = _("do x")
+
     # # --------------------------------------------------------------------------
     # # Initialize the new object
     # # --------------------------------------------------------------------------
@@ -97,8 +111,13 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
         """
 
         # call boilerplate code
+        # add our options first
+        # then add common options (from super)
         self._setup()
 
+        # do something with -x option
+        # if self._dict_args[self.S_ARG_X_DEST]:
+        #     pass
         # ----------------------------------------------------------------------
         # main stuff
 
@@ -129,10 +148,65 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
 
-    # add cmd line args here
+        # # add debug option
+        # self._parser.add_argument(
+        #     self.S_ARG_DBG_OPTION,
+        #     action=self.S_ARG_DBG_ACTION,
+        #     dest=self.S_ARG_DBG_DEST,
+        #     help=self.S_ARG_DBG_HELP,
+        # )
 
-    #     # NB: do setup last
-    #     super()._setup()
+        # # add config option
+        # self._parser.add_argument(
+        #     self.S_ARG_CFG_OPTION,
+        #     dest=self.S_ARG_CFG_DEST,
+        #     help=self.S_ARG_CFG_HELP,
+        #     metavar=self.S_ARG_CFG_METAVAR
+        # )
+
+        # add x option
+        # self._parser.add_argument(
+        #     self.S_ARG_X_OPTION,
+        #     action=self.S_ARG_X_ACTION,
+        #     dest=self.S_ARG_X_DEST,
+        #     help=self.S_ARG_X_HELP,
+        # )
+
+        # NB: do setup last
+        # super()._setup()
+
+        # NB: self._dict_args are now available
+        # as well as self._dict_cfg
+
+    # --------------------------------------------------------------------------
+    # Short description
+    # --------------------------------------------------------------------------
+    def _func(self):
+        """
+        Short description
+
+        Args:
+            var_name: Short description
+
+        Returns:
+            Description
+
+        Raises:
+            exception_type(vars): Description
+
+        Long description (including HTML).
+        """
+
+        # self._logger.info("func")
+
+        # debug_foo
+        if self._arg_debug:
+            # I18N: context for this string
+            return _("this is func (DEBUG)")
+
+        # no debug, return normal result
+        # I18N: context for this string
+        return _("this is func")
 
     # # --------------------------------------------------------------------------
     # # Boilerplate to use at the end of main
@@ -144,8 +218,6 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     Perform some mundane stuff like saving properties.
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
-
-    #     print("sub ", .f_code.co_name)
 
     #     # save a prop
     #     self._dict_cfg["foo"] = "bar"

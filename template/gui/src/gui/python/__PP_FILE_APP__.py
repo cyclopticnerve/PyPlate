@@ -21,13 +21,10 @@ sizes/controls.
 
 # system imports
 from pathlib import Path
-import sys
 
 # ------------------------------------------------------------------------------
-# 3rd party imports
-
+# venv imports
 import gi
-
 gi.require_version("Gtk", "3.0")
 
 # pylint: disable=wrong-import-position
@@ -35,18 +32,10 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk  # type: ignore
 
-# pylint: enable=wrong-import-position
 # pylint: enable=no-name-in-module
 
 # ------------------------------------------------------------------------------
 # local imports
-
-# pylint: disable=wrong-import-position
-
-# add to path
-P_DIR_PY = Path(__file__).parent.resolve()
-sys.path.append(str(P_DIR_PY))
-
 from __PP_FILE_WIN__ import __PP_CLASS_WIN__
 
 # pylint: enable=wrong-import-position
