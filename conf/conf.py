@@ -900,7 +900,7 @@ D_PRV_ALL = {
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
     "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
     "__PP_DIR_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}",
-    "__PP_DLG_FILE__": S_DLG_UI_FILE,
+    "__PP_FILE_DLG__": S_DLG_UI_FILE,
     "__PP_DLG_ABOUT__": S_DLG_ABOUT,
     # --------------------------------------------------------------------------
     # install stuff
@@ -1862,7 +1862,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         try:
             F.run(
                 S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
-                shell=True, capture_output=True
+                shell=True,
+                capture_output=True,
             )
             F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         except F.CNRunError as e:

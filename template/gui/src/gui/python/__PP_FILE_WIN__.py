@@ -62,16 +62,18 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
     # get paths to ui files
     P_FILE_WIN = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
-    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_DLG_FILE__.ui"
+    # TODO: move this to app (common dialogs)
+    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_DLG__.ui"
 
     # the name of the window in the ui file
     S_UI_WIN_NAME = "__PP_CLASS_WIN__"
+    # TODO: move this to app (common dialogs)
     S_UI_ABT_NAME = "__PP_DLG_ABOUT__"
 
     # window actions
     S_ACTION_SHOW = "show"
     S_ACTION_DELETE_EVENT = "delete-event"
-    S_ACTION_DESTROY = "destroy"
+    # S_ACTION_DESTROY = "destroy"
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -112,7 +114,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         # connect window signals
         self.window.connect(self.S_ACTION_SHOW, self._evt_win_show)
         self.window.connect(self.S_ACTION_DELETE_EVENT, self._evt_win_delete)
-        self.window.connect(self.S_ACTION_DESTROY, self._evt_win_destroy)
+        # self.window.connect(self.S_ACTION_DESTROY, self._evt_win_destroy)
 
     # --------------------------------------------------------------------------
     # Control signal methods
@@ -132,40 +134,10 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         """
 
         # get dialog, run, hide (standard for reusable modal dialogs)
-        # NB: no ext (will find .ui, .glade, .xml...)
+        # TODO: move this to app (common dialogs)
         dlg_file = self.P_FILE_DLG
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, self.S_UI_ABT_NAME)
-
-    # --------------------------------------------------------------------------
-    # Called when the New button is clicked
-    # --------------------------------------------------------------------------
-    def _btn_new_clicked(self, _obj):
-        """
-        Called when the New button is clicked
-
-        Args:
-            _obj: Not used
-
-        The New button was clicked, add the new window.
-        """
-
-        print("btn_new: not implemented")
-
-    # --------------------------------------------------------------------------
-    # Called when the Title button is clicked
-    # --------------------------------------------------------------------------
-    def _btn_title_clicked(self, _obj):
-        """
-        Called when the Title button is clicked
-
-        Args:
-            _obj: Not used
-
-        The Title button was clicked, change the window title.
-        """
-
-        print("btn_title: not implemented")
 
     # --------------------------------------------------------------------------
     # Called when the Save button is clicked
@@ -180,6 +152,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The Save button was clicked.
         """
 
+        # NB: save control values, but do not close
         print("btn_save: not implemented")
 
     # --------------------------------------------------------------------------
@@ -195,7 +168,10 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The Cancel button was clicked.
         """
 
-        print("btn_cancel: not implemented")
+        # NB: no save, only exit
+
+        # close the window as if by the 'X' button
+        self.window.close()
 
     # --------------------------------------------------------------------------
     # Called when the OK button is clicked
@@ -210,23 +186,8 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The OK button was clicked.
         """
 
+        # TODO: save file, re-run cli, exit
         print("btn_ok: not implemented")
-
-    # --------------------------------------------------------------------------
-    # Called when the Close button is clicked
-    # --------------------------------------------------------------------------
-    def _btn_close_clicked(self, _obj):
-        """
-        Called when the Close button is clicked
-
-        Args:
-            _obj: Not used
-
-        The Close button was clicked.
-        """
-
-        # close the window as if by the 'X' button
-        self.window.close()
 
     # --------------------------------------------------------------------------
     # Window signal methods
@@ -246,9 +207,8 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         load the control values.
         """
 
+        # TODO: load control values here
         print("_evt_win_show")
-
-        # NB: load control values here
 
     # --------------------------------------------------------------------------
     # Called when the main window is closed by the 'X' button
@@ -272,26 +232,27 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         returning True means the window will not close.
         """
 
-        print("_evt_win_delete")
+        # NB: no save, only exit
+        # print("_evt_win_delete")
 
         # close window
         return False
 
-    # --------------------------------------------------------------------------
-    # Called after the window is destroyed
-    # --------------------------------------------------------------------------
-    def _evt_win_destroy(self, _obj):
-        """
-        Called after the window is destroyed
+    # # --------------------------------------------------------------------------
+    # # Called after the window is destroyed
+    # # --------------------------------------------------------------------------
+    # def _evt_win_destroy(self, _obj):
+    #     """
+    #     Called after the window is destroyed
 
-        Args:
-            _obj: Not used
+    #     Args:
+    #         _obj: Not used
 
-        This method is called after the window is destroyed. It is used to
-        remove the window from the app's internal list.
-        """
+    #     This method is called after the window is destroyed. It is used to
+    #     remove the window from the app's internal list.
+    #     """
 
-        print("_evt_win_destroy")
+    #     print("_evt_win_destroy")
 
 
 # -)

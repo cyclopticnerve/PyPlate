@@ -30,7 +30,7 @@
         "__PP_DIR_GUI__": "src/gui",
         "__PP_DIR_UI__": "src/gui/ui",
         "__PP_DIR_DESK__": "src/gui/desktop",
-        "__PP_DLG_FILE__": "dialogs",
+        "__PP_FILE_DLG__": "dialogs",
         "__PP_DLG_ABOUT__": "dlg_about",
         "__PP_DIR_INSTALL__": "install",
         "__PP_FILE_INST_CFG__": "install.json",

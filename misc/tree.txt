@@ -136,7 +136,7 @@
    │     │     │     │     │     ├─ [] __PP_FILE_APP__.py
    │     │     │     │     │     └─ [] __PP_FILE_WIN__.py
    │     │     │     │     └─ [] ui/
-   │     │     │     │           ├─ [] __PP_DLG_FILE__.ui
+   │     │     │     │           ├─ [] __PP_FILE_DLG__.ui
    │     │     │     │           └─ [] __PP_FILE_WIN__.ui
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
    │     │     └─ [] requirements.txt

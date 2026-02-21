@@ -62,7 +62,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
     # get paths to ui files
     P_FILE_WIN = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
-    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_DLG_FILE__.ui"
+    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_DLG__.ui"
 
     # the name of the window in the ui file
     S_UI_WIN_NAME = "__PP_CLASS_WIN__"
@@ -131,7 +131,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
         # get dialog, run, hide (standard for reusable modal dialogs)
         # NB: no ext (will find .ui, .glade, .xml...)
-        dlg_file = self.P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_DLG_FILE__.ui"
+        dlg_file = self.P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_FILE_DLG__.ui"
         dlg_path = Path(dlg_file).resolve()
         self._app.show_dialog(dlg_path, "__PP_DLG_ABOUT__")
 
