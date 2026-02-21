@@ -233,17 +233,17 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
-    # Called after the window is destroyed
+    # Called after the window is shown
     # --------------------------------------------------------------------------
     def _evt_win_show(self, _obj):
         """
-        Called after the window is destroyed
+        Called after the window is shown
 
         Args:
             _obj: Not used
 
-        This method is called after the window is destroyed. It is used to
-        remove the window from the app's internal list.
+        This method is called after the window is shown. It is used to
+        load the control values.
         """
 
         print("_evt_win_show")
