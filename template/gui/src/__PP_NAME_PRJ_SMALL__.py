@@ -34,14 +34,21 @@ import sys
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=import-error
+
+P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI_SRC__"
+sys.path.insert(0, str(P_GUI))
+from __PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=import-error
+
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
-
-# TODO: where does the "python" come from?
-P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI__/python"
-sys.path.insert(0, str(P_GUI))
-from __PP_FILE_APP__ import __PP_CLASS_APP__
 
 # ------------------------------------------------------------------------------
 # Classes

@@ -28,8 +28,11 @@ from pathlib import Path
 import sys
 
 # cnlib imports
+# pylint: disable=import-error
 from cnlib import cnfunctions as F
 from cnlib.cnformatter import CNFormatter
+
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants

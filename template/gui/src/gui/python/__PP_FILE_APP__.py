@@ -64,9 +64,14 @@ class __PP_CLASS_APP__(Gtk.Application):
     # Class constants
     # --------------------------------------------------------------------------
 
+    # find path to self
+    P_DIR_PRJ = Path(__file__).parents[3].resolve()
+    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_DLG__.ui"
+
     # gui stuff
     S_APP_ID = "org.__PP_AUTHOR__.__PP_NAME_PRJ_SMALL__"
     S_I18N_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+    S_UI_ABT_NAME = "__PP_DLG_ABOUT__"
 
     # app actions
     S_ACTION_ACTIVATE = "activate"
@@ -174,6 +179,25 @@ class __PP_CLASS_APP__(Gtk.Application):
 
         # return dialog end result
         return result
+
+    # --------------------------------------------------------------------------
+    # A convenience method for subclasses to show a dialog
+    # --------------------------------------------------------------------------
+    def show_about_dialog(self):
+        """
+        A convenience method for subclasses to show an about dialog
+
+        Returns:
+            The result of calling run() on the dialog
+
+        Show the About dialog and returns after it is closed. The dialog should
+        be named the same as self.S_UI_ABT_NAME.
+        """
+
+        # show about dialog
+        dlg_file = self.P_FILE_DLG
+        dlg_path = Path(dlg_file).resolve()
+        self.show_dialog(dlg_path, self.S_UI_ABT_NAME)
 
     # --------------------------------------------------------------------------
     # Private methods

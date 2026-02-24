@@ -106,13 +106,13 @@ class CNInstall(CNInstallBase):
     S_MSG_INST_END = _("{} installed")
 
     # questions
-    # I18N: ask to overwrite same version
     S_ASK_VER_SAME = _(
+        # I18N: ask to overwrite same version
         "The current version of this program is already installed.\nDo you "
         "want to overwrite?"
     )
-    # I18N: ask to overwrite newer version
     S_ASK_VER_OLDER = _(
+        # I18N: ask to overwrite newer version
         "A newer version of this program is currently installed.\nDo you want "
         "to overwrite?"
     )

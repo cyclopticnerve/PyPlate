@@ -23,8 +23,8 @@ private functions declared here.
 from pathlib import Path
 
 # ------------------------------------------------------------------------------
-# 3rd party imports
-
+# venv imports
+from cnlib import cnfunctions as F
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -62,18 +62,20 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
     # get paths to ui files
     P_FILE_WIN = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
-    # TODO: move this to app (common dialogs)
-    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_DLG__.ui"
 
     # the name of the window in the ui file
     S_UI_WIN_NAME = "__PP_CLASS_WIN__"
-    # TODO: move this to app (common dialogs)
-    S_UI_ABT_NAME = "__PP_DLG_ABOUT__"
 
     # window actions
     S_ACTION_SHOW = "show"
     S_ACTION_DELETE_EVENT = "delete-event"
-    # S_ACTION_DESTROY = "destroy"
+
+    # the cli we wrap and it's config
+    S_CMD_BIN = ""
+    P_FILE_CFG = (
+        Path.home()
+        / f".local/share/{S_CMD_BIN}/__PP_DIR_CONF__/{S_CMD_BIN}.json"
+    )
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -133,11 +135,8 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The About button was clicked, show the About dialog.
         """
 
-        # get dialog, run, hide (standard for reusable modal dialogs)
-        # TODO: move this to app (common dialogs)
-        dlg_file = self.P_FILE_DLG
-        dlg_path = Path(dlg_file).resolve()
-        self._app.show_dialog(dlg_path, self.S_UI_ABT_NAME)
+        # use app's convenience function
+        self._app.show_about_dialog()
 
     # --------------------------------------------------------------------------
     # Called when the Save button is clicked
@@ -152,8 +151,11 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The Save button was clicked.
         """
 
-        # NB: save control values, but do not close
-        print("btn_save: not implemented")
+        print("btn_save: clicked")
+
+        # save control values, re-run cli
+        self._save()
+        self._run()
 
     # --------------------------------------------------------------------------
     # Called when the Cancel button is clicked
@@ -168,9 +170,10 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The Cancel button was clicked.
         """
 
-        # NB: no save, only exit
+        print("btn_cancel: clicked")
 
         # close the window as if by the 'X' button
+        # NB: also calls _evt_win_delete
         self.window.close()
 
     # --------------------------------------------------------------------------
@@ -186,8 +189,15 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         The OK button was clicked.
         """
 
-        # TODO: save file, re-run cli, exit
-        print("btn_ok: not implemented")
+        print("btn_ok: clicked")
+
+        # save control values, re-run cli
+        self._save()
+        self._run()
+
+        # close the window as if by the 'X' button
+        # NB: also calls _evt_win_delete
+        self.window.close()
 
     # --------------------------------------------------------------------------
     # Window signal methods
@@ -207,8 +217,10 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         load the control values.
         """
 
-        # TODO: load control values here
         print("_evt_win_show")
+
+        # load control values here
+        self._load()
 
     # --------------------------------------------------------------------------
     # Called when the main window is closed by the 'X' button
@@ -232,27 +244,41 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         returning True means the window will not close.
         """
 
-        # NB: no save, only exit
-        # print("_evt_win_delete")
+        print("_evt_win_delete")
 
         # close window
         return False
 
-    # # --------------------------------------------------------------------------
-    # # Called after the window is destroyed
-    # # --------------------------------------------------------------------------
-    # def _evt_win_destroy(self, _obj):
-    #     """
-    #     Called after the window is destroyed
+    # --------------------------------------------------------------------------
+    # Helper methods
+    # --------------------------------------------------------------------------
 
-    #     Args:
-    #         _obj: Not used
+    # --------------------------------------------------------------------------
+    # Re-run the binary after values have been changed
+    # --------------------------------------------------------------------------
+    def _run(self):
+        """
+        Re-run the binary after values have been changed
+        """
+        try:
+            F.run(self.S_CMD_BIN, shell=True)
+        except F.CNRunError as e:
+            print(e)
 
-    #     This method is called after the window is destroyed. It is used to
-    #     remove the window from the app's internal list.
-    #     """
+    # --------------------------------------------------------------------------
+    # Load controls with values from config file
+    # --------------------------------------------------------------------------
+    def _load(self):
+        """
+        Load controls with values from config file
+        """
 
-    #     print("_evt_win_destroy")
-
+    # --------------------------------------------------------------------------
+    # Save control values to config file
+    # --------------------------------------------------------------------------
+    def _save(self):
+        """
+        Save control values to config file
+        """
 
 # -)

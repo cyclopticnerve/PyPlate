@@ -370,6 +370,7 @@ S_DIR_PO = "po"
 S_DIR_TESTS = "tests"
 S_DIR_SCRATCH = "scratch"
 S_DIR_GUI = "gui"
+S_DIR_PYTHON = "python"
 S_DIR_DESKTOP = "desktop"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
@@ -899,6 +900,7 @@ D_PRV_ALL = {
     # gui stuff
     "__PP_DIR_GUI__": f"{S_DIR_SRC}/{S_DIR_GUI}",
     "__PP_DIR_UI__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_UI}",
+    "__PP_DIR_GUI_SRC__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_PYTHON}",
     "__PP_DIR_DESK__": f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}",
     "__PP_FILE_DLG__": S_DLG_UI_FILE,
     "__PP_DLG_ABOUT__": S_DLG_ABOUT,
@@ -2159,13 +2161,12 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # print info
     print(S_ACTION_COMPRESS, end="", flush=True)
 
-    # now do normal dist tar
-    in_dir = p_dist
-    out_file = Path(S_DIR_DIST) / f"{in_dir}{S_DIST_EXT}"
-    with tarfile.open(out_file, mode=S_DIST_MODE) as compressed:
-        compressed.add(in_dir, arcname=Path(in_dir).name)
-    # TODO: make zip
-    # shutil.make_archive()
+    # get out file (dist/prj-<version>.xxx) and in dir (dist/prj-<version>)
+    path_out = path_in = str(p_dist)
+
+    # make archive type(s)
+    # shutil.make_archive(path_out, "gztar", path_in)
+    shutil.make_archive(path_out, "zip", path_in)
 
     # print info
     F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)

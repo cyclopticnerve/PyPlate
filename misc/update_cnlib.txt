@@ -2,6 +2,8 @@
 project
 -------
 
+check venv
+check metadata
 run pybaker and change version
 git stage all changes
 git commit/push w/ msg "baked x.x.x"

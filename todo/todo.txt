@@ -1,10 +1,15 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
-TODO: use zip in dist (cross platform)
-hsee test file (need to make tmp zip and move into dist after to avoid recursion)
-https://note.nkmk.me/en/python-zipfile/#zip-a-directory-folder-shutilmake_archive
-TODO: in base, add adj for logging size/count
+TODO: split conf into seperate files
+TODO: move dialogs.ui pot/po to seperate file
+TODO: spplit load/save out of gui app
+TODO: CFG_EXT = ".json", LOG_EXT = ".log", UI_EXT = ".ui"
+this is to replace exts in any module that builds paths to files
+TODO: can use dunders in .ui props dlg? author, prj name, license
+TODO: use zip/tar in dist (cross platform) conf.py:2168
+need L_MAKE_DIST_TYPE, setting in pp/pub, 
+TODO: in conf, add dunders for logging size/count
 TODO: no yell in pb -d
 TODO: f.dpretty for cpe and no trace
 TODO: spinner as decorator (https://blog.jcharistech.com/2025/02/05/how-to-add-progress-bars-spinners-to-clis-in-python/)
