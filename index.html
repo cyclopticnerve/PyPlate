@@ -174,7 +174,7 @@
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-<p>Version 1.0.5</p>
+<p>Version 1.0.6</p>
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -202,7 +202,7 @@
 <li>
 <p>Download the <a href="https://github.com/cyclopticnerve/PyPlate/releases/latest">latest
 release</a>
-(the <strong>'pyplate-\&lt;version&gt;.zip'</strong> file should work on all platforms).</p>
+(the <strong>'pyplate-&lt;version&gt;.zip'</strong> file should work on all platforms).</p>
 </li>
 <li>
 <p>Or you can clone the git repo to get the latest (and often broken) code from
@@ -235,9 +235,7 @@ project as its development continues.</p>
 <p>Before you do anything, you should take a look at the 'conf.py' file in
 '~/.local/share/pyplate/conf'. This file contains A <strong>LOT</strong> of information that
 is used when creating/building a project. Most of these are string values and
-file/folder names used in the program, which you are free to change. PyPlate
-does not yet support i18n/l10n for itself (meaning any strings in this file
-will not be i18n'ed), but that may be included at a later date.  </p>
+file/folder names used in the program, which you are free to change.</p>
 <p>This file also contains some functions that are run at various times during
 creating/building the project, such as before/after creating a project,
 before/after building a project, etc.
@@ -253,14 +251,14 @@ $ pymaker
 and folders in a subdirectory of the current directory. </p>
 <p>That's it! From there you are free to modify the projects in your favorite IDE.</p>
 <h2 id="pybaker-build-the-project">PyBaker - Build the project</h2>
-<p>Once you have created a project, you can use 'pybaker' in the project's
+<p>Once you have created a project, you can run 'pybaker' in the project's
 directory to update metadata in the project's files and create a
 'dist' folder.
 If you are using VSCode, you can select 'Terminal/Run Build Task...' from the
 menu bar or press 'Ctrl+Shift+B'.</p>
 <p>'pybaker' is a program which will replace certain values in the project
 directory. These values are read/written in the 'project.json' file in your
-project's 'pyplate/project.json' file. Things like version number, short
+project's 'pyplate' directory. Things like version number, short
 description, and other values that might change during a project's lifecycle
 are placed here.</p>
 <p>The values in the 'pyplate/project.json' file can be edited at any time,
@@ -286,7 +284,7 @@ dir in VSCode's terminal.</p>
 </li>
 </ul>
 <p>Wait a minute or two, and your docs should appear at
-      https://\&lt;username&gt;.github.io/\&lt;repo_name&gt;</p>
+      https://&lt;username&gt;.github.io/&lt;repo_name&gt;</p>
 <h2 id="uninstalling">Uninstalling</h2>
 <!-- __RM_APP__ -->
 <p>Just type the program name and use the '--uninstall' option:</p>
@@ -394,5 +392,5 @@ documentation, because pdoc3 is TOO SIMPLE and sphinx is TOO COMPLEX!</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-02-26 18:24:02.277687+00:00
+Build Date UTC : 2026-03-03 15:44:13.981863+00:00
 -->
