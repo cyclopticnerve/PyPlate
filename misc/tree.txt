@@ -51,8 +51,7 @@
    │     │     └─ [] window.py
    │     ├─ [] release.txt
    │     ├─ [] tree.html
-   │     ├─ [] tree.txt
-   │     └─ [] update_cnlib.txt
+   │     └─ [] tree.txt
    ├─ [] pyplate/
    │     ├─ [] private/
    │     │     └─ [] private.json
@@ -120,9 +119,8 @@
    │     ├─ [] cli/
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
-   │     │     ├─ [] src/
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
-   │     │     └─ [] requirements.txt
+   │     │     └─ [] src/
+   │     │           └─ [] __PP_NAME_PRJ_SMALL__.py
    │     ├─ [] gui/
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json

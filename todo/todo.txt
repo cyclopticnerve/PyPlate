@@ -1,6 +1,9 @@
 
 FIXME: THE FUCKING DOCS_USE_RM !!!
 
+TODO: when install new/same/older, delete first to avoid artifacts
+TODO: ask before install new like same/older
+TODO: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 TODO: split conf into seperate files
 TODO: move dialogs.ui pot/po to seperate file
 TODO: spplit load/save out of gui app

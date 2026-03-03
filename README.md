@@ -17,7 +17,7 @@ A program for creating and building CLI/GUI/Packages in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 1.0.5
+Version 1.0.6
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -44,7 +44,7 @@ There are two ways to get the code:
 
 1. Download the [latest
 release](https://github.com/cyclopticnerve/PyPlate/releases/latest)
-(the **'pyplate-\<version\>.zip'** file should work on all platforms).
+(the **'pyplate-<version\>.zip'** file should work on all platforms).
 
 2. Or you can clone the git repo to get the latest (and often broken) code from
    the main branch:
@@ -85,9 +85,7 @@ Let us start with 'pymaker'.
 Before you do anything, you should take a look at the 'conf.py' file in
 '~/.local/share/pyplate/conf'. This file contains A **LOT** of information that
 is used when creating/building a project. Most of these are string values and
-file/folder names used in the program, which you are free to change. PyPlate
-does not yet support i18n/l10n for itself (meaning any strings in this file
-will not be i18n'ed), but that may be included at a later date.  
+file/folder names used in the program, which you are free to change.
 
 This file also contains some functions that are run at various times during
 creating/building the project, such as before/after creating a project,
@@ -109,7 +107,7 @@ and folders in a subdirectory of the current directory.
 That's it! From there you are free to modify the projects in your favorite IDE.
 
 ## PyBaker - Build the project
-Once you have created a project, you can use 'pybaker' in the project's
+Once you have created a project, you can run 'pybaker' in the project's
 directory to update metadata in the project's files and create a
 'dist' folder.
 If you are using VSCode, you can select 'Terminal/Run Build Task...' from the
@@ -117,7 +115,7 @@ menu bar or press 'Ctrl+Shift+B'.
 
 'pybaker' is a program which will replace certain values in the project
 directory. These values are read/written in the 'project.json' file in your
-project's 'pyplate/project.json' file. Things like version number, short
+project's 'pyplate' directory. Things like version number, short
 description, and other values that might change during a project's lifecycle
 are placed here.
 
@@ -146,7 +144,7 @@ Step 2:
       - run 'pybaker' from your project directory
 
 Wait a minute or two, and your docs should appear at
-      https://\<username\>.github.io/\<repo_name\>
+      https://<username\>.github.io/<repo_name\>
 
 ## Uninstalling
 
