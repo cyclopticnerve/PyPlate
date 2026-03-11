@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.0.6\n"
+"Project-Id-Version: 1.0.7\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-03-03 10:44-0500\n"
+"POT-Creation-Date: 2026-03-10 20:14-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,13 +31,13 @@ msgstr ""
 
 #. I18N: show the venv step
 #: develop.py:83
-#: install/install.py:100
+#: install/install.py:101
 msgid "Making venv folder... "
 msgstr ""
 
 #. I18N: show the reqs step
 #: develop.py:85
-#: install/install.py:102
+#: install/install.py:103
 msgid "Installing requirements... "
 msgstr ""
 
@@ -47,49 +47,49 @@ msgid "Error: "
 msgstr ""
 
 #. I18N: install the program
-#: install/install.py:95
+#: install/install.py:96
 msgid "Installing {} Version {}"
 msgstr ""
 
 #. I18N: show the copy step
-#: install/install.py:98
+#: install/install.py:99
 msgid "Copying files... "
 msgstr ""
 
 #. I18N: show desktop step
-#: install/install.py:104
+#: install/install.py:105
 msgid "Fixing .desktop file... "
 msgstr ""
 
-#: install/install.py:109
+#: install/install.py:110
 msgid ""
 "The current version of this program is already installed.\n"
 "Do you want to overwrite?"
 msgstr ""
 
-#: install/install.py:114
+#: install/install.py:115
 msgid ""
 "A newer version of this program is currently installed.\n"
 "Do you want to overwrite?"
 msgstr ""
 
 #. I18N: version numbers invalid
-#: install/install.py:120
+#: install/install.py:121
 msgid "One or both version numbers are invalid"
 msgstr ""
 
 #. I18N: src path invalid
-#: install/install.py:123
+#: install/install.py:124
 msgid "Source path can not be {}"
 msgstr ""
 
 #. I18N: dst path invalid
-#: install/install.py:126
+#: install/install.py:127
 msgid "Destination path can not be {}"
 msgstr ""
 
 #. I18N: can't find .desktop
-#: install/install.py:128
+#: install/install.py:129
 msgid "No desktop files present"
 msgstr ""
 

@@ -40,7 +40,7 @@ P_DIR_INSTALL = P_DIR_ASSETS / "install"
 P_DIR_VENV = Path.home() / ".local/share/pyplate/.venv-pyplate"
 
 # get files
-P_FILE_UNINST = Path.home() / "__PP_USR_INST__/__PP_NAME_UNINST__" 
+P_FILE_UNINST = Path.home() / ".local/share/pyplate/uninstall.py" 
 P_FILE_CFG_UNINST = (
     Path.home() / ".local/share/pyplate/install/install.json"
 )
