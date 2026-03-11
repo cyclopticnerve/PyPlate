@@ -885,12 +885,14 @@ class PyPlate:
         # ----------------------------------------------------------------------
         # save/fix/load public
 
+        path_pub = {}
         try:
             # save public settings
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
+            return
 
         # fix dunders in dict_pub
         self._fix_contents(path_pub)
