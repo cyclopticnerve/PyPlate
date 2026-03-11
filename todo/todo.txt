@@ -1,12 +1,11 @@
 
-FIXME: THE FUCKING DOCS_USE_RM !!!
-
-TODO: when install new/same/older, delete first to avoid artifacts
 TODO: ask before install new like same/older
+
+TODO: move tree files into trees folder
 TODO: better regex for S_PP_SHORT_DESC to match multi-line and i18n
-TODO: split conf into seperate files
-TODO: move dialogs.ui pot/po to seperate file
-TODO: spplit load/save out of gui app
+TODO: split conf into separate files
+TODO: move dialogs.ui pot/po to separate file
+TODO: split load/save out of gui app
 TODO: CFG_EXT = ".json", LOG_EXT = ".log", UI_EXT = ".ui"
 this is to replace exts in any module that builds paths to files
 TODO: can use dunders in .ui props dlg? author, prj name, license
@@ -289,6 +288,7 @@ NEXT: check cspell
 NEXT: run every f-ing linter
 NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
 
+DONE: when install new/same/older, delete first to avoid artifacts
 DONE: make pp in pp
 keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
 tests, todo, readme, 
