@@ -219,6 +219,7 @@ class PyMaker(PyPlate):
         if self._cmd_debug:
 
             # get long name
+            name_prj = "DEBUG"
             for item in P.C.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
