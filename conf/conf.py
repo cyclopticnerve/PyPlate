@@ -641,7 +641,7 @@ L_EXT_MARKUP = [
 # file exts for do_after_fix
 L_EXT_GUI = [".ui", ".glade"]
 
-# files to remove after the project is done
+# files to remove from dist after bake is done
 L_PURGE_FILES = [
     f"**/{S_PH_NAME}",
     "**/__pycache__",
@@ -1742,7 +1742,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
             F.printd(S_ERR_ERR, str(e))
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # do .desktop i18n/version
 
         # check if we want template
@@ -1762,7 +1762,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
                 # fail gracefully
                 F.printd(S_ERR_ERR, str(e))
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
         # fix po files outside blacklist
 
         # print info
@@ -1776,7 +1776,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         str_pattern = S_PO_VER_SCH
         str_rep = S_PO_VER_REP.format(pp_version)
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
 
