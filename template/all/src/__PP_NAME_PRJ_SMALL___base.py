@@ -92,7 +92,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # bools
 
-    # set load/save oder
+    # set load/save order
     # NB: if true, only load from first file found, in this order:
     # 1. cmdline (-c)
     # 2. conf dir (P_CFG_DEF)
