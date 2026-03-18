@@ -1,98 +1,103 @@
 
-TODO: ask before install new like same/older
+NEXT: ask before install new like same/older
 
-TODO: move tree files into trees folder
-TODO: better regex for S_PP_SHORT_DESC to match multi-line and i18n
-TODO: split conf into separate files
-TODO: move dialogs.ui pot/po to separate file
-TODO: split load/save out of gui app
-TODO: CFG_EXT = ".json", LOG_EXT = ".log", UI_EXT = ".ui"
+NEXT: script to make changelog from todos/next/done
+NEXT: add kes.py file to template?
+NEXT: move tree files into trees folder
+NEXT: better regex for S_PP_SHORT_DESC to match multi-line and i18n
+NEXT: split conf into separate files
+NEXT: move dialogs.ui pot/po to separate file
+NEXT: split load/save out of gui app
+NEXT: CFG_EXT = ".json", LOG_EXT = ".log", UI_EXT = ".ui"
 this is to replace exts in any module that builds paths to files
-TODO: can use dunders in .ui props dlg? author, prj name, license
-TODO: use zip/tar in dist (cross platform) conf.py:2168
+NEXT: can use dunders in .ui props dlg? author, prj name, license
+NEXT: use zip/tar in dist (cross platform) conf.py:2168
 need L_MAKE_DIST_TYPE, setting in pp/pub, 
-TODO: in conf, add dunders for logging size/count
-TODO: no yell in pb -d
-TODO: f.dpretty for cpe and no trace
-TODO: spinner as decorator (https://blog.jcharistech.com/2025/02/05/how-to-add-progress-bars-spinners-to-clis-in-python/)
-TODO: man page
-TODO: decorator for debug - need to check debug flag, need func name for
+NEXT: in conf, add dunders for logging size/count
+NEXT: no yell in pb -d
+NEXT: f.dpretty for cpe and no trace
+NEXT: spinner as decorator (https://blog.jcharistech.com/2025/02/05/how-to-add-progress-bars-spinners-to-clis-in-python/)
+NEXT: man page
+NEXT: decorator for debug - need to check debug flag, need func name for
 enter/exit
-TODO: put dunders in sep file for code completion?
-TODO: no commented code in base - should never need to be touched
+NEXT: put dunders in sep file for code completion?
+NEXT: no commented code in base - should never need to be touched
+      use _add_cmd_debug, _add_cmd_uninstall in base/child
+      child calls base func to add cmd line options, always present in base but
+      not automatically added to parser
 
-# TODO: all refs to .local, etc. should be relative to prj in ide until uninstall
-# TODO: remove tooltips from docs
-# TODO: combine pyplate.py B_ flags into dict and add to project.json
-# TODO: custom exceptions (instead of except Exception as e/raise e)
-# how to read in pybaker? and write (debug at least, since we pass it in prj)
-# TODO: dock icon only works after install, and only for global (not src)
-# this might be a wayland thing, see here:
-# https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
-# TODO: swap ui file paths for templates
-# TODO: docs: fix icon/version number
-# TODO: maybe git update/push in pybaker after fix?
-# TODO: make -u option for cli/gui to uninstall
-# TODO: CNInstall help str
-# TODO: for pkg, after fix, activate prj venv and install pkg as editable
-# then change test to use installed pkg, not local dir
-# TODO: multiple switches on one line: # pyplate: foo=7 bar=False
-# TODO: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
-# dunder that is not in comment
-# report that as error
-# TODO: multiple sources for i18n
+NEXT: all refs to .local, etc. should be relative to prj in ide until uninstall
+NEXT: remove tooltips from docs
+NEXT: combine pyplate.py B_ flags into dict and add to project.json
+NEXT: custom exceptions (instead of except Exception as e/raise e)
+how to read in pybaker? and write (debug at least, since we pass it in prj)
+NEXT: dock icon only works after install, and only for global (not src)
+this might be a wayland thing, see here:
+https://stackoverflow.com/questions/45162862/how-do-i-set-an-icon-for-the-whole-application-using-pygobject
+NEXT: swap ui file paths for templates
+NEXT: docs: fix icon/version number
+NEXT: maybe git update/push in pybaker after fix?
+NEXT: make -u option for cli/gui to uninstall
+NEXT: CNInstall help str
+NEXT: for pkg, after fix, activate prj venv and install pkg as editable
+then change test to use installed pkg, not local dir
+NEXT: multiple switches on one line: # pyplate: foo=7 bar=False
+NEXT: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
+dunder that is not in comment
+report that as error
+NEXT: multiple sources for i18n
 
-# TODO: replace all PB_VERSION with new version, across all files in prj dir
-# TODO: fix every metadata using choice menu for new value
-# gonna need a lot of regex in pybaker.conf
-# TODO: do we need D_PRV_DEF/D_PRV_EXTRA?
+NEXT: replace all PB_VERSION with new version, across all files in prj dir
+NEXT: fix every metadata using choice menu for new value
+gonna need a lot of regex in pybaker.conf
+NEXT: do we need D_PRV_DEF/D_PRV_EXTRA?
 
-# replace (or just report) any dunders
-# replace metadata using prj pybaker (context is prj or dev specific)
-# make install.py
-# make dist (list of prj stuff into assets folder, install and README.md alongside)
+replace (or just report) any dunders
+replace metadata using prj pybaker (context is prj or dev specific)
+make install.py
+make dist (list of prj stuff into assets folder, install and README.md alongside)
 
-# TODO: pybaker not rely so much on regex, more on context start/end
-# TODO: check for version number? needs to be stored on user's comp somewhere
-# ------------------------------------------------------------------------------
+NEXT: pybaker not rely so much on regex, more on context start/end
+NEXT: check for version number? needs to be stored on user's comp somewhere
+------------------------------------------------------------------------------
 
-# TODO: pull in a fresh copy of libs on every run and put it in dist
-# we need to get the location of PyPlate from settings (src)
-# we need the name of the "__PP_DIR_LIB__" folder from settings (dst)
-# TODO: any time pybaker encounters a file with __PP_DATE__ still in the
-# header, make sure to use today's date, not the one stored in a config dict
-# TODO: install script must install libs, src, etc. into proper folders
-# TODO: installer for pkg should move pkg to __PP_USR_LIB__
+NEXT: pull in a fresh copy of libs on every run and put it in dist
+we need to get the location of PyPlate from settings (src)
+we need the name of the "__PP_DIR_LIB__" folder from settings (dst)
+NEXT: any time pybaker encounters a file with __PP_DATE__ still in the
+header, make sure to use today's date, not the one stored in a config dict
+NEXT: install script must install libs, src, etc. into proper folders
+NEXT: installer for pkg should move pkg to __PP_USR_LIB__
 
-TODO: change __RM_XXX and _xxx_readme to 'mx/MX' (for markup/markdown)
-TODO: fix README instructions for installing (like where it gets
+NEXT: change __RM_XXX and _xxx_readme to 'mx/MX' (for markup/markdown)
+NEXT: fix README instructions for installing (like where it gets
 installed/uninstalled from)
-TODO: output each step to terminal from pymaker
-TODO: combine all __PP dicts
-TODO: put pyplate/conf/private dicts into one
-TODO: make an html page for checklist.txt and tree.txt that checks all checkboxes for a "complete"
-TODO: tool to scan .ui files and build a stub .py with get/set vals and connect actions
-TODO: multiline comment support for triple quotes
-TODO: html comments also open/close tag, can have code before or after
+NEXT: output each step to terminal from pymaker
+NEXT: combine all __PP dicts
+NEXT: put pyplate/conf/private dicts into one
+NEXT: make an html page for checklist.txt and tree.txt that checks all checkboxes for a "complete"
+NEXT: tool to scan .ui files and build a stub .py with get/set vals and connect actions
+NEXT: multiline comment support for triple quotes
+NEXT: html comments also open/close tag, can have code before or after
 is it worth it? should we just replace every non-header line?
-TODO: have pybaker swap dev/usr lib import in all .py files
+NEXT: have pybaker swap dev/usr lib import in all .py files
 or at least remove dev home from path
 we are not using any rel path anymore
-TODO: pybaker DOES do string repl (all those new files?
+NEXT: pybaker DOES do string repl (all those new files?
 if it only runs at dist time, what about date? [pb never do date])
-TODO: pb never do pyplate folder in prj
-TODO: D_PB_NEED : dict of what pybaker needs : key is D_PRJ_..., val is list
+NEXT: pb never do pyplate folder in prj
+NEXT: D_PB_NEED : dict of what pybaker needs : key is D_PRJ_..., val is list
 of keys from that dict
-TODO: never store proj dir
-TODO: determine what lines in a file
-TODO: _fix_... that use lines[] don't need re.M
-TODO: _fix_header/_fix_code use multiline
+NEXT: never store proj dir
+NEXT: determine what lines in a file
+NEXT: _fix_... that use lines[] don't need re.M
+NEXT: _fix_header/_fix_code use multiline
 non-rat: break on colon, do str rep on value, put back together
 with regex, replace line in array
 rat: break on colon, rest of line split at two spaces, that group 1 is values
 that group 2 split at last space, that group 1 is pad, group 2 is rat
-TODO: convert readme fix to html fix
-TODO: verify block/line switch keys and values against known values (cuts down
+NEXT: convert readme fix to html fix
+NEXT: verify block/line switch keys and values against known values (cuts down
 on false positives?)
 
 my cn rat regex is public/private?
@@ -104,26 +109,26 @@ if we go with rat only for me, what to do about blacklist?
 headers and text should still be used, but public fix_header should only do
 simple string replacement
 
-TODO: _fix_code only looks in lines that don't start with #, split res at #,
+NEXT: _fix_code only looks in lines that don't start with #, split res at #,
 only string rep first group, put first and sec back together, repl in M list
 
-TODO: make sure all stuff in private is strictly pp- or cn-related and not output-related
+NEXT: make sure all stuff in private is strictly pp- or cn-related and not output-related
 make sure this stuff doesn't duplicate anything in public, only extend
 vice versa for public
-TODO: actually private is loaded first but imports public
+NEXT: actually private is loaded first but imports public
 main loads private (MUST STAY)
 private loads public
 private fills in private
 main loads public
 fix this?
 
-TODO: which regex done as list/whole string?
-TODO: how to use positional args in format strings
+NEXT: which regex done as list/whole string?
+NEXT: how to use positional args in format strings
 ie: the sky is {$1}, the sun is {$2}
-TODO: where do we use match? only where we need to check len (ie rat)
+NEXT: where do we use match? only where we need to check len (ie rat)
 everywhere else should just use sub for string replacements
 
-TODO: how does bool flag affect files in skip_headers blacklist?
+NEXT: how does bool flag affect files in skip_headers blacklist?
  flag  |  rat  |  res
 ---------------------
   0    |   0   |
@@ -131,37 +136,37 @@ TODO: how does bool flag affect files in skip_headers blacklist?
   1    |   0   |
   1    |   1   |
 
-TODO: ask dev for base dir 1 time, can change later?
-TODO: ask dev for everything 1 time?
-TODO: always run header test on sample file w/o rat
-TODO: what if you move project? what if you move PyPlate? vals should be
+NEXT: ask dev for base dir 1 time, can change later?
+NEXT: ask dev for everything 1 time?
+NEXT: always run header test on sample file w/o rat
+NEXT: what if you move project? what if you move PyPlate? vals should be
 updated every run and store in a dev file
-TODO: fill in pyplate/private.json w pp PRV_DEF/prg_cfg
-TODO: fill in pyplate/project.json w pp blacklist/i18n/metadata
-TODO: move get info input format to settings.py
-TODO: move _check_name regex to settings
-TODO: make a regex tester to run regex on toml, readme, header
-TODO: make a flow list of all funcs in here
-TODO: rename all const to be consistent
-TODO: make sure all runnable files have shebang/chmod +x
-TODO: write a tool to scan for unused keys/consts
+NEXT: fill in pyplate/private.json w pp PRV_DEF/prg_cfg
+NEXT: fill in pyplate/project.json w pp blacklist/i18n/metadata
+NEXT: move get info input format to settings.py
+NEXT: move _check_name regex to settings
+NEXT: make a regex tester to run regex on toml, readme, header
+NEXT: make a flow list of all funcs in here
+NEXT: rename all const to be consistent
+NEXT: make sure all runnable files have shebang/chmod +x
+NEXT: write a tool to scan for unused keys/consts
 
-TODO: 3 levels: cn (me), dev (user of this prg), end user (user of dev's prg)
-TODO: move all strings to S_ section in pybaker
-TODO: make tree happen in pybaker
-TODO: make pybaker check for empty entries in header (not just dunders)
-TODO: pybaker update metadata in cli (desc, name, version)(may need context)
-TODO: pybaker interactive (ask questions for short desc, deps, etc.)
+NEXT: 3 levels: cn (me), dev (user of this prg), end user (user of dev's prg)
+NEXT: move all strings to S_ section in pybaker
+NEXT: make tree happen in pybaker
+NEXT: make pybaker check for empty entries in header (not just dunders)
+NEXT: pybaker update metadata in cli (desc, name, version)(may need context)
+NEXT: pybaker interactive (ask questions for short desc, deps, etc.)
 
-TODO: test README instructions for all - latest/clone/uninstall
+NEXT: test README instructions for all - latest/clone/uninstall
 (and check for upper/lowercase in names)
-TODO: how to handle screenshot in readme? should be done by pybaker
+NEXT: how to handle screenshot in readme? should be done by pybaker
 (after we get a screenshot obviously)
 
-TODO: ctrl+shift+i (format) all files
-TODO: lint (CTRL+S) all files
+NEXT: ctrl+shift+i (format) all files
+NEXT: lint (CTRL+S) all files
 
-TODO: in gui, what to set to make name change in top bar/dock 
+NEXT: in gui, what to set to make name change in top bar/dock 
 step 1: remove .py from main file
 step 2: where is it getting pyplate? from main file?
 if so, need to rename main file to PyPlate?
@@ -387,31 +392,31 @@ DONE: initial filename in header of first src file (src/modtest - modtest.py)
 DONE: what about exec/icon paths in .desktop?
 DONE: _replace_headers could be done better with regex
 DONE: for pkg type, make sure all submodule names are in __init__.py
-# DONE: make pybaker an entry in .vscode/launch.json
-# DONE: add a .vscode launch for each prj type w/prj name small (or whatever
-# default file)
-# DONE: no full paths in dist files (any file that goes to end user)
-# DONE: _fix_settings_dunders()
-# DONE: MANIFEST.in, .gitignore header not fixed
-# DONE: _fix header(): author/license padding wrong (works in test)
-# DONE: rename pyplate/conf/project.py to private.py (private for pymaker)
-# DONE: rename pyplate/conf/settings.py to pyplate.py (public for
-# pymaker/pybaker)
-# DONE: rename prj/pyplate/project.json to pybaker.json (private for pybaker)
-# DONE: rename prj/pyplate/settings.json to project.json (public for pybaker)
-# DONE: lost metadata for pp
-# DONE: what pybaker functions do we need here (ie. _fix_toml is normally run
-# from pybaker.py)
-# DONE: combine before and after fix - what REALLY needs to be done before fix?
-# DONE: bools to turn on/off git, venv, tree
-# DONE: print warning when in debug mode
-# DONE  print warning/ask if in debug and about to clobber a dir
-# DONE: flesh out use of verbose option
-# DONE: make a pyplate folder in PyPlate, put in fake pybaker so we can run
-# pybaker on PyPlate project
-# also need to add bl/i18n/meta file named "project.json"
-# and a file with WHAT??? named "private.json"
-# DONE: fill in misc/tree.txt
+DONE: make pybaker an entry in .vscode/launch.json
+DONE: add a .vscode launch for each prj type w/prj name small (or whatever
+default file)
+DONE: no full paths in dist files (any file that goes to end user)
+DONE: _fix_settings_dunders()
+DONE: MANIFEST.in, .gitignore header not fixed
+DONE: _fix header(): author/license padding wrong (works in test)
+DONE: rename pyplate/conf/project.py to private.py (private for pymaker)
+DONE: rename pyplate/conf/settings.py to pyplate.py (public for
+pymaker/pybaker)
+DONE: rename prj/pyplate/project.json to pybaker.json (private for pybaker)
+DONE: rename prj/pyplate/settings.json to project.json (public for pybaker)
+DONE: lost metadata for pp
+DONE: what pybaker functions do we need here (ie. _fix_toml is normally run
+from pybaker.py)
+DONE: combine before and after fix - what REALLY needs to be done before fix?
+DONE: bools to turn on/off git, venv, tree
+DONE: print warning when in debug mode
+DONE  print warning/ask if in debug and about to clobber a dir
+DONE: flesh out use of verbose option
+DONE: make a pyplate folder in PyPlate, put in fake pybaker so we can run
+pybaker on PyPlate project
+also need to add bl/i18n/meta file named "project.json"
+and a file with WHAT??? named "private.json"
+DONE: fill in misc/tree.txt
 
 remove .py exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
