@@ -426,7 +426,7 @@ class CNInstallBase:
             # ask the question, get the result
             inp = input(str_fmt)
 
-            # # no input (empty)
+            # no input (empty)
             if inp == "" and default != "":
                 return default
 
