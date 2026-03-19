@@ -125,7 +125,7 @@ class CNInstallBase:
     S_ARG_FORCE_ACTION = "store_true"
     S_ARG_FORCE_DEST = "FORCE_DEST"
     # I18N: force option help
-    S_ARG_FORCE_HELP = _("force install this program")
+    S_ARG_FORCE_HELP = _("force install/uninstall this program")
 
     # quiet option strings
     S_ARG_QUIET_OPTION = "-q"
@@ -443,7 +443,7 @@ class CNInstallBase:
                 return ""
 
     # --------------------------------------------------------------------------
-    # Run the post install script if it exists
+    # Run an external script
     # --------------------------------------------------------------------------
     def _do_external(self, path):
         """
@@ -487,6 +487,6 @@ class CNInstallBase:
 if __name__ == "__main__":
 
     # Code to run when called from command line
-    print("WRONG GLASS, SIR !!!")
+    print("WRONG CLASS, SIR !!!")
 
 # -)

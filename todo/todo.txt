@@ -1,4 +1,13 @@
 
+TODO: when installing newer, do quiet uninstall first (artifact thing)
+TODO: install_base needs docstring for do_external
+TODO: install_base may need shlex split for cmd
+TODO: propagate these changes to template and projects
+
+NEXT: no commented code in base - should never need to be touched
+      use _add_cmd_debug, _add_cmd_uninstall in base/child
+      child calls base func to add cmd line options, always present in base but
+      not automatically added to parser
 NEXT: ask before install new like same/older
 
 NEXT: script to make changelog from todos/next/done
@@ -12,7 +21,7 @@ NEXT: CFG_EXT = ".json", LOG_EXT = ".log", UI_EXT = ".ui"
 this is to replace exts in any module that builds paths to files
 NEXT: can use dunders in .ui props dlg? author, prj name, license
 NEXT: use zip/tar in dist (cross platform) conf.py:2168
-need L_MAKE_DIST_TYPE, setting in pp/pub, 
+need L_MAKE_DIST_TYPE, setting in pp/pub,
 NEXT: in conf, add dunders for logging size/count
 NEXT: no yell in pb -d
 NEXT: f.dpretty for cpe and no trace
@@ -21,10 +30,6 @@ NEXT: man page
 NEXT: decorator for debug - need to check debug flag, need func name for
 enter/exit
 NEXT: put dunders in sep file for code completion?
-NEXT: no commented code in base - should never need to be touched
-      use _add_cmd_debug, _add_cmd_uninstall in base/child
-      child calls base func to add cmd line options, always present in base but
-      not automatically added to parser
 
 NEXT: all refs to .local, etc. should be relative to prj in ide until uninstall
 NEXT: remove tooltips from docs
@@ -166,7 +171,7 @@ NEXT: how to handle screenshot in readme? should be done by pybaker
 NEXT: ctrl+shift+i (format) all files
 NEXT: lint (CTRL+S) all files
 
-NEXT: in gui, what to set to make name change in top bar/dock 
+NEXT: in gui, what to set to make name change in top bar/dock
 step 1: remove .py from main file
 step 2: where is it getting pyplate? from main file?
 if so, need to rename main file to PyPlate?
@@ -187,7 +192,7 @@ git commit -m "first commit"
 git branch -M main
 git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
 git push -u origin main
-  
+
 or push an existing repository from the command line
 
 git remote add origin https://github.com/cyclopticnerve/PKG_Test.git
@@ -245,7 +250,7 @@ NEXT: set project info by cmd line (-t,--type, -n,--name, -a,--author, -e,--emai
 NEXT: use globs in blacklist (for skip header images)
 but these are hardcoded in SO MANY PLACES
 these values would only have to be changed once, so make it a script in install?
-NEXT: how to add new items to be replaced? 
+NEXT: how to add new items to be replaced?
 all current keywords use a fixed regex but what if we want to do simple text replacement?
 like just replace 'PP_SOMETHING' with 'foobar'?
 NEXT: combine strings.json/blacklist.json
@@ -296,7 +301,7 @@ NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.htm
 DONE: when install new/same/older, delete first to avoid artifacts
 DONE: make pp in pp
 keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
-tests, todo, readme, 
+tests, todo, readme,
 DONE: merge no-inst-json with main
 DONE: put pp venv cnlib back to github
 DONE: add --uninstall to pyplate
@@ -338,12 +343,12 @@ DONE: don't replace conf/settings.json keys
 DONE: filename entry in header has wrong spacing (modtest/src/modtest.py)
 DONE: pymaker doesn't replace PP_AUTHOR_or PP_LICENSE in headers
 DONE: rename pyplate.py to pymaker.py and pybaker.py to pybaker.py
-DONE: Add author and license somewhere in pymaker so users don't have to do 
+DONE: Add author and license somewhere in pymaker so users don't have to do
 find/replace everywhere in template
 DONE: what settings do we need in metadata?
 DONE: get rid of project type in settings.json
 DONE: remove my name from conf/settings.json
-DONE: if link is blank in strings.json, don't make link in readme 
+DONE: if link is blank in strings.json, don't make link in readme
 DONE: check that cats end in semicolon
 DONE: put all readme in same doc
 DONE: strings.json PP_PY_DEPS/PP_SYSDEPS/PP_GUI_CATEGORIES is array
@@ -384,7 +389,7 @@ DONE: Module/Package: get rid of import tests after ensuring __init__.py works a
 DONE: pybaker.py: pybaker's own headers not replaced as it is in misc/
 DONE: pybaker.py shows tags in README that are ok (__RM_MOD_START etc)
 DONE: put blacklist back in for recursing (easier to maintain/move to agnostic)
-DONE: versionator script 
+DONE: versionator script
 DONE: add argparse to empty_exe.py
 DONE: some sort of script to go back after and check that all reps are done
 DONE: keep. .py ext in PyPlate/project
@@ -432,20 +437,20 @@ no default, each is required
 CLI/GUI: what files to add to install.py when copying
 (i.e. apps/cli need to copy files to ~/.cyclopticnerve/proj/app and ~/.cyclopticnerve/proj/app/gui)
 
-Change log should be cumulative with an entry for each version number and date 
+Change log should be cumulative with an entry for each version number and date
 of release
 Still working on this - need to compare tags but no tags in dev
 Can't compare tags in main as changelog will be modified after tag is added
 
-when creating a CLI or GUI app, after creating venv, download and install 
+when creating a CLI or GUI app, after creating venv, download and install
 installerator and configurator and build and pylinter
-default install script should be modified by PyPlate to download and install 
+default install script should be modified by PyPlate to download and install
 installerator and configurator in the prerequisites
 Add pip install from GitHub instructions to readme
-How to know if we are using the latest version of PyPlate, installer and 
+How to know if we are using the latest version of PyPlate, installer and
 configurator
 pyproject deps should include inst/cfg for gui/cli but they need to be in pyPI
-pyproject.toml should automatically add configurator and installerator for 
+pyproject.toml should automatically add configurator and installerator for
 cli/gui apps
 
 upload to testpypi/pypi
