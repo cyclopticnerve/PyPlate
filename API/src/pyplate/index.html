@@ -210,7 +210,7 @@ PyPlate project from a template.</p>
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 1.0.7"
+    S_PP_VERSION = "Version 1.0.8"
 
     # pyplate: replace=False
 
@@ -450,9 +450,9 @@ PyPlate project from a template.</p>
             F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
             print()
 
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Boilerplate to use at the start of main
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def _teardown(self):
         """
         Boilerplate to use at the end of main
@@ -500,7 +500,7 @@ PyPlate project from a template.</p>
             print(self.S_MSG_ABORT)
             sys.exit(0)
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # if path exists
         path_uninst = P_UNINST
@@ -512,7 +512,7 @@ PyPlate project from a template.</p>
         if self._cmd_debug:
             cmd += " -d"
 
-        # ------------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         try:
             cp = F.run(cmd, shell=True)
@@ -730,7 +730,7 @@ PyPlate project from a template.</p>
                     code = line[:split_pos]
                     comm = line[split_pos:]
 
-                # ------------------------------------------------------------------
+                # --------------------------------------------------------------
                 # check for switches
 
                 # reset line switch values to block switch values
