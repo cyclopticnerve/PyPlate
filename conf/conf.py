@@ -325,7 +325,7 @@ S_KEY_RULES_REP = "S_KEY_RULES_REP"
 S_KEY_HDR_SCH = "S_KEY_HDR_SCH"
 S_KEY_LEAD = "S_KEY_GRP_LEAD"
 S_KEY_VAL = "S_KEY_GRP_VAL"
-S_KEY_PAD = "S_KEY_GRP_PAD"
+S_KEY_CAPTION_PAD = "S_KEY_GRP_PAD"
 S_KEY_SW_SCH = "S_KEY_SW_SCH"
 S_KEY_SW_KEY = "S_KEY_SW_KEY"
 S_KEY_SW_VAL = "S_KEY_SW_VAL"
@@ -1232,7 +1232,7 @@ D_TYPE_RULES = {
             S_KEY_HDR_SCH: r"^(\s*#\s*\S*\s*:\s*)(\S+)(.*)$",
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
-            S_KEY_PAD: 3,
+            S_KEY_CAPTION_PAD: 3,
             # code stuff
             # NB: match first occurrence of unquoted marker to end of line
             S_KEY_SPLIT: r"[\'\"].*?[\'\"]|(#.*)",
@@ -1250,7 +1250,7 @@ D_TYPE_RULES = {
             S_KEY_HDR_SCH: r"^(\s*<!--\s*\S*\s*:\s*)(\S+)(.*-->.*)$",
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
-            S_KEY_PAD: 3,
+            S_KEY_CAPTION_PAD: 3,
         },
     },
 }
