@@ -40,17 +40,21 @@ P_DIR_INSTALL = P_DIR_ASSETS / "__PP_DIR_INSTALL__"
 P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
 
 # get files
-P_FILE_UNINST = Path.home() / "__PP_USR_INST__/__PP_NAME_UNINST__" 
-P_FILE_CFG_UNINST = (
+# NB: use local uninstall
+P_FILE_UNINST = P_DIR_ASSETS / "__PP_NAME_UNINST__"
+P_FILE_CFG_OLD = (
     Path.home() / "__PP_USR_INST__/__PP_DIR_INSTALL__/__PP_FILE_INST_CFG__"
 )
-P_FILE_CFG = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+P_FILE_CFG_NEW = P_DIR_PRJ / "__PP_FILE_INST_CFG__"
+# NB: path changes after dist
+P_FILE_CFG_DIST_NEW = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+
 P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
 P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
 P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_IMG_DESK__"
 
-P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+# P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
+# P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -60,12 +64,12 @@ P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, import-error
 import install_base as B  # type: ignore
 from install_base import _  # type: ignore
 from install_base import CNInstallBase  # type: ignore
 
-# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-position, import-error
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -91,6 +95,7 @@ class CNInstall(CNInstallBase):
     # --------------------------------------------------------------------------
 
     # strings
+    S_MSG_UNINST_OLD = _("Uninstalling old version... ")
     # NB: format params are prog_name and prog_version
     # I18N: install the program
     S_MSG_INST_START = _("Installing {} Version {}")
@@ -143,8 +148,8 @@ class CNInstall(CNInstallBase):
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
-    # NB: format param is post install file name
-    S_CMD_RUN_EXT = "python {}"
+    # remove old version quietly
+    S_CMD_DEL_OLD = " -q -f"
 
     # regex for adding user's home to icon path
     R_ICON_SCH = r"^(Icon=)(.*)$"
@@ -219,15 +224,15 @@ class CNInstall(CNInstallBase):
         # get prj info from cfg
         self._get_project_info()
 
-        # do pre uninstall
-        self._do_external(P_FILE_PRE)
-
         # check for existing/old version
         self._compare_version()
 
         # uninstall any existing before doing the new install
         # NB: to avoid artifacts/files that no longer exist
-        self._do_external(P_FILE_UNINST)
+        self._uninstall_old()
+
+        # do pre install
+        # self._do_external(P_FILE_PRE)
 
         # make the venv on the user's comp
         self._make_venv()
@@ -245,7 +250,7 @@ class CNInstall(CNInstallBase):
         self._teardown()
 
         # do post install
-        self._do_external(P_FILE_POST)
+        # self._do_external(P_FILE_POST)
 
         print()
 
@@ -265,9 +270,14 @@ class CNInstall(CNInstallBase):
         Get the install info from the config file.
         """
 
+        # get path to config (ide or dist)
+        path_cfg = P_FILE_CFG_NEW
+        if not path_cfg.exists():
+            path_cfg = P_FILE_CFG_DIST_NEW
+
         try:
             # get project info
-            self._dict_cfg = self._get_dict_from_file(P_FILE_CFG)
+            self._dict_cfg = self._get_dict_from_file(path_cfg)
         except OSError as e:
             print(self.S_ERR_ERR, e)
 
@@ -297,13 +307,14 @@ class CNInstall(CNInstallBase):
 
         # if we did pass an old conf, it must exist (if it doesn't, this could
         # be the first install but we will want to check on later updates)
-        if not P_FILE_CFG_UNINST or not P_FILE_CFG_UNINST.exists():
+        if not P_FILE_CFG_OLD or not P_FILE_CFG_OLD.exists():
             return
 
+        # get info from old cfg
         dict_cfg_old = {}
         try:
             # get info from old cfg
-            dict_cfg_old = self._get_dict_from_file(P_FILE_CFG_UNINST)
+            dict_cfg_old = self._get_dict_from_file(P_FILE_CFG_OLD)
         except OSError as e:
             print(self.S_ERR_ERR, e)
             return
@@ -345,7 +356,8 @@ class CNInstall(CNInstallBase):
                 print(self.S_MSG_ABORT)
                 sys.exit(0)
 
-        print()
+        # just print a blank line
+        # print()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -578,7 +590,7 @@ class CNInstall(CNInstallBase):
             if old_val > new_val:
                 return self.I_VER_OLDER
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # still going, check pre
         pre_old = res_old.group(self.R_VERSION_GROUP_PRE)
@@ -650,11 +662,34 @@ class CNInstall(CNInstallBase):
             if len_pre_new > len_pre_old:
                 return self.I_VER_NEWER
 
-        # --------------------------------------------------------------------------
+        # ----------------------------------------------------------------------
 
         # error in one or both versions
         return self.I_VER_ERROR
 
+    # --------------------------------------------------------------------------
+    # Uninstall old version (if present)
+    # --------------------------------------------------------------------------
+    def _uninstall_old(self):
+        """
+        Uninstall old version (if present)
+        """
+
+        # NB: uninstall any existing before doing the new install
+        # to avoid artifacts/files that no longer exist
+
+        # no old install, do nothing
+        if not P_FILE_CFG_OLD.exists():
+            return
+
+        # print some info
+        print(self.S_MSG_UNINST_OLD, flush=True, end="")
+
+        # add quiet and force options
+        cmd = str(P_FILE_UNINST) + self.S_CMD_DEL_OLD
+
+        # run the script quietly
+        self._do_external(cmd, hide=True)
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
