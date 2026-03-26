@@ -41,8 +41,8 @@ P_FILE_CFG = P_DIR_PRJ / "__PP_FILE_INST_CFG__"
 # NB: path changes after dist
 P_FILE_CFG_DIST = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
-P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+# P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
+# P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -52,11 +52,11 @@ P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, import-error
 from install_base import _  # type: ignore
 from install_base import CNInstallBase  # type: ignore
 
-# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-position, import-error
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -86,7 +86,7 @@ class CNUninstall(CNInstallBase):
     # I18N: uninstall the program
     S_MSG_UNINST_START = _("Uninstalling {}")
     # I18N: show the copy step
-    S_MSG_DEL_START = _("Deleting files... ")
+    S_MSG_UNINST_START = _("Deleting files... ")
     # NB: format param is prog_name
     # I18N: done uninstalling
     S_MSG_UNINST_END = _("{} uninstalled")
@@ -143,7 +143,7 @@ class CNUninstall(CNInstallBase):
         self._get_project_info()
 
         # do pre uninstall
-        self._do_external(P_FILE_PRE)
+        # self._do_external(P_FILE_PRE)
 
         # create an instance of the class
         self._uninstall_content()
@@ -151,28 +151,14 @@ class CNUninstall(CNInstallBase):
         # wind down
         self._teardown()
 
-        # do pre uninstall
-        self._do_external(P_FILE_POST)
+        # do post uninstall
+        # self._do_external(P_FILE_POST)
 
     # --------------------------------------------------------------------------
     # Private methods
     # --------------------------------------------------------------------------
 
     # NB: these are the main steps, called in order from main
-
-    # --------------------------------------------------------------------------
-    # Boilerplate to use at the start of main
-    # --------------------------------------------------------------------------
-    # def _setup(self):
-    #     """
-    #     Boilerplate to use at the start of main
-
-    #     Perform some mundane stuff like setting properties.
-    #     If you implement this function. make sure to call super() LAST!!!
-    #     """
-
-    #     # do setup
-    #     super()._setup()
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -231,7 +217,7 @@ class CNUninstall(CNInstallBase):
         # uninstall
 
         # show some info
-        print(self.S_MSG_DEL_START, flush=True, end="")
+        print(self.S_MSG_UNINST_START, flush=True, end="")
 
         # content list from dict
         content = self._dict_cfg.get(self.S_KEY_UNINST_CONT, [])
