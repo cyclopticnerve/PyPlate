@@ -1,7 +1,4 @@
 
-TODO: when installing newer, do quiet uninstall first (artifact thing)
-TODO: install_base needs docstring for do_external
-TODO: install_base may need shlex split for cmd
 TODO: propagate these changes to template and projects
 
 NEXT: no commented code in base - should never need to be touched
@@ -296,8 +293,12 @@ NEXT: make tree.txt/style.txt as html w/checkboxes
 NEXT: change all header date to version ???
 NEXT: check cspell
 NEXT: run every f-ing linter
-NEXT: investigate pyinstaller https://pyinstaller.org/en/stable/requirements.html
+NEXT: investigate pyinstaller
+https://pyinstaller.org/en/stable/requirements.html
 
+DONE: when installing same/newer, do quiet uninstall first (artifact thing)
+DONE: install_base needs docstring for do_external
+DONE: install_base may need shlex split for cmd
 DONE: when install new/same/older, delete first to avoid artifacts
 DONE: make pp in pp
 keep: .git/, pyplate/, .venv*, vs-code, bin, conf, imgs, misc, src, template,
