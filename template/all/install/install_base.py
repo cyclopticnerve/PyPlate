@@ -26,6 +26,7 @@ import gettext
 import json
 import locale
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 
@@ -192,12 +193,6 @@ class CNInstallBase:
     # NB: format param is file path
     # I18N: config file is not valid json
     S_ERR_NOT_JSON = _("File {} is not a JSON file")
-
-    # --------------------------------------------------------------------------
-    # commands
-
-    # command to run external script
-    S_CMD_RUN_EXT = "python {}"
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -443,31 +438,27 @@ class CNInstallBase:
                 return ""
 
     # --------------------------------------------------------------------------
-    # Run the post install script if it exists
+    # Run an external command at some point
     # --------------------------------------------------------------------------
-    def _do_external(self, path):
+    def _do_external(self, cmd, hide=False):
         """
-        docstring
+        Run an external command at some point
+
+        Args:
+            cmd: Command to run
+            hide: Whether to hide the command's output
         """
 
-        # sanity check
-        if not path.exists():
-            return
-
-        # print some info
-        print(self.S_MSG_RUN_EXT.format(path.name), end="", flush=True)
-
-        # if it's a dry run, don't make venv
+        # if it's a dry run, don't do anything
         if self._dry_run:
             print(self.S_MSG_DONE)
             return
 
-        # the command to create a venv
-        cmd = self.S_CMD_RUN_EXT.format(path)
-
-        # run the external script
+        # run the external command
         try:
-            subprocess.run(cmd, shell=True, check=True)
+            # NB: hide output
+            cmd = shlex.split(str(cmd))
+            subprocess.run(cmd, check=True, capture_output=hide)
             print(self.S_MSG_DONE)
 
         except FileNotFoundError as e:
@@ -487,6 +478,6 @@ class CNInstallBase:
 if __name__ == "__main__":
 
     # Code to run when called from command line
-    print("WRONG GLASS, SIR !!!")
+    print("WRONG CLASS, SIR !!!")
 
 # -)
