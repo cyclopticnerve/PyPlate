@@ -40,8 +40,8 @@ P_FILE_CFG = P_DIR_PRJ / "install.json"
 # NB: path changes after dist
 P_FILE_CFG_DIST = P_DIR_INSTALL / "install.json"
 
-P_FILE_PRE = P_DIR_INSTALL / "pre_install.py"
-P_FILE_POST = P_DIR_INSTALL / "post_install.py"
+P_FILE_PRE = P_DIR_INSTALL / "pre_uninstall.py"
+P_FILE_POST = P_DIR_INSTALL / "post_uninstall.py"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -85,7 +85,7 @@ class CNUninstall(CNInstallBase):
     # I18N: uninstall the program
     S_MSG_UNINST_START = _("Uninstalling {}")
     # I18N: show the copy step
-    S_MSG_DEL_START = _("Deleting files... ")
+    S_MSG_UNINST_START = _("Deleting files... ")
     # NB: format param is prog_name
     # I18N: done uninstalling
     S_MSG_UNINST_END = _("{} uninstalled")
@@ -216,7 +216,7 @@ class CNUninstall(CNInstallBase):
         # uninstall
 
         # show some info
-        print(self.S_MSG_DEL_START, flush=True, end="")
+        print(self.S_MSG_UNINST_START, flush=True, end="")
 
         # content list from dict
         content = self._dict_cfg.get(self.S_KEY_UNINST_CONT, [])
