@@ -21,6 +21,7 @@ This is the base class that contains code common to both PyMaker and PyBaker.
 
 # system imports
 import argparse
+
 # import gettext
 # import locale
 import logging
@@ -229,7 +230,8 @@ class PyPlate:
 
         # cmd line stuff
         self._parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter, add_help=False,
+            formatter_class=CNFormatter,
+            add_help=False,
         )
 
         # set arg defaults
@@ -711,7 +713,7 @@ class PyPlate:
         # pull out lead, val, and pad using group match values from M
         lead = res.group(self._dict_type_rules[C.S_KEY_LEAD])
         val = res.group(self._dict_type_rules[C.S_KEY_VAL])
-        pad = res.group(self._dict_type_rules[C.S_KEY_PAD])
+        pad = res.group(self._dict_type_rules[C.S_KEY_CAPTION_PAD])
 
         # this is a complicated function to get the length of the spaces
         # between the key/val pair and the RAT (right-aligned text)
