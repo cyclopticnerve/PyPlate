@@ -26,7 +26,6 @@ from pathlib import Path
 import re
 import shutil
 import sys
-import tarfile
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
@@ -343,6 +342,7 @@ S_KEY_INST_VER = "INST_VER"
 S_KEY_INST_DESK = "INST_DESK"
 S_KEY_INST_CONT = "INST_CONT"
 S_KEY_UNINST_CONT = "UNINST_CONT"
+S_KEY_CFG_CONT = "CFG_CONT"
 
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
@@ -418,6 +418,7 @@ S_I18N_EXT_PO = "**/*.po"
 S_USR_SHARE = ".local/share"  # bulk of the program goes here
 S_USR_APPS = ".local/share/applications"  # for .desktop out file
 S_USR_BIN = ".local/bin"  # where to put the binary
+S_USR_CONF = ".config"  # where to put config files
 
 # formats for tree
 S_TREE_TEXT_NAME = "tree.txt"
@@ -956,7 +957,8 @@ D_PRV_PRJ = {
     "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.13"
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
     "__PP_DEV_INST__": "",  # cmd used by develop.py to install reqs or self
-    "__PP_USR_INST__": "",
+    "__PP_USR_INST__": "",  # /home/user/.local/app_name
+    "__PP_USR_CONF__": "",  # /home/user/.config/app_name
     "__PP_APP_ID__": "",
     "__PP_FMT_DIST__": "",
 }
@@ -1159,7 +1161,6 @@ D_TYPE_INST = {
         S_KEY_INST_DESK: False,
         S_KEY_INST_CONT: {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
-            S_DIR_CONF: "__PP_USR_INST__",
             # S_DIR_LOG: ".local/share/pyplate",
             S_DIR_I18N: "__PP_USR_INST__",
             S_DIR_IMAGES: "__PP_USR_INST__",
@@ -1171,6 +1172,9 @@ D_TYPE_INST = {
             "__PP_USR_BIN__/__PP_NAME_PRJ_SMALL__",
             "__PP_USR_INST__",
         ],
+        S_KEY_CFG_CONT: {
+            S_DIR_CONF: "__PP_USR_CONF__",
+        },
     },
     "g": {
         S_KEY_INST_NAME: "__PP_NAME_PRJ_BIG__",
@@ -1178,7 +1182,6 @@ D_TYPE_INST = {
         S_KEY_INST_DESK: True,
         S_KEY_INST_CONT: {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
-            S_DIR_CONF: "__PP_USR_INST__",
             # S_DIR_LOG: ".local/share/pyplate",
             S_DIR_I18N: "__PP_USR_INST__",
             S_DIR_IMAGES: "__PP_USR_INST__",
@@ -1194,6 +1197,9 @@ D_TYPE_INST = {
             # NB: extra for gui
             "__PP_USR_APPS__/__PP_NAME_PRJ_BIG__.desktop",
         ],
+        S_KEY_CFG_CONT: {
+            S_DIR_CONF: "__PP_USR_CONF__",
+        },
     },
 }
 
@@ -1468,6 +1474,36 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     if prj_type in D_TYPE_INST:
         dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
 
+    # --------------------------------------------------------------------------
+    # make install/uninstall config files
+
+    # prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
+    if prj_type in L_APP_INSTALL:
+
+        # show info
+        print(S_ACTION_INST, end="", flush=True)
+
+        # create a template and save cfg file
+        dict_inst = dict_pub[S_KEY_PUB_INST]
+
+        # dict_inst_cont = dict_inst[S_KEY_INST_CONT]
+        path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
+
+        # # create a template uninstall cfg file
+        # dict_uninst_cont = dict_inst[S_KEY_UNINST_CONT]
+        # path_uninst = dir_prj / S_DIR_INSTALL / S_FILE_UNINST_CFG
+
+        try:
+            F.save_dict_into_paths(dict_inst, [path_inst])
+            # F.save_dict_into_paths(dict_inst, [path_uninst])
+
+            # show info
+            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+
+        except OSError as e:  # from save_dict
+            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
+            F.printd(S_ERR_ERR, str(e))
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
@@ -1603,7 +1639,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # --------------------------------------------------------------------------
-    # metadata
+    # filter using blacklist
 
     # NB: this is an example of how to use the blacklist filter in your own
     # customized fix routine
@@ -1637,7 +1673,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     skip_contents = dict_bl[S_KEY_SKIP_CONTENTS]
 
     # --------------------------------------------------------------------------
-    # do the fixes
+    # fix meta
 
     # NB: root is a full path, dirs and files are relative to root
     for root, root_dirs, root_files in dir_prj.walk():
@@ -1960,38 +1996,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # ----------------------------------------------------------------------
         # we are done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # ----------------------------------------------------------------------
-    # install/uninstall config files
-
-    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-
-    if prj_type in L_APP_INSTALL:
-
-        # show info
-        print(S_ACTION_INST, end="", flush=True)
-
-        # create a template and save cfg file
-        dict_inst = dict_pub[S_KEY_PUB_INST]
-
-        # dict_inst_cont = dict_inst[S_KEY_INST_CONT]
-        path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
-
-        # # create a template uninstall cfg file
-        # dict_uninst_cont = dict_inst[S_KEY_UNINST_CONT]
-        # path_uninst = dir_prj / S_DIR_INSTALL / S_FILE_UNINST_CFG
-
-        try:
-            F.save_dict_into_paths(dict_inst, [path_inst])
-            # F.save_dict_into_paths(dict_inst, [path_uninst])
-
-            # show info
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-        except OSError as e:  # from save_dict
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
