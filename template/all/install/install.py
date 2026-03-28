@@ -20,6 +20,7 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 # Imports
 # ------------------------------------------------------------------------------
 
+# NB: pure python
 # system imports
 from pathlib import Path
 import re
@@ -31,28 +32,31 @@ import sys
 # Constants
 # ------------------------------------------------------------------------------
 
-# get prj dir
-P_DIR_PRJ = Path(__file__).parent.resolve()
+# get pkg dir
+P_DIR_PARENT = Path(__file__).parent.resolve()
 
-# get dirs
-P_DIR_ASSETS = P_DIR_PRJ / "__PP_DIR_ASSETS__"
+# get in dirs
+P_DIR_ASSETS = P_DIR_PARENT / "__PP_DIR_ASSETS__"
 P_DIR_INSTALL = P_DIR_ASSETS / "__PP_DIR_INSTALL__"
-P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
 
-# get files
+# get in files
 # NB: use local uninstall
 P_FILE_UNINST = P_DIR_ASSETS / "__PP_NAME_UNINST__"
-P_FILE_CFG_OLD = (
-    Path.home() / "__PP_USR_INST__/__PP_DIR_INSTALL__/__PP_FILE_INST_CFG__"
-)
-P_FILE_CFG_NEW = P_DIR_PRJ / "__PP_FILE_INST_CFG__"
-# NB: path changes after dist
-P_FILE_CFG_DIST_NEW = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
-
 P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
 P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
 P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_IMG_DESK__"
+P_FILE_CFG_NEW = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
+# get out dirs
+P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
+P_DIR_CONF = Path.home() / ".__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__"
+
+# get out files
+P_FILE_CFG_OLD = (
+    Path.home() / "__PP_USR_INST__/__PP_DIR_INSTALL__/__PP_FILE_INST_CFG__"
+)
+
+# get pre/post files
 # P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
 # P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
 
@@ -61,19 +65,15 @@ P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_IMG_DESK__"
 # ------------------------------------------------------------------------------
 
 # fudge path to load base
+sys.path.append(str(P_DIR_ASSETS))
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
 # pylint: disable=wrong-import-position, import-error
-import install_base as B  # type: ignore
-from install_base import _  # type: ignore
 from install_base import CNInstallBase  # type: ignore
+from uninstall import CNUninstall  # type: ignore
 
 # pylint: enable=wrong-import-position, import-error
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -89,98 +89,6 @@ class CNInstall(CNInstallBase):
 
     This class performs the install operation.
     """
-
-    # --------------------------------------------------------------------------
-    # Class constants
-    # --------------------------------------------------------------------------
-
-    # strings
-    S_MSG_UNINST_OLD = _("Uninstalling old version... ")
-    # NB: format params are prog_name and prog_version
-    # I18N: install the program
-    S_MSG_INST_START = _("Installing {} Version {}")
-    # NB: format param is prog_name
-    # I18N: show the copy step
-    S_MSG_COPY_START = _("Copying files... ")
-    # I18N: show the venv step
-    S_MSG_VENV_START = _("Making venv folder... ")
-    # I18N: show the reqs step
-    S_MSG_REQS_START = _("Installing requirements... ")
-    # I18N: show desktop step
-    S_MSG_DSK_START = _("Fixing .desktop file... ")
-    # I18N: done installing
-    S_MSG_INST_END = _("{} installed")
-
-    # questions
-    S_ASK_VER_SAME = _(
-        # I18N: ask to overwrite same version
-        "The current version of this program is already installed.\nDo you "
-        "want to overwrite?"
-    )
-    S_ASK_VER_OLDER = _(
-        # I18N: ask to overwrite newer version
-        "A newer version of this program is currently installed.\nDo you want "
-        "to overwrite?"
-    )
-
-    # errors
-    # I18N: version numbers invalid
-    S_ERR_VERSION = _("One or both version numbers are invalid")
-    # NB: format param is source path
-    # I18N: src path invalid
-    S_ERR_SRC_PATH = _("Source path can not be {}")
-    # NB: format param is dest path
-    # I18N: dst path invalid
-    S_ERR_DST_PATH = _("Destination path can not be {}")
-    # I18N: can't find .desktop
-    S_ERR_NO_DESK = _("No desktop files present")
-
-    # dry run messages
-    S_DRY_VENV = "\nvenv cmd:"
-    S_DRY_REQS = "\nreqs cmd:"
-    # NB: format params are source and destination file/dir
-    S_DRY_COPY = "\ncopy\n{}\nto\n{}"
-    # NB: format param is path to icon
-    S_DRY_DESK_ICON = "set desktop icon: {}"
-
-    # commands
-    # NB: format param is dir_venv
-    S_CMD_CREATE = "python -m venv {}"
-    # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
-    # remove old version quietly
-    S_CMD_DEL_OLD = " -q -f"
-
-    # regex for adding user's home to icon path
-    R_ICON_SCH = r"^(Icon=)(.*)$"
-    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
-
-    # --------------------------------------------------------------------------
-
-    # version check results
-    I_VER_OLDER = -1
-    I_VER_SAME = 0
-    I_VER_NEWER = 1
-    I_VER_ERROR = -2
-
-    # regex to compare version numbers
-    R_VERSION_VALID = (
-        r"^"
-        r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
-        r"(?:-("
-        r"(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
-        r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*"
-        r"))?"
-        r"(?:\+("
-        r"[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*"
-        r"))?"
-        r"$"
-    )
-    R_VERSION_GROUP_MAJ = 1
-    R_VERSION_GROUP_MIN = 2
-    R_VERSION_GROUP_REV = 3
-    R_VERSION_GROUP_PRE = 4
-    R_VERSION_GROUP_META = 5
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -224,15 +132,18 @@ class CNInstall(CNInstallBase):
         # get prj info from cfg
         self._get_project_info()
 
-        # check for existing/old version
-        self._compare_version()
+        # get prg name/version
+        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
+        prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
-        # uninstall any existing before doing the new install
-        # NB: to avoid artifacts/files that no longer exist
-        self._uninstall_old()
+        # maybe show we are starting
+        if not self._quiet:
+            print(self.S_MSG_INST_START.format(prog_name, prog_version))
+            print()
 
-        # do pre install
-        # self._do_external(P_FILE_PRE)
+        # uninstall old version (if present)
+        obj = CNUninstall()
+        obj.uninstall_content(dry_run=self._dry_run, quiet=True)
 
         # make the venv on the user's comp
         self._make_venv()
@@ -244,15 +155,23 @@ class CNInstall(CNInstallBase):
         self._fix_desktop_file()
 
         # move content
-        self._install_content()
+        cont = self._dict_cfg.get(self.S_KEY_INST_CONT, {})
+        self._install(self.S_MSG_COPY_START, cont)
+
+        # only copy conf, never overwrite
+        if not P_DIR_CONF.exists():
+            conf = self._dict_cfg.get(self.S_KEY_CFG_CONT, {})
+            self._install(self.S_MSG_CONF_START, conf)
+
+        # maybe show we are done
+        if not self._quiet:
+            if not self._dry_run:
+                print()
+            print(self.S_MSG_INST_END.format(prog_name))
+            print()
 
         # wind down
         self._teardown()
-
-        # do post install
-        # self._do_external(P_FILE_POST)
-
-        print()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -270,45 +189,30 @@ class CNInstall(CNInstallBase):
         Get the install info from the config file.
         """
 
-        # get path to config (ide or dist)
-        path_cfg = P_FILE_CFG_NEW
-        if not path_cfg.exists():
-            path_cfg = P_FILE_CFG_DIST_NEW
+        # ----------------------------------------------------------------------
+        # get old info
 
         try:
             # get project info
-            self._dict_cfg = self._get_dict_from_file(path_cfg)
+            self._dict_cfg = self._get_dict_from_file(P_FILE_CFG_NEW)
         except OSError as e:
+            # fatal error, print and quit
+            # NB: print even if quiet
             print(self.S_ERR_ERR, e)
+            sys.exit(-1)
 
-        # get prg name/version
-        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        prog_version = self._dict_cfg[self.S_KEY_INST_VER]
+        # ----------------------------------------------------------------------
+        # check for reasons to skip question
 
-        # print start msg
-        print(self.S_MSG_INST_START.format(prog_name, prog_version))
-        print()
-
-    # --------------------------------------------------------------------------
-    # Check version info
-    # --------------------------------------------------------------------------
-    def _compare_version(self):
-        """
-        Check version info
-
-        Get the version info from the new config file and the old config file
-        (if present), compare the two values, and either continue or abort.
-        """
-
-        # check for force to skip question
-        force = self._dict_args.get(self.S_ARG_FORCE_DEST, False)
-        if force:
+        # don't check for version or new install
+        if self._force:
             return
 
-        # if we did pass an old conf, it must exist (if it doesn't, this could
-        # be the first install but we will want to check on later updates)
+        # if we don't find old cfg, must be new install
         if not P_FILE_CFG_OLD or not P_FILE_CFG_OLD.exists():
             return
+
+        # ----------------------------------------------------------------------
 
         # get info from old cfg
         dict_cfg_old = {}
@@ -316,8 +220,10 @@ class CNInstall(CNInstallBase):
             # get info from old cfg
             dict_cfg_old = self._get_dict_from_file(P_FILE_CFG_OLD)
         except OSError as e:
+            # fatal error, print and quit
+            # NB: print even if quiet
             print(self.S_ERR_ERR, e)
-            return
+            sys.exit(-1)
 
         # check versions
         ver_old = dict_cfg_old[self.S_KEY_INST_VER]
@@ -325,6 +231,16 @@ class CNInstall(CNInstallBase):
 
         # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
         res = self._comp_sem_ver(ver_old, ver_new)
+
+        if self._quiet:
+            print()
+
+        # check for error
+        if res == self.I_VER_ERROR:
+            # fatal error, print and quit
+            # NB: print even if quiet
+            print(self.S_ERR_VERSION)
+            sys.exit(-1)
 
         # same version is installed
         if res == self.I_VER_SAME:
@@ -335,10 +251,14 @@ class CNInstall(CNInstallBase):
                 [self.S_ASK_YES, self.S_ASK_NO],
                 self.S_ASK_NO,
             )
+            print()
 
             # user hit enter or typed anything else except "y"
             if str_ask != self.S_ASK_YES:
-                print(self.S_MSG_ABORT)
+                # normal error, print and quit
+                if not self._quiet:
+                    print(self.S_MSG_ABORT)
+                    print()
                 sys.exit(0)
 
         # newer version is installed
@@ -350,14 +270,15 @@ class CNInstall(CNInstallBase):
                 [self.S_ASK_YES, self.S_ASK_NO],
                 self.S_ASK_NO,
             )
+            print()
 
             # user hit enter or typed anything else except "y"
             if str_ask != self.S_ASK_YES:
-                print(self.S_MSG_ABORT)
+                # normal error, print and quit
+                if not self._quiet:
+                    print(self.S_MSG_ABORT)
+                    print()
                 sys.exit(0)
-
-        # just print a blank line
-        # print()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -366,31 +287,36 @@ class CNInstall(CNInstallBase):
         """
         Make venv for this program on user's computer
 
-        Raises:
-            subprocess.CalledProcessError if the venv creation fails
-
         Makes a .venv-XXX folder on the user's computer.
         """
-
-        # show progress
-        print(self.S_MSG_VENV_START, flush=True, end="")
 
         # the command to create a venv
         cmd = self.S_CMD_CREATE.format(P_DIR_VENV)
 
         # if it's a dry run, don't make venv
         if self._dry_run:
+            if self._quiet:
+                print()
             print(self.S_DRY_VENV, cmd)
-            print(self.S_MSG_DONE)
+            print()
             return
+
+        # ----------------------------------------------------------------------
+
+        # show progress
+        if not self._quiet:
+            print(self.S_MSG_VENV_START, end="", flush=True)
 
         # the cmd to create the venv
         try:
-            subprocess.run(cmd, shell=True, check=True)
-            print(self.S_MSG_DONE)
+            subprocess.run(cmd, check=True, shell=True, capture_output=True)
+            if not self._quiet:
+                print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            print(self.S_MSG_FAIL)
-            print()
+            if not self._quiet:
+                print(self.S_MSG_FAIL)
+            # fatal error, print and quit
+            # NB: print even if quiet
             print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
@@ -401,15 +327,9 @@ class CNInstall(CNInstallBase):
         """
         Install requirements.txt
 
-        Raises:
-            subprocess.CalledProcessError if the reqs install fails
-
         Installs the contents of a requirements.txt file into the program's
         venv.
         """
-
-        # show progress
-        print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the command to install packages to venv from reqs
         cmd = self.S_CMD_TYPE_INST.format(
@@ -419,17 +339,25 @@ class CNInstall(CNInstallBase):
         # if it's a dry run, don't install
         if self._dry_run:
             print(self.S_DRY_REQS, cmd)
-            print(self.S_MSG_DONE)
+            print()
             return
+
+        # ----------------------------------------------------------------------
+
+        # show progress
+        if not self._quiet:
+            print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
         try:
-            # NB: hide output
-            subprocess.run(cmd, shell=True, check=True, capture_output=True)
-            print(self.S_MSG_DONE)
+            subprocess.run(cmd, check=True, shell=True, capture_output=True)
+            if not self._quiet:
+                print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            print(self.S_MSG_FAIL)
-            print()
+            if not self._quiet:
+                print(self.S_MSG_FAIL)
+            # fatal error, print and quit
+            # NB: print even if quiet
             print(self.S_ERR_ERR, e)
             sys.exit(-1)
 
@@ -452,23 +380,32 @@ class CNInstall(CNInstallBase):
         if not use_desk:
             return
 
-        # print info
-        print(self.S_MSG_DSK_START, end="", flush=True)
+        # sanity check (params to main might be None)
+        if (
+            not P_FILE_DESK
+            or not P_FILE_DESK.exists()
+            or not P_FILE_DESK_ICON
+            or not P_FILE_DESK_ICON.exists()
+        ):
+            if not self._quiet:
+                print(self.S_ERR_NO_DESK)
+            return
 
         # don't mess with file
         if self._dry_run:
             print(self.S_DRY_DESK_ICON.format(P_FILE_DESK_ICON))
-            print(self.S_MSG_DONE)
+            print()
             return
 
-        # sanity check (params to main might be None)
-        if not P_FILE_DESK or not P_FILE_DESK_ICON:
-            print(self.S_ERR_NO_DESK)
-            return
+        # ----------------------------------------------------------------------
+
+        # print info
+        if not self._quiet:
+            print(self.S_MSG_DSK_START, end="", flush=True)
 
         # open file
         text = ""
-        with open(P_FILE_DESK, "r", encoding=B.S_ENCODING) as a_file:
+        with open(P_FILE_DESK, "r", encoding=self.S_ENCODING) as a_file:
             text = a_file.read()
 
         # find icon line and fix
@@ -482,46 +419,45 @@ class CNInstall(CNInstallBase):
             r_icon_rep = self.R_ICON_REP.format(path_icon)
             text = re.sub(self.R_ICON_SCH, r_icon_rep, text, flags=re.M)
 
-            # ------------------------------------------------------------------
-
             # write fixed text back to file
-            with open(P_FILE_DESK, "w", encoding=B.S_ENCODING) as a_file:
+            with open(P_FILE_DESK, "w", encoding=self.S_ENCODING) as a_file:
                 a_file.write(text)
 
         # show some info
-        print(self.S_MSG_DONE)
+        if not self._quiet:
+            print(self.S_MSG_DONE)
 
     # --------------------------------------------------------------------------
     # Copy source files/folders
     # --------------------------------------------------------------------------
-    def _install_content(self):
+    def _install(self, msg: str, dict_cfg: dict[str, str]):
         """
         Copy source files/folders
 
-        This method copies files and folders from the assets folder of the
-        source to their final locations in the user's folder structure.
+        This method copies files and folders from the key (relative to assets)
+        to the dest (relative to user home).
         """
 
         # show some info
-        print(self.S_MSG_COPY_START, flush=True, end="")
-
-        # content list from dict
-        content = self._dict_cfg.get(self.S_KEY_INST_CONT, {})
+        if not self._quiet and not self._dry_run:
+            print(msg, flush=True, end="")
 
         # for each key, value
-        for k, v in content.items():
+        for k, v in dict_cfg.items():
 
             # get full paths of source / destination
             src = P_DIR_ASSETS / k
             dst = Path.home() / v / src.name
 
-            # debug may omit certain assets
+            # sanity check
+            # NB: debug may omit certain assets
             if not src.exists():
                 continue
 
             # check for dry run
             if self._dry_run:
                 print(self.S_DRY_COPY.format(src, dst))
+                print()
             else:
                 # if the source is a dir
                 if src.is_dir():
@@ -531,165 +467,9 @@ class CNInstall(CNInstallBase):
                     shutil.copy(src, dst)
 
         # show some info
-        print(self.S_MSG_DONE)
+        if not self._quiet and not self._dry_run:
+            print(self.S_MSG_DONE)
 
-        # just show we are done
-        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        print(self.S_MSG_INST_END.format(prog_name))
-
-    # --------------------------------------------------------------------------
-    # Compare two semantic versions
-    # --------------------------------------------------------------------------
-    def _comp_sem_ver(self, ver_old, ver_new):
-        """
-        Compare two semantic versions
-
-        Args:
-            ver_old: The old version to compare
-            ver_new: The new version to compare
-
-        Returns:
-            An integer showing the relationship between the two version
-
-        Compare two semantic versions
-        """
-
-        # sanity checks
-        if not ver_old or ver_old == "":
-            return self.I_VER_ERROR
-        if not ver_new or ver_new == "":
-            return self.I_VER_ERROR
-        if ver_old == ver_new:
-            return self.I_VER_SAME
-
-        # --------------------------------------------------------------------------
-
-        # compare version string parts (only x.x.x)
-        res_old = re.search(self.R_VERSION_VALID, ver_old)
-        res_new = re.search(self.R_VERSION_VALID, ver_new)
-
-        # if either version string is None
-        if not res_old or not res_new:
-            return self.I_VER_ERROR
-
-        # make a list of groups to check
-        lst_groups = [
-            self.R_VERSION_GROUP_MAJ,
-            self.R_VERSION_GROUP_MIN,
-            self.R_VERSION_GROUP_REV,
-        ]
-
-        # for each part as int
-        for group in lst_groups:
-            old_val = int(res_old.group(group))
-            new_val = int(res_new.group(group))
-
-            # slide out at the first difference
-            if old_val < new_val:
-                return self.I_VER_NEWER
-            if old_val > new_val:
-                return self.I_VER_OLDER
-
-        # ----------------------------------------------------------------------
-
-        # still going, check pre
-        pre_old = res_old.group(self.R_VERSION_GROUP_PRE)
-        pre_new = res_new.group(self.R_VERSION_GROUP_PRE)
-
-        # simple pre rule compare
-        if not pre_old and pre_new:
-            return self.I_VER_OLDER
-        if pre_old and not pre_new:
-            return self.I_VER_NEWER
-        if not pre_old and not pre_new:
-            return self.I_VER_SAME
-
-        # ----------------------------------------------------------------------
-
-        # if pre_old and pre_new:
-
-        # split pre on dots
-        lst_pre_old = pre_old.split(".")
-        lst_pre_new = pre_new.split(".")
-
-        # get number of parts
-        len_pre_old = len(lst_pre_old)
-        len_pre_new = len(lst_pre_new)
-
-        # get shorter of two
-        shortest = len_pre_old if len_pre_old <= len_pre_new else len_pre_new
-
-        # for each part in shortest
-        for index in range(shortest):
-
-            # get each value at position
-            old_val = lst_pre_old[index]
-            new_val = lst_pre_new[index]
-
-            # 1. both numbers
-            if old_val.isdigit() and new_val.isdigit():
-                tmp_old_val = int(old_val)
-                tmp_new_val = int(new_val)
-
-                # slide out at the first difference
-                if tmp_old_val > tmp_new_val:
-                    return self.I_VER_OLDER
-                if tmp_old_val < tmp_new_val:
-                    return self.I_VER_NEWER
-
-            # 2. both alphanumeric
-            if not old_val.isdigit() and not new_val.isdigit():
-                lst_alpha = [old_val, new_val]
-                lst_alpha.sort()
-
-                idx_old = lst_alpha.index(old_val)
-                idx_new = lst_alpha.index(new_val)
-
-                if idx_old > idx_new:
-                    return self.I_VER_OLDER
-                if idx_old < idx_new:
-                    return self.I_VER_NEWER
-
-            # 3 num vs alphanumeric
-            if old_val.isdigit() and not new_val.isdigit():
-                return self.I_VER_OLDER
-            if not old_val.isdigit() and new_val.isdigit():
-                return self.I_VER_NEWER
-
-            # 4 len
-            if len_pre_old > len_pre_new:
-                return self.I_VER_OLDER
-            if len_pre_new > len_pre_old:
-                return self.I_VER_NEWER
-
-        # ----------------------------------------------------------------------
-
-        # error in one or both versions
-        return self.I_VER_ERROR
-
-    # --------------------------------------------------------------------------
-    # Uninstall old version (if present)
-    # --------------------------------------------------------------------------
-    def _uninstall_old(self):
-        """
-        Uninstall old version (if present)
-        """
-
-        # NB: uninstall any existing before doing the new install
-        # to avoid artifacts/files that no longer exist
-
-        # no old install, do nothing
-        if not P_FILE_CFG_OLD.exists():
-            return
-
-        # print some info
-        print(self.S_MSG_UNINST_OLD, flush=True, end="")
-
-        # add quiet and force options
-        cmd = str(P_FILE_UNINST) + self.S_CMD_DEL_OLD
-
-        # run the script quietly
-        self._do_external(cmd, hide=True)
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
