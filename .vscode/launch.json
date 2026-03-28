@@ -54,6 +54,23 @@
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
             "args": "${command:pickArgs}"
+        },
+        {
+            "name": "Current",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Curr Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": "${command:pickArgs}"
         }
     ]
 }
