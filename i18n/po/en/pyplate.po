@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.8\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-03-19 10:25-0400\n"
+"POT-Creation-Date: 2026-03-27 11:19-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,7 +100,7 @@ msgstr ""
 
 #. I18N: force option help
 #: install/install_base.py:128
-msgid "force install this program"
+msgid "force install/uninstall this program"
 msgstr ""
 
 #. I18N: quiet option help
@@ -110,19 +110,19 @@ msgstr ""
 
 #. I18N: help option help
 #: install/install_base.py:142
-#: src/pyplate.py:121
+#: src/pyplate.py:122
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
 #: install/install_base.py:154
-#: src/pyplate.py:134
+#: src/pyplate.py:135
 msgid "Use -h for help"
 msgstr ""
 
 #. I18N: process aborted
 #: install/install_base.py:171
-#: src/pyplate.py:158
+#: src/pyplate.py:159
 msgid "Aborted"
 msgstr ""
 
@@ -143,7 +143,7 @@ msgstr ""
 
 #. I18N: an error occurred
 #: install/install_base.py:188
-#: src/pyplate.py:164
+#: src/pyplate.py:165
 msgid "Error:"
 msgstr ""
 
@@ -180,7 +180,7 @@ msgstr ""
 #. NB: format param is prog name
 #. I18N: ask to uninstall
 #: install/uninstall.py:96
-#: src/pyplate.py:152
+#: src/pyplate.py:153
 msgid ""
 "This will uninstall {}.\n"
 "Do you want to continue?"
@@ -262,21 +262,21 @@ msgid "Making {}"
 msgstr ""
 
 #. I18N: debug mode help
-#: src/pyplate.py:114
+#: src/pyplate.py:115
 msgid "enable debugging mode"
 msgstr ""
 
 #. I18N: uninstall option help
-#: src/pyplate.py:128
+#: src/pyplate.py:129
 msgid "uninstall this program"
 msgstr ""
 
 #. I18N: uninstall not found
-#: src/pyplate.py:166
+#: src/pyplate.py:167
 msgid "Uninstall files not found"
 msgstr ""
 
 #. I18N: could not find -c file
-#: src/pyplate.py:169
+#: src/pyplate.py:170
 msgid "Config file {} not found"
 msgstr ""
