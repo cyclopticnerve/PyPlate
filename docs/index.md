@@ -83,7 +83,7 @@ Let us start with 'pymaker'.
 
 ## PyMaker - Create the project
 Before you do anything, you should take a look at the 'conf.py' file in
-'~/.local/share/pyplate/conf'. This file contains A **LOT** of information that
+'~/.config/pyplate/conf'. This file contains A **LOT** of information that
 is used when creating/building a project. Most of these are string values and
 file/folder names used in the program, which you are free to change.
 
@@ -102,7 +102,7 @@ $ pymaker
 ```
 
 Enter the required information, and 'pymaker' will create the required files
-and folders in a subdirectory of the current directory. 
+and folders in a subdirectory of the current directory.
 
 That's it! From there you are free to modify the projects in your favorite IDE.
 
@@ -161,7 +161,7 @@ See the full [documentation](https://cyclopticnerve.github.io/PyPlate)
 ## Developing
 If you are developing this project, make sure you run the "develop.py" script
 first to create the proper virtual environment and install the requirements (if
-any). 
+any).
 
 ## Notes
 If you have any sort of spellchecker in your IDE, *FOR GOD'S SAKE TURN IT OFF!*
