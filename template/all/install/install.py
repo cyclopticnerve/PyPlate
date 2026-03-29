@@ -49,7 +49,7 @@ P_FILE_CFG_NEW = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
 # get out dirs
 P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
-P_DIR_CONF = Path.home() / ".__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__"
+P_DIR_CONF = Path.home() / "__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__"
 
 # get out files
 P_FILE_CFG_OLD = (
