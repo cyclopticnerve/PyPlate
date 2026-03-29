@@ -1,5 +1,7 @@
 
-TODO: propagate these changes to template and projects
+FIXME: json rat headers are a hot mess (rat, empty filename)
+
+TODO: propagate installer changes to template and projects
 
 NEXT: no commented code in base - should never need to be touched
       use _add_cmd_debug, _add_cmd_uninstall in base/child
@@ -8,7 +10,7 @@ NEXT: no commented code in base - should never need to be touched
 NEXT: ask before install new like same/older
 
 NEXT: script to make changelog from todos/next/done
-NEXT: add kes.py file to template?
+NEXT: add keys.py file to template?
 NEXT: move tree files into trees folder
 NEXT: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 NEXT: split conf into separate files
