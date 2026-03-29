@@ -415,10 +415,10 @@ S_I18N_EXT_POT = "**/*.pot"
 S_I18N_EXT_PO = "**/*.po"
 
 # paths relative to end user home only
-S_USR_SHARE = ".local/share"  # bulk of the program goes here
 S_USR_APPS = ".local/share/applications"  # for .desktop out file
 S_USR_BIN = ".local/bin"  # where to put the binary
 S_USR_CONF = ".config"  # where to put config files
+S_USR_SHARE = ".local/share"  # bulk of the program goes here
 
 # formats for tree
 S_TREE_TEXT_NAME = "tree.txt"
@@ -842,6 +842,8 @@ L_DIST_REMOVE_EXT = [
 # do_before_fix() in this file
 
 D_PRV_ALL = {
+    "__PP_VERSION_PP__": PP.PyPlate.S_PP_VERSION,  # version of pp we are using
+    # --------------------------------------------------------------------------
     # the author name, used in headers and pyproject.toml
     "__PP_AUTHOR__": "cyclopticnerve",
     # the base url for all projects, used in pyproject.toml and GUI about dlg
@@ -892,10 +894,11 @@ D_PRV_ALL = {
     "__PP_DIR_TESTS__": S_DIR_TESTS,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
     "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
     "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
+    "__PP_USR_CONF__": S_USR_CONF,  # /home/user/.config/app_name
     "__PP_USR_SHARE__": S_USR_SHARE,
+    "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
     "__PP_NAME_UNINST__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
     # gui stuff
@@ -930,7 +933,6 @@ D_PRV_ALL = {
 # if you need to adjust any of these values based on a dunder, use
 # do_before_fix() in this file
 D_PRV_PRJ = {
-    "__PP_VERSION_PP__": PP.PyPlate.S_PP_VERSION,  # make version
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_PRJ__": "",  # My Project
     "__PP_NAME_PRJ_BIG__": "",  # My_Project
@@ -957,10 +959,9 @@ D_PRV_PRJ = {
     "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.13"
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
     "__PP_DEV_INST__": "",  # cmd used by develop.py to install reqs or self
-    "__PP_USR_INST__": "",  # /home/user/.local/app_name
-    "__PP_USR_CONF__": "",  # /home/user/.config/app_name
     "__PP_APP_ID__": "",
     "__PP_FMT_DIST__": "",
+    "__PP_USR_INST__": "",  # /home/user/.local/share/app_name
 }
 
 # ------------------------------------------------------------------------------
@@ -1505,6 +1506,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
             F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
             F.printd(S_ERR_ERR, str(e))
 
+
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
@@ -1544,6 +1546,8 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     name_prj_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
 
     # paths relative to the end user's (or dev's) useful folders
+    usr_conf = f"{S_USR_CONF}/{name_prj_small}"
+    dict_prv_prj["__PP_USR_CONF__"] = usr_conf
     usr_inst = f"{S_USR_SHARE}/{name_prj_small}"
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
@@ -1997,6 +2001,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # we are done
         F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
+
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
@@ -2231,14 +2236,6 @@ def _fix_meta(path, dict_prv, dict_pub):
     if path.name == S_FILE_TOML:
         _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
 
-    # fix mkdocs.yml
-    if path.name == S_FILE_MKDOCS_YML:
-        _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
-
-    # fix src files
-    if path.suffix in L_EXT_PY:
-        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
-
     # fix desktop
     if path.suffix in L_EXT_DESK:
         _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
@@ -2246,6 +2243,18 @@ def _fix_meta(path, dict_prv, dict_pub):
     # fix ui files
     if path in L_EXT_GUI:
         _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+
+    # fix src files
+    if path.suffix in L_EXT_PY:
+        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+
+    # fix install.json
+    if path.name == S_FILE_INST_CFG:
+        _fix_install(path, dict_prv_prj, dict_pub, dict_type_rules)
+
+    # fix mkdocs.yml
+    if path.name == S_FILE_MKDOCS_YML:
+        _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
 
 
 # ------------------------------------------------------------------------------
@@ -2601,6 +2610,31 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
+
+# ------------------------------------------------------------------------------
+# Fix version number in install.json
+# ------------------------------------------------------------------------------
+def _fix_install(path, dict_prv_prj, _dict_pub, _dict_type_rules):
+    """
+    Fix version number in install.json
+
+    Args:
+        path: Path for the file to modify text
+        dict_prv_prj: Private calculated proj dict
+        dict_pub_meta: Dict of metadata to replace in the file
+
+    Fixes the version number in install.json.
+    """
+
+    # open file and get contents
+    a_dict = F.load_paths_into_dict(path)
+
+    # replace version
+    ver = dict_prv_prj["__PP_VER_MMR__"]
+    a_dict[S_KEY_INST_VER] = ver
+
+    # save file
+    F.save_dict_into_paths(a_dict, path)
 
 # ------------------------------------------------------------------------------
 # Fix the theme name in mkdocs.yml
