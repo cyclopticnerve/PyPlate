@@ -497,6 +497,7 @@ class PyBaker(PyPlate):
         if prj_type in P.C.L_APP_INSTALL:
             self._dict_pub_inst[P.C.S_KEY_INST_VER] = ver
 
+    # TODO: save version to install.json
     # --------------------------------------------------------------------------
     # Handle the -l option
     # --------------------------------------------------------------------------
