@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: install_base.py                                       |     ()     |
-# Date    : 01/09/2026                                            |            |
+# Date    : 03/29/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -26,15 +26,10 @@ import gettext
 import json
 import locale
 from pathlib import Path
+import re
+import shlex
 import subprocess
 import sys
-
-# ------------------------------------------------------------------------------
-# Constants
-# ------------------------------------------------------------------------------
-
-# for json
-S_ENCODING = "UTF-8"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -125,14 +120,14 @@ class CNInstallBase:
     S_ARG_FORCE_ACTION = "store_true"
     S_ARG_FORCE_DEST = "FORCE_DEST"
     # I18N: force option help
-    S_ARG_FORCE_HELP = _("force install/uninstall this program")
+    S_ARG_FORCE_HELP = _("force install this program")
 
     # quiet option strings
     S_ARG_QUIET_OPTION = "-q"
     S_ARG_QUIET_ACTION = "store_true"
     S_ARG_QUIET_DEST = "QUIET_DEST"
     # I18N: quiet option help
-    S_ARG_QUIET_HELP = _("do not print about message")
+    S_ARG_QUIET_HELP = _("do not print any messages")
 
     # help option strings
     S_ARG_HLP_OPTION = "-h"
@@ -143,7 +138,6 @@ class CNInstallBase:
 
     # about string
     S_ABOUT = (
-        "\n"
         "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
@@ -151,7 +145,7 @@ class CNInstallBase:
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = "\n" + _("Use -h for help")
+    S_ABOUT_HELP = _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -159,27 +153,57 @@ class CNInstallBase:
     S_KEY_INST_DESK = "INST_DESK"
     S_KEY_INST_CONT = "INST_CONT"
     S_KEY_UNINST_CONT = "UNINST_CONT"
+    S_KEY_CFG_CONT = "CFG_CONT"
+
+    # ------------------------------------------------------------------------------
+    # Constants
+    # ------------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
+    # for json
 
-    # messages
-    # I18N: done with step
-    S_MSG_DONE = _("Done")
-    # I18N: step failed
-    S_MSG_FAIL = _("Failed")
-    # I18N: process aborted
-    S_MSG_ABORT = _("Aborted")
-    # NB: format param is script name
-    # I18N: run external script
-    S_MSG_RUN_EXT = _("Running {}... ")
+    S_ENCODING = "UTF-8"
 
     # --------------------------------------------------------------------------
     # questions
 
+    S_ASK_VER_SAME = _(
+        # I18N: ask to overwrite same version
+        "The current version of this program is already installed.\nDo you "
+        "want to overwrite?"
+    )
+    S_ASK_VER_OLDER = _(
+        # I18N: ask to overwrite newer version
+        "A newer version of this program is currently installed.\nDo you want "
+        "to overwrite?"
+    )
+    # NB: format param is prog name
+    # I18N: ask to uninstall
+    S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
     # I18N: answer yes
     S_ASK_YES = _("y")
     # I18N: answer no
     S_ASK_NO = _("N")
+
+    # --------------------------------------------------------------------------
+    # commands
+
+    # NB: format param is dir_venv
+    S_CMD_CREATE = "python -m venv {}"
+    # NB: format params are path to prj, path to venv, and path to reqs file
+    S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+
+    # --------------------------------------------------------------------------
+    # dry run messages
+
+    S_DRY_VENV = "venv cmd:"
+    S_DRY_REQS = "reqs cmd:"
+    # NB: format params are source and destination file/dir
+    S_DRY_COPY = "copy:\n{}\nto\n{}"
+    # NB: format param is path to icon
+    S_DRY_DESK_ICON = "set desktop icon: {}"
+    # NB: format param is file or dir path
+    S_DRY_REMOVE = "remove:\n{}"
 
     # --------------------------------------------------------------------------
     # error messages
@@ -192,12 +216,86 @@ class CNInstallBase:
     # NB: format param is file path
     # I18N: config file is not valid json
     S_ERR_NOT_JSON = _("File {} is not a JSON file")
+    # I18N: version numbers invalid
+    S_ERR_VERSION = _("One or both version numbers are invalid")
+    # NB: format param is source path
+    # I18N: src path invalid
+    S_ERR_SRC_PATH = _("Source path can not be {}")
+    # NB: format param is dest path
+    # I18N: dst path invalid
+    S_ERR_DST_PATH = _("Destination path can not be {}")
+    # I18N: can't find .desktop
+    S_ERR_NO_DESK = _("No desktop files present")
 
     # --------------------------------------------------------------------------
-    # commands
+    # messages
 
-    # command to run external script
-    S_CMD_RUN_EXT = "python {}"
+    # I18N: show the copy step
+    S_MSG_UNINST_START = _("Uninstalling {} Version {}")
+    # I18N: done with step
+    S_MSG_DONE = _("Done")
+    # I18N: step failed
+    S_MSG_FAIL = _("Failed")
+    # I18N: process aborted
+    S_MSG_ABORT = _("Aborted")
+    # NB: format param is script name
+    # I18N: run external script
+    S_MSG_RUN_EXT = _("Running {}... ")
+    # NB: format param is prog_name
+    # I18N: done uninstalling
+    S_MSG_UNINST_END = _("{} uninstalled")
+    # I18N: uninstall old files
+    S_MSG_UNINST_OLD = _("Uninstalling old version... ")
+    # NB: format params are prog_name and prog_version
+    # I18N: install the program
+    S_MSG_INST_START = _("Installing {} Version {}")
+    # I18N: show the copy file step
+    S_MSG_COPY_START = _("Copying files... ")
+    # I18N: show the copy configstep
+    S_MSG_CONF_START = _("Copying config... ")
+    # I18N: show the venv step
+    S_MSG_VENV_START = _("Making venv folder... ")
+    # I18N: show the reqs step
+    S_MSG_REQS_START = _("Installing requirements... ")
+    # I18N: show desktop step
+    S_MSG_DSK_START = _("Fixing .desktop file... ")
+    # I18N: done installing
+    S_MSG_INST_END = _("{} installed")
+    # NB: format param is prog_name
+    # I18N: uninstall the program
+    S_MSG_UNINST_START = _("Uninstalling {}")
+
+    # --------------------------------------------------------------------------
+    # regex stuff
+
+    # version check results
+    I_VER_OLDER = -1
+    I_VER_SAME = 0
+    I_VER_NEWER = 1
+    I_VER_ERROR = -2
+
+    # regex for adding user's home to icon path
+    R_ICON_SCH = r"^(Icon=)(.*)$"
+    R_ICON_REP = r"\g<1>{}"  # Icon=<home/__PP_IMG_DESK__>
+
+    # regex to compare version numbers
+    R_VERSION_VALID = (
+        r"^"
+        r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+        r"(?:-("
+        r"(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+        r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*"
+        r"))?"
+        r"(?:\+("
+        r"[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*"
+        r"))?"
+        r"$"
+    )
+    R_VERSION_GROUP_MAJ = 1
+    R_VERSION_GROUP_MIN = 2
+    R_VERSION_GROUP_REV = 3
+    R_VERSION_GROUP_PRE = 4
+    R_VERSION_GROUP_META = 5
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -217,9 +315,6 @@ class CNInstallBase:
 
         # set defaults
 
-        # cfg stuff
-        self._dict_cfg = {}
-
         # cmd line stuff
         self._parser = argparse.ArgumentParser(
             formatter_class=CNFormatter, add_help=False
@@ -228,6 +323,11 @@ class CNInstallBase:
         # set arg defaults
         self._dict_args = {}
         self._dry_run = False
+        self._force = False
+        self._quiet = False
+
+        # cfg stuff
+        self._dict_cfg = {}
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -283,17 +383,20 @@ class CNInstallBase:
 
         # ----------------------------------------------------------------------
         # use cmd line
-        args = self._parser.parse_args()
+        try:
+            args = self._parser.parse_args()
+        except SystemExit:
+
+            # print usage and arg info and exit
+            print()
+            print(self.S_ABOUT)
+            print()
+            self._parser.print_help()
+            print()
+            sys.exit(0)
 
         # convert namespace to dict
         self._dict_args = vars(args)
-
-        # get quiet option
-        quiet = self._dict_args.get(self.S_ARG_QUIET_DEST, False)
-
-        # print default about text
-        if not quiet:
-            print(self.S_ABOUT)
 
         # ----------------------------------------------------------------------
         # check for one-shot args
@@ -303,20 +406,27 @@ class CNInstallBase:
 
             # print usage and arg info and exit
             print()
+            print(self.S_ABOUT)
+            print()
             self._parser.print_help()
             print()
             sys.exit(0)
-
-        # add help text to about block (only if we got past -h)
-        if not quiet:
-            print(self.S_ABOUT_HELP)
-            print()
 
         # ----------------------------------------------------------------------
         # set props from args
 
         # get the args
         self._dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, self._dry_run)
+        self._force = self._dict_args.get(self.S_ARG_FORCE_DEST, self._force)
+        self._quiet = self._dict_args.get(self.S_ARG_QUIET_DEST, self._quiet)
+
+        # print default about text
+        if not self._quiet:
+            print()
+            print(self.S_ABOUT)
+            print()
+            print(self.S_ABOUT_HELP)
+            print()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
@@ -356,7 +466,7 @@ class CNInstallBase:
 
         try:
             # get dict from file
-            with open(a_file, "r", encoding=S_ENCODING) as a_file:
+            with open(a_file, "r", encoding=self.S_ENCODING) as a_file:
                 a_dict = json.load(a_file)
 
         # file not found
@@ -443,42 +553,167 @@ class CNInstallBase:
                 return ""
 
     # --------------------------------------------------------------------------
-    # Run an external script
+    # Run an external command at some point
     # --------------------------------------------------------------------------
-    def _do_external(self, path):
+    def _do_external(self, cmd: str, hide: bool = False):
         """
-        docstring
+        Run an external command at some point
+
+        Args:
+            cmd: Command to run
+            hide: Whether to hide the command's output
         """
 
-        # sanity check
-        if not path.exists():
-            return
-
-        # print some info
-        print(self.S_MSG_RUN_EXT.format(path.name), end="", flush=True)
-
-        # if it's a dry run, don't make venv
-        if self._dry_run:
+        # if it's a dry run, don't do anything
+        dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
+        if dry_run:
             print(self.S_MSG_DONE)
             return
 
-        # the command to create a venv
-        cmd = self.S_CMD_RUN_EXT.format(path)
-
-        # run the external script
+        # run the external command
         try:
-            subprocess.run(cmd, shell=True, check=True)
+            # NB: hide output
+            cmd_list = shlex.split(cmd)
+            subprocess.run(cmd_list, check=True, capture_output=hide)
             print(self.S_MSG_DONE)
 
         except FileNotFoundError as e:
             print(self.S_MSG_FAIL)
-            print()
             print(self.S_ERR_ERR, e)
 
         except subprocess.CalledProcessError as e:
             print(self.S_MSG_FAIL)
-            print()
             print(self.S_ERR_ERR, e.stderr)
+
+    # --------------------------------------------------------------------------
+    # Compare two semantic versions
+    # --------------------------------------------------------------------------
+    def _comp_sem_ver(self, ver_old: str, ver_new: str) -> int:
+        """
+        Compare two semantic versions
+
+        Args:
+            ver_old: The old version to compare
+            ver_new: The new version to compare
+
+        Returns:
+            An integer showing the relationship between the two version
+
+        Compare two semantic versions
+        """
+
+        # sanity checks
+        if not ver_old or ver_old == "":
+            return self.I_VER_ERROR
+        if not ver_new or ver_new == "":
+            return self.I_VER_ERROR
+        if ver_old == ver_new:
+            return self.I_VER_SAME
+
+        # --------------------------------------------------------------------------
+
+        # compare version string parts (only x.x.x)
+        res_old = re.search(self.R_VERSION_VALID, ver_old)
+        res_new = re.search(self.R_VERSION_VALID, ver_new)
+
+        # if either version string is None
+        if not res_old or not res_new:
+            return self.I_VER_ERROR
+
+        # make a list of groups to check
+        lst_groups = [
+            self.R_VERSION_GROUP_MAJ,
+            self.R_VERSION_GROUP_MIN,
+            self.R_VERSION_GROUP_REV,
+        ]
+
+        # for each part as int
+        for group in lst_groups:
+            old_val = int(res_old.group(group))
+            new_val = int(res_new.group(group))
+
+            # slide out at the first difference
+            if old_val < new_val:
+                return self.I_VER_NEWER
+            if old_val > new_val:
+                return self.I_VER_OLDER
+
+        # ----------------------------------------------------------------------
+
+        # still going, check pre
+        pre_old = res_old.group(self.R_VERSION_GROUP_PRE)
+        pre_new = res_new.group(self.R_VERSION_GROUP_PRE)
+
+        # simple pre rule compare
+        if not pre_old and pre_new:
+            return self.I_VER_OLDER
+        if pre_old and not pre_new:
+            return self.I_VER_NEWER
+        if not pre_old and not pre_new:
+            return self.I_VER_SAME
+
+        # ----------------------------------------------------------------------
+
+        # if pre_old and pre_new:
+
+        # split pre on dots
+        lst_pre_old = pre_old.split(".")
+        lst_pre_new = pre_new.split(".")
+
+        # get number of parts
+        len_pre_old = len(lst_pre_old)
+        len_pre_new = len(lst_pre_new)
+
+        # get shorter of two
+        shortest = len_pre_old if len_pre_old <= len_pre_new else len_pre_new
+
+        # for each part in shortest
+        for index in range(shortest):
+
+            # get each value at position
+            old_val = lst_pre_old[index]
+            new_val = lst_pre_new[index]
+
+            # 1. both numbers
+            if old_val.isdigit() and new_val.isdigit():
+                tmp_old_val = int(old_val)
+                tmp_new_val = int(new_val)
+
+                # slide out at the first difference
+                if tmp_old_val > tmp_new_val:
+                    return self.I_VER_OLDER
+                if tmp_old_val < tmp_new_val:
+                    return self.I_VER_NEWER
+
+            # 2. both alphanumeric
+            if not old_val.isdigit() and not new_val.isdigit():
+                lst_alpha = [old_val, new_val]
+                lst_alpha.sort()
+
+                idx_old = lst_alpha.index(old_val)
+                idx_new = lst_alpha.index(new_val)
+
+                if idx_old > idx_new:
+                    return self.I_VER_OLDER
+                if idx_old < idx_new:
+                    return self.I_VER_NEWER
+
+            # 3 num vs alphanumeric
+            if old_val.isdigit() and not new_val.isdigit():
+                return self.I_VER_OLDER
+            if not old_val.isdigit() and new_val.isdigit():
+                return self.I_VER_NEWER
+
+            # 4 len
+            if len_pre_old > len_pre_new:
+                return self.I_VER_OLDER
+            if len_pre_new > len_pre_old:
+                return self.I_VER_NEWER
+
+        # ----------------------------------------------------------------------
+
+        # error in one or both versions
+        return self.I_VER_ERROR
 
 
 # ------------------------------------------------------------------------------

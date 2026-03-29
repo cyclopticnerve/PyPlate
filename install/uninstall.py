@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : 01/09/2026                                            |            |
+# Date    : 03/29/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
@@ -20,6 +20,7 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 # Imports
 # ------------------------------------------------------------------------------
 
+# NB: pure python
 # system imports
 from pathlib import Path
 import shutil
@@ -29,19 +30,18 @@ import sys
 # Constants
 # ------------------------------------------------------------------------------
 
-# get prj dir
-P_DIR_PRJ = Path(__file__).parent.resolve()
+# get pkg dir
+P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get dirs
-P_DIR_INSTALL = P_DIR_PRJ / "install"
+P_DIR_INSTALL = P_DIR_PARENT / "install"
 
 # get files
-P_FILE_CFG = P_DIR_PRJ / "install.json"
-# NB: path changes after dist
-P_FILE_CFG_DIST = P_DIR_INSTALL / "install.json"
+P_FILE_CFG_OLD = P_DIR_INSTALL / "install.json"
 
-P_FILE_PRE = P_DIR_INSTALL / "pre_uninstall.py"
-P_FILE_POST = P_DIR_INSTALL / "post_uninstall.py"
+# get pre/post files
+# P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
+# P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -51,15 +51,10 @@ P_FILE_POST = P_DIR_INSTALL / "post_uninstall.py"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
-# pylint: disable=wrong-import-position
-from install_base import _  # type: ignore
+# pylint: disable=wrong-import-position, import-error
 from install_base import CNInstallBase  # type: ignore
 
-# pylint: enable=wrong-import-position
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
+# pylint: enable=wrong-import-position, import-error
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -75,29 +70,6 @@ class CNUninstall(CNInstallBase):
 
     This class performs the uninstall operation.
     """
-
-    # --------------------------------------------------------------------------
-    # Class constants
-    # --------------------------------------------------------------------------
-
-    # strings
-    # NB: format param is prog_name
-    # I18N: uninstall the program
-    S_MSG_UNINST_START = _("Uninstalling {}")
-    # I18N: show the copy step
-    S_MSG_UNINST_START = _("Deleting files... ")
-    # NB: format param is prog_name
-    # I18N: done uninstalling
-    S_MSG_UNINST_END = _("{} uninstalled")
-
-    # questions
-    # NB: format param is prog name
-    # I18N: ask to uninstall
-    S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
-
-    # dry run messages
-    # NB: format param is file or dir path
-    S_DRY_REMOVE = "\nremove\n{}"
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -141,17 +113,72 @@ class CNUninstall(CNInstallBase):
         # get prj info from cfg
         self._get_project_info()
 
-        # do pre uninstall
-        self._do_external(P_FILE_PRE)
+        # get prg name/version
+        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
+        prog_version = self._dict_cfg[self.S_KEY_INST_VER]
+
+        # show some info
+        if not self._quiet:
+            print(self.S_MSG_UNINST_START.format(prog_name, prog_version))
+            print()
 
         # create an instance of the class
-        self._uninstall_content()
+        self.uninstall_content(dry_run=self._dry_run, quiet=self._quiet)
+
+        # uninstall conf stuff
+        self._uninstall_conf()
 
         # wind down
         self._teardown()
 
-        # do pre uninstall
-        self._do_external(P_FILE_POST)
+    # --------------------------------------------------------------------------
+    # Uninstall the program, but not the config stuff
+    # --------------------------------------------------------------------------
+    def uninstall_content(self, dry_run=False, quiet=False):
+        """
+        Uninstall the program
+
+        Runs the uninstall operation.
+        """
+
+        # uninstall
+
+        # content list from dict
+        content = self._dict_cfg.get(self.S_KEY_UNINST_CONT, [])
+
+        # for each key, value
+        for item in content:
+
+            # get full path of destination
+            src = Path.home() / item
+
+            # debug may omit certain assets
+            if not src.exists():
+                continue
+
+            # if it's a dry run, don't do anything
+            # dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
+            if dry_run:
+                print(self.S_DRY_REMOVE.format(item))
+                continue
+
+            # if the source is a dir
+            if src.is_dir():
+                # remove dir
+                shutil.rmtree(src)
+
+            # if the source is a file
+            else:
+                # copy file
+                src.unlink()
+
+        # show some info
+        if not quiet:
+            print(self.S_MSG_DONE)
+
+        # # just show we are done
+        # prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
+        # print(self.S_MSG_UNINST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -169,16 +196,17 @@ class CNUninstall(CNInstallBase):
         Get the install info from the config file.
         """
 
-        # get path to config (ide or dist)
-        path_cfg = P_FILE_CFG
-        if not path_cfg.exists():
-            path_cfg = P_FILE_CFG_DIST
+        # ----------------------------------------------------------------------
+        # get old info
 
         try:
             # get project info
-            self._dict_cfg = self._get_dict_from_file(path_cfg)
+            self._dict_cfg = self._get_dict_from_file(P_FILE_CFG_OLD)
         except OSError as e:
+            # fatal error, print and quit
+            # NB: print even if quiet
             print(self.S_ERR_ERR, e)
+            sys.exit(-1)
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
@@ -199,38 +227,24 @@ class CNUninstall(CNInstallBase):
                 print(self.S_MSG_ABORT)
                 sys.exit(0)
 
-        # print start msg
-        print()
-        print(self.S_MSG_UNINST_START.format(prog_name))
-
     # --------------------------------------------------------------------------
-    # Uninstall the program
+    # Uninstall the config stuff after final delete
     # --------------------------------------------------------------------------
-    def _uninstall_content(self):
+    def _uninstall_conf(self):
         """
-        Uninstall the program
+        Uninstall the config stuff after final delete
 
         Runs the uninstall operation.
         """
 
-        # uninstall
-
-        # show some info
-        print(self.S_MSG_UNINST_START, flush=True, end="")
-
         # content list from dict
-        content = self._dict_cfg.get(self.S_KEY_UNINST_CONT, [])
+        content = self._dict_cfg.get(self.S_KEY_CFG_CONT, {})
 
         # for each key, value
-        for item in content:
+        for _k, v in content.items():
 
             # get full path of destination
-            src = Path.home() / item
-
-            # check for dry run
-            if self._dry_run:
-                print(self.S_DRY_REMOVE.format(item))
-                continue
+            src = Path.home() / v
 
             # debug may omit certain assets
             if not src.exists():
@@ -245,13 +259,6 @@ class CNUninstall(CNInstallBase):
             else:
                 # copy file
                 src.unlink()
-
-        # show some info
-        print(self.S_MSG_DONE)
-
-        # just show we are done
-        prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        print(self.S_MSG_UNINST_END.format(prog_name))
 
 
 # ------------------------------------------------------------------------------
