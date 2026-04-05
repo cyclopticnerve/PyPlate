@@ -48,7 +48,7 @@ P_LOG_DEF = P_DIR_LOG / "pyplate.log"
 # path to uninst
 P_UNINST = P_DIR_PRJ / "install/uninstall.py"
 # NB: path changes after dist
-P_UNINST_DIST = P_DIR_PRJ / "uninstall.py"
+# P_UNINST_DIST = P_DIR_PRJ / "uninstall.py"
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -236,7 +236,7 @@ class PyPlate:
 
         # set arg defaults
         self._dict_args = {}
-        self._cmd_debug = False
+        self._debug = False
 
         # ----------------------------------------------------------------------
         # set self._dir_prj
@@ -325,11 +325,9 @@ class PyPlate:
         # set props from args
 
         # set self and lib debug
-        self._cmd_debug = self._dict_args.get(
-            self.S_ARG_DBG_DEST, self._cmd_debug
-        )
-        F.B_DEBUG = self._cmd_debug
-        C.B_DEBUG = self._cmd_debug
+        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
+        F.B_DEBUG = self._debug
+        C.B_DEBUG = self._debug
 
         # punt to uninstall func
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
@@ -338,7 +336,7 @@ class PyPlate:
             self._do_uninstall()
 
         # maybe yell
-        if self._cmd_debug:
+        if self._debug:
 
             # yup, yell
             F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
@@ -382,28 +380,28 @@ class PyPlate:
         Handle the --uninstall cmd line op
         """
 
-        # ask to uninstall
-        str_ask = F.dialog(
-            self.S_ASK_UNINST.format("PyPlate"),
-            [F.S_ASK_YES, F.S_ASK_NO],
-            default=F.S_ASK_NO,
-        )
+        # # ask to uninstall
+        # str_ask = F.dialog(
+        #     self.S_ASK_UNINST.format("PyPlate"),
+        #     [F.S_ASK_YES, F.S_ASK_NO],
+        #     default=F.S_ASK_NO,
+        # )
 
-        # user hit enter or typed "n/N"
-        if str_ask != F.S_ASK_YES:
-            print(self.S_MSG_ABORT)
-            sys.exit(0)
+        # # user hit enter or typed "n/N"
+        # if str_ask != F.S_ASK_YES:
+        #     print(self.S_MSG_ABORT)
+        #     sys.exit(0)
 
-        # ----------------------------------------------------------------------
+        # # ----------------------------------------------------------------------
 
-        # if path exists
-        path_uninst = P_UNINST
-        if not path_uninst.exists():
-            path_uninst = P_UNINST_DIST
+        # # if path exists
+        # path_uninst = P_UNINST
+        # if not path_uninst.exists():
+        #     path_uninst = P_UNINST_DIST
 
         # format cmd line
-        cmd = str(path_uninst) + " -f -q"
-        if self._cmd_debug:
+        cmd = str(P_UNINST)  # + " -f -q"
+        if self._debug:
             cmd += " -d"
 
         # ----------------------------------------------------------------------
@@ -703,6 +701,7 @@ class PyPlate:
         as it goes.
         """
 
+        # FIXME: do c-style comments in json/jsonc
         # break apart header line
         # NB: gotta do this again, can't pass res param
         str_pattern = self._dict_type_rules[C.S_KEY_HDR_SCH]

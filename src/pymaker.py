@@ -216,7 +216,7 @@ class PyMaker(PyPlate):
         # next question is name
 
         # if in debug mode
-        if self._cmd_debug:
+        if self._debug:
 
             # get long name
             name_prj = "DEBUG"
@@ -291,7 +291,7 @@ class PyMaker(PyPlate):
         if prj_type in P.C.D_NAME_SEC:
 
             # dup prj names if debug
-            if self._cmd_debug:
+            if self._debug:
                 name_sec = name_prj
                 name_sec_big = name_prj_big
                 name_sec_small = name_prj_small
@@ -380,7 +380,7 @@ class PyMaker(PyPlate):
         # ----------------------------------------------------------------------
         # handle -d
         # NB: do after _fix dicts
-        if self._cmd_debug:
+        if self._debug:
             self._dict_dbg = dict(P.C.D_DBG_PM)
 
         # ----------------------------------------------------------------------

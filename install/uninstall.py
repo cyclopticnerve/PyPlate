@@ -128,6 +128,13 @@ class CNUninstall(CNInstallBase):
         # uninstall conf stuff
         self._uninstall_conf()
 
+        # maybe show we are done
+        if not self._quiet:
+            if not self._dry_run:
+                print()
+            print(self.S_MSG_DEL_END.format(prog_name))
+            print()
+
         # wind down
         self._teardown()
 

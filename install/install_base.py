@@ -230,8 +230,6 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # messages
 
-    # I18N: show the copy step
-    S_MSG_UNINST_START = _("Uninstalling {} Version {}")
     # I18N: done with step
     S_MSG_DONE = _("Done")
     # I18N: step failed
@@ -241,11 +239,7 @@ class CNInstallBase:
     # NB: format param is script name
     # I18N: run external script
     S_MSG_RUN_EXT = _("Running {}... ")
-    # NB: format param is prog_name
-    # I18N: done uninstalling
-    S_MSG_UNINST_END = _("{} uninstalled")
-    # I18N: uninstall old files
-    S_MSG_UNINST_OLD = _("Uninstalling old version... ")
+
     # NB: format params are prog_name and prog_version
     # I18N: install the program
     S_MSG_INST_START = _("Installing {} Version {}")
@@ -261,9 +255,15 @@ class CNInstallBase:
     S_MSG_DSK_START = _("Fixing .desktop file... ")
     # I18N: done installing
     S_MSG_INST_END = _("{} installed")
+
     # NB: format param is prog_name
     # I18N: uninstall the program
     S_MSG_UNINST_START = _("Uninstalling {}")
+    # I18N: stsrt deleting old files
+    S_MSG_DEL_START = _("Deleting old files... ")
+    # NB: format param is prog_name
+    # I18N: done uninstalling
+    S_MSG_UNINST_END = _("{} uninstalled")
 
     # --------------------------------------------------------------------------
     # regex stuff

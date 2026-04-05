@@ -291,7 +291,7 @@ class PyBaker(PyPlate):
         # ----------------------------------------------------------------------
         # handle -d
         # NB: do after _fix_dicts
-        if self._cmd_debug:
+        if self._debug:
             self._dict_dbg = dict(P.C.D_DBG_PB)
 
         # ----------------------------------------------------------------------

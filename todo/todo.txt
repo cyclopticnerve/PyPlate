@@ -1,8 +1,19 @@
 
-FIXME: json rat headers are a hot mess (rat, empty filename)
+FIXME: json rat headers are a hot mess (rules, ext, parse)
+FIXME: add json/jsonc to fix_header
+
 
 TODO: propagate installer changes to template and projects
+TODO: pp needs teardown arg (all sys.exit)
+TODO: cli base needs teardown arg (all sys.exit)
+TODO: truth table of when to print for -d/-f/-q
+for fresh inst/inst/uninst
+TODO: prog_name=??? in parser
 
+NEXT: reduce calls to format if can be concatenated
+NEXT: check for internet before install - if not, no delete old
+NEXT: split conf into strings.py and hooks.py
+NEXT: add switches to MUD/C in D_TYPE_RULES
 NEXT: no commented code in base - should never need to be touched
       use _add_cmd_debug, _add_cmd_uninstall in base/child
       child calls base func to add cmd line options, always present in base but

@@ -25,7 +25,6 @@
         "__PP_NAME_DSK_TMP__": "template.desktop",
         "__PP_USR_APPS__": ".local/share/applications",
         "__PP_USR_BIN__": ".local/bin",
-        "__PP_USR_SHARE__": ".local/share",
         "__PP_NAME_UNINST__": "uninstall.py",
         "__PP_DIR_GUI__": "src/gui",
         "__PP_DIR_UI__": "src/gui/ui",
@@ -68,6 +67,6 @@
         "__PP_USR_INST__": ".local/share/pyplate",
         "__PP_APP_ID__": "org.cyclopticnerve.pyplate",
         "__PP_FMT_DIST__": "pyplate-1.0.8",
-        "__PP_USR_CONF__": ".config/pyplate"
+        "__PP_USR_CONF__": ".config"
     }
 }

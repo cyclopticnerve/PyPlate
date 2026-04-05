@@ -319,6 +319,7 @@ S_KEY_META_CATS = "META_CATS"
 # python header/split dict keys
 S_KEY_RULES_HASH = "S_KEY_RULES_HASH"
 S_KEY_RULES_MUD = "S_KEY_RULES_MUD"
+S_KEY_RULES_DS = "S_KEY_RULES_DS"
 S_KEY_RULES_EXT = "S_KEY_RULES_EXT"
 S_KEY_RULES_REP = "S_KEY_RULES_REP"
 S_KEY_HDR_SCH = "S_KEY_HDR_SCH"
@@ -639,6 +640,12 @@ L_EXT_MARKUP = [
     ".glade",
 ]
 
+# list of filetypes that have c type comments
+L_EXT_DS = [
+    ".json",
+    ".jsonc",
+]
+
 # file exts for do_after_fix
 L_EXT_GUI = [".ui", ".glade"]
 
@@ -894,10 +901,10 @@ D_PRV_ALL = {
     "__PP_DIR_TESTS__": S_DIR_TESTS,
     # --------------------------------------------------------------------------
     # these paths are relative to the user's home dir
-    "__PP_USR_APPS__": S_USR_APPS,  # for .desktop file
-    "__PP_USR_BIN__": S_USR_BIN,  # where to put the binary
-    "__PP_USR_CONF__": S_USR_CONF,  # /home/user/.config/app_name
-    "__PP_USR_SHARE__": S_USR_SHARE,
+    "__PP_USR_APPS__": S_USR_APPS,  # /home/user/.local/applications
+    "__PP_USR_BIN__": S_USR_BIN,  # /home/user/.local/bin
+    "__PP_USR_CONF__": S_USR_CONF,  # /home/user/.config
+    # "__PP_USR_SHARE__": S_USR_SHARE,
     "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
     "__PP_NAME_UNINST__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
@@ -933,6 +940,8 @@ D_PRV_ALL = {
 # if you need to adjust any of these values based on a dunder, use
 # do_before_fix() in this file
 D_PRV_PRJ = {
+    # --------------------------------------------------------------------------
+    # get_project_info
     "__PP_TYPE_PRJ__": "",  # 'c'
     "__PP_NAME_PRJ__": "",  # My Project
     "__PP_NAME_PRJ_BIG__": "",  # My_Project
@@ -941,27 +950,36 @@ D_PRV_PRJ = {
     "__PP_NAME_SEC_BIG__": "",  # My_Win
     "__PP_NAME_SEC_SMALL__": "",  # my_win
     "__PP_NAME_SEC_PASCAL__": "",  # MyWin
-    "__PP_DATE__": "",  # the date each file was created, updated every time
     "__PP_NAME_VENV__": "",  # venv folder name
+    # --------------------------------------------------------------------------
+    # do_before_fix
+    "__PP_DATE__": "",  # the date each file was created, updated every time
+    # --------------------------------------------------------------------------
+    # gui stuff
     "__PP_FILE_APP__": "",  # my_project_app
     "__PP_CLASS_APP__": "",  # MyProjectApp
     "__PP_FILE_WIN__": "",  # my_project_win
     "__PP_CLASS_WIN__": "",  # MyProjectWin
+    "__PP_APP_ID__": "",
     # --------------------------------------------------------------------------
-    # these strings are calculated in do_before_fix
+    # folders
+    "__PP_USR_INST__": "",  # /home/user/.local/share/app_name
+    # --------------------------------------------------------------------------
+    # files
     "__PP_FILE_DESK__": "",  # final desk file, not template
+    # --------------------------------------------------------------------------
+    # images
     "__PP_IMG_README__": "",  # image for readme file logo
     "__PP_IMG_DESK__": "",  # image for .desktop logo
     "__PP_IMG_DASH__": "",  # image for dash/win logo
     "__PP_IMG_ABOUT__": "",  # image for about logo
+    # --------------------------------------------------------------------------
     # NB: technically this should be metadata but we don't want dev editing,
     # only use metadata to recalculate these on every build
     "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.13"
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
-    "__PP_DEV_INST__": "",  # cmd used by develop.py to install reqs or self
-    "__PP_APP_ID__": "",
     "__PP_FMT_DIST__": "",
-    "__PP_USR_INST__": "",  # /home/user/.local/share/app_name
+    "__PP_DEV_INST__": "",  # cmd used by develop.py to install reqs or self
 }
 
 # ------------------------------------------------------------------------------
@@ -1174,7 +1192,7 @@ D_TYPE_INST = {
             "__PP_USR_INST__",
         ],
         S_KEY_CFG_CONT: {
-            S_DIR_CONF: "__PP_USR_CONF__",
+            S_DIR_CONF: "__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__",
         },
     },
     "g": {
@@ -1199,7 +1217,7 @@ D_TYPE_INST = {
             "__PP_USR_APPS__/__PP_NAME_PRJ_BIG__.desktop",
         ],
         S_KEY_CFG_CONT: {
-            S_DIR_CONF: "__PP_USR_CONF__",
+            S_DIR_CONF: "__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__",
         },
     },
 }
@@ -1255,6 +1273,16 @@ D_TYPE_RULES = {
         S_KEY_RULES_REP: {
             # header stuff
             S_KEY_HDR_SCH: r"^(\s*<!--\s*\S*\s*:\s*)(\S+)(.*-->.*)$",
+            S_KEY_LEAD: 1,
+            S_KEY_VAL: 2,
+            S_KEY_CAPTION_PAD: 3,
+        },
+    },
+    S_KEY_RULES_DS: {
+        S_KEY_RULES_EXT: L_EXT_DS,
+        S_KEY_RULES_REP: {
+            # header stuff
+            S_KEY_HDR_SCH: r"^(\s*\\\\\s*\S*\s*:\s*)(\S+)(.*)$",
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_CAPTION_PAD: 3,
@@ -1530,26 +1558,51 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     'dict_pub' dicts before any replacement occurs.
     """
 
-    # get project type
-    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-
     # --------------------------------------------------------------------------
-    # these paths are formatted here because they are complex and may be
-    # changed by dev
-
     # get sub dicts we need
     dict_prv_all = dict_prv[S_KEY_PRV_ALL]
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
-    # get values after pymaker has set them
-    name_prj_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
+    # --------------------------------------------------------------------------
+    # calculate current date
+    # NB: this is the initial create date for all files in the template
+    # new files added to the project will have their dates set to the date
+    # when pybaker was last run
 
-    # paths relative to the end user's (or dev's) useful folders
-    usr_conf = f"{S_USR_CONF}/{name_prj_small}"
-    dict_prv_prj["__PP_USR_CONF__"] = usr_conf
+    # get current date and format it according to dev fmt
+    now = datetime.now()
+    fmt_date = S_DATE_FMT
+    info_date = now.strftime(fmt_date)
+    dict_prv_prj["__PP_DATE__"] = info_date
+
+    # --------------------------------------------------------------------------
+    # get project names
+    name_prj_small = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
+    name_prj_pascal = dict_prv_prj["__PP_NAME_PRJ_PASCAL__"]
+    name_sec_small = dict_prv_prj["__PP_NAME_SEC_SMALL__"]
+    name_sec_pascal = dict_prv_prj["__PP_NAME_SEC_PASCAL__"]
+
+    # --------------------------------------------------------------------------
+    # gui app/win replacements
+    dict_prv_prj["__PP_FILE_APP__"] = S_APP_FILE_FMT.format(name_prj_small)
+    dict_prv_prj["__PP_CLASS_APP__"] = S_APP_CLASS_FMT.format(name_prj_pascal)
+    dict_prv_prj["__PP_FILE_WIN__"] = S_WIN_FILE_FMT.format(name_sec_small)
+    dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
+
+    # app id for gui
+    author = dict_prv_all["__PP_AUTHOR__"]
+    dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_prj_small)
+
+    # --------------------------------------------------------------------------
+    # folders
+
+    # path to the program's install dir (/home/user/.local/sahre/app_name)
     usr_inst = f"{S_USR_SHARE}/{name_prj_small}"
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
+
+    # --------------------------------------------------------------------------
+    # files
 
     # k/v to fix desktop
     name_prj_big = dict_prv_prj["__PP_NAME_PRJ_BIG__"]
@@ -1557,9 +1610,18 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{name_prj_big}.desktop"
     )
 
-    # app id for gui
-    author = dict_prv_all["__PP_AUTHOR__"]
-    dict_prv_prj["__PP_APP_ID__"] = S_APP_ID_FMT.format(author, name_prj_small)
+    # --------------------------------------------------------------------------
+    # various image files
+    img_name = S_IMG_FMT.format(name_prj_small)
+
+    dict_prv_prj["__PP_IMG_README__"] = f"{S_DIR_IMAGES}/{img_name}"
+    # NB: .desktop needs abs path to img
+    dict_prv_prj["__PP_IMG_DESK__"] = f"{usr_inst}/{S_DIR_IMAGES}/{img_name}"
+    # NB: .ui files need rel path to img
+    dict_prv_prj["__PP_IMG_DASH__"] = f"{"../../.."}/{S_DIR_IMAGES}/{img_name}"
+    dict_prv_prj["__PP_IMG_ABOUT__"] = (
+        f"{"../../.."}/{S_DIR_IMAGES}/{img_name}"
+    )
 
     # --------------------------------------------------------------------------
     # version stuff
@@ -1576,40 +1638,9 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     ver_dist = S_VER_DIST_FMT.format(name_prj_small, ver_base)
     dict_prv_prj["__PP_FMT_DIST__"] = ver_dist
 
-    # ----------------------------------------------------------------------
-    # calculate current date
-    # NB: this is the initial create date for all files in the template
-    # new files added to the project will have their dates set to the date
-    # when pybaker was last run
-
-    # get current date and format it according to dev fmt
-    now = datetime.now()
-    fmt_date = S_DATE_FMT
-    info_date = now.strftime(fmt_date)
-    dict_prv_prj["__PP_DATE__"] = info_date
-
-    # gui app/win replacements
-    name_prj_pascal = dict_prv_prj["__PP_NAME_PRJ_PASCAL__"]
-    name_sec_small = dict_prv_prj["__PP_NAME_SEC_SMALL__"]
-    name_sec_pascal = dict_prv_prj["__PP_NAME_SEC_PASCAL__"]
-    dict_prv_prj["__PP_FILE_APP__"] = S_APP_FILE_FMT.format(name_prj_small)
-    dict_prv_prj["__PP_CLASS_APP__"] = S_APP_CLASS_FMT.format(name_prj_pascal)
-    dict_prv_prj["__PP_FILE_WIN__"] = S_WIN_FILE_FMT.format(name_sec_small)
-    dict_prv_prj["__PP_CLASS_WIN__"] = S_WIN_CLASS_FMT.format(name_sec_pascal)
-
-    # various image files
-    img_name = S_IMG_FMT.format(name_prj_small)
-
-    dict_prv_prj["__PP_IMG_README__"] = f"{S_DIR_IMAGES}/{img_name}"
-    # NB: .desktop needs abs path to img
-    dict_prv_prj["__PP_IMG_DESK__"] = f"{usr_inst}/{S_DIR_IMAGES}/{img_name}"
-    # NB: .ui files need rel path to img
-    dict_prv_prj["__PP_IMG_DASH__"] = f"{"../../.."}/{S_DIR_IMAGES}/{img_name}"
-    dict_prv_prj["__PP_IMG_ABOUT__"] = (
-        f"{"../../.."}/{S_DIR_IMAGES}/{img_name}"
-    )
-
+    # --------------------------------------------------------------------------
     # develop.py stuff
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
     if prj_type in L_INST_SELF:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
     else:
@@ -2228,6 +2259,7 @@ def _fix_meta(path, dict_prv, dict_pub):
     # do md/html/xml separately (needs special handling)
     dict_type_rules = PP.get_type_rules(path)
 
+    # TODO: none of these use rules?
     # fix readme
     if path.name == S_FILE_README:
         _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
@@ -2255,6 +2287,10 @@ def _fix_meta(path, dict_prv, dict_pub):
     # fix mkdocs.yml
     if path.name == S_FILE_MKDOCS_YML:
         _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
+
+    # fix mkdocs.yml
+    if path.suffix in L_EXT_DS:
+        _fix_dbl_slash(path, dict_prv_prj, dict_pub, dict_type_rules)
 
 
 # ------------------------------------------------------------------------------
@@ -2636,6 +2672,7 @@ def _fix_install(path, dict_prv_prj, _dict_pub, _dict_type_rules):
     # save file
     F.save_dict_into_paths(a_dict, path)
 
+
 # ------------------------------------------------------------------------------
 # Fix the theme name in mkdocs.yml
 # ------------------------------------------------------------------------------
@@ -2671,4 +2708,14 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
         a_file.write(text)
 
 
+# ------------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------------
+def _fix_dbl_slash(path, _dict_prv_prj, dict_pub, _dict_type_rules):
+    """
+    docstring
+    """
+
+    print("fix c:", path)
+    
 # -)

@@ -54,9 +54,9 @@ P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
 P_LOG_DEF = P_DIR_PRJ / "__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log"
 
 # path to uninst
-P_UNINST = P_DIR_PRJ / "__PP_DIR_INSTALL__/__PP_NAME_UNINST__"
+P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
 # NB: path changes after dist
-P_UNINST_DIST = P_DIR_PRJ / "__PP_NAME_UNINST__"
+# P_UNINST_DIST = P_DIR_PRJ / "__PP_NAME_UNINST__"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -301,7 +301,17 @@ class __PP_NAME_PRJ_PASCAL__Base:
         )
 
         # run the parser
-        args = self._parser.parse_args()
+        try:
+            args = self._parser.parse_args()
+        except SystemExit:
+
+            # print usage and arg info and exit
+            print()
+            print(self.S_ABOUT)
+            print()
+            self._parser.print_help()
+            print()
+            sys.exit(0)
 
         # convert namespace to dict
         self._dict_args = vars(args)
@@ -448,40 +458,40 @@ class __PP_NAME_PRJ_PASCAL__Base:
         """
 
         # print some text
-        print(self.S_ABOUT)
-        print()
+        # print(self.S_ABOUT)
+        # print()
 
-        # ask to uninstall
-        str_ask = F.dialog(
-            self.S_ASK_UNINST.format("SpaceOddity"),
-            [F.S_ASK_YES, F.S_ASK_NO],
-            F.S_ASK_NO,
-        )
+        # # ask to uninstall
+        # str_ask = F.dialog(
+        #     self.S_ASK_UNINST.format("__PP_NAME_PRJ_BIG__"),
+        #     [F.S_ASK_YES, F.S_ASK_NO],
+        #     F.S_ASK_NO,
+        # )
 
-        # user hit enter or typed "n/N"
-        if str_ask != F.S_ASK_YES:
-            print()
-            print(self.S_MSG_ABORT)
-            print()
-            sys.exit(0)
+        # # user hit enter or typed "n/N"
+        # if str_ask != F.S_ASK_YES:
+        #     print()
+        #     print(self.S_MSG_ABORT)
+        #     print()
+        #     sys.exit(0)
 
         # ----------------------------------------------------------------------
 
         # if path exists
-        path_uninst = P_UNINST
+        # path_uninst = P_UNINST
 
-        # try for install loc's uninstall
-        if not path_uninst.exists():
-            path_uninst = P_UNINST_DIST
+        # # try for install loc's uninstall
+        # if not path_uninst.exists():
+        #     path_uninst = P_UNINST_DIST
 
-            # still not found? error
-            if not path_uninst.exists():
-                print(self.S_ERR_NO_UNINST)
-                print()
-                sys.exit(-1)
+        #     # still not found? error
+        #     if not path_uninst.exists():
+        #         print(self.S_ERR_NO_UNINST)
+        #         print()
+        #         sys.exit(-1)
 
         # format cmd line
-        cmd = str(path_uninst) + " -f -q"
+        cmd = str(P_UNINST)
         if self._arg_debug:
             cmd += " -d"
 
@@ -489,7 +499,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         try:
             F.run(cmd, shell=True)
-            print()
+            # print()
             sys.exit(0)
         except F.CNRunError as e:
             print(e.output)
@@ -503,6 +513,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
 if __name__ == "__main__":
 
     # Code to run when called from command line
-    print("WRONG GLASS, SIR !!!")
+    print("WRONG CLASS, SIR !!!")
 
 # -)
