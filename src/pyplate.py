@@ -21,17 +21,18 @@ This is the base class that contains code common to both PyMaker and PyBaker.
 
 # system imports
 import argparse
-
-# import gettext
-# import locale
 import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 import re
 import sys
 
 # cnlib imports
+# pylint: disable=import-error
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
+
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -47,8 +48,6 @@ P_LOG_DEF = P_DIR_LOG / "pyplate.log"
 
 # path to uninst
 P_UNINST = P_DIR_PRJ / "install/uninstall.py"
-# NB: path changes after dist
-# P_UNINST_DIST = P_DIR_PRJ / "uninstall.py"
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -83,8 +82,8 @@ class PyPlate:
     Public methods:
         main: The main method of the program
 
-    This class implements all the needed functionality of PyMaker, to create a
-    PyPlate project from a template.
+    This class implements all the commonly needed functionality of PyMaker and
+    PyBaker.
     """
 
     # --------------------------------------------------------------------------
@@ -92,9 +91,17 @@ class PyPlate:
     # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
+    # ints
+
+    # rotating log stuff
+    I_LOG_SIZE = 2097152  # max log file size in bytes (2 Mb)
+    I_LOG_COUNT = 5  # max number of log files
+
+    # --------------------------------------------------------------------------
     # strings
 
-    # pyplate: replace=True
+    # NB: used for parser/logger
+    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
     # pylint: disable=line-too-long
@@ -132,22 +139,18 @@ class PyPlate:
     S_ABOUT = ""
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = "\n" + _("Use -h for help")
+    S_ABOUT_HELP = _("Use -h for help")
 
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
 
-    # default format af log files
+    # default format for log files
     S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
-    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S %p"
+    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S"
 
     # --------------------------------------------------------------------------
     # questions
 
-    # I18N: answer yes
-    # S_ASK_YES = _("y")
-    # # I18N: answer no
-    # S_ASK_NO = _("N")
     # NB: format param is prog name
     # I18N: ask to uninstall
     S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
@@ -185,7 +188,11 @@ class PyPlate:
         new object.
         """
 
-        # set the initial values of properties
+        # set defaults
+
+        # args and arg props
+        self._dict_args = {}
+        self._arg_debug = False
 
         # internal props
         self._dir_prj = Path()
@@ -208,35 +215,9 @@ class PyPlate:
         self._dict_pub_i18n = {}
         self._dict_pub_meta = {}
         self._dict_pub_inst = {}
-        # self._dict_pub_uninst = {}
 
         # dictionary to hold current pm/pb debug settings
         self._dict_dbg = {}
-
-        # ----------------------------------------------------------------------
-
-        # make some folders
-        if not P_DIR_LOG.exists():
-            Path.mkdir(P_DIR_LOG)
-
-        # log stuff
-        self._logger = logging.getLogger(__name__)
-        logging.basicConfig(
-            filename=P_LOG_DEF,
-            level=logging.INFO,
-            format=self.S_LOG_FMT,
-            datefmt=self.S_LOG_DATE_FMT,
-        )
-
-        # cmd line stuff
-        self._parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter,
-            add_help=False,
-        )
-
-        # set arg defaults
-        self._dict_args = {}
-        self._debug = False
 
         # ----------------------------------------------------------------------
         # set self._dir_prj
@@ -250,6 +231,39 @@ class PyPlate:
         # set switch dicts to defaults
         self._dict_sw_block = dict(C.D_SWITCH_DEF)
         self._dict_sw_line = dict(C.D_SWITCH_DEF)
+
+        # ----------------------------------------------------------------------
+
+        # make some folders
+        if not P_DIR_LOG.exists():
+            Path.mkdir(P_DIR_LOG)
+
+        # make a rotating handler
+        handler = RotatingFileHandler(
+            str(P_LOG_DEF),
+            maxBytes=self.I_LOG_SIZE,
+            backupCount=self.I_LOG_COUNT,
+        )
+
+        # add a formatter to rot handler
+        formatter = logging.Formatter(
+            self.S_LOG_FMT, datefmt=self.S_LOG_DATE_FMT
+        )
+
+        # set formatter to handler
+        handler.setFormatter(formatter)
+
+        # create logger and add rot handler
+        self._logger = logging.getLogger(self.S_APP_NAME)
+        self._logger.setLevel(logging.INFO)
+        self._logger.addHandler(handler)
+
+        # ----------------------------------------------------------------------
+
+        # cmd line stuff
+        self._parser = argparse.ArgumentParser(
+            formatter_class=CNFormatter, add_help=False, prog=self.S_APP_NAME
+        )
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -296,7 +310,17 @@ class PyPlate:
         )
 
         # run the parser
-        args = self._parser.parse_args()
+        args = {}
+        try:
+            args = self._parser.parse_args()
+        except SystemExit:
+
+            # print usage and arg info and exit
+            print()
+            print(self.S_ABOUT)
+            print()
+            self._parser.print_help()
+            self._teardown()
 
         # convert namespace to dict
         self._dict_args = vars(args)
@@ -311,46 +335,57 @@ class PyPlate:
         # if -h passed, this will print and exit
         if self._dict_args.get(self.S_ARG_HLP_DEST, False):
 
+            # print default about text
+            print()
+            print(self.S_ABOUT)
+            print()
+
             # print usage and arg info and exit
-            print()
             self._parser.print_help()
-            print()
-            sys.exit(0)
+            self._teardown()
 
         # no -h, print epilog
         print(self.S_ABOUT_HELP)
         print()
 
         # ----------------------------------------------------------------------
-        # set props from args
+        # check for -d (debug)
 
         # set self and lib debug
-        self._debug = self._dict_args.get(self.S_ARG_DBG_DEST, self._debug)
-        F.B_DEBUG = self._debug
-        C.B_DEBUG = self._debug
+        self._arg_debug = self._dict_args.get(
+            self.S_ARG_DBG_DEST, self._arg_debug
+        )
+        F.B_DEBUG = self._arg_debug
+
+        # ----------------------------------------------------------------------
+        # check for --uninstall
 
         # punt to uninstall func
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
             self._do_uninstall()
+            # NB: exit is handled by _do_uninstall
 
         # maybe yell
-        if self._debug:
+        if self._arg_debug:
 
             # yup, yell
             F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
             print()
 
     # --------------------------------------------------------------------------
-    # Boilerplate to use at the start of main
+    # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self):
+    def _teardown(self, errcode: int=0):
         """
         Boilerplate to use at the end of main
 
-        Perform some mundane stuff like saving properties.
+        Perform some mundane stuff like saving config files.
         """
+
+        # print last blank
+        print()
 
         # ----------------------------------------------------------------------
         # save private
@@ -372,6 +407,10 @@ class PyPlate:
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
 
+
+        # use exit code
+        sys.exit(errcode)
+
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
     # --------------------------------------------------------------------------
@@ -380,40 +419,19 @@ class PyPlate:
         Handle the --uninstall cmd line op
         """
 
-        # # ask to uninstall
-        # str_ask = F.dialog(
-        #     self.S_ASK_UNINST.format("PyPlate"),
-        #     [F.S_ASK_YES, F.S_ASK_NO],
-        #     default=F.S_ASK_NO,
-        # )
-
-        # # user hit enter or typed "n/N"
-        # if str_ask != F.S_ASK_YES:
-        #     print(self.S_MSG_ABORT)
-        #     sys.exit(0)
-
-        # # ----------------------------------------------------------------------
-
-        # # if path exists
-        # path_uninst = P_UNINST
-        # if not path_uninst.exists():
-        #     path_uninst = P_UNINST_DIST
-
         # format cmd line
-        cmd = str(P_UNINST)  # + " -f -q"
-        if self._debug:
+        cmd = str(P_UNINST)
+        if self._arg_debug:
             cmd += " -d"
 
         # ----------------------------------------------------------------------
 
         try:
-            cp = F.run(cmd, shell=True)
-            print(cp.stdout)
-            print(cp.stderr)
-            sys.exit(0)
+            F.run(cmd, shell=True)
+            self._teardown()
         except F.CNRunError as e:
             print(e.output)
-            sys.exit(e.returncode)
+            self._teardown(e.returncode)
 
     # --------------------------------------------------------------------------
     # Do any work before fix
@@ -1138,7 +1156,7 @@ def get_type_rules(path):
 if __name__ == "__main__":
 
     # Code to run when called from command line
-    print("WRONG GLASS, SIR !!!")
+    print("WRONG CLASS, SIR !!!")
 
 # -)
 
