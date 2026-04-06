@@ -292,7 +292,7 @@ PyPlate project from a template.</p>
         # do not run pymaker in pyplate dir
         if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
-            P.sys.exit(-1)
+            self._teardown(-1)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -319,7 +319,7 @@ PyPlate project from a template.</p>
                 # loop=True
             )
             if res != F.S_ASK_YES:
-                P.sys.exit(-1)
+                self._teardown(-1)
 
         # ----------------------------------------------------------------------
         # first question is type
@@ -355,7 +355,7 @@ PyPlate project from a template.</p>
         # next question is name
 
         # if in debug mode
-        if self._cmd_debug:
+        if self._arg_debug:
 
             # get long name
             name_prj = "DEBUG"
@@ -430,7 +430,7 @@ PyPlate project from a template.</p>
         if prj_type in P.C.D_NAME_SEC:
 
             # dup prj names if debug
-            if self._cmd_debug:
+            if self._arg_debug:
                 name_sec = name_prj
                 name_sec_big = name_prj_big
                 name_sec_small = name_prj_small
@@ -519,7 +519,7 @@ PyPlate project from a template.</p>
         # ----------------------------------------------------------------------
         # handle -d
         # NB: do after _fix dicts
-        if self._cmd_debug:
+        if self._arg_debug:
             self._dict_dbg = dict(P.C.D_DBG_PM)
 
         # ----------------------------------------------------------------------
