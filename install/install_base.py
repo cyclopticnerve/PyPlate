@@ -101,7 +101,7 @@ class CNInstallBase:
     # strings
 
     # NB: used for logger
-    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+    S_APP_NAME = "pyplate"
 
     # short description
     # pylint: disable=line-too-long
@@ -110,7 +110,7 @@ class CNInstallBase:
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 1.0.8"
+    S_PP_VERSION = "Version 1.1.0"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
