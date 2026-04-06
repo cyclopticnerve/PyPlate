@@ -153,7 +153,7 @@ class PyMaker(PyPlate):
         # do not run pymaker in pyplate dir
         if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
             print(P.C.S_ERR_PRJ_DIR_IS_PP)
-            P.sys.exit(-1)
+            self._teardown(-1)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -180,7 +180,7 @@ class PyMaker(PyPlate):
                 # loop=True
             )
             if res != F.S_ASK_YES:
-                P.sys.exit(-1)
+                self._teardown(-1)
 
         # ----------------------------------------------------------------------
         # first question is type
@@ -216,7 +216,7 @@ class PyMaker(PyPlate):
         # next question is name
 
         # if in debug mode
-        if self._debug:
+        if self._arg_debug:
 
             # get long name
             name_prj = "DEBUG"
@@ -291,7 +291,7 @@ class PyMaker(PyPlate):
         if prj_type in P.C.D_NAME_SEC:
 
             # dup prj names if debug
-            if self._debug:
+            if self._arg_debug:
                 name_sec = name_prj
                 name_sec_big = name_prj_big
                 name_sec_small = name_prj_small
@@ -380,7 +380,7 @@ class PyMaker(PyPlate):
         # ----------------------------------------------------------------------
         # handle -d
         # NB: do after _fix dicts
-        if self._debug:
+        if self._arg_debug:
             self._dict_dbg = dict(P.C.D_DBG_PM)
 
         # ----------------------------------------------------------------------
