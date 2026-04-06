@@ -1,10 +1,7 @@
 
-TODO: propagate installer changes to pp and projects
-TODO: pp needs teardown arg (all sys.exit)
-TODO: cli base needs teardown arg (all sys.exit)
+TODO: propagate installer changes to projects
 TODO: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
-TODO: prog_name=??? in parser in pp/template/spod/spod_gui
 
 NEXT: reduce calls to format if can be concatenated
 NEXT: check for internet before install - if not, no delete old
@@ -305,6 +302,9 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: prog_name=??? in parser in pp/template/spod/spod_gui
+DONE: pp needs teardown arg (all sys.exit)
+DONE: cli base needs teardown arg (all sys.exit)
 DONE: add json/jsonc to fix_header
 DONE: when installing same/newer, do quiet uninstall first (artifact thing)
 DONE: install_base needs docstring for do_external
