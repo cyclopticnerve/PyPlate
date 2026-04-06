@@ -29,8 +29,8 @@ import sys
 
 # cnlib imports
 # pylint: disable=import-error
-from cnlib import cnfunctions as F
-from cnlib.cnformatter import CNFormatter
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # pylint: enable=import-error
 
@@ -51,12 +51,10 @@ P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
 
 # path to default log file
 # NB: if not using, set to None
-P_LOG_DEF = P_DIR_PRJ / "__PP_DIR_LOG__/__PP_NAME_PRJ_SMALL__.log"
+P_LOG_DEF = P_DIR_LOG / "__PP_NAME_PRJ_SMALL__.log"
 
 # path to uninst
 P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
-# NB: path changes after dist
-# P_UNINST_DIST = P_DIR_PRJ / "__PP_NAME_UNINST__"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -118,7 +116,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # strings
 
-    # NB: used for logger
+    # NB: used for parser/logger
     S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
@@ -222,8 +220,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # args and arg props
         self._dict_args = {}
-        self._arg_cfg = None
         self._arg_debug = False
+        self._arg_cfg = None
 
         # cfg stuff
         self._dict_cfg = {}
@@ -301,6 +299,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         )
 
         # run the parser
+        args = {}
         try:
             args = self._parser.parse_args()
         except SystemExit:
@@ -310,8 +309,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             print(self.S_ABOUT)
             print()
             self._parser.print_help()
-            print()
-            sys.exit(0)
+            self._teardown()
 
         # convert namespace to dict
         self._dict_args = vars(args)
@@ -329,8 +327,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
             # print usage and arg info and exit
             self._parser.print_help()
-            print()
-            sys.exit(0)
+            self._teardown()
 
         # ----------------------------------------------------------------------
         # check for -d (debug)
@@ -378,18 +375,24 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self):
+    def _teardown(self, errcode: int=0):
         """
         Boilerplate to use at the end of main
 
         Perform some mundane stuff like saving config files.
         """
 
+        # print last blank
+        print()
+
         # ----------------------------------------------------------------------
         # use cfg
 
         # call to save config
         self._save_config()
+
+        # use exit code
+        sys.exit(errcode)
 
     # --------------------------------------------------------------------------
     # Load config data from a file
@@ -457,39 +460,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         Handle the --uninstall cmd line op
         """
 
-        # print some text
-        # print(self.S_ABOUT)
-        # print()
-
-        # # ask to uninstall
-        # str_ask = F.dialog(
-        #     self.S_ASK_UNINST.format("__PP_NAME_PRJ_BIG__"),
-        #     [F.S_ASK_YES, F.S_ASK_NO],
-        #     F.S_ASK_NO,
-        # )
-
-        # # user hit enter or typed "n/N"
-        # if str_ask != F.S_ASK_YES:
-        #     print()
-        #     print(self.S_MSG_ABORT)
-        #     print()
-        #     sys.exit(0)
-
-        # ----------------------------------------------------------------------
-
-        # if path exists
-        # path_uninst = P_UNINST
-
-        # # try for install loc's uninstall
-        # if not path_uninst.exists():
-        #     path_uninst = P_UNINST_DIST
-
-        #     # still not found? error
-        #     if not path_uninst.exists():
-        #         print(self.S_ERR_NO_UNINST)
-        #         print()
-        #         sys.exit(-1)
-
         # format cmd line
         cmd = str(P_UNINST)
         if self._arg_debug:
@@ -499,12 +469,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         try:
             F.run(cmd, shell=True)
-            # print()
-            sys.exit(0)
+            self._teardown()
         except F.CNRunError as e:
             print(e.output)
-            print()
-            sys.exit(e.returncode)
+            self._teardown(e.returncode)
 
 
 # ------------------------------------------------------------------------------

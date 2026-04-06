@@ -40,6 +40,7 @@ P_DIR_INSTALL = P_DIR_PARENT / "install"
 P_FILE_CFG_OLD = P_DIR_INSTALL / "install.json"
 
 # get pre/post files
+# NB: uncomment these and pybaker will replace them
 # P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
 # P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
 
@@ -97,9 +98,9 @@ class CNUninstall(CNInstallBase):
     # Public methods
     # --------------------------------------------------------------------------
 
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Uninstall the program
-    # ------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def main(self):
         """
         Uninstall the program
@@ -115,77 +116,26 @@ class CNUninstall(CNInstallBase):
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
         # show some info
-        if not self._quiet:
-            print(self.S_MSG_UNINST_START.format(prog_name, prog_version))
+        if not self._arg_quiet:
+            print(self.S_MSG_UNINST_START.format(prog_name))
             print()
 
         # create an instance of the class
-        self.uninstall_content(dry_run=self._dry_run, quiet=self._quiet)
+        self._uninstall_cont(self._arg_quiet)
 
         # uninstall conf stuff
         self._uninstall_conf()
 
         # maybe show we are done
-        if not self._quiet:
-            if not self._dry_run:
+        if not self._arg_quiet:
+            if not self._arg_dry:
                 print()
-            print(self.S_MSG_DEL_END.format(prog_name))
-            print()
+            print(self.S_MSG_UNINST_END.format(prog_name))
 
         # wind down
         self._teardown()
-
-    # --------------------------------------------------------------------------
-    # Uninstall the program, but not the config stuff
-    # --------------------------------------------------------------------------
-    def uninstall_content(self, dry_run=False, quiet=False):
-        """
-        Uninstall the program
-
-        Runs the uninstall operation.
-        """
-
-        # uninstall
-
-        # content list from dict
-        content = self._dict_cfg.get(self.S_KEY_UNINST_CONT, [])
-
-        # for each key, value
-        for item in content:
-
-            # get full path of destination
-            src = Path.home() / item
-
-            # debug may omit certain assets
-            if not src.exists():
-                continue
-
-            # if it's a dry run, don't do anything
-            # dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
-            if dry_run:
-                print(self.S_DRY_REMOVE.format(item))
-                continue
-
-            # if the source is a dir
-            if src.is_dir():
-                # remove dir
-                shutil.rmtree(src)
-
-            # if the source is a file
-            else:
-                # copy file
-                src.unlink()
-
-        # show some info
-        if not quiet:
-            print(self.S_MSG_DONE)
-
-        # # just show we are done
-        # prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
-        # print(self.S_MSG_UNINST_END.format(prog_name))
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -213,26 +163,34 @@ class CNUninstall(CNInstallBase):
             # fatal error, print and quit
             # NB: print even if quiet
             print(self.S_ERR_ERR, e)
-            sys.exit(-1)
+            self._teardown(-1)
+
+        # ----------------------------------------------------------------------
+        # check for reasons to skip question
+
+        # don't ask question
+        if self._arg_force:
+            return
+
+        # ----------------------------------------------------------------------
 
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
 
-        # check for force to skip question
-        force = self._dict_args.get(self.S_ARG_FORCE_DEST, False)
-        if not force:
+        # ask to uninstall
+        str_ask = self._dialog(
+            self.S_ASK_UNINST.format(prog_name),
+            [self.S_ASK_YES, self.S_ASK_NO],
+            self.S_ASK_NO,
+        )
+        print()
 
-            # ask to uninstall
-            str_ask = self._dialog(
-                self.S_ASK_UNINST.format(prog_name),
-                [self.S_ASK_YES, self.S_ASK_NO],
-                self.S_ASK_NO,
-            )
-
-            # user hit enter or typed "n/N"
-            if str_ask != self.S_ASK_YES:
+        # user hit enter or typed anything else except "y"
+        if str_ask != self.S_ASK_YES:
+            # normal error, print and quit
+            if not self._arg_quiet:
                 print(self.S_MSG_ABORT)
-                sys.exit(0)
+            self._teardown()
 
     # --------------------------------------------------------------------------
     # Uninstall the config stuff after final delete
@@ -243,6 +201,10 @@ class CNUninstall(CNInstallBase):
 
         Runs the uninstall operation.
         """
+
+        # show some progress
+        if not self._arg_quiet and not self._arg_dry:
+            print(self.S_MSG_DEL_CFG_START, flush=True, end="")
 
         # content list from dict
         content = self._dict_cfg.get(self.S_KEY_CFG_CONT, {})
@@ -257,6 +219,11 @@ class CNUninstall(CNInstallBase):
             if not src.exists():
                 continue
 
+            # if it's a dry run, don't do anything
+            if self._arg_dry:
+                print(self.S_DRY_REMOVE, src)
+                continue
+
             # if the source is a dir
             if src.is_dir():
                 # remove dir
@@ -266,6 +233,14 @@ class CNUninstall(CNInstallBase):
             else:
                 # copy file
                 src.unlink()
+
+        # show some info
+        if not self._arg_quiet and not self._arg_dry:
+            print(self.S_MSG_DONE)
+
+        # for make pretty
+        if self._arg_dry:
+            print()
 
 
 # ------------------------------------------------------------------------------

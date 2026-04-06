@@ -257,14 +257,14 @@ class PyBaker(PyPlate):
         path_pyplate = self._dir_prj / P.C.S_PRJ_PP_DIR
         if not path_pyplate.exists():
             print(P.C.S_ERR_NOT_PRJ)
-            P.sys.exit(-1)
+            self._teardown(-1)
 
         # check if data files exist
         path_prv = self._dir_prj / P.C.S_PRJ_PRV_CFG
         path_pub = self._dir_prj / P.C.S_PRJ_PUB_CFG
         if not path_prv.exists() or not path_pub.exists():
             print(P.C.S_ERR_PP_MISSING)
-            P.sys.exit(-1)
+            self._teardown(-1)
 
         # ----------------------------------------------------------------------
         # make dicts from files
@@ -282,7 +282,7 @@ class PyBaker(PyPlate):
         except OSError as e:  # from load_dicts
             # exit gracefully
             print(self.S_ERR_ERR, e)
-            P.sys.exit(-1)
+            self._teardown(-1)
 
         # ----------------------------------------------------------------------
         # fix dicts
@@ -291,7 +291,7 @@ class PyBaker(PyPlate):
         # ----------------------------------------------------------------------
         # handle -d
         # NB: do after _fix_dicts
-        if self._debug:
+        if self._arg_debug:
             self._dict_dbg = dict(P.C.D_DBG_PB)
 
         # ----------------------------------------------------------------------
@@ -452,7 +452,7 @@ class PyBaker(PyPlate):
                     loop=True,
                 )
                 if res != F.S_ASK_YES:
-                    P.sys.exit(-1)
+                    self._teardown(-1)
 
         # not passed, ask question
         else:
@@ -497,7 +497,6 @@ class PyBaker(PyPlate):
         if prj_type in P.C.L_APP_INSTALL:
             self._dict_pub_inst[P.C.S_KEY_INST_VER] = ver
 
-    # TODO: save version to install.json
     # --------------------------------------------------------------------------
     # Handle the -l option
     # --------------------------------------------------------------------------

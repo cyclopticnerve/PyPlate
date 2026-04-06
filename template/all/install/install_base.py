@@ -243,7 +243,6 @@ class CNInstallBase:
     S_MSG_ABORT = _("Aborted")
     # NB: format param is script name
     # I18N: run external script
-    # NB: param is script command
     S_MSG_RUN_EXT = _("Running {}... ")
 
     # NB: format params are prog_name and prog_version
