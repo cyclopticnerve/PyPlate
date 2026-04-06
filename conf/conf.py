@@ -2273,7 +2273,7 @@ def _fix_meta(path, dict_prv, dict_pub):
 
     # fix mkdocs.yml
     if path.name == S_FILE_MKDOCS_YML:
-        _fix_mkdocs(path, dict_prv_prj, dict_pub_meta)
+        _fix_mkdocs(path, dict_prv_prj, dict_pub)
 
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
@@ -2634,7 +2634,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
 # ------------------------------------------------------------------------------
 # Fix version number in install.json
 # ------------------------------------------------------------------------------
-def _fix_install(path, dict_prv_prj, _dict_pub):
+def _fix_install(path, dict_prv_prj, _dict_pub_meta):
     """
     Fix version number in install.json
 
