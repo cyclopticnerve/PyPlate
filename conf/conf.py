@@ -1282,7 +1282,7 @@ D_TYPE_RULES = {
         S_KEY_RULES_EXT: L_EXT_DS,
         S_KEY_RULES_REP: {
             # header stuff
-            S_KEY_HDR_SCH: r"^(\s*\\\\\s*\S*\s*:\s*)(\S+)(.*)$",
+            S_KEY_HDR_SCH: r"^(\s*//\s*\S*\s*:\s*)(\S+)(.*)$",
             S_KEY_LEAD: 1,
             S_KEY_VAL: 2,
             S_KEY_CAPTION_PAD: 3,
@@ -1847,10 +1847,8 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         str_pattern = S_PO_VER_SCH
         str_rep = S_PO_VER_REP.format(pp_version)
 
-        # ----------------------------------------------------------------------
-
+        # get po/pot exts
         l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
-
         list_files = []
         for item in l_ext:
             res = list(dir_prj.glob(item))
@@ -1859,19 +1857,12 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         # for each file
         for item in list_files:
 
-            # make sure lang matches folder
-            # lang = Path(item).parent.stem
-            # str_pattern2 = S_PO_LANG_SCH
-            # str_rep2 = S_PO_LANG_REP.format(lang)
-
             # open file and get contents
             with open(item, "r", encoding=S_ENCODING) as a_file:
                 text = a_file.read()
 
             # replace version
             text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-            # replace lang
-            # text = re.sub(str_pattern2, str_rep2, text, flags=re.M | re.S)
 
             # delete path from .pot/.po files (in case of debug)
             # NB: also no regex or rules, just nuke it everywhere
@@ -2246,7 +2237,7 @@ def _fix_meta(path, dict_prv, dict_pub):
 
     Args:
         dict_prv_prj: Private calculated proj dict
-        dict_pub_meta: Dict of metadata to replace in the file
+        dict_pub_prj: Dict of metadata to replace in the file
 
     Fixes metadata in individual files. Note that this function is only called
     for files that make it through the BL filter. Switches are your problem.
@@ -2256,47 +2247,38 @@ def _fix_meta(path, dict_prv, dict_pub):
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
     dict_pub_meta = dict_pub[S_KEY_PUB_META]
 
-    # do md/html/xml separately (needs special handling)
-    dict_type_rules = PP.get_type_rules(path)
-
-    # TODO: none of these use rules?
     # fix readme
     if path.name == S_FILE_README:
-        _fix_readme(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+        _fix_readme(path, dict_prv_prj, dict_pub_meta)
 
     # fix pyproject
     if path.name == S_FILE_TOML:
-        _fix_pyproject(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+        _fix_pyproject(path, dict_prv_prj, dict_pub_meta)
 
     # fix desktop
     if path.suffix in L_EXT_DESK:
-        _fix_desktop(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+        _fix_desktop(path, dict_prv_prj, dict_pub_meta)
 
     # fix ui files
     if path in L_EXT_GUI:
-        _fix_ui(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+        _fix_ui(path, dict_prv_prj, dict_pub_meta)
 
     # fix src files
     if path.suffix in L_EXT_PY:
-        _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules)
+        _fix_src(path, dict_prv_prj, dict_pub_meta)
 
     # fix install.json
     if path.name == S_FILE_INST_CFG:
-        _fix_install(path, dict_prv_prj, dict_pub, dict_type_rules)
+        _fix_install(path, dict_prv_prj, dict_pub_meta)
 
     # fix mkdocs.yml
     if path.name == S_FILE_MKDOCS_YML:
-        _fix_mkdocs(path, dict_prv_prj, dict_pub, dict_type_rules)
-
-    # fix mkdocs.yml
-    if path.suffix in L_EXT_DS:
-        _fix_dbl_slash(path, dict_prv_prj, dict_pub, dict_type_rules)
-
+        _fix_mkdocs(path, dict_prv_prj, dict_pub_meta)
 
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
-def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
+def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     """
     Remove/replace parts of the main README file
 
@@ -2379,7 +2361,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
 # ------------------------------------------------------------------------------
 # Replace text in the pyproject file
 # ------------------------------------------------------------------------------
-def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
+def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     """
     Replace text in the pyproject file
 
@@ -2437,7 +2419,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
 # ------------------------------------------------------------------------------
 # Replace text in the desktop file
 # ------------------------------------------------------------------------------
-def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_type_rules):
+def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     """
     Replace text in the desktop file
 
@@ -2495,7 +2477,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta, _dict_type_rules):
 # ------------------------------------------------------------------------------
 # Replace text in the UI files
 # ------------------------------------------------------------------------------
-def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
+def _fix_ui(path, dict_prv_prj, dict_pub_meta):
     """
     Replace text in the UI files
 
@@ -2534,7 +2516,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta, _dict_type_rules):
 # ------------------------------------------------------------------------------
 # Fix the version number and short description in source files
 # ------------------------------------------------------------------------------
-def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
+def _fix_src(path, dict_prv_prj, dict_pub_meta):
     """
     Fix the version number and short description in source files
 
@@ -2550,11 +2532,13 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
     is in L_EXT_PY.
     """
 
-    # NB: this is an example of using switches to control line replacement
-
     # the switch statuses
+    # NB: this is an example of using switches to control line replacement
     dict_sw_block = dict(D_SWITCH_DEF)
     dict_sw_line = dict(D_SWITCH_DEF)
+
+    # do md/html/xml separately (needs special handling)
+    dict_type_rules = PP.get_type_rules(path)
 
     # the whole text of the file
     lines = []
@@ -2650,7 +2634,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta, dict_type_rules):
 # ------------------------------------------------------------------------------
 # Fix version number in install.json
 # ------------------------------------------------------------------------------
-def _fix_install(path, dict_prv_prj, _dict_pub, _dict_type_rules):
+def _fix_install(path, dict_prv_prj, _dict_pub):
     """
     Fix version number in install.json
 
@@ -2676,7 +2660,7 @@ def _fix_install(path, dict_prv_prj, _dict_pub, _dict_type_rules):
 # ------------------------------------------------------------------------------
 # Fix the theme name in mkdocs.yml
 # ------------------------------------------------------------------------------
-def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
+def _fix_mkdocs(path, _dict_prv_prj, dict_pub):
     """
     Fix the theme name in mkdocs.yml
 
@@ -2707,15 +2691,4 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub, _dict_type_rules):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
 
-
-# ------------------------------------------------------------------------------
-#
-# ------------------------------------------------------------------------------
-def _fix_dbl_slash(path, _dict_prv_prj, dict_pub, _dict_type_rules):
-    """
-    docstring
-    """
-
-    print("fix c:", path)
-    
 # -)

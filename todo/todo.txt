@@ -1,14 +1,10 @@
 
-FIXME: json rat headers are a hot mess (rules, ext, parse)
-FIXME: add json/jsonc to fix_header
-
-
-TODO: propagate installer changes to template and projects
+TODO: propagate installer changes to pp and projects
 TODO: pp needs teardown arg (all sys.exit)
 TODO: cli base needs teardown arg (all sys.exit)
 TODO: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
-TODO: prog_name=??? in parser
+TODO: prog_name=??? in parser in pp/template/spod/spod_gui
 
 NEXT: reduce calls to format if can be concatenated
 NEXT: check for internet before install - if not, no delete old
@@ -219,7 +215,7 @@ NEXT: copy default files from template on make / (bake?)
         need a chart of sources and dests
 NEXT: F.run that runs in venv
 
-
+NEXT: do fix header after fix path for missing filename?
 NEXT: i18n for error messages and file/dir names in settings.py
 NEXT: should we ask for names of files for gui ala module name for pkg?
 NEXT: should we run potpy on a fresh project? any benefit?
@@ -309,6 +305,7 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: add json/jsonc to fix_header
 DONE: when installing same/newer, do quiet uninstall first (artifact thing)
 DONE: install_base needs docstring for do_external
 DONE: install_base may need shlex split for cmd

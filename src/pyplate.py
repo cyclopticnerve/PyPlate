@@ -553,7 +553,7 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # Fix header or code for each line in a file
     # --------------------------------------------------------------------------
-    def _fix_contents(self, path, bl_hdr=False, bl_code=False):
+    def _fix_contents(self, path: Path, bl_hdr=False, bl_code=False):
         """
         Fix header or code for each line in a file
 
@@ -701,7 +701,6 @@ class PyPlate:
         as it goes.
         """
 
-        # FIXME: do c-style comments in json/jsonc
         # break apart header line
         # NB: gotta do this again, can't pass res param
         str_pattern = self._dict_type_rules[C.S_KEY_HDR_SCH]
