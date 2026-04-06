@@ -52,11 +52,10 @@ P_DIR_VENV = Path.home() / ".local/share/pyplate/.venv-pyplate"
 P_DIR_CONF = Path.home() / ".config/pyplate/pyplate"
 
 # get out files
-P_FILE_CFG_OLD = (
-    Path.home() / ".local/share/pyplate/install/install.json"
-)
+P_FILE_CFG_OLD = Path.home() / ".local/share/pyplate/install/install.json"
 
 # get pre/post files
+# NB: uncomment these and pybaker will replace them
 # P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
 # P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
 
@@ -65,13 +64,11 @@ P_FILE_CFG_OLD = (
 # ------------------------------------------------------------------------------
 
 # fudge path to load base
-sys.path.append(str(P_DIR_ASSETS))
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
 # pylint: disable=wrong-import-position, import-error
 from install_base import CNInstallBase  # type: ignore
-from uninstall import CNUninstall  # type: ignore
 
 # pylint: enable=wrong-import-position, import-error
 
@@ -137,13 +134,12 @@ class CNInstall(CNInstallBase):
         prog_version = self._dict_cfg[self.S_KEY_INST_VER]
 
         # maybe show we are starting
-        if not self._quiet:
+        if not self._arg_quiet:
             print(self.S_MSG_INST_START.format(prog_name, prog_version))
             print()
 
         # uninstall old version (if present)
-        obj = CNUninstall()
-        obj.uninstall_content(dry_run=self._dry_run, quiet=True)
+        self._uninstall_cont(True)
 
         # make the venv on the user's comp
         self._make_venv()
@@ -164,11 +160,10 @@ class CNInstall(CNInstallBase):
             self._install(self.S_MSG_CONF_START, conf)
 
         # maybe show we are done
-        if not self._quiet:
-            if not self._dry_run:
+        if not self._arg_quiet:
+            if not self._arg_dry:
                 print()
             print(self.S_MSG_INST_END.format(prog_name))
-            print()
 
         # wind down
         self._teardown()
@@ -190,7 +185,7 @@ class CNInstall(CNInstallBase):
         """
 
         # ----------------------------------------------------------------------
-        # get old info
+        # get new info
 
         try:
             # get project info
@@ -199,13 +194,13 @@ class CNInstall(CNInstallBase):
             # fatal error, print and quit
             # NB: print even if quiet
             print(self.S_ERR_ERR, e)
-            sys.exit(-1)
+            self._teardown(-1)
 
         # ----------------------------------------------------------------------
         # check for reasons to skip question
 
         # don't check for version or new install
-        if self._force:
+        if self._arg_force:
             return
 
         # if we don't find old cfg, must be new install
@@ -223,7 +218,7 @@ class CNInstall(CNInstallBase):
             # fatal error, print and quit
             # NB: print even if quiet
             print(self.S_ERR_ERR, e)
-            sys.exit(-1)
+            self._teardown(-1)
 
         # check versions
         ver_old = dict_cfg_old[self.S_KEY_INST_VER]
@@ -232,15 +227,12 @@ class CNInstall(CNInstallBase):
         # do the compare and get S_VER__OLDER, I_VER_SAME, I_VER_NEWER
         res = self._comp_sem_ver(ver_old, ver_new)
 
-        if self._quiet:
-            print()
-
         # check for error
         if res == self.I_VER_ERROR:
             # fatal error, print and quit
             # NB: print even if quiet
             print(self.S_ERR_VERSION)
-            sys.exit(-1)
+            self._teardown(-1)
 
         # same version is installed
         if res == self.I_VER_SAME:
@@ -256,10 +248,9 @@ class CNInstall(CNInstallBase):
             # user hit enter or typed anything else except "y"
             if str_ask != self.S_ASK_YES:
                 # normal error, print and quit
-                if not self._quiet:
+                if not self._arg_quiet:
                     print(self.S_MSG_ABORT)
-                    print()
-                sys.exit(0)
+                self._teardown()
 
         # newer version is installed
         elif res == self.I_VER_OLDER:
@@ -275,10 +266,9 @@ class CNInstall(CNInstallBase):
             # user hit enter or typed anything else except "y"
             if str_ask != self.S_ASK_YES:
                 # normal error, print and quit
-                if not self._quiet:
+                if not self._arg_quiet:
                     print(self.S_MSG_ABORT)
-                    print()
-                sys.exit(0)
+                self._teardown()
 
     # --------------------------------------------------------------------------
     # Make venv for this program on user's computer
@@ -294,9 +284,7 @@ class CNInstall(CNInstallBase):
         cmd = self.S_CMD_CREATE.format(P_DIR_VENV)
 
         # if it's a dry run, don't make venv
-        if self._dry_run:
-            if self._quiet:
-                print()
+        if self._arg_dry:
             print(self.S_DRY_VENV, cmd)
             print()
             return
@@ -304,21 +292,22 @@ class CNInstall(CNInstallBase):
         # ----------------------------------------------------------------------
 
         # show progress
-        if not self._quiet:
+        if not self._arg_quiet:
             print(self.S_MSG_VENV_START, end="", flush=True)
 
         # the cmd to create the venv
         try:
             subprocess.run(cmd, check=True, shell=True, capture_output=True)
-            if not self._quiet:
+            if not self._arg_quiet:
                 print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            if not self._quiet:
+            if not self._arg_quiet:
                 print(self.S_MSG_FAIL)
             # fatal error, print and quit
             # NB: print even if quiet
+            print()
             print(self.S_ERR_ERR, e)
-            sys.exit(-1)
+            self._teardown(-1)
 
     # --------------------------------------------------------------------------
     # Install requirements.txt
@@ -337,7 +326,7 @@ class CNInstall(CNInstallBase):
         )
 
         # if it's a dry run, don't install
-        if self._dry_run:
+        if self._arg_dry:
             print(self.S_DRY_REQS, cmd)
             print()
             return
@@ -345,21 +334,22 @@ class CNInstall(CNInstallBase):
         # ----------------------------------------------------------------------
 
         # show progress
-        if not self._quiet:
+        if not self._arg_quiet:
             print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
         try:
             subprocess.run(cmd, check=True, shell=True, capture_output=True)
-            if not self._quiet:
+            if not self._arg_quiet:
                 print(self.S_MSG_DONE)
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            if not self._quiet:
+            if not self._arg_quiet:
                 print(self.S_MSG_FAIL)
             # fatal error, print and quit
             # NB: print even if quiet
+            print()
             print(self.S_ERR_ERR, e)
-            sys.exit(-1)
+            self._teardown(-1)
 
     # --------------------------------------------------------------------------
     # Fix .desktop file, for paths and such
@@ -387,20 +377,20 @@ class CNInstall(CNInstallBase):
             or not P_FILE_DESK_ICON
             or not P_FILE_DESK_ICON.exists()
         ):
-            if not self._quiet:
-                print(self.S_ERR_NO_DESK)
+            print(self.S_ERR_NO_DESK)
+            print()
             return
 
         # don't mess with file
-        if self._dry_run:
-            print(self.S_DRY_DESK_ICON.format(P_FILE_DESK_ICON))
+        if self._arg_dry:
+            print(self.S_DRY_DESK_ICON, P_FILE_DESK_ICON)
             print()
             return
 
         # ----------------------------------------------------------------------
 
         # print info
-        if not self._quiet:
+        if not self._arg_quiet:
             print(self.S_MSG_DSK_START, end="", flush=True)
 
         # open file
@@ -424,7 +414,7 @@ class CNInstall(CNInstallBase):
                 a_file.write(text)
 
         # show some info
-        if not self._quiet:
+        if not self._arg_quiet:
             print(self.S_MSG_DONE)
 
     # --------------------------------------------------------------------------
@@ -439,7 +429,7 @@ class CNInstall(CNInstallBase):
         """
 
         # show some info
-        if not self._quiet and not self._dry_run:
+        if not self._arg_quiet and not self._arg_dry:
             print(msg, flush=True, end="")
 
         # for each key, value
@@ -455,7 +445,7 @@ class CNInstall(CNInstallBase):
                 continue
 
             # check for dry run
-            if self._dry_run:
+            if self._arg_dry:
                 print(self.S_DRY_COPY.format(src, dst))
                 print()
             else:
@@ -467,7 +457,7 @@ class CNInstall(CNInstallBase):
                     shutil.copy(src, dst)
 
         # show some info
-        if not self._quiet and not self._dry_run:
+        if not self._arg_quiet and not self._arg_dry:
             print(self.S_MSG_DONE)
 
 

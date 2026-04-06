@@ -28,6 +28,7 @@ import locale
 from pathlib import Path
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 
@@ -99,6 +100,9 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # strings
 
+    # NB: used for logger
+    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+
     # short description
     # pylint: disable=line-too-long
     # NB: need to keep on one line for replacement
@@ -155,10 +159,6 @@ class CNInstallBase:
     S_KEY_UNINST_CONT = "UNINST_CONT"
     S_KEY_CFG_CONT = "CFG_CONT"
 
-    # ------------------------------------------------------------------------------
-    # Constants
-    # ------------------------------------------------------------------------------
-
     # --------------------------------------------------------------------------
     # for json
 
@@ -167,6 +167,9 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # questions
 
+    # I18N: dialog fmt (params are question and buttons)
+    S_ASK_FMT = _("{} [{}]: ")
+    S_ASK_BTN_SEP = "/"
     S_ASK_VER_SAME = _(
         # I18N: ask to overwrite same version
         "The current version of this program is already installed.\nDo you "
@@ -196,14 +199,16 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # dry run messages
 
-    S_DRY_VENV = "venv cmd:"
-    S_DRY_REQS = "reqs cmd:"
+    S_DRY_VENV = "venv cmd:\n"
+    S_DRY_REQS = "reqs cmd:\n"
     # NB: format params are source and destination file/dir
     S_DRY_COPY = "copy:\n{}\nto\n{}"
     # NB: format param is path to icon
-    S_DRY_DESK_ICON = "set desktop icon: {}"
+    S_DRY_DESK_ICON = "set desktop icon:\n"
     # NB: format param is file or dir path
-    S_DRY_REMOVE = "remove:\n{}"
+    S_DRY_REMOVE = "remove:\n"
+    # NB: format param is ext file
+    S_DRY_EXT = "external:\n"
 
     # --------------------------------------------------------------------------
     # error messages
@@ -212,10 +217,10 @@ class CNInstallBase:
     S_ERR_ERR = _("Error:")
     # NB: format param is file path
     # I18N: config file not found
-    S_ERR_NOT_FOUND = _("File {} not found")
+    S_ERR_NOT_FOUND = _("File not found:")
     # NB: format param is file path
     # I18N: config file is not valid json
-    S_ERR_NOT_JSON = _("File {} is not a JSON file")
+    S_ERR_NOT_JSON = _("File is not a JSON file:")
     # I18N: version numbers invalid
     S_ERR_VERSION = _("One or both version numbers are invalid")
     # NB: format param is source path
@@ -245,7 +250,7 @@ class CNInstallBase:
     S_MSG_INST_START = _("Installing {} Version {}")
     # I18N: show the copy file step
     S_MSG_COPY_START = _("Copying files... ")
-    # I18N: show the copy configstep
+    # I18N: show the copy config step
     S_MSG_CONF_START = _("Copying config... ")
     # I18N: show the venv step
     S_MSG_VENV_START = _("Making venv folder... ")
@@ -253,14 +258,17 @@ class CNInstallBase:
     S_MSG_REQS_START = _("Installing requirements... ")
     # I18N: show desktop step
     S_MSG_DSK_START = _("Fixing .desktop file... ")
+    # NB: format param is __PP_NAME_PRJ_SMALL__
     # I18N: done installing
     S_MSG_INST_END = _("{} installed")
 
     # NB: format param is prog_name
     # I18N: uninstall the program
     S_MSG_UNINST_START = _("Uninstalling {}")
-    # I18N: stsrt deleting old files
-    S_MSG_DEL_START = _("Deleting old files... ")
+    # I18N: start deleting old program
+    S_MSG_DEL_PRG_START = _("Deleting old program files... ")
+    # I18N: start deleting old config
+    S_MSG_DEL_CFG_START = _("Deleting old configuration... ")
     # NB: format param is prog_name
     # I18N: done uninstalling
     S_MSG_UNINST_END = _("{} uninstalled")
@@ -313,21 +321,19 @@ class CNInstallBase:
         new object.
         """
 
-        # set defaults
+        # set arg defaults
+        self._dict_args = {}
+        self._arg_dry = False
+        self._arg_force = False
+        self._arg_quiet = False
+
+        # contents of install.json
+        self._dict_cfg = {}
 
         # cmd line stuff
         self._parser = argparse.ArgumentParser(
-            formatter_class=CNFormatter, add_help=False
+            formatter_class=CNFormatter, add_help=False, prog=self.S_APP_NAME
         )
-
-        # set arg defaults
-        self._dict_args = {}
-        self._dry_run = False
-        self._force = False
-        self._quiet = False
-
-        # cfg stuff
-        self._dict_cfg = {}
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -383,17 +389,16 @@ class CNInstallBase:
 
         # ----------------------------------------------------------------------
         # use cmd line
+        args = None
         try:
+            # NB: will always print usage and "unrecognized arg" msg
             args = self._parser.parse_args()
         except SystemExit:
 
-            # print usage and arg info and exit
+            # print "use -h" and bail
             print()
-            print(self.S_ABOUT)
-            print()
-            self._parser.print_help()
-            print()
-            sys.exit(0)
+            print(self.S_ABOUT_HELP)
+            self._teardown(-1)
 
         # convert namespace to dict
         self._dict_args = vars(args)
@@ -409,29 +414,38 @@ class CNInstallBase:
             print(self.S_ABOUT)
             print()
             self._parser.print_help()
-            print()
-            sys.exit(0)
+            self._teardown()
 
         # ----------------------------------------------------------------------
         # set props from args
 
         # get the args
-        self._dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, self._dry_run)
-        self._force = self._dict_args.get(self.S_ARG_FORCE_DEST, self._force)
-        self._quiet = self._dict_args.get(self.S_ARG_QUIET_DEST, self._quiet)
+        self._arg_dry = self._dict_args.get(self.S_ARG_DRY_DEST, self._arg_dry)
+        self._arg_force = self._dict_args.get(
+            self.S_ARG_FORCE_DEST, self._arg_force
+        )
+        self._arg_quiet = self._dict_args.get(
+            self.S_ARG_QUIET_DEST, self._arg_quiet
+        )
 
         # print default about text
-        if not self._quiet:
+        if not self._arg_quiet:
             print()
             print(self.S_ABOUT)
             print()
             print(self.S_ABOUT_HELP)
+
+        # ready to go
+        # NB: not sure how do do this the other way around
+        if self._arg_dry or (self._arg_force and self._arg_quiet):
+            pass
+        else:
             print()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self):
+    def _teardown(self, errcode: int=0):
         """
         Boilerplate to use at the end of main
 
@@ -439,7 +453,11 @@ class CNInstallBase:
         """
 
         # ----------------------------------------------------------------------
-        # this method intentionally left blank (virtual method)
+        # call this at the end of subclass teardown
+
+        if not self._arg_quiet:
+            print()
+        sys.exit(errcode)
 
     # --------------------------------------------------------------------------
     # Get a dict from a file
@@ -471,11 +489,11 @@ class CNInstallBase:
 
         # file not found
         except FileNotFoundError as e:
-            raise OSError(self.S_ERR_NOT_FOUND.format(a_file)) from e
+            raise OSError(self.S_ERR_NOT_FOUND, a_file) from e
 
         # not valid json in file
         except json.JSONDecodeError as e:
-            raise OSError(self.S_ERR_NOT_JSON.format(a_file)) from e
+            raise OSError(self.S_ERR_NOT_JSON, a_file) from e
 
         # return result
         return a_dict
@@ -489,8 +507,8 @@ class CNInstallBase:
         buttons,
         default="",
         loop=False,
-        btn_sep="/",
-        msg_fmt="{} [{}]: ",
+        btn_sep=S_ASK_BTN_SEP,
+        msg_fmt=S_ASK_FMT,
     ):
         """
         Create a dialog-like question and return the result
@@ -565,25 +583,30 @@ class CNInstallBase:
         """
 
         # if it's a dry run, don't do anything
-        dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
-        if dry_run:
-            print(self.S_MSG_DONE)
+        # dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
+        if self._arg_dry:
+            print(self.S_DRY_EXT, cmd)
+            print()
             return
+
+        if not self._arg_quiet:
+            print(self.S_MSG_RUN_EXT, cmd, flush=True, end="")
 
         # run the external command
         try:
-            # NB: hide output
+            # NB: maybe hide output
             cmd_list = shlex.split(cmd)
             subprocess.run(cmd_list, check=True, capture_output=hide)
-            print(self.S_MSG_DONE)
-
-        except FileNotFoundError as e:
-            print(self.S_MSG_FAIL)
+            if not self._arg_quiet:
+                print(self.S_MSG_DONE)
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            if not self._arg_quiet:
+                print(self.S_MSG_FAIL)
+            # fatal error, print and quit
+            # NB: print even if quiet
+            print()
             print(self.S_ERR_ERR, e)
-
-        except subprocess.CalledProcessError as e:
-            print(self.S_MSG_FAIL)
-            print(self.S_ERR_ERR, e.stderr)
+            self._teardown(-1)
 
     # --------------------------------------------------------------------------
     # Compare two semantic versions
@@ -714,6 +737,56 @@ class CNInstallBase:
 
         # error in one or both versions
         return self.I_VER_ERROR
+
+    # --------------------------------------------------------------------------
+    # Uninstall the program, but not the config stuff
+    # --------------------------------------------------------------------------
+    def _uninstall_cont(self, quiet: bool):
+        """
+        Uninstall the contents (but not config) of program
+
+        Runs the uninstall operation.
+        """
+
+        # show some progress
+        if not quiet and not self._arg_dry:
+            print(self.S_MSG_DEL_PRG_START, flush=True, end="")
+
+        # content list from dict
+        content = self._dict_cfg.get(self.S_KEY_UNINST_CONT, [])
+
+        # for each key, value
+        for item in content:
+
+            # get full path of destination
+            src = Path.home() / item
+
+            # debug may omit certain assets
+            if not src.exists():
+                continue
+
+            # if it's a dry run, don't do anything
+            if self._arg_dry:
+                print(self.S_DRY_REMOVE, item)
+                continue
+
+            # if the source is a dir
+            if src.is_dir():
+                # remove dir
+                shutil.rmtree(src)
+
+            # if the source is a file
+            else:
+                # copy file
+                src.unlink()
+
+        # show some info
+        if not quiet and not self._arg_dry:
+            print(self.S_MSG_DONE)
+
+        # for make pretty
+        if self._arg_dry:
+            print()
 
 
 # ------------------------------------------------------------------------------
