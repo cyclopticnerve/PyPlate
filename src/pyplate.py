@@ -387,6 +387,17 @@ class PyPlate:
         # print last blank
         print()
 
+        # use exit code
+        sys.exit(errcode)
+
+    # --------------------------------------------------------------------------
+    # Save pyplate folder
+    # --------------------------------------------------------------------------
+    def _save_config(self):
+        """
+        Save pyplate folder
+        """
+
         # ----------------------------------------------------------------------
         # save private
 
@@ -407,9 +418,6 @@ class PyPlate:
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
 
-
-        # use exit code
-        sys.exit(errcode)
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op

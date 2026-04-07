@@ -174,6 +174,7 @@ class PyBaker(PyPlate):
         # teardown
 
         # call boilerplate code
+        self._save_config()
         self._teardown()
 
         print()

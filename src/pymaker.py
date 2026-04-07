@@ -127,6 +127,7 @@ class PyMaker(PyPlate):
         # teardown
 
         # call boilerplate code
+        self._save_config()
         self._teardown()
 
     # --------------------------------------------------------------------------

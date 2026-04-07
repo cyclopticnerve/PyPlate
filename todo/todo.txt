@@ -1,4 +1,6 @@
 
+
+TODO: move conf dir to .config
 TODO: propagate installer changes to projects
 TODO: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
