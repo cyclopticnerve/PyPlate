@@ -312,11 +312,10 @@ distribution from a PyPlate project.</p>
         # teardown
 
         # call boilerplate code
+        self._save_config()
         self._teardown()
 
-        print()
-
-        # just to verify we are in the right project
+        # done with project
         print(self.S_MSG_DONE.format(self._dir_prj.name))
         print()
 
@@ -773,11 +772,10 @@ program, and performing its steps.</p>
     # teardown
 
     # call boilerplate code
+    self._save_config()
     self._teardown()
 
-    print()
-
-    # just to verify we are in the right project
+    # done with project
     print(self.S_MSG_DONE.format(self._dir_prj.name))
     print()</code></pre>
             </details>

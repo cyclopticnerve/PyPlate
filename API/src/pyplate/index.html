@@ -495,6 +495,17 @@ PyBaker.</p>
         # print last blank
         print()
 
+        # use exit code
+        sys.exit(errcode)
+
+    # --------------------------------------------------------------------------
+    # Save pyplate folder
+    # --------------------------------------------------------------------------
+    def _save_config(self):
+        """
+        Save pyplate folder
+        """
+
         # ----------------------------------------------------------------------
         # save private
 
@@ -515,9 +526,6 @@ PyBaker.</p>
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
 
-
-        # use exit code
-        sys.exit(errcode)
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
@@ -612,7 +620,7 @@ PyBaker.</p>
 
             # handle dirs in skip_all
             if root in skip_all:
-                # NB: don't recurse into subfolders
+                # NB: don't recurse into sub folders
                 root_dirs.clear()
                 continue
 
