@@ -110,7 +110,7 @@ class CNInstallBase:
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 1.1.0"
+    S_PP_VERSION = "Version 1.1.1"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"

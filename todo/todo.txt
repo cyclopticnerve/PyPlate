@@ -1,5 +1,5 @@
 
-
+TODO: split conf into strings.py and hooks.py
 TODO: move conf dir to .config
 TODO: propagate installer changes to projects
 TODO: truth table of when to print for -d/-f/-q
@@ -7,7 +7,6 @@ for fresh inst/inst/uninst
 
 NEXT: reduce calls to format if can be concatenated
 NEXT: check for internet before install - if not, no delete old
-NEXT: split conf into strings.py and hooks.py
 NEXT: add switches to MUD/C in D_TYPE_RULES
 NEXT: no commented code in base - should never need to be touched
       use _add_cmd_debug, _add_cmd_uninstall in base/child
@@ -69,7 +68,6 @@ make dist (list of prj stuff into assets folder, install and README.md alongside
 
 NEXT: pybaker not rely so much on regex, more on context start/end
 NEXT: check for version number? needs to be stored on user's comp somewhere
-------------------------------------------------------------------------------
 
 NEXT: pull in a fresh copy of libs on every run and put it in dist
 we need to get the location of PyPlate from settings (src)

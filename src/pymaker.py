@@ -78,6 +78,9 @@ class PyMaker(PyPlate):
     # make msg
     # NB: param is name of project folder
     S_MSG_MAKE = _("Making {}")
+    # NB: param is name of project folder
+    # I18N: done baking
+    S_MSG_DONE = _("Done making {}")
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -121,14 +124,16 @@ class PyMaker(PyPlate):
         # do extra stuff to final dir after fix
         self._do_after_fix()
 
-        print()
-
         # ----------------------------------------------------------------------
         # teardown
 
         # call boilerplate code
         self._save_config()
         self._teardown()
+
+        # done with project
+        print(self.S_MSG_DONE.format(self._dir_prj.name))
+        print()
 
     # --------------------------------------------------------------------------
     # Private methods

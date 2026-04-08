@@ -177,9 +177,7 @@ class PyBaker(PyPlate):
         self._save_config()
         self._teardown()
 
-        print()
-
-        # just to verify we are in the right project
+        # done with project
         print(self.S_MSG_DONE.format(self._dir_prj.name))
         print()
 

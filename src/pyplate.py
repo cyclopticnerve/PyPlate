@@ -512,7 +512,7 @@ class PyPlate:
 
             # handle dirs in skip_all
             if root in skip_all:
-                # NB: don't recurse into subfolders
+                # NB: don't recurse into sub folders
                 root_dirs.clear()
                 continue
 
