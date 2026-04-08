@@ -308,16 +308,16 @@ distribution from a PyPlate project.</p>
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_after_dist()
 
+        # done with project
+        print(self.S_MSG_DONE.format(self._dir_prj.name))
+        print()
+
         # ----------------------------------------------------------------------
         # teardown
 
         # call boilerplate code
         self._save_config()
         self._teardown()
-
-        # done with project
-        print(self.S_MSG_DONE.format(self._dir_prj.name))
-        print()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -443,9 +443,6 @@ distribution from a PyPlate project.</p>
         # print some info
         print()
         print(self.S_MSG_BAKE.format(self._dir_prj.name))
-
-        # blank line before printing progress
-        print()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist
@@ -768,16 +765,16 @@ program, and performing its steps.</p>
     # do any fixing up of dicts (like meta keywords, etc)
     self._do_after_dist()
 
+    # done with project
+    print(self.S_MSG_DONE.format(self._dir_prj.name))
+    print()
+
     # ----------------------------------------------------------------------
     # teardown
 
     # call boilerplate code
     self._save_config()
-    self._teardown()
-
-    # done with project
-    print(self.S_MSG_DONE.format(self._dir_prj.name))
-    print()</code></pre>
+    self._teardown()</code></pre>
             </details>
     </div>
 
