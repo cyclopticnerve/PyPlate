@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.1\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-04-08 05:41-0400\n"
+"POT-Creation-Date: 2026-04-08 17:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,13 +63,13 @@ msgstr ""
 
 #. I18N: help option help
 #: install/install_base.py:141
-#: src/pyplate.py:129
+#: src/pyplate.py:131
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
 #: install/install_base.py:152
-#: src/pyplate.py:142
+#: src/pyplate.py:144
 msgid "Use -h for help"
 msgstr ""
 
@@ -94,7 +94,7 @@ msgstr ""
 
 #. I18N: ask to uninstall
 #: install/install_base.py:185
-#: src/pyplate.py:156
+#: src/pyplate.py:158
 msgid ""
 "This will uninstall {}.\n"
 "Do you want to continue?"
@@ -112,7 +112,7 @@ msgstr ""
 
 #. I18N: an error occurred
 #: install/install_base.py:217
-#: src/pyplate.py:168
+#: src/pyplate.py:170
 msgid "Error:"
 msgstr ""
 
@@ -148,7 +148,7 @@ msgstr ""
 
 #. I18N: process aborted
 #: install/install_base.py:243
-#: src/pyplate.py:162
+#: src/pyplate.py:164
 msgid "Aborted"
 msgstr ""
 
@@ -228,76 +228,74 @@ msgstr ""
 msgid "VERSION"
 msgstr ""
 
-#: src/pybaker.py:96
+#: src/pybaker.py:95
 msgid "Run this program from the directory of the project you want to build."
 msgstr ""
 
 #. I18N: language already exists in project.json and i18n folder
-#: src/pybaker.py:102
+#: src/pybaker.py:101
 msgid "Language file {} already exists"
 msgstr ""
 
-#: src/pybaker.py:103
+#: src/pybaker.py:102
 msgid "Could not get language code from {}"
 msgstr ""
 
 #. I18N: prep for baking
-#: src/pybaker.py:110
+#: src/pybaker.py:109
 msgid "Preparing to bake {}"
 msgstr ""
 
 #. I18N: start baking
-#: src/pybaker.py:113
+#: src/pybaker.py:112
 msgid "Baking {}"
 msgstr ""
 
 #. I18N: done baking
-#: src/pybaker.py:116
+#: src/pybaker.py:115
 msgid "Done baking {}"
 msgstr ""
 
 #. I18N: add language at cmd line
-#: src/pybaker.py:119
+#: src/pybaker.py:118
 msgid "Adding language file {}..."
 msgstr ""
 
 #. I18N: ask to overwrite
 #. NB: format param is file name
-#: src/pybaker.py:125
+#: src/pybaker.py:124
 msgid "The file {} already exists. Do you want to overwrite it?"
 msgstr ""
 
-#: src/pymaker.py:71
-msgid ""
-"\n"
-"Run this program from the directory where you want to create a project."
+#: src/pymaker.py:70
+msgid "Run this program from the directory where you want to create a project."
 msgstr ""
 
-#: src/pymaker.py:80
+#: src/pymaker.py:78
 msgid "Making {}"
 msgstr ""
 
 #. I18N: done baking
-#: src/pymaker.py:83
+#: src/pymaker.py:81
 msgid "Done making {}"
 msgstr ""
 
 #. I18N: debug mode help
-#: src/pyplate.py:122
+#: src/pyplate.py:124
 msgid "enable debugging mode"
 msgstr ""
 
 #. I18N: uninstall option help
-#: src/pyplate.py:136
+#: src/pyplate.py:138
 msgid "uninstall this program"
 msgstr ""
 
 #. I18N: uninstall not found
-#: src/pyplate.py:170
+#: src/pyplate.py:172
 msgid "Uninstall files not found"
 msgstr ""
 
 #. I18N: could not find -c file
-#: src/pyplate.py:173
+#: src/pyplate.py:175
 msgid "Config file {} not found"
 msgstr ""
