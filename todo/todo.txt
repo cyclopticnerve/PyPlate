@@ -302,6 +302,8 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: version not updated in S_ABOUT after bake
+DONE: S_ABOUT printed twice when -h
 DONE: prog_name=??? in parser in pp/template/spod/spod_gui
 DONE: pp needs teardown arg (all sys.exit)
 DONE: cli base needs teardown arg (all sys.exit)
