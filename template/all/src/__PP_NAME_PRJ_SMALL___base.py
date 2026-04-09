@@ -309,7 +309,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
             print(self.S_ABOUT)
             print()
             self._parser.print_help()
-            self._teardown()
+            self._teardown(-1)
 
         # convert namespace to dict
         self._dict_args = vars(args)
