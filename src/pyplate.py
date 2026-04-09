@@ -100,8 +100,10 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # strings
 
+    # pyplate: replace=True
+
     # NB: used for parser/logger
-    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+    S_APP_NAME = "pyplate"
 
     # short description
     # pylint: disable=line-too-long
@@ -110,7 +112,7 @@ class PyPlate:
     # pylint: enable=line-too-long
 
     # version string
-    S_PP_VERSION = "Version 1.0.8"
+    S_PP_VERSION = "Version 1.1.1"
 
     # pyplate: replace=False
 
@@ -310,24 +312,18 @@ class PyPlate:
         )
 
         # run the parser
-        args = {}
+        args = None
         try:
             args = self._parser.parse_args()
         except SystemExit:
 
             # print usage and arg info and exit
             print()
-            print(self.S_ABOUT)
-            print()
-            self._parser.print_help()
-            self._teardown()
+            print(self.S_ABOUT_HELP)
+            self._teardown(-1)
 
         # convert namespace to dict
         self._dict_args = vars(args)
-
-        # print default about text
-        print(self.S_ABOUT)
-        print(self.S_EPILOG)
 
         # ----------------------------------------------------------------------
         # check for one-shot args
@@ -339,14 +335,8 @@ class PyPlate:
             print()
             print(self.S_ABOUT)
             print()
-
-            # print usage and arg info and exit
             self._parser.print_help()
             self._teardown()
-
-        # no -h, print epilog
-        print(self.S_ABOUT_HELP)
-        print()
 
         # ----------------------------------------------------------------------
         # check for -d (debug)
@@ -366,6 +356,19 @@ class PyPlate:
             # uninstall and exit
             self._do_uninstall()
             # NB: exit is handled by _do_uninstall
+
+
+        # ----------------------------------------------------------------------
+        # no more args to handle
+
+        # print default about text
+        print()
+        print(self.S_ABOUT)
+        print()
+        print(self.S_EPILOG)
+        print()
+        print(self.S_ABOUT_HELP)
+        print()
 
         # maybe yell
         if self._arg_debug:
