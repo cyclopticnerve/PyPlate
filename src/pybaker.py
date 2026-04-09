@@ -84,15 +84,14 @@ class PyBaker(PyPlate):
 
     # about string
     S_ABOUT = (
-        "\n"
         f"{'PyPlate/PyBaker'}\n"
         f"{PyPlate.S_PP_SHORT_DESC}\n"
         f"{PyPlate.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
-    # I18N cmd line instructions string
-    S_EPILOG = "\n" + _(
+    # I18N: cmd line instructions string
+    S_EPILOG = _(
         "Run this program from the directory of the project you want to build."
     )
 
@@ -170,16 +169,16 @@ class PyBaker(PyPlate):
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_after_dist()
 
+        # done with project
+        print()
+        print(self.S_MSG_DONE.format(self._dir_prj.name))
+
         # ----------------------------------------------------------------------
         # teardown
 
         # call boilerplate code
         self._save_config()
         self._teardown()
-
-        # done with project
-        print(self.S_MSG_DONE.format(self._dir_prj.name))
-        print()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -305,9 +304,6 @@ class PyBaker(PyPlate):
         # print some info
         print()
         print(self.S_MSG_BAKE.format(self._dir_prj.name))
-
-        # blank line before printing progress
-        print()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist

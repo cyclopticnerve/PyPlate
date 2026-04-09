@@ -59,16 +59,14 @@ class PyMaker(PyPlate):
 
     # about string
     S_ABOUT = (
-        "\n"
         f"{'PyPlate/PyMaker'}\n"
         f"{PyPlate.S_PP_SHORT_DESC}\n"
         f"{PyPlate.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
-    # I18N cmd line instructions string
+    # I18N: cmd line instructions string
     S_EPILOG = _(
-        "\n"
         "Run this program from the directory where you want to create "
         "a project."
     )
@@ -124,16 +122,16 @@ class PyMaker(PyPlate):
         # do extra stuff to final dir after fix
         self._do_after_fix()
 
+        # done with project
+        print()
+        print(self.S_MSG_DONE.format(self._dir_prj.name))
+
         # ----------------------------------------------------------------------
         # teardown
 
         # call boilerplate code
         self._save_config()
         self._teardown()
-
-        # done with project
-        print(self.S_MSG_DONE.format(self._dir_prj.name))
-        print()
 
     # --------------------------------------------------------------------------
     # Private methods
@@ -394,9 +392,6 @@ class PyMaker(PyPlate):
         # print some info
         print()
         print(self.S_MSG_MAKE.format(name_prj_big))
-
-        # blank line before printing progress
-        print()
 
     # --------------------------------------------------------------------------
     # Do any work before template copy
