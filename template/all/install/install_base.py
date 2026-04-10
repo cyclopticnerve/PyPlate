@@ -195,6 +195,8 @@ class CNInstallBase:
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    # NB: format param is pre/post script path
+    S_CMD_EXTERNAL = "python {}"
 
     # --------------------------------------------------------------------------
     # dry run messages
@@ -583,7 +585,6 @@ class CNInstallBase:
         """
 
         # if it's a dry run, don't do anything
-        # dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
         if self._arg_dry:
             print(self.S_DRY_EXT, cmd)
             print()

@@ -1,8 +1,10 @@
 
-TODO: split conf into strings.py and hooks.py
-TODO: move conf dir to .config
-TODO: propagate installer changes to projects
-TODO: truth table of when to print for -d/-f/-q
+TODO: install finds scripts with fixed names so NO coding in install files
+
+NEXT: split conf into strings.py and hooks.py
+NEXT: move conf dir to .config
+NEXT: propagate installer changes to projects
+NEXT: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
 
 NEXT: reduce calls to format if can be concatenated

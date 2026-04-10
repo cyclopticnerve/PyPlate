@@ -220,8 +220,8 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # args and arg props
         self._dict_args = {}
-        self._arg_debug = False
         self._arg_cfg = None
+        self._arg_debug = False
 
         # cfg stuff
         self._dict_cfg = {}
