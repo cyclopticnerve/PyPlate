@@ -1,4 +1,6 @@
 
+FIXME: how to test below without -i (need to build)
+
 TODO: install finds scripts with fixed names so NO coding in install files
 
 NEXT: split conf into strings.py and hooks.py
