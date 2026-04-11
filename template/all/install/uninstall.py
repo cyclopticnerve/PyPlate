@@ -40,9 +40,8 @@ P_DIR_INSTALL = P_DIR_PARENT / "__PP_DIR_INSTALL__"
 P_FILE_CFG_OLD = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
 # get pre/post files
-# NB: uncomment these and pybaker will replace them
-# P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
-# P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -114,6 +113,9 @@ class CNUninstall(CNInstallBase):
         # get prj info from cfg
         self._get_project_info()
 
+        # call external
+        self._do_external(P_FILE_PRE)
+
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
 
@@ -133,6 +135,9 @@ class CNUninstall(CNInstallBase):
             if not self._arg_dry:
                 print()
             print(self.S_MSG_UNINST_END.format(prog_name))
+
+        # call external
+        self._do_external(P_FILE_POST)
 
         # wind down
         self._teardown()
