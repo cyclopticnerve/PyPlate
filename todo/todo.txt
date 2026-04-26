@@ -1,7 +1,14 @@
 
-FIXME: how to test below without -i (need to build)
+TODO: test all cmd line opts
+TODO: fix all printing
 
-TODO: install finds scripts with fixed names so NO coding in install files
+NEXT: no post_uninstall, folder already deleted
+
+NEXT: printing pre/post is still ugly
+need to know if script had output to dtermine ellipsis/newline
+NEXT: put pre/post as keys in json (array?)
+NEXT: make sure no edit needed in base/inst/uninst
+scripts and json only
 
 NEXT: split conf into strings.py and hooks.py
 NEXT: move conf dir to .config
@@ -9,6 +16,7 @@ NEXT: propagate installer changes to projects
 NEXT: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
 
+NEXT: make log files read-only (chmod 444)
 NEXT: reduce calls to format if can be concatenated
 NEXT: check for internet before install - if not, no delete old
 NEXT: add switches to MUD/C in D_TYPE_RULES
@@ -306,6 +314,11 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: move template pre/post to misc
+DONE: print "running pre-flight"/"post-flight" instead of path
+unless dry, then print path
+DONE: install finds scripts with fixed names so NO coding in install files
+DONE: move pre/post scripts to "scripts" folder under "install"
 DONE: version not updated in S_ABOUT after bake
 DONE: S_ABOUT printed twice when -h
 DONE: prog_name=??? in parser in pp/template/spod/spod_gui

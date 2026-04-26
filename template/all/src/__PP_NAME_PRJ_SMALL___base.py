@@ -382,9 +382,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
         Perform some mundane stuff like saving config files.
         """
 
-        # print last blank
-        print()
-
         # ----------------------------------------------------------------------
         # use cfg
 

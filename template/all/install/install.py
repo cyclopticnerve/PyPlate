@@ -57,8 +57,8 @@ P_FILE_CFG_OLD = (
 )
 
 # get pre/post files
-P_FILE_PRE = P_DIR_INSTALL / "__PP_INST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_INST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_INST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_INST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports

@@ -40,8 +40,8 @@ P_DIR_INSTALL = P_DIR_PARENT / "__PP_DIR_INSTALL__"
 P_FILE_CFG_OLD = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
 # get pre/post files
-P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports

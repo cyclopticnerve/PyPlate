@@ -376,6 +376,7 @@ S_DIR_DESKTOP = "desktop"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
+S_DIR_SCRIPTS = "scripts"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -918,6 +919,7 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # install stuff
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    "__PP_DIR_SCRIPTS__": S_DIR_SCRIPTS,
     "__PP_FILE_INST_CFG__": S_FILE_INST_CFG,
     "__PP_INST_PRE__": S_FILE_INST_PRE,
     "__PP_INST_POST__": S_FILE_INST_POST,
