@@ -29,7 +29,6 @@ NEXT: ask before install new like same/older
 NEXT: script to make changelog from todos/next/done
 NEXT: add keys.py file to template?
 NEXT: move tree files into trees folder
-NEXT: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 NEXT: split conf into separate files
 NEXT: move dialogs.ui pot/po to separate file
 NEXT: split load/save out of gui app
@@ -314,6 +313,7 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 DONE: move template pre/post to misc
 DONE: print "running pre-flight"/"post-flight" instead of path
 unless dry, then print path
