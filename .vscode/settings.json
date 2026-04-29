@@ -12,6 +12,21 @@
             "envManager": "ms-python.python:venv",
             "packageManager": "ms-python.python:pip"
         }
+    ],
+    "cSpell.words": [
+        "cnmkdocs",
+        "cnpot",
+        "cntree",
+        "cnvenv",
+        "Dialup",
+        "Geoscience",
+        "gztar",
+        "noexts",
+        "potpy",
+        "PYPRJ",
+        "subfolders",
+        "undunderized",
+        "WLANG"
     ]
 }
 // -)
