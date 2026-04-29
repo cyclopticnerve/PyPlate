@@ -106,10 +106,7 @@ class PyPlate:
     S_APP_NAME = "pyplate"
 
     # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
-    # pylint: enable=line-too-long
+    S_PP_SHORT_DESC = ""
 
     # version string
     S_PP_VERSION = "Version 1.1.1"
