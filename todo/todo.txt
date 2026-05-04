@@ -4,6 +4,7 @@ TODO: fix all printing
 
 NEXT: no post_uninstall, folder already deleted
 
+NEXT: do something with build date (__PP_DATE__)
 NEXT: printing pre/post is still ugly
 need to know if script had output to dtermine ellipsis/newline
 NEXT: put pre/post as keys in json (array?)
