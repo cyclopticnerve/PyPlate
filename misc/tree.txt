@@ -94,6 +94,11 @@
    │     │     │     │     ├─ [] project.txt
    │     │     │     │     └─ [] style.txt
    │     │     │     ├─ [] default_files/
+   │     │     │     │     ├─ [] install/
+   │     │     │     │     │     ├─ [] post_install.py
+   │     │     │     │     │     ├─ [] post_uninstall.py
+   │     │     │     │     │     ├─ [] pre_install.py
+   │     │     │     │     │     └─ [] pre_uninstall.py
    │     │     │     │     ├─ [] class.py
    │     │     │     │     ├─ [] default.html
    │     │     │     │     ├─ [] default.md
