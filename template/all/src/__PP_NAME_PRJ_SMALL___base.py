@@ -120,10 +120,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = ""
-    # pylint: enable=line-too-long
+    S_PP_SHORT_DESC = _("")
 
     # version string
     S_PP_VERSION = ""
@@ -381,9 +378,6 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         Perform some mundane stuff like saving config files.
         """
-
-        # print last blank
-        print()
 
         # ----------------------------------------------------------------------
         # use cfg

@@ -376,6 +376,7 @@ S_DIR_DESKTOP = "desktop"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
+S_DIR_SCRIPTS = "scripts"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -533,11 +534,11 @@ S_TOML_DESC_REP = r'\g<1>\g<2>\g<3>"{}"'
 S_TOML_KW_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 S_TOML_KW_REP = r"\g<1>\g<2>\g<3>[{}]"
 
-# desc/version in all files
-S_SRC_DESC_SCH = r"(^\s*S_PP_SHORT_DESC\s*=\s*)(_\()*(.*?)(\n|\))"
-S_SRC_DESC_REP = r'\g<1>\g<2>"{}"\g<4>'
-S_SRC_VER_SCH = r"(^\s*S_PP_VERSION\s*=\s*)(.*)"
-S_SRC_VER_REP = r'\g<1>"{}"'
+# short desc/version in all files
+S_SRC_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=.*?\")(.*?)(\")"
+S_SRC_DESC_REP = r"\g<1>{}\g<3>"
+S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=.*?\")(.*?)(\")"
+S_SRC_VER_REP = r"\g<1>{}\g<3>"
 
 # make sure ver num entered in pybaker is valid
 S_SEM_VER_VALID = (
@@ -918,6 +919,7 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # install stuff
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    "__PP_DIR_SCRIPTS__": S_DIR_SCRIPTS,
     "__PP_FILE_INST_CFG__": S_FILE_INST_CFG,
     "__PP_INST_PRE__": S_FILE_INST_PRE,
     "__PP_INST_POST__": S_FILE_INST_POST,
@@ -1597,7 +1599,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # --------------------------------------------------------------------------
     # folders
 
-    # path to the program's install dir (/home/user/.local/sahre/app_name)
+    # path to the program's install dir (/home/user/.local/share/app_name)
     usr_inst = f"{S_USR_SHARE}/{name_prj_small}"
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
@@ -2275,6 +2277,7 @@ def _fix_meta(path, dict_prv, dict_pub):
     if path.name == S_FILE_MKDOCS_YML:
         _fix_mkdocs(path, dict_prv_prj, dict_pub)
 
+
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
@@ -2376,9 +2379,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     # convert long ver to mmr
     str_pattern = S_SEM_VER_VALID
     str_rep = dict_prv_prj["__PP_VER_MMR__"]
-    res = re.search(str_pattern, str_rep)
-    if res:
-        str_rep = re.sub(str_pattern, S_SEM_VER_PYPRJ, str_rep)
+    str_rep = re.sub(str_pattern, S_SEM_VER_PYPRJ, str_rep)
 
     # --------------------------------------------------------------------------
 
@@ -2609,19 +2610,11 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
 
         # ----------------------------------------------------------------------
 
-        # replace short desc in line
-        str_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-        str_sch = S_SRC_DESC_SCH
-        str_rep = S_SRC_DESC_REP.format(str_desc)
-        line = re.sub(str_sch, str_rep, line, flags=re.M)
-
         # replace version in line
         str_ver = dict_prv_prj["__PP_VER_DISP__"]
-        # ver = dict_prv_prj["__PP_VER_MMR__"]
         str_sch = S_SRC_VER_SCH
-        # str_rep = S_SRC_VER_REP.format(ver)
         str_rep = S_SRC_VER_REP.format(str_ver)
-        line = re.sub(str_sch, str_rep, line, flags=re.M)
+        line = re.sub(str_sch, str_rep, line)
 
         # replace line in lines
         lines[index] = line
@@ -2630,6 +2623,23 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
 
+    # --------------------------------------------------------------------------
+    # S_PP_SHORT_DESC needs special handling for _() and () if Black wraps it
+    # FIXME: does not respect current state of replace flag
+
+    # open and read whole file
+    with open(path, "r", encoding=S_ENCODING) as a_file:
+        text = a_file.read()
+
+        # replace short desc in multi line
+        str_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
+        str_sch = S_SRC_DESC_SCH
+        str_rep = S_SRC_DESC_REP.format(str_desc)
+        text = re.sub(str_sch, str_rep, text, flags=re.S)
+
+    # save lines back to file
+    with open(path, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(text)
 
 # ------------------------------------------------------------------------------
 # Fix version number in install.json
@@ -2690,5 +2700,6 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub):
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
+
 
 # -)

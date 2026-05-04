@@ -392,6 +392,7 @@ class PyMaker(PyPlate):
         # print some info
         print()
         print(self.S_MSG_MAKE.format(name_prj_big))
+        print()
 
     # --------------------------------------------------------------------------
     # Do any work before template copy

@@ -55,7 +55,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     """
 
     # --------------------------------------------------------------------------
-    # Constants
+    # Class constants
     # --------------------------------------------------------------------------
 
 
@@ -67,6 +67,13 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     # S_ARG_X_DEST = "X_DEST"
     # # I18N: enable mode help
     # S_ARG_X_HELP = _("do x")
+
+    # --------------------------------------------------------------------------
+    # Dictionaries
+
+    # TODO: move defaults out
+    # set default config dict
+    D_DEFAULT = {}
 
     # # --------------------------------------------------------------------------
     # # Initialize the new object
@@ -82,6 +89,9 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
 
     #     # do super init
     #     super().__init__()
+
+    #     # set default cfg dict
+    #     self._dict_cfg = self.D_DEFAULT.copy()
 
     #     # NB: add class properties here
     #     self._foo = True

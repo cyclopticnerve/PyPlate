@@ -1,5 +1,14 @@
 
-TODO: install finds scripts with fixed names so NO coding in install files
+TODO: test all cmd line opts
+TODO: fix all printing
+
+NEXT: no post_uninstall, folder already deleted
+
+NEXT: printing pre/post is still ugly
+need to know if script had output to dtermine ellipsis/newline
+NEXT: put pre/post as keys in json (array?)
+NEXT: make sure no edit needed in base/inst/uninst
+scripts and json only
 
 NEXT: split conf into strings.py and hooks.py
 NEXT: move conf dir to .config
@@ -7,6 +16,7 @@ NEXT: propagate installer changes to projects
 NEXT: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
 
+NEXT: make log files read-only (chmod 444)
 NEXT: reduce calls to format if can be concatenated
 NEXT: check for internet before install - if not, no delete old
 NEXT: add switches to MUD/C in D_TYPE_RULES
@@ -19,7 +29,6 @@ NEXT: ask before install new like same/older
 NEXT: script to make changelog from todos/next/done
 NEXT: add keys.py file to template?
 NEXT: move tree files into trees folder
-NEXT: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 NEXT: split conf into separate files
 NEXT: move dialogs.ui pot/po to separate file
 NEXT: split load/save out of gui app
@@ -304,6 +313,12 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: better regex for S_PP_SHORT_DESC to match multi-line and i18n
+DONE: move template pre/post to misc
+DONE: print "running pre-flight"/"post-flight" instead of path
+unless dry, then print path
+DONE: install finds scripts with fixed names so NO coding in install files
+DONE: move pre/post scripts to "scripts" folder under "install"
 DONE: version not updated in S_ABOUT after bake
 DONE: S_ABOUT printed twice when -h
 DONE: prog_name=??? in parser in pp/template/spod/spod_gui

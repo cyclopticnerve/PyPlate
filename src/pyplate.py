@@ -106,10 +106,9 @@ class PyPlate:
     S_APP_NAME = "pyplate"
 
     # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
-    # pylint: enable=line-too-long
+    S_PP_SHORT_DESC = _(
+        "A program for creating and building CLI/GUI/Packages in Python from a template"
+    )
 
     # version string
     S_PP_VERSION = "Version 1.1.1"
@@ -357,7 +356,6 @@ class PyPlate:
             self._do_uninstall()
             # NB: exit is handled by _do_uninstall
 
-
         # ----------------------------------------------------------------------
         # no more args to handle
 
@@ -380,7 +378,7 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 
@@ -420,7 +418,6 @@ class PyPlate:
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
             F.printd(self.S_ERR_ERR, str(e))
-
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op

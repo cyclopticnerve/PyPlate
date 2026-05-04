@@ -104,10 +104,7 @@ class CNInstallBase:
     S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = ""
-    # pylint: enable=line-too-long
+    S_PP_SHORT_DESC = _("")
 
     # version string
     S_PP_VERSION = ""
@@ -575,7 +572,7 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # Run an external command at some point
     # --------------------------------------------------------------------------
-    def _do_external(self, cmd: str, hide: bool = False):
+    def _do_external(self, path: Path, hide: bool = False):
         """
         Run an external command at some point
 
@@ -584,18 +581,23 @@ class CNInstallBase:
             hide: Whether to hide the command's output
         """
 
+        # check if path exists
+        if not path or not path.exists():
+            return
+
         # if it's a dry run, don't do anything
         if self._arg_dry:
-            print(self.S_DRY_EXT, cmd)
+            print(self.S_DRY_EXT, path)
             print()
             return
 
         if not self._arg_quiet:
-            print(self.S_MSG_RUN_EXT, cmd, flush=True, end="")
+            print(self.S_MSG_RUN_EXT, path, flush=True, end="")
 
         # run the external command
         try:
             # NB: maybe hide output
+            cmd = self.S_CMD_EXTERNAL.format(path)
             cmd_list = shlex.split(cmd)
             subprocess.run(cmd_list, check=True, capture_output=hide)
             if not self._arg_quiet:
