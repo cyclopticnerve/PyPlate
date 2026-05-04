@@ -84,6 +84,8 @@
    │     │     ├─ [] images/
    │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
    │     │     ├─ [] install/
+   │     │     │     ├─ [] scripts/
+   │     │     │     │     └─ [] ABOUT
    │     │     │     ├─ [] install_base.py
    │     │     │     ├─ [] install.py
    │     │     │     └─ [] uninstall.py
@@ -94,6 +96,11 @@
    │     │     │     │     ├─ [] project.txt
    │     │     │     │     └─ [] style.txt
    │     │     │     ├─ [] default_files/
+   │     │     │     │     ├─ [] install/
+   │     │     │     │     │     ├─ [] post_install.py
+   │     │     │     │     │     ├─ [] post_uninstall.py
+   │     │     │     │     │     ├─ [] pre_install.py
+   │     │     │     │     │     └─ [] pre_uninstall.py
    │     │     │     │     ├─ [] class.py
    │     │     │     │     ├─ [] default.html
    │     │     │     │     ├─ [] default.md
