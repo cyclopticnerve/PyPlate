@@ -109,7 +109,7 @@ class CNInstallBase:
     )
 
     # version string
-    S_PP_VERSION = "Version 1.1.2"
+    S_PP_VERSION = "Version 1.1.1"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"

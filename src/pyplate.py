@@ -111,7 +111,7 @@ class PyPlate:
     )
 
     # version string
-    S_PP_VERSION = "Version 1.1.2"
+    S_PP_VERSION = "Version 1.1.1"
 
     # pyplate: replace=False
 
