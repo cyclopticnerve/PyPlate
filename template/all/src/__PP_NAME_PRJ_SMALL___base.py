@@ -120,7 +120,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
-    S_PP_SHORT_DESC = ""
+    S_PP_SHORT_DESC = _("")
 
     # version string
     S_PP_VERSION = ""
