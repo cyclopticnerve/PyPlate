@@ -2625,7 +2625,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
 
     # --------------------------------------------------------------------------
     # S_PP_SHORT_DESC needs special handling for _() and () if Black wraps it
-    # TODO: does not respect current state of replace flag
+    # FIXME: does not respect current state of replace flag
 
     # open and read whole file
     with open(path, "r", encoding=S_ENCODING) as a_file:
