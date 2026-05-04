@@ -103,7 +103,10 @@ class CNInstallBase:
     # NB: used for logger
     S_APP_NAME = "pyplate"
 
-    S_PP_SHORT_DESC = ""
+    # I18N: short description of program
+    S_PP_SHORT_DESC = _(
+        "A program for creating and building CLI/GUI/Packages in Python from a template"
+    )
 
     # version string
     S_PP_VERSION = "Version 1.1.1"
@@ -443,7 +446,7 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 
