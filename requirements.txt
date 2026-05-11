@@ -1,5 +1,5 @@
 click==8.2.1
-CNLib @ git+https://github.com/cyclopticnerve/CNLib@5c7521368156825431aba507c07664e17a5cb1aa
+CNLib @ git+https://github.com/cyclopticnerve/CNLib@v1.4.0
 colorama==0.4.6
 ghp-import==2.1.0
 griffe==1.7.3

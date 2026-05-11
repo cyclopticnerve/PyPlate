@@ -2392,7 +2392,6 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
 
     # replace version
     str_pattern = S_TOML_VER_SCH
-
     str_rep = S_TOML_VER_REP.format(str_rep)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 

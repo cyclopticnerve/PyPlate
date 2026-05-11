@@ -1,4 +1,5 @@
 
+TODO: when make pkg, add all subfolders as packages in toml ["pkg", "pkg.sub", etc.]
 TODO: test all cmd line opts
 TODO: fix all printing
 
