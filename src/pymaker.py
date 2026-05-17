@@ -35,6 +35,7 @@ from cnlib.decorators.cnspinner import spin
 # local imports
 import pyplate_base as P
 from pyplate_base import _
+from pyplate_base import PyPlateBase
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -44,7 +45,7 @@ from pyplate_base import _
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyMaker(P.PyPlateBase):
+class PyMaker(PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -98,22 +99,22 @@ class PyMaker(P.PyPlateBase):
         self._get_project_info()  # here
 
         # do before template
-        self._do_before_template()  # conf
+        self._do_before_template()  # here/conf
 
         # copy template
         self._do_template()  # here
 
         # do before template
-        self._do_after_template()  # conf
+        self._do_after_template()  # here/conf
 
         # do any fixing up of dicts (like meta keywords, etc)
-        self._do_before_fix()  # conf
+        self._do_before_fix()  # super
 
         # do replacements in final project location
-        self._do_fix()  # here
+        self._do_fix()  # super
 
         # do extra stuff to final dir after fix
-        self._do_after_fix()  # conf
+        self._do_after_fix()  # super
 
         # done with project
         print()
@@ -339,7 +340,6 @@ class PyMaker(P.PyPlateBase):
             P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
             P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
             P.C.S_KEY_PUB_INST: dict(P.C.D_PUB_INST),
-            # P.C.S_KEY_PUB_UNINST: dict(P.C.D_PUB_UNINST),
         }
 
         # ----------------------------------------------------------------------
@@ -415,9 +415,6 @@ class PyMaker(P.PyPlateBase):
         Gets dirs/files from template and copies them to the project dir.
         """
 
-        # show info
-        # print(P.C.S_ACTION_COPY, end="", flush=True)
-
         # ----------------------------------------------------------------------
         # do template/all
 
@@ -469,7 +466,6 @@ class PyMaker(P.PyPlateBase):
         # ----------------------------------------------------------------------
         # done
         return (True, None)
-        # F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after template copy

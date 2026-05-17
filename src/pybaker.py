@@ -28,8 +28,11 @@ Run pybaker -h for more options.
 import re
 import shutil
 
-# local imports
+# venv imports
 from cnlib import cnfunctions as F  # type: ignore
+from cnlib.decorators.cnspinner import spin
+
+# local imports
 import pyplate_base as P
 from pyplate_base import _
 from pyplate_base import PyPlateBase
@@ -288,15 +291,13 @@ class PyBaker(PyPlateBase):
     # --------------------------------------------------------------------------
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
+    @spin(P.C.S_ACTION_DIST)
     def _do_dist(self):
         """
         Copy fixed files to final location
 
         Gets dirs/files from project and copies them to the dist/assets dir.
         """
-
-        # print info
-        print(P.C.S_ACTION_DIST, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do common dist stuff
@@ -328,8 +329,8 @@ class PyBaker(PyPlateBase):
                 shutil.copy2(src, dst)
 
         # ----------------------------------------------------------------------
-        # done copying project files
-        F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        # done
+        return (True, None)
 
     # --------------------------------------------------------------------------
     # Do any work after making dist

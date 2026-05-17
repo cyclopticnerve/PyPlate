@@ -28,11 +28,8 @@ from pathlib import Path
 import sys
 
 # cnlib imports
-# pylint: disable=import-error
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
-
-# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -55,6 +52,7 @@ P_LOG_DEF = P_DIR_LOG / "__PP_NAME_PRJ_SMALL__.log"
 
 # path to uninst
 P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
+P_UNINST_DBG = P_DIR_PRJ / "__PP_NAME_UNINST__ -d"
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -343,7 +341,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
-            self._do_uninstall()
+            self._handle_u()
             # NB: exit is handled by _do_uninstall
 
         # ----------------------------------------------------------------------
@@ -373,7 +371,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 
@@ -450,7 +448,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
     # --------------------------------------------------------------------------
-    def _do_uninstall(self):
+    def _handle_u(self):
         """
         Handle the --uninstall cmd line op
         """
@@ -458,7 +456,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # format cmd line
         cmd = str(P_UNINST)
         if self._arg_debug:
-            cmd += " -d"
+            cmd = str(P_UNINST_DBG)
 
         # ----------------------------------------------------------------------
 

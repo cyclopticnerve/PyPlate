@@ -1,5 +1,4 @@
 
-TODO: use spin
 TODO: test all cmd line opts
 TODO: fix all printing
 
@@ -454,7 +453,7 @@ and a file with WHAT??? named "private.json"
 DONE: fill in misc/tree.txt
 DONE: when make/bake pkg, add all subfolders as packages in toml ["pkg",
 "pkg.sub", etc.]
-
+DONE: use spin
 
 remove .py exts from executables after installing
 (makes them easier/more compliant to call from cmd line)

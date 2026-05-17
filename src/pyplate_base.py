@@ -46,6 +46,7 @@ P_LOG_DEF = P_DIR_LOG / "pyplate.log"
 
 # path to uninst
 P_UNINST = P_DIR_PRJ / "install/uninstall.py"
+P_UNINST_DBG = P_DIR_PRJ / "install/uninstall.py -d"
 
 # ------------------------------------------------------------------------------
 # local imports
@@ -310,7 +311,7 @@ class PyPlateBase:
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
-            self._do_uninstall()
+            self._handle_u()
             # NB: exit is handled by _do_uninstall
 
         # ----------------------------------------------------------------------
@@ -379,7 +380,7 @@ class PyPlateBase:
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
     # --------------------------------------------------------------------------
-    def _do_uninstall(self):
+    def _handle_u(self):
         """
         Handle the --uninstall cmd line op
         """
@@ -387,7 +388,7 @@ class PyPlateBase:
         # format cmd line
         cmd = str(P_UNINST)
         if self._arg_debug:
-            cmd += " -d"
+            cmd = str(P_UNINST_DBG)
 
         # ----------------------------------------------------------------------
 
@@ -431,9 +432,6 @@ class PyPlateBase:
         encounters, it passes the path to a filter to determine if the file
         needs fixing based on its appearance in the blacklist.
         """
-
-        # print info
-        # print(C.S_ACTION_FIX, end="", flush=True)
 
         # last chance to do shit w/ dicts
         self._fix_dicts()
@@ -508,7 +506,6 @@ class PyPlateBase:
             self._fix_path(root)
 
         # done
-        # F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
         return (True, None)
 
     # --------------------------------------------------------------------------
