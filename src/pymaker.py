@@ -28,11 +28,13 @@ Run pymaker -h for more options.
 # system imports
 import shutil
 
-# local imports
+# venv imports
 from cnlib import cnfunctions as F  # type: ignore
-import pyplate as P
-from pyplate import _
-from pyplate import PyPlate
+from cnlib.decorators.cnspinner import spin
+
+# local imports
+import pyplate_base as P
+from pyplate_base import _
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -42,7 +44,7 @@ from pyplate import PyPlate
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyMaker(PyPlate):
+class PyMaker(P.PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -60,8 +62,8 @@ class PyMaker(PyPlate):
     # about string
     S_ABOUT = (
         f"{'PyPlate/PyMaker'}\n"
-        f"{PyPlate.S_PP_SHORT_DESC}\n"
-        f"{PyPlate.S_PP_VERSION}\n"
+        f"{P.PyPlateBase.S_PP_SHORT_DESC}\n"
+        f"{P.PyPlateBase.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
@@ -70,15 +72,6 @@ class PyMaker(PyPlate):
         "Run this program from the directory where you want to create "
         "a project."
     )
-
-    # messages
-
-    # make msg
-    # NB: param is name of project folder
-    S_MSG_MAKE = _("Making {}")
-    # NB: param is name of project folder
-    # I18N: done baking
-    S_MSG_DONE = _("Done making {}")
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -102,29 +95,29 @@ class PyMaker(PyPlate):
         # main stuff
 
         # get project info
-        self._get_project_info()
+        self._get_project_info()  # here
 
         # do before template
-        self._do_before_template()
+        self._do_before_template()  # conf
 
         # copy template
-        self._do_template()
+        self._do_template()  # here
 
         # do before template
-        self._do_after_template()
+        self._do_after_template()  # conf
 
         # do any fixing up of dicts (like meta keywords, etc)
-        self._do_before_fix()
+        self._do_before_fix()  # conf
 
         # do replacements in final project location
-        self._do_fix()
+        self._do_fix()  # here
 
         # do extra stuff to final dir after fix
-        self._do_after_fix()
+        self._do_after_fix()  # conf
 
         # done with project
         print()
-        print(self.S_MSG_DONE.format(self._dir_prj.name))
+        print(P.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
 
         # ----------------------------------------------------------------------
         # teardown
@@ -391,7 +384,7 @@ class PyMaker(PyPlate):
 
         # print some info
         print()
-        print(self.S_MSG_MAKE.format(name_prj_big))
+        print(P.C.S_MSG_MAKE.format(name_prj_big))
         print()
 
     # --------------------------------------------------------------------------
@@ -414,6 +407,7 @@ class PyMaker(PyPlate):
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
+    @spin(P.C.S_ACTION_COPY)
     def _do_template(self):
         """
         Copy template files to final location
@@ -422,7 +416,7 @@ class PyMaker(PyPlate):
         """
 
         # show info
-        print(P.C.S_ACTION_COPY, end="", flush=True)
+        # print(P.C.S_ACTION_COPY, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -474,7 +468,8 @@ class PyMaker(PyPlate):
 
         # ----------------------------------------------------------------------
         # done
-        F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        return (True, None)
+        # F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
 
     # --------------------------------------------------------------------------
     # Do any work after template copy

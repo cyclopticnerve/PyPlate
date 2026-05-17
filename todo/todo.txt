@@ -1,23 +1,24 @@
 
-TODO: when make pkg, add all subfolders as packages in toml ["pkg", "pkg.sub", etc.]
+TODO: use spin
 TODO: test all cmd line opts
 TODO: fix all printing
 
+NEXT: script to update pp and template reqs on cnlib version change
+update reqs, install new version in pp
 NEXT: no post_uninstall, folder already deleted
-
-NEXT: do something with build date (__PP_DATE__)
+NEXT: make __PP_DIR_SRC__ be S_DIR_SRC or __PP_NAME_PRJ_SMALL__
+change as many refs to S_DIR_SRC be __PP_DIR_SRC__
+NEXT: do somthing with build date (__PP_DATE__)
 NEXT: printing pre/post is still ugly
-need to know if script had output to dtermine ellipsis/newline
+need to know if script had output to determine ellipsis/newline
 NEXT: put pre/post as keys in json (array?)
 NEXT: make sure no edit needed in base/inst/uninst
 scripts and json only
-
 NEXT: split conf into strings.py and hooks.py
 NEXT: move conf dir to .config
 NEXT: propagate installer changes to projects
 NEXT: truth table of when to print for -d/-f/-q
 for fresh inst/inst/uninst
-
 NEXT: make log files read-only (chmod 444)
 NEXT: reduce calls to format if can be concatenated
 NEXT: check for internet before install - if not, no delete old
@@ -27,7 +28,6 @@ NEXT: no commented code in base - should never need to be touched
       child calls base func to add cmd line options, always present in base but
       not automatically added to parser
 NEXT: ask before install new like same/older
-
 NEXT: script to make changelog from todos/next/done
 NEXT: add keys.py file to template?
 NEXT: move tree files into trees folder
@@ -47,7 +47,6 @@ NEXT: man page
 NEXT: decorator for debug - need to check debug flag, need func name for
 enter/exit
 NEXT: put dunders in sep file for code completion?
-
 NEXT: all refs to .local, etc. should be relative to prj in ide until uninstall
 NEXT: remove tooltips from docs
 NEXT: combine pyplate.py B_ flags into dict and add to project.json
@@ -68,7 +67,6 @@ NEXT: for each file in proj, use blacklist and D_CFG/D_ADD/etc to find any
 dunder that is not in comment
 report that as error
 NEXT: multiple sources for i18n
-
 NEXT: replace all PB_VERSION with new version, across all files in prj dir
 NEXT: fix every metadata using choice menu for new value
 gonna need a lot of regex in pybaker.conf
@@ -454,6 +452,9 @@ pybaker on PyPlate project
 also need to add bl/i18n/meta file named "project.json"
 and a file with WHAT??? named "private.json"
 DONE: fill in misc/tree.txt
+DONE: when make/bake pkg, add all subfolders as packages in toml ["pkg",
+"pkg.sub", etc.]
+
 
 remove .py exts from executables after installing
 (makes them easier/more compliant to call from cmd line)
@@ -475,7 +476,7 @@ Still working on this - need to compare tags but no tags in dev
 Can't compare tags in main as changelog will be modified after tag is added
 
 when creating a CLI or GUI app, after creating venv, download and install
-installerator and configurator and build and pylinter
+installerator and configurator and build and pylint
 default install script should be modified by PyPlate to download and install
 installerator and configurator in the prerequisites
 Add pip install from GitHub instructions to readme

@@ -1,6 +1,6 @@
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
-# Filename: pyplate.py                                            |     ()     |
+# Filename: pyplate_base.py                                       |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
 # License : WTFPLv2                                                \          /
@@ -28,11 +28,9 @@ import re
 import sys
 
 # cnlib imports
-# pylint: disable=import-error
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
-
-# pylint: enable=import-error
+from cnlib.decorators import cnspinner as S
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -54,11 +52,7 @@ P_UNINST = P_DIR_PRJ / "install/uninstall.py"
 
 # fudge the path to import conf stuff
 sys.path.append(str(P_DIR_PRJ))
-
-# pylint: disable=wrong-import-position
-import conf.conf as C  # type: ignore
-
-# pylint: enable=wrong-import-position
+import conf.conf as C
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -75,7 +69,7 @@ _ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyPlate:
+class PyPlateBase:
     """
     The main class, responsible for the operation of the program
 
@@ -89,13 +83,6 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # Class constants
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # ints
-
-    # rotating log stuff
-    I_LOG_SIZE = 2097152  # max log file size in bytes (2 Mb)
-    I_LOG_COUNT = 5  # max number of log files
 
     # --------------------------------------------------------------------------
     # strings
@@ -136,42 +123,14 @@ class PyPlate:
     # I18N: uninstall option help
     S_ARG_UNINST_HELP = _("uninstall this program")
 
-    # about string (to be set by subclass)
-    S_ABOUT = ""
-
     # I18N if using argparse, add help at end of about
     S_ABOUT_HELP = _("Use -h for help")
 
+    # about string (to be set by subclass)
+    S_ABOUT = ""
+
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
-
-    # default format for log files
-    S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
-    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S"
-
-    # --------------------------------------------------------------------------
-    # questions
-
-    # NB: format param is prog name
-    # I18N: ask to uninstall
-    S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
-
-    # --------------------------------------------------------------------------
-    # messages
-
-    # I18N: process aborted
-    S_MSG_ABORT = _("Aborted")
-
-    # --------------------------------------------------------------------------
-    # error messages
-
-    # I18N: an error occurred
-    S_ERR_ERR = _("Error:")
-    # I18N: uninstall not found
-    S_ERR_NO_UNINST = _("Uninstall files not found")
-    # NB: format param is file path
-    # I18N: could not find -c file
-    S_ERR_NO_CFG = _("Config file {} not found")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -242,14 +201,12 @@ class PyPlate:
         # make a rotating handler
         handler = RotatingFileHandler(
             str(P_LOG_DEF),
-            maxBytes=self.I_LOG_SIZE,
-            backupCount=self.I_LOG_COUNT,
+            maxBytes=C.I_LOG_SIZE,
+            backupCount=C.I_LOG_COUNT,
         )
 
         # add a formatter to rot handler
-        formatter = logging.Formatter(
-            self.S_LOG_FMT, datefmt=self.S_LOG_DATE_FMT
-        )
+        formatter = logging.Formatter(C.S_LOG_FMT, datefmt=C.S_LOG_DATE_FMT)
 
         # set formatter to handler
         handler.setFormatter(formatter)
@@ -372,7 +329,7 @@ class PyPlate:
         if self._arg_debug:
 
             # yup, yell
-            F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
+            F.printc(C.S_MSG_DEBUG, fg=F.C_FG_RED, bg=F.C_BG_NONE, bold=True)
             print()
 
     # --------------------------------------------------------------------------
@@ -407,7 +364,7 @@ class PyPlate:
             path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
             F.save_dict_into_paths(self._dict_prv, [path_prv])
         except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # save public
@@ -417,7 +374,7 @@ class PyPlate:
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
@@ -465,6 +422,7 @@ class PyPlate:
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
+    @S.spin(C.S_ACTION_FIX)
     def _do_fix(self):
         """
         Scan dirs/files in the project for replacing text
@@ -475,7 +433,7 @@ class PyPlate:
         """
 
         # print info
-        print(C.S_ACTION_FIX, end="", flush=True)
+        # print(C.S_ACTION_FIX, end="", flush=True)
 
         # last chance to do shit w/ dicts
         self._fix_dicts()
@@ -550,7 +508,8 @@ class PyPlate:
             self._fix_path(root)
 
         # done
-        F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        # F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        return (True, None)
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -898,7 +857,7 @@ class PyPlate:
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
             return
 
         # fix dunders in dict_pub
@@ -909,7 +868,7 @@ class PyPlate:
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             self._dict_pub = F.load_paths_into_dict([path_pub])
         except OSError as e:  # from load dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # get pub subs

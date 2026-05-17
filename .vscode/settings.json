@@ -14,6 +14,7 @@
         }
     ],
     "cSpell.words": [
+        "argparse",
         "cnmkdocs",
         "cnpot",
         "cntree",
@@ -21,11 +22,28 @@
         "Dialup",
         "Geoscience",
         "gztar",
+        "imgs",
+        "installerator",
+        "Installerator",
+        "modtest",
+        "MODTEST",
         "noexts",
+        "pathlib",
         "potpy",
+        "pydocstyle",
+        "pyinstaller",
+        "pylint",
+        "pypi",
         "PYPRJ",
+        "repls",
+        "shlex",
+        "strs",
         "subfolders",
+        "SYSDEPS",
+        "testpypi",
+        "timeshift",
         "undunderized",
+        "versionator",
         "WLANG"
     ]
 }

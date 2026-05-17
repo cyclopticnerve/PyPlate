@@ -30,9 +30,9 @@ import shutil
 
 # local imports
 from cnlib import cnfunctions as F  # type: ignore
-import pyplate as P
-from pyplate import _
-from pyplate import PyPlate
+import pyplate_base as P
+from pyplate_base import _
+from pyplate_base import PyPlateBase
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -42,7 +42,7 @@ from pyplate import PyPlate
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyBaker(PyPlate):
+class PyBaker(PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -85,8 +85,8 @@ class PyBaker(PyPlate):
     # about string
     S_ABOUT = (
         f"{'PyPlate/PyBaker'}\n"
-        f"{PyPlate.S_PP_SHORT_DESC}\n"
-        f"{PyPlate.S_PP_VERSION}\n"
+        f"{PyPlateBase.S_PP_SHORT_DESC}\n"
+        f"{PyPlateBase.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
@@ -94,34 +94,6 @@ class PyBaker(PyPlate):
     S_EPILOG = _(
         "Run this program from the directory of the project you want to build."
     )
-
-    # error strings
-
-    # I18N: language already exists in project.json and i18n folder
-    S_ERR_LANG_EXIST = _("Language file {} already exists")
-    S_ERR_NO_LANG = _("Could not get language code from {}")
-
-    # messages
-
-    # NB: param is name of project folder
-    # I18N: start baking
-    S_MSG_BAKE = _("Baking {}")
-    # NB: param is name of project folder
-    # I18N: done baking
-    S_MSG_DONE = _("Done baking {}")
-    # NB: format param is file name
-    # I18N: add language at cmd line
-    S_MSG_LANG_ADD = _("Adding language file {}...")
-
-    # questions
-
-    # I18N: ask to overwrite
-    # NB: format param is file name
-    S_ASK_OVER = _("The file {} already exists. Do you want to overwrite it?")
-
-    # --------------------------------------------------------------------------
-    # Instance methods
-    # --------------------------------------------------------------------------
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -167,7 +139,7 @@ class PyBaker(PyPlate):
 
         # done with project
         print()
-        print(self.S_MSG_DONE.format(self._dir_prj.name))
+        print(P.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
 
         # ----------------------------------------------------------------------
         # teardown
@@ -271,7 +243,7 @@ class PyBaker(PyPlate):
         # if there was a problem
         except OSError as e:  # from load_dicts
             # exit gracefully
-            print(self.S_ERR_ERR, e)
+            print(P.C.S_ERR_ERR, e)
             self._teardown(-1)
 
         # ----------------------------------------------------------------------
@@ -295,7 +267,7 @@ class PyBaker(PyPlate):
         # ----------------------------------------------------------------------
         # print some info
         print()
-        print(self.S_MSG_BAKE.format(self._dir_prj.name))
+        print(P.C.S_MSG_BAKE.format(self._dir_prj.name))
         print()
 
     # --------------------------------------------------------------------------
@@ -500,7 +472,7 @@ class PyBaker(PyPlate):
         if not lang_file:
             return
 
-        print(self.S_MSG_LANG_ADD.format(lang_file), flush=True, end="")
+        print(P.C.S_MSG_LANG_ADD.format(lang_file), flush=True, end="")
 
         # default lang code
         lang_code = ""
@@ -541,7 +513,7 @@ class PyBaker(PyPlate):
             print()
 
             # ask to overwrite
-            msg = self.S_ASK_OVER.format(lang_file)
+            msg = P.C.S_ASK_OVER.format(lang_file)
             ask = F.dialog(msg, [F.S_ASK_YES, F.S_ASK_NO], default=F.S_ASK_NO)
             if ask != F.S_ASK_YES:
                 F.printc(P.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
