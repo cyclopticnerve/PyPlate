@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../../img/favicon.ico">
-        <title>pyplate.py - PyPlate</title>
+        <title>pyplate_base.py - PyPlate</title>
         <link href="../../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../../css/brands.min.css" rel="stylesheet">
@@ -55,7 +55,7 @@
 </li>
             
 <li>
-    <a href="./" class="dropdown-item active" aria-current="page">pyplate.py</a>
+    <a href="./" class="dropdown-item active" aria-current="page">pyplate_base.py</a>
 </li>
     </ul>
   </li>
@@ -97,21 +97,21 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#pyplatepy" class="nav-link">pyplate.py</a>
+            <li class="nav-item" data-bs-level="1"><a href="#pyplate_basepy" class="nav-link">pyplate_base.py</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate" class="nav-link">pyplate</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.PyPlate" class="nav-link">PyPlate</a>
+            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate_base" class="nav-link">pyplate_base</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.check_switches" class="nav-link">check_switches</a>
+            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate_base.PyPlateBase" class="nav-link">PyPlateBase</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate.get_type_rules" class="nav-link">get_type_rules</a>
+            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate_base.check_switches" class="nav-link">check_switches</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#src.pyplate_base.get_type_rules" class="nav-link">get_type_rules</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -122,14 +122,14 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="pyplatepy">pyplate.py</h1>
+<h1 id="pyplate_basepy">pyplate_base.py</h1>
 
 
 <div class="doc doc-object doc-module">
 
 
 
-<a id="src.pyplate"></a>
+<a id="src.pyplate_base"></a>
     <div class="doc doc-contents first">
 
         <p>A class to be the base for pymaker/pybaker</p>
@@ -156,8 +156,8 @@
 
 
 
-<h2 id="src.pyplate.PyPlate" class="doc doc-heading">
-            <code>PyPlate</code>
+<h2 id="src.pyplate_base.PyPlateBase" class="doc doc-heading">
+            <code>PyPlateBase</code>
 
 
 </h2>
@@ -182,8 +182,8 @@ PyBaker.</p>
 
 
               <details class="quote">
-                <summary>Source code in <code>src/pyplate.py</code></summary>
-                <pre class="highlight"><code class="language-python">class PyPlate:
+                <summary>Source code in <code>src/pyplate_base.py</code></summary>
+                <pre class="highlight"><code class="language-python">class PyPlateBase:
     """
     The main class, responsible for the operation of the program
 
@@ -197,13 +197,6 @@ PyBaker.</p>
     # --------------------------------------------------------------------------
     # Class constants
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # ints
-
-    # rotating log stuff
-    I_LOG_SIZE = 2097152  # max log file size in bytes (2 Mb)
-    I_LOG_COUNT = 5  # max number of log files
 
     # --------------------------------------------------------------------------
     # strings
@@ -244,42 +237,14 @@ PyBaker.</p>
     # I18N: uninstall option help
     S_ARG_UNINST_HELP = _("uninstall this program")
 
-    # about string (to be set by subclass)
-    S_ABOUT = ""
-
     # I18N if using argparse, add help at end of about
     S_ABOUT_HELP = _("Use -h for help")
 
+    # about string (to be set by subclass)
+    S_ABOUT = ""
+
     # cmd line instructions string (to be set by subclass)
     S_EPILOG = ""
-
-    # default format for log files
-    S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
-    S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S"
-
-    # --------------------------------------------------------------------------
-    # questions
-
-    # NB: format param is prog name
-    # I18N: ask to uninstall
-    S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
-
-    # --------------------------------------------------------------------------
-    # messages
-
-    # I18N: process aborted
-    S_MSG_ABORT = _("Aborted")
-
-    # --------------------------------------------------------------------------
-    # error messages
-
-    # I18N: an error occurred
-    S_ERR_ERR = _("Error:")
-    # I18N: uninstall not found
-    S_ERR_NO_UNINST = _("Uninstall files not found")
-    # NB: format param is file path
-    # I18N: could not find -c file
-    S_ERR_NO_CFG = _("Config file {} not found")
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -350,14 +315,12 @@ PyBaker.</p>
         # make a rotating handler
         handler = RotatingFileHandler(
             str(P_LOG_DEF),
-            maxBytes=self.I_LOG_SIZE,
-            backupCount=self.I_LOG_COUNT,
+            maxBytes=C.I_LOG_SIZE,
+            backupCount=C.I_LOG_COUNT,
         )
 
         # add a formatter to rot handler
-        formatter = logging.Formatter(
-            self.S_LOG_FMT, datefmt=self.S_LOG_DATE_FMT
-        )
+        formatter = logging.Formatter(C.S_LOG_FMT, datefmt=C.S_LOG_DATE_FMT)
 
         # set formatter to handler
         handler.setFormatter(formatter)
@@ -461,7 +424,7 @@ PyBaker.</p>
         if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
-            self._do_uninstall()
+            self._handle_u()
             # NB: exit is handled by _do_uninstall
 
         # ----------------------------------------------------------------------
@@ -480,7 +443,7 @@ PyBaker.</p>
         if self._arg_debug:
 
             # yup, yell
-            F.printc(C.S_MSG_DEBUG, bg=F.C_BG_RED, fg=F.C_FG_WHITE, bold=True)
+            F.printc(C.S_MSG_DEBUG, fg=F.C_FG_RED, bg=F.C_BG_NONE, bold=True)
             print()
 
     # --------------------------------------------------------------------------
@@ -515,7 +478,7 @@ PyBaker.</p>
             path_prv = self._dir_prj / C.S_PRJ_PRV_CFG
             F.save_dict_into_paths(self._dict_prv, [path_prv])
         except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # save public
@@ -525,12 +488,12 @@ PyBaker.</p>
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
     # --------------------------------------------------------------------------
-    def _do_uninstall(self):
+    def _handle_u(self):
         """
         Handle the --uninstall cmd line op
         """
@@ -538,7 +501,7 @@ PyBaker.</p>
         # format cmd line
         cmd = str(P_UNINST)
         if self._arg_debug:
-            cmd += " -d"
+            cmd = str(P_UNINST_DBG)
 
         # ----------------------------------------------------------------------
 
@@ -573,6 +536,7 @@ PyBaker.</p>
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
+    @S.spin(C.S_ACTION_FIX)
     def _do_fix(self):
         """
         Scan dirs/files in the project for replacing text
@@ -581,9 +545,6 @@ PyBaker.</p>
         encounters, it passes the path to a filter to determine if the file
         needs fixing based on its appearance in the blacklist.
         """
-
-        # print info
-        print(C.S_ACTION_FIX, end="", flush=True)
 
         # last chance to do shit w/ dicts
         self._fix_dicts()
@@ -658,7 +619,7 @@ PyBaker.</p>
             self._fix_path(root)
 
         # done
-        F.printc(C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        return (True, None)
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -1006,7 +967,7 @@ PyBaker.</p>
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
             return
 
         # fix dunders in dict_pub
@@ -1017,7 +978,7 @@ PyBaker.</p>
             path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             self._dict_pub = F.load_paths_into_dict([path_pub])
         except OSError as e:  # from load dict
-            F.printd(self.S_ERR_ERR, str(e))
+            F.printd(C.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # get pub subs
@@ -1187,7 +1148,7 @@ PyBaker.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="src.pyplate.PyPlate.__init__" class="doc doc-heading">
+<h3 id="src.pyplate_base.PyPlateBase.__init__" class="doc doc-heading">
             <code class="highlight language-python">__init__()</code>
 
 </h3>
@@ -1202,7 +1163,7 @@ new object.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/pyplate.py</code></summary>
+              <summary>Source code in <code>src/pyplate_base.py</code></summary>
               <pre class="highlight"><code class="language-python">def __init__(self):
     """
     Initialize the new object
@@ -1265,14 +1226,12 @@ new object.</p>
     # make a rotating handler
     handler = RotatingFileHandler(
         str(P_LOG_DEF),
-        maxBytes=self.I_LOG_SIZE,
-        backupCount=self.I_LOG_COUNT,
+        maxBytes=C.I_LOG_SIZE,
+        backupCount=C.I_LOG_COUNT,
     )
 
     # add a formatter to rot handler
-    formatter = logging.Formatter(
-        self.S_LOG_FMT, datefmt=self.S_LOG_DATE_FMT
-    )
+    formatter = logging.Formatter(C.S_LOG_FMT, datefmt=C.S_LOG_DATE_FMT)
 
     # set formatter to handler
     handler.setFormatter(formatter)
@@ -1305,7 +1264,7 @@ new object.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="src.pyplate.check_switches" class="doc doc-heading">
+<h2 id="src.pyplate_base.check_switches" class="doc doc-heading">
             <code class="highlight language-python">check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line)</code>
 
 </h2>
@@ -1381,7 +1340,7 @@ dict_sw_line.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/pyplate.py</code></summary>
+              <summary>Source code in <code>src/pyplate_base.py</code></summary>
               <pre class="highlight"><code class="language-python">def check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
     """
     Check if line or trailing comment is a switch
@@ -1434,7 +1393,7 @@ dict_sw_line.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="src.pyplate.get_type_rules" class="doc doc-heading">
+<h2 id="src.pyplate_base.get_type_rules" class="doc doc-heading">
             <code class="highlight language-python">get_type_rules(path)</code>
 
 </h2>
@@ -1498,7 +1457,7 @@ dict_sw_line.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/pyplate.py</code></summary>
+              <summary>Source code in <code>src/pyplate_base.py</code></summary>
               <pre class="highlight"><code class="language-python">def get_type_rules(path):
     """
     Get the filetype-specific regexes (headers, comments. switches)

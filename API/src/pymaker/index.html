@@ -55,7 +55,7 @@
 </li>
             
 <li>
-    <a href="../pyplate/" class="dropdown-item">pyplate.py</a>
+    <a href="../pyplate_base/" class="dropdown-item">pyplate_base.py</a>
 </li>
     </ul>
   </li>
@@ -75,7 +75,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../pyplate/" class="nav-link">
+                                <a rel="next" href="../pyplate_base/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -161,7 +161,7 @@ names in the resulting files.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="pyplate.PyPlate">PyPlate</span></code></p>
+              Bases: <code><span title="pyplate_base.PyPlateBase">PyPlateBase</span></code></p>
 
 
         <p>The main class, responsible for the operation of the program</p>
@@ -181,7 +181,7 @@ PyPlate project from a template.</p>
 
               <details class="quote">
                 <summary>Source code in <code>src/pymaker.py</code></summary>
-                <pre class="highlight"><code class="language-python">class PyMaker(PyPlate):
+                <pre class="highlight"><code class="language-python">class PyMaker(PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -199,8 +199,8 @@ PyPlate project from a template.</p>
     # about string
     S_ABOUT = (
         f"{'PyPlate/PyMaker'}\n"
-        f"{PyPlate.S_PP_SHORT_DESC}\n"
-        f"{PyPlate.S_PP_VERSION}\n"
+        f"{P.PyPlateBase.S_PP_SHORT_DESC}\n"
+        f"{P.PyPlateBase.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
@@ -209,15 +209,6 @@ PyPlate project from a template.</p>
         "Run this program from the directory where you want to create "
         "a project."
     )
-
-    # messages
-
-    # make msg
-    # NB: param is name of project folder
-    S_MSG_MAKE = _("Making {}")
-    # NB: param is name of project folder
-    # I18N: done baking
-    S_MSG_DONE = _("Done making {}")
 
     # --------------------------------------------------------------------------
     # Public methods
@@ -241,29 +232,29 @@ PyPlate project from a template.</p>
         # main stuff
 
         # get project info
-        self._get_project_info()
+        self._get_project_info()  # here
 
         # do before template
-        self._do_before_template()
+        self._do_before_template()  # here/conf
 
         # copy template
-        self._do_template()
+        self._do_template()  # here
 
         # do before template
-        self._do_after_template()
+        self._do_after_template()  # here/conf
 
         # do any fixing up of dicts (like meta keywords, etc)
-        self._do_before_fix()
+        self._do_before_fix()  # super
 
         # do replacements in final project location
-        self._do_fix()
+        self._do_fix()  # super
 
         # do extra stuff to final dir after fix
-        self._do_after_fix()
+        self._do_after_fix()  # super
 
         # done with project
         print()
-        print(self.S_MSG_DONE.format(self._dir_prj.name))
+        print(P.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
 
         # ----------------------------------------------------------------------
         # teardown
@@ -485,7 +476,6 @@ PyPlate project from a template.</p>
             P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
             P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
             P.C.S_KEY_PUB_INST: dict(P.C.D_PUB_INST),
-            # P.C.S_KEY_PUB_UNINST: dict(P.C.D_PUB_UNINST),
         }
 
         # ----------------------------------------------------------------------
@@ -530,7 +520,7 @@ PyPlate project from a template.</p>
 
         # print some info
         print()
-        print(self.S_MSG_MAKE.format(name_prj_big))
+        print(P.C.S_MSG_MAKE.format(name_prj_big))
         print()
 
     # --------------------------------------------------------------------------
@@ -553,15 +543,13 @@ PyPlate project from a template.</p>
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
+    @spin(P.C.S_ACTION_COPY)
     def _do_template(self):
         """
         Copy template files to final location
 
         Gets dirs/files from template and copies them to the project dir.
         """
-
-        # show info
-        print(P.C.S_ACTION_COPY, end="", flush=True)
 
         # ----------------------------------------------------------------------
         # do template/all
@@ -613,7 +601,7 @@ PyPlate project from a template.</p>
 
         # ----------------------------------------------------------------------
         # done
-        F.printc(P.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+        return (True, None)
 
     # --------------------------------------------------------------------------
     # Do any work after template copy
@@ -676,29 +664,29 @@ program, and performing its steps.</p>
     # main stuff
 
     # get project info
-    self._get_project_info()
+    self._get_project_info()  # here
 
     # do before template
-    self._do_before_template()
+    self._do_before_template()  # here/conf
 
     # copy template
-    self._do_template()
+    self._do_template()  # here
 
     # do before template
-    self._do_after_template()
+    self._do_after_template()  # here/conf
 
     # do any fixing up of dicts (like meta keywords, etc)
-    self._do_before_fix()
+    self._do_before_fix()  # super
 
     # do replacements in final project location
-    self._do_fix()
+    self._do_fix()  # super
 
     # do extra stuff to final dir after fix
-    self._do_after_fix()
+    self._do_after_fix()  # super
 
     # done with project
     print()
-    print(self.S_MSG_DONE.format(self._dir_prj.name))
+    print(P.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
 
     # ----------------------------------------------------------------------
     # teardown
