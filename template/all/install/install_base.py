@@ -122,7 +122,7 @@ class CNInstallBase:
     S_ARG_FORCE_ACTION = "store_true"
     S_ARG_FORCE_DEST = "FORCE_DEST"
     # I18N: force option help
-    S_ARG_FORCE_HELP = _("force install this program")
+    S_ARG_FORCE_HELP = _("force install/uninstall this program")
 
     # quiet option strings
     S_ARG_QUIET_OPTION = "-q"
@@ -147,7 +147,7 @@ class CNInstallBase:
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_USE_HELP = _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -368,7 +368,6 @@ class CNInstallBase:
             self.S_ARG_FORCE_OPTION,
             action=self.S_ARG_FORCE_ACTION,
             dest=self.S_ARG_FORCE_DEST,
-            help=self.S_ARG_FORCE_HELP,
         )
 
         # add quiet option
@@ -397,7 +396,7 @@ class CNInstallBase:
 
             # print "use -h" and bail
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
             self._teardown(-1)
 
         # convert namespace to dict
@@ -433,7 +432,7 @@ class CNInstallBase:
             print()
             print(self.S_ABOUT)
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
 
         # ready to go
         # NB: not sure how do do this the other way around

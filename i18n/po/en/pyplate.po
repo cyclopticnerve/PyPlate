@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.3\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-05-11 17:37-0400\n"
+"POT-Creation-Date: 2026-05-19 14:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,7 +47,7 @@ msgid "Error: "
 msgstr ""
 
 #: install/install_base.py:108
-#: src/pyplate.py:110
+#: src/pyplate_base.py:98
 msgid ""
 "A program for creating and building CLI/GUI/Packages in Python from a "
 "template"
@@ -70,13 +70,13 @@ msgstr ""
 
 #. I18N: help option help
 #: install/install_base.py:140
-#: src/pyplate.py:130
+#: src/pyplate_base.py:118
 msgid "show this help message and exit"
 msgstr ""
 
 #. I18N if using argparse, add help at end of about
 #: install/install_base.py:151
-#: src/pyplate.py:143
+#: src/pyplate_base.py:128
 msgid "Use -h for help"
 msgstr ""
 
@@ -101,7 +101,6 @@ msgstr ""
 
 #. I18N: ask to uninstall
 #: install/install_base.py:184
-#: src/pyplate.py:157
 msgid ""
 "This will uninstall {}.\n"
 "Do you want to continue?"
@@ -119,7 +118,6 @@ msgstr ""
 
 #. I18N: an error occurred
 #: install/install_base.py:218
-#: src/pyplate.py:169
 msgid "Error:"
 msgstr ""
 
@@ -155,7 +153,6 @@ msgstr ""
 
 #. I18N: process aborted
 #: install/install_base.py:244
-#: src/pyplate.py:163
 msgid "Aborted"
 msgstr ""
 
@@ -210,94 +207,45 @@ msgid "{} uninstalled"
 msgstr ""
 
 #. I18N help string for ide cmd line option
-#: src/pybaker.py:65
+#: src/pybaker.py:68
 msgid "ask for project folder when running in IDE"
 msgstr ""
 
 #. I18N: lang option help
-#: src/pybaker.py:71
+#: src/pybaker.py:74
 msgid "add a language (*.po) file"
 msgstr ""
 
 #. I18N: lang file source
-#: src/pybaker.py:73
+#: src/pybaker.py:76
 msgid "FILE"
 msgstr ""
 
-#: src/pybaker.py:80
+#: src/pybaker.py:83
 msgid ""
 "set the new version of the project\n"
 "(if used, -l is ignored)"
 msgstr ""
 
 #. I18N: config file dest
-#: src/pybaker.py:83
+#: src/pybaker.py:86
 msgid "VERSION"
 msgstr ""
 
-#: src/pybaker.py:95
+#: src/pybaker.py:98
 msgid "Run this program from the directory of the project you want to build."
 msgstr ""
 
-#. I18N: language already exists in project.json and i18n folder
-#: src/pybaker.py:101
-msgid "Language file {} already exists"
-msgstr ""
-
-#: src/pybaker.py:102
-msgid "Could not get language code from {}"
-msgstr ""
-
-#. I18N: start baking
-#: src/pybaker.py:108
-msgid "Baking {}"
-msgstr ""
-
-#. I18N: done baking
-#: src/pybaker.py:111
-msgid "Done baking {}"
-msgstr ""
-
-#. I18N: add language at cmd line
-#: src/pybaker.py:114
-msgid "Adding language file {}..."
-msgstr ""
-
-#. I18N: ask to overwrite
-#. NB: format param is file name
-#: src/pybaker.py:120
-msgid "The file {} already exists. Do you want to overwrite it?"
-msgstr ""
-
-#: src/pymaker.py:70
+#: src/pymaker.py:73
 msgid "Run this program from the directory where you want to create a project."
 msgstr ""
 
-#: src/pymaker.py:78
-msgid "Making {}"
-msgstr ""
-
-#. I18N: done baking
-#: src/pymaker.py:81
-msgid "Done making {}"
-msgstr ""
-
 #. I18N: debug mode help
-#: src/pyplate.py:123
+#: src/pyplate_base.py:111
 msgid "enable debugging mode"
 msgstr ""
 
 #. I18N: uninstall option help
-#: src/pyplate.py:137
+#: src/pyplate_base.py:125
 msgid "uninstall this program"
-msgstr ""
-
-#. I18N: uninstall not found
-#: src/pyplate.py:171
-msgid "Uninstall files not found"
-msgstr ""
-
-#. I18N: could not find -c file
-#: src/pyplate.py:174
-msgid "Config file {} not found"
 msgstr ""

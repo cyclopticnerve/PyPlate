@@ -1,7 +1,9 @@
 
+TODO: test all spinners
 TODO: test all cmd line opts
 TODO: fix all printing
 
+NEXT: all sys.path.append should be __init__.py
 NEXT: script to update pp and template reqs on cnlib version change
 update reqs, install new version in pp
 NEXT: no post_uninstall, folder already deleted

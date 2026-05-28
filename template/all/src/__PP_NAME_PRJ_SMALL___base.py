@@ -35,12 +35,10 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 # Constants
 # ------------------------------------------------------------------------------
 
-# project dir
+# dirs
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# conf dir
-P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
 P_DIR_LOG = P_DIR_PRJ / "__PP_DIR_LOG__"
+P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
 
 # path to default config file
 # NB: if not using, set to None
@@ -162,7 +160,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_USE_HELP = _("Use -h for help")
 
     # default format for log files
     S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
@@ -371,7 +369,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int = 0):
+    def _teardown(self, errcode: int=0):
         """
         Boilerplate to use at the end of main
 
