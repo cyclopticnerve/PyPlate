@@ -1,15 +1,16 @@
 
+TODO: -l opt should be: ~/prj $ pybaker -l /path/to/foo.po
 TODO: test all spinners
 TODO: test all cmd line opts
 TODO: fix all printing
 
-NEXT: all sys.path.append should be __init__.py
+NEXT: -t should imply -d
 NEXT: script to update pp and template reqs on cnlib version change
 update reqs, install new version in pp
 NEXT: no post_uninstall, folder already deleted
 NEXT: make __PP_DIR_SRC__ be S_DIR_SRC or __PP_NAME_PRJ_SMALL__
 change as many refs to S_DIR_SRC be __PP_DIR_SRC__
-NEXT: do somthing with build date (__PP_DATE__)
+NEXT: do something with build date (__PP_DATE__)
 NEXT: printing pre/post is still ugly
 need to know if script had output to determine ellipsis/newline
 NEXT: put pre/post as keys in json (array?)

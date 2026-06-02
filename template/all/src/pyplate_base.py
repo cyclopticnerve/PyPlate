@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL___base.py                         |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate_base.py                                       |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -37,27 +37,28 @@ from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # dirs
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-P_DIR_LOG = P_DIR_PRJ / "__PP_DIR_LOG__"
-P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
+P_DIR_LOG = P_DIR_PRJ / "log"
+P_DIR_CONF = P_DIR_PRJ / "conf"
 
 # path to default config file
 # NB: if not using, set to None
-P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
+P_CFG_DEF = P_DIR_CONF / "pyplate.json"
 
 # path to default log file
 # NB: if not using, set to None
-P_LOG_DEF = P_DIR_LOG / "__PP_NAME_PRJ_SMALL__.log"
+P_LOG_DEF = P_DIR_LOG / "pyplate.log"
 
 # path to uninst
-P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
-P_UNINST_DBG = P_DIR_PRJ / "__PP_NAME_UNINST__ -d"
+P_UNINST = P_DIR_PRJ / "uninstall.py"
+P_UNINST_DBG = P_DIR_PRJ / "uninstall.py -d"
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
-_ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
+# i18n stuff
+DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
+_ = F.get_underscore("pyplate", DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -67,7 +68,7 @@ _ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_PRJ_PASCAL__Base:
+class PyplateBase:
     """
     The main class, responsible for the operation of the program
 
@@ -113,15 +114,20 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # strings
 
     # NB: used for parser/logger
-    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+    S_APP_NAME = "pyplate"
 
+    # pyplate: replace=True
     # I18N: short description
     # NB: the dot shuts up warnings from xgettext
-    S_PP_SHORT_DESC = _(".")
+    S_PP_SHORT_DESC = _("A Short description")
 
     # version string
-    S_PP_VERSION = ""
+    S_PP_VERSION = "Version 1.2.3"
 
+    # pyplate: replace=False
+
+    # --------------------------------------------------------------------------
+    # args
     # config option strings
     S_ARG_CFG_OPTION = "-c"
     S_ARG_CFG_DEST = "CFG_DEST"
@@ -130,37 +136,30 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # I18N: config file dest (indicate it should be a file name/path)
     S_ARG_CFG_METAVAR = _("FILE")
 
-    # debug option strings
+    # debug option
     S_ARG_DBG_OPTION = "-d"
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
     # I18N: debug mode help
     S_ARG_DBG_HELP = _("enable debugging mode")
 
-    # config option strings
+    # help option
     S_ARG_HLP_OPTION = "-h"
     S_ARG_HLP_ACTION = "store_true"
     S_ARG_HLP_DEST = "HLP_DEST"
     # I18N: help option help
     S_ARG_HLP_HELP = _("show this help message and exit")
 
-    # config option strings
+    # uninstall option
     S_ARG_UNINST_OPTION = "--uninstall"
     S_ARG_UNINST_ACTION = "store_true"
     S_ARG_UNINST_DEST = "UNINST_DEST"
     # I18N: uninstall option help
     S_ARG_UNINST_HELP = _("uninstall this program")
 
-    # about string
-    S_ABOUT = (
-        "__PP_NAME_PRJ_BIG__\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__"
-    )
-
     # I18N if using argparse, add help at end of about
-    S_USE_HELP = _("Use -h for help")
+    S_USE_HELP = _("use -h for help")
+
 
     # default format for log files
     S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
@@ -193,6 +192,17 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # NB: format param is file path
     # I18N: could not find -c file
     S_ERR_NO_CFG = _("Config file {} not found")
+
+    # about string
+    S_ABOUT = (
+        "__PP_NAME_PRJ_BIG__\n"
+        f"{S_PP_SHORT_DESC}\n"
+        f"{S_PP_VERSION}\n"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__"
+    )
+
+    # cmd line instructions string (to be set by subclass)
+    S_EPILOG = ""
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -270,13 +280,13 @@ class __PP_NAME_PRJ_PASCAL__Base:
         Boilerplate to use at the start of main
 
         Perform some mundane stuff like running the arg parser and loading
-        config files.
+        config files. Also handles -h (help) and --uninstall
         """
 
         # ----------------------------------------------------------------------
         # use cmd line
 
-        # always add help option
+        # add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
             action=self.S_ARG_HLP_ACTION,
@@ -309,10 +319,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
         self._dict_args = vars(args)
 
         # ----------------------------------------------------------------------
-        # check for one-shot args
+        # check for -h (help)
 
         # if -h passed, this will print and exit
-        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
+        if self._dict_args[self.S_ARG_HLP_DEST]:
 
             # print default about text
             print()
@@ -327,20 +337,17 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # check for -d (debug)
 
         # set self and lib debug
-        self._arg_debug = self._dict_args.get(
-            self.S_ARG_DBG_DEST, self._arg_debug
-        )
+        self._arg_debug = self._dict_args[self.S_ARG_DBG_DEST]
         F.B_DEBUG = self._arg_debug
 
         # ----------------------------------------------------------------------
         # check for --uninstall
 
         # punt to uninstall func
-        if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
+        if self._dict_args[self.S_ARG_UNINST_DEST]:
 
             # uninstall and exit
             self._handle_u()
-            # NB: exit is handled by _do_uninstall
 
         # ----------------------------------------------------------------------
         # set props from args
@@ -459,7 +466,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
         # ----------------------------------------------------------------------
 
         try:
-            F.run(cmd, shell=True)
+            F.run(cmd, shell=True, capture_output=True)
             self._teardown()
         except F.CNRunError as e:
             print(e.output)

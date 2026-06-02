@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: develop.py                                            |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -45,8 +45,8 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 T_DIR_PRJ = P_DIR_PRJ
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -70,8 +70,8 @@ class CNDevelop:
     # --------------------------------------------------------------------------
 
     # venv and reqs names
-    S_NAME_VENV = "__PP_NAME_VENV__"
-    S_FILE_REQS = "__PP_REQS_FILE__"
+    S_NAME_VENV = ".venv-pyplate"
+    S_FILE_REQS = "requirements.txt"
 
     # messages
 
@@ -93,7 +93,7 @@ class CNDevelop:
 
     # NB: format param is dir_venv
     S_CMD_CREATE = "python -m venv {}"
-    S_CMD_TYPE_INST = "__PP_DEV_INST__"
+    S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
 
     # --------------------------------------------------------------------------
     # Class methods

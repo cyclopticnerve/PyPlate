@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: install_base.py                                       |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -45,8 +45,8 @@ import sys
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -101,14 +101,14 @@ class CNInstallBase:
     # strings
 
     # NB: used for logger
-    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+    S_APP_NAME = "pyplate"
 
     # I18N: short description
     # NB: the dot shuts up warnings from xgettext
-    S_PP_SHORT_DESC = _(".")
+    S_PP_SHORT_DESC = _("A Short description")
 
     # version string
-    S_PP_VERSION = ""
+    S_PP_VERSION = "Version 1.2.3"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
@@ -140,10 +140,10 @@ class CNInstallBase:
 
     # about string
     S_ABOUT = (
-        "__PP_NAME_PRJ_BIG__\n"
+        "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__"
+        "https://github.com/cyclopticnerve/PyPlate"
     )
 
     # I18N if using argparse, add help at end of about

@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate.py                                            |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -12,7 +12,7 @@ The main file that runs the program
 
 This file is executable and can be called from the terminal like:
 
-foo@bar:~$ __PP_NAME_PRJ_SMALL__ [cmd line]
+foo@bar:~$ pyplate [cmd line]
 
 when placed in a folder that is in the default $PATH, ie:
 /usr/bin
@@ -21,7 +21,7 @@ etc.
 
 (The extension will be removed by the installer)\n
 All command line options will be passed to the main class, usually located at
-~/.local/share/__PP_NAME_PRJ_SMALL__/src/__PP_NAME_PRJ_SMALL__.py.
+~/.local/share/pyplate/src/pyplate.py.
 
 Typical usage is show in the main() method.
 """
@@ -40,7 +40,7 @@ import sys
 # ------------------------------------------------------------------------------
 
 # find path to prj/lib
-P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
+P_DIR_USR_INST = Path.home() / ".local/share/pyplate"
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -50,7 +50,7 @@ P_DIR_USR_INST = Path.home() / "__PP_USR_INST__"
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_PRJ_PASCAL__:
+class Pyplate:
     """
     The entry point class, responsible for launching the program
 
@@ -74,11 +74,11 @@ class __PP_NAME_PRJ_PASCAL__:
         # cd to prj dir
         "cd {};"
         # activate prj venv
-        ". __PP_NAME_VENV__/bin/activate;"
+        ". .venv-pyplate/bin/activate;"
         # cd to old cwd
         "cd {};"
         # call prj with full pat
-        "{}/__PP_DIR_SRC__/__PP_NAME_PRJ_SMALL__.py {}"
+        "{}/src/pyplate.py {}"
     )
 
     # --------------------------------------------------------------------------
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    obj = __PP_NAME_PRJ_PASCAL__()
+    obj = Pyplate()
 
     # run the new object
     obj.main()

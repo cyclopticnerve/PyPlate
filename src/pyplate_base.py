@@ -91,14 +91,13 @@ class PyPlateBase:
     S_APP_NAME = "pyplate"
 
     # pyplate: replace=True
-
-    # short description
+    # I18N: short description
     S_PP_SHORT_DESC = _(
-        "A program for creating and building CLI/GUI/Packages in Python from a template"
+        "A Short description"
     )
 
     # version string
-    S_PP_VERSION = "Version 1.1.3"
+    S_PP_VERSION = "Version 1.2.3"
 
     # pyplate: replace=False
 
@@ -409,6 +408,7 @@ class PyPlateBase:
         # set self and lib debug
         # NB: gotta do debug before --uninstall in case we need to pass
         self._arg_debug = True
+        C.B_DEBUG = True
         F.B_DEBUG = True
 
     # --------------------------------------------------------------------------

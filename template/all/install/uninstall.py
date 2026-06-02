@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -34,14 +34,14 @@ import sys
 P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get dirs
-P_DIR_INSTALL = P_DIR_PARENT / "__PP_DIR_INSTALL__"
+P_DIR_INSTALL = P_DIR_PARENT / "install"
 
 # get files
-P_FILE_CFG_OLD = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+P_FILE_CFG_OLD = P_DIR_INSTALL / "install.json"
 
 # get pre/post files
-P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/pre_uninstall.py"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_uninstall.py"
 
 # ------------------------------------------------------------------------------
 # Local imports

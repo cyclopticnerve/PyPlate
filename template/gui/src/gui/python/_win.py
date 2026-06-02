@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_FILE_WIN__.py                                    |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: _win.py                                               |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -45,7 +45,7 @@ from gi.repository import Gtk  # type: ignore
 # ------------------------------------------------------------------------------
 # A class to wrap a specific window object in the ui file
 # ------------------------------------------------------------------------------
-class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
+class Win(Gtk.ApplicationWindow):
     """
     A class to wrap a specific window object in the ui file
 
@@ -61,10 +61,10 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     P_DIR_PRJ = Path(__file__).parents[3].resolve()
 
     # get paths to ui files
-    P_FILE_WIN = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
+    P_FILE_WIN = P_DIR_PRJ / "src/gui/ui/_win.ui"
 
     # the name of the window in the ui file
-    S_UI_WIN_NAME = "__PP_CLASS_WIN__"
+    S_UI_WIN_NAME = "Win"
 
     # window actions
     S_ACTION_SHOW = "show"
@@ -74,7 +74,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     S_CMD_BIN = ""
     P_FILE_CFG = (
         Path.home()
-        / f".local/share/{S_CMD_BIN}/__PP_DIR_CONF__/{S_CMD_BIN}.json"
+        / f".local/share/{S_CMD_BIN}/conf/{S_CMD_BIN}.json"
     )
 
     # --------------------------------------------------------------------------

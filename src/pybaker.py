@@ -29,7 +29,7 @@ import re
 import shutil
 
 # venv imports
-from cnlib import cnfunctions as F  # type: ignore
+from cnlib import cnfunctions as F
 
 # local imports
 import pyplate_base as B
@@ -50,11 +50,11 @@ D_PB_ACT = {
     B.C.S_KEY_ACT_META: True,
     B.C.S_KEY_ACT_PLACE: True,
     B.C.S_KEY_ACT_EDIT: True,
-    B.C.S_KEY_ACT_MAKE_DOCS: True,
+    B.C.S_KEY_ACT_DOCS_MAKE: True,
     B.C.S_KEY_ACT_TREE: True,
     B.C.S_KEY_ACT_FREEZE: True,
-    B.C.S_KEY_ACT_BAKE_DOCS: True,
-    B.C.S_KEY_ACT_DEPLOY_DOCS: True,
+    B.C.S_KEY_ACT_DOCS_BAKE: True,
+    B.C.S_KEY_ACT_DOCS_DEPLOY: True,
     B.C.S_KEY_ACT_COMPRESS: True,
     B.C.S_KEY_ACT_REM_DIST: True,
 }
@@ -137,6 +137,12 @@ class PyBaker(B.PyPlateBase):
 
         # handle -v AFTER getting current project info
         self._handle_v()
+
+        # ----------------------------------------------------------------------
+        # print some info
+        print()
+        print(B.C.S_MSG_BAKE.format(self._dir_prj.name))
+        print()
 
         # do any fixing up of dicts (like meta keywords, etc)
         self._do_before_fix()
@@ -443,11 +449,11 @@ class PyBaker(B.PyPlateBase):
         # fix dicts
         self._fix_dicts()
 
-        # ----------------------------------------------------------------------
-        # print some info
-        print()
-        print(B.C.S_MSG_BAKE.format(self._dir_prj.name))
-        print()
+        # # ----------------------------------------------------------------------
+        # # print some info
+        # print()
+        # print(B.C.S_MSG_BAKE.format(self._dir_prj.name))
+        # print()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist

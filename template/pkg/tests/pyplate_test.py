@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL___test.py                         |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate_test.py                                       |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -16,7 +16,7 @@ A simple script to test a package from within the project itself
 # ------------------------------------------------------------------------------
 
 # local imports
-from __PP_NAME_PRJ_SMALL__ import __PP_NAME_SEC_SMALL__
+from pyplate import 
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    RES = __PP_NAME_SEC_SMALL__.func()
+    RES = .func()
     print(RES)
 
 # -)

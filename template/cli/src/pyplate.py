@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate.py                                            |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -13,11 +13,11 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file] ./__PP_NAME_PRJ_SMALL__.py [cmd line]
+foo@bar:~[path to directory of this file] ./pyplate.py [cmd line]
 
 or if installed in a global location:
 
-foo@bar:~$ __PP_NAME_PRJ_SMALL__ [cmd line]
+foo@bar:~$ pyplate [cmd line]
 
 Typical usage is show in the main() method.
 """
@@ -27,8 +27,8 @@ Typical usage is show in the main() method.
 # ------------------------------------------------------------------------------
 
 # local imports
-from __PP_NAME_PRJ_SMALL___base import _
-from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
+from pyplate_base import _
+from pyplate_base import PyplateBase
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -42,7 +42,7 @@ from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
+class Pyplate(PyplateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    obj = __PP_NAME_PRJ_PASCAL__()
+    obj = Pyplate()
 
     # run the instance
     obj.main()

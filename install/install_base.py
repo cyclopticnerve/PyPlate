@@ -105,11 +105,11 @@ class CNInstallBase:
 
     # I18N: short description of program
     S_PP_SHORT_DESC = _(
-        "A program for creating and building CLI/GUI/Packages in Python from a template"
+        "A Short description"
     )
 
     # version string
-    S_PP_VERSION = "Version 1.1.3"
+    S_PP_VERSION = "Version 1.2.3"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
