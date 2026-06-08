@@ -51,10 +51,11 @@ P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_POST__"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
-# pylint: disable=wrong-import-position, import-error
 from install_base import CNInstallBase  # type: ignore
+from install_base import _
 
-# pylint: enable=wrong-import-position, import-error
+# I18N: force install help message
+S_ARG_FORCE_HELP = _("force uninstall this program")
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -62,7 +63,7 @@ from install_base import CNInstallBase  # type: ignore
 
 
 # ------------------------------------------------------------------------------
-# The class to use for installing/uninstalling
+# The class to use for installing a PyPlate program
 # ------------------------------------------------------------------------------
 class CNUninstall(CNInstallBase):
     """
@@ -70,6 +71,13 @@ class CNUninstall(CNInstallBase):
 
     This class performs the uninstall operation.
     """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    # NB: different help message for force between pm/pb
+    S_ARG_FORCE_HELP = S_ARG_FORCE_HELP
 
     # --------------------------------------------------------------------------
     # Class methods

@@ -57,14 +57,6 @@
             "**/*.egg-info"
         ]
     },
-    "PUB_DBG": {
-        "DBG_GIT": true,
-        "DBG_VENV": true,
-        "DBG_I18N": true,
-        "DBG_DOCS": true,
-        "DBG_TREE": true,
-        "DBG_DIST": false
-    },
     "PUB_DIST": {
         "bin": "assets",
         "conf": "assets",
@@ -128,5 +120,23 @@
             ".local/bin/pybaker",
             ".local/share/pyplate"
         ]
+    },
+    "D_PUB_ACT": {
+        "S_KEY_ACT_VENV": true,
+        "S_KEY_ACT_REQS": true,
+        "S_KEY_ACT_GIT": true,
+        "S_KEY_ACT_INST": true,
+        "S_KEY_ACT_PURGE": true,
+        "S_KEY_ACT_I18N": true,
+        "S_KEY_ACT_META": true,
+        "S_KEY_ACT_PLACE": true,
+        "S_KEY_ACT_EDIT": true,
+        "S_KEY_ACT_MAKE_DOCS": true,
+        "S_KEY_ACT_TREE": true,
+        "S_KEY_ACT_FREEZE": true,
+        "S_KEY_ACT_BAKE_DOCS": true,
+        "S_KEY_ACT_DEPLOY_DOCS": true,
+        "S_KEY_ACT_COMPRESS": true,
+        "S_KEY_ACT_REM_DIST": true
     }
 }

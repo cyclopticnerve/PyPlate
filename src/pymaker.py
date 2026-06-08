@@ -30,12 +30,36 @@ import shutil
 
 # venv imports
 from cnlib import cnfunctions as F  # type: ignore
-from cnlib.decorators.cnspinner import spin
 
 # local imports
-import pyplate_base as P
+import pyplate_base as B
 from pyplate_base import _
-from pyplate_base import PyPlateBase
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+
+# ALTERNATE dict in pymaker to control pm processing
+# NB: this is what controls the steps in making TEST projects
+# it does NOT affect the project's 'pyplate/*' files
+D_PM_ACT = {
+    B.C.S_KEY_ACT_VENV: True,
+    B.C.S_KEY_ACT_REQS: True,
+    B.C.S_KEY_ACT_GIT: True,
+    B.C.S_KEY_ACT_INST: True,
+    B.C.S_KEY_ACT_PURGE: True,
+    B.C.S_KEY_ACT_I18N: True,
+    B.C.S_KEY_ACT_META: True,
+    B.C.S_KEY_ACT_PLACE: True,
+    B.C.S_KEY_ACT_EDIT: True,
+    B.C.S_KEY_ACT_MAKE_DOCS: True,
+    B.C.S_KEY_ACT_TREE: True,
+    B.C.S_KEY_ACT_FREEZE: True,
+    B.C.S_KEY_ACT_BAKE_DOCS: True,
+    B.C.S_KEY_ACT_DEPLOY_DOCS: True,
+    B.C.S_KEY_ACT_COMPRESS: True,
+    B.C.S_KEY_ACT_REM_DIST: True,
+}
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -45,7 +69,7 @@ from pyplate_base import PyPlateBase
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyMaker(PyPlateBase):
+class PyMaker(B.PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -63,8 +87,8 @@ class PyMaker(PyPlateBase):
     # about string
     S_ABOUT = (
         f"{'PyPlate/PyMaker'}\n"
-        f"{P.PyPlateBase.S_PP_SHORT_DESC}\n"
-        f"{P.PyPlateBase.S_PP_VERSION}\n"
+        f"{B.PyPlateBase.S_PP_SHORT_DESC}\n"
+        f"{B.PyPlateBase.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
@@ -118,7 +142,14 @@ class PyMaker(PyPlateBase):
 
         # done with project
         print()
-        print(P.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
+
+        # NB: easier to parse path than get dunder
+        if B.C.B_ERROR:
+            print(self.S_ERR_MAKE.format(self._dir_prj.name))
+            if not B.C.B_DEBUG:
+                print(self.S_ERR_USE_D)
+        else:
+            print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
 
         # ----------------------------------------------------------------------
         # teardown
@@ -143,15 +174,32 @@ class PyMaker(PyPlateBase):
         Perform some mundane stuff like setting properties.
         """
 
+        # name to use for the usage string (defaults to pyplate)
         self._parser.prog = "pymaker"
 
         # do parent setup
         super()._setup()
 
         # do not run pymaker in pyplate dir
-        if self._dir_prj.is_relative_to(P.P_DIR_PRJ):
-            print(P.C.S_ERR_PRJ_DIR_IS_PP)
+        # NB: expensive, but needs to be done after testing for -h and
+        # --uninstall
+        if self._dir_prj.is_relative_to(B.P_DIR_PRJ):
+            F.printc(B.C.S_ERR_PRJ_DIR_IS_PP, fg=F.C_FG_RED, bold=True)
             self._teardown(-1)
+
+    # --------------------------------------------------------------------------
+    # Handle the -t option
+    # --------------------------------------------------------------------------
+    def _handle_t(self):
+        """
+        Docstring for _handle_t
+        """
+
+        # super for warning
+        super()._handle_t()
+
+        # local
+        self._dict_act = dict(D_PM_ACT)
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -165,14 +213,14 @@ class PyMaker(PyPlateBase):
         """
 
         # check version from conf
-        pattern = P.C.S_SEM_VER_VALID
-        version = P.C.D_PUB_META[P.C.S_KEY_META_VERSION]
-        ver_ok = P.re.search(pattern, version) is not None
+        pattern = B.C.S_SEM_VER_VALID
+        version = B.C.D_PUB_META[B.C.S_KEY_META_VERSION]
+        ver_ok = B.re.search(pattern, version) is not None
 
         # ask if user wants to keep invalid version or quit
         if not ver_ok:
             res = F.dialog(
-                P.C.S_ERR_SEM_VER,
+                B.C.S_ERR_SEM_VER,
                 [F.S_ASK_YES, F.S_ASK_NO],
                 default=F.S_ASK_NO,
                 # loop=True
@@ -189,13 +237,13 @@ class PyMaker(PyPlateBase):
 
         # build the input question
         types = []
-        for item in P.C.L_TYPES:
-            s = P.C.S_ASK_TYPE_FMT.format(item[0], item[1])
+        for item in B.C.L_TYPES:
+            s = B.C.S_ASK_TYPE_FMT.format(item[0], item[1])
             types.append(s)
-        str_types = P.C.S_ASK_TYPE_JOIN.join(types)
+        str_types = B.C.S_ASK_TYPE_JOIN.join(types)
 
         # format the question
-        in_type = P.C.S_ASK_TYPE.format(str_types)
+        in_type = B.C.S_ASK_TYPE.format(str_types)
 
         # loop forever until we get a valid type
         while True:
@@ -213,12 +261,12 @@ class PyMaker(PyPlateBase):
         # ----------------------------------------------------------------------
         # next question is name
 
-        # if in debug mode
-        if self._arg_debug:
+        # if in test mode
+        if self._arg_test:
 
             # get long name
             name_prj = "DEBUG"
-            for item in P.C.L_TYPES:
+            for item in B.C.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
                     name_prj = f"{item[1]} DEBUG"
@@ -239,14 +287,14 @@ class PyMaker(PyPlateBase):
                 # ITS FUNNY
                 shutil.rmtree(tmp_dir)
 
-        # not debug
+        # not test mode
         else:
 
             # loop forever until we get a valid name that does not exist
             while True:
 
                 # ask for name of project
-                name_prj = input(P.C.S_ASK_NAME)
+                name_prj = input(B.C.S_ASK_NAME)
                 name_prj = name_prj.strip(" ")
 
                 # check for valid name
@@ -262,7 +310,7 @@ class PyMaker(PyPlateBase):
                     if tmp_dir.exists():
 
                         # tell the user that the old name exists
-                        print(P.C.S_ERR_EXIST.format(name_prj_big))
+                        print(B.C.S_ERR_EXIST.format(name_prj_big))
                     else:
                         break
 
@@ -286,20 +334,20 @@ class PyMaker(PyPlateBase):
         name_sec_pascal = ""
 
         # do we need a second name?
-        if prj_type in P.C.D_NAME_SEC:
+        if prj_type in B.C.D_NAME_SEC:
 
-            # dup prj names if debug
-            if self._arg_debug:
+            # dup prj names if test mode
+            if self._arg_test:
                 name_sec = name_prj
                 name_sec_big = name_prj_big
                 name_sec_small = name_prj_small
                 name_sec_pascal = name_prj_pascal
 
-            # if not debug, if need second name, ask for it
+            # if not test mode, if need second name, ask for it
             else:
 
                 # format question for second name
-                s_sec_ask = P.C.D_NAME_SEC[prj_type]
+                s_sec_ask = B.C.D_NAME_SEC[prj_type]
                 s_sec_ask_fmt = s_sec_ask.format(name_prj_small)
 
                 # loop forever until we get a valid name or empty string
@@ -327,27 +375,27 @@ class PyMaker(PyPlateBase):
 
         # create global settings dicts in private.json
         self._dict_prv = {
-            P.C.S_KEY_PRV_ALL: dict(P.C.D_PRV_ALL),
-            P.C.S_KEY_PRV_PRJ: dict(P.C.D_PRV_PRJ),
+            B.C.S_KEY_PRV_ALL: dict(B.C.D_PRV_ALL),
+            B.C.S_KEY_PRV_PRJ: dict(B.C.D_PRV_PRJ),
         }
 
         # create individual dicts in project.json
         self._dict_pub = {
-            P.C.S_KEY_PUB_META: dict(P.C.D_PUB_META),
-            P.C.S_KEY_PUB_BL: dict(P.C.D_PUB_BL),
-            P.C.S_KEY_PUB_DBG: dict(P.C.D_PUB_DBG),
-            P.C.S_KEY_PUB_DIST: dict(P.C.D_PUB_DIST),
-            P.C.S_KEY_PUB_DOCS: dict(P.C.D_PUB_DOCS),
-            P.C.S_KEY_PUB_I18N: dict(P.C.D_PUB_I18N),
-            P.C.S_KEY_PUB_INST: dict(P.C.D_PUB_INST),
+            B.C.S_KEY_PUB_META: dict(B.C.D_PUB_META),
+            B.C.S_KEY_PUB_BL: dict(B.C.D_PUB_BL),
+            B.C.S_KEY_PUB_ACT: dict(B.C.D_PUB_ACT),
+            B.C.S_KEY_PUB_DIST: dict(B.C.D_PUB_DIST),
+            B.C.S_KEY_PUB_DOCS: dict(B.C.D_PUB_DOCS),
+            B.C.S_KEY_PUB_I18N: dict(B.C.D_PUB_I18N),
+            B.C.S_KEY_PUB_INST: dict(B.C.D_PUB_INST),
         }
 
         # ----------------------------------------------------------------------
         # fill dicts
 
         # get prv subs
-        self._dict_prv_all = self._dict_prv[P.C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[P.C.S_KEY_PRV_PRJ]
+        self._dict_prv_all = self._dict_prv[B.C.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[B.C.S_KEY_PRV_PRJ]
 
         # save project stuff
         self._dict_prv_prj["__PP_TYPE_PRJ__"] = prj_type
@@ -358,14 +406,14 @@ class PyMaker(PyPlateBase):
         self._dict_prv_prj["__PP_NAME_SEC_BIG__"] = name_sec_big
         self._dict_prv_prj["__PP_NAME_SEC_SMALL__"] = name_sec_small
         self._dict_prv_prj["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
-        self._dict_prv_prj["__PP_NAME_VENV__"] = P.C.S_VENV_FMT_NAME.format(
+        self._dict_prv_prj["__PP_NAME_VENV__"] = B.C.S_VENV_FMT_NAME.format(
             name_prj_small
         )
-        self._dict_prv_prj["__PP_FILE_APP__"] = P.C.S_APP_FILE_FMT.format(
+        self._dict_prv_prj["__PP_FILE_APP__"] = B.C.S_APP_FILE_FMT.format(
             name_prj_small
         )
         self._dict_prv_prj["__PP_CLASS_APP__"] = name_prj_pascal
-        self._dict_prv_prj["__PP_FILE_WIN__"] = P.C.S_WIN_FILE_FMT.format(
+        self._dict_prv_prj["__PP_FILE_WIN__"] = B.C.S_WIN_FILE_FMT.format(
             name_sec_small
         )
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
@@ -375,16 +423,10 @@ class PyMaker(PyPlateBase):
         self._fix_dicts()
 
         # ----------------------------------------------------------------------
-        # handle -d
-        # NB: do after _fix dicts
-        if self._arg_debug:
-            self._dict_dbg = dict(P.C.D_DBG_PM)
-
-        # ----------------------------------------------------------------------
 
         # print some info
         print()
-        print(P.C.S_MSG_MAKE.format(name_prj_big))
+        print(B.C.S_MSG_MAKE.format(name_prj_big))
         print()
 
     # --------------------------------------------------------------------------
@@ -400,14 +442,14 @@ class PyMaker(PyPlateBase):
         'dict_pub' dicts before any copying occurs.
         """
 
-        P.C.do_before_template(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
+        B.C.do_before_template(
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
         )
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
-    @spin(P.C.S_ACTION_COPY)
+    @B.C.S.spin(B.C.S_ACTION_COPY)
     def _do_template(self):
         """
         Copy template files to final location
@@ -419,7 +461,7 @@ class PyMaker(PyPlateBase):
         # do template/all
 
         # copy template/all
-        src = P.P_DIR_PRJ / P.C.S_DIR_TEMPLATE / P.C.S_DIR_ALL
+        src = B.P_DIR_PRJ / B.C.S_DIR_TEMPLATE / B.C.S_DIR_ALL
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -431,13 +473,13 @@ class PyMaker(PyPlateBase):
         prj_type_long = ""
 
         # get long type of project
-        for item in P.C.L_TYPES:
+        for item in B.C.L_TYPES:
             if item[0] == prj_type_short:
                 prj_type_long = item[2]
                 break
 
         # get the src dir in the template dir
-        src = P.P_DIR_PRJ / P.C.S_DIR_TEMPLATE / prj_type_long
+        src = B.P_DIR_PRJ / B.C.S_DIR_TEMPLATE / prj_type_long
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -445,10 +487,10 @@ class PyMaker(PyPlateBase):
         # do stuff outside template all/type
 
         # copy linked files
-        for key, val in P.C.D_COPY.items():
+        for key, val in B.C.D_COPY.items():
 
             # get src/dst
-            src = P.P_DIR_PRJ / key
+            src = B.P_DIR_PRJ / key
             dst = self._dir_prj / val
 
             # copy dir/file
@@ -465,7 +507,8 @@ class PyMaker(PyPlateBase):
 
         # ----------------------------------------------------------------------
         # done
-        return (True, None)
+        # NB: None = pass, Exception = fail
+        return None
 
     # --------------------------------------------------------------------------
     # Do any work after template copy
@@ -478,10 +521,9 @@ class PyMaker(PyPlateBase):
         _do_template, and before _do_before_fix.
         """
 
-        P.C.do_after_template(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_dbg
+        B.C.do_after_template(
+            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
         )
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

@@ -34,17 +34,9 @@ import sys
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=import-error
-
 P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI_SRC__"
 sys.path.insert(0, str(P_GUI))
 from __PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -218,7 +210,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     # # --------------------------------------------------------------------------
     # # Boilerplate to use at the end of main
     # # --------------------------------------------------------------------------
-    # def _teardown(self):
+    # def _teardown(self, errcode: int=o):
     #     """
     #     Boilerplate to use at the end of main
 
@@ -230,7 +222,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     self._dict_cfg["foo"] = "bar"
 
     #     # do teardown
-    #     super()._teardown()
+    #     super()._teardown(errcode)
 
 
 # ------------------------------------------------------------------------------

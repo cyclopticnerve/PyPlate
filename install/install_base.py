@@ -148,7 +148,7 @@ class CNInstallBase:
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_USE_HELP = _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -398,7 +398,7 @@ class CNInstallBase:
 
             # print "use -h" and bail
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
             self._teardown(-1)
 
         # convert namespace to dict
@@ -434,7 +434,7 @@ class CNInstallBase:
             print()
             print(self.S_ABOUT)
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
 
         # ready to go
         # NB: not sure how do do this the other way around
@@ -446,7 +446,7 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int = 0):
+    def _teardown(self, errcode: int=0):
         """
         Boilerplate to use at the end of main
 

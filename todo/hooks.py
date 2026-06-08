@@ -22,7 +22,7 @@ C.D_PRV_PRJ["__PP_VERSION_PP__"] = PP.PyPlateBase.S_PP_VERSION
 # ------------------------------------------------------------------------------
 # Do any work before template copy
 # ------------------------------------------------------------------------------
-def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
+def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_act):
     """
     Do any work before template copy
 
@@ -123,7 +123,7 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
+def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_act):
     """
     Do any work before fix
 

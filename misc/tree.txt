@@ -13,7 +13,7 @@
    │     │     └─ [] src/
    │     │           ├─ [] pybaker.md
    │     │           ├─ [] pymaker.md
-   │     │           └─ [] pyplate.md
+   │     │           └─ [] pyplate_base.md
    │     ├─ [] images/
    │     │     └─ [] pyplate.png
    │     ├─ [] img/
@@ -57,12 +57,9 @@
    │     │     └─ [] private.json
    │     └─ [] project.json
    ├─ [] src/
-   │     ├─ [] foo/
-   │     │     └─ [] bar/
-   │     │           └─ [] baz
    │     ├─ [] pybaker.py
    │     ├─ [] pymaker.py
-   │     └─ [] pyplate.py
+   │     └─ [] pyplate_base.py
    ├─ [] template/
    │     ├─ [] all/
    │     │     ├─ [] .vscode/
@@ -155,14 +152,7 @@
    │           └─ [] tests/
    │                 └─ [] __PP_NAME_PRJ_SMALL___test.py
    ├─ [] tests/
-   │     └─ [] fix_toml/
-   │           ├─ [] src/
-   │           │     ├─ [] test1/
-   │           │     │     └─ [] test1.py
-   │           │     └─ [] test2/
-   │           │           └─ [] test3/
-   │           │                 └─ [] test3.py
-   │           └─ [] pkg.py
+   │     └─ [] po.py
    ├─ [] todo/
    │     ├─ [] clean/
    │     │     ├─ [] collect_strings.py
@@ -174,11 +164,12 @@
    │     │     ├─ [] cnwindow_junk.py
    │     │     ├─ [] cnwindow_w_state.py
    │     │     ├─ [] cnwindow.py
+   │     │     ├─ [] gui_linker.py
    │     │     └─ [] state.py
+   │     ├─ [] hooks.py
    │     └─ [] todo.txt
    ├─ [] .gitignore
    ├─ [] LICENSE.txt
-   ├─ [] PyPlate.code-workspace
    ├─ [] README.md
    ├─ [] develop.py
    ├─ [] mkdocs.yml

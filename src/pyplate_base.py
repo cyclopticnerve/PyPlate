@@ -7,7 +7,6 @@
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
-# pyplate: replace=False
 
 """
 A class to be the base for pymaker/pybaker
@@ -30,13 +29,12 @@ import sys
 # cnlib imports
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
-from cnlib.decorators import cnspinner as S
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-# project dir
+# dirs
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_LOG = P_DIR_PRJ / "log"
 
@@ -59,8 +57,9 @@ import conf.conf as C
 # Globals
 # ------------------------------------------------------------------------------
 
-DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
-_ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
+# i18n stuff
+DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
+_ = F.get_underscore("pyplate", DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -88,10 +87,10 @@ class PyPlateBase:
     # --------------------------------------------------------------------------
     # strings
 
-    # pyplate: replace=True
-
     # NB: used for parser/logger
     S_APP_NAME = "pyplate"
+
+    # pyplate: replace=True
 
     # short description
     S_PP_SHORT_DESC = _(
@@ -103,21 +102,31 @@ class PyPlateBase:
 
     # pyplate: replace=False
 
-    # debug option strings
+    # --------------------------------------------------------------------------
+    # args
+
+    # debug option
     S_ARG_DBG_OPTION = "-d"
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
     # I18N: debug mode help
     S_ARG_DBG_HELP = _("enable debugging mode")
 
-    # config option strings
+    # help option
     S_ARG_HLP_OPTION = "-h"
     S_ARG_HLP_ACTION = "store_true"
     S_ARG_HLP_DEST = "HLP_DEST"
     # I18N: help option help
     S_ARG_HLP_HELP = _("show this help message and exit")
 
-    # config option strings
+    # test option
+    S_ARG_TEST_OPTION = "-t"
+    S_ARG_TEST_ACTION = "store_true"
+    S_ARG_TEST_DEST = "TEST_DEST"
+    # dont show in help
+    S_ARG_TEST_HELP = argparse.SUPPRESS
+
+    # uninstall option
     S_ARG_UNINST_OPTION = "--uninstall"
     S_ARG_UNINST_ACTION = "store_true"
     S_ARG_UNINST_DEST = "UNINST_DEST"
@@ -125,7 +134,29 @@ class PyPlateBase:
     S_ARG_UNINST_HELP = _("uninstall this program")
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_USE_HELP = _("use -h for help")
+
+    # --------------------------------------------------------------------------
+    # messages
+
+    # I18N: warn if running in test mode
+    S_MSG_TEST = _(
+        "WARNING! YOU ARE IN TEST MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!"
+    )
+
+    # --------------------------------------------------------------------------
+    # errors
+
+    # I18N: there was an error when making
+    # NB: fmt param is prj name big
+    S_ERR_MAKE = _("There were errors making {}")
+    # I18N: there was an error when baking
+    # NB: fmt param is prj name big
+    S_ERR_BAKE = _("There were errors baking {}")
+    # I18N: common message to use debug mode
+    S_ERR_USE_D = _("Use -d for more information")
+
+    # --------------------------------------------------------------------------
 
     # about string (to be set by subclass)
     S_ABOUT = ""
@@ -154,10 +185,12 @@ class PyPlateBase:
         # args and arg props
         self._dict_args = {}
         self._arg_debug = False
+        self._arg_test = False
 
         # internal props
         self._dir_prj = Path()
         self._dict_rep = {}
+        self._dict_act = {}
         self._dict_type_rules = {}
         self._dict_sw_block = {}
         self._dict_sw_line = {}
@@ -169,16 +202,13 @@ class PyPlateBase:
 
         # project.json dicts
         self._dict_pub = {}
+        self._dict_pub_meta = {}
         self._dict_pub_bl = {}
-        self._dict_pub_dbg = {}
         self._dict_pub_dist = {}
         self._dict_pub_docs = {}
         self._dict_pub_i18n = {}
-        self._dict_pub_meta = {}
         self._dict_pub_inst = {}
-
-        # dictionary to hold current pm/pb debug settings
-        self._dict_dbg = {}
+        self._dict_pub_act = {}
 
         # ----------------------------------------------------------------------
         # set self._dir_prj
@@ -195,7 +225,7 @@ class PyPlateBase:
 
         # ----------------------------------------------------------------------
 
-        # make some folders
+        # make log folder
         if not P_DIR_LOG.exists():
             Path.mkdir(P_DIR_LOG)
 
@@ -238,7 +268,7 @@ class PyPlateBase:
         Boilerplate to use at the start of main
 
         Perform some mundane stuff like running the arg parser and loading
-        config files.
+        config files. Also handles -h (help) and --uninstall
         """
 
         # ----------------------------------------------------------------------
@@ -252,12 +282,20 @@ class PyPlateBase:
             action=self.S_ARG_DBG_ACTION,
         )
 
-        # always add help option
+        # add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
             action=self.S_ARG_HLP_ACTION,
             dest=self.S_ARG_HLP_DEST,
             help=self.S_ARG_HLP_HELP,
+        )
+
+        # add test option
+        self._parser.add_argument(
+            self.S_ARG_TEST_OPTION,
+            action=self.S_ARG_TEST_ACTION,
+            dest=self.S_ARG_TEST_DEST,
+            help=self.S_ARG_TEST_HELP,
         )
 
         # add uninstall option
@@ -269,74 +307,70 @@ class PyPlateBase:
         )
 
         # run the parser
-        args = None
+        args = {}
         try:
             args = self._parser.parse_args()
         except SystemExit:
 
             # print usage and arg info and exit
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_ABOUT)
+            print()
+            self._parser.print_help()
             self._teardown(-1)
 
         # convert namespace to dict
         self._dict_args = vars(args)
 
         # ----------------------------------------------------------------------
-        # check for one-shot args
+        # check for -h (help)
 
         # if -h passed, this will print and exit
-        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
+        if self._dict_args[self.S_ARG_HLP_DEST]:
 
-            # print default about text
-            print()
-            print(self.S_ABOUT)
-            print()
-            self._parser.print_help()
-            self._teardown()
+            # show help and exit
+            self._handle_h()
 
         # ----------------------------------------------------------------------
         # check for -d (debug)
 
-        # set self and lib debug
-        self._arg_debug = self._dict_args.get(
-            self.S_ARG_DBG_DEST, self._arg_debug
-        )
-        F.B_DEBUG = self._arg_debug
+        # if -d passed, this will set debug mode
+        if self._dict_args[self.S_ARG_DBG_DEST]:
+
+            # show help and exit
+            self._handle_d()
 
         # ----------------------------------------------------------------------
         # check for --uninstall
 
         # punt to uninstall func
-        if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
+        if self._dict_args[self.S_ARG_UNINST_DEST]:
 
             # uninstall and exit
             self._handle_u()
-            # NB: exit is handled by _do_uninstall
 
         # ----------------------------------------------------------------------
-        # no more args to handle
-
         # print default about text
         print()
         print(self.S_ABOUT)
         print()
         print(self.S_EPILOG)
         print()
-        print(self.S_ABOUT_HELP)
-        print()
+        print(self.S_USE_HELP)
 
-        # maybe yell
-        if self._arg_debug:
+        # ----------------------------------------------------------------------
+        # check for -t (test)
 
-            # yup, yell
-            F.printc(C.S_MSG_DEBUG, fg=F.C_FG_RED, bg=F.C_BG_NONE, bold=True)
+        # NB: yell after printing about info
+        if self._dict_args[self.S_ARG_TEST_DEST]:
+            self._handle_t()
+        else:
             print()
 
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int = 0):
+    def _teardown(self, errcode: int=0):
         """
         Boilerplate to use at the end of main
 
@@ -348,6 +382,72 @@ class PyPlateBase:
 
         # use exit code
         sys.exit(errcode)
+
+    # --------------------------------------------------------------------------
+    # Handle the -h cmd line op
+    # --------------------------------------------------------------------------
+    def _handle_h(self):
+        """
+        Handle the -h cmd line op
+        """
+
+        # print default about text
+        print()
+        print(self.S_ABOUT)
+        print()
+        self._parser.print_help()
+        self._teardown()
+
+    # --------------------------------------------------------------------------
+    # Handle the -d cmd line op
+    # --------------------------------------------------------------------------
+    def _handle_d(self):
+        """
+        Handle the -d cmd line op
+        """
+
+        # set self and lib debug
+        # NB: gotta do debug before --uninstall in case we need to pass
+        self._arg_debug = True
+        F.B_DEBUG = True
+
+    # --------------------------------------------------------------------------
+    # Handle the --uninstall cmd line op
+    # --------------------------------------------------------------------------
+    def _handle_u(self):
+        """
+        Handle the --uninstall cmd line op
+        """
+
+        # format cmd line
+        cmd = str(P_UNINST)
+        if self._arg_debug:
+            cmd = f"{str(P_UNINST)} {self.S_ARG_DBG_OPTION}"
+
+        # ----------------------------------------------------------------------
+
+        try:
+            F.run(cmd, shell=True)
+            self._teardown()
+        except F.CNRunError as e:
+            F.printd(e.output)
+            self._teardown(e.returncode)
+
+    # --------------------------------------------------------------------------
+    # Handle the -t cmd line op
+    # --------------------------------------------------------------------------
+    def _handle_t(self):
+        """
+        Handle the -t cmd line op
+        """
+
+        # set property
+        self._arg_test = True
+
+        # yell about being in test mode
+        print()
+        F.printc(self.S_MSG_TEST, fg=F.C_FG_RED, bg=F.C_BG_NONE, bold=True)
+        print()
 
     # --------------------------------------------------------------------------
     # Save pyplate folder
@@ -378,28 +478,6 @@ class PyPlateBase:
             F.printd(C.S_ERR_ERR, str(e))
 
     # --------------------------------------------------------------------------
-    # Handle the --uninstall cmd line op
-    # --------------------------------------------------------------------------
-    def _handle_u(self):
-        """
-        Handle the --uninstall cmd line op
-        """
-
-        # format cmd line
-        cmd = str(P_UNINST)
-        if self._arg_debug:
-            cmd = str(P_UNINST_DBG)
-
-        # ----------------------------------------------------------------------
-
-        try:
-            F.run(cmd, shell=True)
-            self._teardown()
-        except F.CNRunError as e:
-            print(e.output)
-            self._teardown(e.returncode)
-
-    # --------------------------------------------------------------------------
     # Do any work before fix
     # --------------------------------------------------------------------------
     def _do_before_fix(self):
@@ -417,13 +495,13 @@ class PyPlateBase:
             self._dir_prj,
             self._dict_prv,
             self._dict_pub,
-            self._dict_dbg,
+            self._dict_act,
         )
 
     # --------------------------------------------------------------------------
     # Scan dirs/files in the project for replacing text
     # --------------------------------------------------------------------------
-    @S.spin(C.S_ACTION_FIX)
+    @C.S.spin(C.S_ACTION_FIX)
     def _do_fix(self):
         """
         Scan dirs/files in the project for replacing text
@@ -506,7 +584,8 @@ class PyPlateBase:
             self._fix_path(root)
 
         # done
-        return (True, None)
+        # NB: None = pass, Exception = fail
+        return None
 
     # --------------------------------------------------------------------------
     # Do any work after fix
@@ -525,7 +604,7 @@ class PyPlateBase:
             self._dir_prj,
             self._dict_prv,
             self._dict_pub,
-            self._dict_dbg,
+            self._dict_act,
         )
 
     # --------------------------------------------------------------------------
@@ -842,7 +921,7 @@ class PyPlateBase:
         self._dict_prv_prj = self._dict_prv[C.S_KEY_PRV_PRJ]
 
         # ----------------------------------------------------------------------
-        # get prv subs
+        # make dunder rep dict
         self._dict_rep = self._dict_prv_all | self._dict_prv_prj
 
         # ----------------------------------------------------------------------
@@ -869,17 +948,17 @@ class PyPlateBase:
 
         # ----------------------------------------------------------------------
         # get pub subs
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
         self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_dbg = self._dict_pub[C.S_KEY_PUB_DBG]
         self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
         self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
         self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
         self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]
-        # self._dict_pub_uninst = self._dict_pub[C.S_KEY_PUB_UNINST]
+        self._dict_pub_act = self._dict_pub[C.S_KEY_PUB_ACT]
 
-        # set initial debug
-        self._dict_dbg = dict(self._dict_pub_dbg)
+        # set initial actions
+        if not self._arg_test:
+            self._dict_act = dict(self._dict_pub_act)
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters

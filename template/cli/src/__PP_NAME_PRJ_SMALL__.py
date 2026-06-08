@@ -71,9 +71,8 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     # --------------------------------------------------------------------------
     # Dictionaries
 
-    # TODO: move defaults out
     # set default config dict
-    D_DEFAULT = {}
+    D_CFG_DEF = {}
 
     # # ------------------------------------------------------------------------
     # # Initialize the new object
@@ -91,7 +90,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     super().__init__()
 
     #     # set default cfg dict
-    #     self._dict_cfg = self.D_DEFAULT.copy()
+    #     self._dict_cfg = self.D_CFG_DEF.copy()
 
     #     # NB: add class properties here
     #     self._foo = True
@@ -211,7 +210,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     # # --------------------------------------------------------------------------
     # # Boilerplate to use at the end of main
     # # --------------------------------------------------------------------------
-    # def _teardown(self):
+    # def _teardown(self, errcode: int=0):
     #     """
     #     Boilerplate to use at the end of main
 
@@ -223,7 +222,7 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     self._dict_cfg["foo"] = "bar"
 
     #     # do teardown
-    #     super()._teardown()
+    #     super()._teardown(errcode)
 
 
 # ------------------------------------------------------------------------------

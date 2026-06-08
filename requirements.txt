@@ -1,5 +1,5 @@
 click==8.2.1
-CNLib @ git+https://github.com/cyclopticnerve/CNLib@ad238aad034884829b842dc33961fe39f8250b85
+CNLib @ file:///home/dana/Projects/Python/CNLib/dist/cnlib-1.4.0.zip#sha256=954331722c0cb1af9452e5c63cf6ca6412202b9d0e21344347aa9477825c8c9a
 colorama==0.4.6
 ghp-import==2.1.0
 griffe==1.7.3

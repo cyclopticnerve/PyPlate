@@ -1,2 +1,0 @@
-# pyplate.py
-::: src.pyplate
