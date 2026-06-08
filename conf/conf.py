@@ -33,7 +33,7 @@ from cnlib.cnmkdocs import CNMkDocs  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
-from cnlib.decorators import cnspinner as S
+from cnlib.decorators import cnspinner as S  # type: ignore
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -331,11 +331,11 @@ S_KEY_ACT_I18N = "ACT_I18N"
 S_KEY_ACT_META = "ACT_META"
 S_KEY_ACT_PLACE = "ACT_PLACE"
 S_KEY_ACT_EDIT = "ACT_EDIT"
-S_KEY_ACT_MAKE_DOCS = "ACT_MAKE_DOCS"
+S_KEY_ACT_DOCS_MAKE = "ACT_MAKE_DOCS"
 S_KEY_ACT_TREE = "ACT_TREE"
 S_KEY_ACT_FREEZE = "ACT_FREEZE"
-S_KEY_ACT_BAKE_DOCS = "ACT_BAKE_DOCS"
-S_KEY_ACT_DEPLOY_DOCS = "ACT_DEPLOY_DOCS"
+S_KEY_ACT_DOCS_BAKE = "ACT_BAKE_DOCS"
+S_KEY_ACT_DOCS_DEPLOY = "ACT_DEPLOY_DOCS"
 S_KEY_ACT_COMPRESS = "ACT_COMPRESS"
 S_KEY_ACT_REM_DIST = "ACT_REM_DIST"
 
@@ -587,7 +587,7 @@ S_THEME_REP = r"\g<1> {}"
 
 S_WLANG = "en"
 S_ENCODING = "UTF-8"
-S_DIST_MODE = "tar"
+S_DIST_MODE = "gztar"
 # I18N: default date format
 S_DATE_FMT = _("%m/%d/%Y")
 # I18N: def deps
@@ -1130,7 +1130,6 @@ D_PUB_INST = {}
 # TEMPLATE dict in project to control pm/pb processing
 # NB: this is what controls the steps in making ALL projects
 # and what controls a particular PROJECT when baking
-
 D_PUB_ACT = {
     S_KEY_ACT_VENV: True,
     S_KEY_ACT_REQS: True,
@@ -1141,11 +1140,11 @@ D_PUB_ACT = {
     S_KEY_ACT_META: True,
     S_KEY_ACT_PLACE: True,
     S_KEY_ACT_EDIT: True,
-    S_KEY_ACT_MAKE_DOCS: True,
+    S_KEY_ACT_DOCS_MAKE: True,
     S_KEY_ACT_TREE: True,
     S_KEY_ACT_FREEZE: True,
-    S_KEY_ACT_BAKE_DOCS: True,
-    S_KEY_ACT_DEPLOY_DOCS: True,
+    S_KEY_ACT_DOCS_BAKE: True,
+    S_KEY_ACT_DOCS_DEPLOY: True,
     S_KEY_ACT_COMPRESS: True,
     S_KEY_ACT_REM_DIST: True,
 }
@@ -1452,47 +1451,19 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
     # --------------------------------------------------------------------------
     # create venv
 
-    """
-
-    if not dict_act[S_KEY_ACT_VENV]:
-        S.skip(S_ACTION_VENV)
-
-    else:
-        err = _action_venv(dir_prj, dict_prv, dict_pub)
-
-        if err:
-            if len(tip) > 0:
-                F.printc(
-                    tip,
-                    fg=S.D_SPIN[S.S_KEY_FAIL][S.S_KEY_FG],
-                    bg=S.D_SPIN[S.S_KEY_FAIL][S.S_KEY_BG],
-                    bold=S.D_SPIN[S.S_KEY_FAIL][S.S_KEY_BOLD]
-                )
-            F.printd(str(err))
-
-    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-            if quit:
-                # TODO: PM/PB teardown
-                sys.exit(-1)
-
-    """
-
     # call the spinner-wrapped function
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,  # ok
         S_KEY_ACT_VENV,  # ok
         S_ACTION_VENV,  # ok
-
         # run action and check for error
         _action_venv,  # ok
         dir_prj,  # ok
         dict_prv,  # ok
         dict_pub,  # ok
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # --------------------------------------------------------------------------
@@ -1500,20 +1471,17 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
 
     # call the spinner-wrapped function
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_REQS,
         S_ACTION_REQS,
-
         # run action and check for error
         _action_reqs,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # --------------------------------------------------------------------------
@@ -1521,20 +1489,17 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
 
     # call the spinner-wrapped function
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_GIT,
         S_ACTION_GIT,
-
         # run action and check for error
         _action_git,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # --------------------------------------------------------------------------
@@ -1544,23 +1509,20 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
     if prj_type in D_TYPE_INST:
         dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
 
-    # call the spinner-wrapped function
-    _res = _action_run(
-
-        # check for key presence or skip
-        dict_act,
-        S_KEY_ACT_INST,
-        S_ACTION_INST,
-
-        # run action and check for error
-        _action_inst,
-        dir_prj,
-        dict_prv,
-        dict_pub,
-
-        # handle error
-        quit=False
-    )
+        # call the spinner-wrapped function
+        _res = _action_run(
+            # check for key presence or skip
+            dict_act,
+            S_KEY_ACT_INST,
+            S_ACTION_INST,
+            # run action and check for error
+            _action_inst,
+            dir_prj,
+            dict_prv,
+            dict_pub,
+            # handle error
+            quit=False,
+        )
 
     # --------------------------------------------------------------------------
     # purge package dirs
@@ -1578,23 +1540,6 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
 
     # --------------------------------------------------------------------------
     # do i18n stuff
-
-    _res = _action_run(
-
-        # check for key presence or skip
-        dict_act,
-        S_KEY_ACT_I18N,
-        S_ACTION_I18N,
-
-        # run action and check for error
-        _action_i18n,
-        dir_prj,
-        dict_prv,
-        dict_pub,
-
-        # handle error
-        quit=False
-    )
 
     if prj_type in D_TYPE_I18N:
 
@@ -1761,58 +1706,49 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     # if dict_act[S_KEY_ACT_I18N]:
     #     _action_i18n(dir_prj, dict_prv, dict_pub)
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_I18N,
         S_ACTION_I18N,
-
         # run action and check for error
         _action_i18n,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # meta
     # _action_meta(dir_prj, dict_prv, dict_pub)
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_META,
         S_ACTION_META,
-
         # run action and check for error
         _action_meta,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # add/remove placeholders
     # _action_placeholders(dir_prj, dict_prv, dict_pub)
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_PLACE,
         S_ACTION_PLACE,
-
         # run action and check for error
         _action_placeholders,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # --------------------------------------------------------------------------
@@ -1822,43 +1758,37 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
         # _action_edit(dir_prj, dict_prv)
 
         _res = _action_run(
-
             # check for key presence or skip
             dict_act,
             S_KEY_ACT_EDIT,
             S_ACTION_EDIT,
-
             # run action and check for error
             _action_edit,
             dir_prj,
             dict_prv,
             dict_pub,
-
             # handle error
-            quit=False
+            quit=False,
         )
 
     # --------------------------------------------------------------------------
     # docs
 
     # if docs flag is set
-    # if dict_act[S_KEY_ACT_MAKE_DOCS]:
+    # if dict_act[S_KEY_ACT_DOCS_MAKE]:
     #     _action_make_docs(dir_prj, dict_pub)
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
-        S_KEY_ACT_MAKE_DOCS,
+        S_KEY_ACT_DOCS_MAKE,
         S_ACTION_MAKE_DOCS,
-
         # run action and check for error
         _action_make_docs,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # --------------------------------------------------------------------------
@@ -1870,20 +1800,17 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     # if dict_act[S_KEY_ACT_TREE]:
     #     _action_tree(dir_prj, dict_pub)
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_TREE,
         S_ACTION_TREE,
-
         # run action and check for error
         _action_tree,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
 
@@ -1911,68 +1838,59 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_act):
     # freeze venv
 
     if prj_type in L_APP_INSTALL:
-#         _action_freeze(dir_prj, dict_prv)
+        #         _action_freeze(dir_prj, dict_prv)
         _res = _action_run(
-
             # check for key presence or skip
             dict_act,
             S_KEY_ACT_FREEZE,
             S_ACTION_FREEZE,
-
             # run action and check for error
             _action_freeze,
             dir_prj,
             dict_prv,
             dict_pub,
-
             # handle error
-            quit=False
+            quit=False,
         )
 
     # --------------------------------------------------------------------------
     # docs bake
 
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
-        S_KEY_ACT_BAKE_DOCS,
+        S_KEY_ACT_DOCS_BAKE,
         S_ACTION_BAKE_DOCS,
-
         # run action and check for error
         _action_bake_docs,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # --------------------------------------------------------------------------
     # docs deploy
 
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
-        S_KEY_ACT_DEPLOY_DOCS,
+        S_KEY_ACT_DOCS_DEPLOY,
         S_ACTION_DEPLOY_DOCS,
-
         # run action and check for error
         _action_deploy_docs,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # if docs flag is set
-    # if dict_act[S_KEY_ACT_BAKE_DOCS]:
+    # if dict_act[S_KEY_ACT_DOCS_BAKE]:
     #     res, obj = _action_bake_docs(dir_prj)
-    #     if res and obj and dict_act[S_KEY_ACT_DEPLOY_DOCS]:
+    #     if res and obj and dict_act[S_KEY_ACT_DOCS_DEPLOY]:
     #         _action_deploy_docs(dir_prj, obj)
 
 
@@ -2051,20 +1969,17 @@ def do_after_dist(dir_prj, dict_prv, dict_pub, dict_act):
     # compress dist
 
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_COMPRESS,
         S_ACTION_COMPRESS,
-
         # run action and check for error
         _action_compress,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
 
     # # if debug key set
@@ -2074,22 +1989,18 @@ def do_after_dist(dir_prj, dict_prv, dict_pub, dict_act):
     # docs bake
 
     _res = _action_run(
-
         # check for key presence or skip
         dict_act,
         S_KEY_ACT_REM_DIST,
         S_ACTION_REM_DIST,
-
         # run action and check for error
         _action_rem_dist,
         dir_prj,
         dict_prv,
         dict_pub,
-
         # handle error
-        quit=False
+        quit=False,
     )
-
 
 
 # ------------------------------------------------------------------------------
@@ -2108,7 +2019,7 @@ def _action_run(
     dict_act, key, msg, action_func, dir_prj, dict_prv, dict_pub, quit=False
 ):
     """
-    Run an action
+    Run an actionS_KEY_ACT_DOCS_BAKE
 
     Arguments:
 
@@ -2125,20 +2036,17 @@ def _action_run(
 
     # the real func failed - why?
     if err:
+
+        # set flag
         global B_ERROR
         B_ERROR = True
-        # if len(tip) > 0:
-        #     F.printc(
-        #         tip,
-        #         fg=S.D_SPIN[S.S_KEY_FAIL][S.S_KEY_FG],
-        #         bg=S.D_SPIN[S.S_KEY_FAIL][S.S_KEY_BG],
-        #         bold=S.D_SPIN[S.S_KEY_FAIL][S.S_KEY_BOLD]
-        #     )
-        F.printd(str(err))
 
-        # is it a fireable offence?
+        # print more info if -d
+        # F.printd(str(err))
+
+        # is it a fireable offense?
         if quit:
-            # TODO: use teardown
+            # TODO: use PM/PB teardown
             sys.exit(-1)
 
     # pass
@@ -2236,7 +2144,7 @@ def _action_git(dir_prj, _dict_prv, _dict_pub):
     # add git dir
     cmd = S_CMD_GIT_CREATE.format(dir_prj)
     try:
-        F.run(cmd, shell=True)
+        F.run(cmd, shell=True, capture_output=True)
         return None
     except F.CNRunError as e:
         return e
@@ -2342,11 +2250,16 @@ def _action_i18n(dir_prj, dict_prv, dict_pub):
     # --------------------------------------------------------------------------
     # do bulk of i18n
 
+    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+    str_version = dict_prv_prj["__PP_VER_MMR__"]
+    if str_version == "":
+        str_version = "0.0.0"
+
     # create CNPotPy object
     potpy = CNPotPy(
         # header
         str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
-        str_version=dict_prv[S_KEY_PRV_PRJ]["__PP_VER_MMR__"],
+        str_version=str_version,
         str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
         str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
         # base prj dir
@@ -2398,17 +2311,13 @@ def _action_i18n(dir_prj, dict_prv, dict_pub):
 @S.spin(S_ACTION_META)
 def _action_meta(dir_prj, dict_prv, dict_pub):
     """
-    HEADER TEXT
+    Fix metadata
 
     Args:
         dir_prj: The project directory
         dict_prv: The PyPlate private dict
         dict_pub: The PyPlate public dict
 
-    Returns:
-        A tuple consisting of:
-            bool: Whether the action passed or failed
-            obj: An object returned from the function
     """
 
     # --------------------------------------------------------------------------
@@ -2550,6 +2459,7 @@ def _action_edit(dir_prj, dict_prv, _dict_pub):
     except F.CNRunError as e:
         return e
 
+
 # ------------------------------------------------------------------------------
 # Make docs folderS_ERR_NO_REPO
 # ------------------------------------------------------------------------------
@@ -2571,7 +2481,7 @@ def _action_make_docs(dir_prj, _dict_prv, dict_pub):
     if use_rm or not exist:
         use_rm = True
 
-    # the command to make docs
+    # command to make docs
     try:
 
         # make docs
@@ -2591,7 +2501,7 @@ def _action_make_docs(dir_prj, _dict_prv, dict_pub):
         return e
 
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Make tree files
 # ------------------------------------------------------------------------------
 @S.spin(S_ACTION_TREE)
@@ -2683,13 +2593,18 @@ def _action_deploy_docs(dir_prj, _dict_prv, _dict_pub):
 #
 # ------------------------------------------------------------------------------
 @S.spin(S_ACTION_COMPRESS)
-def _action_compress(_dir_prj, _dict_prv, _dict_pub):
+def _action_compress(dir_prj, dict_prv, _dict_pub):
+
+    # get dist dir for all operations
+    dist = Path(dir_prj) / S_DIR_DIST
+    name_fmt = str(dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"])
+    p_dist = dist / name_fmt
 
     # get out file (dist/prj-<version>.xxx) and in dir (dist/prj-<version>)
-    # path_out = path_in = str(p_dist)
+    path_out = path_in = str(p_dist)
 
     # make archive type
-    # shutil.make_archive(path_out, S_DIST_MODE, path_in)
+    shutil.make_archive(path_out, S_DIST_MODE, path_in)
 
     # print info
     pass
@@ -2698,10 +2613,15 @@ def _action_compress(_dir_prj, _dict_prv, _dict_pub):
 #
 # ------------------------------------------------------------------------------
 @S.spin(S_ACTION_REM_DIST)
-def _action_rem_dist(_dir_prj, _dict_prv, _dict_pub):
+def _action_rem_dist(dir_prj, dict_prv, _dict_pub):
+
+    # get dist dir for all operations
+    dist = Path(dir_prj) / S_DIR_DIST
+    name_fmt = str(dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"])
+    p_dist = dist / name_fmt
 
     # delete folder
-    # shutil.rmtree(p_dist)
+    shutil.rmtree(p_dist)
 
     # show info
     pass
@@ -2961,6 +2881,10 @@ def _fix_pyproject(path: Path, dict_prv_prj, dict_pub_meta):
 
         # only care about dirs
         for child_dir in child_dirs:
+
+            # ignore __pycache__
+            if child_dir == "__pycache__":
+                continue
 
             # get full path, then relative to project path to get relative path
             abs_path = parent_dir / child_dir

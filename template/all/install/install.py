@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -36,29 +36,29 @@ import sys
 P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get in dirs
-P_DIR_ASSETS = P_DIR_PARENT / "__PP_DIR_ASSETS__"
-P_DIR_INSTALL = P_DIR_ASSETS / "__PP_DIR_INSTALL__"
+P_DIR_ASSETS = P_DIR_PARENT / "assets"
+P_DIR_INSTALL = P_DIR_ASSETS / "install"
 
 # get in files
 # NB: use local uninstall
-P_FILE_UNINST = P_DIR_ASSETS / "__PP_NAME_UNINST__"
-P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
-P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
-P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_IMG_DESK__"
-P_FILE_CFG_NEW = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+P_FILE_UNINST = P_DIR_ASSETS / "uninstall.py"
+P_FILE_REQS = P_DIR_INSTALL / "requirements.txt"
+P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
+P_FILE_DESK_ICON = P_DIR_ASSETS / ".local/share/pyplate/images/pyplate.png"
+P_FILE_CFG_NEW = P_DIR_INSTALL / "install.json"
 
 # get out dirs
-P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
-P_DIR_CONF = Path.home() / "__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__"
+P_DIR_VENV = Path.home() / ".local/share/pyplate/.venv-pyplate"
+P_DIR_CONF = Path.home() / ".config/pyplate"
 
 # get out files
 P_FILE_CFG_OLD = (
-    Path.home() / "__PP_USR_INST__/__PP_DIR_INSTALL__/__PP_FILE_INST_CFG__"
+    Path.home() / ".local/share/pyplate/install/install.json"
 )
 
 # get pre/post files
-P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_INST_PRE__"
-P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_INST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/pre_install.py"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_install.py"
 
 # ------------------------------------------------------------------------------
 # Local imports

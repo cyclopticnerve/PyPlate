@@ -13,11 +13,11 @@
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
 <!-- __RM_SHORT_DESC__ -->
-A program for creating and building CLI/GUI/Packages in Python from a template
+A program for creating and building CLI/GUI/Package projects in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 1.1.3
+Version 1.1.4
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->

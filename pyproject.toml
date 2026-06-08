@@ -12,8 +12,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PyPlate"
-version = "1.1.3"
-description = "A program for creating and building CLI/GUI/Packages in Python from a template"
+version = "1.1.4"
+description = "A program for creating and building CLI/GUI/Package projects in Python from a template"
 authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["python", "cli", "template", "app", "package", "gui", "module", "gtk3"]
+keywords = []
 dependencies = []
 requires-python = ">=3.10"
 
@@ -31,6 +31,6 @@ requires-python = ">=3.10"
 homepage = "https://github.com/cyclopticnerve/PyPlate"
 
 [tool.setuptools]
-packages = ["pyplate"]
+packages = ["src"]
 
 # -)

@@ -52,11 +52,11 @@ D_PM_ACT = {
     B.C.S_KEY_ACT_META: True,
     B.C.S_KEY_ACT_PLACE: True,
     B.C.S_KEY_ACT_EDIT: True,
-    B.C.S_KEY_ACT_MAKE_DOCS: True,
+    B.C.S_KEY_ACT_DOCS_MAKE: True,
     B.C.S_KEY_ACT_TREE: True,
     B.C.S_KEY_ACT_FREEZE: True,
-    B.C.S_KEY_ACT_BAKE_DOCS: True,
-    B.C.S_KEY_ACT_DEPLOY_DOCS: True,
+    B.C.S_KEY_ACT_DOCS_BAKE: True,
+    B.C.S_KEY_ACT_DOCS_DEPLOY: True,
     B.C.S_KEY_ACT_COMPRESS: True,
     B.C.S_KEY_ACT_REM_DIST: True,
 }
@@ -121,6 +121,13 @@ class PyMaker(B.PyPlateBase):
 
         # get project info
         self._get_project_info()  # here
+
+        # ----------------------------------------------------------------------
+
+        # print some info
+        print()
+        print(B.C.S_MSG_MAKE.format(self._dir_prj.name))
+        print()
 
         # do before template
         self._do_before_template()  # here/conf
@@ -422,13 +429,6 @@ class PyMaker(B.PyPlateBase):
         # get reps to fix public
         self._fix_dicts()
 
-        # ----------------------------------------------------------------------
-
-        # print some info
-        print()
-        print(B.C.S_MSG_MAKE.format(name_prj_big))
-        print()
-
     # --------------------------------------------------------------------------
     # Do any work before template copy
     # --------------------------------------------------------------------------
@@ -524,6 +524,7 @@ class PyMaker(B.PyPlateBase):
         B.C.do_after_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
         )
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

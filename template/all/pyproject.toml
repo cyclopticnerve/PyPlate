@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: pyproject.toml                                        |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 [build-system]
@@ -11,26 +11,26 @@ requires = ["setuptools>=78.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "__PP_NAME_PRJ_BIG__"
-version = "0.0.6"
-description = "A program for creating and building CLI/GUI/Packages in Python from a template"
-authors = [{ name = "__PP_AUTHOR__", email = "__PP_EMAIL__" }]
-readme = "__PP_README_FILE__"
-license = { file = "__PP_LICENSE_FILE__" }
+name = "PyPlate"
+version = "1.1.4"
+description = "A program for creating and building CLI/GUI/Package projects in Python from a template"
+authors = [{ name = "cyclopticnerve", email = "cyclopticnerve@gmail.com" }]
+readme = "README.md"
+license = { file = "LICENSE.txt" }
 classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["python", "cli", "template", "app", "package", "gui", "module", "gtk3"]
+keywords = []
 dependencies = []
 requires-python = ">=3.10"
 
 [project.urls]
-homepage = "__PP_URL__/__PP_NAME_PRJ_BIG__"
+homepage = "https://github.com/cyclopticnerve/PyPlate"
 
 [tool.setuptools]
-packages = ["__PP_NAME_PRJ_SMALL__"]
+packages = ["src"]
 
 # -)

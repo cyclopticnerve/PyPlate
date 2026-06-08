@@ -66,9 +66,9 @@
    │     │     │     ├─ [] settings.json
    │     │     │     └─ [] tasks.json
    │     │     ├─ [] bin/
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
+   │     │     │     └─ [] pyplate.py
    │     │     ├─ [] conf/
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.json
+   │     │     │     └─ [] pyplate.json
    │     │     ├─ [] dist/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] docs/
@@ -82,13 +82,13 @@
    │     │     │     └─ [] po/
    │     │     │           └─ [] LINGUAS
    │     │     ├─ [] images/
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.png
+   │     │     │     └─ [] pyplate.png
    │     │     ├─ [] install/
    │     │     │     ├─ [] install_base.py
    │     │     │     ├─ [] install.py
    │     │     │     └─ [] uninstall.py
    │     │     ├─ [] log/
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.log
+   │     │     │     └─ [] pyplate.log
    │     │     ├─ [] misc/
    │     │     │     ├─ [] checklists/
    │     │     │     │     ├─ [] project.txt
@@ -109,7 +109,7 @@
    │     │     │     └─ [] private/
    │     │     │           └─ [] ABOUT
    │     │     ├─ [] src/
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL___base.py
+   │     │     │     └─ [] pyplate_base.py
    │     │     ├─ [] tests/
    │     │     │     └─ [] ABOUT
    │     │     ├─ [] todo/
@@ -125,7 +125,7 @@
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
    │     │     └─ [] src/
-   │     │           └─ [] __PP_NAME_PRJ_SMALL__.py
+   │     │           └─ [] pyplate.py
    │     ├─ [] gui/
    │     │     ├─ [] .vscode/
    │     │     │     └─ [] launch.json
@@ -134,25 +134,28 @@
    │     │     ├─ [] src/
    │     │     │     ├─ [] gui/
    │     │     │     │     ├─ [] desktop/
-   │     │     │     │     │     ├─ [] __PP_NAME_PRJ_BIG__.desktop
+   │     │     │     │     │     ├─ [] PyPlate.desktop
    │     │     │     │     │     └─ [] template.desktop
    │     │     │     │     ├─ [] python/
-   │     │     │     │     │     ├─ [] __PP_FILE_APP__.py
-   │     │     │     │     │     └─ [] __PP_FILE_WIN__.py
+   │     │     │     │     │     ├─ [] _win.py
+   │     │     │     │     │     └─ [] pyplate_app.py
    │     │     │     │     └─ [] ui/
-   │     │     │     │           ├─ [] __PP_FILE_DLG__.ui
-   │     │     │     │           └─ [] __PP_FILE_WIN__.ui
-   │     │     │     └─ [] __PP_NAME_PRJ_SMALL__.py
+   │     │     │     │           ├─ [] _win.ui
+   │     │     │     │           └─ [] dialogs.ui
+   │     │     │     └─ [] pyplate.py
    │     │     └─ [] requirements.txt
    │     └─ [] pkg/
-   │           ├─ [] __PP_NAME_PRJ_SMALL__/
-   │           │     └─ [] __PP_NAME_SEC_SMALL__.py
    │           ├─ [] .vscode/
    │           │     └─ [] launch.json
+   │           ├─ [] pyplate/
+   │           │     └─ [] .py
    │           └─ [] tests/
-   │                 └─ [] __PP_NAME_PRJ_SMALL___test.py
+   │                 └─ [] pyplate_test.py
    ├─ [] tests/
-   │     └─ [] po.py
+   │     ├─ [] unit/
+   │     │     ├─ [] __init__.py
+   │     │     └─ [] test_test.py
+   │     └─ [] __init__.py
    ├─ [] todo/
    │     ├─ [] clean/
    │     │     ├─ [] collect_strings.py
@@ -166,6 +169,26 @@
    │     │     ├─ [] cnwindow.py
    │     │     ├─ [] gui_linker.py
    │     │     └─ [] state.py
+   │     ├─ [] venv/
+   │     │     ├─ [] cnlib/
+   │     │     │     ├─ [] decorators/
+   │     │     │     │     ├─ [] cndecorator_params.py
+   │     │     │     │     ├─ [] cndecorator.py
+   │     │     │     │     └─ [] cnspinner.py
+   │     │     │     ├─ [] cnformatter.py
+   │     │     │     ├─ [] cnfunctions.py
+   │     │     │     ├─ [] cnmkdocs.py
+   │     │     │     ├─ [] cnpot.py
+   │     │     │     ├─ [] cntree.py
+   │     │     │     └─ [] cnvenv.py
+   │     │     └─ [] cnlib-1.4.0.dist-info/
+   │     │           ├─ [] INSTALLER
+   │     │           ├─ [] METADATA
+   │     │           ├─ [] RECORD
+   │     │           ├─ [] REQUESTED
+   │     │           ├─ [] WHEEL
+   │     │           ├─ [] direct_url.json
+   │     │           └─ [] top_level.txt
    │     ├─ [] hooks.py
    │     └─ [] todo.txt
    ├─ [] .gitignore

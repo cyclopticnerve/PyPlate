@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.40.0 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkApplicationWindow" id="Win">
+    <property name="can-focus">False</property>
+    <property name="default-width">800</property>
+    <property name="default-height">500</property>
+    <property name="icon">../../../images/pyplate.png</property>
+    <property name="show-menubar">False</property>
+    <child>
+      <!-- n-columns=1 n-rows=2 -->
+      <object class="GtkGrid">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
+        <child>
+          <object class="GtkButtonBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-top">10</property>
+            <property name="spacing">5</property>
+            <property name="layout-style">start</property>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes" comments="I18N: About button text">About...</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes" comments="I18N: Show the About dialog">Show the About dialog</property>
+                <signal name="clicked" handler="_btn_about_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes" comments="I18N: Save button text">Save</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes" comments="I18N: save changes">Save any changes and leave window open</property>
+                <signal name="clicked" handler="_btn_save_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+                <property name="secondary">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes" comments="I18N: Cancel button text">Cancel</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes" comments="I18N: save without changes">Abandon any changes and close window</property>
+                <signal name="clicked" handler="_btn_cancel_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+                <property name="secondary">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton">
+                <property name="label" translatable="yes" comments="I18N: OK button text">OK</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="tooltip-text" translatable="yes" comments="I18N: save changes and close">Save any changes and close window</property>
+                <signal name="clicked" handler="_btn_ok_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+                <property name="secondary">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">button</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
