@@ -927,10 +927,9 @@ class PyPlateBase:
         # ----------------------------------------------------------------------
         # save/fix/load public
 
-        path_pub = {}
+        path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
         try:
             # save public settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             F.save_dict_into_paths(self._dict_pub, [path_pub])
         except OSError as e:  # from save_dict
             F.printd(C.S_ERR_ERR, str(e))
@@ -941,20 +940,19 @@ class PyPlateBase:
 
         try:
             # load public settings
-            path_pub = self._dir_prj / C.S_PRJ_PUB_CFG
             self._dict_pub = F.load_paths_into_dict([path_pub])
         except OSError as e:  # from load dict
             F.printd(C.S_ERR_ERR, str(e))
 
         # ----------------------------------------------------------------------
         # get pub subs
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
-        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
-        self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]
-        self._dict_pub_act = self._dict_pub[C.S_KEY_PUB_ACT]
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]  # type: ignore
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]  # type: ignore
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]  # type: ignore
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]  # type: ignore
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]  # type: ignore
+        self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]  # type: ignore
+        self._dict_pub_act = self._dict_pub[C.S_KEY_PUB_ACT]  # type: ignore
 
         # set initial actions
         if not self._arg_test:

@@ -1,5 +1,8 @@
 
+FIXME: template/pkg launch.json needs dunders for filename
+
 TODO: -l opt should be: ~/prj $ pybaker -l /path/to/foo.po
+TODO: look at launchers/tasks/settings in all .vscode
 TODO: test all spinners
 TODO: test all cmd line opts
 TODO: fix all printing

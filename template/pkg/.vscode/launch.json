@@ -12,6 +12,7 @@
             "name": "Pkg Test",
             "type": "debugpy",
             "request": "launch",
+            // FIXME: this nneds dunders
             "program": "tests/pyplate_test.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
