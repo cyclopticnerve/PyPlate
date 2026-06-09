@@ -152,10 +152,8 @@
    │           └─ [] tests/
    │                 └─ [] pyplate_test.py
    ├─ [] tests/
-   │     ├─ [] unit/
-   │     │     ├─ [] __init__.py
-   │     │     └─ [] test_test.py
-   │     └─ [] __init__.py
+   │     └─ [] unit/
+   │           └─ [] test_test.py
    ├─ [] todo/
    │     ├─ [] clean/
    │     │     ├─ [] collect_strings.py
