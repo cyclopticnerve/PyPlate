@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_FILE_APP__.py                                    |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: pyplate_app.py                                        |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -36,7 +36,7 @@ from gi.repository import Gtk  # type: ignore
 
 # ------------------------------------------------------------------------------
 # local imports
-from __PP_FILE_WIN__ import __PP_CLASS_WIN__
+from _win import Win
 
 # pylint: enable=wrong-import-position
 
@@ -48,7 +48,7 @@ from __PP_FILE_WIN__ import __PP_CLASS_WIN__
 # ------------------------------------------------------------------------------
 # A subclass of Gtk.Application to suit our needs
 # ------------------------------------------------------------------------------
-class __PP_CLASS_APP__(Gtk.Application):
+class PyplateApp(Gtk.Application):
     """
     A subclass of Gtk.Application to suit our needs
 
@@ -66,12 +66,12 @@ class __PP_CLASS_APP__(Gtk.Application):
 
     # find path to self
     P_DIR_PRJ = Path(__file__).parents[3].resolve()
-    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_DLG__.ui"
+    P_FILE_DLG = P_DIR_PRJ / "src/gui/ui/dialogs.ui"
 
     # gui stuff
-    S_APP_ID = "org.__PP_AUTHOR__.__PP_NAME_PRJ_SMALL__"
-    S_I18N_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-    S_UI_ABT_NAME = "__PP_DLG_ABOUT__"
+    S_APP_ID = "org.cyclopticnerve.pyplate"
+    S_I18N_DOMAIN = "pyplate"
+    S_UI_ABT_NAME = "dlg_about"
 
     # app actions
     S_ACTION_ACTIVATE = "activate"
@@ -217,7 +217,7 @@ class __PP_CLASS_APP__(Gtk.Application):
         """
 
         # create a python window class
-        win = __PP_CLASS_WIN__(self)
+        win = Win(self)
 
         # get the gtk window instance
         gwin = win.window

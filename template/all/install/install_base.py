@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: install_base.py                                       |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -45,8 +45,8 @@ import sys
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -101,16 +101,14 @@ class CNInstallBase:
     # strings
 
     # NB: used for logger
-    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
+    S_APP_NAME = "pyplate"
 
-    # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = ""
-    # pylint: enable=line-too-long
+    # I18N: short description
+    # NB: the dot shuts up warnings from xgettext
+    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Package projects in Python from a template")
 
     # version string
-    S_PP_VERSION = ""
+    S_PP_VERSION = "Version 1.1.4"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
@@ -124,7 +122,7 @@ class CNInstallBase:
     S_ARG_FORCE_ACTION = "store_true"
     S_ARG_FORCE_DEST = "FORCE_DEST"
     # I18N: force option help
-    S_ARG_FORCE_HELP = _("force install this program")
+    S_ARG_FORCE_HELP = _("force install/uninstall this program")
 
     # quiet option strings
     S_ARG_QUIET_OPTION = "-q"
@@ -142,14 +140,14 @@ class CNInstallBase:
 
     # about string
     S_ABOUT = (
-        "__PP_NAME_PRJ_BIG__\n"
+        "PyPlate\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__"
+        "https://github.com/cyclopticnerve/PyPlate"
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_USE_HELP = _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -195,6 +193,8 @@ class CNInstallBase:
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    # NB: format param is pre/post script path
+    S_CMD_EXTERNAL = "python {}"
 
     # --------------------------------------------------------------------------
     # dry run messages
@@ -243,7 +243,7 @@ class CNInstallBase:
     S_MSG_ABORT = _("Aborted")
     # NB: format param is script name
     # I18N: run external script
-    S_MSG_RUN_EXT = _("Running {}... ")
+    S_MSG_RUN_EXT = _("Running:")
 
     # NB: format params are prog_name and prog_version
     # I18N: install the program
@@ -368,7 +368,6 @@ class CNInstallBase:
             self.S_ARG_FORCE_OPTION,
             action=self.S_ARG_FORCE_ACTION,
             dest=self.S_ARG_FORCE_DEST,
-            help=self.S_ARG_FORCE_HELP,
         )
 
         # add quiet option
@@ -397,7 +396,7 @@ class CNInstallBase:
 
             # print "use -h" and bail
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
             self._teardown(-1)
 
         # convert namespace to dict
@@ -433,7 +432,7 @@ class CNInstallBase:
             print()
             print(self.S_ABOUT)
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
 
         # ready to go
         # NB: not sure how do do this the other way around
@@ -573,7 +572,7 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # Run an external command at some point
     # --------------------------------------------------------------------------
-    def _do_external(self, cmd: str, hide: bool = False):
+    def _do_external(self, path: Path, hide: bool = False):
         """
         Run an external command at some point
 
@@ -582,19 +581,23 @@ class CNInstallBase:
             hide: Whether to hide the command's output
         """
 
+        # check if path exists
+        if not path or not path.exists():
+            return
+
         # if it's a dry run, don't do anything
-        # dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
         if self._arg_dry:
-            print(self.S_DRY_EXT, cmd)
+            print(self.S_DRY_EXT, path)
             print()
             return
 
         if not self._arg_quiet:
-            print(self.S_MSG_RUN_EXT, cmd, flush=True, end="")
+            print(self.S_MSG_RUN_EXT, path, flush=True, end="")
 
         # run the external command
         try:
             # NB: maybe hide output
+            cmd = self.S_CMD_EXTERNAL.format(path)
             cmd_list = shlex.split(cmd)
             subprocess.run(cmd_list, check=True, capture_output=hide)
             if not self._arg_quiet:

@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Project : PyPlate                                                /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -30,19 +30,18 @@ import sys
 # Constants
 # ------------------------------------------------------------------------------
 
-# get pkg dir
+# get prj dir
 P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get dirs
-P_DIR_INSTALL = P_DIR_PARENT / "__PP_DIR_INSTALL__"
+P_DIR_INSTALL = P_DIR_PARENT / "install"
 
 # get files
-P_FILE_CFG_OLD = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
+P_FILE_CFG_OLD = P_DIR_INSTALL / "install.json"
 
 # get pre/post files
-# NB: uncomment these and pybaker will replace them
-# P_FILE_PRE = P_DIR_INSTALL / "__PP_UNINST_PRE__"
-# P_FILE_POST = P_DIR_INSTALL / "__PP_UNINST_POST__"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/pre_uninstall.py"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_uninstall.py"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -52,10 +51,11 @@ P_FILE_CFG_OLD = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
-# pylint: disable=wrong-import-position, import-error
 from install_base import CNInstallBase  # type: ignore
+from install_base import _
 
-# pylint: enable=wrong-import-position, import-error
+# I18N: force install help message
+S_ARG_FORCE_HELP = _("force uninstall this program")
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -63,7 +63,7 @@ from install_base import CNInstallBase  # type: ignore
 
 
 # ------------------------------------------------------------------------------
-# The class to use for installing/uninstalling
+# The class to use for installing a PyPlate program
 # ------------------------------------------------------------------------------
 class CNUninstall(CNInstallBase):
     """
@@ -71,6 +71,13 @@ class CNUninstall(CNInstallBase):
 
     This class performs the uninstall operation.
     """
+
+    # --------------------------------------------------------------------------
+    # Class constants
+    # --------------------------------------------------------------------------
+
+    # NB: different help message for force between pm/pb
+    S_ARG_FORCE_HELP = S_ARG_FORCE_HELP
 
     # --------------------------------------------------------------------------
     # Class methods
@@ -114,6 +121,9 @@ class CNUninstall(CNInstallBase):
         # get prj info from cfg
         self._get_project_info()
 
+        # call external
+        self._do_external(P_FILE_PRE)
+
         # get prg name/version
         prog_name = self._dict_cfg[self.S_KEY_INST_NAME]
 
@@ -133,6 +143,9 @@ class CNUninstall(CNInstallBase):
             if not self._arg_dry:
                 print()
             print(self.S_MSG_UNINST_END.format(prog_name))
+
+        # call external
+        self._do_external(P_FILE_POST)
 
         # wind down
         self._teardown()

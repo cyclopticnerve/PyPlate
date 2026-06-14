@@ -1,17 +1,8 @@
 {
     "PUB_META": {
-        "META_SHORT_DESC": "A program for creating and building CLI/GUI/Packages in Python from a template",
-        "META_VERSION": "1.1.0",
-        "META_KEYWORDS": [
-            "python",
-            "cli",
-            "template",
-            "app",
-            "package",
-            "gui",
-            "module",
-            "gtk3"
-        ],
+        "META_SHORT_DESC": "A program for creating and building CLI/GUI/Package projects in Python from a template",
+        "META_VERSION": "1.1.4",
+        "META_KEYWORDS": [],
         "META_DEPS": {
             "Python 3.10+": "https://python.org"
         },
@@ -26,7 +17,6 @@
             "dist",
             "docs",
             "i18n",
-            "log",
             "misc",
             "site",
             "todo",
@@ -34,8 +24,7 @@
             "requirements.txt",
             "**/__pycache__",
             "**/*.egg-info",
-            "pyplate",
-            "template"
+            "pyplate"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
@@ -57,13 +46,23 @@
             "**/*.egg-info"
         ]
     },
-    "PUB_DBG": {
-        "DBG_GIT": true,
-        "DBG_VENV": true,
-        "DBG_I18N": true,
-        "DBG_DOCS": true,
-        "DBG_TREE": true,
-        "DBG_DIST": false
+    "PUB_ACT": {
+        "ACT_VENV": true,
+        "ACT_REQS": true,
+        "ACT_GIT": true,
+        "ACT_INST": true,
+        "ACT_PURGE": true,
+        "ACT_I18N": true,
+        "ACT_META": true,
+        "ACT_PLACE": true,
+        "ACT_EDIT": true,
+        "ACT_MAKE_DOCS": true,
+        "ACT_TREE": true,
+        "ACT_FREEZE": true,
+        "ACT_BAKE_DOCS": true,
+        "ACT_DEPLOY_DOCS": true,
+        "ACT_COMPRESS": true,
+        "ACT_REM_DIST": true
     },
     "PUB_DIST": {
         "bin": "assets",
@@ -72,12 +71,11 @@
         "images": "assets",
         "install": "assets",
         "src": "assets",
-        "requirements.txt": "assets/install",
-        "template": "assets"
+        "requirements.txt": "assets/install"
     },
     "PUB_DOCS": {
         "DOCS_THEME": "",
-        "DOCS_USE_RM": true,
+        "DOCS_USE_RM": false,
         "DOCS_MAKE_API": true,
         "DOCS_DIR_API": [
             "src"
@@ -110,23 +108,22 @@
     },
     "PUB_INST": {
         "INST_NAME": "PyPlate",
-        "INST_VER": "1.1.0",
+        "INST_VER": "1.1.4",
         "INST_DESK": false,
         "INST_CONT": {
-            "bin/pymaker": ".local/bin",
-            "bin/pybaker": ".local/bin",
-            "conf": ".local/share/pyplate",
+            "bin/cli_debug": ".local/bin",
             "i18n": ".local/share/pyplate",
             "images": ".local/share/pyplate",
             "install": ".local/share/pyplate",
             "src": ".local/share/pyplate",
-            "uninstall.py": ".local/share/pyplate",
-            "template": ".local/share/pyplate"
+            "uninstall.py": ".local/share/pyplate"
         },
         "UNINST_CONT": [
-            ".local/bin/pymaker",
-            ".local/bin/pybaker",
+            ".local/bin/pyplate",
             ".local/share/pyplate"
-        ]
+        ],
+        "CFG_CONT": {
+            "conf": ".config/pyplate"
+        }
     }
 }

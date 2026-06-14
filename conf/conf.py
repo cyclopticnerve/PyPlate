@@ -27,33 +27,19 @@ import re
 import shutil
 import sys
 
-# local imports
+# venv imports
 from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnmkdocs import CNMkDocs  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
-from cnlib.cnmkdocs import CNMkDocs  # type: ignore
+from cnlib.decorators import cnspinner as S  # type: ignore
 
 # ------------------------------------------------------------------------------
-# local imports
-
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-
-# fudge the path to import pyplate stuff
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
-sys.path.append(str(P_DIR_PRJ))
-
-import src.pyplate as PP
-
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
-# ------------------------------------------------------------------------------
-# Globals
+# Constants
 # ------------------------------------------------------------------------------
 
-# ABSOLUTE CURRENT PATH OF PyPlate
+# absolute current path OF PyPlate
 P_DIR_PP = Path(__file__).parents[1].resolve()
 P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
@@ -81,39 +67,39 @@ locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
 
 # global debug flag
 B_DEBUG = False
+# global error flag
+B_ERROR = False
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Start customization
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# Integers
+# ------------------------------------------------------------------------------
+
+# rotating log stuff
+I_LOG_SIZE = 2097152  # max log file size in bytes (2 Mb)
+I_LOG_COUNT = 5  # max number of log files
 
 # ------------------------------------------------------------------------------
 # Strings
 # ------------------------------------------------------------------------------
 
-# default i18n lang
-S_WLANG = "en"
-# default encoding
-S_ENCODING = "UTF-8"
-# I18N: default date format
-S_DATE_FMT = _("%m/%d/%Y")
-# I18N: def deps
-S_DEPS_NONE = _("None")
-# default image ext
-# NB: format param is __PP_NAME_PRJ_SMALL__
-S_IMG_FMT = "{}.png"
-
-# I18N: name of home folder in docs
-S_DOCS_HOME = _("Home")
-
+# ------------------------------------------------------------------------------
 # spice up version number
-S_VER_DATE_FMT = "%Y%m%d"
+
 # NB: format param is __PP_VER_MMR__
 # I18N: printable version number
 S_VER_DISP_FMT = _("Version {}")
 # NB: format params are __PP_NAME_PRJ_SMALL__ and __PP_VER_MMR__
 S_VER_DIST_FMT = "{}-{}"
 
+# ------------------------------------------------------------------------------
 # ask questions
-# # I18N: answer yes
-# S_ASK_YES = _("y")
-# # I18N: answer no
-# S_ASK_NO = _("N")
+
 # I18N: ask prj name
 S_ASK_NAME = _("Project name: ")
 # NB: format params are L_TYPES[item][0] and L_TYPES[item][1]
@@ -135,6 +121,13 @@ S_ASK_IDE = _("Project name: (relative to {}): ")
 # NB: param is current version
 # I18N: ask for new version
 S_ASK_VER = _("Version ({}): ")
+# NB: format param is prog name
+# I18N: ask to uninstall
+S_ASK_UNINST = _("This will uninstall {}.\nDo you want to continue?")
+# I18N: ask to overwrite
+# NB: format param is file name
+S_ASK_OVER = _("The file {} already exists. Do you want to overwrite it?")
+
 
 # placeholder files
 # NB: this should be the same as the ones preexisting in template
@@ -198,64 +191,99 @@ S_ERR_DESK_CAT = _(
 # I18N: alternate text for screenshot in README.md
 S_ERR_NO_SCREENSHOT = _("Create the file {}")
 
-# error installing reqs
-# I18N: need internet connection to install requirements
-S_ERR_NO_INTERNET = _("Make sure you are connected to the internet")
-# error pushing docs
-# I18N: make sure repo exists
-S_ERR_NO_REPO = _("Make sure you have pushed your repo after PyMaker")
+
+# I18N: uninstall not found
+S_ERR_NO_UNINST = _("Uninstall files not found")
+# NB: format param is file path
+# I18N: could not find -c file
+S_ERR_NO_CFG = _("Config file {} not found")
+
+# I18N: language already exists in project.json and i18n folder
+S_ERR_LANG_EXIST = _("Language file {} already exists")
+S_ERR_NO_LANG = _("Could not get language code from {}")
+
+# log formats
+S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
+S_LOG_DATE_FMT = "%Y-%m-%d %I:%M:%S"
 
 # messages
 
-# debug-specific strings
-# I18N: warn if running in debug mode
-S_MSG_DEBUG = "WARNING! YOU ARE IN DEBUG MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!"
+# I18N: process aborted
+S_MSG_ABORT = _("Aborted")
+# make msg
+# NB: param is name of project folder
+S_MSG_MAKE = _("Making {}")
+# NB: param is name of project folder
+# I18N: done baking
+S_MSG_MAKE_DONE = _("Done making {}")
+# NB: param is name of project folder
+# I18N: start baking
+S_MSG_BAKE = _("Baking {}")
+# NB: param is name of project folder
+# I18N: done baking
+S_MSG_BAKE_DONE = _("Done baking {}")
+# NB: format param is file name
+# I18N: add language at cmd line
+S_MSG_LANG_ADD = _("Adding language file {}...")
+
+# ------------------------------------------------------------------------------
+# commands for do_after_fix
+
+# cmd for git
+# NB: format param is proj dir
+S_CMD_GIT_CREATE = "cd {}; git init -q"
+# NB: format params are prj dir and venv name
+S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python -m pip install -e ."
+# NB: format params are prj dir, venv name, and reqs file
+S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python -m pip install -r {}"
+# mkdocs commands
+S_CMD_DOC_DEPLOY = "mkdocs gh-deploy"
 
 # ------------------------------------------------------------------------------
 # output msg for steps
 
-# I18N: Copy template files
-S_ACTION_COPY = _("Copying template files... ")
-# I18N fix readme
-S_ACTION_README = _("Fixing README... ")
-# I18N: fix other files
-S_ACTION_META = _("Fixing metadata... ")
-# I18N: fix other files
-S_ACTION_PO = _("Fixing po files... ")
-# I18N: Do fix
-S_ACTION_FIX = _("Fixing dunders... ")
+# I18N: Make venv folder
+S_ACTION_VENV = _("Making venv folder")
+# I18N: Make venv folder
+S_ACTION_REQS = _("Installing requirements")
 # I18N: Make git folder
-S_ACTION_GIT = _("Making git folder... ")
-# I18N: Make venv folder
-S_ACTION_VENV = _("Making venv folder... ")
-# I18N: Make venv folder
-S_ACTION_REQS = _("Installing requirements... ")
-# I18N: freeze venv folder
-S_ACTION_FREEZE = _("Freezing venv... ")
-# I18N: Make i18n folder
-S_ACTION_I18N = _("Making i18n folder... ")
-# I18N: Make docs folder
-S_ACTION_MAKE_DOCS = _("Making docs folder... ")
-# I18N: Build docs folder
-S_ACTION_BAKE_DOCS = _("Baking docs folder... ")
-# I18N: Deploy docs site
-S_ACTION_DEPLOY_DOCS = _("Deploying docs site... ")
-# I18N: Make tree file
-S_ACTION_TREE = _("Making tree file... ")
-# I18N: Make dist folder
-S_ACTION_DIST = _("Copying dist files... ")
+S_ACTION_GIT = _("Making git folder")
 # I18N: Make install file
-S_ACTION_INST = _("Making install/uninstall files... ")
-# I18N: install package in own venv
-S_ACTION_EDIT = _("Installing package... ")
+S_ACTION_INST = _("Making install/uninstall files")
 # I18N: purge unnecessary files
-S_ACTION_PURGE = _("Purging unnecessary files... ")
+S_ACTION_PURGE = _("Purging unnecessary files")
+# I18N: Make i18n folder
+S_ACTION_I18N = _("Making i18n folder")
+# I18N: fix other files
+S_ACTION_META = _("Fixing metadata")
 # I18N: Make placeholder files
-S_ACTION_PLACE = _("Fixing placeholder files... ")
+S_ACTION_PLACE = _("Fixing placeholder files")
+# I18N: install package in own venv
+S_ACTION_EDIT = _("Installing package")
+# I18N: Make docs folder
+S_ACTION_MAKE_DOCS = _("Making docs folder")
+# I18N: Make tree file
+S_ACTION_TREE = _("Making tree file")
+# I18N: freeze venv folder
+S_ACTION_FREEZE = _("Freezing venv")
+# I18N: Build docs folder
+S_ACTION_BAKE_DOCS = _("Baking docs folder")
+# I18N: Deploy docs site
+S_ACTION_DEPLOY_DOCS = _("Deploying docs site")
 # I18N: compress files
-S_ACTION_COMPRESS = _("Compressing files... ")
+S_ACTION_COMPRESS = _("Compressing files")
 # I18N: remove dist
-S_ACTION_REM_DIST = _("Removing dist source... ")
+S_ACTION_REM_DIST = _("Removing dist source")
+
+# I18N: Copy template files
+S_ACTION_COPY = _("Copying template files")
+# I18N: Do fix
+S_ACTION_FIX = _("Fixing dunders")
+# I18N: Make dist folder
+S_ACTION_DIST = _("Copying dist files")
+
+# I18N: skipped action
+S_ACTION_SKIP = _("Skipped")
 # I18N: Done
 S_ACTION_DONE = _("Done")
 # I18N: Failed
@@ -271,14 +299,13 @@ S_KEY_PRV_ALL = "PRV_ALL"
 S_KEY_PRV_PRJ = "PRV_PRJ"
 
 # keys for metadata, blacklist, i18n in pybaker dev dict
+S_KEY_PUB_META = "PUB_META"
 S_KEY_PUB_BL = "PUB_BL"
-S_KEY_PUB_DBG = "PUB_DBG"
 S_KEY_PUB_DIST = "PUB_DIST"
 S_KEY_PUB_DOCS = "PUB_DOCS"
 S_KEY_PUB_I18N = "PUB_I18N"
-S_KEY_PUB_META = "PUB_META"
 S_KEY_PUB_INST = "PUB_INST"
-# S_KEY_PUB_UNINST = "PUB_UNINST"
+S_KEY_PUB_ACT = "PUB_ACT"
 
 # keys for blacklist
 S_KEY_SKIP_ALL = "SKIP_ALL"
@@ -294,14 +321,23 @@ S_KEY_PUB_I18N_CLANGS = "CLANGS"
 S_KEY_PUB_I18N_WLANGS = "WLANGS"
 S_KEY_PUB_I18N_CHAR = "CHARSET"
 
-# keys for D_PUB_DBG
-S_KEY_DBG_GIT = "DBG_GIT"
-S_KEY_DBG_VENV = "DBG_VENV"
-S_KEY_DBG_I18N = "DBG_I18N"
-S_KEY_DBG_DOCS = "DBG_DOCS"
-# S_KEY_DBG_INST = "DBG_INST"
-S_KEY_DBG_TREE = "DBG_TREE"
-S_KEY_DBG_DIST = "DBG_DIST"
+# keys for D_PUB_ACT
+S_KEY_ACT_VENV = "ACT_VENV"
+S_KEY_ACT_REQS = "ACT_REQS"
+S_KEY_ACT_GIT = "ACT_GIT"
+S_KEY_ACT_INST = "ACT_INST"
+S_KEY_ACT_PURGE = "ACT_PURGE"
+S_KEY_ACT_I18N = "ACT_I18N"
+S_KEY_ACT_META = "ACT_META"
+S_KEY_ACT_PLACE = "ACT_PLACE"
+S_KEY_ACT_EDIT = "ACT_EDIT"
+S_KEY_ACT_DOCS_MAKE = "ACT_MAKE_DOCS"
+S_KEY_ACT_TREE = "ACT_TREE"
+S_KEY_ACT_FREEZE = "ACT_FREEZE"
+S_KEY_ACT_DOCS_BAKE = "ACT_BAKE_DOCS"
+S_KEY_ACT_DOCS_DEPLOY = "ACT_DEPLOY_DOCS"
+S_KEY_ACT_COMPRESS = "ACT_COMPRESS"
+S_KEY_ACT_REM_DIST = "ACT_REM_DIST"
 
 # keys for D_PUB_DOCS
 S_KEY_DOCS_THEME = "DOCS_THEME"
@@ -376,6 +412,7 @@ S_DIR_DESKTOP = "desktop"
 S_DIR_DIST = "dist"
 S_DIR_ASSETS = "assets"
 S_DIR_INSTALL = "install"
+S_DIR_SCRIPTS = "scripts"
 
 # common file names, rel to prj dir or pyplate dir
 S_FILE_LICENSE = "LICENSE.txt"
@@ -384,7 +421,6 @@ S_FILE_INDEX = "index.md"
 S_FILE_TOML = "pyproject.toml"
 S_FILE_REQS = "requirements.txt"
 S_FILE_INST_CFG = "install.json"
-# S_FILE_UNINST_CFG = "uninstall.json"
 S_FILE_INST_PY = "install.py"
 S_FILE_UNINST_PY = "uninstall.py"
 S_FILE_SCREENSHOT = "screenshot.png"
@@ -394,26 +430,7 @@ S_FILE_INST_PRE = "pre_install.py"
 S_FILE_INST_POST = "post_install.py"
 S_FILE_UNINST_PRE = "pre_uninstall.py"
 S_FILE_UNINST_POST = "post_uninstall.py"
-
-# screenshot path for readme
-S_PATH_SCREENSHOT = f"{S_DIR_IMAGES}/{S_FILE_SCREENSHOT}"
-
-# fix reqs cmds
-S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
-# NB: format param is L_TYPES[item][2] (long prj type, subdir in template)
-S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
-
-# .desktop stuff
-S_PATH_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DSK_TMP}"
-
-# I18N stuff
-P_DIR_I18N = Path(S_DIR_I18N)
-S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
-S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
-S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
-S_I18N_TAG = "I18N"
-S_I18N_EXT_POT = "**/*.pot"
-S_I18N_EXT_PO = "**/*.po"
+S_FILE_MKDOCS_YML = "mkdocs.yml"
 
 # paths relative to end user home only
 S_USR_APPS = ".local/share/applications"  # for .desktop out file
@@ -429,10 +446,6 @@ S_TREE_HTML_FILE = f"{S_DIR_MISC}/{S_TREE_HTML_NAME}"
 S_TREE_DIR_FORMAT = " [] $NAME/"
 S_TREE_FILE_FORMAT = " [] $NAME"
 
-# format for venv
-# NB: format param is __PP_NAME_PRJ_SMALL__
-S_VENV_FMT_NAME = ".venv-{}"
-
 # switch constants
 S_SW_ENABLE = "enable"
 S_SW_DISABLE = "disable"
@@ -446,19 +459,26 @@ S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/private"
 S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
 
 # ------------------------------------------------------------------------------
-# commands for do_after_fix
+# gui stuff
 
-# cmd for git
-# NB: format param is proj dir
-S_CMD_GIT_CREATE = "cd {}; git init -q"
-# NB: format params are prj dir and venv name
-S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python -m pip install -e ."
-# NB: format params are prj dir, venv name, and reqs file
-S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python -m pip install -r {}"
+# ui files/names
+S_DLG_UI_FILE = "dialogs"
+S_DLG_ABOUT = "dlg_about"
 
-# mkdocs commands
-# S_CMD_DOC_BUILD = "mkdocs build"
-S_CMD_DOC_DEPLOY = "mkdocs gh-deploy"
+# NB: format param is __PP_NAME_PRJ_SMALL__
+S_APP_FILE_FMT = "{}_app"
+# NB: format param is __PP_NAME_SEC_SMALL__
+S_WIN_FILE_FMT = "{}_win"
+# NB: format param is _PP_NAME_PRJ_PASCAL__
+S_APP_CLASS_FMT = "{}App"
+# NB: format param is _PP_NAME_SEC_PASCAL__
+S_WIN_CLASS_FMT = "{}Win"
+# NB: format params are __PP_AUTHOR__ and __PP_NAME_PRJ_SMALL__
+S_APP_ID_FMT = "org.{}.{}"
+
+# ------------------------------------------------------------------------------
+# dist stuff
+
 
 # ------------------------------------------------------------------------------
 # regex stuff
@@ -532,16 +552,19 @@ S_TOML_DESC_SCH = (
 S_TOML_DESC_REP = r'\g<1>\g<2>\g<3>"{}"'
 S_TOML_KW_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*keywords[\t ]*=[\t ]*)(.*?\])"
 S_TOML_KW_REP = r"\g<1>\g<2>\g<3>[{}]"
+S_TOML_PKGS_SCH = (
+    r"(^\s*\[tool\.setuptools\]\s*$)(.*?)(^\s*packages[\t ]*=[\t ]*)(.*?$)"
+)
+S_TOML_PKGS_REP = r"\g<1>\g<2>\g<3>{}"
 
-# desc/version in all files
-S_SRC_DESC_SCH = r"(^\s*S_PP_SHORT_DESC\s*=\s*)(_\()*(.*?)(\n|\))"
-S_SRC_DESC_REP = r'\g<1>\g<2>"{}"\g<4>'
-S_SRC_VER_SCH = r"(^\s*S_PP_VERSION\s*=\s*)(.*)"
-S_SRC_VER_REP = r'\g<1>"{}"'
+# short desc/version in all files
+S_SRC_DESC_SCH = r"(\s*S_PP_SHORT_DESC\s*=.*?\")(.*?)(\")"
+S_SRC_DESC_REP = r"\g<1>{}\g<3>"
+S_SRC_VER_SCH = r"(\s*S_PP_VERSION\s*=.*?\")(.*?)(\")"
+S_SRC_VER_REP = r"\g<1>{}\g<3>"
 
 # make sure ver num entered in pybaker is valid
 S_SEM_VER_VALID = (
-    # r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(.*)$"
     r"^"
     r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
     r"(?:-("
@@ -560,37 +583,45 @@ S_THEME_SCH = r"(theme:)(.*)"
 S_THEME_REP = r"\g<1> {}"
 
 # ------------------------------------------------------------------------------
-# gui stuff
+# random stuff
 
-# ui files/names
-S_DLG_UI_FILE = "dialogs"
-S_DLG_ABOUT = "dlg_about"
+S_WLANG = "en"
+S_ENCODING = "UTF-8"
+S_DIST_MODE = "gztar"
+# I18N: default date format
+S_DATE_FMT = _("%m/%d/%Y")
+# I18N: def deps
+S_DEPS_NONE = _("None")
+# default image ext
 # NB: format param is __PP_NAME_PRJ_SMALL__
-S_APP_FILE_FMT = "{}_app"
-# NB: format param is __PP_NAME_SEC_SMALL__
-S_WIN_FILE_FMT = "{}_win"
-# NB: format param is _PP_NAME_PRJ_PASCAL__
-S_APP_CLASS_FMT = "{}App"
-# NB: format param is _PP_NAME_SEC_PASCAL__
-S_WIN_CLASS_FMT = "{}Win"
-# NB: format params are __PP_AUTHOR__ and __PP_NAME_PRJ_SMALL__
-S_APP_ID_FMT = "org.{}.{}"
+S_IMG_FMT = "{}.png"
 
-# ------------------------------------------------------------------------------
-# dist stuff
+# I18N: name of home folder in docs
+S_DOCS_HOME = _("Home")
 
-S_DIST_EXT = ".tar.gz"
-S_DIST_MODE = "w:gz"
-
-# ------------------------------------------------------------------------------
-# readme stuff
-
+# screenshot path for readme
+S_PATH_SCREENSHOT = f"{S_DIR_IMAGES}/{S_FILE_SCREENSHOT}"
 # NB: format params are alt text and path to image
 S_RM_SCREENSHOT = "![{}]({})"
 
-# ------------------------------------------------------------------------------
-# docs stuff
-S_FILE_MKDOCS_YML = "mkdocs.yml"
+# fix reqs cmds
+S_FILE_REQS_ALL = f"{S_DIR_TEMPLATE}/{S_DIR_ALL}/{S_FILE_REQS}"
+# NB: format param is L_TYPES[item][2] (long prj type, subdir in template)
+S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
+
+# .desktop stuff
+S_PATH_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DSK_TMP}"
+
+# I18N stuff
+P_DIR_I18N = Path(S_DIR_I18N)
+S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
+S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
+S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
+S_I18N_TAG = "I18N"
+
+# format for venv
+# NB: format param is __PP_NAME_PRJ_SMALL__
+S_VENV_FMT_NAME = ".venv-{}"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -617,9 +648,11 @@ L_TYPES = [
         "pkg",
     ],
 ]
+# ------------------------------------------------------------------------------
 
 # file exts for do_after_fix
 L_EXT_PY = [".py"]
+L_EXT_PO = [".po", ".pot"]
 L_EXT_DESK = [".desktop"]
 
 # list of filetypes that use hash (#) for comments
@@ -649,8 +682,30 @@ L_EXT_DS = [
 # file exts for do_after_fix
 L_EXT_GUI = [".ui", ".glade"]
 
+# ------------------------------------------------------------------------------
+
+# prj type(s) for making an install.json
+L_APP_INSTALL = [
+    "c",
+    "g",
+]
+
+# prj type(s) to install in own venv (packages mostly)
+L_INST_SELF = ["p"]
+
+# prj type(s) for making .desktop file
+L_MAKE_DESK = ["g"]
+
+# prj type(s) for making screenshot in README
+L_SCREENSHOT = ["g"]
+
+# if in list, use S_DIR_SRC, else use __PP_NAME_PRJ_SMALL__
+L_TOML_USE_SRC = ["c", "g"]
+
+# ------------------------------------------------------------------------------
+
 # files to remove from dist after bake is done
-L_PURGE_FILES = [
+L_PURGE_DIST = [
     f"**/{S_PH_NAME}",
     "**/__pycache__",
     f"**/{S_FILE_DSK_TMP}",
@@ -659,6 +714,11 @@ L_PURGE_FILES = [
 
 # skip placeholder files in these dirs
 L_PH_SKIP = [S_DIR_GIT, ".venv*"]
+
+# remove exts from bin files
+L_DIST_REMOVE_EXT = [f"{S_DIR_ASSETS}/{S_DIR_BIN}/*.py"]
+
+# ------------------------------------------------------------------------------
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -808,27 +868,6 @@ L_CATS = [
     "Applet",
     "Shell",
 ]
-# prj type(s) for making an install.json
-L_APP_INSTALL = [
-    "c",
-    "g",
-]
-
-# prj type(s) to install in own venv (packages mostly)
-L_INST_SELF = ["p"]
-
-# prj type(s) for making .desktop file
-L_MAKE_DESK = ["g"]
-
-# prj type(s) for making screenshot in README
-L_SCREENSHOT = ["g"]
-
-# remove exts from bin files
-L_DIST_REMOVE_EXT = [
-    f"{S_DIR_ASSETS}/{S_DIR_BIN}/*.py",
-    # f"{S_FILE_INST_PY}",
-    # f"{S_DIR_ASSETS}/{S_FILE_UNINST_PY}",
-]
 
 # ------------------------------------------------------------------------------
 # Dictionaries
@@ -849,7 +888,6 @@ L_DIST_REMOVE_EXT = [
 # do_before_fix() in this file
 
 D_PRV_ALL = {
-    "__PP_VERSION_PP__": PP.PyPlate.S_PP_VERSION,  # version of pp we are using
     # --------------------------------------------------------------------------
     # the author name, used in headers and pyproject.toml
     "__PP_AUTHOR__": "cyclopticnerve",
@@ -904,7 +942,6 @@ D_PRV_ALL = {
     "__PP_USR_APPS__": S_USR_APPS,  # /home/user/.local/applications
     "__PP_USR_BIN__": S_USR_BIN,  # /home/user/.local/bin
     "__PP_USR_CONF__": S_USR_CONF,  # /home/user/.config
-    # "__PP_USR_SHARE__": S_USR_SHARE,
     "__PP_NAME_DSK_TMP__": S_FILE_DSK_TMP,
     "__PP_NAME_UNINST__": S_FILE_UNINST_PY,
     # --------------------------------------------------------------------------
@@ -918,12 +955,12 @@ D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # install stuff
     "__PP_DIR_INSTALL__": S_DIR_INSTALL,
+    "__PP_DIR_SCRIPTS__": S_DIR_SCRIPTS,
     "__PP_FILE_INST_CFG__": S_FILE_INST_CFG,
     "__PP_INST_PRE__": S_FILE_INST_PRE,
     "__PP_INST_POST__": S_FILE_INST_POST,
     "__PP_UNINST_PRE__": S_FILE_UNINST_PRE,
     "__PP_UNINST_POST__": S_FILE_UNINST_POST,
-    # "__PP_FILE_UNINST_CFG__": S_FILE_UNINST_CFG,
     # --------------------------------------------------------------------------
     # mkdocs stuff
     "__PP_DIR_DOCS__": S_DIR_DOCS,
@@ -940,6 +977,7 @@ D_PRV_ALL = {
 # if you need to adjust any of these values based on a dunder, use
 # do_before_fix() in this file
 D_PRV_PRJ = {
+    "__PP_VERSION_PP__": "",  # version of pp we are using
     # --------------------------------------------------------------------------
     # get_project_info
     "__PP_TYPE_PRJ__": "",  # 'c'
@@ -985,6 +1023,23 @@ D_PRV_PRJ = {
 # ------------------------------------------------------------------------------
 # Public dictionaries
 # ------------------------------------------------------------------------------
+
+# these are settings that will be changed before running pybaker.py
+# consider them the "each build" settings
+D_PUB_META = {
+    # the short description to use in __PP_README_FILE__ and pyproject.toml
+    S_KEY_META_SHORT_DESC: "Short description",
+    # the version number to use in __PP_README_FILE__ and pyproject.toml
+    S_KEY_META_VERSION: "0.0.0",
+    # the keywords to use in pyproject.toml and github
+    S_KEY_META_KEYWORDS: [],
+    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
+    # github, and install.py
+    # NB: key is dep name, val is link to dep (optional)
+    S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
+    # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
+    S_KEY_META_CATS: [],
+}
 
 # the lists of dirs/files we don't mess with while running pymaker
 # each item can be a path relative to the project directory, or a glob
@@ -1037,17 +1092,6 @@ D_PUB_BL = {
     ],
 }
 
-# dict in project to control pb processing
-D_PUB_DBG = {
-    S_KEY_DBG_GIT: True,
-    S_KEY_DBG_VENV: True,
-    S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: True,
-    # S_KEY_DBG_INST: True,
-    S_KEY_DBG_TREE: True,
-    S_KEY_DBG_DIST: False,
-}
-
 # dict of files to put in dist folder (defaults, written by pymaker, edited by
 # hand, read by pybaker)
 # NB: tbd by do_after_template based on prj type
@@ -1076,67 +1120,48 @@ D_PUB_I18N = {
     # list of written languages that are available
     S_KEY_PUB_I18N_WLANGS: [S_WLANG],
     # default charset for .pot/.po files
-    # S_KEY_PUB_I18N_CHAR: S_ENCODING,
     S_KEY_PUB_I18N_CHAR: S_ENCODING,
-}
-
-# these are settings that will be changed before running pybaker.py
-# consider them the "each build" settings
-D_PUB_META = {
-    # the short description to use in __PP_README_FILE__ and pyproject.toml
-    S_KEY_META_SHORT_DESC: "Short description",
-    # the version number to use in __PP_README_FILE__ and pyproject.toml
-    S_KEY_META_VERSION: "0.0.0",
-    # the keywords to use in pyproject.toml and github
-    S_KEY_META_KEYWORDS: [],
-    # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
-    # github, and install.py
-    # NB: key is dep name, val is link to dep (optional)
-    S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
-    # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
-    S_KEY_META_CATS: [],
 }
 
 # default dict for install/uninstall
 # NB: tbd by do_after_template based on prj type
 D_PUB_INST = {}
 
+# TEMPLATE dict in project to control pm/pb processing
+# NB: this is what controls the steps in making ALL projects
+# and what controls a particular PROJECT when baking
+D_PUB_ACT = {
+    S_KEY_ACT_VENV: True,
+    S_KEY_ACT_REQS: True,
+    S_KEY_ACT_GIT: True,
+    S_KEY_ACT_INST: True,
+    S_KEY_ACT_PURGE: True,
+    S_KEY_ACT_I18N: True,
+    S_KEY_ACT_META: True,
+    S_KEY_ACT_PLACE: True,
+    S_KEY_ACT_EDIT: True,
+    S_KEY_ACT_DOCS_MAKE: True,
+    S_KEY_ACT_TREE: True,
+    S_KEY_ACT_FREEZE: True,
+    S_KEY_ACT_DOCS_BAKE: True,
+    S_KEY_ACT_DOCS_DEPLOY: True,
+    S_KEY_ACT_COMPRESS: True,
+    S_KEY_ACT_REM_DIST: True,
+}
+
 # ------------------------------------------------------------------------------
 # Other dictionaries
 # ------------------------------------------------------------------------------
 
-# dict in pymaker to control post processing in debug mode
-# NB: not related to D_PUB_DBG above
-D_DBG_PM = {
-    S_KEY_DBG_GIT: False,
-    S_KEY_DBG_VENV: True,
-    S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: True,
-    # S_KEY_DBG_INST: True,
-    S_KEY_DBG_TREE: True,
-    S_KEY_DBG_DIST: True,
-}
-
-# dict in pybaker to control post processing in debug mode
-# NB: not related to D_PUB_DBG above
-D_DBG_PB = {
-    S_KEY_DBG_GIT: False,
-    S_KEY_DBG_VENV: True,
-    S_KEY_DBG_I18N: True,
-    S_KEY_DBG_DOCS: True,
-    # S_KEY_DBG_INST: True,
-    S_KEY_DBG_TREE: True,
-    S_KEY_DBG_DIST: True,
-}
-
 # dict of files that should be copied from the PyPlate project to the resulting
 # project (outside of the template dir)
-# this is so that when you update a file in the PyPlate project, it gets copied
-# to the project, and cuts down on duplicate files
+# this is so that when you update a file in the PyPlate project itself (not the
+# template), it gets copied to the project, and cuts down on duplicate files
 # key is the relative path to the source file in PyPlate
 # val is the relative path to the dest file in the project dir
 D_COPY = {
     # f"{S_DIR_MISC}/default_files": f"{S_DIR_MISC}/default_files",
+    # f"{S_DIR_MISC}/release.txt": f"{S_DIR_MISC}/release.txt",
 }
 
 # NB: key is src, rel to prj dir
@@ -1146,7 +1171,6 @@ D_TYPE_DIST = {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
-        # S_DIR_LOG: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         S_DIR_IMAGES: S_DIR_ASSETS,
         S_DIR_INSTALL: S_DIR_ASSETS,
@@ -1157,7 +1181,6 @@ D_TYPE_DIST = {
         # basic stuff (put in assets folder)
         S_DIR_BIN: S_DIR_ASSETS,
         S_DIR_CONF: S_DIR_ASSETS,
-        # S_DIR_LOG: S_DIR_ASSETS,
         S_DIR_I18N: S_DIR_ASSETS,
         S_DIR_IMAGES: S_DIR_ASSETS,
         S_DIR_INSTALL: S_DIR_ASSETS,
@@ -1180,7 +1203,6 @@ D_TYPE_INST = {
         S_KEY_INST_DESK: False,
         S_KEY_INST_CONT: {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
-            # S_DIR_LOG: ".local/share/pyplate",
             S_DIR_I18N: "__PP_USR_INST__",
             S_DIR_IMAGES: "__PP_USR_INST__",
             S_DIR_INSTALL: "__PP_USR_INST__",
@@ -1201,7 +1223,6 @@ D_TYPE_INST = {
         S_KEY_INST_DESK: True,
         S_KEY_INST_CONT: {
             f"{S_DIR_BIN}/__PP_NAME_PRJ_SMALL__": "__PP_USR_BIN__",
-            # S_DIR_LOG: ".local/share/pyplate",
             S_DIR_I18N: "__PP_USR_INST__",
             S_DIR_IMAGES: "__PP_USR_INST__",
             S_DIR_INSTALL: "__PP_USR_INST__",
@@ -1316,7 +1337,7 @@ D_NAME = {
 }
 
 # dirs to remove after the project is fixed by either pm or pb
-D_PURGE = {
+D_PURGE_MAKE = {
     "p": [
         S_DIR_BIN,
         S_DIR_CONF,
@@ -1336,14 +1357,58 @@ D_DOCS_DIR_API = {
 }
 
 # ------------------------------------------------------------------------------
+# NB: so this is weird...
+# but it works
+
+# settings for spinner
+S.D_SPIN = {
+    S.S_KEY_FRAMES: ["", ".", "..", "... "],
+    S.S_KEY_INTERVAL: 0.5,
+    S.S_KEY_SKIP: {
+        S.S_KEY_MSG: S_ACTION_SKIP,
+        S.S_KEY_FG: F.C_FG_YELLOW,
+        S.S_KEY_BG: F.C_BG_NONE,
+        S.S_KEY_BOLD: True,
+    },
+    S.S_KEY_DONE: {
+        S.S_KEY_MSG: S_ACTION_DONE,
+        S.S_KEY_FG: F.C_FG_GREEN,
+        S.S_KEY_BG: F.C_BG_NONE,
+        S.S_KEY_BOLD: True,
+    },
+    S.S_KEY_FAIL: {
+        S.S_KEY_MSG: S_ACTION_FAIL,
+        S.S_KEY_FG: F.C_FG_RED,
+        S.S_KEY_BG: F.C_BG_NONE,
+        S.S_KEY_BOLD: True,
+    },
+}
+
+# ------------------------------------------------------------------------------
+# local imports
+
+# fudge the path to import pyplate stuff
+sys.path.append(str(P_DIR_PP))
+
+import src.pyplate_base as PP
+
+# get version number from base
+D_PRV_PRJ["__PP_VERSION_PP__"] = PP.PyPlateBase.S_PP_VERSION
+
+# ------------------------------------------------------------------------------
 # Public functions
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Hook functions
 # ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
 # Do any work before template copy
 # ------------------------------------------------------------------------------
-def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
+def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_act):
     """
     Do any work before template copy
 
@@ -1351,7 +1416,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
-        dict_dbg: The dictionary containing the current session's debug
+        dict_act: The dictionary containing the current session's action
         settings
 
     Do any work before copying the template. This method is called just before
@@ -1364,7 +1429,7 @@ def do_before_template(_dir_prj, _dict_prv, _dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after template copy
 # ------------------------------------------------------------------------------
-def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
     """
     Do any work after template copy
 
@@ -1372,113 +1437,106 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
-        dict_dbg: The dictionary containing the current session's debug
+        dict_act: The dictionary containing the current session's debug
         settings
 
-    Raises:
-        cnlib.cnfunctions.CNRunError if git create fails
-
     Do any work after copying the template. This function is called after
-    _do_template, and before _do_before_fix.\n
-    Use this function to create any files that your project needs to be created
-    dynamically. You can also run code that is only called by PyMaker before
-    fixing, like chopping the readme file sections.
+    _do_template, and before _do_before_fix.\n Use this function to create any
+    files that your project needs to be created dynamically. You can also run
+    code that is only called by PyMaker before fixing, like chopping
+    the readme file sections.
     """
-
     # get project type
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-
     # --------------------------------------------------------------------------
     # create venv
 
-    # if venv flag is set
-    if dict_dbg[S_KEY_DBG_VENV]:
+    # call the spinner-wrapped function
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,  # ok
+        S_KEY_ACT_VENV,  # ok
+        S_ACTION_VENV,  # ok
+        # run action and check for error
+        _action_venv,  # ok
+        dir_prj,  # ok
+        dict_prv,  # ok
+        dict_pub,  # ok
+        # handle error
+        quit=False,
+    )
 
-        # print info
-        print(S_ACTION_VENV, end="", flush=True)
+    # --------------------------------------------------------------------------
+    # install reqs
 
-        # get name ov venv folder and reqs file
-        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-
-        # create a cnvenv object
-        cv = CNVenv(dir_prj, dir_venv)
-
-        # create venv
-        try:
-            cv.create()
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # exit gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-
-        # print info
-        print(S_ACTION_REQS, end="", flush=True)
-
-        # get name of venv folder and reqs file
-        file_reqs = dir_prj / S_FILE_REQS
-
-        # install requirements
-        try:
-            cv.install_reqs(file_reqs)
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # exit gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-            # sys.exit(-1)
+    # call the spinner-wrapped function
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_REQS,
+        S_ACTION_REQS,
+        # run action and check for error
+        _action_reqs,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
     # --------------------------------------------------------------------------
     # git
 
-    # if git flag
-    if dict_dbg[S_KEY_DBG_GIT]:
+    # call the spinner-wrapped function
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_GIT,
+        S_ACTION_GIT,
+        # run action and check for error
+        _action_git,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
-        # show info
-        print(S_ACTION_GIT, end="", flush=True)
+    # --------------------------------------------------------------------------
+    # inst/uninst
 
-        # add git dir
-        cmd = S_CMD_GIT_CREATE.format(dir_prj)
-        try:
-            F.run(cmd, shell=True)
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # exit gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-            # sys.exit(-1)
+    # fix dict_pub
+    if prj_type in D_TYPE_INST:
+        dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
+
+        # call the spinner-wrapped function
+        _res = _action_run(
+            # check for key presence or skip
+            dict_act,
+            S_KEY_ACT_INST,
+            S_ACTION_INST,
+            # run action and check for error
+            _action_inst,
+            dir_prj,
+            dict_prv,
+            dict_pub,
+            # handle error
+            quit=False,
+        )
 
     # --------------------------------------------------------------------------
     # purge package dirs
-
-    if prj_type in D_PURGE:
-
-        print(S_ACTION_PURGE, end="", flush=True)
-
-        lst_purge = D_PURGE[prj_type]
-        lst_purge = [
-            (
-                Path(dir_prj) / item
-                if not Path(item).is_absolute()
-                else Path(item)
-            )
-            for item in lst_purge
-        ]
-        for item in lst_purge:
-            if item.exists():
-                if item.is_dir():
-                    shutil.rmtree(item)
-                elif item.is_file():
-                    item.unlink()
-
-        # print done
-        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
-    # set DOCS_DIR_API
-
-    if prj_type in D_DOCS_DIR_API:
-        dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
+    if prj_type in D_PURGE_MAKE:
+        # call the spinner-wrapped function
+        _res = _action_run(
+            dict_act,
+            S_KEY_ACT_PURGE,
+            S_ACTION_PURGE,
+            _action_purge,
+            dir_prj,
+            dict_prv,
+            dict_pub,
+        )
 
     # --------------------------------------------------------------------------
     # do i18n stuff
@@ -1498,47 +1556,16 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_dbg):
     dict_pub[S_KEY_PUB_DIST] = dict(D_TYPE_DIST[prj_type])
 
     # --------------------------------------------------------------------------
-    # set inst dict to default
+    # set DOCS_DIR_API
 
-    if prj_type in D_TYPE_INST:
-        dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
-
-    # --------------------------------------------------------------------------
-    # make install/uninstall config files
-
-    # prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-
-    if prj_type in L_APP_INSTALL:
-
-        # show info
-        print(S_ACTION_INST, end="", flush=True)
-
-        # create a template and save cfg file
-        dict_inst = dict_pub[S_KEY_PUB_INST]
-
-        # dict_inst_cont = dict_inst[S_KEY_INST_CONT]
-        path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
-
-        # # create a template uninstall cfg file
-        # dict_uninst_cont = dict_inst[S_KEY_UNINST_CONT]
-        # path_uninst = dir_prj / S_DIR_INSTALL / S_FILE_UNINST_CFG
-
-        try:
-            F.save_dict_into_paths(dict_inst, [path_inst])
-            # F.save_dict_into_paths(dict_inst, [path_uninst])
-
-            # show info
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-        except OSError as e:  # from save_dict
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
+    if prj_type in D_DOCS_DIR_API:
+        dict_pub[S_KEY_PUB_DOCS][S_KEY_DOCS_DIR_API] = D_DOCS_DIR_API[prj_type]
 
 
 # ------------------------------------------------------------------------------
 # Do any work before fix
 # ------------------------------------------------------------------------------
-def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
+def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_act):
     """
     Do any work before fix
 
@@ -1546,7 +1573,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
-        dict_dbg: The dictionary containing the current session's debug
+        dict_act: The dictionary containing the current session's action
         settings
         pymaker: True if called by PyMaker, False if called by PyBaker
 
@@ -1597,7 +1624,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
     # --------------------------------------------------------------------------
     # folders
 
-    # path to the program's install dir (/home/user/.local/sahre/app_name)
+    # path to the program's install dir (/home/user/.local/share/app_name)
     usr_inst = f"{S_USR_SHARE}/{name_prj_small}"
     dict_prv_prj["__PP_USR_INST__"] = usr_inst
 
@@ -1650,7 +1677,7 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_dbg):
 # ------------------------------------------------------------------------------
 # Do any work after fix
 # ------------------------------------------------------------------------------
-def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
+def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     """
     Do any work after fix
 
@@ -1658,7 +1685,7 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
-        dict_dbg: The dictionary containing the current session's debug
+        dict_act: The dictionary containing the current session's debug
         settings
         pymaker: True if called by PyMaker, False if called by PyBaker
 
@@ -1673,312 +1700,96 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # get project type
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
-    # --------------------------------------------------------------------------
-    # filter using blacklist
-
-    # NB: this is an example of how to use the blacklist filter in your own
-    # customized fix routine
-
-    # print info
-    print(S_ACTION_META, end="", flush=True)
-
-    # NB: this function uses the blacklist to filter files at the very end of
-    # the fix process. At this point you can assume ALL dunders in ALL eligible
-    # files have been fixed, as well as paths/filenames. also dict_pub has been
-    # undunderized
-
-    # fix up blacklist and convert relative or glob paths to absolute Path
-    # objects
-
-    dict_bl = dict(dict_pub[S_KEY_PUB_BL])
-
-    # for each section of blacklist
-    for key, val in dict_bl.items():
-
-        # convert all items in list to Path objects
-        list_res = []
-        for item in val:
-            res = list(dir_prj.glob(item))
-            list_res.extend(res)
-
-        dict_bl[key] = list_res
-
-    # just shorten the names
-    skip_all = dict_bl[S_KEY_SKIP_ALL]
-    skip_contents = dict_bl[S_KEY_SKIP_CONTENTS]
-
-    # --------------------------------------------------------------------------
-    # fix meta
-
-    # NB: root is a full path, dirs and files are relative to root
-    for root, root_dirs, root_files in dir_prj.walk():
-
-        # handle dirs in skip_all
-        if root in skip_all:
-            # NB: don't recurse into subfolders
-            root_dirs.clear()
-            continue
-
-        # convert files into Paths
-        files = [root / f for f in root_files]
-
-        # for each file item
-        for item in files:
-
-            # handle files in skip_all
-            if item in skip_all:
-                continue
-
-            # handle dirs/files in skip_contents
-            if not root in skip_contents and not item in skip_contents:
-                # fix content with appropriate dict
-                _fix_meta(item, dict_prv, dict_pub)
-
-    # print done
-    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
-    # readme chop section
-
-    path_readme = dir_prj / dict_prv[S_KEY_PRV_ALL]["__PP_README_FILE__"]
-    if path_readme.exists():
-
-        print(S_ACTION_README, end="", flush=True)
-
-        # the whole text of the file
-        text = ""
-
-        # open and read whole file
-        with open(path_readme, "r", encoding=S_ENCODING) as a_file:
-            text = a_file.read()
-
-        # find the remove blocks (opposite of prj type)
-        if prj_type in L_APP_INSTALL:
-            str_pattern = S_RM_PKG
-        else:
-            str_pattern = S_RM_APP
-
-        # replace block with empty string (equiv to deleting it)
-        # NB: need S flag to make dot match newline
-        text = re.sub(str_pattern, "", text, flags=re.S)
-
-        # save file
-        with open(path_readme, "w", encoding=S_ENCODING) as a_file:
-            a_file.write(text)
-
-        # show info
-        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
     # i18n
-
     # NB: needs to be callable from pybaker for -l option
     # if i18n flag is set
-    if dict_dbg[S_KEY_DBG_I18N]:
+    # if dict_act[S_KEY_ACT_I18N]:
+    #     _action_i18n(dir_prj, dict_prv, dict_pub)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_I18N,
+        S_ACTION_I18N,
+        # run action and check for error
+        _action_i18n,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
-        # print info
-        print(S_ACTION_I18N, end="", flush=True)
+    # meta
+    # _action_meta(dir_prj, dict_prv, dict_pub)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_META,
+        S_ACTION_META,
+        # run action and check for error
+        _action_meta,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
-        # --------------------------------------------------------------------------
-        # do bulk of i18n
-
-        # create CNPotPy object
-        potpy = CNPotPy(
-            # header
-            str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
-            str_version=dict_prv[S_KEY_PRV_PRJ]["__PP_VER_MMR__"],
-            str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
-            str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
-            # base prj dir
-            dir_prj=dir_prj,
-            # in
-            list_src=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_SRC],
-            # out
-            dir_pot=S_PATH_POT,
-            dir_po=S_PATH_PO,
-            dir_locale=S_PATH_LOCALE,
-            # optional in
-            str_tag=S_I18N_TAG,
-            dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
-            list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
-            charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
-        )
-
-        # make .pot, .po, and .mo files
-        try:
-            potpy.main()
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # fail gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-        # do .desktop i18n/version
-
-        # check if we want template
-        if prj_type in L_MAKE_DESK:
-
-            # path to desktop template
-            path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
-            # path to desktop output
-            path_dsk_out = (
-                dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
-            )
-
-            # do the thing
-            try:
-                potpy.make_desktop(path_dsk_tmp, path_dsk_out)
-            except F.CNRunError as e:
-                # fail gracefully
-                F.printd(S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-        # fix po files outside blacklist
-
-        # print info
-        print(S_ACTION_PO, end="", flush=True)
-
-        # get sub-dicts we need
-        dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-
-        # replace version
-        pp_version = dict_prv_prj["__PP_VER_MMR__"]
-        str_pattern = S_PO_VER_SCH
-        str_rep = S_PO_VER_REP.format(pp_version)
-
-        # get po/pot exts
-        l_ext = [S_I18N_EXT_POT, S_I18N_EXT_PO]
-        list_files = []
-        for item in l_ext:
-            res = list(dir_prj.glob(item))
-            list_files.extend(res)
-
-        # for each file
-        for item in list_files:
-
-            # open file and get contents
-            with open(item, "r", encoding=S_ENCODING) as a_file:
-                text = a_file.read()
-
-            # replace version
-            text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-            # delete path from .pot/.po files (in case of debug)
-            # NB: also no regex or rules, just nuke it everywhere
-            text = text.replace(str(dir_prj) + "/", "")
-
-            # save file
-            with open(item, "w", encoding=S_ENCODING) as a_file:
-                a_file.write(text)
-
-        # print done
-        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
     # add/remove placeholders
-
-    # print info
-    print(S_ACTION_PLACE, end="", flush=True)
-
-    list_skip = []
-    for item in L_PH_SKIP:
-        res = list(dir_prj.glob(item))
-        list_skip.extend(res)
-
-    # for all dirs/subdirs
-    for root, root_dirs, root_files in dir_prj.walk():
-
-        # skip .git, etc
-        if root in list_skip:
-            root_dirs.clear()
-            continue
-
-        # if dir is empty
-        if len(root_dirs) == 0 and len(root_files) == 0:
-
-            # make a dummy file
-            with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
-                a_file.write(S_PH_TEXT)
-
-        # if dir has files/folders and placeholder
-        if len(root_dirs) > 0 or len(root_files) > 1:
-            for a_file in root_files:
-                if a_file == S_PH_NAME:
-                    a_path = root / a_file
-                    a_path.unlink()
-
-    # print info
-    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+    # _action_placeholders(dir_prj, dict_prv, dict_pub)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_PLACE,
+        S_ACTION_PLACE,
+        # run action and check for error
+        _action_placeholders,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
     # --------------------------------------------------------------------------
     # install package in itself
+    # if it is the right type (package)
+    if prj_type in L_INST_SELF:
+        # _action_edit(dir_prj, dict_prv)
 
-    # if venv flag is set and it is the right type (package)
-    if dict_dbg[S_KEY_DBG_VENV] and prj_type in L_INST_SELF:
-
-        print(S_ACTION_EDIT, end="", flush=True)
-
-        # get venv name
-        dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-
-        # install
-        try:
-            F.run(
-                S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv),
-                shell=True,
-                capture_output=True,
-            )
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
+        _res = _action_run(
+            # check for key presence or skip
+            dict_act,
+            S_KEY_ACT_EDIT,
+            S_ACTION_EDIT,
+            # run action and check for error
+            _action_edit,
+            dir_prj,
+            dict_prv,
+            dict_pub,
+            # handle error
+            quit=False,
+        )
 
     # --------------------------------------------------------------------------
     # docs
 
     # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-
-        # print info
-        print(S_ACTION_MAKE_DOCS, end="", flush=True)
-
-        # get some props
-        dict_docs = dict_pub[S_KEY_PUB_DOCS]
-        use_rm = dict_docs[S_KEY_DOCS_USE_RM]
-        use_api = dict_docs[S_KEY_DOCS_MAKE_API]
-        lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
-
-        # check if first run
-        index_path = dir_prj / S_DIR_DOCS / S_FILE_INDEX
-        exist = index_path.exists()
-
-        # if use_rm = true, use rm on every run
-        # if use_rm = false, use rm only only on first run
-        if use_rm or not exist:
-            use_rm = True
-
-        # the command to make docs
-        try:
-
-            # make docs
-            mkdocs = CNMkDocs()
-            mkdocs.make_docs(
-                dir_prj,
-                S_DIR_DOCS,
-                use_rm,
-                use_api,
-                lst_api_in,
-                S_FILE_README,
-                S_DIR_API,
-                S_DIR_IMAGES,
-            )
-
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            # fail gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
+    # if dict_act[S_KEY_ACT_DOCS_MAKE]:
+    #     _action_make_docs(dir_prj, dict_pub)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_DOCS_MAKE,
+        S_ACTION_MAKE_DOCS,
+        # run action and check for error
+        _action_make_docs,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
     # --------------------------------------------------------------------------
     # tree
@@ -1986,48 +1797,27 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_dbg):
     # NB: this will wipe out all previous checks (maybe good?)
 
     # if tree flag is set
-    if dict_dbg[S_KEY_DBG_TREE]:
-
-        # print info
-        print(S_ACTION_TREE, end="", flush=True)
-
-        # get path to tree
-        file_tree_text = dir_prj / S_TREE_TEXT_FILE
-        file_tree_html = dir_prj / S_TREE_HTML_FILE
-
-        # create the file so it includes itself
-        with open(file_tree_text, "w", encoding=S_ENCODING) as a_file:
-            a_file.write("")
-
-        # create the file so it includes itself
-        with open(file_tree_html, "w", encoding=S_ENCODING) as a_file:
-            a_file.write("")
-
-        # create tree object and call
-        tree_obj = CNTree(
-            str(dir_prj),
-            filter_list=dict_pub[S_KEY_PUB_BL][S_KEY_SKIP_TREE],
-            dir_format=S_TREE_DIR_FORMAT,
-            file_format=S_TREE_FILE_FORMAT,
-            ignore_case=False,
-        )
-        tree_obj.make_tree()
-
-        # write to file
-        with open(file_tree_text, "w", encoding=S_ENCODING) as a_file:
-            a_file.write(tree_obj.text)
-        with open(file_tree_html, "w", encoding=S_ENCODING) as a_file:
-            a_file.write(tree_obj.html)
-
-        # ----------------------------------------------------------------------
-        # we are done
-        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+    # if dict_act[S_KEY_ACT_TREE]:
+    #     _action_tree(dir_prj, dict_pub)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_TREE,
+        S_ACTION_TREE,
+        # run action and check for error
+        _action_tree,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
 
 # ------------------------------------------------------------------------------
 # Do any work before making dist
 # ------------------------------------------------------------------------------
-def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
+def do_before_dist(dir_prj, dict_prv, dict_pub, dict_act):
     """
     Do any work before making dist
 
@@ -2035,90 +1825,79 @@ def do_before_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
-        dict_dbg: The dictionary containing the current session's debug
+        dict_act: The dictionary containing the current session's debug
         settings
 
     Do any work on the dist folder before it is created. This method is called
     after _do_after_fix, and before _do_dist.
     """
 
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
     # --------------------------------------------------------------------------
     # freeze venv
 
-    # if venv flag is set
-    if dict_dbg[S_KEY_DBG_VENV]:
-
-        prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
-
-        if prj_type in L_APP_INSTALL:
-            # print info
-            print(S_ACTION_FREEZE, end="", flush=True)
-
-            # get name ov venv folder and reqs file
-            dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
-            file_reqs = dir_prj / S_FILE_REQS
-
-            # do the thing with the thing
-            cv = CNVenv(dir_prj, dir_venv)
-            try:
-                cv.freeze(file_reqs)
-                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-            except F.CNRunError as e:
-                # exit gracefully
-                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printd(S_ERR_ERR, str(e))
+    if prj_type in L_APP_INSTALL:
+        #         _action_freeze(dir_prj, dict_prv)
+        _res = _action_run(
+            # check for key presence or skip
+            dict_act,
+            S_KEY_ACT_FREEZE,
+            S_ACTION_FREEZE,
+            # run action and check for error
+            _action_freeze,
+            dir_prj,
+            dict_prv,
+            dict_pub,
+            # handle error
+            quit=False,
+        )
 
     # --------------------------------------------------------------------------
-    # docs
+    # docs bake
+
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_DOCS_BAKE,
+        S_ACTION_BAKE_DOCS,
+        # run action and check for error
+        _action_bake_docs,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
+
+    # --------------------------------------------------------------------------
+    # docs deploy
+
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_DOCS_DEPLOY,
+        S_ACTION_DEPLOY_DOCS,
+        # run action and check for error
+        _action_deploy_docs,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
     # if docs flag is set
-    if dict_dbg[S_KEY_DBG_DOCS]:
-
-        # "I expect the BEST!" - Debbie Hunt
-        deploy = True
-
-        # ----------------------------------------------------------------------
-
-        # print info
-        print(S_ACTION_BAKE_DOCS, end="", flush=True)
-
-        # get docs object
-        cm = CNMkDocs()
-
-        # the command to make or bake docs
-        try:
-            cm.build_docs(P_DIR_PP_VENV, dir_prj)
-            F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-        except F.CNRunError as e:
-            deploy = False
-            # fail gracefully
-            F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            F.printd(S_ERR_ERR, str(e))
-
-        # ----------------------------------------------------------------------
-
-        if deploy:
-
-            # print info
-            print(S_ACTION_DEPLOY_DOCS, end="", flush=True)
-
-            # the command to make or bake docs
-            try:
-                cm.deploy_docs(P_DIR_PP_VENV, dir_prj)
-                F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-            except F.CNRunError as e:
-                # fail gracefully
-                F.printc(S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                F.printc(
-                    S_ERR_NO_REPO, fg=F.C_FG_WHITE, bg=F.C_BG_RED, bold=True
-                )
-                F.printd(S_ERR_ERR, str(e))
+    # if dict_act[S_KEY_ACT_DOCS_BAKE]:
+    #     res, obj = _action_bake_docs(dir_prj)
+    #     if res and obj and dict_act[S_KEY_ACT_DOCS_DEPLOY]:
+    #         _action_deploy_docs(dir_prj, obj)
 
 
 # ------------------------------------------------------------------------------
 # Do any work after making dist
 # ------------------------------------------------------------------------------
-def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
+def do_after_dist(dir_prj, dict_prv, dict_pub, dict_act):
     """
     Do any work after making dist
 
@@ -2126,7 +1905,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
         dir_prj: The root of the new project
         dict_prv: The dictionary containing private pyplate data
         dict_pub: The dictionary containing public project data
-        dict_dbg: The dictionary containing the current session's debug
+        dict_act: The dictionary containing the current session's debug
         settings
 
     Do any work on the dist folder after it is created. This method is called
@@ -2176,7 +1955,7 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # remove unnecessary files from dist
 
     lst_del = []
-    for item in L_PURGE_FILES:
+    for item in L_PURGE_DIST:
         res = list(p_dist.glob(item))
         lst_del.extend(res)
 
@@ -2189,57 +1968,710 @@ def do_after_dist(dir_prj, dict_prv, _dict_pub, dict_dbg):
     # --------------------------------------------------------------------------
     # compress dist
 
-    # print info
-    print(S_ACTION_COMPRESS, end="", flush=True)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_COMPRESS,
+        S_ACTION_COMPRESS,
+        # run action and check for error
+        _action_compress,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
-    # get out file (dist/prj-<version>.xxx) and in dir (dist/prj-<version>)
-    path_out = path_in = str(p_dist)
-
-    # make archive type(s)
-    # shutil.make_archive(path_out, "gztar", path_in)
-    shutil.make_archive(path_out, "zip", path_in)
-
-    # print info
-    F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
+    # # if debug key set
+    # if dict_act[S_KEY_ACT_REM_DIST]:
+    #     _action_rem_dist(p_dist)
     # --------------------------------------------------------------------------
-    # delete the origin dir, if key set
+    # docs bake
 
-    # if debug key set
-    if dict_dbg[S_KEY_DBG_DIST]:
-
-        # print info
-        print(S_ACTION_REM_DIST, end="", flush=True)
-
-        # get dist dir for all operations
-        dist = Path(dir_prj) / S_DIR_DIST
-        name_fmt = dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"]
-        p_dist = dist / name_fmt
-
-        # delete folder
-        shutil.rmtree(p_dist)
-
-        # show info
-        F.printc(S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_REM_DIST,
+        S_ACTION_REM_DIST,
+        # run action and check for error
+        _action_rem_dist,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
 
 # ------------------------------------------------------------------------------
 # Private functions
 # ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
+# Actions
+# ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
-# Fix metadata in individual files
+# Run an action
 # ------------------------------------------------------------------------------
-def _fix_meta(path, dict_prv, dict_pub):
+def _action_run(
+    dict_act, key, msg, action_func, dir_prj, dict_prv, dict_pub, quit=False
+):
     """
-    Fix metadata in individual files
+    Run an actionS_KEY_ACT_DOCS_BAKE
+
+    Arguments:
+
+    """
+
+    # handle skip
+    if not dict_act[key]:
+
+        # return True
+        return S.skip(msg)
+
+    # run the real func and get pass/fail
+    err = action_func(dir_prj, dict_prv, dict_pub)
+
+    # the real func failed - why?
+    if err:
+
+        # set flag
+        global B_ERROR
+        B_ERROR = True
+
+        # print more info if -d
+        # F.printd(str(err))
+
+        # is it a fireable offense?
+        if quit:
+            # TODO: use PM/PB teardown
+            sys.exit(-1)
+
+    # pass
+    return not err
+
+
+# ------------------------------------------------------------------------------
+# Make a venv in the project directory
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_VENV)
+def _action_venv(dir_prj, dict_prv, _dict_pub):
+    """
+    Make a venv in the project directory
 
     Args:
-        dict_prv_prj: Private calculated proj dict
-        dict_pub_prj: Dict of metadata to replace in the file
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        _dict_pub: The PyPlate public dict (not used)
 
-    Fixes metadata in individual files. Note that this function is only called
+    Returns:
+        A tuple consisting of:
+            bool: Whether the action passed or failed
+            obj: An object returned from the function
+    """
+
+    # get name of venv folder and reqs file
+    dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+
+    # create a cnvenv object
+    cv = CNVenv(dir_prj, dir_venv)
+
+    # create venv
+    try:
+        cv.create()
+        return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+# Install reqs in venv
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_REQS)
+def _action_reqs(dir_prj, dict_prv, _dict_pub):
+    """
+    Install reqs in venv
+
+    Args:
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        dict_pub: The PyPlate public dict
+
+    Returns:
+        A tuple consisting of:
+            bool: Whether the action passed or failed
+            obj: An object returned from the function
+    """
+
+    # get name of venv folder and reqs file
+    dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+
+    # create a cnvenv object
+    cv = CNVenv(dir_prj, dir_venv)
+
+    # get name of venv folder and reqs file
+    file_reqs = dir_prj / S_FILE_REQS
+
+    # install requirements
+    try:
+        cv.install_reqs(file_reqs)
+        return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+# Make git repo for new project
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_GIT)
+def _action_git(dir_prj, _dict_prv, _dict_pub):
+    """
+    Make git repo for new project
+
+    Args:
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        dict_pub: The PyPlate public dict
+
+    Returns:
+        A tuple consisting of:
+            bool: Whether the action passed or failed
+            obj: An object returned from the function
+    """
+
+    # add git dir
+    cmd = S_CMD_GIT_CREATE.format(dir_prj)
+    try:
+        F.run(cmd, shell=True, capture_output=True)
+        return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+# Install lib in project
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_INST)
+def _action_inst(dir_prj, dict_prv, dict_pub):
+    """
+    Install lib in project
+
+    Args:
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        dict_pub: The PyPlate public dict
+
+    Returns:
+        A tuple consisting of:
+            bool: Whether the action passed or failed
+            obj: An object returned from the function
+    """
+
+    # make the project.json inst dict
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    dict_pub[S_KEY_PUB_INST] = dict(D_TYPE_INST[prj_type])
+
+    # create a template and save cfg file
+    dict_inst = dict_pub[S_KEY_PUB_INST]
+
+    # dict_inst_cont = dict_inst[S_KEY_INST_CONT]
+    path_inst = dir_prj / S_DIR_INSTALL / S_FILE_INST_CFG
+
+    try:
+        F.save_dict_into_paths(dict_inst, [path_inst])
+        return None
+    except OSError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+# Purge some files
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_PURGE)
+def _action_purge(dir_prj, dict_prv, _dict_pub):
+    """
+    Purge some files
+
+    Args:
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        dict_pub: The PyPlate public dict
+
+    Returns:
+        A tuple consisting of:
+            bool: Whether the action passed or failed
+            obj: An object returned from the function
+    """
+
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+
+    # get list of purges for this prj type
+    lst_purge = D_PURGE_MAKE[prj_type]
+
+    # make sure all paths are absolute
+    lst_purge = [
+        (Path(dir_prj) / item if not Path(item).is_absolute() else Path(item))
+        for item in lst_purge
+    ]
+
+    # nuke any files/folders
+    for item in lst_purge:
+        if item.exists():
+            if item.is_dir():
+                shutil.rmtree(item)
+            elif item.is_file():
+                item.unlink()
+
+    # print done
+    return None
+
+
+# ------------------------------------------------------------------------------
+# Make i18n stuff
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_I18N)
+def _action_i18n(dir_prj, dict_prv, dict_pub):
+    """
+    Make i18n stuff
+
+    Args:
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        dict_pub: The PyPlate public dict
+
+    Returns:
+        A tuple consisting of:
+            bool: Whether the action passed or failed
+            obj: An object returned from the function
+    """
+
+    # --------------------------------------------------------------------------
+    # do bulk of i18n
+
+    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+    str_version = dict_prv_prj["__PP_VER_MMR__"]
+    if str_version == "":
+        str_version = "0.0.0"
+
+    # create CNPotPy object
+    potpy = CNPotPy(
+        # header
+        str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
+        str_version=str_version,
+        str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
+        str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
+        # base prj dir
+        dir_prj=dir_prj,
+        # in
+        list_src=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_SRC],
+        # out
+        dir_pot=S_PATH_POT,
+        dir_po=S_PATH_PO,
+        dir_locale=S_PATH_LOCALE,
+        # optional in
+        str_tag=S_I18N_TAG,
+        dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
+        list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
+        charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
+    )
+
+    # make .pot, .po, and .mo files
+    try:
+        potpy.main()
+    except F.CNRunError as e:
+        return e
+
+    # --------------------------------------------------------------------------
+    # do .desktop i18n/version
+
+    # check if we want template
+    prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
+    if prj_type in L_MAKE_DESK:
+
+        # path to desktop template
+        path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
+        # path to desktop output
+        path_dsk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
+
+        # do the thing
+        try:
+            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+        except F.CNRunError as e:
+            return e
+
+    # default result
+    return None
+
+
+# ------------------------------------------------------------------------------
+# Fix metadata
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_META)
+def _action_meta(dir_prj, dict_prv, dict_pub):
+    """
+    Fix metadata
+
+    Args:
+        dir_prj: The project directory
+        dict_prv: The PyPlate private dict
+        dict_pub: The PyPlate public dict
+
+    """
+
+    # --------------------------------------------------------------------------
+    # fix po files (version/remove home dir)
+    # NB: this ignores blacklist
+
+    # NB: root is a full path, dirs and files are relative to root
+    for root, root_dirs, root_files in dir_prj.walk():
+
+        # special case for po/pot files
+
+        # convert files into Paths
+        files = [root / f for f in root_files]
+
+        # for each file item
+        for item in files:
+
+            # if it is a .po or .pot file
+            if item.suffix in L_EXT_PO:
+
+                # fix it with appropriate dicts
+                _fix_po(item, dict_prv, dict_pub)
+
+    # --------------------------------------------------------------------------
+    # filter using blacklist
+
+    # NB: this is an example of how to use the blacklist filter in your own
+    # customized fix routine
+
+    # NB: this function uses the blacklist to filter files at the very end of
+    # the fix process. At this point you can assume ALL dunders in ALL eligible
+    # files have been fixed, as well as paths/filenames. also dict_pub has been
+    # undunderized
+
+    # fix up blacklist and convert relative or glob paths to absolute Path
+    # objects
+    dict_bl = dict(dict_pub[S_KEY_PUB_BL])
+
+    # for each section of blacklist
+    for key, val in dict_bl.items():
+
+        # convert all items in list to Path objects
+        list_res = []
+        for item in val:
+            res = list(dir_prj.glob(item))
+            list_res.extend(res)
+
+        # store in local bl
+        dict_bl[key] = list_res
+
+    # just shorten the names
+    skip_all = dict_bl[S_KEY_SKIP_ALL]
+    skip_contents = dict_bl[S_KEY_SKIP_CONTENTS]
+
+    # --------------------------------------------------------------------------
+    # fix po files (version/remove home dir)
+    # NB: this uses blacklist
+
+    # NB: root is a full path, dirs and files are relative to root
+    for root, root_dirs, root_files in dir_prj.walk():
+
+        # handle dirs in skip_all
+        if root in skip_all:
+            # NB: don't recurse into subfolders
+            root_dirs.clear()
+            continue
+
+        # convert files into Paths
+        files = [root / f for f in root_files]
+
+        # for each file item
+        for item in files:
+
+            # handle files in skip_all
+            if item in skip_all:
+                continue
+
+            # handle dirs/files in skip_contents
+            if not root in skip_contents and not item in skip_contents:
+
+                # fix content with appropriate dicts
+                _fix_files(item, dict_prv, dict_pub)
+
+    # print done
+    return None
+
+
+# ------------------------------------------------------------------------------
+# Fix placeholders
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_PLACE)
+def _action_placeholders(dir_prj, _dict_prv, _dict_pub):
+
+    # do not fuck with placeholders in these dirs
+    list_skip = []
+    for item in L_PH_SKIP:
+        res = list(dir_prj.glob(item))
+        list_skip.extend(res)
+
+    # for all dirs/subdirs
+    for root, root_dirs, root_files in dir_prj.walk():
+
+        # skip .git, etc
+        if root in list_skip:
+            root_dirs.clear()
+            continue
+
+        # if dir is empty
+        if len(root_dirs) == 0 and len(root_files) == 0:
+
+            # make a dummy file
+            with open(root / S_PH_NAME, "w", encoding=S_ENCODING) as a_file:
+                a_file.write(S_PH_TEXT)
+
+        # if dir has files/folders and placeholder
+        if len(root_dirs) > 0 or len(root_files) > 1:
+            for a_file in root_files:
+                if a_file == S_PH_NAME:
+                    a_path = root / a_file
+                    a_path.unlink()
+
+    # print info
+    return None
+
+
+# ------------------------------------------------------------------------------
+# Install package in itself
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_EDIT)
+def _action_edit(dir_prj, dict_prv, _dict_pub):
+
+    # get venv name
+    dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+    # install
+    cmd = S_CMD_VENV_INST_SELF.format(dir_prj, dir_venv)
+    try:
+        F.run(cmd, shell=True, capture_output=True)
+        return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+# Make docs folderS_ERR_NO_REPO
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_MAKE_DOCS)
+def _action_make_docs(dir_prj, _dict_prv, dict_pub):
+
+    # get some props
+    dict_docs = dict_pub[S_KEY_PUB_DOCS]
+    use_rm = dict_docs[S_KEY_DOCS_USE_RM]
+    use_api = dict_docs[S_KEY_DOCS_MAKE_API]
+    lst_api_in = dict_docs[S_KEY_DOCS_DIR_API]
+
+    # check if first run
+    index_path = dir_prj / S_DIR_DOCS / S_FILE_INDEX
+    exist = index_path.exists()
+
+    # if use_rm = true, use rm on every run
+    # if use_rm = false, use rm only only on first run
+    if use_rm or not exist:
+        use_rm = True
+
+    # command to make docs
+    try:
+
+        # make docs
+        mkdocs = CNMkDocs()
+        mkdocs.make_docs(
+            dir_prj,
+            S_DIR_DOCS,
+            use_rm,
+            use_api,
+            lst_api_in,
+            S_FILE_README,
+            S_DIR_API,
+            S_DIR_IMAGES,
+        )
+        return None
+    except F.CNRunError as e:
+        return e
+
+
+# -----------------------------------------------------------------------------
+# Make tree files
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_TREE)
+def _action_tree(dir_prj, _dict_prv, dict_pub):
+
+    # get path to tree
+    file_tree_text = dir_prj / S_TREE_TEXT_FILE
+    file_tree_html = dir_prj / S_TREE_HTML_FILE
+
+    # create the file so it includes itself
+    with open(file_tree_text, "w", encoding=S_ENCODING) as a_file:
+        a_file.write("")
+
+    # create the file so it includes itself
+    with open(file_tree_html, "w", encoding=S_ENCODING) as a_file:
+        a_file.write("")
+
+    # create tree object and call
+    tree_obj = CNTree(
+        str(dir_prj),
+        filter_list=dict_pub[S_KEY_PUB_BL][S_KEY_SKIP_TREE],
+        dir_format=S_TREE_DIR_FORMAT,
+        file_format=S_TREE_FILE_FORMAT,
+        ignore_case=False,
+    )
+    tree_obj.make_tree()
+
+    # write to file
+    with open(file_tree_text, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(tree_obj.text)
+    with open(file_tree_html, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(tree_obj.html)
+
+    # --------------------------------------------------------------------------
+    # we are done
+    # return None
+
+
+# ------------------------------------------------------------------------------
+# Freeze venv dir
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_FREEZE)
+def _action_freeze(dir_prj, dict_prv, _dict_pub):
+
+    # get name ov venv folder and reqs file
+    dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+    file_reqs = dir_prj / S_FILE_REQS
+
+    # do the thing with the thing
+    cv = CNVenv(dir_prj, dir_venv)
+    try:
+        cv.freeze(file_reqs)
+        # return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_BAKE_DOCS)
+def _action_bake_docs(dir_prj, _dict_prv, _dict_pub):
+
+    # bake docs
+    try:
+        cm = CNMkDocs()
+        cm.bake_docs(P_DIR_PP_VENV, dir_prj)
+        # return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_DEPLOY_DOCS)
+def _action_deploy_docs(dir_prj, _dict_prv, _dict_pub):
+
+    # the command to make or bake docs
+    try:
+        cm = CNMkDocs()
+        cm.deploy_docs(P_DIR_PP_VENV, dir_prj)
+        # return None
+    except F.CNRunError as e:
+        return e
+
+
+# ------------------------------------------------------------------------------
+#
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_COMPRESS)
+def _action_compress(dir_prj, dict_prv, _dict_pub):
+
+    # get dist dir for all operations
+    dist = Path(dir_prj) / S_DIR_DIST
+    name_fmt = str(dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"])
+    p_dist = dist / name_fmt
+
+    # get out file (dist/prj-<version>.xxx) and in dir (dist/prj-<version>)
+    path_out = path_in = str(p_dist)
+
+    # make archive type
+    shutil.make_archive(path_out, S_DIST_MODE, path_in)
+
+    # print info
+    pass
+
+
+#
+# ------------------------------------------------------------------------------
+@S.spin(S_ACTION_REM_DIST)
+def _action_rem_dist(dir_prj, dict_prv, _dict_pub):
+
+    # get dist dir for all operations
+    dist = Path(dir_prj) / S_DIR_DIST
+    name_fmt = str(dict_prv[S_KEY_PRV_PRJ]["__PP_FMT_DIST__"])
+    p_dist = dist / name_fmt
+
+    # delete folder
+    shutil.rmtree(p_dist)
+
+    # show info
+    pass
+
+
+# ------------------------------------------------------------------------------
+# Metadata functions
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Fix po files outside blacklist to hide file paths
+# ------------------------------------------------------------------------------
+def _fix_po(path, dict_prv, _dict_pub):
+
+    # replace version
+    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+    pp_version = dict_prv_prj["__PP_VER_MMR__"]
+    str_pattern = S_PO_VER_SCH
+    str_rep = S_PO_VER_REP.format(pp_version)
+
+    # open file and get contents
+    with open(path, "r", encoding=S_ENCODING) as a_file:
+        text = a_file.read()
+
+    # replace version
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # delete home dir from .pot/.po files
+    # NB: also no regex or rules, just nuke it everywhere
+    text = text.replace(str(Path.home()), "")
+
+    # save file
+    with open(path, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(text)
+
+
+# ------------------------------------------------------------------------------
+# Fix stuff in individual files
+# ------------------------------------------------------------------------------
+def _fix_files(path, dict_prv, dict_pub):
+    """
+    Fix stuff in individual files
+
+    Args:
+        path: Path object for file to be fixed
+        dict_prv_prj: Private project dict
+        dict_pub_prj: Public project dict
+
+    Fixes stuff in individual files. Note that this function is only called
     for files that make it through the BL filter. Switches are your problem.
     """
 
@@ -2275,6 +2707,7 @@ def _fix_meta(path, dict_prv, dict_pub):
     if path.name == S_FILE_MKDOCS_YML:
         _fix_mkdocs(path, dict_prv_prj, dict_pub)
 
+
 # ------------------------------------------------------------------------------
 # Remove/replace parts of the main README file
 # ------------------------------------------------------------------------------
@@ -2297,6 +2730,19 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     # open and read whole file
     with open(path, "r", encoding=S_ENCODING) as a_file:
         text = a_file.read()
+
+    # find the remove blocks (opposite of prj type)
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
+    if prj_type in L_APP_INSTALL:
+        str_pattern = S_RM_PKG
+    else:
+        str_pattern = S_RM_APP
+
+    # replace block with empty string (equiv to deleting it)
+    # NB: need S flag to make dot match newline
+    text = re.sub(str_pattern, "", text, flags=re.S)
+
+    # --------------------------------------------------------------------------
 
     # replace short description
     str_pattern = S_RM_DESC_SCH
@@ -2361,7 +2807,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
 # ------------------------------------------------------------------------------
 # Replace text in the pyproject file
 # ------------------------------------------------------------------------------
-def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
+def _fix_pyproject(path: Path, dict_prv_prj, dict_pub_meta):
     """
     Replace text in the pyproject file
 
@@ -2376,9 +2822,7 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     # convert long ver to mmr
     str_pattern = S_SEM_VER_VALID
     str_rep = dict_prv_prj["__PP_VER_MMR__"]
-    res = re.search(str_pattern, str_rep)
-    if res:
-        str_rep = re.sub(str_pattern, S_SEM_VER_PYPRJ, str_rep)
+    str_rep = re.sub(str_pattern, S_SEM_VER_PYPRJ, str_rep)
 
     # --------------------------------------------------------------------------
 
@@ -2391,7 +2835,6 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
 
     # replace version
     str_pattern = S_TOML_VER_SCH
-
     str_rep = S_TOML_VER_REP.format(str_rep)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
@@ -2410,6 +2853,60 @@ def _fix_pyproject(path, dict_prv_prj, dict_pub_meta):
     str_pattern = S_TOML_KW_SCH
     str_rep = S_TOML_KW_REP.format(s_keywords)
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # --------------------------------------------------------------------------
+    # fix packages list
+
+    # get src or pkg name as start_dir
+    prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
+    prj_name = dict_prv_prj["__PP_NAME_PRJ_SMALL__"]
+    start_dir = ""
+
+    # use appropriate start dir
+    if prj_type in L_TOML_USE_SRC:
+        start_dir = S_DIR_SRC
+    else:
+        start_dir = prj_name
+
+    # get full start path
+    path_src = path.parent.resolve()
+    path_src = path_src / start_dir
+
+    # init list
+    pkgs = [start_dir]
+    path_prj = path_src.parent.resolve()
+
+    # walk all subdirs of 'path_src'
+    for parent_dir, child_dirs, _child_files in path_src.walk():
+
+        # only care about dirs
+        for child_dir in child_dirs:
+
+            # ignore __pycache__
+            if child_dir == "__pycache__":
+                continue
+
+            # get full path, then relative to project path to get relative path
+            abs_path = parent_dir / child_dir
+            rel_path = abs_path.relative_to(path_prj)
+
+            # swap characters
+            str_rel_path = str(rel_path).replace("/", ".")
+
+            # add to list
+            pkgs.append(str_rel_path)
+
+    # format list
+    pkgs = [f'"{item}"' for item in pkgs]
+    s_pkgs = ", ".join(pkgs)
+    s_pkgs = f"[{s_pkgs}]"
+
+    # replace package list
+    str_pattern = S_TOML_PKGS_SCH
+    str_rep = S_TOML_PKGS_REP.format(s_pkgs)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+
+    # --------------------------------------------------------------------------
 
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
@@ -2609,19 +3106,11 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
 
         # ----------------------------------------------------------------------
 
-        # replace short desc in line
-        str_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-        str_sch = S_SRC_DESC_SCH
-        str_rep = S_SRC_DESC_REP.format(str_desc)
-        line = re.sub(str_sch, str_rep, line, flags=re.M)
-
         # replace version in line
         str_ver = dict_prv_prj["__PP_VER_DISP__"]
-        # ver = dict_prv_prj["__PP_VER_MMR__"]
         str_sch = S_SRC_VER_SCH
-        # str_rep = S_SRC_VER_REP.format(ver)
         str_rep = S_SRC_VER_REP.format(str_ver)
-        line = re.sub(str_sch, str_rep, line, flags=re.M)
+        line = re.sub(str_sch, str_rep, line)
 
         # replace line in lines
         lines[index] = line
@@ -2629,6 +3118,24 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
     # save lines back to file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.writelines(lines)
+
+    # --------------------------------------------------------------------------
+    # S_PP_SHORT_DESC needs special handling for _() and () if Black wraps it
+    # FIXME: does not respect current state of replace flag b/c multiline
+
+    # open and read whole file
+    with open(path, "r", encoding=S_ENCODING) as a_file:
+        text = a_file.read()
+
+        # replace short desc in multi line
+        str_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
+        str_sch = S_SRC_DESC_SCH
+        str_rep = S_SRC_DESC_REP.format(str_desc)
+        text = re.sub(str_sch, str_rep, text, flags=re.S)
+
+    # save lines back to file
+    with open(path, "w", encoding=S_ENCODING) as a_file:
+        a_file.write(text)
 
 
 # ------------------------------------------------------------------------------
@@ -2672,6 +3179,7 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub):
     Fixes the theme name in mkdocs.yml.
     """
 
+    # get theme name
     dict_pub_docs = dict_pub[S_KEY_PUB_DOCS]
     theme = dict_pub_docs[S_KEY_DOCS_THEME]
 
@@ -2690,5 +3198,6 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub):
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
         a_file.write(text)
+
 
 # -)

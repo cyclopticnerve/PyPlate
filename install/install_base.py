@@ -103,14 +103,13 @@ class CNInstallBase:
     # NB: used for logger
     S_APP_NAME = "pyplate"
 
-    # short description
-    # pylint: disable=line-too-long
-    # NB: need to keep on one line for replacement
-    S_PP_SHORT_DESC = "A program for creating and building CLI/GUI/Packages in Python from a template"
-    # pylint: enable=line-too-long
+    # I18N: short description of program
+    S_PP_SHORT_DESC = _(
+        "A program for creating and building CLI/GUI/Package projects in Python from a template"
+    )
 
     # version string
-    S_PP_VERSION = "Version 1.1.0"
+    S_PP_VERSION = "Version 1.1.4"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
@@ -149,7 +148,7 @@ class CNInstallBase:
     )
 
     # I18N if using argparse, add help at end of about
-    S_ABOUT_HELP = _("Use -h for help")
+    S_USE_HELP = _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -195,6 +194,8 @@ class CNInstallBase:
     S_CMD_CREATE = "python -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
     S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    # NB: format param is pre/post script path
+    S_CMD_EXTERNAL = "python {}"
 
     # --------------------------------------------------------------------------
     # dry run messages
@@ -243,7 +244,7 @@ class CNInstallBase:
     S_MSG_ABORT = _("Aborted")
     # NB: format param is script name
     # I18N: run external script
-    S_MSG_RUN_EXT = _("Running {}... ")
+    S_MSG_RUN_EXT = _("Running:")
 
     # NB: format params are prog_name and prog_version
     # I18N: install the program
@@ -397,7 +398,7 @@ class CNInstallBase:
 
             # print "use -h" and bail
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
             self._teardown(-1)
 
         # convert namespace to dict
@@ -433,7 +434,7 @@ class CNInstallBase:
             print()
             print(self.S_ABOUT)
             print()
-            print(self.S_ABOUT_HELP)
+            print(self.S_USE_HELP)
 
         # ready to go
         # NB: not sure how do do this the other way around
@@ -583,7 +584,6 @@ class CNInstallBase:
         """
 
         # if it's a dry run, don't do anything
-        # dry_run = self._dict_args.get(self.S_ARG_DRY_DEST, False)
         if self._arg_dry:
             print(self.S_DRY_EXT, cmd)
             print()

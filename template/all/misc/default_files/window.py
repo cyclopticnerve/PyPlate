@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
-# Filename: __PP_FILE_WIN__.py                                    |     ()     |
-# Date    : __PP_DATE__                                           |            |
-# Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# Project : PyPlate                                                /          \
+# Filename: _win.py                                               |     ()     |
+# Date    : 05/31/2026                                            |            |
+# Author  : cyclopticnerve                                        |   \____/   |
+# License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -45,7 +45,7 @@ from gi.repository import Gtk  # type: ignore
 # ------------------------------------------------------------------------------
 # A class to wrap a specific window object in the ui file
 # ------------------------------------------------------------------------------
-class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
+class Win(Gtk.ApplicationWindow):
     """
     A class to wrap a specific window object in the ui file
 
@@ -61,12 +61,12 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
     P_DIR_PRJ = Path(__file__).parents[3].resolve()
 
     # get paths to ui files
-    P_FILE_WIN = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
-    P_FILE_DLG = P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_DLG__.ui"
+    P_FILE_WIN = P_DIR_PRJ / "src/gui/ui/_win.ui"
+    P_FILE_DLG = P_DIR_PRJ / "src/gui/ui/dialogs.ui"
 
     # the name of the window in the ui file
-    S_UI_WIN_NAME = "__PP_CLASS_WIN__"
-    S_UI_ABT_NAME = "__PP_DLG_ABOUT__"
+    S_UI_WIN_NAME = "Win"
+    S_UI_ABT_NAME = "dlg_about"
 
     # window actions
     S_ACTION_DELETE_EVENT = "delete-event"
@@ -94,7 +94,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
         self._app = app
 
         # props necessary tro create a basic window
-        ui_file = self.P_DIR_PRJ / "__PP_DIR_UI__/__PP_FILE_WIN__.ui"
+        ui_file = self.P_DIR_PRJ / "src/gui/ui/_win.ui"
         ui_path = Path(ui_file).resolve()
 
         # create a builder and set i18n domain
@@ -103,7 +103,7 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
         # load file and get window
         self.builder.add_from_file(str(ui_path))
-        self.window = self.builder.get_object("__PP_CLASS_WIN__")
+        self.window = self.builder.get_object("Win")
 
         # connect all control signals
         self.builder.connect_signals(self)  # pylint: disable=no-member
@@ -131,9 +131,9 @@ class __PP_CLASS_WIN__(Gtk.ApplicationWindow):
 
         # get dialog, run, hide (standard for reusable modal dialogs)
         # NB: no ext (will find .ui, .glade, .xml...)
-        dlg_file = self.P_DIR_PRJ / "__PP_DIR_UI__" / "__PP_FILE_DLG__.ui"
+        dlg_file = self.P_DIR_PRJ / "src/gui/ui" / "dialogs.ui"
         dlg_path = Path(dlg_file).resolve()
-        self._app.show_dialog(dlg_path, "__PP_DLG_ABOUT__")
+        self._app.show_dialog(dlg_path, "dlg_about")
 
     # --------------------------------------------------------------------------
     # Called when the New button is clicked

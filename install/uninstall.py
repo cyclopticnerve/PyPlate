@@ -30,7 +30,7 @@ import sys
 # Constants
 # ------------------------------------------------------------------------------
 
-# get pkg dir
+# get prj dir
 P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get dirs
