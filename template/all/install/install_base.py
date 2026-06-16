@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: install_base.py                                       |     ()     |
-# Date    : 05/31/2026                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -45,8 +45,8 @@ import sys
 T_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
+T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
@@ -101,14 +101,13 @@ class CNInstallBase:
     # strings
 
     # NB: used for logger
-    S_APP_NAME = "pyplate"
+    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
-    # I18N: short description
-    # NB: the dot shuts up warnings from xgettext
-    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Package projects in Python from a template")
+    # short description
+    S_PP_SHORT_DESC = _("")
 
     # version string
-    S_PP_VERSION = "Version 1.1.4"
+    S_PP_VERSION = ""
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"
@@ -122,7 +121,7 @@ class CNInstallBase:
     S_ARG_FORCE_ACTION = "store_true"
     S_ARG_FORCE_DEST = "FORCE_DEST"
     # I18N: force option help
-    S_ARG_FORCE_HELP = _("force install/uninstall this program")
+    S_ARG_FORCE_HELP = _("force install this program")
 
     # quiet option strings
     S_ARG_QUIET_OPTION = "-q"
@@ -140,14 +139,14 @@ class CNInstallBase:
 
     # about string
     S_ABOUT = (
-        "PyPlate\n"
+        "__PP_NAME_PRJ_BIG__\n"
         f"{S_PP_SHORT_DESC}\n"
         f"{S_PP_VERSION}\n"
-        "https://github.com/cyclopticnerve/PyPlate"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__"
     )
 
     # I18N if using argparse, add help at end of about
-    S_USE_HELP = _("Use -h for help")
+    S_ABOUT_HELP = _("Use -h for help")
 
     # keys
     S_KEY_INST_NAME = "INST_NAME"
@@ -368,6 +367,7 @@ class CNInstallBase:
             self.S_ARG_FORCE_OPTION,
             action=self.S_ARG_FORCE_ACTION,
             dest=self.S_ARG_FORCE_DEST,
+            help=self.S_ARG_FORCE_HELP,
         )
 
         # add quiet option
@@ -396,7 +396,7 @@ class CNInstallBase:
 
             # print "use -h" and bail
             print()
-            print(self.S_USE_HELP)
+            print(self.S_ABOUT_HELP)
             self._teardown(-1)
 
         # convert namespace to dict
@@ -432,7 +432,7 @@ class CNInstallBase:
             print()
             print(self.S_ABOUT)
             print()
-            print(self.S_USE_HELP)
+            print(self.S_ABOUT_HELP)
 
         # ready to go
         # NB: not sure how do do this the other way around

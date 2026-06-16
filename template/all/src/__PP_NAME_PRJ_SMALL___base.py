@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
-# Filename: pyplate_base.py                                       |     ()     |
-# Date    : 05/31/2026                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_NAME_PRJ_SMALL___base.py                         |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -28,37 +28,40 @@ from pathlib import Path
 import sys
 
 # cnlib imports
+# pylint: disable=import-error
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
+
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
-# dirs
+# project dir
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
-P_DIR_LOG = P_DIR_PRJ / "log"
-P_DIR_CONF = P_DIR_PRJ / "conf"
+
+# conf dir
+P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
+P_DIR_LOG = P_DIR_PRJ / "__PP_DIR_LOG__"
 
 # path to default config file
 # NB: if not using, set to None
-P_CFG_DEF = P_DIR_CONF / "pyplate.json"
+P_CFG_DEF = P_DIR_CONF / "__PP_NAME_PRJ_SMALL__.json"
 
 # path to default log file
 # NB: if not using, set to None
-P_LOG_DEF = P_DIR_LOG / "pyplate.log"
+P_LOG_DEF = P_DIR_LOG / "__PP_NAME_PRJ_SMALL__.log"
 
 # path to uninst
-P_UNINST = P_DIR_PRJ / "uninstall.py"
-P_UNINST_DBG = P_DIR_PRJ / "uninstall.py -d"
+P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
 
 # ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
-# i18n stuff
-DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
-_ = F.get_underscore("pyplate", DIR_LOCALE)
+DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+_ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -68,7 +71,7 @@ _ = F.get_underscore("pyplate", DIR_LOCALE)
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyplateBase:
+class __PP_NAME_PRJ_PASCAL__Base:
     """
     The main class, responsible for the operation of the program
 
@@ -114,20 +117,14 @@ class PyplateBase:
     # strings
 
     # NB: used for parser/logger
-    S_APP_NAME = "pyplate"
+    S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
-    # pyplate: replace=True
-    # I18N: short description
-    # NB: the dot shuts up warnings from xgettext
-    S_PP_SHORT_DESC = _("A program for creating and building CLI/GUI/Package projects in Python from a template")
+    # short description
+    S_PP_SHORT_DESC = _("")
 
     # version string
-    S_PP_VERSION = "Version 1.1.4"
+    S_PP_VERSION = ""
 
-    # pyplate: replace=False
-
-    # --------------------------------------------------------------------------
-    # args
     # config option strings
     S_ARG_CFG_OPTION = "-c"
     S_ARG_CFG_DEST = "CFG_DEST"
@@ -136,30 +133,37 @@ class PyplateBase:
     # I18N: config file dest (indicate it should be a file name/path)
     S_ARG_CFG_METAVAR = _("FILE")
 
-    # debug option
+    # debug option strings
     S_ARG_DBG_OPTION = "-d"
     S_ARG_DBG_ACTION = "store_true"
     S_ARG_DBG_DEST = "DBG_DEST"
     # I18N: debug mode help
     S_ARG_DBG_HELP = _("enable debugging mode")
 
-    # help option
+    # config option strings
     S_ARG_HLP_OPTION = "-h"
     S_ARG_HLP_ACTION = "store_true"
     S_ARG_HLP_DEST = "HLP_DEST"
     # I18N: help option help
     S_ARG_HLP_HELP = _("show this help message and exit")
 
-    # uninstall option
+    # config option strings
     S_ARG_UNINST_OPTION = "--uninstall"
     S_ARG_UNINST_ACTION = "store_true"
     S_ARG_UNINST_DEST = "UNINST_DEST"
     # I18N: uninstall option help
     S_ARG_UNINST_HELP = _("uninstall this program")
 
-    # I18N if using argparse, add help at end of about
-    S_USE_HELP = _("use -h for help")
+    # about string
+    S_ABOUT = (
+        "__PP_NAME_PRJ_BIG__\n"
+        f"{S_PP_SHORT_DESC}\n"
+        f"{S_PP_VERSION}\n"
+        "__PP_URL__/__PP_NAME_PRJ_BIG__"
+    )
 
+    # I18N if using argparse, add help at end of about
+    S_ABOUT_HELP = _("Use -h for help")
 
     # default format for log files
     S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
@@ -192,17 +196,6 @@ class PyplateBase:
     # NB: format param is file path
     # I18N: could not find -c file
     S_ERR_NO_CFG = _("Config file {} not found")
-
-    # about string
-    S_ABOUT = (
-        "__PP_NAME_PRJ_BIG__\n"
-        f"{S_PP_SHORT_DESC}\n"
-        f"{S_PP_VERSION}\n"
-        "__PP_URL__/__PP_NAME_PRJ_BIG__"
-    )
-
-    # cmd line instructions string (to be set by subclass)
-    S_EPILOG = ""
 
     # --------------------------------------------------------------------------
     # Instance methods
@@ -280,13 +273,13 @@ class PyplateBase:
         Boilerplate to use at the start of main
 
         Perform some mundane stuff like running the arg parser and loading
-        config files. Also handles -h (help) and --uninstall
+        config files.
         """
 
         # ----------------------------------------------------------------------
         # use cmd line
 
-        # add help option
+        # always add help option
         self._parser.add_argument(
             self.S_ARG_HLP_OPTION,
             action=self.S_ARG_HLP_ACTION,
@@ -319,10 +312,10 @@ class PyplateBase:
         self._dict_args = vars(args)
 
         # ----------------------------------------------------------------------
-        # check for -h (help)
+        # check for one-shot args
 
         # if -h passed, this will print and exit
-        if self._dict_args[self.S_ARG_HLP_DEST]:
+        if self._dict_args.get(self.S_ARG_HLP_DEST, False):
 
             # print default about text
             print()
@@ -337,17 +330,20 @@ class PyplateBase:
         # check for -d (debug)
 
         # set self and lib debug
-        self._arg_debug = self._dict_args[self.S_ARG_DBG_DEST]
+        self._arg_debug = self._dict_args.get(
+            self.S_ARG_DBG_DEST, self._arg_debug
+        )
         F.B_DEBUG = self._arg_debug
 
         # ----------------------------------------------------------------------
         # check for --uninstall
 
         # punt to uninstall func
-        if self._dict_args[self.S_ARG_UNINST_DEST]:
+        if self._dict_args.get(self.S_ARG_UNINST_DEST, False):
 
             # uninstall and exit
-            self._handle_u()
+            self._do_uninstall()
+            # NB: exit is handled by _do_uninstall
 
         # ----------------------------------------------------------------------
         # set props from args
@@ -453,7 +449,7 @@ class PyplateBase:
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op
     # --------------------------------------------------------------------------
-    def _handle_u(self):
+    def _do_uninstall(self):
         """
         Handle the --uninstall cmd line op
         """
@@ -461,12 +457,12 @@ class PyplateBase:
         # format cmd line
         cmd = str(P_UNINST)
         if self._arg_debug:
-            cmd = str(P_UNINST_DBG)
+            cmd += " -d"
 
         # ----------------------------------------------------------------------
 
         try:
-            F.run(cmd, shell=True, capture_output=True)
+            F.run(cmd, shell=True)
             self._teardown()
         except F.CNRunError as e:
             print(e.output)

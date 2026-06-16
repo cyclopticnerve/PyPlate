@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: pre_uninstall.py                                      |     ()     |
-# Date    : 05/31/2026                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """

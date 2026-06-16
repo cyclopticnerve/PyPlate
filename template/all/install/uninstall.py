@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: uninstall.py                                          |     ()     |
-# Date    : 05/31/2026                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -34,14 +34,14 @@ import sys
 P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get dirs
-P_DIR_INSTALL = P_DIR_PARENT / "install"
+P_DIR_INSTALL = P_DIR_PARENT / "__PP_DIR_INSTALL__"
 
 # get files
-P_FILE_CFG_OLD = P_DIR_INSTALL / "install.json"
+P_FILE_CFG_OLD = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
 # get pre/post files
-P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/pre_uninstall.py"
-P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_uninstall.py"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_UNINST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -51,11 +51,10 @@ P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_uninstall.py"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
+# pylint: disable=wrong-import-position, import-error
 from install_base import CNInstallBase  # type: ignore
-from install_base import _
 
-# I18N: force install help message
-S_ARG_FORCE_HELP = _("force uninstall this program")
+# pylint: enable=wrong-import-position, import-error
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -63,7 +62,7 @@ S_ARG_FORCE_HELP = _("force uninstall this program")
 
 
 # ------------------------------------------------------------------------------
-# The class to use for installing a PyPlate program
+# The class to use for installing/uninstalling
 # ------------------------------------------------------------------------------
 class CNUninstall(CNInstallBase):
     """
@@ -71,13 +70,6 @@ class CNUninstall(CNInstallBase):
 
     This class performs the uninstall operation.
     """
-
-    # --------------------------------------------------------------------------
-    # Class constants
-    # --------------------------------------------------------------------------
-
-    # NB: different help message for force between pm/pb
-    S_ARG_FORCE_HELP = S_ARG_FORCE_HELP
 
     # --------------------------------------------------------------------------
     # Class methods

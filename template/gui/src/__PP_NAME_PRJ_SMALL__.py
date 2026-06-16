@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
-# Filename: pyplate.py                                            |     ()     |
-# Date    : 05/31/2026                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -13,11 +13,11 @@ The main file that runs the program
 This file is executable and can be called from the terminal like:
 
 foo@bar:~$ cd [path to directory of this file]
-foo@bar:~[path to directory of this file] ./pyplate.py [cmd line]
+foo@bar:~[path to directory of this file] ./__PP_NAME_PRJ_SMALL__.py [cmd line]
 
 or if installed in a global location:
 
-foo@bar:~$ pyplate [cmd line]
+foo@bar:~$ __PP_NAME_PRJ_SMALL__ [cmd line]
 
 Typical usage is show in the main() method.
 """
@@ -26,9 +26,25 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
+# system imports
+from pathlib import Path
+import sys
+
 # local imports
-from pyplate_base import _
-from pyplate_base import PyplateBase
+from __PP_NAME_PRJ_SMALL___base import _
+from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+# pylint: disable=import-error
+
+P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI_SRC__"
+sys.path.insert(0, str(P_GUI))
+from __PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
+
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -42,7 +58,7 @@ from pyplate_base import PyplateBase
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class Pyplate(PyplateBase):
+class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     """
     The main class, responsible for the operation of the program
 
@@ -55,7 +71,7 @@ class Pyplate(PyplateBase):
     """
 
     # --------------------------------------------------------------------------
-    # Class constants
+    # Constants
     # --------------------------------------------------------------------------
 
 
@@ -68,15 +84,9 @@ class Pyplate(PyplateBase):
     # # I18N: enable mode help
     # S_ARG_X_HELP = _("do x")
 
-    # --------------------------------------------------------------------------
-    # Dictionaries
-
-    # set default config dict
-    D_CFG_DEF = {}
-
-    # # ------------------------------------------------------------------------
+    # # --------------------------------------------------------------------------
     # # Initialize the new object
-    # # ------------------------------------------------------------------------
+    # # --------------------------------------------------------------------------
     # def __init__(self):
     #     """
     #     Initialize the new object
@@ -88,9 +98,6 @@ class Pyplate(PyplateBase):
 
     #     # do super init
     #     super().__init__()
-
-    #     # set default cfg dict
-    #     self._dict_cfg = self.D_CFG_DEF.copy()
 
     #     # NB: add class properties here
     #     self._foo = True
@@ -122,7 +129,8 @@ class Pyplate(PyplateBase):
         # main stuff
 
         # do the thing with the thing
-        print(self._func())
+        app = __PP_CLASS_APP__(self._dict_args, self._dict_cfg)
+        app.run()
 
         # ----------------------------------------------------------------------
         # teardown
@@ -130,22 +138,22 @@ class Pyplate(PyplateBase):
         # call boilerplate code
         self._teardown()
 
-        # ----------------------------------------------------------------------
-        # Private methods
-        # ----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # Private methods
+    # --------------------------------------------------------------------------
 
-        # NB: these are the main steps, called in order from main
+    # NB: these are the main steps, called in order from main
 
-        # # ----------------------------------------------------------------------
-        # # Boilerplate to use at the start of main
-        # # ----------------------------------------------------------------------
-        # def _setup(self):
-        #     """
-        #     Boilerplate to use at the start of main
+    # # --------------------------------------------------------------------------
+    # # Boilerplate to use at the start of main
+    # # --------------------------------------------------------------------------
+    # def _setup(self):
+    #     """
+    #     Boilerplate to use at the start of main
 
-        #     Perform some mundane stuff like setting properties.
-        #     If you implement this function. make sure to call super() LAST!!!
-        #     """
+    #     Perform some mundane stuff like setting properties.
+    #     If you implement this function. make sure to call super() LAST!!!
+    #     """
 
         # # add debug option
         # self._parser.add_argument(
@@ -210,7 +218,7 @@ class Pyplate(PyplateBase):
     # # --------------------------------------------------------------------------
     # # Boilerplate to use at the end of main
     # # --------------------------------------------------------------------------
-    # def _teardown(self, errcode: int=0):
+    # def _teardown(self):
     #     """
     #     Boilerplate to use at the end of main
 
@@ -222,7 +230,7 @@ class Pyplate(PyplateBase):
     #     self._dict_cfg["foo"] = "bar"
 
     #     # do teardown
-    #     super()._teardown(errcode)
+    #     super()._teardown()
 
 
 # ------------------------------------------------------------------------------
@@ -236,7 +244,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # create a new instance of the main class
-    obj = Pyplate()
+    obj = __PP_NAME_PRJ_PASCAL__()
 
     # run the instance
     obj.main()

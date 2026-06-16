@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Project : __PP_NAME_PRJ_BIG__                                    /          \
 # Filename: install.py                                            |     ()     |
-# Date    : 05/31/2026                                            |            |
-# Author  : cyclopticnerve                                        |   \____/   |
-# License : WTFPLv2                                                \          /
+# Date    : __PP_DATE__                                           |            |
+# Author  : __PP_AUTHOR__                                         |   \____/   |
+# License : __PP_LICENSE_NAME__                                    \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -36,29 +36,29 @@ import sys
 P_DIR_PARENT = Path(__file__).parent.resolve()
 
 # get in dirs
-P_DIR_ASSETS = P_DIR_PARENT / "assets"
-P_DIR_INSTALL = P_DIR_ASSETS / "install"
+P_DIR_ASSETS = P_DIR_PARENT / "__PP_DIR_ASSETS__"
+P_DIR_INSTALL = P_DIR_ASSETS / "__PP_DIR_INSTALL__"
 
 # get in files
 # NB: use local uninstall
-P_FILE_UNINST = P_DIR_ASSETS / "uninstall.py"
-P_FILE_REQS = P_DIR_INSTALL / "requirements.txt"
-P_FILE_DESK = P_DIR_ASSETS / "src/gui/desktop/PyPlate.desktop"
-P_FILE_DESK_ICON = P_DIR_ASSETS / ".local/share/pyplate/images/pyplate.png"
-P_FILE_CFG_NEW = P_DIR_INSTALL / "install.json"
+P_FILE_UNINST = P_DIR_ASSETS / "__PP_NAME_UNINST__"
+P_FILE_REQS = P_DIR_INSTALL / "__PP_REQS_FILE__"
+P_FILE_DESK = P_DIR_ASSETS / "__PP_FILE_DESK__"
+P_FILE_DESK_ICON = P_DIR_ASSETS / "__PP_IMG_DESK__"
+P_FILE_CFG_NEW = P_DIR_INSTALL / "__PP_FILE_INST_CFG__"
 
 # get out dirs
-P_DIR_VENV = Path.home() / ".local/share/pyplate/.venv-pyplate"
-P_DIR_CONF = Path.home() / ".config/pyplate"
+P_DIR_VENV = Path.home() / "__PP_USR_INST__/__PP_NAME_VENV__"
+P_DIR_CONF = Path.home() / "__PP_USR_CONF__/__PP_NAME_PRJ_SMALL__"
 
 # get out files
 P_FILE_CFG_OLD = (
-    Path.home() / ".local/share/pyplate/install/install.json"
+    Path.home() / "__PP_USR_INST__/__PP_DIR_INSTALL__/__PP_FILE_INST_CFG__"
 )
 
 # get pre/post files
-P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/pre_install.py"
-P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_install.py"
+P_FILE_PRE = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_INST_PRE__"
+P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/__PP_INST_POST__"
 
 # ------------------------------------------------------------------------------
 # Local imports
@@ -68,11 +68,10 @@ P_FILE_POST = P_DIR_INSTALL / "__PP_DIR_SCRIPTS__/post_install.py"
 sys.path.append(str(P_DIR_INSTALL))
 
 # local imports
+# pylint: disable=wrong-import-position, import-error
 from install_base import CNInstallBase  # type: ignore
-from install_base import _
 
-# I18N: force install help message
-S_ARG_FORCE_HELP = _("force install this program")
+# pylint: enable=wrong-import-position, import-error
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -80,7 +79,7 @@ S_ARG_FORCE_HELP = _("force install this program")
 
 
 # ------------------------------------------------------------------------------
-# The class to use for installing a PyPlate program
+# The class to use for installing/uninstalling
 # ------------------------------------------------------------------------------
 class CNInstall(CNInstallBase):
     """
@@ -88,13 +87,6 @@ class CNInstall(CNInstallBase):
 
     This class performs the install operation.
     """
-
-    # --------------------------------------------------------------------------
-    # Class constants
-    # --------------------------------------------------------------------------
-
-    # NB: different help message for force between pm/pb
-    S_ARG_FORCE_HELP = S_ARG_FORCE_HELP
 
     # --------------------------------------------------------------------------
     # Class methods
