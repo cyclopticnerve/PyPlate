@@ -1,7 +1,12 @@
 
 FIXME: template/pkg launch.json needs dunders for filename
 
+TODO: true uninstall also removes config
+TODO: add 'run after install' option
+TODO: figure out D_XXX_ACT stuff
 TODO: -l opt should be: ~/prj $ pybaker -l /path/to/foo.po
+TODO: develop.py needs B_IS_PKG for installing self
+TODO: no sys.path fuckery, use __init__.py
 TODO: look at launchers/tasks/settings in all .vscode
 TODO: test all spinners
 TODO: test all cmd line opts

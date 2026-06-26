@@ -233,9 +233,9 @@ S_MSG_LANG_ADD = _("Adding language file {}...")
 # NB: format param is proj dir
 S_CMD_GIT_CREATE = "cd {}; git init -q"
 # NB: format params are prj dir and venv name
-S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python -m pip install -e ."
+S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python3 -m pip install -e ."
 # NB: format params are prj dir, venv name, and reqs file
-S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python -m pip install -r {}"
+S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python3 -m pip install -r {}"
 # mkdocs commands
 S_CMD_DOC_DEPLOY = "mkdocs gh-deploy"
 
@@ -1127,9 +1127,14 @@ D_PUB_I18N = {
 # NB: tbd by do_after_template based on prj type
 D_PUB_INST = {}
 
-# TEMPLATE dict in project to control pm/pb processing
-# NB: this is what controls the steps in making ALL projects
-# and what controls a particular PROJECT when baking
+# initial dict in project to control baking
+# NB: this is what goes into a project's 'project.json' file  when it is
+# created by pymaker and that dict controls a particular project when baking
+# all values should be True unless you have a good reason (such as, you will
+# never need a .git folder or a venv, or you don't use documentation tools, or
+# i18n tools, etc.)
+# remember that this dict is only read by pybaker AFTER the project has been
+# created. to change the actions tha pymaker uses, see D_PM_ACT in pymaker.py.
 D_PUB_ACT = {
     S_KEY_ACT_VENV: True,
     S_KEY_ACT_REQS: True,

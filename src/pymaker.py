@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # ------------------------------------------------------------------------------
 # Project : PyPlate                                                /          \
 # Filename: pymaker.py                                            |     ()     |
@@ -41,7 +41,7 @@ from pyplate_base import _
 
 # ALTERNATE dict in pymaker to control pm processing
 # NB: this is what controls the steps in making TEST projects
-# it does NOT affect the project's 'pyplate/*' files
+# it does NOT affect the project's 'project.json' file
 D_PM_ACT = {
     B.C.S_KEY_ACT_VENV: True,
     B.C.S_KEY_ACT_REQS: True,

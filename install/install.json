@@ -5,7 +5,6 @@
     "INST_CONT": {
         "bin/pymaker": ".local/bin",
         "bin/pybaker": ".local/bin",
-        "conf": ".local/share/pyplate",
         "i18n": ".local/share/pyplate",
         "images": ".local/share/pyplate",
         "install": ".local/share/pyplate",
@@ -16,6 +15,10 @@
     "UNINST_CONT": [
         ".local/bin/pymaker",
         ".local/bin/pybaker",
-        ".local/share/pyplate"
-    ]
+        ".local/share/pyplate",
+        ".config/pyplate"
+    ],
+    "CFG_CONT": {
+        "conf": ".config/pyplate"
+    }
 }

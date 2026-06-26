@@ -2,9 +2,14 @@
     "PUB_META": {
         "META_SHORT_DESC": "A program for creating and building CLI/GUI/Package projects in Python from a template",
         "META_VERSION": "1.1.4",
-        "META_KEYWORDS": [],
+        "META_KEYWORDS": [
+            "python",
+            "pyplate",
+            "pymaker",
+            "pybaker"
+        ],
         "META_DEPS": {
-            "Python 3.10+": "https://python.org"
+            "Python 3.14+": "https://python.org"
         },
         "META_CATS": []
     },
@@ -18,13 +23,14 @@
             "docs",
             "i18n",
             "misc",
+            "pyplate",
             "site",
             "todo",
             "LICENSE.txt",
             "requirements.txt",
             "**/__pycache__",
             "**/*.egg-info",
-            "pyplate"
+            "template"
         ],
         "SKIP_CONTENTS": [
             "**/*.png",
@@ -40,6 +46,7 @@
             ".git",
             ".venv*",
             ".VSCodeCounter",
+            "*.code-workspace",
             "dist",
             "site",
             "**/__pycache__",
@@ -71,11 +78,12 @@
         "images": "assets",
         "install": "assets",
         "src": "assets",
+        "template": "assets",
         "requirements.txt": "assets/install"
     },
     "PUB_DOCS": {
         "DOCS_THEME": "",
-        "DOCS_USE_RM": false,
+        "DOCS_USE_RM": true,
         "DOCS_MAKE_API": true,
         "DOCS_DIR_API": [
             "src"
@@ -111,15 +119,19 @@
         "INST_VER": "1.1.4",
         "INST_DESK": false,
         "INST_CONT": {
-            "bin/cli_debug": ".local/bin",
+            "bin/pymaker": ".local/bin",
+            "bin/pybaker": ".local/bin",
+            "conf": ".local/share/pyplate",
             "i18n": ".local/share/pyplate",
             "images": ".local/share/pyplate",
             "install": ".local/share/pyplate",
             "src": ".local/share/pyplate",
+            "template": ".local/share/pyplate",
             "uninstall.py": ".local/share/pyplate"
         },
         "UNINST_CONT": [
-            ".local/bin/pyplate",
+            ".local/bin/pymaker",
+            ".local/bin/pybaker",
             ".local/share/pyplate"
         ],
         "CFG_CONT": {
