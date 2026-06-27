@@ -1,8 +1,9 @@
 
-FIXME: template/pkg launch.json needs dunders for filename
+FIXME: po/pot needs path rel to prj, not just delete home
 
 TODO: true uninstall also removes config
-TODO: add 'run after install' option
+TODO: pkg deps need to go in toml, not reqs
+TODO: add 'run after install' option (already can run post-install)
 TODO: figure out D_XXX_ACT stuff
 TODO: -l opt should be: ~/prj $ pybaker -l /path/to/foo.po
 TODO: develop.py needs B_IS_PKG for installing self
@@ -323,6 +324,7 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: template/pkg launch.json needs dunders for filename
 DONE: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 DONE: move template pre/post to misc
 DONE: print "running pre-flight"/"post-flight" instead of path

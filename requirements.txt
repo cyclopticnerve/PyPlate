@@ -1,0 +1,22 @@
+click==8.4.2
+CNLib @ git+https://github.com/cyclopticnerve/CNLib@1a9e9d6be31f654e6a725ee6d578b0a1af7d03db
+ghp-import==2.1.0
+griffelib==2.1.0
+Jinja2==3.1.6
+Markdown==3.10.2
+MarkupSafe==3.0.3
+mergedeep==1.3.4
+mkdocs==1.6.1
+mkdocs-autorefs==1.4.4
+mkdocs-get-deps==0.2.2
+mkdocstrings==1.0.4
+mkdocstrings-python==2.0.5
+packaging==26.2
+pathspec==1.1.1
+platformdirs==4.10.0
+pymdown-extensions==11.0
+python-dateutil==2.9.0.post0
+PyYAML==6.0.3
+pyyaml_env_tag==1.1
+six==1.17.0
+watchdog==6.0.0

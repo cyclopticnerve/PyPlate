@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.1.4\n"
 "Report-Msgid-Bugs-To: cyclopticnerve@gmail.com\n"
-"POT-Creation-Date: 2026-06-14 17:58-0400\n"
+"POT-Creation-Date: 2026-06-26 22:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,31 +18,36 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. I18N: done with step
-#: /Documents/Projects/Python/PyPlate/develop.py:79
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:240
+#: /Documents/Projects/Python/PyPlate/develop.py:81
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:237
 msgid "Done"
 msgstr ""
 
 #. I18N: step failed
-#: /Documents/Projects/Python/PyPlate/develop.py:81
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:242
+#: /Documents/Projects/Python/PyPlate/develop.py:83
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:239
 msgid "Failed"
 msgstr ""
 
 #. I18N: show the venv step
-#: /Documents/Projects/Python/PyPlate/develop.py:83
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:257
+#: /Documents/Projects/Python/PyPlate/develop.py:85
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:254
 msgid "Making venv folder... "
 msgstr ""
 
 #. I18N: show the reqs step
-#: /Documents/Projects/Python/PyPlate/develop.py:85
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:259
+#: /Documents/Projects/Python/PyPlate/develop.py:87
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:256
 msgid "Installing requirements... "
 msgstr ""
 
+#. I18N: show the self step
+#: /Documents/Projects/Python/PyPlate/develop.py:89
+msgid "Installing self as editable... "
+msgstr ""
+
 #. I18N: an error occurred
-#: /Documents/Projects/Python/PyPlate/develop.py:90
+#: /Documents/Projects/Python/PyPlate/develop.py:94
 msgid "Error: "
 msgstr ""
 
@@ -84,6 +89,10 @@ msgstr ""
 msgid "{} [{}]: "
 msgstr ""
 
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:171
+msgid "/"
+msgstr ""
+
 #. I18N: ask to overwrite same version
 #: /Documents/Projects/Python/PyPlate/install/install_base.py:174
 msgid ""
@@ -116,92 +125,92 @@ msgid "N"
 msgstr ""
 
 #. I18N: an error occurred
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:218
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:215
 msgid "Error:"
 msgstr ""
 
 #. I18N: config file not found
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:221
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:218
 msgid "File not found:"
 msgstr ""
 
 #. I18N: config file is not valid json
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:224
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:221
 msgid "File is not a JSON file:"
 msgstr ""
 
 #. I18N: version numbers invalid
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:226
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:223
 msgid "One or both version numbers are invalid"
 msgstr ""
 
 #. I18N: src path invalid
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:229
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:226
 msgid "Source path can not be {}"
 msgstr ""
 
 #. I18N: dst path invalid
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:232
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:229
 msgid "Destination path can not be {}"
 msgstr ""
 
 #. I18N: can't find .desktop
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:234
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:231
 msgid "No desktop files present"
 msgstr ""
 
 #. I18N: process aborted
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:244
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:241
 msgid "Aborted"
 msgstr ""
 
 #. I18N: run external script
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:247
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:244
 msgid "Running:"
 msgstr ""
 
 #. I18N: install the program
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:251
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:248
 msgid "Installing {} Version {}"
 msgstr ""
 
 #. I18N: show the copy file step
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:253
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:250
 msgid "Copying files... "
 msgstr ""
 
 #. I18N: show the copy config step
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:255
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:252
 msgid "Copying config... "
 msgstr ""
 
 #. I18N: show desktop step
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:261
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:258
 msgid "Fixing .desktop file... "
 msgstr ""
 
 #. I18N: done installing
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:264
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:261
 msgid "{} installed"
 msgstr ""
 
 #. I18N: uninstall the program
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:268
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:265
 msgid "Uninstalling {}"
 msgstr ""
 
 #. I18N: start deleting old program
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:270
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:267
 msgid "Deleting old program files... "
 msgstr ""
 
 #. I18N: start deleting old config
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:272
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:269
 msgid "Deleting old configuration... "
 msgstr ""
 
 #. I18N: done uninstalling
-#: /Documents/Projects/Python/PyPlate/install/install_base.py:275
+#: /Documents/Projects/Python/PyPlate/install/install_base.py:272
 msgid "{} uninstalled"
 msgstr ""
 

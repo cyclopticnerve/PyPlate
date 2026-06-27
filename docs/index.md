@@ -13,11 +13,11 @@
 [![License: WTFPLv2](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net)
 
 <!-- __RM_SHORT_DESC__ -->
-A program for creating and building CLI/GUI/Packages in Python from a template
+A program for creating and building CLI/GUI/Package projects in Python from a template
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-Version 1.2.3
+Version 1.1.4
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -35,7 +35,7 @@ Version 1.2.3
 
 ## Requirements
 <!-- __RM_DEPS__ -->
-[Python 3.10+](https://python.org)
+[Python 3.14+](https://python.org)
 <!-- __RM_DEPS__ -->
 
 ## Downloading
@@ -83,7 +83,7 @@ Let us start with 'pymaker'.
 
 ## PyMaker - Create the project
 Before you do anything, you should take a look at the 'conf.py' file in
-'~/.config/pyplate/conf'. This file contains A **LOT** of information that
+'~/.config/pyplate/conf'. This file contains **A LOT** of information that
 is used when creating/building a project. Most of these are string values and
 file/folder names used in the program, which you are free to change.
 
@@ -92,7 +92,7 @@ creating/building the project, such as before/after creating a project,
 before/after building a project, etc.
 These functions have been extended to the config file so you don't have to do a
 lot of mucking around in the source code, but be sure to take a look at those
-too.
+files too.
 
 Now run the script from the command line, in the directory where you want to
 create the project:
@@ -143,8 +143,8 @@ Step 2:
    - To use MkDocs, you have to:
       - run 'pybaker' from your project directory
 
-Wait a minute or two, and your docs should appear at
-      https://<username\>.github.io/<repo_name\>
+      Wait a minute or two, and your docs should appear at
+            https://<username\>.github.io/<repo_name\>
 
 ## Uninstalling
 
@@ -159,12 +159,12 @@ $ pyplate --uninstall
 See the full [documentation](https://cyclopticnerve.github.io/PyPlate)
 
 ## Developing
-If you are developing this project, make sure you run the "develop.py" script
+If you are developing this project, make sure you run the 'develop.py' script
 first to create the proper virtual environment and install the requirements (if
 any).
 
 ## Notes
-If you have any sort of spellchecker in your IDE, *FOR GOD'S SAKE TURN IT OFF!*
+If you have any sort of spellchecker in your IDE, ***FOR GOD'S SAKE TURN IT OFF!***
 It would brick a fucking quantum computer. On the other hand, I'm about to use
 an Oxford comma, so \\/ jog on.
 
