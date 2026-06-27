@@ -170,11 +170,11 @@
 <h2 id="it-mostly-works-tm">"It mostly works" ™©®</h2>
 <p><a href="http://www.wtfpl.net"><img alt="License: WTFPLv2" src="https://img.shields.io/badge/License-WTFPL-brightgreen.svg" /></a></p>
 <!-- __RM_SHORT_DESC__ -->
-<p>A program for creating and building CLI/GUI/Packages in Python from a template</p>
+<p>A program for creating and building CLI/GUI/Package projects in Python from a template</p>
 <!-- __RM_SHORT_DESC__ -->
 
 <!-- __RM_VERSION__ -->
-<p>Version 1.1.3</p>
+<p>Version 1.1.4</p>
 <!-- __RM_VERSION__ -->
 
 <!-- __RM_SCREENSHOT__ -->
@@ -193,7 +193,7 @@
 </ul>
 <h2 id="requirements">Requirements</h2>
 <!-- __RM_DEPS__ -->
-<p><a href="https://python.org">Python 3.10+</a></p>
+<p><a href="https://python.org">Python 3.14+</a></p>
 <!-- __RM_DEPS__ -->
 
 <h2 id="downloading">Downloading</h2>
@@ -233,7 +233,7 @@ project as its development continues.</p>
 <p>Let us start with 'pymaker'.</p>
 <h2 id="pymaker-create-the-project">PyMaker - Create the project</h2>
 <p>Before you do anything, you should take a look at the 'conf.py' file in
-'~/.config/pyplate/conf'. This file contains A <strong>LOT</strong> of information that
+'~/.config/pyplate/conf'. This file contains <strong>A LOT</strong> of information that
 is used when creating/building a project. Most of these are string values and
 file/folder names used in the program, which you are free to change.</p>
 <p>This file also contains some functions that are run at various times during
@@ -241,7 +241,7 @@ creating/building the project, such as before/after creating a project,
 before/after building a project, etc.
 These functions have been extended to the config file so you don't have to do a
 lot of mucking around in the source code, but be sure to take a look at those
-too.</p>
+files too.</p>
 <p>Now run the script from the command line, in the directory where you want to
 create the project:</p>
 <pre><code class="language-bash">$ cd ~/Projects/Python
@@ -278,13 +278,15 @@ dir in VSCode's terminal.</p>
       - Go to the repo's Settings/Pages
       - Set the source to your main branch / docs folder</p>
 <ul>
-<li>To use MkDocs, you have to:<ul>
+<li>
+<p>To use MkDocs, you have to:</p>
+<ul>
 <li>run 'pybaker' from your project directory</li>
 </ul>
+<p>Wait a minute or two, and your docs should appear at
+        https://&lt;username&gt;.github.io/&lt;repo_name&gt;</p>
 </li>
 </ul>
-<p>Wait a minute or two, and your docs should appear at
-      https://&lt;username&gt;.github.io/&lt;repo_name&gt;</p>
 <h2 id="uninstalling">Uninstalling</h2>
 <!-- __RM_APP__ -->
 <p>Just type the program name and use the '--uninstall' option:</p>
@@ -295,11 +297,11 @@ dir in VSCode's terminal.</p>
 <h2 id="documentation">Documentation</h2>
 <p>See the full <a href="https://cyclopticnerve.github.io/PyPlate">documentation</a></p>
 <h2 id="developing">Developing</h2>
-<p>If you are developing this project, make sure you run the "develop.py" script
+<p>If you are developing this project, make sure you run the 'develop.py' script
 first to create the proper virtual environment and install the requirements (if
 any).</p>
 <h2 id="notes">Notes</h2>
-<p>If you have any sort of spellchecker in your IDE, <em>FOR GOD'S SAKE TURN IT OFF!</em>
+<p>If you have any sort of spellchecker in your IDE, <strong><em>FOR GOD'S SAKE TURN IT OFF!</em></strong>
 It would brick a fucking quantum computer. On the other hand, I'm about to use
 an Oxford comma, so \/ jog on.</p>
 <p>If you make any changes to this template to better suit your own style/setup,
@@ -392,5 +394,5 @@ documentation, because pdoc3 is TOO SIMPLE and sphinx is TOO COMPLEX!</p>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-05-19 18:28:12.047849+00:00
+Build Date UTC : 2026-06-27 02:24:27.974470+00:00
 -->
