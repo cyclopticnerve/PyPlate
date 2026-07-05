@@ -1,4 +1,6 @@
 
+FIXME: update for cnpot.underscore
+
 FIXME: for pkg (or any?) add reqs to toml deps
 FIXME: CNLIB NEEDS MKDOCS!!! WTF!!!
 no it depends on having pyplate installed, which depends on mkdocs
