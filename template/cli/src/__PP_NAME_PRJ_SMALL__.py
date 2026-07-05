@@ -58,7 +58,6 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     # Class constants
     # --------------------------------------------------------------------------
 
-
     # cmd line options
 
     # enable option strings

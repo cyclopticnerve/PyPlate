@@ -123,7 +123,7 @@ class __PP_NAME_PRJ_PASCAL__:
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except (FileNotFoundError, subprocess.CalledProcessError):
+        except FileNotFoundError, subprocess.CalledProcessError:
             sys.exit(-1)
 
 

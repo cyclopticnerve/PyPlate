@@ -23,9 +23,9 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["python", "cli", "template", "app", "package", "gui", "module", "gtk3"]
+keywords = []
 dependencies = []
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 
 [project.urls]
 homepage = "__PP_URL__/__PP_NAME_PRJ_BIG__"

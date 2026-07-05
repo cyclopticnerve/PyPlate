@@ -14,7 +14,7 @@ Initialize
         [] Install reqs - $ python -m pip install -r requirements.txt
 
         Mod/Pkg
-            [] Install in venv - $ python -m pip install -e .  
+            [] Install in venv - $ python -m pip install -e .
 
         [] Stage all changes
         [] Commit 'first commit'
@@ -41,10 +41,10 @@ Release
 
     I18N
         [] Use gettext _ for all user-facing strings
-        [] Format numbers/dates/currency 
+        [] Format numbers/dates/currency
             https://phrase.com/blog/posts/beginners-guide-to-locale-in-python/
         [] Do I18N for .pot/.mo in src/gui/locale
-                
+
     VSCodium
 
         All
@@ -70,7 +70,7 @@ Release
 
             Mod/Pkg
                 [] Test build - $ python -m build
-                
+
             [] Test in VM using GitHub/README
 
         Branch 'release'
@@ -81,13 +81,13 @@ Release
             [] Build - $ python -m build
             ??? [] Upload to TestPyPI/PyPI
             [] Commit/push 'release'
-    
+
         branch 'main'
             [] Checkout 'main'
             [] Merge from 'release' to 'main' (git checkout 'main'; git merge 'release')
             [] Delete release branch
             [] Tag with version number 'vX.X.X'
-            [] Push 'main'    
+            [] Push 'main'
             [] Checkout 'dev'
 
     GitHub

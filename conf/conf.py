@@ -89,6 +89,28 @@ I_LOG_COUNT = 5  # max number of log files
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
+# Basic developer info
+
+# author info
+S_AUTHOR = "cyclopticnerve"
+S_EMAIL = "cyclopticnerve@gmail.com"
+S_URL = "https://github.com/cyclopticnerve"
+# license info
+S_LICENSE_NAME = "WTFPLv2"
+S_LICENSE_URL = "http://www.wtfpl.net"
+# license badge for readme
+S_LICENSE_BADGE_URL = (
+    "https://img.shields.io/badge/License-WTFPL-brightgreen.svg"
+)
+S_RM_LICENSE = (
+        "[!"  # open image tag
+        f"[License: {S_LICENSE_NAME}]"  # alt text
+        f"({S_LICENSE_BADGE_URL})"  # img src
+        "]"  # close image tag
+        f"({S_LICENSE_URL})"  # click url
+)
+
+# ------------------------------------------------------------------------------
 # spice up version number
 
 # NB: format param is __PP_VER_MMR__
@@ -587,7 +609,7 @@ S_THEME_REP = r"\g<1> {}"
 
 S_WLANG = "en"
 S_ENCODING = "UTF-8"
-S_DIST_MODE = "gztar"
+S_DIST_MODE = "zip"
 # I18N: default date format
 S_DATE_FMT = _("%m/%d/%Y")
 # I18N: def deps
@@ -648,7 +670,6 @@ L_TYPES = [
         "pkg",
     ],
 ]
-# ------------------------------------------------------------------------------
 
 # file exts for do_after_fix
 L_EXT_PY = [".py"]
@@ -682,8 +703,6 @@ L_EXT_DS = [
 # file exts for do_after_fix
 L_EXT_GUI = [".ui", ".glade"]
 
-# ------------------------------------------------------------------------------
-
 # prj type(s) for making an install.json
 L_APP_INSTALL = [
     "c",
@@ -702,8 +721,6 @@ L_SCREENSHOT = ["g"]
 # if in list, use S_DIR_SRC, else use __PP_NAME_PRJ_SMALL__
 L_TOML_USE_SRC = ["c", "g"]
 
-# ------------------------------------------------------------------------------
-
 # files to remove from dist after bake is done
 L_PURGE_DIST = [
     f"**/{S_PH_NAME}",
@@ -717,8 +734,6 @@ L_PH_SKIP = [S_DIR_GIT, ".venv*"]
 
 # remove exts from bin files
 L_DIST_REMOVE_EXT = [f"{S_DIR_ASSETS}/{S_DIR_BIN}/*.py"]
-
-# ------------------------------------------------------------------------------
 
 # get list of approved categories
 # https://specifications.freedesktop.org/menu-spec/latest/apa.html
@@ -868,7 +883,7 @@ L_CATS = [
     "Applet",
     "Shell",
 ]
-
+f"{(S_DIR_ALL)}"
 # ------------------------------------------------------------------------------
 # Dictionaries
 # ------------------------------------------------------------------------------
@@ -890,25 +905,18 @@ L_CATS = [
 D_PRV_ALL = {
     # --------------------------------------------------------------------------
     # the author name, used in headers and pyproject.toml
-    "__PP_AUTHOR__": "cyclopticnerve",
-    # the base url for all projects, used in pyproject.toml and GUI about dlg
-    "__PP_URL__": "https://github.com/cyclopticnerve",
+    "__PP_AUTHOR__": S_AUTHOR,
     # the author's email, used in headers and pyproject.toml
-    "__PP_EMAIL__": "cyclopticnerve@gmail.com",
+    "__PP_EMAIL__": S_EMAIL,
+    # the base url for all projects, used in pyproject.toml and GUI about dlg
+    "__PP_URL__": S_URL,
     # the license name, used in headers and pyproject.toml
-    "__PP_LICENSE_NAME__": "WTFPLv2",
+    "__PP_LICENSE_NAME__": S_LICENSE_NAME,
     # the license url, used in gui about dialog
-    "__PP_LICENSE_URL__": "http://www.wtfpl.net",
-    # the license image/link to use in __PP_README_FILE__
-    "__PP_RM_LICENSE__": (
-        "[!"  # open image tag
-        "[License: WTFPLv2]"  # alt text
-        "(https://img.shields.io/badge/License-WTFPL-brightgreen.svg)"  # img src
-        "]"  # close image tag
-        "(http://www.wtfpl.net)"  # click url
-    ),
-    # dummy value to use in headers
-    "__PP_DUMMY__": "",
+    "__PP_LICENSE_URL__": S_LICENSE_URL,
+    # the license badge to use in README.md
+    "__PP_RM_LICENSE__": S_RM_LICENSE,
+    # ------------------------------------------------------------------------------
     # NB: the struggle here is that using the fixed format results in a
     # four-digit year, but using the locale format ('%x') results in a
     # two-digit year (at least for my locale, which in 'en_US'). so what to do?
@@ -928,7 +936,7 @@ D_PRV_ALL = {
     "__PP_DIR_ASSETS__": S_DIR_ASSETS,
     # --------------------------------------------------------------------------
     # these paths are relative to the dev's prj name
-    # i.e. /home/dev/Projects/Python/MyProject
+    # i.e. /home/user/Projects/Python/MyProject
     "__PP_DIR_CONF__": S_DIR_CONF,
     "__PP_DIR_LOG__": S_DIR_LOG,
     "__PP_DIR_SRC__": S_DIR_SRC,
@@ -1017,7 +1025,7 @@ D_PRV_PRJ = {
     "__PP_VER_MMR__": "",  # semantic version string, ie. "0.0.13"
     "__PP_VER_DISP__": "",  # formatted version string, ie. "Version 0.0.1"
     "__PP_FMT_DIST__": "",
-    "__PP_DEV_INST__": "",  # cmd used by develop.py to install reqs or self
+    "__PP_DEV_INST__": "",  # develop.py to install reqs or self/reqs
 }
 
 # ------------------------------------------------------------------------------
@@ -1036,7 +1044,7 @@ D_PUB_META = {
     # the python dependencies to use in __PP_README_FILE__, pyproject.toml,
     # github, and install.py
     # NB: key is dep name, val is link to dep (optional)
-    S_KEY_META_DEPS: {"Python 3.10+": "https://python.org"},
+    S_KEY_META_DEPS: {"Python 3.14+": "https://python.org"},
     # the categories to use in .desktop for gui apps (found in pybaker_conf.py)
     S_KEY_META_CATS: [],
 }
@@ -1097,10 +1105,10 @@ D_PUB_BL = {
 # NB: tbd by do_after_template based on prj type
 D_PUB_DIST = {}
 
-# which docs maker to use, based on project type
+# mkdocs settings
 D_PUB_DOCS = {
     S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
-    S_KEY_DOCS_USE_RM: False,
+    S_KEY_DOCS_USE_RM: False,  # initially use dummy file
     S_KEY_DOCS_MAKE_API: True,
     S_KEY_DOCS_DIR_API: [],  # tbd by do_after_template
 }
@@ -1248,7 +1256,7 @@ D_TYPE_INST = {
     },
 }
 
-# list of i18n sources/noexts per prj type
+# list of i18n files/folders per prj type
 D_TYPE_I18N = {
     "c": {
         S_KEY_PUB_I18N_SRC: [
@@ -1350,7 +1358,6 @@ D_PURGE_MAKE = {
         S_DIR_I18N,
         S_DIR_INSTALL,
         S_DIR_SRC,
-        S_FILE_REQS,
     ]
 }
 
@@ -1534,11 +1541,12 @@ def do_after_template(dir_prj, dict_prv, dict_pub, dict_act):
     if prj_type in D_PURGE_MAKE:
         # call the spinner-wrapped function
         _res = _action_run(
+            # test if action should be run
             dict_act,
             S_KEY_ACT_PURGE,
-            S_ACTION_PURGE,
-            _action_purge,
-            dir_prj,
+            S_ACTION_PURGE,  # string to print in spinner
+            _action_purge,  # real function
+            dir_prj,  # func params
             dict_prv,
             dict_pub,
         )
@@ -1674,7 +1682,9 @@ def do_before_fix(_dir_prj, dict_prv, dict_pub, _dict_act):
     # develop.py stuff
     prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
     if prj_type in L_INST_SELF:
-        dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_SELF
+        dict_prv_prj["__PP_DEV_INST__"] = (
+            S_CMD_VENV_INST_REQS + ";" + S_CMD_VENV_INST_SELF
+        )
     else:
         dict_prv_prj["__PP_DEV_INST__"] = S_CMD_VENV_INST_REQS
 
@@ -1706,10 +1716,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
 
     # i18n
-    # NB: needs to be callable from pybaker for -l option
-    # if i18n flag is set
-    # if dict_act[S_KEY_ACT_I18N]:
-    #     _action_i18n(dir_prj, dict_prv, dict_pub)
     _res = _action_run(
         # check for key presence or skip
         dict_act,
@@ -1725,7 +1731,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     )
 
     # meta
-    # _action_meta(dir_prj, dict_prv, dict_pub)
     _res = _action_run(
         # check for key presence or skip
         dict_act,
@@ -1741,7 +1746,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     )
 
     # add/remove placeholders
-    # _action_placeholders(dir_prj, dict_prv, dict_pub)
     _res = _action_run(
         # check for key presence or skip
         dict_act,
@@ -1758,10 +1762,9 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
 
     # --------------------------------------------------------------------------
     # install package in itself
+
     # if it is the right type (package)
     if prj_type in L_INST_SELF:
-        # _action_edit(dir_prj, dict_prv)
-
         _res = _action_run(
             # check for key presence or skip
             dict_act,
@@ -1779,9 +1782,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     # --------------------------------------------------------------------------
     # docs
 
-    # if docs flag is set
-    # if dict_act[S_KEY_ACT_DOCS_MAKE]:
-    #     _action_make_docs(dir_prj, dict_pub)
     _res = _action_run(
         # check for key presence or skip
         dict_act,
@@ -1801,9 +1801,6 @@ def do_after_fix(dir_prj, dict_prv, dict_pub, dict_act):
     # NB: run last so it includes .git and .venv folders
     # NB: this will wipe out all previous checks (maybe good?)
 
-    # if tree flag is set
-    # if dict_act[S_KEY_ACT_TREE]:
-    #     _action_tree(dir_prj, dict_pub)
     _res = _action_run(
         # check for key presence or skip
         dict_act,
@@ -1842,21 +1839,19 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_act):
     # --------------------------------------------------------------------------
     # freeze venv
 
-    if prj_type in L_APP_INSTALL:
-        #         _action_freeze(dir_prj, dict_prv)
-        _res = _action_run(
-            # check for key presence or skip
-            dict_act,
-            S_KEY_ACT_FREEZE,
-            S_ACTION_FREEZE,
-            # run action and check for error
-            _action_freeze,
-            dir_prj,
-            dict_prv,
-            dict_pub,
-            # handle error
-            quit=False,
-        )
+    _res = _action_run(
+        # check for key presence or skip
+        dict_act,
+        S_KEY_ACT_FREEZE,
+        S_ACTION_FREEZE,
+        # run action and check for error
+        _action_freeze,
+        dir_prj,
+        dict_prv,
+        dict_pub,
+        # handle error
+        quit=False,
+    )
 
     # --------------------------------------------------------------------------
     # docs bake
@@ -1891,13 +1886,6 @@ def do_before_dist(dir_prj, dict_prv, dict_pub, dict_act):
         # handle error
         quit=False,
     )
-
-    # if docs flag is set
-    # if dict_act[S_KEY_ACT_DOCS_BAKE]:
-    #     res, obj = _action_bake_docs(dir_prj)
-    #     if res and obj and dict_act[S_KEY_ACT_DOCS_DEPLOY]:
-    #         _action_deploy_docs(dir_prj, obj)
-
 
 # ------------------------------------------------------------------------------
 # Do any work after making dist
@@ -2344,7 +2332,7 @@ def _action_meta(dir_prj, dict_prv, dict_pub):
             if item.suffix in L_EXT_PO:
 
                 # fix it with appropriate dicts
-                _fix_po(item, dict_prv, dict_pub)
+                _fix_po(item, dir_prj, dict_prv, dict_pub)
 
     # --------------------------------------------------------------------------
     # filter using blacklist
@@ -2355,7 +2343,7 @@ def _action_meta(dir_prj, dict_prv, dict_pub):
     # NB: this function uses the blacklist to filter files at the very end of
     # the fix process. At this point you can assume ALL dunders in ALL eligible
     # files have been fixed, as well as paths/filenames. also dict_pub has been
-    # undunderized
+    # un-dunderized
 
     # fix up blacklist and convert relative or glob paths to absolute Path
     # objects
@@ -2640,7 +2628,7 @@ def _action_rem_dist(dir_prj, dict_prv, _dict_pub):
 # ------------------------------------------------------------------------------
 # Fix po files outside blacklist to hide file paths
 # ------------------------------------------------------------------------------
-def _fix_po(path, dict_prv, _dict_pub):
+def _fix_po(path, dir_prj, dict_prv, _dict_pub):
 
     # replace version
     dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
@@ -2655,9 +2643,14 @@ def _fix_po(path, dict_prv, _dict_pub):
     # replace version
     text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
+    # --------------------------------------------------------------------------
+
     # delete home dir from .pot/.po files
     # NB: also no regex or rules, just nuke it everywhere
-    text = text.replace(str(Path.home()), "")
+    rep = str(dir_prj) + "/"
+    text = text.replace(rep, "")
+
+    # --------------------------------------------------------------------------
 
     # save file
     with open(path, "w", encoding=S_ENCODING) as a_file:
@@ -3126,7 +3119,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
 
     # --------------------------------------------------------------------------
     # S_PP_SHORT_DESC needs special handling for _() and () if Black wraps it
-    # FIXME: does not respect current state of replace flag b/c multiline
+    # TODO: does not respect current state of replace flag b/c multiline
 
     # open and read whole file
     with open(path, "r", encoding=S_ENCODING) as a_file:
@@ -3159,11 +3152,12 @@ def _fix_install(path, dict_prv_prj, _dict_pub_meta):
     """
 
     # open file and get contents
+    # TODO: return type
     a_dict = F.load_paths_into_dict(path)
 
     # replace version
     ver = dict_prv_prj["__PP_VER_MMR__"]
-    a_dict[S_KEY_INST_VER] = ver
+    a_dict[S_KEY_INST_VER] = ver  # type: ignore
 
     # save file
     F.save_dict_into_paths(a_dict, path)

@@ -133,7 +133,7 @@ class PyPlateBase:
     S_ARG_UNINST_HELP = _("uninstall this program")
 
     # I18N if using argparse, add help at end of about
-    S_USE_HELP = _("use -h for help")
+    S_USE_HELP = _("Use -h for help")
 
     # --------------------------------------------------------------------------
     # messages
@@ -334,6 +334,7 @@ class PyPlateBase:
         # check for -d (debug)
 
         # if -d passed, this will set debug mode
+        # NB: gotta do debug before --uninstall in case we need to pass
         if self._dict_args[self.S_ARG_DBG_DEST]:
 
             # show help and exit
@@ -406,7 +407,6 @@ class PyPlateBase:
         """
 
         # set self and lib debug
-        # NB: gotta do debug before --uninstall in case we need to pass
         self._arg_debug = True
         C.B_DEBUG = True
         F.B_DEBUG = True
@@ -443,6 +443,9 @@ class PyPlateBase:
 
         # set property
         self._arg_test = True
+
+        # -t implies -d
+        self._handle_d()
 
         # yell about being in test mode
         print()
@@ -764,6 +767,7 @@ class PyPlateBase:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
+        # NEXT: allow single spaces in value when using 'key:value * rat'
         str_pattern = self._dict_type_rules[C.S_KEY_HDR_SCH]
         res = re.search(str_pattern, line)
         if not res:
@@ -957,6 +961,9 @@ class PyPlateBase:
         # set initial actions
         if not self._arg_test:
             self._dict_act = dict(self._dict_pub_act)
+
+        #  save dicts here in case something goes pear-shaped
+        self._save_config()
 
     # --------------------------------------------------------------------------
     # Check project type for allowed characters

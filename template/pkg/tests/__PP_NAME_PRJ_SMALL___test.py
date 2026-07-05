@@ -9,6 +9,8 @@
 
 """
 A simple script to test a package from within the project itself
+
+Make sure the venv is activated before running this script
 """
 
 # ------------------------------------------------------------------------------

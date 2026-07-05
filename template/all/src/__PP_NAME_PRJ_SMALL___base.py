@@ -3,7 +3,7 @@
 # Filename: __PP_NAME_PRJ_SMALL___base.py                         |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |
-# License : __PP_LICENSE_NAME__                                    \          /
+# License : __PP_LICENSE_NAME__(__PP_LICENSE_URL__)                \          /
 # ------------------------------------------------------------------------------
 
 """
@@ -372,7 +372,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 

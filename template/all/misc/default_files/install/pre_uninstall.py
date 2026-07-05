@@ -28,6 +28,6 @@ if __name__ == "__main__":
     # This is the top level code of the program, called when the Python file is
     # invoked from the command line.
 
-    pass
+    print("pre-uninstall")
 
 # -)

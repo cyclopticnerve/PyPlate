@@ -74,7 +74,6 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     # Constants
     # --------------------------------------------------------------------------
 
-
     # cmd line options
 
     # enable option strings
@@ -155,35 +154,35 @@ class __PP_NAME_PRJ_PASCAL__(__PP_NAME_PRJ_PASCAL__Base):
     #     If you implement this function. make sure to call super() LAST!!!
     #     """
 
-        # # add debug option
-        # self._parser.add_argument(
-        #     self.S_ARG_DBG_OPTION,
-        #     action=self.S_ARG_DBG_ACTION,
-        #     dest=self.S_ARG_DBG_DEST,
-        #     help=self.S_ARG_DBG_HELP,
-        # )
+    # # add debug option
+    # self._parser.add_argument(
+    #     self.S_ARG_DBG_OPTION,
+    #     action=self.S_ARG_DBG_ACTION,
+    #     dest=self.S_ARG_DBG_DEST,
+    #     help=self.S_ARG_DBG_HELP,
+    # )
 
-        # # add config option
-        # self._parser.add_argument(
-        #     self.S_ARG_CFG_OPTION,
-        #     dest=self.S_ARG_CFG_DEST,
-        #     help=self.S_ARG_CFG_HELP,
-        #     metavar=self.S_ARG_CFG_METAVAR
-        # )
+    # # add config option
+    # self._parser.add_argument(
+    #     self.S_ARG_CFG_OPTION,
+    #     dest=self.S_ARG_CFG_DEST,
+    #     help=self.S_ARG_CFG_HELP,
+    #     metavar=self.S_ARG_CFG_METAVAR
+    # )
 
-        # add x option
-        # self._parser.add_argument(
-        #     self.S_ARG_X_OPTION,
-        #     action=self.S_ARG_X_ACTION,
-        #     dest=self.S_ARG_X_DEST,
-        #     help=self.S_ARG_X_HELP,
-        # )
+    # add x option
+    # self._parser.add_argument(
+    #     self.S_ARG_X_OPTION,
+    #     action=self.S_ARG_X_ACTION,
+    #     dest=self.S_ARG_X_DEST,
+    #     help=self.S_ARG_X_HELP,
+    # )
 
-        # NB: do setup last
-        # super()._setup()
+    # NB: do setup last
+    # super()._setup()
 
-        # NB: self._dict_args are now available
-        # as well as self._dict_cfg
+    # NB: self._dict_args are now available
+    # as well as self._dict_cfg
 
     # --------------------------------------------------------------------------
     # Short description

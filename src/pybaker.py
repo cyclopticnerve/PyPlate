@@ -288,10 +288,10 @@ class PyBaker(B.PyPlateBase):
 
         # find the line
         with open(p_lang, "r", encoding=B.C.S_ENCODING) as a_file:
-            string = a_file.read()
+            text = a_file.read()
 
         # find the lang
-        res = re.search(B.C.S_PO_LANG_SCH, string)
+        res = re.search(B.C.S_PO_LANG_SCH, text)
         if res:
             lang_code = res.group(2)
 

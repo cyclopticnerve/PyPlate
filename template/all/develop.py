@@ -92,7 +92,7 @@ class CNDevelop:
     # commands
 
     # NB: format param is dir_venv
-    S_CMD_CREATE = "python -m venv {}"
+    S_CMD_CREATE = "python3 -m venv {}"
     S_CMD_TYPE_INST = "__PP_DEV_INST__"
 
     # --------------------------------------------------------------------------
@@ -164,9 +164,10 @@ class CNDevelop:
         print(self.S_MSG_REQS_START, end="", flush=True)
 
         # the cmd to install the reqs
-        # NB: for packages, the last fmt param is ignored (no reqs file)
+        # NB: for apps, the last two fmt params are ignored (no self install)
         cmd = self.S_CMD_TYPE_INST.format(
-            P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
+            P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS,  # for reqs
+            P_DIR_PRJ, self.S_NAME_VENV  # for self
         )
         try:
             # NB: hide output

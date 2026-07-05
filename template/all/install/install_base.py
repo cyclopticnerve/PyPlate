@@ -189,11 +189,11 @@ class CNInstallBase:
     # commands
 
     # NB: format param is dir_venv
-    S_CMD_CREATE = "python -m venv {}"
+    S_CMD_CREATE = "python3 -m venv {}"
     # NB: format params are path to prj, path to venv, and path to reqs file
-    S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python -m pip install -r {}"
+    S_CMD_TYPE_INST = "cd {};. {}/bin/activate;python3 -m pip install -r {}"
     # NB: format param is pre/post script path
-    S_CMD_EXTERNAL = "python {}"
+    S_CMD_EXTERNAL = "python3 {}"
 
     # --------------------------------------------------------------------------
     # dry run messages
@@ -444,7 +444,7 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 

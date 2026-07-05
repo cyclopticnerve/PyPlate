@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 
 site_name: __PP_NAME_PRJ__
-theme: 
+theme:
 docs_dir: __PP_DIR_DOCS__
 site_dir: __PP_DIR_SITE__
 plugins:

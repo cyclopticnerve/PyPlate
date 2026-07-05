@@ -40,8 +40,8 @@ from pyplate_base import _
 # ------------------------------------------------------------------------------
 
 # ALTERNATE dict in pymaker to control pm processing
-# NB: this is what controls the steps in making TEST projects
-# it does NOT affect the project's 'project.json' file
+# NB: this is what controls the steps in making TEST projects - it does NOT
+# affect the project's 'project.json' file (which comes from conf.py)
 D_PM_ACT = {
     B.C.S_KEY_ACT_VENV: True,
     B.C.S_KEY_ACT_REQS: True,

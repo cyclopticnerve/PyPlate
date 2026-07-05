@@ -33,7 +33,7 @@ __PP_RM_LICENSE__
 
 ## Requirements
 <!-- __RM_DEPS__ -->
-[Python 3.10+](https://python.org)
+[Python 3.14+](https://python.org)
 <!-- __RM_DEPS__ -->
 
 ## Downloading
@@ -46,9 +46,9 @@ release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
 
 2. Or you can clone the git repo to get the latest (and often broken) code from
    the main branch:
-```bash
-$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
-```
+   ```bash
+   $ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
+   ```
 
 ## Installing
 <!-- __RM_PKG__ -->
@@ -110,7 +110,7 @@ Read the full [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG_
 <!-- __RM_PKG__ -->
 In your project folder:
 ```bash
-$ . .venv/bin/activate
+$ . .venv-__PP_NAME_PRJ_SMALL__/bin/activate
 $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
 <!-- __RM_PKG__ -->
@@ -127,7 +127,7 @@ See the full [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG__
 ## Developing
 If you are developing this project, make sure you run the "develop.py" script
 first to create the proper virtual environment and install the requirements (if
-any). 
+any).
 
 ## Notes
 10/10, no notes.

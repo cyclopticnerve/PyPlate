@@ -1,7 +1,31 @@
 
-FIXME: po/pot needs path rel to prj, not just delete home
+FIXME: for pkg (or any?) add reqs to toml deps
+FIXME: CNLIB NEEDS MKDOCS!!! WTF!!!
+no it depends on having pyplate installed, which depends on mkdocs
 
+FIXME: make python req version (3.14+) into context replace in readme/toml
+FIXME: some dicts need to know diff between paths rel to user/home, or rel to
+user/home/inst..., or absolute. need standard
+anywhere we copy/move/delete: template, dist, install/uninstall, etc
+this would make the config system more robust by figuring out paths rather than
+crashing
+
+TODO: .pot needs def lang in header (dev locale)
+TODO: .po needs lang in header (translator locale)
+TODO: check for 'which xgettext' and warn/quit if not found
+
+TODO: skip some folders/files when doing i18n (.venv*, .git, .gitignore)
+i think this means avoid anything in skip_all?
+
+FIXME: WHAT THE FUCK IS NOT I18N????!!!
+
+# maybe
 TODO: true uninstall also removes config
+
+TODO: pybaker always fix filename in header
+TODO: figure out unit tests
+TODO: gloabal python req for readme/toml/prj.json
+TODO: D_PUB_ACT vs D_PM_ACT vs D_PB_ACT
 TODO: pkg deps need to go in toml, not reqs
 TODO: add 'run after install' option (already can run post-install)
 TODO: figure out D_XXX_ACT stuff
@@ -13,7 +37,6 @@ TODO: test all spinners
 TODO: test all cmd line opts
 TODO: fix all printing
 
-NEXT: -t should imply -d
 NEXT: script to update pp and template reqs on cnlib version change
 update reqs, install new version in pp
 NEXT: no post_uninstall, folder already deleted
@@ -324,6 +347,8 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: po/pot needs path rel to prj, not just delete home
+DONE: -t should imply -d
 DONE: template/pkg launch.json needs dunders for filename
 DONE: better regex for S_PP_SHORT_DESC to match multi-line and i18n
 DONE: move template pre/post to misc
