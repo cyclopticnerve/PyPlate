@@ -30,6 +30,7 @@ import sys
 # venv imports
 from cnlib import cnfunctions as F  # type: ignore
 from cnlib.cnmkdocs import CNMkDocs  # type: ignore
+from cnlib import cnpot  # type: ignore
 from cnlib.cnpot import CNPotPy  # type: ignore
 from cnlib.cntree import CNTree  # type: ignore
 from cnlib.cnvenv import CNVenv  # type: ignore
@@ -41,25 +42,14 @@ from cnlib.decorators import cnspinner as S  # type: ignore
 
 # absolute current path OF PyPlate
 P_DIR_PP = Path(__file__).parents[1].resolve()
+# TODO: remove after fixing mkdocs
 P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
 
 # ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
-
-# path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-
 # init gettext
 T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
-
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+T_DIR_LOCALE = P_DIR_PP / "i18n/locale"
+_ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Bools
@@ -560,11 +550,6 @@ S_UI_VER_SCH = (
 )
 S_UI_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
-# po files
-S_PO_VER_SCH = r"(\"Project-Id-Version: )(.*?)(\\n\")"
-S_PO_VER_REP = r"\g<1>{}\g<3>"
-S_PO_LANG_SCH = r"(\"Language: )(.*?)(\\n\")"
-
 # pyproject.toml
 S_TOML_VER_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
 S_TOML_VER_REP = r'\g<1>\g<2>\g<3>"{}"'
@@ -638,7 +623,7 @@ S_PATH_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DSK_TMP}"
 P_DIR_I18N = Path(S_DIR_I18N)
 S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
 S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
-S_PATH_POT = str(P_DIR_I18N / S_DIR_POT)
+S_PATH_POT = str(P_DIR_I18N)
 S_I18N_TAG = "I18N"
 
 # format for venv
@@ -2266,7 +2251,7 @@ def _action_i18n(dir_prj, dict_prv, dict_pub):
         # optional in
         str_tag=S_I18N_TAG,
         dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
-        list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
+        # list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
         charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
     )
 
@@ -2284,13 +2269,13 @@ def _action_i18n(dir_prj, dict_prv, dict_pub):
     if prj_type in L_MAKE_DESK:
 
         # path to desktop template
-        path_dsk_tmp = dir_prj / S_PATH_DSK_TMP
+        path_desk_tmp = dir_prj / S_PATH_DSK_TMP
         # path to desktop output
-        path_dsk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
+        path_desk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
 
         # do the thing
         try:
-            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
+            potpy.make_desktop(path_desk_tmp, path_desk_out)
         except F.CNRunError as e:
             return e
 
@@ -2318,21 +2303,21 @@ def _action_meta(dir_prj, dict_prv, dict_pub):
     # NB: this ignores blacklist
 
     # NB: root is a full path, dirs and files are relative to root
-    for root, root_dirs, root_files in dir_prj.walk():
+    # for root, root_dirs, root_files in dir_prj.walk():
 
-        # special case for po/pot files
+    #     # special case for po/pot files
 
-        # convert files into Paths
-        files = [root / f for f in root_files]
+    #     # convert files into Paths
+    #     files = [root / f for f in root_files]
 
-        # for each file item
-        for item in files:
+    #     # for each file item
+    #     for item in files:
 
-            # if it is a .po or .pot file
-            if item.suffix in L_EXT_PO:
+    #         # if it is a .po or .pot file
+    #         if item.suffix in L_EXT_PO:
 
-                # fix it with appropriate dicts
-                _fix_po(item, dir_prj, dict_prv, dict_pub)
+    #             # fix it with appropriate dicts
+    #             _fix_po(item, dir_prj, dict_prv, dict_pub)
 
     # --------------------------------------------------------------------------
     # filter using blacklist
@@ -2366,7 +2351,7 @@ def _action_meta(dir_prj, dict_prv, dict_pub):
     skip_contents = dict_bl[S_KEY_SKIP_CONTENTS]
 
     # --------------------------------------------------------------------------
-    # fix po files (version/remove home dir)
+    # fix meta in files
     # NB: this uses blacklist
 
     # NB: root is a full path, dirs and files are relative to root
@@ -2625,36 +2610,37 @@ def _action_rem_dist(dir_prj, dict_prv, _dict_pub):
 # ------------------------------------------------------------------------------
 
 
-# ------------------------------------------------------------------------------
-# Fix po files outside blacklist to hide file paths
-# ------------------------------------------------------------------------------
-def _fix_po(path, dir_prj, dict_prv, _dict_pub):
+# # ------------------------------------------------------------------------------
+# # Fix po files outside blacklist to hide file paths
+# # ------------------------------------------------------------------------------
+# def _fix_po(path, dir_prj, dict_prv, _dict_pub):
 
-    # replace version
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    pp_version = dict_prv_prj["__PP_VER_MMR__"]
-    str_pattern = S_PO_VER_SCH
-    str_rep = S_PO_VER_REP.format(pp_version)
+#     # replace version
+#     # NB: done in cnpot
+#     # dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+#     # pp_version = dict_prv_prj["__PP_VER_MMR__"]
+#     # str_pattern = S_PO_VER_SCH
+#     # str_rep = S_PO_VER_REP.format(pp_version)
 
-    # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
-        text = a_file.read()
+#     # open file and get contents
+#     with open(path, "r", encoding=S_ENCODING) as a_file:
+#         text = a_file.read()
 
-    # replace version
-    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
+#     # replace version
+#     # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
-    # --------------------------------------------------------------------------
+#     # --------------------------------------------------------------------------
 
-    # delete home dir from .pot/.po files
-    # NB: also no regex or rules, just nuke it everywhere
-    rep = str(dir_prj) + "/"
-    text = text.replace(rep, "")
+#     # delete home dir from .pot/.po files
+#     # NB: also no regex or rules, just nuke it everywhere
+#     rep = str(dir_prj) + "/"
+#     text = text.replace(rep, "")
 
-    # --------------------------------------------------------------------------
+#     # --------------------------------------------------------------------------
 
-    # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
-        a_file.write(text)
+#     # save file
+#     with open(path, "w", encoding=S_ENCODING) as a_file:
+#         a_file.write(text)
 
 
 # ------------------------------------------------------------------------------

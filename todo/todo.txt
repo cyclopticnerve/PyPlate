@@ -1,10 +1,6 @@
 
-FIXME: update for cnpot.underscore
-
 FIXME: for pkg (or any?) add reqs to toml deps
-FIXME: CNLIB NEEDS MKDOCS!!! WTF!!!
-no it depends on having pyplate installed, which depends on mkdocs
-
+FIXME: CNLIB depends on having pyplate installed, which depends on mkdocs
 FIXME: make python req version (3.14+) into context replace in readme/toml
 FIXME: some dicts need to know diff between paths rel to user/home, or rel to
 user/home/inst..., or absolute. need standard
@@ -15,15 +11,9 @@ crashing
 TODO: .pot needs def lang in header (dev locale)
 TODO: .po needs lang in header (translator locale)
 TODO: check for 'which xgettext' and warn/quit if not found
-
 TODO: skip some folders/files when doing i18n (.venv*, .git, .gitignore)
 i think this means avoid anything in skip_all?
-
-FIXME: WHAT THE FUCK IS NOT I18N????!!!
-
-# maybe
 TODO: true uninstall also removes config
-
 TODO: pybaker always fix filename in header
 TODO: figure out unit tests
 TODO: gloabal python req for readme/toml/prj.json
@@ -349,6 +339,9 @@ NEXT: run every f-ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: update for cnpot.underscore
+DONE: template/all/i18n/ - create locale/__PP_LOCALE_DEF__/LC_MESSAGES on the fly
+also init LINGUAS
 DONE: po/pot needs path rel to prj, not just delete home
 DONE: -t should imply -d
 DONE: template/pkg launch.json needs dunders for filename

@@ -28,6 +28,7 @@ import sys
 
 # cnlib imports
 from cnlib import cnfunctions as F  # type: ignore
+from cnlib import cnpot  # type: ignore
 from cnlib.cnformatter import CNFormatter  # type: ignore
 
 # ------------------------------------------------------------------------------
@@ -54,12 +55,12 @@ sys.path.append(str(P_DIR_PRJ))
 import conf.conf as C
 
 # ------------------------------------------------------------------------------
-# Globals
+# Constants
 # ------------------------------------------------------------------------------
-
-# i18n stuff
-DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
-_ = F.get_underscore("pyplate", DIR_LOCALE)
+# init gettext
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
+_ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes

@@ -321,7 +321,7 @@ class PyMaker(B.PyPlateBase):
                     else:
                         break
 
-        # save global property
+        # save project dir property
         self._dir_prj = tmp_dir
 
         # save other names

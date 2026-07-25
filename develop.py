@@ -41,12 +41,9 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # NB: keep global
 # to test translations, run as foo@bar:$ LANGUAGE=xx ./develop.py
 
-# path to project dir
-T_DIR_PRJ = P_DIR_PRJ
-
 # init gettext
 T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
+T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
