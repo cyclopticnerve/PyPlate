@@ -36,9 +36,13 @@ import sys
 # get prj dir path
 P_DIR_PRJ = Path(__file__).parent.resolve()
 
+<<<<<<< HEAD
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI and GUI
 
+=======
+# init gettext
+>>>>>>> fix_po
 T_DOMAIN = "pyplate"
 T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)

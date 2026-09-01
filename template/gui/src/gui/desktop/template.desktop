@@ -12,8 +12,8 @@ Version=1.0
 Type=Application
 Terminal=false
 Exec=__PP_NAME_PRJ_SMALL__
-StartupWMClass = __PP_NAME_PRJ_SMALL__.py
-# I18N: program name
+StartupWMClass=__PP_NAME_PRJ_SMALL__.py
+# I18N: program name (DO NOT TRANSLATE)
 Name=__PP_NAME_PRJ__
 Icon=__PP_IMG_DESK__
 # I18N: short description

@@ -27,6 +27,7 @@ import re
 import sys
 
 # cnlib imports
+<<<<<<< HEAD
 from cnlib import cnfunctions as F
 from cnlib import cnpot
 from cnlib.cnformatter import CNFormatter
@@ -47,6 +48,11 @@ import conf.conf as C  # pylint: disable=import-error, wrong-import-position
 T_DOMAIN = "pyplate"
 T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
 _ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
+=======
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib import cnpot  # type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
+>>>>>>> fix_po
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -64,9 +70,25 @@ P_UNINST = P_DIR_PRJ / "install/uninstall.py"
 P_UNINST_DBG = P_DIR_PRJ / "install/uninstall.py -d"
 
 # ------------------------------------------------------------------------------
+<<<<<<< HEAD
 # Globals
 # ------------------------------------------------------------------------------
 B_RESULT = True
+=======
+# local imports
+
+# fudge the path to import conf stuff
+sys.path.append(str(P_DIR_PRJ))
+import conf.conf as C
+
+# ------------------------------------------------------------------------------
+# Constants
+# ------------------------------------------------------------------------------
+# init gettext
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
+_ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
+>>>>>>> fix_po
 
 # ------------------------------------------------------------------------------
 # Classes

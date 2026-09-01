@@ -28,9 +28,16 @@ from pathlib import Path
 import sys
 
 # cnlib imports
+<<<<<<< HEAD
 from cnlib import cnfunctions as F
 from cnlib import cnpot
 from cnlib.cnformatter import CNFormatter
+=======
+# pylint: disable=import-error
+from cnlib import cnfunctions as F  # type: ignore
+from cnlib.cnformatter import CNFormatter  # type: ignore
+from cnlib import cnpot  # type: ignore
+>>>>>>> fix_po
 
 # ------------------------------------------------------------------------------
 # Globals
@@ -63,6 +70,17 @@ P_LOG_DEF = P_DIR_LOG / "__PP_NAME_PRJ_SMALL__.log"
 P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
 
 # ------------------------------------------------------------------------------
+<<<<<<< HEAD
+=======
+# Globals
+# ------------------------------------------------------------------------------
+# init gettext
+T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
+T_DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
+_ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
+
+# ------------------------------------------------------------------------------
+>>>>>>> fix_po
 # Classes
 # ------------------------------------------------------------------------------
 
@@ -122,7 +140,11 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_PP_SHORT_DESC = _("Short description")
 
     # version string
+<<<<<<< HEAD
     S_PP_VERSION = "0.0.0"
+=======
+    S_PP_VERSION = "Version 0.0.0"
+>>>>>>> fix_po
 
     # config option strings
     S_ARG_CFG_OPTION = "-c"

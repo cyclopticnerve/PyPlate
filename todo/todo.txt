@@ -1,9 +1,14 @@
 
+<<<<<<< HEAD
 FIXME: learn unit testing
 FIXME: use baked version of cnlib (from github url)
 FIXME: need to install libgirepository-2.0-dev in os to use gi?
 FIXME: for pkg (or any?) add reqs to toml deps
 FIXME: cnlib depends on having pyplate installed, which depends on mkdocs
+=======
+FIXME: for pkg (or any?) add reqs to toml deps
+FIXME: CNLIB depends on having pyplate installed, which depends on mkdocs
+>>>>>>> fix_po
 FIXME: make python req version (3.14+) into context replace in readme/toml
 FIXME: some dicts need to know diff between paths rel to user/home, or rel to
 user/home/inst..., or absolute. need standard
@@ -23,13 +28,14 @@ like having separate templates/common?
 TODO: .pot needs def lang in header (dev locale)
 TODO: .po needs lang in header (translator locale)
 TODO: check for 'which xgettext' and warn/quit if not found
-
 TODO: skip some folders/files when doing i18n (.venv*, .git, .gitignore)
 i think this means avoid anything in skip_all?
+<<<<<<< HEAD
 
 # maybe
+=======
+>>>>>>> fix_po
 TODO: true uninstall also removes config
-
 TODO: pybaker always fix filename in header
 TODO: figure out unit tests
 TODO: global python req for readme/toml/prj.json
@@ -359,12 +365,17 @@ NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
 DONE: update for cnpot.underscore
+<<<<<<< HEAD
 DONE: using reqs does not install latest version of cnlib
 DONE: any error in action_run restore cursor
 DONE: test for unknown switches
 DONE: test for empty _("")
 DONE: no domain/auth/email/version in D_PUB_I18N
 DONE: set def version to "0.0.0" if blank
+=======
+DONE: template/all/i18n/ - create locale/__PP_LOCALE_DEF__/LC_MESSAGES on the fly
+also init LINGUAS
+>>>>>>> fix_po
 DONE: po/pot needs path rel to prj, not just delete home
 DONE: -t should imply -d
 DONE: template/pkg launch.json needs dunders for filename
