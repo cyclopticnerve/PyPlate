@@ -27,9 +27,9 @@ from pathlib import Path
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import (
-    Gtk,
-)  # pylint: disable=wrong-import-position # type: ignore
+from gi.repository import Gtk  # type: ignore pylint: disable=wrong-import-position
+
+# TODO: foobar
 
 # ------------------------------------------------------------------------------
 # Public classes

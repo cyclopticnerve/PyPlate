@@ -18,6 +18,7 @@ Make sure the venv is activated before running this script
 # ------------------------------------------------------------------------------
 
 # local imports
+# NB: live with error (does not occur in runtime)
 from __PP_NAME_PRJ_SMALL__ import __PP_NAME_SEC_SMALL__
 
 # ------------------------------------------------------------------------------
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     # invoked from the command line.
 
     # run main function
-    RES = __PP_NAME_SEC_SMALL__.func()
-    print(RES)
+    res = __PP_NAME_SEC_SMALL__.func()
+    print(res)
 
 # -)

@@ -123,7 +123,7 @@ class PyMaker:
         # run cmd
         try:
             subprocess.run(cmd, shell=True, check=True)
-        except (FileNotFoundError, subprocess.CalledProcessError):
+        except FileNotFoundError, subprocess.CalledProcessError:
             sys.exit(-1)
 
 

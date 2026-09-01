@@ -64,13 +64,10 @@ P_FILE_CFG_OLD = Path.home() / ".local/share/pyplate/install/install.json"
 # ------------------------------------------------------------------------------
 
 # fudge path to load base
+# NB: this is because in the final program, base and install will be in
+# different dirs
 sys.path.append(str(P_DIR_INSTALL))
-
-# local imports
-# pylint: disable=wrong-import-position, import-error
-from install_base import CNInstallBase  # type: ignore
-
-# pylint: enable=wrong-import-position, import-error
+from install_base import CNInstallBase  # pylint: disable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Classes

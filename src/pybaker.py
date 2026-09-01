@@ -7,7 +7,6 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# pylint: disable=too-many-lines
 # pyplate: replace=False
 
 """
@@ -25,11 +24,7 @@ Run pybaker -h for more options.
 # ------------------------------------------------------------------------------
 
 # system imports
-import re
 import shutil
-
-# venv imports
-from cnlib import cnfunctions as F  # type: ignore
 
 # local imports
 import pyplate_base as B
@@ -81,14 +76,6 @@ class PyBaker(B.PyPlateBase):
     # --------------------------------------------------------------------------
     # Class constants
     # --------------------------------------------------------------------------
-
-    # lang option strings
-    S_ARG_LANG_OPTION = "-l"
-    S_ARG_LANG_DEST = "LANG_DEST"
-    # I18N: lang option help
-    S_ARG_LANG_HELP = _("add a language (*.po) file")
-    # I18N: lang file source
-    S_ARG_LANG_METAVAR = _("FILE")
 
     # ide option strings
     S_ARG_VER_OPTION = "-v"
@@ -163,21 +150,6 @@ class PyBaker(B.PyPlateBase):
         self._do_after_dist()
 
         # done with project
-        print()
-
-        # NB: easier to parse path than get dunder
-        if B.C.B_ERROR:
-            print(self.S_ERR_BAKE.format(self._dir_prj.name))
-            if not B.C.B_DEBUG:
-                print(self.S_ERR_USE_D)
-        else:
-            print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
-
-        # ----------------------------------------------------------------------
-        # teardown
-
-        # call boilerplate code
-        self._save_config()
         self._teardown()
 
     # --------------------------------------------------------------------------
@@ -199,14 +171,6 @@ class PyBaker(B.PyPlateBase):
         # name to use for the usage string (defaults to pyplate)
         self._parser.prog = "pybaker"
 
-        # add lang option
-        self._parser.add_argument(
-            self.S_ARG_LANG_OPTION,
-            dest=self.S_ARG_LANG_DEST,
-            help=self.S_ARG_LANG_HELP,
-            metavar=self.S_ARG_LANG_METAVAR,
-        )
-
         # add version option
         self._parser.add_argument(
             self.S_ARG_VER_OPTION,
@@ -218,9 +182,29 @@ class PyBaker(B.PyPlateBase):
         # do setup
         super()._setup()
 
-        # ----------------------------------------------------------------------
-        # handle custom args
-        self._handle_l()
+    # --------------------------------------------------------------------------
+    # Boilerplate to use at the end of main
+    # --------------------------------------------------------------------------
+    def _teardown(self, errcode: int = 0):
+        """
+        Boilerplate to use at the end of main
+
+        Perform some mundane stuff like saving config files.
+        """
+
+        # blank line
+        print()
+
+        # check final result
+        if not B.B_RESULT:
+            print(B.C.S_ERR_BAKE.format(self._dir_prj.name))
+            if not B.C.B_DEBUG:
+                print(B.C.S_ERR_USE_D)
+        else:
+            print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
+
+        # call super
+        super()._teardown(errcode)
 
     # --------------------------------------------------------------------------
     # Handle the -t option
@@ -259,74 +243,6 @@ class PyBaker(B.PyPlateBase):
             break
 
     # --------------------------------------------------------------------------
-    # Handle the -l option
-    # --------------------------------------------------------------------------
-    def _handle_l(self):
-        """
-        Docstring for _handle_l
-
-        :param self: Description
-        """
-
-        # if no lang, no go
-        lang_file = self._dict_args.get(self.S_ARG_LANG_DEST, None)
-        if not lang_file:
-            return
-
-        print(B.C.S_MSG_LANG_ADD.format(lang_file), flush=True, end="")
-
-        # default lang code
-        lang_code = ""
-
-        # get code from file
-        p_lang = self._dir_prj / lang_file
-
-        # in case of typo -)
-        if not p_lang.exists():
-            F.printc(B.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            return
-
-        # find the line
-        with open(p_lang, "r", encoding=B.C.S_ENCODING) as a_file:
-            text = a_file.read()
-
-        # find the lang
-        res = re.search(B.C.S_PO_LANG_SCH, text)
-        if res:
-            lang_code = res.group(2)
-
-        # make sure it worked before doing api
-        if lang_code == "":
-            F.printc(B.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-            return
-
-        # get lang dict from props
-        dict_lang = self._dict_pub_i18n[B.C.S_KEY_PUB_I18N_WLANGS]
-
-        # only add once (might be old)
-        if not lang_code in dict_lang:
-            dict_lang.append(lang_code)
-
-        # check file exists
-        dst = self._dir_prj / B.C.S_DIR_I18N / B.C.S_DIR_PO / lang_code
-        dst_file = dst / lang_file
-        if dst_file.exists():
-            print()
-
-            # ask to overwrite
-            msg = B.C.S_ASK_OVER.format(lang_file)
-            ask = F.dialog(msg, [F.S_ASK_YES, F.S_ASK_NO], default=F.S_ASK_NO)
-            if ask != F.S_ASK_YES:
-                F.printc(B.C.S_ACTION_FAIL, fg=F.C_FG_RED, bold=True)
-                return
-
-        # copy file to dest
-        dst.mkdir(parents=True, exist_ok=True)
-        shutil.copy(p_lang, dst_file)
-
-        F.printc(B.C.S_ACTION_DONE, fg=F.C_FG_GREEN, bold=True)
-
-    # --------------------------------------------------------------------------
     # Handle the -v option
     # --------------------------------------------------------------------------
 
@@ -348,13 +264,13 @@ class PyBaker(B.PyPlateBase):
 
             # ask if user wants to keep invalid version or quit
             if not ver_ok:
-                res = F.dialog(
+                res = B.F.dialog(
                     B.C.S_ERR_SEM_VER,
-                    [F.S_ASK_YES, F.S_ASK_NO],
-                    default=F.S_ASK_NO,
+                    [B.F.S_ASK_YES, B.F.S_ASK_NO],
+                    default=B.F.S_ASK_NO,
                     loop=True,
                 )
-                if res != F.S_ASK_YES:
+                if res != B.F.S_ASK_YES:
                     self._teardown(-1)
 
         # not passed, ask question
@@ -433,11 +349,11 @@ class PyBaker(B.PyPlateBase):
         # check if files are valid json
         try:
             # get settings dicts in private.json
-            self._dict_prv = F.load_paths_into_dict(path_prv)
+            self._dict_prv = B.F.load_paths_into_dict(path_prv)
 
             # get settings dicts in project.json
             # NB: may contain dunders
-            self._dict_pub = F.load_paths_into_dict(path_pub)
+            self._dict_pub = B.F.load_paths_into_dict(path_pub)
 
         # if there was a problem
         except OSError as e:  # from load_dicts
@@ -448,12 +364,6 @@ class PyBaker(B.PyPlateBase):
         # ----------------------------------------------------------------------
         # fix dicts
         self._fix_dicts()
-
-        # # ----------------------------------------------------------------------
-        # # print some info
-        # print()
-        # print(B.C.S_MSG_BAKE.format(self._dir_prj.name))
-        # print()
 
     # --------------------------------------------------------------------------
     # Do any work before making dist
@@ -467,7 +377,7 @@ class PyBaker(B.PyPlateBase):
         """
 
         B.C.do_before_dist(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
+            self._dict_act, self._dir_prj, self._dict_prv, self._dict_pub
         )
 
     # --------------------------------------------------------------------------
@@ -533,7 +443,6 @@ class PyBaker(B.PyPlateBase):
         B.C.do_after_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
         )
-
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

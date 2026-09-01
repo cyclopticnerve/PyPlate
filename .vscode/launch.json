@@ -8,7 +8,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "PM",
             "type": "debugpy",
@@ -17,6 +16,16 @@
             "console": "integratedTerminal",
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/.."
+        },
+        {
+            "name": "PM Test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "PyPlate/src/pymaker.py",
+            "console": "integratedTerminal",
+            // run from above PyPlate project
+            "cwd": "${workspaceFolder}/..",
+            "args": ["-t"]
         },
         {
             "name": "PM Args",
@@ -38,6 +47,16 @@
             "cwd": "${workspaceFolder}/..",
         },
         {
+            "name": "PB Test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "PyPlate/src/pybaker.py",
+            "console": "integratedTerminal",
+            // run from above PyPlate project
+            "cwd": "${workspaceFolder}/..",
+            "args": ["-t"]
+        },
+        {
             "name": "PB Args",
             "type": "debugpy",
             "request": "launch",
@@ -46,14 +65,6 @@
             // run from above PyPlate project
             "cwd": "${workspaceFolder}/..",
             "args": "${command:pickArgs}"
-        },
-        {
-            "name": "Current",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Curr Args",

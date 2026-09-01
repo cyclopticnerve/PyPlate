@@ -1,10 +1,9 @@
 
-FIXME: update for cnpot.underscore
-
+FIXME: learn unit testing
+FIXME: use baked version of cnlib (from github url)
+FIXME: need to install libgirepository-2.0-dev in os to use gi?
 FIXME: for pkg (or any?) add reqs to toml deps
-FIXME: CNLIB NEEDS MKDOCS!!! WTF!!!
-no it depends on having pyplate installed, which depends on mkdocs
-
+FIXME: cnlib depends on having pyplate installed, which depends on mkdocs
 FIXME: make python req version (3.14+) into context replace in readme/toml
 FIXME: some dicts need to know diff between paths rel to user/home, or rel to
 user/home/inst..., or absolute. need standard
@@ -12,6 +11,15 @@ anywhere we copy/move/delete: template, dist, install/uninstall, etc
 this would make the config system more robust by figuring out paths rather than
 crashing
 
+TODO: add color to final results
+TODO: put some files back in misc?
+TODO: hooks.py
+TODO: make switches a lib module
+TODO: get all strings, paths, dicts, lists, etc from pyplate_conf
+# ([A-Z_]*)\s*=\s*
+TODO: separate conf files for pkg, cli, gui, all based on central conf
+ie what files/folders to create, ignore, etc.
+like having separate templates/common?
 TODO: .pot needs def lang in header (dev locale)
 TODO: .po needs lang in header (translator locale)
 TODO: check for 'which xgettext' and warn/quit if not found
@@ -19,14 +27,12 @@ TODO: check for 'which xgettext' and warn/quit if not found
 TODO: skip some folders/files when doing i18n (.venv*, .git, .gitignore)
 i think this means avoid anything in skip_all?
 
-FIXME: WHAT THE FUCK IS NOT I18N????!!!
-
 # maybe
 TODO: true uninstall also removes config
 
 TODO: pybaker always fix filename in header
 TODO: figure out unit tests
-TODO: gloabal python req for readme/toml/prj.json
+TODO: global python req for readme/toml/prj.json
 TODO: D_PUB_ACT vs D_PM_ACT vs D_PB_ACT
 TODO: pkg deps need to go in toml, not reqs
 TODO: add 'run after install' option (already can run post-install)
@@ -39,6 +45,9 @@ TODO: test all spinners
 TODO: test all cmd line opts
 TODO: fix all printing
 
+NEXT: switches in html/md <!-- pyplate: disable=replace -->
+NEXT: make switch stuff into lib
+NEXT: different pub_act for prj type (pkg i18n set to false by default)
 NEXT: script to update pp and template reqs on cnlib version change
 update reqs, install new version in pp
 NEXT: no post_uninstall, folder already deleted
@@ -283,7 +292,7 @@ NEXT: think of better name for cntree
 NEXT: cntree as separate project
 NEXT: cntree accept format string for names ('[] $NAME')
 NEXT: combine default cli and default cli_config
-NEXT: convert all paths to pathlib
+NEXT: convert all paths to path lib
 NEXT remove .py ext from executable files
 i.e. timeshift, timeshift-gtk
 NEXT: add logging to all templates
@@ -345,10 +354,17 @@ NEXT: make checklist as html/interactive
 NEXT: make tree.txt/style.txt as html w/checkboxes
 NEXT: change all header date to version ???
 NEXT: check cspell
-NEXT: run every f-ing linter
+NEXT: run every f'ing linter
 NEXT: investigate pyinstaller
 https://pyinstaller.org/en/stable/requirements.html
 
+DONE: update for cnpot.underscore
+DONE: using reqs does not install latest version of cnlib
+DONE: any error in action_run restore cursor
+DONE: test for unknown switches
+DONE: test for empty _("")
+DONE: no domain/auth/email/version in D_PUB_I18N
+DONE: set def version to "0.0.0" if blank
 DONE: po/pot needs path rel to prj, not just delete home
 DONE: -t should imply -d
 DONE: template/pkg launch.json needs dunders for filename
@@ -445,7 +461,7 @@ DONE: check for prj_
 DONE: path - whole thing
 DONE: file - name only
 DONE: dir - up to name or if a folder
-DONE: run pip freeze into template during copy
+DONE: run pip3 freeze into template during copy
 DONE: docs folder is empty in template, so doesn't get into GitHub
 DONE: why does PP_SHORT_DESC/PP_VERSION change in misc/empty_main.py?
 DONE: PyPlate in empty_main.py? can we live with one error?
@@ -518,7 +534,7 @@ when creating a CLI or GUI app, after creating venv, download and install
 installerator and configurator and build and pylint
 default install script should be modified by PyPlate to download and install
 installerator and configurator in the prerequisites
-Add pip install from GitHub instructions to readme
+Add pip3 install from GitHub instructions to readme
 How to know if we are using the latest version of PyPlate, installer and
 configurator
 pyproject deps should include inst/cfg for gui/cli but they need to be in pyPI
@@ -530,13 +546,13 @@ $ twine upload -r testpypi dist/*
 $ twine upload dist/*
 
 install from testpypi/pypi
-$ python3 -m pip install -i https://test.pypi.org/simple/PyPlate
-$ python3 -m pip install PyPlate
+$ python3 -m pip3 install -i https://test.pypi.org/simple/PyPlate
+$ python3 -m pip3 install PyPlate
 
 install from github
 https://packaging.python.org/en/latest/tutorials/installing-packages/#id23
-python3 -m pip install git+https://github.com/cyclopticnerve/PyPlate
-requirements? pip install -r requirements.txt
+python3 -m pip3 install git+https://github.com/cyclopticnerve/PyPlate
+requirements? pip3 install -r requirements.txt
 
-python3 -m pip install -e git+https://github.com/cyclopticnerve/PyPlate.git#egg=__PP_NAME_PRJ_BIG__         # from default branch
-python3 -m pip install -e git+https://github.com/cyclopticnerve/PyPlate.git@maine#egg=__PP_NAME_PRJ_BIG__   # from specific branch
+python3 -m pip3 install -e git+https://github.com/cyclopticnerve/PyPlate.git#egg=__PP_NAME_PRJ_BIG__         # from default branch
+python3 -m pip3 install -e git+https://github.com/cyclopticnerve/PyPlate.git@maine#egg=__PP_NAME_PRJ_BIG__   # from specific branch

@@ -28,14 +28,7 @@ from pathlib import Path
 import gi
 
 gi.require_version("Gtk", "3.0")
-
-# pylint: disable=wrong-import-position
-# pylint: disable=no-name-in-module
-
-from gi.repository import Gtk  # type: ignore
-
-# pylint: enable=wrong-import-position
-# pylint: enable=no-name-in-module
+from gi.repository import Gtk  # type: ignore pylint: disable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Classes

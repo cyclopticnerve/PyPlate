@@ -29,30 +29,25 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# add parent dir to path
-P_DIR_PRJ = Path(__file__).parent.resolve()
-
-# ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
+# get prj dir path
+P_DIR_PRJ = Path(__file__).parent.resolve()
+
+# ------------------------------------------------------------------------------
 # gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./develop.py
 
-# path to project dir
-T_DIR_PRJ = P_DIR_PRJ
-
-# init gettext
 T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+T_PATH_LOCALE = P_DIR_PRJ / "__PP_DIR_LOCALE__"
+T_TRANSLATION = gettext.translation(T_DOMAIN, T_PATH_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+locale.setlocale(locale.LC_ALL, "")
+locale.bindtextdomain(T_DOMAIN, T_PATH_LOCALE)
 
 
 # ------------------------------------------------------------------------------
@@ -166,8 +161,11 @@ class CNDevelop:
         # the cmd to install the reqs
         # NB: for apps, the last two fmt params are ignored (no self install)
         cmd = self.S_CMD_TYPE_INST.format(
-            P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS,  # for reqs
-            P_DIR_PRJ, self.S_NAME_VENV  # for self
+            P_DIR_PRJ,
+            self.S_NAME_VENV,
+            self.S_FILE_REQS,  # for reqs
+            P_DIR_PRJ,
+            self.S_NAME_VENV,  # for self
         )
         try:
             # NB: hide output

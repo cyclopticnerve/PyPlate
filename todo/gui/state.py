@@ -1,3 +1,5 @@
+"""docstring"""
+
 # dict_state = {
 #     "name_win": {  # name_win/state_win
 #         KEY_CLASS: "windowmain.WindowMain",  # mod_name.Class_Name

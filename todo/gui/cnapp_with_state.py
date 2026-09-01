@@ -32,11 +32,11 @@
 # import sys
 
 # # cnlib imports
-# from cnlib import cnfunctions as CF  # type: ignore
-# import gi  # type: ignore
+# from cnlib import cnfunctions as CF
 
+# import gi
 # gi.require_version("Gtk", "3.0")
-# from gi.repository import Gtk, GLib  # type: ignore
+# from gi.repository import Gtk, GLib
 
 # # find paths to lib
 # # NB: this assumes cnlib is a "sister" folder to cnapplib
@@ -187,7 +187,7 @@
 #     # --------------------------------------------------------------------------
 #     def add_window(
 #         self, class_win, name_win, state_win
-#     ):  # pylint: disable=arguments-differ
+#     ):
 #         """
 #         Add a new window instance with the specified name, class, and state
 
@@ -264,7 +264,7 @@
 #     # --------------------------------------------------------------------------
 #     # Remove the specified window instance from the internal list
 #     # --------------------------------------------------------------------------
-#     def remove_window(self, name_win):  # pylint: disable=arguments-differ
+#     def remove_window(self, name_win):
 #         """
 #         Remove the specified window instance from the internal list
 

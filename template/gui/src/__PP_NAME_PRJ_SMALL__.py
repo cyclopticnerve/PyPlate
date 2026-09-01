@@ -26,25 +26,33 @@ Typical usage is show in the main() method.
 # Imports
 # ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
+# GUI specific
+
 # system imports
 from pathlib import Path
 import sys
 
+# TODO: can we get rid of this using dunders and pylint: disable=import-error?
+# NB: need to append for path to gui folder
+P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI_SRC__"
+sys.path.append(str(P_GUI))
+
+# pylint: disable=wrong-import-position
+
+# NB: see below
+from __PP_FILE_APP__ import __PP_CLASS_APP__
+
+# ------------------------------------------------------------------------------
+
 # local imports
+# NB: we can live with pylint/pylance errors here b/c in template, base is in
+# all/src, we are in cli/src.
+# once the program is made, they will be in the same dir
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-# pylint: disable=import-error
-
-P_GUI = Path(__file__).parents[1] / "__PP_DIR_GUI_SRC__"
-sys.path.insert(0, str(P_GUI))
-from __PP_FILE_APP__ import __PP_CLASS_APP__  # type: ignore
-
 # pylint: enable=wrong-import-position
-# pylint: enable=wrong-import-order
-# pylint: enable=import-error
 
 # ------------------------------------------------------------------------------
 # Constants

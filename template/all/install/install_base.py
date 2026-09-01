@@ -37,22 +37,21 @@ import sys
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
+# get prj dir path
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+# ------------------------------------------------------------------------------
 # gettext stuff for CLI and GUI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./__PP_NAME_PRJ_SMALL__.py
 
-# path to project dir
-T_DIR_PRJ = Path(__file__).parents[1].resolve()
-
-# init gettext
 T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = T_DIR_PRJ / "__PP_PATH_LOCALE__"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+T_PATH_LOCALE = P_DIR_PRJ / "i18n/locale_"
+T_TRANSLATION = gettext.translation(T_DOMAIN, T_PATH_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+locale.setlocale(locale.LC_ALL, "")
+locale.bindtextdomain(T_DOMAIN, T_PATH_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -104,10 +103,10 @@ class CNInstallBase:
     S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
-    S_PP_SHORT_DESC = _("")
+    S_PP_SHORT_DESC = _("Short description")
 
     # version string
-    S_PP_VERSION = ""
+    S_PP_VERSION = "0.0.0"
 
     # dry option strings
     S_ARG_DRY_OPTION = "-d"

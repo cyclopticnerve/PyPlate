@@ -27,6 +27,9 @@ Typical usage is show in the main() method.
 # ------------------------------------------------------------------------------
 
 # local imports
+# NB: we can live with pylint/pylance errors here b/c in template, base is in
+# all/src, we are in cli/src.
+# once the program is made, they will be in the same dir
 from __PP_NAME_PRJ_SMALL___base import _
 from __PP_NAME_PRJ_SMALL___base import __PP_NAME_PRJ_PASCAL__Base
 

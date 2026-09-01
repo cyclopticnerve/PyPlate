@@ -28,18 +28,24 @@ from pathlib import Path
 import sys
 
 # cnlib imports
-# pylint: disable=import-error
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnformatter import CNFormatter  # type: ignore
+from cnlib import cnfunctions as F
+from cnlib import cnpot
+from cnlib.cnformatter import CNFormatter
 
-# pylint: enable=import-error
+# ------------------------------------------------------------------------------
+# Globals
+# ------------------------------------------------------------------------------
+
+# absolute path to project
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+# i18n stuff
+P_DIR_LOCALE = P_DIR_PRJ / "i18n/locale_"
+_ = cnpot.underscore("__PP_NAME_PRJ_SMALL__", P_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
-
-# project dir
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # conf dir
 P_DIR_CONF = P_DIR_PRJ / "__PP_DIR_CONF__"
@@ -55,13 +61,6 @@ P_LOG_DEF = P_DIR_LOG / "__PP_NAME_PRJ_SMALL__.log"
 
 # path to uninst
 P_UNINST = P_DIR_PRJ / "__PP_NAME_UNINST__"
-
-# ------------------------------------------------------------------------------
-# Globals
-# ------------------------------------------------------------------------------
-
-DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
-_ = F.get_underscore("__PP_NAME_PRJ_SMALL__", DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Classes
@@ -120,10 +119,10 @@ class __PP_NAME_PRJ_PASCAL__Base:
     S_APP_NAME = "__PP_NAME_PRJ_SMALL__"
 
     # short description
-    S_PP_SHORT_DESC = _("")
+    S_PP_SHORT_DESC = _("Short description")
 
     # version string
-    S_PP_VERSION = ""
+    S_PP_VERSION = "0.0.0"
 
     # config option strings
     S_ARG_CFG_OPTION = "-c"

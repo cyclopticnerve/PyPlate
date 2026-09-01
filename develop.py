@@ -29,30 +29,29 @@ import subprocess
 import sys
 
 # ------------------------------------------------------------------------------
-# add parent dir to path
-P_DIR_PRJ = Path(__file__).parent.resolve()
-
-# ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# gettext stuff for CLI
-# NB: keep global
-# to test translations, run as foo@bar:$ LANGUAGE=xx ./develop.py
+# get prj dir path
+P_DIR_PRJ = Path(__file__).parent.resolve()
 
-# path to project dir
-T_DIR_PRJ = P_DIR_PRJ
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI and GUI
 
-# init gettext
 T_DOMAIN = "pyplate"
-T_DIR_LOCALE = T_DIR_PRJ / "i18n/locale"
+T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
 _ = T_TRANSLATION.gettext
 
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
 # use for CLI in the interest of common code)
+locale.setlocale(locale.LC_ALL, "")
 locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+
+# ------------------------------------------------------------------------------
+# Classes
+# ------------------------------------------------------------------------------
 
 
 # ------------------------------------------------------------------------------
@@ -162,9 +161,7 @@ class CNDevelop:
 
         # the cmd to install the reqs
         cmd = self.S_CMD_INST_REQS.format(
-            P_DIR_PRJ,
-            self.S_NAME_VENV,
-            self.S_FILE_REQS
+            P_DIR_PRJ, self.S_NAME_VENV, self.S_FILE_REQS
         )
         self._do_command(cmd)
 
@@ -207,6 +204,7 @@ class CNDevelop:
             print()
             print(self.S_ERR_ERR, e)
             sys.exit(-1)
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line

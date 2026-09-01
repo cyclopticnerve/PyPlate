@@ -17,7 +17,6 @@
         "__PP_DIR_CONF__": "conf",
         "__PP_DIR_LOG__": "log",
         "__PP_DIR_SRC__": "src",
-        "__PP_PATH_LOCALE__": "i18n/locale",
         "__PP_DIR_DIST__": "dist",
         "__PP_DIR_BIN__": "bin",
         "__PP_DIR_MISC__": "misc",

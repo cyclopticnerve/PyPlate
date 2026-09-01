@@ -26,10 +26,10 @@
 
 # # cnlib imports
 # from .cnapp import CNApp as A
-# from cnlib import cnfunctions as CF  # type: ignore
-# import gi  # type: ignore
+# from cnlib import cnfunctions as CF
+# import gi
 # gi.require_version("Gtk", "3.0")
-# from gi.repository import Gtk  # type: ignore
+# from gi.repository import Gtk
 
 # # find paths to lib
 # # NB: this assumes cnlib is a "sister" folder to cnapplib

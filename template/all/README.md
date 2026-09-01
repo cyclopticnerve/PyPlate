@@ -65,12 +65,12 @@ $ . .venv/bin/activate
 
 If you downloaded the zip file:
 ```bash
-$ python -m pip install /path/to/__PP_NAME_PRJ_SMALL__-<version>.zip
+$ python -m pip3 install /path/to/__PP_NAME_PRJ_SMALL__-<version>.zip
 ```
 
 Or if you cloned the repo:
 ```bash
-$ python -m pip install /path/to/__PP_NAME_PRJ_BIG__
+$ python -m pip3 install /path/to/__PP_NAME_PRJ_BIG__
 ```
 
 ### Automagically
@@ -81,8 +81,8 @@ __PP_NAME_PRJ_BIG__ @ git+https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__@<
 where \<tag\> is the tag you want, such as 'v0.0.1', etc.
 
 Then run:
-```
-$ python -m pip install -r requirements.txt
+```bash
+$ python -m pip3 install -r requirements.txt
 ```
 <!-- __RM_PKG__ -->
 <!-- __RM_APP__ -->
@@ -110,7 +110,7 @@ Read the full [documentation](https://__PP_AUTHOR__.github.io/__PP_NAME_PRJ_BIG_
 <!-- __RM_PKG__ -->
 In your project folder:
 ```bash
-$ . .venv-__PP_NAME_PRJ_SMALL__/bin/activate
+$ . .venv/bin/activate
 $ python -m pip uninstall __PP_NAME_PRJ_SMALL__
 ```
 <!-- __RM_PKG__ -->

@@ -27,15 +27,32 @@ import re
 import sys
 
 # cnlib imports
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnformatter import CNFormatter  # type: ignore
+from cnlib import cnfunctions as F
+from cnlib import cnpot
+from cnlib.cnformatter import CNFormatter
+
+# ------------------------------------------------------------------------------
+# local imports
+
+# absolute path to PyPlate
+P_DIR_PRJ = Path(__file__).parents[1].resolve()
+
+# fudge the path to import conf stuff
+sys.path.append(str(P_DIR_PRJ))
+import conf.conf as C  # pylint: disable=import-error, wrong-import-position
+
+# ------------------------------------------------------------------------------
+# gettext stuff for CLI and GUI
+
+T_DOMAIN = "pyplate"
+T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
+_ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
 # Constants
 # ------------------------------------------------------------------------------
 
 # dirs
-P_DIR_PRJ = Path(__file__).parents[1].resolve()
 P_DIR_LOG = P_DIR_PRJ / "log"
 
 # path to default log file
@@ -47,24 +64,13 @@ P_UNINST = P_DIR_PRJ / "install/uninstall.py"
 P_UNINST_DBG = P_DIR_PRJ / "install/uninstall.py -d"
 
 # ------------------------------------------------------------------------------
-# local imports
-
-# fudge the path to import conf stuff
-sys.path.append(str(P_DIR_PRJ))
-import conf.conf as C
-
-# ------------------------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------------------------
-
-# i18n stuff
-DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
-_ = F.get_underscore("pyplate", DIR_LOCALE)
+B_RESULT = True
 
 # ------------------------------------------------------------------------------
 # Classes
 # ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
@@ -83,6 +89,12 @@ class PyPlateBase:
     # --------------------------------------------------------------------------
     # Class constants
     # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # Booleans
+    # --------------------------------------------------------------------------
+
+
 
     # --------------------------------------------------------------------------
     # strings
@@ -142,18 +154,6 @@ class PyPlateBase:
     S_MSG_TEST = _(
         "WARNING! YOU ARE IN TEST MODE!\nIT IS POSSIBLE TO OVERWRITE EXISTING PROJECTS!"
     )
-
-    # --------------------------------------------------------------------------
-    # errors
-
-    # I18N: there was an error when making
-    # NB: fmt param is prj name big
-    S_ERR_MAKE = _("There were errors making {}")
-    # I18N: there was an error when baking
-    # NB: fmt param is prj name big
-    S_ERR_BAKE = _("There were errors baking {}")
-    # I18N: common message to use debug mode
-    S_ERR_USE_D = _("Use -d for more information")
 
     # --------------------------------------------------------------------------
 
@@ -222,6 +222,9 @@ class PyPlateBase:
         self._dict_sw_block = dict(C.D_SWITCH_DEF)
         self._dict_sw_line = dict(C.D_SWITCH_DEF)
 
+        # total process result (True/False or raise OSError, set by conf)
+        # self.final_result = True
+
         # ----------------------------------------------------------------------
 
         # make log folder
@@ -237,8 +240,6 @@ class PyPlateBase:
 
         # add a formatter to rot handler
         formatter = logging.Formatter(C.S_LOG_FMT, datefmt=C.S_LOG_DATE_FMT)
-
-        # set formatter to handler
         handler.setFormatter(formatter)
 
         # create logger and add rot handler
@@ -370,7 +371,7 @@ class PyPlateBase:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 
@@ -380,8 +381,14 @@ class PyPlateBase:
         # print last blank
         print()
 
+        # call boilerplate code
+        self._save_config()
+
         # use exit code
         sys.exit(errcode)
+
+    # --------------------------------------------------------------------------
+    # NB: these methods are defined in order of precedence, not alpha
 
     # --------------------------------------------------------------------------
     # Handle the -h cmd line op
@@ -406,7 +413,7 @@ class PyPlateBase:
         Handle the -d cmd line op
         """
 
-        # set self and lib debug
+        # set self debug, conf debug, and cnlib debug
         self._arg_debug = True
         C.B_DEBUG = True
         F.B_DEBUG = True
@@ -562,7 +569,7 @@ class PyPlateBase:
                 # for each new file, reset block and line switches to def
                 # NB: line switches always default to current block switches
                 self._dict_sw_block = dict(C.D_SWITCH_DEF)
-                self._dict_sw_line = dict(self._dict_sw_block)
+                self._dict_sw_line = dict(C.D_SWITCH_DEF)
 
                 # handle files in skip_all
                 if item in skip_all:
@@ -604,10 +611,10 @@ class PyPlateBase:
         """
 
         C.do_after_fix(
+            self._dict_act,
             self._dir_prj,
             self._dict_prv,
             self._dict_pub,
-            self._dict_act,
         )
 
     # --------------------------------------------------------------------------
@@ -694,6 +701,7 @@ class PyPlateBase:
 
                 # check switches
                 check_switches(
+                    path,
                     code,
                     comm,
                     self._dict_type_rules,
@@ -767,7 +775,6 @@ class PyPlateBase:
 
         # break apart header line
         # NB: gotta do this again, can't pass res param
-        # NEXT: allow single spaces in value when using 'key:value * rat'
         str_pattern = self._dict_type_rules[C.S_KEY_HDR_SCH]
         res = re.search(str_pattern, line)
         if not res:
@@ -950,13 +957,13 @@ class PyPlateBase:
 
         # ----------------------------------------------------------------------
         # get pub subs
-        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]  # type: ignore
-        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]  # type: ignore
-        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]  # type: ignore
-        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]  # type: ignore
-        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]  # type: ignore
-        self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]  # type: ignore
-        self._dict_pub_act = self._dict_pub[C.S_KEY_PUB_ACT]  # type: ignore
+        self._dict_pub_meta = self._dict_pub[C.S_KEY_PUB_META]
+        self._dict_pub_bl = self._dict_pub[C.S_KEY_PUB_BL]
+        self._dict_pub_dist = self._dict_pub[C.S_KEY_PUB_DIST]
+        self._dict_pub_docs = self._dict_pub[C.S_KEY_PUB_DOCS]
+        self._dict_pub_i18n = self._dict_pub[C.S_KEY_PUB_I18N]
+        self._dict_pub_inst = self._dict_pub[C.S_KEY_PUB_INST]
+        self._dict_pub_act = self._dict_pub[C.S_KEY_PUB_ACT]
 
         # set initial actions
         if not self._arg_test:
@@ -1115,24 +1122,37 @@ class PyPlateBase:
 # ------------------------------------------------------------------------------
 # Check if line or trailing comment is a switch
 # ------------------------------------------------------------------------------
-def check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
+def check_switches(
+    path, code, comm, dict_type_rules, dict_sw_block, dict_sw_line
+):
     """
     Check if line or trailing comment is a switch
 
     Args:
+        path: Path to file (for errors)
+        code: The code part of the line (already split)
         comm: The comment part of a line to check for switches
         dict_type_rules: Dictionary containing the regex to look for
-        dict_sw: Dictionary of switch values for either block or line
-        switches
+        dict_sw_block: Dictionary of switch values for block switches
+        dict_sw_line: Dictionary of switch values for line switches
 
     This method checks to see if a line or trailing comment contains a
     valid switch for the values in dict_type_rules. If a valid switch is
     found, it sets the appropriate flag in either dict_sw_block or
     dict_sw_line.
+
+    This method will turn a line in your file that looks like this:
+    # pyplate: enable=replace
+
+    into a dict entry that looks like this:
+
+    {
+        "replace": True,
+    }
     """
 
     # switch does not appear anywhere in line
-    res = re.search(dict_type_rules[C.S_KEY_SW_SCH], comm)
+    res = re.search(dict_type_rules[C.S_KEY_SW_SCH], comm, flags=re.I)
     if not res:
         return
 
@@ -1142,23 +1162,35 @@ def check_switches(code, comm, dict_type_rules, dict_sw_block, dict_sw_line):
     # for each match
     for match in matches:
 
-        # get key/val of switch
-        key = match.group(dict_type_rules[C.S_KEY_SW_KEY])
-        val = match.group(dict_type_rules[C.S_KEY_SW_VAL])
+        # NB: match looks like: "x_pylplate_x: enable=replace"
+        # where sw_val is "enable" and sw_name is "replace"
 
-        # try a bool conversion
-        # NB: in honor of John Valby (ddg him!)
-        val_b = val.lower()
-        if val_b == "true":
-            val = True
-        elif val_b == "false":
-            val = False
+        # get key/val of switch
+        sw_val = match.group(dict_type_rules[C.S_KEY_SW_VAL])
+        sw_val = sw_val.lower()  # "enable"/"disable"
+        sw_name = match.group(dict_type_rules[C.S_KEY_SW_NAME])
+        sw_name = sw_name.lower()  # what to enable/disable (i.e. "replace")
+
+        # check for valid value
+        vals = [item.lower() for item in C.D_SWITCH_VALS]
+        if not sw_val in vals:  # enum keys only
+            str_err = C.S_ERR_SW_VAL.format(path, sw_val, C.D_SWITCH_VALS)
+            raise OSError(str_err)
+        # check for valid name
+        names = [item.lower() for item in C.D_SWITCH_DEF]
+        if not sw_name in names:  # enum keys only
+            str_err = C.S_ERR_SW_NAME.format(path, sw_name, C.D_SWITCH_DEF)
+            raise OSError(str_err)
+
+        # key is switch name, val comes from D_SWITCH_DEF
+        key_out = sw_name
+        val_out = C.D_SWITCH_VALS[sw_val]
 
         # pick a dict based on if there is preceding code
         if code.strip() == "":
-            dict_sw_block[key] = val
+            dict_sw_block[key_out] = val_out
         else:
-            dict_sw_line[key] = val
+            dict_sw_line[key_out] = val_out
 
 
 # ------------------------------------------------------------------------------

@@ -7,7 +7,6 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# pylint: disable=too-many-lines
 # pyplate: replace=False
 
 """
@@ -27,9 +26,6 @@ Run pymaker -h for more options.
 
 # system imports
 import shutil
-
-# venv imports
-from cnlib import cnfunctions as F  # type: ignore
 
 # local imports
 import pyplate_base as B
@@ -147,22 +143,7 @@ class PyMaker(B.PyPlateBase):
         # do extra stuff to final dir after fix
         self._do_after_fix()  # super
 
-        # done with project
-        print()
-
-        # NB: easier to parse path than get dunder
-        if B.C.B_ERROR:
-            print(self.S_ERR_MAKE.format(self._dir_prj.name))
-            if not B.C.B_DEBUG:
-                print(self.S_ERR_USE_D)
-        else:
-            print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
-
-        # ----------------------------------------------------------------------
-        # teardown
-
-        # call boilerplate code
-        self._save_config()
+        # custom teardown code
         self._teardown()
 
     # --------------------------------------------------------------------------
@@ -191,8 +172,31 @@ class PyMaker(B.PyPlateBase):
         # NB: expensive, but needs to be done after testing for -h and
         # --uninstall
         if self._dir_prj.is_relative_to(B.P_DIR_PRJ):
-            F.printc(B.C.S_ERR_PRJ_DIR_IS_PP, fg=F.C_FG_RED, bold=True)
+            B.F.printc(B.C.S_ERR_PRJ_DIR_IS_PP, fg=B.F.C_FG_RED, bold=True)
             self._teardown(-1)
+
+    # --------------------------------------------------------------------------
+    # Boilerplate to use at the end of main
+    # --------------------------------------------------------------------------
+    def _teardown(self, errcode: int = 0):
+        """
+        Boilerplate to use at the end of main
+
+        Perform some mundane stuff like saving config files.
+        """
+
+        # blank line
+        print()
+
+        if not B.B_RESULT:
+            print(B.C.S_ERR_MAKE.format(self._dir_prj.name))
+            if not B.C.B_DEBUG:
+                print(B.C.S_ERR_USE_D)
+        else:
+            print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
+
+        # call super
+        super()._teardown(errcode)
 
     # --------------------------------------------------------------------------
     # Handle the -t option
@@ -226,13 +230,13 @@ class PyMaker(B.PyPlateBase):
 
         # ask if user wants to keep invalid version or quit
         if not ver_ok:
-            res = F.dialog(
+            res = B.F.dialog(
                 B.C.S_ERR_SEM_VER,
-                [F.S_ASK_YES, F.S_ASK_NO],
-                default=F.S_ASK_NO,
+                [B.F.S_ASK_YES, B.F.S_ASK_NO],
+                default=B.F.S_ASK_NO,
                 # loop=True
             )
-            if res != F.S_ASK_YES:
+            if res != B.F.S_ASK_YES:
                 self._teardown(-1)
 
         # ----------------------------------------------------------------------
@@ -326,7 +330,7 @@ class PyMaker(B.PyPlateBase):
 
         # save other names
         name_prj_small = name_prj_big.lower()
-        name_prj_pascal = F.pascal_case(name_prj_small)
+        name_prj_pascal = B.F.pascal_case(name_prj_small)
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -375,7 +379,7 @@ class PyMaker(B.PyPlateBase):
 
                 # save other names
                 name_sec_small = name_sec_big.lower()
-                name_sec_pascal = F.pascal_case(name_sec_small)
+                name_sec_pascal = B.F.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
         # make dicts from conf defaults
@@ -507,8 +511,8 @@ class PyMaker(B.PyPlateBase):
 
         # ----------------------------------------------------------------------
         # done
-        # NB: None = pass, Exception = fail
-        return None
+        # NB: True = pass, False = fail, or raise Exception
+        return True
 
     # --------------------------------------------------------------------------
     # Do any work after template copy
@@ -522,7 +526,7 @@ class PyMaker(B.PyPlateBase):
         """
 
         B.C.do_after_template(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
+            self._dict_act, self._dir_prj, self._dict_prv, self._dict_pub
         )
 
 

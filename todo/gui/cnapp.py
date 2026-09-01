@@ -27,9 +27,7 @@ from pathlib import Path
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import (
-    Gtk,
-)  # pylint:disable=wrong-import-position # type: ignore
+from gi.repository import Gtk  # type: ignore pylint: disable=wrong-import-position
 
 # ------------------------------------------------------------------------------
 # Public classes
@@ -123,9 +121,7 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Add a new window instance with the specified name
     # --------------------------------------------------------------------------
-    def add_window(
-        self, name_win, inst_win
-    ):  # pylint: disable=arguments-differ
+    def add_window(self, name_win, inst_win, _dummy) -> None:
         """
         Add a new window instance with the specified name
 
@@ -156,7 +152,7 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Remove the specified window instance from the internal list
     # --------------------------------------------------------------------------
-    def remove_window(self, name_win):  # pylint: disable=arguments-differ
+    def remove_window(self, name_win):
         """
         Remove the specified window instance from the internal list
 
@@ -184,7 +180,7 @@ class CNApp(Gtk.Application):
     # --------------------------------------------------------------------------
     # Return the list of currently displayed windows
     # --------------------------------------------------------------------------
-    def get_windows(self):  # pylint: disable=arguments-differ
+    def get_windows(self):
         """
         Return the list of currently displayed windows
 
@@ -202,7 +198,7 @@ class CNApp(Gtk.Application):
     # Return a tuple of the CNWindow subclass name and instance for the active
     # window (the currently focused window)
     # --------------------------------------------------------------------------
-    def get_active_window(self):  # pylint: disable=arguments-differ
+    def get_active_window(self):
         """
         Return a tuple of the CNWindow subclass name and instance for the
         active window (the currently focused window)

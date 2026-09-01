@@ -356,8 +356,7 @@
 #     )
 
 #     # make all buttons stretch
-#     msg_box.action_area.set_homogeneous(True)  # pylint: disable=no-member
-
+#     msg_box.action_area.set_homogeneous(True)
 #     # set the bad/none button as red
 #     btn_red = msg_box.get_widget_for_response(
 #         response_id=Gtk.ResponseType.CLOSE
@@ -372,12 +371,12 @@
 #     msg_box.set_focus(btn_def)
 
 #     # center dialog on parent
-#     msg_box.set_position(  # pylint: disable=no-member
+#     msg_box.set_position(
 #         Gtk.WindowPosition.CENTER
 #     )
 
 #     # show message box and get result
-#     result = msg_box.run()  # pylint: disable=no-member
+#     result = msg_box.run()
 #     msg_box.hide()
 
 #     # return the button that was clicked
