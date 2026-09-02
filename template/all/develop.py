@@ -39,16 +39,9 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI
 
-<<<<<<< HEAD
 T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
 T_PATH_LOCALE = P_DIR_PRJ / "__PP_DIR_LOCALE__"
 T_TRANSLATION = gettext.translation(T_DOMAIN, T_PATH_LOCALE, fallback=True)
-=======
-# init gettext
-T_DOMAIN = "__PP_NAME_PRJ_SMALL__"
-T_DIR_LOCALE = P_DIR_PRJ / "__PP_PATH_LOCALE__"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
->>>>>>> fix_po
 _ = T_TRANSLATION.gettext
 
 # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to

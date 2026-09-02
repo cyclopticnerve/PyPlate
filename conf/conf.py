@@ -25,7 +25,6 @@ import re
 import shutil
 
 # venv imports
-<<<<<<< HEAD
 from cnlib import cnfunctions as F
 from cnlib.cnmkdocs import CNMkDocs
 from cnlib import cnpot
@@ -33,21 +32,11 @@ from cnlib.cnpot import CNPotPy
 from cnlib.cntree import CNTree
 from cnlib.cnvenv import CNVenv
 from cnlib.decorators import cnspinner as S
-=======
-from cnlib import cnfunctions as F  # type: ignore
-from cnlib.cnmkdocs import CNMkDocs  # type: ignore
-from cnlib import cnpot  # type: ignore
-from cnlib.cnpot import CNPotPy  # type: ignore
-from cnlib.cntree import CNTree  # type: ignore
-from cnlib.cnvenv import CNVenv  # type: ignore
-from cnlib.decorators import cnspinner as S  # type: ignore
->>>>>>> fix_po
 
 # ------------------------------------------------------------------------------
 # Paths (DO NOT EDIT)
 # ------------------------------------------------------------------------------
 
-<<<<<<< HEAD
 # get PyPlate path
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 # absolute current path venv
@@ -60,21 +49,10 @@ P_DIR_PP_VENV = P_DIR_PRJ / ".venv-pyplate"
 
 T_DOMAIN = "pyplate"
 T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
-=======
-# absolute current path OF PyPlate
-P_DIR_PP = Path(__file__).parents[1].resolve()
-# TODO: remove after fixing mkdocs
-P_DIR_PP_VENV = P_DIR_PP / ".venv-pyplate"
-
-# ------------------------------------------------------------------------------
-# init gettext
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = P_DIR_PP / "i18n/locale"
->>>>>>> fix_po
 _ = cnpot.underscore(T_DOMAIN, T_DIR_LOCALE)
 
 # ------------------------------------------------------------------------------
-# Bools (DO NOT EDIT)
+# Globals (DO NOT EDIT)
 # ------------------------------------------------------------------------------
 
 """
@@ -87,8 +65,8 @@ this is pretty much the START code of this program. this is where it all
 begins. if you run pymaker, this is the first local import. same with pybaker.
 so it makes sense to start here.
 
-i want EVERY part of my code to know wether we are running in debug mode or
-not.
+i want EVERY part of my code to know what the final outcome is (or the outcome
+of the current step, if we fail on first).
 the most "pythonic" (shudder) way to do this is to have a class with an
 instance variable or instance methods to read/write that variable. aint nobody
 got time for that.
@@ -102,8 +80,11 @@ sometimes thats the point.
 /r /s
 """
 
-# global debug flag
-B_DEBUG = False
+# ------------------------------------------------------------------------------
+# Bools
+
+# global result flag
+B_RESULT = True
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -342,14 +323,12 @@ S_ACTION_DEPLOY_DOCS = _("Deploying docs site")
 S_ACTION_COMPRESS = _("Compressing files")
 # I18N: remove dist
 S_ACTION_REM_DIST = _("Removing dist source")
-
 # I18N: Copy template files
 S_ACTION_COPY = _("Copying template files")
 # I18N: Do fix
 S_ACTION_FIX = _("Fixing dunders")
 # I18N: Make dist folder
 S_ACTION_DIST = _("Copying dist files")
-
 # I18N: skipped action
 S_ACTION_SKIP = _("Skipped")
 # I18N: Done
@@ -599,14 +578,11 @@ S_UI_VER_SCH = (
 )
 S_UI_VER_REP = r"\g<1>\g<2>{}\g<4>"
 
-<<<<<<< HEAD
 # pot files
 S_PO_VER_SCH = r"(\"Project-Id-Version: )(.*?)(\\n\")"
 S_PO_VER_REP = r"\g<1>{}\g<3>"
 S_PO_LANG_SCH = r"(\"Language: )(.*?)(\\n\")"
 
-=======
->>>>>>> fix_po
 # pyproject.toml
 S_TOML_VER_SCH = r"(^\s*\[project\]\s*$)(.*?)(^\s*version[\t ]*=[\t ]*)(.*?$)"
 S_TOML_VER_REP = r'\g<1>\g<2>\g<3>"{}"'
@@ -673,13 +649,6 @@ S_FILE_REQS_TYPE = f"{S_DIR_TEMPLATE}/" + "{}/" + f"{S_FILE_REQS}"
 S_PATH_DSK_TMP = f"{S_DIR_SRC}/{S_DIR_GUI}/{S_DIR_DESKTOP}/{S_FILE_DSK_TMP}"
 
 # I18N stuff
-<<<<<<< HEAD
-=======
-P_DIR_I18N = Path(S_DIR_I18N)
-S_PATH_LOCALE = str(P_DIR_I18N / S_DIR_LOCALE)
-S_PATH_PO = str(P_DIR_I18N / S_DIR_PO)
-S_PATH_POT = str(P_DIR_I18N)
->>>>>>> fix_po
 S_I18N_TAG = "I18N"
 
 # format for venv
@@ -2042,8 +2011,8 @@ def _action_run(dict_act, key, msg, action_func, dir_prj, dict_prv, dict_pub):
     # will then return the error here, so we can set B_RESULT.
     err = action_func(dir_prj, dict_prv, dict_pub)
     if err:
-        print(err)
-        PP.B_RESULT = False
+        global B_RESULT  # pylint:disable=global-statement
+        B_RESULT = False
 
 # ------------------------------------------------------------------------------
 # Make a venv in the project directory
@@ -2065,13 +2034,14 @@ def _action_venv(dir_prj, dict_prv, _dict_pub):
     """
 
     # get name of venv folder and reqs file
-    dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+    # dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
 
-    # create a cnvenv object
-    cv = CNVenv(dir_prj, dir_venv)
+    # # create a cnvenv object
+    # cv = CNVenv(dir_prj, dir_venv)
 
-    # create venv
-    cv.create()
+    # # create venv
+    # cv.create()
+    raise OSError("boobs")
 
 # ------------------------------------------------------------------------------
 # Install reqs in venv
@@ -2222,47 +2192,7 @@ def _action_i18n(dir_prj, dict_prv, dict_pub):
     # --------------------------------------------------------------------------
     # do bulk of i18n
 
-<<<<<<< HEAD
     # check if we want i18n
-=======
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    str_version = dict_prv_prj["__PP_VER_MMR__"]
-    if str_version == "":
-        str_version = "0.0.0"
-
-    # create CNPotPy object
-    potpy = CNPotPy(
-        # header
-        str_domain=dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_PRJ_SMALL__"],
-        str_version=str_version,
-        str_author=dict_prv[S_KEY_PRV_ALL]["__PP_AUTHOR__"],
-        str_email=dict_prv[S_KEY_PRV_ALL]["__PP_EMAIL__"],
-        # base prj dir
-        dir_prj=dir_prj,
-        # in
-        list_src=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_SRC],
-        # out
-        dir_pot=S_PATH_POT,
-        dir_po=S_PATH_PO,
-        dir_locale=S_PATH_LOCALE,
-        # optional in
-        str_tag=S_I18N_TAG,
-        dict_clangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CLANGS],
-        # list_wlangs=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_WLANGS],
-        charset=dict_pub[S_KEY_PUB_I18N][S_KEY_PUB_I18N_CHAR],
-    )
-
-    # make .pot, .po, and .mo files
-    try:
-        potpy.main()
-    except F.CNRunError as e:
-        return e
-
-    # --------------------------------------------------------------------------
-    # do .desktop i18n/version
-
-    # check if we want template
->>>>>>> fix_po
     prj_type = dict_prv[S_KEY_PRV_PRJ]["__PP_TYPE_PRJ__"]
     if prj_type in L_MAKE_I18N:
 
@@ -2300,23 +2230,11 @@ def _action_i18n(dir_prj, dict_prv, dict_pub):
         # path to desktop output
         path_desk_out = dir_prj / dict_prv[S_KEY_PRV_PRJ]["__PP_FILE_DESK__"]
 
-<<<<<<< HEAD
         # check for template.desktop (or rule out using dict)
-        if path_dsk_tmp.exists():
+        if path_desk_tmp.exists():
 
             # do the thing
-            potpy.make_desktop(path_dsk_tmp, path_dsk_out)
-=======
-        # do the thing
-        try:
             potpy.make_desktop(path_desk_tmp, path_desk_out)
-        except F.CNRunError as e:
-            return e
-
-    # default result
-    return None
-
->>>>>>> fix_po
 
 # ------------------------------------------------------------------------------
 # Fix metadata
@@ -2337,13 +2255,8 @@ def _action_meta(dir_prj, dict_prv, dict_pub):
     # fix version in po files
     # NB: this ignores blacklist
 
-<<<<<<< HEAD
-    # # NB: root is a full path, dirs and files are relative to root
-    for root, root_dirs, root_files in dir_prj.walk():
-=======
     # NB: root is a full path, dirs and files are relative to root
     # for root, root_dirs, root_files in dir_prj.walk():
->>>>>>> fix_po
 
     #     # special case for po/pot files
 
@@ -2614,50 +2527,28 @@ def _action_rem_dist(dir_prj, dict_prv, _dict_pub):
 # ------------------------------------------------------------------------------
 
 
-<<<<<<< HEAD
 # ------------------------------------------------------------------------------
 # Fix po files outside blacklist to hide file paths
 # ------------------------------------------------------------------------------
-def _fix_po(path, _dir_prj, dict_prv, _dict_pub):
-=======
-# # ------------------------------------------------------------------------------
-# # Fix po files outside blacklist to hide file paths
-# # ------------------------------------------------------------------------------
-# def _fix_po(path, dir_prj, dict_prv, _dict_pub):
->>>>>>> fix_po
+# def fix_po(path, _dir_prj, dict_prv, _dict_pub):
 
-#     # replace version
-#     # NB: done in cnpot
-#     # dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-#     # pp_version = dict_prv_prj["__PP_VER_MMR__"]
-#     # str_pattern = S_PO_VER_SCH
-#     # str_rep = S_PO_VER_REP.format(pp_version)
+# #     # replace version
+# #     # NB: done in cnpot
+# #     # dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+# #     # pp_version = dict_prv_prj["__PP_VER_MMR__"]
+# #     # str_pattern = S_PO_VER_SCH
+# #     # str_rep = S_PO_VER_REP.format(pp_version)
 
-#     # open file and get contents
-#     with open(path, "r", encoding=S_ENCODING) as a_file:
-#         text = a_file.read()
+# #     # open file and get contents
+# #     with open(path, "r", encoding=S_ENCODING) as a_file:
+# #         text = a_file.read()
 
-#     # replace version
-#     # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
-
-<<<<<<< HEAD
-    # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
-        a_file.write(text)
-=======
-#     # --------------------------------------------------------------------------
-
-#     # delete home dir from .pot/.po files
-#     # NB: also no regex or rules, just nuke it everywhere
-#     rep = str(dir_prj) + "/"
-#     text = text.replace(rep, "")
-
-#     # --------------------------------------------------------------------------
+# #     # replace version
+# #     # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
 #     # save file
 #     with open(path, "w", encoding=S_ENCODING) as a_file:
 #         a_file.write(text)
->>>>>>> fix_po
 
 
 # ------------------------------------------------------------------------------

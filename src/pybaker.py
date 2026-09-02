@@ -195,13 +195,14 @@ class PyBaker(B.PyPlateBase):
         # blank line
         print()
 
+        # TODO: color
         # check final result
-        if not B.B_RESULT:
-            print(B.C.S_ERR_BAKE.format(self._dir_prj.name))
-            if not B.C.B_DEBUG:
-                print(B.C.S_ERR_USE_D)
-        else:
+        if B.C.B_RESULT:
             print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
+        else:
+            print(B.C.S_ERR_BAKE.format(self._dir_prj.name))
+            if not self._arg_debug:
+                print(B.C.S_ERR_USE_D)
 
         # call super
         super()._teardown(errcode)
