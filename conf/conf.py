@@ -2034,14 +2034,13 @@ def _action_venv(dir_prj, dict_prv, _dict_pub):
     """
 
     # get name of venv folder and reqs file
-    # dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
+    dir_venv = dict_prv[S_KEY_PRV_PRJ]["__PP_NAME_VENV__"]
 
-    # # create a cnvenv object
-    # cv = CNVenv(dir_prj, dir_venv)
+    # create a cnvenv object
+    cv = CNVenv(dir_prj, dir_venv)
 
-    # # create venv
-    # cv.create()
-    raise OSError("boobs")
+    # create venv
+    cv.create()
 
 # ------------------------------------------------------------------------------
 # Install reqs in venv
