@@ -7,6 +7,7 @@
 # ------------------------------------------------------------------------------
 
 # pylint: disable=too-many-lines
+# pyplate: disable=replace
 
 """
 A class to be the base for pymaker/pybaker
@@ -38,6 +39,7 @@ from cnlib.cnformatter import CNFormatter
 P_DIR_PRJ = Path(__file__).parents[1].resolve()
 
 # fudge the path to import conf stuff
+# NB: basically, we treat the conf folder as an outside lib
 sys.path.append(str(P_DIR_PRJ))
 import conf.conf as C  # pylint: disable=import-error, wrong-import-position
 
@@ -91,7 +93,7 @@ class PyPlateBase:
     # NB: used for parser/logger
     S_APP_NAME = "pyplate"
 
-    # pyplate: replace=True
+    # pyplate: enable=replace
     # I18N: short description
     S_PP_SHORT_DESC = _(
         "A program for creating and building CLI/GUI/Package projects in Python from a template"
@@ -100,7 +102,7 @@ class PyPlateBase:
     # version string
     S_PP_VERSION = "Version 1.1.5"
 
-    # pyplate: replace=False
+   # pyplate: disable=replace
 
     # --------------------------------------------------------------------------
     # args

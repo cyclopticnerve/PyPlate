@@ -7,7 +7,7 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# pyplate: replace=False
+# pyplate: disable=replace
 
 """
 A program to change the metadata of a PyPlate project and create a dist
@@ -195,14 +195,18 @@ class PyBaker(B.PyPlateBase):
         # blank line
         print()
 
-        # TODO: color
         # check final result
         if B.C.B_RESULT:
-            print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
+            msg = B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name)
+            B.F.printc(msg, fg=B.F.C_FG_GREEN, bold=True)
+            # print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
         else:
-            print(B.C.S_ERR_BAKE.format(self._dir_prj.name))
+            msg = B.C.S_ERR_BAKE.format(self._dir_prj.name)
+            B.F.printc(msg, fg=B.F.C_FG_RED, bold=True)
+            # print(B.C.S_ERR_BAKE.format(self._dir_prj.name))
             if not self._arg_debug:
-                print(B.C.S_ERR_USE_D)
+                B.F.printc(B.C.S_ERR_USE_D, fg=B.F.C_FG_RED, bold=True)
+                # print(B.C.S_ERR_USE_D)
 
         # call super
         super()._teardown(errcode)

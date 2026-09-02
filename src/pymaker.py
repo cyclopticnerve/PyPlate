@@ -7,7 +7,7 @@
 # License : WTFPLv2                                                \          /
 # ------------------------------------------------------------------------------
 
-# pyplate: replace=False
+# pyplate: disable=replace
 
 """
 A program to create a PyPlate project from a few variables
@@ -188,13 +188,17 @@ class PyMaker(B.PyPlateBase):
         # blank line
         print()
 
-        # TODO: color
         if B.C.B_RESULT:
-            print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
+            msg = B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name)
+            B.F.printc(msg, fg=B.F.C_FG_GREEN, bold=True)
+            # print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
         else:
-            print(B.C.S_ERR_MAKE.format(self._dir_prj.name))
+            msg = B.C.S_ERR_MAKE.format(self._dir_prj.name)
+            B.F.printc(msg, fg=B.F.C_FG_RED, bold=True)
+            # print(B.C.S_ERR_MAKE.format(self._dir_prj.name))
             if not self._arg_debug:
-                print(B.C.S_ERR_USE_D)
+                B.F.printc(B.C.S_ERR_USE_D, fg=B.F.C_FG_RED, bold=True)
+                # print(B.C.S_ERR_USE_D)
 
         # call super
         super()._teardown(errcode)

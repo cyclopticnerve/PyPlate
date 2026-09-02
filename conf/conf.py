@@ -1394,6 +1394,7 @@ S.D_SPIN = {
 # ------------------------------------------------------------------------------
 # local imports
 
+# TODO: this is breaking my brain
 import src.pyplate_base as PP  # pylint: disable=wrong-import-position, import-error
 
 # get version number from base
