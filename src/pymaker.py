@@ -188,7 +188,7 @@ class PyMaker(B.PyPlateBase):
         # blank line
         print()
 
-        if B.C.B_RESULT:
+        if B.C.B_PP_RESULT:
             msg = B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name)
             B.F.printc(msg, fg=B.F.C_FG_GREEN, bold=True)
             # print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))

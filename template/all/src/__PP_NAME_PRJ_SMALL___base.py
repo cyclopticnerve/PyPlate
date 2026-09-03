@@ -330,7 +330,7 @@ class __PP_NAME_PRJ_PASCAL__Base:
 
         # set self and lib debug
         self._arg_debug = self._dict_args.get(self.S_ARG_DBG_DEST, False)
-        F.B_DEBUG = self._arg_debug
+        F.B_PP_DEBUG = self._arg_debug
 
         # ----------------------------------------------------------------------
         # check for --uninstall

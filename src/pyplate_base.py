@@ -41,7 +41,8 @@ P_DIR_PRJ = Path(__file__).parents[1].resolve()
 # fudge the path to import conf stuff
 # NB: basically, we treat the conf folder as an outside lib
 sys.path.append(str(P_DIR_PRJ))
-import conf.conf as C  # pylint: disable=import-error, wrong-import-position
+import conf as C  # pylint: disable=import-error, wrong-import-position
+import hooks as hooks
 
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI and GUI
@@ -68,6 +69,7 @@ P_UNINST_DBG = P_DIR_PRJ / "install/uninstall.py -d"
 # ------------------------------------------------------------------------------
 # Classes
 # ------------------------------------------------------------------------------
+
 
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
@@ -102,7 +104,7 @@ class PyPlateBase:
     # version string
     S_PP_VERSION = "Version 1.1.5"
 
-   # pyplate: disable=replace
+    # pyplate: disable=replace
 
     # --------------------------------------------------------------------------
     # args
@@ -362,7 +364,7 @@ class PyPlateBase:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 
@@ -406,7 +408,7 @@ class PyPlateBase:
 
         # set self debug and cnfunctions debug
         self._arg_debug = True
-        F.B_DEBUG = True
+        F.B_PP_DEBUG = True
 
     # --------------------------------------------------------------------------
     # Handle the --uninstall cmd line op

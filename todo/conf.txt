@@ -1,0 +1,5 @@
+what to do with spinner dict?
+can we write it from somewhere BEFORE/AFTER we import?
+will it change anything?
+
+set dict_prj[pp_ver] from base?

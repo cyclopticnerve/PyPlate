@@ -196,7 +196,7 @@ class PyBaker(B.PyPlateBase):
         print()
 
         # check final result
-        if B.C.B_RESULT:
+        if B.C.B_PP_RESULT:
             msg = B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name)
             B.F.printc(msg, fg=B.F.C_FG_GREEN, bold=True)
             # print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
@@ -448,6 +448,7 @@ class PyBaker(B.PyPlateBase):
         B.C.do_after_dist(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
         )
+
 
 # ------------------------------------------------------------------------------
 # Code to run when called from command line
