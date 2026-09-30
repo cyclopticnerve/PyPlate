@@ -1,5 +1,15 @@
-what to do with spinner dict?
+
+actions.py
+------------
+DONE: what to do about mkdocs?
+
+conf.py
+------------
+DONE what to do with spinner dict?
 can we write it from somewhere BEFORE/AFTER we import?
 will it change anything?
 
-set dict_prj[pp_ver] from base?
+DONE: set dict_prj[pp_ver] from base?
+
+get non-editable out (S_KEY_XXX)
+

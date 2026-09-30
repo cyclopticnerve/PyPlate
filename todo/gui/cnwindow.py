@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : CNGuiLib                                               /          \
+# Package :CNGuiLib                                               /          \
 # Filename: cnwindow.py                                           |     ()     |
 # Date    : 03/14/2024                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |

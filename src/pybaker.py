@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: pybaker.py                                            |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -26,9 +26,19 @@ Run pybaker -h for more options.
 # system imports
 import shutil
 
+# lib imports
+from cnlib import cnfunctions
+
+# from cnlib.decorators import cnspinner
+
 # local imports
-import pyplate_base as B
-from pyplate_base import _
+import hooks
+import ppglobals
+import pyplate_base
+import spinner
+
+# from pyplate_base import _
+_ = ppglobals._
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -36,22 +46,22 @@ from pyplate_base import _
 
 # dict in pybaker to control post processing in debug mode
 D_PB_ACT = {
-    B.C.S_KEY_ACT_VENV: True,
-    B.C.S_KEY_ACT_REQS: True,
-    B.C.S_KEY_ACT_GIT: True,
-    B.C.S_KEY_ACT_INST: True,
-    B.C.S_KEY_ACT_PURGE: True,
-    B.C.S_KEY_ACT_I18N: True,
-    B.C.S_KEY_ACT_META: True,
-    B.C.S_KEY_ACT_PLACE: True,
-    B.C.S_KEY_ACT_EDIT: True,
-    B.C.S_KEY_ACT_DOCS_MAKE: True,
-    B.C.S_KEY_ACT_TREE: True,
-    B.C.S_KEY_ACT_FREEZE: True,
-    B.C.S_KEY_ACT_DOCS_BAKE: True,
-    B.C.S_KEY_ACT_DOCS_DEPLOY: True,
-    B.C.S_KEY_ACT_COMPRESS: True,
-    B.C.S_KEY_ACT_REM_DIST: True,
+    pyplate_base.conf.S_KEY_ACT_VENV: True,
+    pyplate_base.conf.S_KEY_ACT_REQS: True,
+    pyplate_base.conf.S_KEY_ACT_GIT: True,
+    pyplate_base.conf.S_KEY_ACT_INST: True,
+    pyplate_base.conf.S_KEY_ACT_PURGE: True,
+    pyplate_base.conf.S_KEY_ACT_I18N: True,
+    pyplate_base.conf.S_KEY_ACT_META: True,
+    pyplate_base.conf.S_KEY_ACT_PLACE: True,
+    pyplate_base.conf.S_KEY_ACT_EDIT: True,
+    pyplate_base.conf.S_KEY_ACT_DOCS_MAKE: True,
+    pyplate_base.conf.S_KEY_ACT_TREE: True,
+    pyplate_base.conf.S_KEY_ACT_FREEZE: True,
+    pyplate_base.conf.S_KEY_ACT_DOCS_BAKE: True,
+    pyplate_base.conf.S_KEY_ACT_DOCS_DEPLOY: True,
+    pyplate_base.conf.S_KEY_ACT_COMPRESS: True,
+    pyplate_base.conf.S_KEY_ACT_REM_DIST: True,
 }
 
 # ------------------------------------------------------------------------------
@@ -62,7 +72,7 @@ D_PB_ACT = {
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyBaker(B.PyPlateBase):
+class PyBaker(pyplate_base.PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -88,8 +98,8 @@ class PyBaker(B.PyPlateBase):
     # about string
     S_ABOUT = (
         f"{'PyPlate/PyBaker'}\n"
-        f"{B.PyPlateBase.S_PP_SHORT_DESC}\n"
-        f"{B.PyPlateBase.S_PP_VERSION}\n"
+        f"{pyplate_base.PyPlateBase.S_PP_SHORT_DESC}\n"
+        f"{pyplate_base.PyPlateBase.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
@@ -128,7 +138,7 @@ class PyBaker(B.PyPlateBase):
         # ----------------------------------------------------------------------
         # print some info
         print()
-        print(B.C.S_MSG_BAKE.format(self._dir_prj.name))
+        print(pyplate_base.conf.S_MSG_BAKE.format(self._dir_prj.name))
         print()
 
         # do any fixing up of dicts (like meta keywords, etc)
@@ -196,17 +206,21 @@ class PyBaker(B.PyPlateBase):
         print()
 
         # check final result
-        if B.C.B_PP_RESULT:
-            msg = B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name)
-            B.F.printc(msg, fg=B.F.C_FG_GREEN, bold=True)
-            # print(B.C.S_MSG_BAKE_DONE.format(self._dir_prj.name))
+        if ppglobals.B_PP_RESULT:
+            msg = pyplate_base.conf.S_MSG_BAKE_DONE.format(self._dir_prj.name)
+            cnfunctions.printc(msg, fg=cnfunctions.C_FG_GREEN, bold=True)
+            # print(pyplate_base.conf.S_MSG_BAKE_DONE.format(self._dir_prj.name))
         else:
-            msg = B.C.S_ERR_BAKE.format(self._dir_prj.name)
-            B.F.printc(msg, fg=B.F.C_FG_RED, bold=True)
-            # print(B.C.S_ERR_BAKE.format(self._dir_prj.name))
+            msg = pyplate_base.conf.S_ERR_BAKE.format(self._dir_prj.name)
+            cnfunctions.printc(msg, fg=cnfunctions.C_FG_RED, bold=True)
+            # print(pyplate_base.conf.S_ERR_BAKE.format(self._dir_prj.name))
             if not self._arg_debug:
-                B.F.printc(B.C.S_ERR_USE_D, fg=B.F.C_FG_RED, bold=True)
-                # print(B.C.S_ERR_USE_D)
+                cnfunctions.printc(
+                    pyplate_base.conf.S_ERR_USE_D,
+                    fg=cnfunctions.C_FG_RED,
+                    bold=True,
+                )
+                # print(pyplate_base.conf.S_ERR_USE_D)
 
         # call super
         super()._teardown(errcode)
@@ -228,18 +242,18 @@ class PyBaker(B.PyPlateBase):
         # ----------------------------------------------------------------------
 
         # ask for prj name rel to cwd
-        in_str = B.C.S_ASK_IDE.format(self._dir_prj)
+        in_str = pyplate_base.conf.S_ASK_IDE.format(self._dir_prj)
         while True:
             prj_name = input(in_str)
             if prj_name == "":
                 continue
 
             # if running in ide, cwd is pyplate prj dir, so move up + down
-            tmp_dir = B.Path(self._dir_prj / prj_name).resolve()
+            tmp_dir = pyplate_base.Path(self._dir_prj / prj_name).resolve()
 
             # check if project exists
             if not tmp_dir.exists():
-                e_str = B.C.S_ERR_NOT_EXIST.format(tmp_dir)
+                e_str = pyplate_base.conf.S_ERR_NOT_EXIST.format(tmp_dir)
                 print(e_str)
                 continue
 
@@ -263,27 +277,27 @@ class PyBaker(B.PyPlateBase):
         if ver:
 
             # check version before we start fixing
-            pattern = B.C.S_SEM_VER_VALID
+            pattern = pyplate_base.conf.S_SEM_VER_VALID
             version = ver
-            ver_ok = B.re.search(pattern, version) is not None
+            ver_ok = pyplate_base.re.search(pattern, version) is not None
 
             # ask if user wants to keep invalid version or quit
             if not ver_ok:
-                res = B.F.dialog(
-                    B.C.S_ERR_SEM_VER,
-                    [B.F.S_ASK_YES, B.F.S_ASK_NO],
-                    default=B.F.S_ASK_NO,
+                res = cnfunctions.dialog(
+                    pyplate_base.conf.S_ERR_SEM_VER,
+                    [cnfunctions.S_ASK_YES, cnfunctions.S_ASK_NO],
+                    default=cnfunctions.S_ASK_NO,
                     loop=True,
                 )
-                if res != B.F.S_ASK_YES:
+                if res != cnfunctions.S_ASK_YES:
                     self._teardown(-1)
 
         # not passed, ask question
         else:
 
             # format and ask question
-            old_ver = self._dict_pub_meta[B.C.S_KEY_META_VERSION]
-            ask_ver = B.C.S_ASK_VER.format(old_ver)
+            old_ver = self._dict_pub_meta[pyplate_base.conf.S_KEY_META_VERSION]
+            ask_ver = pyplate_base.conf.S_ASK_VER.format(old_ver)
 
             # loop until condition
             while True:
@@ -299,9 +313,9 @@ class PyBaker(B.PyPlateBase):
                     break
 
                 # check version before we start fixing
-                pattern = B.C.S_SEM_VER_VALID
+                pattern = pyplate_base.conf.S_SEM_VER_VALID
                 version = new_ver
-                ver_ok = B.re.search(pattern, version) is not None
+                ver_ok = pyplate_base.re.search(pattern, version) is not None
 
                 # ask if user wants to keep invalid version or quit
                 if ver_ok:
@@ -311,15 +325,15 @@ class PyBaker(B.PyPlateBase):
                     break
 
                 # print version error
-                print(B.C.S_ERR_SEM_VER)
+                print(pyplate_base.conf.S_ERR_SEM_VER)
 
         # change in project.json
-        self._dict_pub_meta[B.C.S_KEY_META_VERSION] = ver
+        self._dict_pub_meta[pyplate_base.conf.S_KEY_META_VERSION] = ver
 
         # set version in install dict
         prj_type = self._dict_prv_prj["__PP_TYPE_PRJ__"]
-        if prj_type in B.C.L_APP_INSTALL:
-            self._dict_pub_inst[B.C.S_KEY_INST_VER] = ver
+        if prj_type in pyplate_base.conf.L_APP_INSTALL:
+            self._dict_pub_inst[pyplate_base.conf.S_KEY_INST_VER] = ver
 
     # --------------------------------------------------------------------------
     # Get project info
@@ -336,16 +350,16 @@ class PyBaker(B.PyPlateBase):
         # sanity checks
 
         # check if dir_prj has pyplate folder for a valid prj
-        path_pyplate = self._dir_prj / B.C.S_PRJ_PP_DIR
+        path_pyplate = self._dir_prj / pyplate_base.conf.S_PRJ_PP_DIR
         if not path_pyplate.exists():
-            print(B.C.S_ERR_NOT_PRJ)
+            print(pyplate_base.conf.S_ERR_NOT_PRJ)
             self._teardown(-1)
 
         # check if data files exist
-        path_prv = self._dir_prj / B.C.S_PRJ_PRV_CFG
-        path_pub = self._dir_prj / B.C.S_PRJ_PUB_CFG
+        path_prv = self._dir_prj / pyplate_base.conf.S_PRJ_PRV_CFG
+        path_pub = self._dir_prj / pyplate_base.conf.S_PRJ_PUB_CFG
         if not path_prv.exists() or not path_pub.exists():
-            print(B.C.S_ERR_PP_MISSING)
+            print(pyplate_base.conf.S_ERR_PP_MISSING)
             self._teardown(-1)
 
         # ----------------------------------------------------------------------
@@ -354,16 +368,16 @@ class PyBaker(B.PyPlateBase):
         # check if files are valid json
         try:
             # get settings dicts in private.json
-            self._dict_prv = B.F.load_paths_into_dict(path_prv)
+            self._dict_prv = cnfunctions.load_paths_into_dict(path_prv)
 
             # get settings dicts in project.json
             # NB: may contain dunders
-            self._dict_pub = B.F.load_paths_into_dict(path_pub)
+            self._dict_pub = cnfunctions.load_paths_into_dict(path_pub)
 
         # if there was a problem
         except OSError as e:  # from load_dicts
             # exit gracefully
-            print(B.C.S_ERR_ERR, e)
+            print(pyplate_base.conf.S_ERR_ERR, e)
             self._teardown(-1)
 
         # ----------------------------------------------------------------------
@@ -381,7 +395,7 @@ class PyBaker(B.PyPlateBase):
         called after _do_after_fix, and before _do_dist.
         """
 
-        B.C.do_before_dist(
+        hooks.do_before_dist(
             self._dict_act, self._dir_prj, self._dict_prv, self._dict_pub
         )
 
@@ -389,7 +403,7 @@ class PyBaker(B.PyPlateBase):
     # Copy fixed files to final location
     # --------------------------------------------------------------------------
     # NB: HOWS THIS FOR A FUCKING IMPORT CHAIN?!?!
-    @B.C.S.spin(B.C.S_ACTION_DIST)
+    @spinner.spin(pyplate_base.conf.S_ACTION_DIST)
     def _do_dist(self):
         """
         Copy fixed files to final location
@@ -401,7 +415,7 @@ class PyBaker(B.PyPlateBase):
         # do common dist stuff
 
         # find old dist? nuke it from orbit! it's the only way to be sure!
-        a_dist = self._dir_prj / B.C.S_DIR_DIST
+        a_dist = self._dir_prj / pyplate_base.conf.S_DIR_DIST
         if a_dist.is_dir():
             shutil.rmtree(a_dist)
 
@@ -445,8 +459,8 @@ class PyBaker(B.PyPlateBase):
         install process.
         """
 
-        B.C.do_after_dist(
-            self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
+        hooks.do_after_dist(
+            self._dict_act, self._dir_prj, self._dict_prv, self._dict_pub
         )
 
 

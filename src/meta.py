@@ -1,4 +1,9 @@
+"""docstring"""
+from pathlib import Path
+import re
 
+from cnlib import cnfunctions
+import conf
 
 # ------------------------------------------------------------------------------
 # Fix po files outside blacklist to hide file paths
@@ -7,32 +12,32 @@
 
 # #     # replace version
 # #     # NB: done in cnpot
-# #     # dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
+# #     # dict_prv_prj = dict_prv[conf.S_KEY_PRV_PRJ]
 # #     # pp_version = dict_prv_prj["__PP_VER_MMR__"]
 # #     # str_pattern = S_PO_VER_SCH
 # #     # str_rep = S_PO_VER_REP.format(pp_version)
 
 # #     # open file and get contents
-# #     with open(path, "r", encoding=S_ENCODING) as a_file:
+# #     with open(path, "r", encoding=conf.S_ENCODING) as a_file:
 # #         text = a_file.read()
 
 # #     # replace version
-# #     # text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+# #     # text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
 #     # save file
-#     with open(path, "w", encoding=S_ENCODING) as a_file:
+#     with open(path, "w", encoding=conf.S_ENCODING) as a_file:
 #         a_file.write(text)
 
 
 # ------------------------------------------------------------------------------
 # Fix stuff in individual files
 # ------------------------------------------------------------------------------
-def _fix_files(path, dict_prv, dict_pub):
+def fix_files(path, dict_prv, dict_pub):
     """
     Fix stuff in individual files
 
     Args:
-        path: G.Path object for file to be fixed
+        path: Path object for file to be fixed
         dict_prv_prj: Private project dict
         dict_pub_prj: Public project dict
 
@@ -41,35 +46,35 @@ def _fix_files(path, dict_prv, dict_pub):
     """
 
     # get sub-dicts we need
-    dict_prv_prj = dict_prv[S_KEY_PRV_PRJ]
-    dict_pub_meta = dict_pub[S_KEY_PUB_META]
+    dict_prv_prj = dict_prv[conf.S_KEY_PRV_PRJ]
+    dict_pub_meta = dict_pub[conf.S_KEY_PUB_META]
 
     # fix readme
-    if path.name == S_FILE_README:
+    if path.name == conf.S_FILE_README:
         _fix_readme(path, dict_prv_prj, dict_pub_meta)
 
     # fix pyproject
-    if path.name == S_FILE_TOML:
+    if path.name == conf.S_FILE_TOML:
         _fix_pyproject(path, dict_prv_prj, dict_pub_meta)
 
     # fix desktop
-    if path.suffix in L_EXT_DESK:
+    if path.suffix in conf.L_EXT_DESK:
         _fix_desktop(path, dict_prv_prj, dict_pub_meta)
 
     # fix ui files
-    if path in L_EXT_GUI:
+    if path in conf.L_EXT_GUI:
         _fix_ui(path, dict_prv_prj, dict_pub_meta)
 
     # fix src files
-    if path.suffix in L_EXT_PY:
+    if path.suffix in conf.L_EXT_PY:
         _fix_src(path, dict_prv_prj, dict_pub_meta)
 
     # fix install.json
-    if path.name == S_FILE_INST_CFG:
+    if path.name == conf.S_FILE_INST_CFG:
         _fix_install(path, dict_prv_prj, dict_pub_meta)
 
     # fix mkdocs.yml
-    if path.name == S_FILE_MKDOCS_YML:
+    if path.name == conf.S_FILE_MKDOCS_YML:
         _fix_mkdocs(path, dict_prv_prj, dict_pub)
 
 
@@ -81,7 +86,7 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     Remove/replace parts of the main README file
 
     Args:
-        path: G.Path for the README to modify text
+        path: Path for the README to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
 
@@ -93,33 +98,33 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open and read whole file
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=conf.S_ENCODING) as a_file:
         text = a_file.read()
 
     # find the remove blocks (opposite of prj type)
     prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
-    if prj_type in L_APP_INSTALL:
-        str_pattern = S_RM_PKG
+    if prj_type in conf.L_APP_INSTALL:
+        str_pattern = conf.S_RM_PKG
     else:
-        str_pattern = S_RM_APP
+        str_pattern = conf.S_RM_APP
 
     # replace block with empty string (equiv to deleting it)
     # NB: need S flag to make dot match newline
-    text = G.re.sub(str_pattern, "", text, flags=G.re.S)
+    text = re.sub(str_pattern, "", text, flags=re.S)
 
     # --------------------------------------------------------------------------
 
     # replace short description
-    str_pattern = S_RM_DESC_SCH
-    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-    str_rep = S_RM_DESC_REP.format(pp_short_desc)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.S)
+    str_pattern = conf.S_RM_DESC_SCH
+    pp_short_desc = dict_pub_meta[conf.S_KEY_META_SHORT_DESC]
+    str_rep = conf.S_RM_DESC_REP.format(pp_short_desc)
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # replace version
-    str_pattern = S_RM_VER_SCH
+    str_pattern = conf.S_RM_VER_SCH
     pp_ver_disp = dict_prv_prj["__PP_VER_DISP__"]
-    str_rep = S_RM_VER_REP.format(pp_ver_disp)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.S)
+    str_rep = conf.S_RM_VER_REP.format(pp_ver_disp)
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # --------------------------------------------------------------------------
 
@@ -131,22 +136,22 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     prj_type = dict_prv_prj["__PP_TYPE_PRJ__"]
 
     # should we futz with the readme?
-    if prj_type in L_SCREENSHOT:
+    if prj_type in conf.L_SCREENSHOT:
 
         # format the alt text
-        s_alt = S_ERR_NO_SCREENSHOT.format(S_PATH_SCREENSHOT)
-        s_img = S_RM_SCREENSHOT.format(s_alt, S_PATH_SCREENSHOT)
+        s_alt = conf.S_ERR_NO_SCREENSHOT.format(conf.S_PATH_SCREENSHOT)
+        s_img = conf.S_RM_SCREENSHOT.format(s_alt, conf.S_PATH_SCREENSHOT)
 
         # replace screenshot
-        str_pattern = S_RM_SS_SCH
-        str_rep = S_RM_SS_REP.format(s_img)
-        text = G.re.sub(str_pattern, str_rep, text, flags=G.re.S)
+        str_pattern = conf.S_RM_SS_SCH
+        str_rep = conf.S_RM_SS_REP.format(s_img)
+        text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # --------------------------------------------------------------------------
     # fix deps in readme
 
     # get deps as links
-    d_py_deps = dict_pub_meta[S_KEY_META_DEPS]
+    d_py_deps = dict_pub_meta[conf.S_KEY_META_DEPS]
     l_rm_deps = [
         f"[{key}]({val})" if val != "" else key
         for key, val in d_py_deps.items()
@@ -155,29 +160,29 @@ def _fix_readme(path, dict_prv_prj, dict_pub_meta):
     # make a pretty string
     s_rm_deps = "<br>\n".join(l_rm_deps)
     if len(s_rm_deps) == 0:
-        s_rm_deps = S_DEPS_NONE
+        s_rm_deps = conf.S_DEPS_NONE
 
     # replace dependencies array
-    str_pattern = S_RM_DEPS_SCH
-    str_rep = S_RM_DEPS_REP.format(s_rm_deps)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.S)
+    str_pattern = conf.S_RM_DEPS_SCH
+    str_rep = conf.S_RM_DEPS_REP.format(s_rm_deps)
+    text = re.sub(str_pattern, str_rep, text, flags=re.S)
 
     # --------------------------------------------------------------------------
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=conf.S_ENCODING) as a_file:
         a_file.write(text)
 
 
 # ------------------------------------------------------------------------------
 # Replace text in the pyproject file
 # ------------------------------------------------------------------------------
-def _fix_pyproject(path: G.Path, dict_prv_prj, dict_pub_meta):
+def _fix_pyproject(path: Path, dict_prv_prj, dict_pub_meta):
     """
     Replace text in the pyproject file
 
     Args:
-        path: G.Path for the file to modify text
+        path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: the dict of metadata to replace in the file
 
@@ -185,9 +190,9 @@ def _fix_pyproject(path: G.Path, dict_prv_prj, dict_pub_meta):
     """
 
     # convert long ver to mmr
-    str_pattern = S_SEM_VER_VALID
+    str_pattern = conf.S_SEM_VER_VALID
     str_rep = dict_prv_prj["__PP_VER_MMR__"]
-    str_rep = G.re.sub(str_pattern, S_SEM_VER_PYPRJ, str_rep)
+    str_rep = re.sub(str_pattern, conf.S_SEM_VER_PYPRJ, str_rep)
 
     # --------------------------------------------------------------------------
 
@@ -195,29 +200,29 @@ def _fix_pyproject(path: G.Path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=conf.S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
-    str_pattern = S_TOML_VER_SCH
-    str_rep = S_TOML_VER_REP.format(str_rep)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_TOML_VER_SCH
+    str_rep = conf.S_TOML_VER_REP.format(str_rep)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
-    str_pattern = S_TOML_DESC_SCH
-    str_rep = dict_pub_meta[S_KEY_META_SHORT_DESC]
-    str_rep = S_TOML_DESC_REP.format(str_rep)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_TOML_DESC_SCH
+    str_rep = dict_pub_meta[conf.S_KEY_META_SHORT_DESC]
+    str_rep = conf.S_TOML_DESC_REP.format(str_rep)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # fix keywords for pyproject.toml
-    l_keywords = dict_pub_meta[S_KEY_META_KEYWORDS]
+    l_keywords = dict_pub_meta[conf.S_KEY_META_KEYWORDS]
     q_keywords = [f'"{item}"' for item in l_keywords]
     s_keywords = ", ".join(q_keywords)
 
     # replace keywords array
-    str_pattern = S_TOML_KW_SCH
-    str_rep = S_TOML_KW_REP.format(s_keywords)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_TOML_KW_SCH
+    str_rep = conf.S_TOML_KW_REP.format(s_keywords)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # --------------------------------------------------------------------------
     # fix packages list
@@ -228,8 +233,8 @@ def _fix_pyproject(path: G.Path, dict_prv_prj, dict_pub_meta):
     start_dir = ""
 
     # use appropriate start dir
-    if prj_type in L_TOML_USE_SRC:
-        start_dir = S_DIR_SRC
+    if prj_type in conf.L_TOML_USE_SRC:
+        start_dir = conf.S_DIR_SRC
     else:
         start_dir = prj_name
 
@@ -267,14 +272,14 @@ def _fix_pyproject(path: G.Path, dict_prv_prj, dict_pub_meta):
     s_pkgs = f"[{s_pkgs}]"
 
     # replace package list
-    str_pattern = S_TOML_PKGS_SCH
-    str_rep = S_TOML_PKGS_REP.format(s_pkgs)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_TOML_PKGS_SCH
+    str_rep = conf.S_TOML_PKGS_REP.format(s_pkgs)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # --------------------------------------------------------------------------
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=conf.S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -286,7 +291,7 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     Replace text in the desktop file
 
     Args:
-        path: G.Path for the file to modify text
+        path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: the dict of metadata to replace in the file
 
@@ -298,13 +303,13 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     new_cats = []
 
     # check cats now
-    cats = dict_pub_meta[S_KEY_META_CATS]
+    cats = dict_pub_meta[conf.S_KEY_META_CATS]
     for cat in cats:
         # category is not valid
-        if not cat in L_CATS:
+        if not cat in conf.L_CATS:
             # category is not valid, print error
             print("\n", path, ":")
-            print(S_ERR_DESK_CAT.format(cat))
+            print(conf.S_ERR_DESK_CAT.format(cat))
         else:
             new_cats.append(cat)
 
@@ -317,22 +322,22 @@ def _fix_desktop(path, _dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=conf.S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace categories
-    str_pattern = S_DESK_CAT_SCH
-    str_rep = S_DESK_CAT_REP.format(str_cat)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_DESK_CAT_SCH
+    str_rep = conf.S_DESK_CAT_REP.format(str_cat)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description (comment)
-    str_pattern = S_DESK_DESC_SCH
-    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-    str_rep = S_DESK_DESC_REP.format(pp_short_desc)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_DESK_DESC_SCH
+    pp_short_desc = dict_pub_meta[conf.S_KEY_META_SHORT_DESC]
+    str_rep = conf.S_DESK_DESC_REP.format(pp_short_desc)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=conf.S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -344,7 +349,7 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta):
     Replace text in the UI files
 
     Args:
-        path: G.Path for the file to modify text
+        path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: the dict of metadata to replace in the file
 
@@ -355,23 +360,23 @@ def _fix_ui(path, dict_prv_prj, dict_pub_meta):
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=conf.S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace version
-    str_pattern = S_UI_VER_SCH
+    str_pattern = conf.S_UI_VER_SCH
     pp_version = dict_prv_prj["__PP_VER_MMR__"]
-    str_rep = S_UI_VER_REP.format(pp_version)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_rep = conf.S_UI_VER_REP.format(pp_version)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # replace short description
-    str_pattern = S_UI_DESC_SCH
-    pp_short_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-    str_rep = S_UI_DESC_REP.format(pp_short_desc)
-    text = G.re.sub(str_pattern, str_rep, text, flags=G.re.M | G.re.S)
+    str_pattern = conf.S_UI_DESC_SCH
+    pp_short_desc = dict_pub_meta[conf.S_KEY_META_SHORT_DESC]
+    str_rep = conf.S_UI_DESC_REP.format(pp_short_desc)
+    text = re.sub(str_pattern, str_rep, text, flags=re.M | re.S)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=conf.S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -383,7 +388,7 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
     Fix the version number and short description in source files
 
     Args:
-        path: G.Path for the file to modify text
+        path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
 
@@ -391,30 +396,30 @@ def _fix_src(path, dict_prv_prj, dict_pub_meta):
         The new line of code
 
     Fixes the version number and short description in any file whose extension
-    is in L_EXT_PY. These two variables are special in that they can be changed
+    is in conf.L_EXT_PY. These two variables are special in that they can be changed
     between bakes (and indeed the version SHOULD BE CHANGED), so they fall
     outside the usual "replace dunder" paradigm. It also handles strings that
     are i18n'd.
     """
 
     # open and read whole file
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=conf.S_ENCODING) as a_file:
         text = a_file.read()
 
         # replace version in file
         str_ver = dict_prv_prj["__PP_VER_DISP__"]
-        str_sch = S_SRC_VER_SCH
-        str_rep = S_SRC_VER_REP.format(str_ver)
-        text = G.re.sub(str_sch, str_rep, text, flags=G.re.S)
+        str_sch = conf.S_SRC_VER_SCH
+        str_rep = conf.S_SRC_VER_REP.format(str_ver)
+        text = re.sub(str_sch, str_rep, text, flags=re.S)
 
         # replace short desc in file
-        str_desc = dict_pub_meta[S_KEY_META_SHORT_DESC]
-        str_sch = S_SRC_DESC_SCH
-        str_rep = S_SRC_DESC_REP.format(str_desc)
-        text = G.re.sub(str_sch, str_rep, text, flags=G.re.S)
+        str_desc = dict_pub_meta[conf.S_KEY_META_SHORT_DESC]
+        str_sch = conf.S_SRC_DESC_SCH
+        str_rep = conf.S_SRC_DESC_REP.format(str_desc)
+        text = re.sub(str_sch, str_rep, text, flags=re.S)
 
     # save lines back to file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=conf.S_ENCODING) as a_file:
         a_file.write(text)
 
 
@@ -426,7 +431,7 @@ def _fix_install(path, dict_prv_prj, _dict_pub_meta):
     Fix version number in install.json
 
     Args:
-        path: G.Path for the file to modify text
+        path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
 
@@ -434,14 +439,14 @@ def _fix_install(path, dict_prv_prj, _dict_pub_meta):
     """
 
     # open file and get contents
-    a_dict = G.F.load_paths_into_dict(path)
+    a_dict = cnfunctions.load_paths_into_dict(path)
 
     # replace version
     ver = dict_prv_prj["__PP_VER_MMR__"]
-    a_dict[S_KEY_INST_VER] = ver
+    a_dict[conf.S_KEY_INST_VER] = ver
 
     # save file
-    G.F.save_dict_into_paths(a_dict, path)
+    cnfunctions.save_dict_into_paths(a_dict, path)
 
 
 # ------------------------------------------------------------------------------
@@ -452,7 +457,7 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub):
     Fix the theme name in mkdocs.yml
 
     Args:
-        path: G.Path for the file to modify text
+        path: Path for the file to modify text
         dict_prv_prj: Private calculated proj dict
         dict_pub_meta: Dict of metadata to replace in the file
 
@@ -460,22 +465,23 @@ def _fix_mkdocs(path, _dict_prv_prj, dict_pub):
     """
 
     # get theme name
-    dict_pub_docs = dict_pub[S_KEY_PUB_DOCS]
-    theme = dict_pub_docs[S_KEY_DOCS_THEME]
+    dict_pub_docs = dict_pub[conf.S_KEY_PUB_DOCS]
+    theme = dict_pub_docs[conf.S_KEY_DOCS_THEME]
 
     # default text if we can't open file
     text = ""
 
     # open file and get contents
-    with open(path, "r", encoding=S_ENCODING) as a_file:
+    with open(path, "r", encoding=conf.S_ENCODING) as a_file:
         text = a_file.read()
 
     # replace theme
-    str_pattern = S_THEME_SCH
-    str_rep = S_THEME_REP.format(theme)
-    text = G.re.sub(str_pattern, str_rep, text)
+    str_pattern = conf.S_THEME_SCH
+    str_rep = conf.S_THEME_REP.format(theme)
+    text = re.sub(str_pattern, str_rep, text)
 
     # save file
-    with open(path, "w", encoding=S_ENCODING) as a_file:
+    with open(path, "w", encoding=conf.S_ENCODING) as a_file:
         a_file.write(text)
 
+# -)

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: pymaker.py                                            |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -27,9 +27,19 @@ Run pymaker -h for more options.
 # system imports
 import shutil
 
+# lib imports
+from cnlib import cnfunctions
+
+# from cnlib.decorators import cnspinner
+
 # local imports
-import pyplate_base as B
-from pyplate_base import _
+import hooks
+import ppglobals
+import pyplate_base
+import spinner
+
+# from pyplate_base import _
+_ = ppglobals._
 
 # ------------------------------------------------------------------------------
 # Constants
@@ -39,22 +49,22 @@ from pyplate_base import _
 # NB: this is what controls the steps in making TEST projects - it does NOT
 # affect the project's 'project.json' file (which comes from conf.py)
 D_PM_ACT = {
-    B.C.S_KEY_ACT_VENV: True,
-    B.C.S_KEY_ACT_REQS: True,
-    B.C.S_KEY_ACT_GIT: True,
-    B.C.S_KEY_ACT_INST: True,
-    B.C.S_KEY_ACT_PURGE: True,
-    B.C.S_KEY_ACT_I18N: True,
-    B.C.S_KEY_ACT_META: True,
-    B.C.S_KEY_ACT_PLACE: True,
-    B.C.S_KEY_ACT_EDIT: True,
-    B.C.S_KEY_ACT_DOCS_MAKE: True,
-    B.C.S_KEY_ACT_TREE: True,
-    B.C.S_KEY_ACT_FREEZE: True,
-    B.C.S_KEY_ACT_DOCS_BAKE: True,
-    B.C.S_KEY_ACT_DOCS_DEPLOY: True,
-    B.C.S_KEY_ACT_COMPRESS: True,
-    B.C.S_KEY_ACT_REM_DIST: True,
+    pyplate_base.conf.S_KEY_ACT_VENV: True,
+    pyplate_base.conf.S_KEY_ACT_REQS: True,
+    pyplate_base.conf.S_KEY_ACT_GIT: True,
+    pyplate_base.conf.S_KEY_ACT_INST: True,
+    pyplate_base.conf.S_KEY_ACT_PURGE: True,
+    pyplate_base.conf.S_KEY_ACT_I18N: True,
+    pyplate_base.conf.S_KEY_ACT_META: True,
+    pyplate_base.conf.S_KEY_ACT_PLACE: True,
+    pyplate_base.conf.S_KEY_ACT_EDIT: True,
+    pyplate_base.conf.S_KEY_ACT_DOCS_MAKE: True,
+    pyplate_base.conf.S_KEY_ACT_TREE: True,
+    pyplate_base.conf.S_KEY_ACT_FREEZE: True,
+    pyplate_base.conf.S_KEY_ACT_DOCS_BAKE: True,
+    pyplate_base.conf.S_KEY_ACT_DOCS_DEPLOY: True,
+    pyplate_base.conf.S_KEY_ACT_COMPRESS: True,
+    pyplate_base.conf.S_KEY_ACT_REM_DIST: True,
 }
 
 # ------------------------------------------------------------------------------
@@ -65,7 +75,7 @@ D_PM_ACT = {
 # ------------------------------------------------------------------------------
 # The main class, responsible for the operation of the program
 # ------------------------------------------------------------------------------
-class PyMaker(B.PyPlateBase):
+class PyMaker(pyplate_base.PyPlateBase):
     """
     The main class, responsible for the operation of the program
 
@@ -83,8 +93,8 @@ class PyMaker(B.PyPlateBase):
     # about string
     S_ABOUT = (
         f"{'PyPlate/PyMaker'}\n"
-        f"{B.PyPlateBase.S_PP_SHORT_DESC}\n"
-        f"{B.PyPlateBase.S_PP_VERSION}\n"
+        f"{pyplate_base.PyPlateBase.S_PP_SHORT_DESC}\n"
+        f"{pyplate_base.PyPlateBase.S_PP_VERSION}\n"
         f"https://github.com/cyclopticnerve/PyPlate"
     )
 
@@ -122,7 +132,7 @@ class PyMaker(B.PyPlateBase):
 
         # print some info
         print()
-        print(B.C.S_MSG_MAKE.format(self._dir_prj.name))
+        print(pyplate_base.conf.S_MSG_MAKE.format(self._dir_prj.name))
         print()
 
         # do before template
@@ -171,8 +181,12 @@ class PyMaker(B.PyPlateBase):
         # do not run pymaker in pyplate dir
         # NB: expensive, but needs to be done after testing for -h and
         # --uninstall
-        if self._dir_prj.is_relative_to(B.P_DIR_PRJ):
-            B.F.printc(B.C.S_ERR_PRJ_DIR_IS_PP, fg=B.F.C_FG_RED, bold=True)
+        if self._dir_prj.is_relative_to(ppglobals.P_DIR_PRJ):
+            cnfunctions.printc(
+                pyplate_base.conf.S_ERR_PRJ_DIR_IS_PP,
+                fg=cnfunctions.C_FG_RED,
+                bold=True,
+            )
             self._teardown(-1)
 
     # --------------------------------------------------------------------------
@@ -188,17 +202,21 @@ class PyMaker(B.PyPlateBase):
         # blank line
         print()
 
-        if B.C.B_PP_RESULT:
-            msg = B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name)
-            B.F.printc(msg, fg=B.F.C_FG_GREEN, bold=True)
-            # print(B.C.S_MSG_MAKE_DONE.format(self._dir_prj.name))
+        if ppglobals.B_PP_RESULT:
+            msg = pyplate_base.conf.S_MSG_MAKE_DONE.format(self._dir_prj.name)
+            cnfunctions.printc(msg, fg=cnfunctions.C_FG_GREEN, bold=True)
+            # print(pyplate_base.conf.S_MSG_MAKE_DONE.format(self._dir_prj.name))
         else:
-            msg = B.C.S_ERR_MAKE.format(self._dir_prj.name)
-            B.F.printc(msg, fg=B.F.C_FG_RED, bold=True)
-            # print(B.C.S_ERR_MAKE.format(self._dir_prj.name))
+            msg = pyplate_base.conf.S_ERR_MAKE.format(self._dir_prj.name)
+            cnfunctions.printc(msg, fg=cnfunctions.C_FG_RED, bold=True)
+            # print(pyplate_base.conf.S_ERR_MAKE.format(self._dir_prj.name))
             if not self._arg_debug:
-                B.F.printc(B.C.S_ERR_USE_D, fg=B.F.C_FG_RED, bold=True)
-                # print(B.C.S_ERR_USE_D)
+                cnfunctions.printc(
+                    pyplate_base.conf.S_ERR_USE_D,
+                    fg=cnfunctions.C_FG_RED,
+                    bold=True,
+                )
+                # print(pyplate_base.conf.S_ERR_USE_D)
 
         # call super
         super()._teardown(errcode)
@@ -229,19 +247,21 @@ class PyMaker(B.PyPlateBase):
         """
 
         # check version from conf
-        pattern = B.C.S_SEM_VER_VALID
-        version = B.C.D_PUB_META[B.C.S_KEY_META_VERSION]
-        ver_ok = B.re.search(pattern, version) is not None
+        pattern = pyplate_base.conf.S_SEM_VER_VALID
+        version = pyplate_base.conf.D_PUB_META[
+            pyplate_base.conf.S_KEY_META_VERSION
+        ]
+        ver_ok = pyplate_base.re.search(pattern, version) is not None
 
         # ask if user wants to keep invalid version or quit
         if not ver_ok:
-            res = B.F.dialog(
-                B.C.S_ERR_SEM_VER,
-                [B.F.S_ASK_YES, B.F.S_ASK_NO],
-                default=B.F.S_ASK_NO,
+            res = cnfunctions.dialog(
+                pyplate_base.conf.S_ERR_SEM_VER,
+                [cnfunctions.S_ASK_YES, cnfunctions.S_ASK_NO],
+                default=cnfunctions.S_ASK_NO,
                 # loop=True
             )
-            if res != B.F.S_ASK_YES:
+            if res != cnfunctions.S_ASK_YES:
                 self._teardown(-1)
 
         # ----------------------------------------------------------------------
@@ -253,13 +273,13 @@ class PyMaker(B.PyPlateBase):
 
         # build the input question
         types = []
-        for item in B.C.L_TYPES:
-            s = B.C.S_ASK_TYPE_FMT.format(item[0], item[1])
+        for item in pyplate_base.conf.L_TYPES:
+            s = pyplate_base.conf.S_ASK_TYPE_FMT.format(item[0], item[1])
             types.append(s)
-        str_types = B.C.S_ASK_TYPE_JOIN.join(types)
+        str_types = pyplate_base.conf.S_ASK_TYPE_JOIN.join(types)
 
         # format the question
-        in_type = B.C.S_ASK_TYPE.format(str_types)
+        in_type = pyplate_base.conf.S_ASK_TYPE.format(str_types)
 
         # loop forever until we get a valid type
         while True:
@@ -282,7 +302,7 @@ class PyMaker(B.PyPlateBase):
 
             # get long name
             name_prj = "DEBUG"
-            for item in B.C.L_TYPES:
+            for item in pyplate_base.conf.L_TYPES:
                 if item[0] == prj_type:
                     # get debug name of project
                     name_prj = f"{item[1]} DEBUG"
@@ -310,7 +330,7 @@ class PyMaker(B.PyPlateBase):
             while True:
 
                 # ask for name of project
-                name_prj = input(B.C.S_ASK_NAME)
+                name_prj = input(pyplate_base.conf.S_ASK_NAME)
                 name_prj = name_prj.strip(" ")
 
                 # check for valid name
@@ -326,7 +346,9 @@ class PyMaker(B.PyPlateBase):
                     if tmp_dir.exists():
 
                         # tell the user that the old name exists
-                        print(B.C.S_ERR_EXIST.format(name_prj_big))
+                        print(
+                            pyplate_base.conf.S_ERR_EXIST.format(name_prj_big)
+                        )
                     else:
                         break
 
@@ -335,7 +357,7 @@ class PyMaker(B.PyPlateBase):
 
         # save other names
         name_prj_small = name_prj_big.lower()
-        name_prj_pascal = B.F.pascal_case(name_prj_small)
+        name_prj_pascal = cnfunctions.pascal_case(name_prj_small)
 
         # ----------------------------------------------------------------------
         # here we figure out the binary/package/window name for a project
@@ -350,7 +372,7 @@ class PyMaker(B.PyPlateBase):
         name_sec_pascal = ""
 
         # do we need a second name?
-        if prj_type in B.C.D_NAME_SEC:
+        if prj_type in pyplate_base.conf.D_NAME_SEC:
 
             # dup prj names if test mode
             if self._arg_test:
@@ -363,7 +385,7 @@ class PyMaker(B.PyPlateBase):
             else:
 
                 # format question for second name
-                s_sec_ask = B.C.D_NAME_SEC[prj_type]
+                s_sec_ask = pyplate_base.conf.D_NAME_SEC[prj_type]
                 s_sec_ask_fmt = s_sec_ask.format(name_prj_small)
 
                 # loop forever until we get a valid name or empty string
@@ -384,34 +406,44 @@ class PyMaker(B.PyPlateBase):
 
                 # save other names
                 name_sec_small = name_sec_big.lower()
-                name_sec_pascal = B.F.pascal_case(name_sec_small)
+                name_sec_pascal = cnfunctions.pascal_case(name_sec_small)
 
         # ----------------------------------------------------------------------
         # make dicts from conf defaults
 
         # create global settings dicts in private.json
         self._dict_prv = {
-            B.C.S_KEY_PRV_ALL: dict(B.C.D_PRV_ALL),
-            B.C.S_KEY_PRV_PRJ: dict(B.C.D_PRV_PRJ),
+            pyplate_base.conf.S_KEY_PRV_ALL: dict(pyplate_base.conf.D_PRV_ALL),
+            pyplate_base.conf.S_KEY_PRV_PRJ: dict(pyplate_base.conf.D_PRV_PRJ),
         }
 
         # create individual dicts in project.json
         self._dict_pub = {
-            B.C.S_KEY_PUB_META: dict(B.C.D_PUB_META),
-            B.C.S_KEY_PUB_BL: dict(B.C.D_PUB_BL),
-            B.C.S_KEY_PUB_ACT: dict(B.C.D_PUB_ACT),
-            B.C.S_KEY_PUB_DIST: dict(B.C.D_PUB_DIST),
-            B.C.S_KEY_PUB_DOCS: dict(B.C.D_PUB_DOCS),
-            B.C.S_KEY_PUB_I18N: dict(B.C.D_PUB_I18N),
-            B.C.S_KEY_PUB_INST: dict(B.C.D_PUB_INST),
+            pyplate_base.conf.S_KEY_PUB_META: dict(
+                pyplate_base.conf.D_PUB_META
+            ),
+            pyplate_base.conf.S_KEY_PUB_BL: dict(pyplate_base.conf.D_PUB_BL),
+            pyplate_base.conf.S_KEY_PUB_ACT: dict(pyplate_base.conf.D_PUB_ACT),
+            pyplate_base.conf.S_KEY_PUB_DIST: dict(
+                pyplate_base.conf.D_PUB_DIST
+            ),
+            pyplate_base.conf.S_KEY_PUB_DOCS: dict(
+                pyplate_base.conf.D_PUB_DOCS
+            ),
+            pyplate_base.conf.S_KEY_PUB_I18N: dict(
+                pyplate_base.conf.D_PUB_I18N
+            ),
+            pyplate_base.conf.S_KEY_PUB_INST: dict(
+                pyplate_base.conf.D_PUB_INST
+            ),
         }
 
         # ----------------------------------------------------------------------
         # fill dicts
 
         # get prv subs
-        self._dict_prv_all = self._dict_prv[B.C.S_KEY_PRV_ALL]
-        self._dict_prv_prj = self._dict_prv[B.C.S_KEY_PRV_PRJ]
+        self._dict_prv_all = self._dict_prv[pyplate_base.conf.S_KEY_PRV_ALL]
+        self._dict_prv_prj = self._dict_prv[pyplate_base.conf.S_KEY_PRV_PRJ]
 
         # save project stuff
         self._dict_prv_prj["__PP_TYPE_PRJ__"] = prj_type
@@ -422,15 +454,15 @@ class PyMaker(B.PyPlateBase):
         self._dict_prv_prj["__PP_NAME_SEC_BIG__"] = name_sec_big
         self._dict_prv_prj["__PP_NAME_SEC_SMALL__"] = name_sec_small
         self._dict_prv_prj["__PP_NAME_SEC_PASCAL__"] = name_sec_pascal
-        self._dict_prv_prj["__PP_NAME_VENV__"] = B.C.S_VENV_FMT_NAME.format(
-            name_prj_small
+        self._dict_prv_prj["__PP_NAME_VENV__"] = (
+            pyplate_base.conf.S_VENV_FMT_NAME.format(name_prj_small)
         )
-        self._dict_prv_prj["__PP_FILE_APP__"] = B.C.S_APP_FILE_FMT.format(
-            name_prj_small
+        self._dict_prv_prj["__PP_FILE_APP__"] = (
+            pyplate_base.conf.S_APP_FILE_FMT.format(name_prj_small)
         )
         self._dict_prv_prj["__PP_CLASS_APP__"] = name_prj_pascal
-        self._dict_prv_prj["__PP_FILE_WIN__"] = B.C.S_WIN_FILE_FMT.format(
-            name_sec_small
+        self._dict_prv_prj["__PP_FILE_WIN__"] = (
+            pyplate_base.conf.S_WIN_FILE_FMT.format(name_sec_small)
         )
         self._dict_prv_prj["__PP_CLASS_WIN__"] = name_sec_pascal
 
@@ -451,14 +483,14 @@ class PyMaker(B.PyPlateBase):
         'dict_pub' dicts before any copying occurs.
         """
 
-        B.C.do_before_template(
+        hooks.do_before_template(
             self._dir_prj, self._dict_prv, self._dict_pub, self._dict_act
         )
 
     # --------------------------------------------------------------------------
     # Copy template files to final location
     # --------------------------------------------------------------------------
-    @B.C.S.spin(B.C.S_ACTION_COPY)
+    @spinner.spin(pyplate_base.conf.S_ACTION_COPY)
     def _do_template(self):
         """
         Copy template files to final location
@@ -470,7 +502,11 @@ class PyMaker(B.PyPlateBase):
         # do template/all
 
         # copy template/all
-        src = B.P_DIR_PRJ / B.C.S_DIR_TEMPLATE / B.C.S_DIR_ALL
+        src = (
+            ppglobals.P_DIR_PRJ
+            / pyplate_base.conf.S_DIR_TEMPLATE
+            / pyplate_base.conf.S_DIR_ALL
+        )
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -482,13 +518,17 @@ class PyMaker(B.PyPlateBase):
         prj_type_long = ""
 
         # get long type of project
-        for item in B.C.L_TYPES:
+        for item in pyplate_base.conf.L_TYPES:
             if item[0] == prj_type_short:
                 prj_type_long = item[2]
                 break
 
         # get the src dir in the template dir
-        src = B.P_DIR_PRJ / B.C.S_DIR_TEMPLATE / prj_type_long
+        src = (
+            ppglobals.P_DIR_PRJ
+            / pyplate_base.conf.S_DIR_TEMPLATE
+            / prj_type_long
+        )
         dst = self._dir_prj
         shutil.copytree(src, dst, dirs_exist_ok=True)
 
@@ -496,10 +536,10 @@ class PyMaker(B.PyPlateBase):
         # do stuff outside template all/type
 
         # copy linked files
-        for key, val in B.C.D_COPY.items():
+        for key, val in pyplate_base.conf.D_COPY.items():
 
             # get src/dst
-            src = B.P_DIR_PRJ / key
+            src = ppglobals.P_DIR_PRJ / key
             dst = self._dir_prj / val
 
             # copy dir/file
@@ -530,7 +570,7 @@ class PyMaker(B.PyPlateBase):
         _do_template, and before _do_before_fix.
         """
 
-        B.C.do_after_template(
+        hooks.do_after_template(
             self._dict_act, self._dir_prj, self._dict_prv, self._dict_pub
         )
 

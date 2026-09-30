@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: pymaker.py                                            |     ()     |
 # Date    : 02/20/2025                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |

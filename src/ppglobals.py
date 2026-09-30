@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: pp_globals.py                                         |     ()     |
 # Date    : 09/03/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -18,7 +18,7 @@ other module in the program.
 # system imports
 from pathlib import Path
 
-# local imports
+# cnlib imports
 from cnlib import cnpot
 
 # ------------------------------------------------------------------------------

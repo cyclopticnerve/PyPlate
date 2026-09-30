@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Project : __PP_NAME_PRJ_BIG__                                    /          \
+# Package :__PP_NAME_PRJ_BIG__                                    /          \
 # Filename: __PP_NAME_PRJ_SMALL__.py                              |     ()     |
 # Date    : __PP_DATE__                                           |            |
 # Author  : __PP_AUTHOR__                                         |   \____/   |

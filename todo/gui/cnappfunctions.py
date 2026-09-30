@@ -1,5 +1,5 @@
 # # ------------------------------------------------------------------------------
-# # Project : CNAppLib                                               /          \
+# # Package :CNAppLib                                               /          \
 # # Filename: cnappfunctions.py                                     |     ()     |
 # # Date    : 03/14/2024                                            |            |
 # # Author  : cyclopticnerve                                        |   \____/   |

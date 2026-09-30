@@ -1,0 +1,201 @@
+[01;34m.[0m
+├── [01;34mbin[0m
+│   ├── [01;32mpybaker.py[0m
+│   └── [01;32mpymaker.py[0m
+├── [01;34mconf[0m
+├── [01;32mdevelop.py[0m
+├── [01;34mdocs[0m
+│   ├── [01;34mAPI[0m
+│   │   └── [01;34msrc[0m
+│   │       ├── pybaker.md
+│   │       ├── pymaker.md
+│   │       └── pyplate_base.md
+│   ├── [01;34mimages[0m
+│   │   └── [01;35mpyplate.png[0m
+│   ├── [01;34mimg[0m
+│   │   └── favicon.ico
+│   └── index.md
+├── file.txt
+├── [01;34mi18n[0m
+│   ├── [01;34mlocale[0m
+│   │   └── [01;34men[0m
+│   │       └── [01;34mLC_MESSAGES[0m
+│   │           └── pyplate.mo
+│   ├── [01;34mpo[0m
+│   │   ├── en.po
+│   │   └── LINGUAS
+│   └── pyplate.pot
+├── [01;34mimages[0m
+│   └── [01;35mpyplate.png[0m
+├── [01;34minstall[0m
+│   ├── install_base.py
+│   ├── install.json
+│   ├── [01;32minstall.py[0m
+│   └── [01;32muninstall.py[0m
+├── LICENSE.txt
+├── [01;34mlog[0m
+│   └── pyplate.log
+├── [01;34mmisc[0m
+│   ├── [01;34mchecklists[0m
+│   │   ├── project.txt
+│   │   └── style.txt
+│   ├── [01;34mdefault_files[0m
+│   │   ├── class.py
+│   │   ├── default.html
+│   │   ├── default.md
+│   │   ├── module.py
+│   │   └── window.py
+│   ├── release.txt
+│   ├── tree.html
+│   └── tree.txt
+├── mkdocs.yml
+├── [01;34mpyplate[0m
+│   ├── [01;34mprivate[0m
+│   │   └── private.json
+│   └── project.json
+├── pyproject.toml
+├── README.md
+├── requirements.txt
+├── [01;34msite[0m
+│   ├── 404.html
+│   ├── [01;34mAPI[0m
+│   │   └── [01;34msrc[0m
+│   │       ├── [01;34mpybaker[0m
+│   │       │   └── index.html
+│   │       ├── [01;34mpymaker[0m
+│   │       │   └── index.html
+│   │       └── [01;34mpyplate_base[0m
+│   │           └── index.html
+│   ├── [01;34massets[0m
+│   │   └── _mkdocstrings.css
+│   ├── [01;34mcss[0m
+│   │   ├── base.css
+│   │   ├── bootstrap.min.css
+│   │   ├── bootstrap.min.css.map
+│   │   ├── brands.min.css
+│   │   ├── fontawesome.min.css
+│   │   ├── solid.min.css
+│   │   └── v4-font-face.min.css
+│   ├── [01;34mimages[0m
+│   │   └── [01;35mpyplate.png[0m
+│   ├── [01;34mimg[0m
+│   │   ├── favicon.ico
+│   │   └── [01;35mgrid.png[0m
+│   ├── index.html
+│   ├── [01;34mjs[0m
+│   │   ├── base.js
+│   │   ├── bootstrap.bundle.min.js
+│   │   ├── bootstrap.bundle.min.js.map
+│   │   └── darkmode.js
+│   ├── objects.inv
+│   ├── [01;34msearch[0m
+│   │   ├── lunr.js
+│   │   ├── main.js
+│   │   ├── search_index.json
+│   │   └── worker.js
+│   ├── sitemap.xml
+│   ├── [01;31msitemap.xml.gz[0m
+│   └── [01;34mwebfonts[0m
+│       ├── fa-brands-400.ttf
+│       ├── fa-brands-400.woff2
+│       ├── fa-regular-400.ttf
+│       ├── fa-regular-400.woff2
+│       ├── fa-solid-900.ttf
+│       ├── fa-solid-900.woff2
+│       ├── fa-v4compatibility.ttf
+│       └── fa-v4compatibility.woff2
+├── [01;34msrc[0m
+│   ├── actions.py
+│   ├── conf.py
+│   ├── hooks.py
+│   ├── meta.py
+│   ├── pp_globals.py
+│   ├── pp_mkdocs.py
+│   ├── [01;32mpybaker.py[0m
+│   ├── [01;34m__pycache__[0m
+│   │   ├── actions.cpython-314.pyc
+│   │   ├── conf.cpython-314.pyc
+│   │   ├── hooks.cpython-314.pyc
+│   │   ├── meta.cpython-314.pyc
+│   │   ├── pp_globals.cpython-314.pyc
+│   │   ├── pp_mkdocs.cpython-314.pyc
+│   │   ├── pyplate_base.cpython-314.pyc
+│   │   └── spinner.cpython-314.pyc
+│   ├── [01;32mpymaker.py[0m
+│   ├── pyplate_base.py
+│   └── spinner.py
+├── [01;34mtemplate[0m
+│   ├── [01;34mall[0m
+│   │   ├── [01;34mbin[0m
+│   │   │   └── [01;32m__PP_NAME_PRJ_SMALL__.py[0m
+│   │   ├── [01;34mconf[0m
+│   │   │   └── __PP_NAME_PRJ_SMALL__.json
+│   │   ├── [01;32mdevelop.py[0m
+│   │   ├── [01;34mdist[0m
+│   │   │   └── ABOUT
+│   │   ├── [01;34mdocs[0m
+│   │   │   ├── [01;34mimg[0m
+│   │   │   │   └── favicon.ico
+│   │   │   └── index.md
+│   │   ├── [01;34mi18n[0m
+│   │   │   └── ABOUT
+│   │   ├── [01;34mimages[0m
+│   │   │   └── [01;35m__PP_NAME_PRJ_SMALL__.png[0m
+│   │   ├── [01;34minstall[0m
+│   │   │   ├── install_base.py
+│   │   │   ├── [01;32minstall.py[0m
+│   │   │   └── [01;32muninstall.py[0m
+│   │   ├── LICENSE.txt
+│   │   ├── mkdocs.yml
+│   │   ├── [01;34mpyplate[0m
+│   │   │   └── [01;34mprivate[0m
+│   │   │       └── ABOUT
+│   │   ├── pyproject.toml
+│   │   ├── README.md
+│   │   ├── requirements.txt
+│   │   ├── [01;34msrc[0m
+│   │   │   └── __PP_NAME_PRJ_SMALL___base.py
+│   │   ├── [01;34mtests[0m
+│   │   │   └── ABOUT
+│   │   └── [01;34mtodo[0m
+│   │       └── todo.txt
+│   ├── [01;34mcli[0m
+│   │   ├── requirements.txt
+│   │   └── [01;34msrc[0m
+│   │       └── [01;32m__PP_NAME_PRJ_SMALL__.py[0m
+│   ├── [01;34mgui[0m
+│   │   ├── [01;34mimages[0m
+│   │   │   └── [01;35mscreenshot.png[0m
+│   │   ├── requirements.txt
+│   │   └── [01;34msrc[0m
+│   │       ├── [01;34mgui[0m
+│   │       │   ├── [01;34mdesktop[0m
+│   │       │   │   ├── __PP_NAME_PRJ_BIG__.desktop
+│   │       │   │   └── template.desktop
+│   │       │   ├── [01;34mpython[0m
+│   │       │   │   ├── [01;32m__PP_FILE_APP__.py[0m
+│   │       │   │   └── __PP_FILE_WIN__.py
+│   │       │   └── [01;34mui[0m
+│   │       │       ├── __PP_FILE_DLG__.ui
+│   │       │       └── __PP_FILE_WIN__.ui
+│   │       └── [01;32m__PP_NAME_PRJ_SMALL__.py[0m
+│   └── [01;34mpkg[0m
+│       ├── [01;34m__PP_NAME_PRJ_SMALL__[0m
+│       │   └── __PP_NAME_SEC_SMALL__.py
+│       └── [01;34mtests[0m
+│           └── [01;32m__PP_NAME_PRJ_SMALL___test.py[0m
+├── [01;34mtests[0m
+└── [01;34mtodo[0m
+    ├── conf.txt
+    ├── [01;34mgui[0m
+    │   ├── cnappfunctions.py
+    │   ├── cnapp.py
+    │   ├── cnapp_with_state.py
+    │   ├── cnwindow_junk.py
+    │   ├── cnwindow.py
+    │   ├── cnwindow_w_state.py
+    │   ├── gui_linker.py
+    │   └── state.py
+    └── todo.txt
+
+66 directories, 133 files

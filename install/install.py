@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: install.py                                            |     ()     |
 # Date    : 03/29/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |

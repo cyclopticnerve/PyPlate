@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: conf.py                                               |     ()     |
 # Date    : 12/08/2022                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -9,7 +9,7 @@
 # pylint: disable=too-many-lines
 
 """
-This module separates out the constants from pymaker.py.
+This module separates out the variables from pymaker.py.
 This file, and the template folder, are the main ways to customize PyPlate.
 """
 
@@ -17,11 +17,18 @@ This file, and the template folder, are the main ways to customize PyPlate.
 # Imports
 # ------------------------------------------------------------------------------
 
-# # local imports
-import pp_globals
+# lib imports
+from cnlib import cnfunctions
 
+# # local imports
+import ppglobals
+
+# ------------------------------------------------------------------------------
 # I18N
-_ = pp_globals._
+# ------------------------------------------------------------------------------
+
+# get underscore function
+_ = ppglobals._
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -189,6 +196,8 @@ S_ERR_SW_VAL = _("{}: {} is not a valid switch value, should be one of: {}")
 # I18N: switch name error
 # NB: format params are file path, bad name, list of name keys in def dict
 S_ERR_SW_NAME = _("{}: () is not a valid switch name, should be one of: {}")
+# I18N: control c
+S_ERR_CTRL_C = _("Keyboard interrupt (Ctrl-C)")
 
 # log formats
 S_LOG_FMT = "%(asctime)s [%(levelname)-7s] %(message)s"
@@ -224,6 +233,25 @@ S_CMD_GIT_CREATE = "cd {}; git init -q"
 S_CMD_VENV_INST_SELF = "cd {};. {}/bin/activate;python3 -m pip install -e ."
 # NB: format params are prj dir, venv name, and reqs file
 S_CMD_VENV_INST_REQS = "cd {};. {}/bin/activate;python3 -m pip install -r {}"
+
+# some mkdocs stuff
+
+# cmd for mkdocs
+# NB: format param is path to project
+S_CMD_DOC_BUILD = "cd {};mkdocs build"
+# cmd for mkdocs
+# NB: format param is path to project
+S_CMD_DOC_DEPLOY = "cd {};mkdocs gh-deploy"
+
+# file ext for in/out
+S_MK_EXT_IN = ".py"
+S_MK_EXT_OUT = ".md"
+
+# default to include mkdocstrings content in .md file
+# NB: format params are file name and formatted pkg name, done in make_docs
+S_MK_DEF_FILE = "# {}\n::: {}"
+S_MK_INDEX = "index.md"
+S_MK_DIR_IMG = "img"
 
 # ------------------------------------------------------------------------------
 # output msg for steps
@@ -275,6 +303,7 @@ S_ACTION_FAIL = _("Failed")
 
 # ------------------------------------------------------------------------------
 
+# TODO: get these out (not user editable)
 # NB: DO NOT DELETE/CHANGE S_KEY_XXX !!!
 # ONLY ADD !!!
 
@@ -365,6 +394,15 @@ S_KEY_INST_CONT = "INST_CONT"
 S_KEY_UNINST_CONT = "UNINST_CONT"
 S_KEY_CFG_CONT = "CFG_CONT"
 
+# spinner keys
+S_KEY_FRAMES = "S_KEY_FRAMES"
+S_KEY_INTERVAL = "S_KEY_INTERVAL"
+S_KEY_SKIP = "S_KEY_SKIP"
+S_KEY_DONE = "S_KEY_DONE"
+S_KEY_FAIL = "S_KEY_FAIL"
+S_KEY_RES = "S_KEY_RES"
+S_KEY_FG = "S_KEY_FG"
+
 # dir names, relative to PP template, or project dir
 # NB: if you change anything in the template structure, you should revisit this
 # and make any appropriate changes
@@ -438,6 +476,17 @@ S_PRJ_PP_DIR = "pyplate"
 S_PRJ_PUB_CFG = f"{S_PRJ_PP_DIR}/project.json"
 S_PRJ_PRV_DIR = f"{S_PRJ_PP_DIR}/private"
 S_PRJ_PRV_CFG = f"{S_PRJ_PRV_DIR}/private.json"
+
+# spinner stuff
+
+# terminal escape commands
+S_HIDE_CURSOR = "\033[?25l"
+S_SHOW_CURSOR = "\033[?25h"
+S_CLEAR_LINE = "\033[0K"
+
+# message format
+# NB: format params are message and frame
+S_MSG_FMT = "{}{} "
 
 # ------------------------------------------------------------------------------
 # gui stuff
@@ -591,6 +640,24 @@ S_I18N_TAG = "I18N"
 # format for venv
 # NB: format param is __PP_NAME_PRJ_SMALL__
 S_VENV_FMT_NAME = ".venv-{}"
+# NB format param is self._dir_venv
+S_CMD_CREATE = "python3 -Xfrozen_modules=off -m venv {}"
+# NB: format params are venv.parent, venv.name, path to reqs file
+S_CMD_INSTALL = "cd {};. {}/bin/activate;python3 -m pip install -r {}"
+# NB: format params are venv.parent, venv.name, path to reqs file
+S_CMD_FREEZE = (
+    "cd {}; "
+    ". {}/bin/activate; "
+    "python3 -Xfrozen_modules=off -m "
+    "pip freeze -l --exclude-editable --require-virtualenv "
+    "> {}"
+)
+
+# error messages
+# NB: format param is dir_prj
+S_ERR_NOT_ABS = "Path {} is not absolute"
+# NB: format param is dir_prj
+S_ERR_NOT_DIR = "Path {} is not a directory"
 
 # ------------------------------------------------------------------------------
 # Lists
@@ -916,6 +983,7 @@ D_PRV_ALL = {
     "__PP_DIR_SITE__": S_DIR_SITE,
 }
 
+# TODO: get these out (not user editable)
 # these are settings that will be calculated for you while running pymaker.py
 # consider them the "each project" settings
 # they are used for an individual project, and should not be changed after a
@@ -940,6 +1008,7 @@ D_PRV_PRJ = {
     "__PP_NAME_VENV__": "",  # venv folder name
     # --------------------------------------------------------------------------
     # do_before_fix
+    # NB: interesting side effect: this does not change unless pybaker passes
     "__PP_DATE__": "",  # the date each file was created, updated every time
     # --------------------------------------------------------------------------
     # gui stuff
@@ -1036,6 +1105,7 @@ D_PUB_BL = {
         ".VSCodeCounter",
         S_DIR_DIST,
         S_DIR_SITE,
+        S_DIR_DOCS,
         "**/__pycache__",
         "**/*.egg-info",
     ],
@@ -1048,7 +1118,7 @@ D_PUB_DIST = {}
 
 # mkdocs settings
 D_PUB_DOCS = {
-    S_KEY_DOCS_THEME: "",  # "readthedocs", etc.
+    S_KEY_DOCS_THEME: "readthedocs",  # "readthedocs", "" (default), etc.
     S_KEY_DOCS_USE_RM: False,  # initially use dummy file
     S_KEY_DOCS_MAKE_API: True,
     S_KEY_DOCS_DIR_API: [],  # tbd by do_after_template
@@ -1307,35 +1377,23 @@ D_DOCS_DIR_API = {
 
 # ------------------------------------------------------------------------------
 # spinner stuff
-# TODO: move this back a level
 
-# G.S.S_ERR_CTRL_C = S_ERR_CTRL_C
-
-# # settings for spinner
-# G.S.D_SPIN = {
-#     G.S.S_KEY_FRAMES: ["", ".", "..", "..."],
-#     G.S.S_KEY_INTERVAL: 0.5,
-#     G.S.S_KEY_SKIP: {
-#         G.S.S_KEY_RES: S_ACTION_SKIP,
-#         G.S.S_KEY_FG: G.F.C_FG_YELLOW
-#     },
-#     G.S.S_KEY_DONE: {
-#         G.S.S_KEY_RES: S_ACTION_DONE,
-#         G.S.S_KEY_FG: G.F.C_FG_GREEN
-#     },
-#     G.S.S_KEY_FAIL: {
-#         G.S.S_KEY_RES: S_ACTION_FAIL,
-#         G.S.S_KEY_FG: G.F.C_FG_RED
-#     }
-# }
-
-# ------------------------------------------------------------------------------
-# local imports
-
-# TODO: this is breaking my brain - put in base
-# import src.pyplate_base as PP  # pylint: disable=wrong-import-position, import-error
-
-# # get version number from base
-# D_PRV_PRJ["__PP_VERSION_PP__"] = PP.PyPlateBase.S_PP_VERSION
+# settings for spinner
+D_SPIN = {
+    S_KEY_FRAMES: ["", ".", "..", "..."],
+    S_KEY_INTERVAL: 0.5,
+    S_KEY_SKIP: {
+        S_KEY_RES: S_ACTION_SKIP,
+        S_KEY_FG: cnfunctions.C_FG_YELLOW
+    },
+    S_KEY_DONE: {
+        S_KEY_RES: S_ACTION_DONE,
+        S_KEY_FG: cnfunctions.C_FG_GREEN
+    },
+    S_KEY_FAIL: {
+        S_KEY_RES: S_ACTION_FAIL,
+        S_KEY_FG: cnfunctions.C_FG_RED
+    }
+}
 
 # -)

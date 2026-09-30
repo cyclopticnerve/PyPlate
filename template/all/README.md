@@ -47,7 +47,7 @@ release](https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__/releases/latest)
 2. Or you can clone the git repo to get the latest (and often broken) code from
    the main branch:
    ```bash
-   $ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
+   user@host:~/Downloads$ git clone https://github.com/__PP_AUTHOR__/__PP_NAME_PRJ_BIG__
    ```
 
 ## Installing
@@ -57,20 +57,20 @@ Run these commands from your project directory.
 
 First make sure you have a venv and it is active:
 ```bash
-$  python -m venv .venv
-$ . .venv/bin/activate
+user@host:~/MyProject$  python -m venv .venv
+user@host:~/MyProject$ . .venv/bin/activate
 ```
 
 ### Manually
 
 If you downloaded the zip file:
 ```bash
-$ python -m pip3 install /path/to/__PP_NAME_PRJ_SMALL__-<version>.zip
+(venv) user@host:~/MyProject$ python -m pip3 install /path/to/__PP_NAME_PRJ_SMALL__-<version>.zip
 ```
 
 Or if you cloned the repo:
 ```bash
-$ python -m pip3 install /path/to/__PP_NAME_PRJ_BIG__
+(venv) user@host:~/MyProject$ python -m pip3 install /path/to/__PP_NAME_PRJ_BIG__
 ```
 
 ### Automagically
@@ -82,19 +82,20 @@ where \<tag\> is the tag you want, such as 'v0.0.1', etc.
 
 Then run:
 ```bash
-$ python -m pip3 install -r requirements.txt
+(venv) user@host:~/MyProject$ python -m pip3 install -r requirements.txt
 ```
 <!-- __RM_PKG__ -->
 <!-- __RM_APP__ -->
 If you downloaded the zip file, extract it and go to the main directory:
 ```bash
-$ cd ~/Downloads/__PP_NAME_PRJ_SMALL__-<version>
+user@host:~/Downloads$ cd __PP_NAME_PRJ_SMALL__-<version>
 ```
 where \<version\> is the version number of the file you downloaded.
 
-If you cloned the repo, just go to the 'install' directory:
+If you cloned the repo, just go to the 'dist' directory and unzip the program:
 ```bash
-$ cd ~/Downloads/__PP_NAME_PRJ_BIG__/install
+user@host:~/Downloads$ cd __PP_NAME_PRJ_BIG__/dist
+user@host:~Downloads/__PP_NAME_PRJ_BIG__/dist$ 
 ```
 
 Either way, run the install script:

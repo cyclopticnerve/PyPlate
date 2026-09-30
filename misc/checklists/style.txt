@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: style.txt                                             |     ()     |
 # Date    : 03/22/2025                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |

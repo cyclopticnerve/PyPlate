@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: develop.py                                            |     ()     |
 # Date    : 01/09/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -22,8 +22,8 @@ This file is real ugly b/c we can't access the venv, so we do it manually.
 
 # NB: pure python
 # system imports
-import gettext
-import locale
+# import gettext
+# import locale
 from pathlib import Path
 import subprocess
 import sys
@@ -39,15 +39,21 @@ P_DIR_PRJ = Path(__file__).parent.resolve()
 # ------------------------------------------------------------------------------
 # gettext stuff for CLI and GUI
 
-T_DOMAIN = "pyplate"
-T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
-T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
-_ = T_TRANSLATION.gettext
+# T_DOMAIN = "cnlib"
+# T_DIR_LOCALE = P_DIR_PRJ / "i18n/locale"
+# T_TRANSLATION = gettext.translation(T_DOMAIN, T_DIR_LOCALE, fallback=True)
+# _ = T_TRANSLATION.gettext
 
-# fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
-# use for CLI in the interest of common code)
-locale.setlocale(locale.LC_ALL, "")
-locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+# # fix locale (different than gettext stuff, mostly fixes GUI issues, but ok to
+# # use for CLI in the interest of common code)
+# locale.setlocale(locale.LC_ALL, "")
+# locale.bindtextdomain(T_DOMAIN, T_DIR_LOCALE)
+# TODO: how to do i18n here? and install_base?
+# can either put i18n back in for pkg, to support develop/install
+# or test for folder existence here (bad)
+# make sure to handle empty PUB_I18N
+# FIXME: make sure to handle empty PUB_I18N
+_ = print
 
 # ------------------------------------------------------------------------------
 # Classes

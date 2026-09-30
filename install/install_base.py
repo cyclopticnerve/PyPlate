@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Project : PyPlate                                                /          \
+# Package :PyPlate                                                /          \
 # Filename: install_base.py                                       |     ()     |
 # Date    : 03/29/2026                                            |            |
 # Author  : cyclopticnerve                                        |   \____/   |
@@ -442,7 +442,7 @@ class CNInstallBase:
     # --------------------------------------------------------------------------
     # Boilerplate to use at the end of main
     # --------------------------------------------------------------------------
-    def _teardown(self, errcode: int=0):
+    def _teardown(self, errcode: int = 0):
         """
         Boilerplate to use at the end of main
 
